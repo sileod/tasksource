@@ -5,20 +5,16 @@ from typing import Union
 import itertools
 import funcy as fc
 import exrex 
-import pandas as pd
 import magicattr 
 import numpy as np
-import re
 
-def parse_var_name(var_name):
-    regex = r"([^_]+)__([^_]+)"
-    task_config = re.search(regex, var_name)
-    task_config = task_config.groups()[-1] if task_config else None
-    regex = r"___([^_]+)"
-    config = re.search(regex, var_name)
-    config = config.groups()[-1] if config else None
-    dataset_name = var_name.split('__')[0]
-    return dataset_name, config, task_config
+
+def get_column_names(dataset):
+    cn = dataset.column_names
+    if type(cn)==dict:
+        return set(fc.flatten(cn.values()))
+    else:
+        return set(cn)
 
 class Preprocessing(DotWiz):
     default_splits = ('train','validation','test')
@@ -40,11 +36,12 @@ class Preprocessing(DotWiz):
                                         if (k and k!='splits' and type(v)==str)})
         for k in self.to_dict().keys():
             v=getattr(self, k)
-            print(type(v))
             if callable(v):
                 dataset=dataset.map(self.__map_to_target,
                                     fn_kwargs={'fn':v,'target':k})
-                #dataset=v(dataset,k)
+
+        dataset=dataset.remove_columns(
+            get_column_names(dataset)-set(self.to_dict().keys()))
         return dataset
     
 @dataclass

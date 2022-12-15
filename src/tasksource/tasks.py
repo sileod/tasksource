@@ -1,19 +1,4 @@
-from .preprocess import cat, get, regen, constant, parse_var_name, Preprocessing, Classification, TokenClassification, MultipleChoice
-import pandas as pd
-
-def list_tasks():
-    l = []
-    for key, value in list(globals().items()):
-        if isinstance(value,Preprocessing):
-            dataset_name, config_name, task_config = parse_var_name(key)
-            dataset_name = (value.dataset_name if value.dataset_name else dataset_name)
-            config_name = (value.config_name if value.config_name else config_name)
-            hasattr(value,key)
-            l+=[{'dataset_name': dataset_name,
-                 'config_name' : config_name,
-                 'task_config': task_config,
-                'task_type': value.__class__.__name__,'parsing': value,}]
-    return pd.DataFrame(l)
+from .preprocess import cat, get, regen, constant, Classification, TokenClassification, MultipleChoice
 
 # variable name: dataset___config__task
 
@@ -49,9 +34,14 @@ tner___tweebank_ner    = TokenClassification(tokens="tokens", labels="tags")
 
 ######################## Multiple choice ###########################
 
+bigbench = MultipleChoice(
+    'inputs',
+    choices_list='multiple_choice_targets',
+    labels=lambda x:x['multiple_choice_scores'].index(1))
+
 cos_e = MultipleChoice('question',
     choices_list='choices',
-    labels= lambda x: (x['choices'].index(x['answer'])))
+    labels= lambda x: x['choices'].index(x['answer']))
 
 cosmos_qa = MultipleChoice(cat('context','question'),regen('answer[0-3]'),'labels')
 
@@ -117,24 +107,30 @@ hellaswag = MultipleChoice('ctx_a',
 super_glue___copa = MultipleChoice('premise',['choice1','choice2'],'label')
 
 art = MultipleChoice(cat('hypothesis_1','hypothesis_2'),
-                     ['observation_1','observation_2'],
-                     labels='label')
+    ['observation_1','observation_2'],
+    labels='label')
 
 blimp = MultipleChoice(inputs=constant(''),
-                       choices=['sentence_good','sentence_bad'],
-                       labels=constant(0))
+    choices=['sentence_good','sentence_bad'],
+    labels=constant(0))
 
 hendrycks_test = MultipleChoice('question',labels='answer',choices_list='choices')
 
 winogrande = MultipleChoice('sentence1',['option1','option2'],'answer')
 
 quora = Classification(get.text[0], get.text[1], 'is_duplicate')
+
 medical_questions_pairs = Classification("question_1","question_2", labels="label")
 
+#codah, ai2_arc 
 
 # definite_pronoun_resolution = TokenClassification(sentence1="sentence", labels="label")
 
 swag=MultipleChoice(cat("sent1","sent2"),regen("ending[0-3]"),"label")
+
+
+trec = Classification(sentence1="text", labels="fine_label")
+
 
 ###################### Automatically generated (verified)############
 
@@ -158,8 +154,6 @@ glue___ax = Classification(sentence1="premise", sentence2="hypothesis", labels="
 tweet_eval = Classification(sentence1="text", labels="label")
 
 imdb = Classification(sentence1="text", labels="label")
-
-trec = Classification(sentence1="text", labels="fine_label")
 
 rotten_tomatoes = Classification(sentence1="text", labels="label")
 
