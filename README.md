@@ -37,6 +37,7 @@ for _,x in df[df.task_type=="MultipleChoice"].iterrows():
 ```
 
 See supported tasks in [tasks.md](https://github.com/sileod/tasksource/blob/main/tasks.md)
++200 MultipleChoic tasks, +100 Classification tasks, and 4 TokenClassification tasks.
 
  ### contact
  `damien.sileo@inria.fr`
