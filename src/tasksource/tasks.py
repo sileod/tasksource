@@ -211,6 +211,12 @@ super_glue___axg = Classification(sentence1="premise", sentence2="hypothesis", l
 
 tweet_eval = Classification(sentence1="text", labels="label", config_name=["emoji", "emotion", "hate", "irony", "offensive", "sentiment", "stance_abortion", "stance_atheism", "stance_climate", "stance_feminist", "stance_hillary"])
 
+anthropic_rlhf = MultipleChoice(constant(''), ['chosen','rejected'], constant(0),
+    dataset_name="Anthropic/hh-rlhf")
+
+model_written_evals = MultipleChoice('question', ['answer_matching_behavior','answer_not_matching_behavior'], constant(0),
+    dataset_name="Anthropic/model-written-evals")
+
 #lex_glue___ecthr_a = Classification(sentence1="text", labels="labels")
 #lex_glue___ecthr_b = Classification(sentence1="text", labels="labels")
 lex_glue___eurlex = Classification(sentence1="text", labels="labels")
@@ -220,15 +226,8 @@ lex_glue___unfair_tos = Classification(sentence1="text", labels="labels")
 lex_glue___case_hold = MultipleChoice("context", choices_list='endings', labels="label")
 
 
-anthropic_rlhf = MultipleChoice(constant(''), ['chosen','rejected'], constant(0),
-    dataset_name="Anthropic/hh-rlhf"
-)
 
-model_written_evals = MultipleChoice('question', ['answer_matching_behavior','answer_not_matching_behavior'], constant(0),
-    dataset_name="Anthropic/model-written-evals"
-)
-
-###################### Automatically generated (unverified)##########
+################ Automatically generated (not completely verified)##########
 
 imdb = Classification(sentence1="text", labels="label", splits=["train", None, "test"])
 
@@ -276,43 +275,21 @@ hyperpartisan_news_detection___bypublisher = Classification(sentence1="text", la
 
 health_fact = Classification(sentence1="claim", labels="label")
 
-#daily_dialog = Classification()
-
-crows_pairs = Classification(splits=["test", None, None], config_name=["crows_pairs"])
-
-go_emotions___raw = Classification(sentence1="text", splits=["train", None, None])
+#go_emotions___raw = Classification(sentence1="text", splits=["train", None, None])
 go_emotions___simplified = Classification(sentence1="text", labels="labels")
 
-#boolq = Classification(sentence1="question", splits=["train", "validation", None])
+#daily_dialog = Classification()
 
-movie_rationales = Classification(labels="label")
+
+#boolq = Classification(sentence1="question", splits=["train", "validation", None])
 
 ecthr_cases___alleged_violation_prediction = Classification(labels="labels", dataset_name="ecthr_cases", config_name="alleged-violation-prediction")
 ecthr_cases___violation_prediction = Classification(labels="labels", dataset_name="ecthr_cases", config_name="violation-prediction")
 
 scicite = Classification(sentence1="string", labels="label")
 
-tab_fact = Classification(labels="label", config_name=["tab_fact", "blind_test"])
-
-tab_fact___blind_test = Classification(splits=["test", None, None])
 
 liar = Classification(sentence1="context", labels="label")
-
-biosses = Classification(sentence1="sentence1", sentence2="sentence2", labels="score", splits=["train", None, None])
-
-sem_eval_2014_task_1 = Classification(sentence1="premise", sentence2="hypothesis")
-
-gutenberg_time = Classification(splits=["train", None, None], config_name=["gutenberg"])
-
-hlgd = Classification(labels="label")
-
-clinc_oos = Classification(sentence1="text", config_name=["small", "imbalanced", "plus"])
-
-circa = Classification(sentence1="context", splits=["train", None, None])
-
-nlu_evaluation_data = Classification(sentence1="text", labels="label", splits=["train", None, None])
-
-newspop = Classification(splits=["train", None, None])
 
 relbert_lexical_relation_classification___BLESS = Classification(sentence1="head", sentence2="tail", labels="relation", dataset_name="relbert/lexical_relation_classification", config_name="BLESS")
 relbert_lexical_relation_classification___CogALexV = Classification(sentence1="head", sentence2="tail", labels="relation", splits=["train", None, "test"], dataset_name="relbert/lexical_relation_classification", config_name="CogALexV")
@@ -348,6 +325,11 @@ metaeval_ethics___justice = Classification(sentence1="text", labels="label", dat
 metaeval_ethics___utilitarianism = Classification(sentence1="text", labels="label", dataset_name="metaeval/ethics", config_name="utilitarianism")
 metaeval_ethics___virtue = Classification(sentence1="sentence1", sentence2="sentence2", labels="label", dataset_name="metaeval/ethics", config_name="virtue")
 
+sileod_wep_probes___reasoning_1hop = Classification(sentence1="context", sentence2="hypothesis", labels="label", dataset_name="sileod/wep-probes", config_name="reasoning_1hop")
+sileod_wep_probes___reasoning_2hop = Classification(sentence1="context", sentence2="hypothesis", labels="label", dataset_name="sileod/wep-probes", config_name="reasoning_2hop")
+sileod_wep_probes___usnli = Classification(sentence1="context", sentence2="hypothesis", labels="label", dataset_name="sileod/wep-probes", config_name="usnli")
+
+
 
 emo = Classification(sentence1="text", labels="label", splits=["train", None, "test"], config_name=["emo2019"])
 
@@ -366,6 +348,42 @@ google_wellformed_query = Classification(sentence1="content", labels="rating")
 
 tweets_hate_speech_detection = Classification(sentence1="tweet", labels="label", splits=["train", None, None])
 
+adv_glue___adv_sst2 = Classification(sentence1="sentence", labels="label", splits=["validation", None, None])
+adv_glue___adv_qqp = Classification(sentence1="question1", sentence2="question2", labels="label", splits=["validation", None, None])
+adv_glue___adv_mnli = Classification(sentence1="premise", sentence2="hypothesis", labels="label", splits=["validation", None, None])
+adv_glue___adv_mnli_mismatched = Classification(sentence1="premise", sentence2="hypothesis", labels="label", splits=["validation", None, None])
+adv_glue___adv_qnli = Classification(sentence1="question", labels="label", splits=["validation", None, None])
+adv_glue___adv_rte = Classification(sentence1="sentence1", sentence2="sentence2", labels="label", splits=["validation", None, None])
+
+
+###END
+################### END OF SUPPORT ######################
+
+
+tab_fact = Classification(labels="label", config_name=["tab_fact", "blind_test"])
+
+tab_fact___blind_test = Classification(splits=["test", None, None])
+
+movie_rationales = Classification(labels="label")
+
+crows_pairs = Classification(splits=["test", None, None], config_name=["crows_pairs"])
+
+biosses = Classification(sentence1="sentence1", sentence2="sentence2", labels="score", splits=["train", None, None])
+
+sem_eval_2014_task_1 = Classification(sentence1="premise", sentence2="hypothesis")
+
+gutenberg_time = Classification(splits=["train", None, None], config_name=["gutenberg"])
+
+hlgd = Classification(labels="label")
+
+clinc_oos = Classification(sentence1="text", config_name=["small", "imbalanced", "plus"])
+
+circa = Classification(sentence1="context", splits=["train", None, None])
+
+nlu_evaluation_data = Classification(sentence1="text", labels="label", splits=["train", None, None])
+
+newspop = Classification(splits=["train", None, None])
+
 hatexplain = Classification()
 
 bing_coronavirus_query_set = Classification(splits=["train", None, None], config_name=["country_2020-09-01_2020-09-30"])
@@ -374,12 +392,6 @@ stereoset = Classification(sentence1="context", splits=["validation", None, None
 
 swda = Classification(sentence1="text")
 
-adv_glue___adv_sst2 = Classification(sentence1="sentence", labels="label", splits=["validation", None, None])
-adv_glue___adv_qqp = Classification(sentence1="question1", sentence2="question2", labels="label", splits=["validation", None, None])
-adv_glue___adv_mnli = Classification(sentence1="premise", sentence2="hypothesis", labels="label", splits=["validation", None, None])
-adv_glue___adv_mnli_mismatched = Classification(sentence1="premise", sentence2="hypothesis", labels="label", splits=["validation", None, None])
-adv_glue___adv_qnli = Classification(sentence1="question", labels="label", splits=["validation", None, None])
-adv_glue___adv_rte = Classification(sentence1="sentence1", sentence2="sentence2", labels="label", splits=["validation", None, None])
 
 #conceptnet5 = Classification(sentence1="sentence", splits=["train", None, None], config_name=["conceptnet5", "omcs_sentences_free", "omcs_sentences_more"])
 
@@ -607,9 +619,6 @@ sileod_movie_recommendation = Classification(sentence1="question", labels="label
 
 nightingal3_fig_qa = MultipleChoice(dataset_name="nightingal3/fig-qa", config_name="nightingal3--fig-qa")
 
-sileod_wep_probes___reasoning_1hop = Classification(sentence1="context", sentence2="hypothesis", labels="label", dataset_name="sileod/wep-probes", config_name="reasoning_1hop")
-sileod_wep_probes___reasoning_2hop = Classification(sentence1="context", sentence2="hypothesis", labels="label", dataset_name="sileod/wep-probes", config_name="reasoning_2hop")
-sileod_wep_probes___usnli = Classification(sentence1="context", sentence2="hypothesis", labels="label", dataset_name="sileod/wep-probes", config_name="usnli")
 
 sileod_discourse_marker_qa = Classification(sentence1="context", labels="label", splits=["test", None, None], dataset_name="sileod/discourse_marker_qa")
 

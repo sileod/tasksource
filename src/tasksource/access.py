@@ -23,12 +23,15 @@ def parse_var_name(s):
 
 def list_tasks(tasks_path=f'{os.path.dirname(__file__)}/tasks.py'):
     task_order = open(tasks_path).readlines()
+    task_order= task_order[:task_order.index('###END\n')]
     task_order = [x.split('=')[0].rstrip() for x in task_order if '=' in x]
     task_order = [x for x in task_order if x.isidentifier()]
     task_order = fc.flip(dict(enumerate(task_order)))
 
     l = []
     for key in dir(tasks):
+        if not task_order.get(key,None):
+            continue
         value=getattr(tasks, key)
         if isinstance(value,Preprocessing):
             dataset_name, config_name, task_name = parse_var_name(key)
