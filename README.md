@@ -35,7 +35,7 @@ df=list_tasks()
 Iterate over tasks:
 ```python
 for _,x in df[df.task_type=="MultipleChoice"].iterrows():
-    dataset=load_task(x.dataset_name,x.config_name, x.task_name)
+    dataset = load_task(x.dataset_name,x.config_name, x.task_name)
 ```
 
 See supported tasks in [tasks.md](https://github.com/sileod/tasksource/blob/main/tasks.md)
