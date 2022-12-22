@@ -17,7 +17,7 @@ All implemented preprocessings can be found in [tasks.py](https://github.com/sil
 
 The annotation format is designed to be human readable. Adding a new preprocessing only takes a few lines, e.g:
 
-```
+```python
 cos_e = MultipleChoice('question',
     choices_list='choices',
     labels= lambda x: x['choices_list'].index(x['answer']),
