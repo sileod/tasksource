@@ -1,4 +1,14 @@
-{
+import pandas as pd
+
+dfh=pd.read_csv('https://raw.githubusercontent.com/alexwarstadt/blimp/master/raw_results/summary/human_validation_summary.csv')
+dfh['linguistic_term']=dfh['Condition']
+dfm=pd.read_json('https://raw.githubusercontent.com/alexwarstadt/blimp/master/raw_results/summary/models_summary.jsonl',lines=True)
+df=dfm.join(dfh)
+df['diff']=df.total_mean - df.gpt2
+blimp_hard = set(df[df['diff']>0.1].UID)
+del dfh, dfm, df
+
+blimp_groups = {
  "syntax": [
   "adjunct_island",
   "animate_subject_passive",

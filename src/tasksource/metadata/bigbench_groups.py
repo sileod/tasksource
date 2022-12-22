@@ -115,9 +115,9 @@ unit_interpretation
 vitaminc_fact_verification
 what_is_the_tao
 which_wiki_edit
-winowhy""".split('\n'))
+winowhy""".split('\n')) - {'simple_arithmetic_json_multiple_choice'}
 
-non_english = set("""common_morpheme
+bigbench_non_english = set("""common_morpheme
 cryobiology_spanish
 gem
 gender_inclusive_sentences_german
@@ -133,7 +133,7 @@ polish_sequence_labeling
 swahili_english_proverbs
 swedish_to_german_proverbs
 what_is_the_tao
-which_wiki_edit""")
+which_wiki_edit""".split('\n')) | {"parsinlu_qa","hinglish_toxicity","indic_cause_and_effect","entailed_polarity_hindi","english_russian_proverbs"}
 
 bbl=set('''auto_debugging
 bbq_lite_json
@@ -159,3 +159,5 @@ strategyqa
 symbol_interpretation
 vitaminc_fact_verification
 winowhy'''.split('\n'))
+
+bigbench_discriminative_english = bigbench_discriminative - bigbench_non_english
