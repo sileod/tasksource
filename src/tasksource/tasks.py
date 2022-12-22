@@ -26,12 +26,12 @@ recast = Classification(sentence1="context", sentence2="hypothesis", labels="lab
 
 nan_nli = Classification("premise", "hypothesis", "label", dataset_name="joey234/nan-nli", config_name="joey234--nan-nli")
 
-paws___labeled_final   = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
-paws___labeled_swap    = Classification(sentence1="sentence1", sentence2="sentence2", labels="label", splits=["train", None, None])
-paws___unlabeled_final = Classification(sentence1="sentence1", sentence2="sentence2", labels="label", splits=["train", "validation", None])
+paws___labeled_final   = Classification("sentence1", "sentence2", "label")
+paws___labeled_swap    = Classification("sentence1", "sentence2", "label", splits=["train", None, None])
+paws___unlabeled_final = Classification("sentence1", "sentence2", "label", splits=["train", "validation", None])
 
 quora = Classification(get.questions.text[0], get.questions.text[1], 'is_duplicate')
-medical_questions_pairs = Classification("question_1","question_2", labels="label")
+medical_questions_pairs = Classification("question_1","question_2", "label")
 
 ###################### Token Classification #########################
 
@@ -98,20 +98,17 @@ race___high   = MultipleChoice('question', choices_list='choices', labels='answe
 sciq = MultipleChoice(
     'question',
     ['correct_answer']+regen('distractor[1-3]'),
-    labels=constant(0)
-    )
+    labels=constant(0))
 
 social_i_qa = MultipleChoice(
     'question',
     ['answerA','answerB'],
-    'label'
-    )
+    'label')
 
 wiki_hop = MultipleChoice(
     'question', 
     choices_list='candidates',
-    labels=lambda x:x['choices_list'].index(x["answer"])
-    )
+    labels=lambda x:x['choices_list'].index(x["answer"]))
 
 wiqa = MultipleChoice('question_stem',
     choices_list = lambda x: x['choices']['text'],
@@ -145,8 +142,8 @@ ai2_arc__challenge = MultipleChoice('question',choices_list=get.choices.text,  l
     config_name='ARC-Challenge')
 
 definite_pronoun_resolution = MultipleChoice(
-    sentence1=cat(["sentence","pronoun"],' : '),
-    choices_list='candidates' 
+    inputs=cat(["sentence","pronoun"],' : '),
+    choices_list='candidates',
     labels="label",
     splits=['train',None,'test'])
 
@@ -173,6 +170,19 @@ ethos___multilabel = Classification(
     ],
     splits=["train", None, None]
 )
+
+discovery = Classification("sentence1", "sentence2", labels="label", config_name=["discovery"])
+
+pragmeval__single_input = Classification('sentence1',labels="label",
+    config_name= ["emobank-arousal", "emobank-dominance", "emobank-valence", "squinky-formality", "squinky-implicature", 
+    "squinky-informativeness","switchboard",'mrda'])
+
+pragmeval__pairs = Classification('sentence1','sentence2',labels="label",
+    config_name= ["emergent", "gum", "pdtb", "persuasiveness-claimtype", 
+    "persuasiveness-eloquence", "persuasiveness-premisetype", "persuasiveness-relevance", "persuasiveness-specificity", 
+    "persuasiveness-strength", "sarcasm","stac", "verifiability"])
+
+
 
 ###################### Automatically generated (verified)############
 
@@ -266,27 +276,6 @@ hyperpartisan_news_detection___bypublisher = Classification(sentence1="text", la
 
 health_fact = Classification(sentence1="claim", labels="label")
 
-pragmeval___verifiability = Classification(sentence1="sentence", labels="label")
-pragmeval___emobank_arousal = Classification(sentence1="sentence", labels="label", dataset_name="pragmeval", config_name="emobank-arousal")
-pragmeval___switchboard = Classification(sentence1="sentence", labels="label")
-pragmeval___persuasiveness_eloquence = Classification(sentence1="sentence1", sentence2="sentence2", labels="label", dataset_name="pragmeval", config_name="persuasiveness-eloquence")
-pragmeval___mrda = Classification(sentence1="sentence", labels="label")
-pragmeval___gum = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
-pragmeval___emergent = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
-pragmeval___persuasiveness_relevance = Classification(sentence1="sentence1", sentence2="sentence2", labels="label", dataset_name="pragmeval", config_name="persuasiveness-relevance")
-pragmeval___persuasiveness_specificity = Classification(sentence1="sentence1", sentence2="sentence2", labels="label", dataset_name="pragmeval", config_name="persuasiveness-specificity")
-pragmeval___persuasiveness_strength = Classification(sentence1="sentence1", sentence2="sentence2", labels="label", dataset_name="pragmeval", config_name="persuasiveness-strength")
-pragmeval___emobank_dominance = Classification(sentence1="sentence", labels="label", dataset_name="pragmeval", config_name="emobank-dominance")
-pragmeval___squinky_implicature = Classification(sentence1="sentence", labels="label", dataset_name="pragmeval", config_name="squinky-implicature")
-pragmeval___sarcasm = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
-pragmeval___squinky_formality = Classification(sentence1="sentence", labels="label", dataset_name="pragmeval", config_name="squinky-formality")
-pragmeval___stac = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
-pragmeval___pdtb = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
-pragmeval___persuasiveness_premisetype = Classification(sentence1="sentence1", sentence2="sentence2", labels="label", dataset_name="pragmeval", config_name="persuasiveness-premisetype")
-pragmeval___squinky_informativeness = Classification(sentence1="sentence", labels="label", dataset_name="pragmeval", config_name="squinky-informativeness")
-pragmeval___persuasiveness_claimtype = Classification(sentence1="sentence1", sentence2="sentence2", labels="label", dataset_name="pragmeval", config_name="persuasiveness-claimtype")
-pragmeval___emobank_valence = Classification(sentence1="sentence", labels="label", dataset_name="pragmeval", config_name="emobank-valence")
-
 #daily_dialog = Classification()
 
 crows_pairs = Classification(splits=["test", None, None], config_name=["crows_pairs"])
@@ -297,10 +286,6 @@ go_emotions___simplified = Classification(sentence1="text", labels="labels")
 #boolq = Classification(sentence1="question", splits=["train", "validation", None])
 
 movie_rationales = Classification(labels="label")
-
-discovery = Classification(sentence1="sentence1", sentence2="sentence2", labels="label", config_name=["discovery", "discoverysmall"])
-
-discovery___discoverysmall = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
 
 ecthr_cases___alleged_violation_prediction = Classification(labels="labels", dataset_name="ecthr_cases", config_name="alleged-violation-prediction")
 ecthr_cases___violation_prediction = Classification(labels="labels", dataset_name="ecthr_cases", config_name="violation-prediction")
@@ -334,6 +319,35 @@ relbert_lexical_relation_classification___CogALexV = Classification(sentence1="h
 relbert_lexical_relation_classification___EVALution = Classification(sentence1="head", sentence2="tail", labels="relation", dataset_name="relbert/lexical_relation_classification", config_name="EVALution")
 relbert_lexical_relation_classification___K_H_N = Classification(sentence1="head", sentence2="tail", labels="relation", dataset_name="relbert/lexical_relation_classification", config_name="K&H+N")
 relbert_lexical_relation_classification___ROOT09 = Classification(sentence1="head", sentence2="tail", labels="relation", dataset_name="relbert/lexical_relation_classification", config_name="ROOT09")
+
+
+metaeval_linguisticprobing___subj_number = Classification(sentence1="sentence", labels="label", dataset_name="metaeval/linguisticprobing", config_name="subj_number")
+metaeval_linguisticprobing___word_content = Classification(sentence1="sentence", labels="label", dataset_name="metaeval/linguisticprobing", config_name="word_content")
+metaeval_linguisticprobing___obj_number = Classification(sentence1="sentence", labels="label", dataset_name="metaeval/linguisticprobing", config_name="obj_number")
+metaeval_linguisticprobing___past_present = Classification(sentence1="sentence", labels="label", dataset_name="metaeval/linguisticprobing", config_name="past_present")
+metaeval_linguisticprobing___sentence_length = Classification(sentence1="sentence", labels="label", dataset_name="metaeval/linguisticprobing", config_name="sentence_length")
+metaeval_linguisticprobing___top_constituents = Classification(sentence1="sentence", labels="label", dataset_name="metaeval/linguisticprobing", config_name="top_constituents")
+metaeval_linguisticprobing___tree_depth = Classification(sentence1="sentence", labels="label", dataset_name="metaeval/linguisticprobing", config_name="tree_depth")
+metaeval_linguisticprobing___coordination_inversion = Classification(sentence1="sentence", labels="label", dataset_name="metaeval/linguisticprobing", config_name="coordination_inversion")
+metaeval_linguisticprobing___odd_man_out = Classification(sentence1="sentence", labels="label", dataset_name="metaeval/linguisticprobing", config_name="odd_man_out")
+metaeval_linguisticprobing___bigram_shift = Classification(sentence1="sentence", labels="label", dataset_name="metaeval/linguisticprobing", config_name="bigram_shift")
+
+metaeval_crowdflower___sentiment_nuclear_power = Classification(sentence1="text", labels="label", splits=["train", None, None], dataset_name="metaeval/crowdflower", config_name="sentiment_nuclear_power")
+metaeval_crowdflower___tweet_global_warming = Classification(sentence1="text", labels="label", splits=["train", None, None], dataset_name="metaeval/crowdflower", config_name="tweet_global_warming")
+metaeval_crowdflower___airline_sentiment = Classification(sentence1="text", labels="label", splits=["train", None, None], dataset_name="metaeval/crowdflower", config_name="airline-sentiment")
+metaeval_crowdflower___corporate_messaging = Classification(sentence1="text", labels="label", splits=["train", None, None], dataset_name="metaeval/crowdflower", config_name="corporate-messaging")
+metaeval_crowdflower___economic_news = Classification(sentence1="text", labels="label", splits=["train", None, None], dataset_name="metaeval/crowdflower", config_name="economic-news")
+metaeval_crowdflower___political_media_audience = Classification(sentence1="text", labels="label", splits=["train", None, None], dataset_name="metaeval/crowdflower", config_name="political-media-audience")
+metaeval_crowdflower___political_media_bias = Classification(sentence1="text", labels="label", splits=["train", None, None], dataset_name="metaeval/crowdflower", config_name="political-media-bias")
+metaeval_crowdflower___political_media_message = Classification(sentence1="text", labels="label", splits=["train", None, None], dataset_name="metaeval/crowdflower", config_name="political-media-message")
+metaeval_crowdflower___text_emotion = Classification(sentence1="text", labels="label", splits=["train", None, None], dataset_name="metaeval/crowdflower", config_name="text_emotion")
+
+metaeval_ethics___commonsense = Classification(sentence1="text", labels="label", dataset_name="metaeval/ethics", config_name="commonsense")
+metaeval_ethics___deontology = Classification(sentence1="text", labels="label", dataset_name="metaeval/ethics", config_name="deontology")
+metaeval_ethics___justice = Classification(sentence1="text", labels="label", dataset_name="metaeval/ethics", config_name="justice")
+metaeval_ethics___utilitarianism = Classification(sentence1="text", labels="label", dataset_name="metaeval/ethics", config_name="utilitarianism")
+metaeval_ethics___virtue = Classification(sentence1="sentence1", sentence2="sentence2", labels="label", dataset_name="metaeval/ethics", config_name="virtue")
+
 
 emo = Classification(sentence1="text", labels="label", splits=["train", None, "test"], config_name=["emo2019"])
 
@@ -395,16 +409,6 @@ coastalcph_fairlex___cail = Classification(sentence1="text", labels="label", dat
 
 peer_read = Classification(config_name=["parsed_pdfs", "reviews"])
 
-metaeval_linguisticprobing___subj_number = Classification(sentence1="sentence", labels="label", dataset_name="metaeval/linguisticprobing", config_name="subj_number")
-metaeval_linguisticprobing___word_content = Classification(sentence1="sentence", labels="label", dataset_name="metaeval/linguisticprobing", config_name="word_content")
-metaeval_linguisticprobing___obj_number = Classification(sentence1="sentence", labels="label", dataset_name="metaeval/linguisticprobing", config_name="obj_number")
-metaeval_linguisticprobing___past_present = Classification(sentence1="sentence", labels="label", dataset_name="metaeval/linguisticprobing", config_name="past_present")
-metaeval_linguisticprobing___sentence_length = Classification(sentence1="sentence", labels="label", dataset_name="metaeval/linguisticprobing", config_name="sentence_length")
-metaeval_linguisticprobing___top_constituents = Classification(sentence1="sentence", labels="label", dataset_name="metaeval/linguisticprobing", config_name="top_constituents")
-metaeval_linguisticprobing___tree_depth = Classification(sentence1="sentence", labels="label", dataset_name="metaeval/linguisticprobing", config_name="tree_depth")
-metaeval_linguisticprobing___coordination_inversion = Classification(sentence1="sentence", labels="label", dataset_name="metaeval/linguisticprobing", config_name="coordination_inversion")
-metaeval_linguisticprobing___odd_man_out = Classification(sentence1="sentence", labels="label", dataset_name="metaeval/linguisticprobing", config_name="odd_man_out")
-metaeval_linguisticprobing___bigram_shift = Classification(sentence1="sentence", labels="label", dataset_name="metaeval/linguisticprobing", config_name="bigram_shift")
 
 jigsaw_unintended_bias = Classification(sentence1="comment_text", labels="rating", splits=["train", None, None])
 
@@ -459,21 +463,6 @@ OxAISH_AL_LLM_wiki_toxic = Classification(sentence1="comment_text", labels="labe
 
 carblacac_twitter_sentiment_analysis = Classification(sentence1="text", dataset_name="carblacac/twitter-sentiment-analysis")
 
-metaeval_crowdflower___sentiment_nuclear_power = Classification(sentence1="text", labels="label", splits=["train", None, None], dataset_name="metaeval/crowdflower", config_name="sentiment_nuclear_power")
-metaeval_crowdflower___tweet_global_warming = Classification(sentence1="text", labels="label", splits=["train", None, None], dataset_name="metaeval/crowdflower", config_name="tweet_global_warming")
-metaeval_crowdflower___airline_sentiment = Classification(sentence1="text", labels="label", splits=["train", None, None], dataset_name="metaeval/crowdflower", config_name="airline-sentiment")
-metaeval_crowdflower___corporate_messaging = Classification(sentence1="text", labels="label", splits=["train", None, None], dataset_name="metaeval/crowdflower", config_name="corporate-messaging")
-metaeval_crowdflower___economic_news = Classification(sentence1="text", labels="label", splits=["train", None, None], dataset_name="metaeval/crowdflower", config_name="economic-news")
-metaeval_crowdflower___political_media_audience = Classification(sentence1="text", labels="label", splits=["train", None, None], dataset_name="metaeval/crowdflower", config_name="political-media-audience")
-metaeval_crowdflower___political_media_bias = Classification(sentence1="text", labels="label", splits=["train", None, None], dataset_name="metaeval/crowdflower", config_name="political-media-bias")
-metaeval_crowdflower___political_media_message = Classification(sentence1="text", labels="label", splits=["train", None, None], dataset_name="metaeval/crowdflower", config_name="political-media-message")
-metaeval_crowdflower___text_emotion = Classification(sentence1="text", labels="label", splits=["train", None, None], dataset_name="metaeval/crowdflower", config_name="text_emotion")
-
-metaeval_ethics___commonsense = Classification(sentence1="text", labels="label", dataset_name="metaeval/ethics", config_name="commonsense")
-metaeval_ethics___deontology = Classification(sentence1="text", labels="label", dataset_name="metaeval/ethics", config_name="deontology")
-metaeval_ethics___justice = Classification(sentence1="text", labels="label", dataset_name="metaeval/ethics", config_name="justice")
-metaeval_ethics___utilitarianism = Classification(sentence1="text", labels="label", dataset_name="metaeval/ethics", config_name="utilitarianism")
-metaeval_ethics___virtue = Classification(sentence1="sentence1", sentence2="sentence2", labels="label", dataset_name="metaeval/ethics", config_name="virtue")
 
 copenlu_scientific_exaggeration_detection = Classification(splits=["train", None, "test"], dataset_name="copenlu/scientific-exaggeration-detection", config_name="copenlu--scientific-exaggeration-detection")
 
