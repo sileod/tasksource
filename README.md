@@ -28,5 +28,14 @@ See supported tasks in [tasks.md](https://github.com/sileod/tasksource/blob/main
 
  ### contact
  `damien.sileo@inria.fr`
-
+```bib
+@misc{sileod23-tasksource,
+  author = {Sileo, Damien},
+  doi = {10.5281/zenodo.7473446},
+  month = {01},
+  title = {{tasksource: preprocessings for reproducibility and multitask-learning}},
+  url = {https://github.com/sileod/tasksource},
+  version = {1.5.0},
+  year = {2023}}
+```
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
