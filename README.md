@@ -29,12 +29,12 @@ cos_e = tasksource.MultipleChoice('question',
 
 List tasks:
 ```python
-from tasksource import list_tasks
+from tasksource import list_tasks, load_task
 df=list_tasks()
 ```
 Iterate over tasks:
 ```python
-for _,x in df.iterrows():
+for _,x in df[df.task_type=="MultipleChoice"].iterrows():
     dataset=load_task(x.dataset_name,x.config_name, x.task_name)
 ```
 
