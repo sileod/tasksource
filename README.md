@@ -24,6 +24,20 @@ cos_e = tasksource.MultipleChoice('question',
     config_name='v1.0')
 ```
 
+### Installation and usage:
+`pip install tasksource`
+
+List tasks:
+```python
+from tasksource import list_tasks
+df=list_tasks()
+```
+Iterate over tasks:
+```python
+for _,x in df.iterrows():
+    dataset=load_task(x.dataset_name,x.config_name, x.task_name)
+```
+
 See supported tasks in [tasks.md](https://github.com/sileod/tasksource/blob/main/tasks.md)
 
  ### contact
