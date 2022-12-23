@@ -26,9 +26,9 @@ recast = Classification(sentence1="context", sentence2="hypothesis", labels="lab
     'recast_verbcorner', 'recast_ner', 'recast_sentiment', 'recast_megaveridicality']
 )
 
-sileod_wep_probes = Classification(sentence1="context", sentence2="hypothesis", labels="label", dataset_name="sileod/wep-probes", config_name=[
-    ["reasoning_1hop","reasoning_2hop","usnli"]
-])
+sileod_wep_probes = Classification(sentence1="context", sentence2="hypothesis", labels="label", dataset_name="sileod/wep-probes", 
+config_name=["reasoning_1hop","reasoning_2hop","usnli"]
+)
 
 nan_nli = Classification("premise", "hypothesis", "label", dataset_name="joey234/nan-nli", config_name="joey234--nan-nli")
 
@@ -401,10 +401,10 @@ blog_authorship_corpus__age       = Classification(sentence1="text",labels="age"
 blog_authorship_corpus__horoscope = Classification(sentence1="text",labels="horoscope", splits=["train", "validation", None])
 blog_authorship_corpus__job       = Classification(sentence1="text",labels="job", splits=["train", "validation", None])
 
+launch_open_question_type = Classification(sentence1="question", labels="resolve_type", dataset_name="launch/open_question_type")
+
 ###END
 ################### END OF SUPPORT ######################
-
-
 
 
 tab_fact = Classification(labels="label", config_name=["tab_fact", "blind_test"])
@@ -585,8 +585,6 @@ peixian_rtGender___posts = Classification(splits=[None, None, None], dataset_nam
 peixian_rtGender___responses = Classification(splits=[None, None, None], dataset_name="peixian/rtGender", config_name="responses")
 
 valurank_Adult_content_dataset = Classification(splits=[None, None, None], dataset_name="valurank/Adult-content-dataset")
-
-launch_open_question_type = Classification(sentence1="question", dataset_name="launch/open_question_type")
 
 DeveloperOats_DBPedia_Classes = Classification(dataset_name="DeveloperOats/DBPedia_Classes", config_name="DeveloperOats--DBPedia_Classes")
 
