@@ -1,7 +1,7 @@
 # tasksource
 
 Huggingface Datasets is a great library, but it lacks standardization, and datasets require preprocessings to be used interchangeably.
-Meet `tasksource` : a collection of task preprocessings to facilitate multi-task learning and reproducibility.
+`tasksource` is a collection of task preprocessings, facilitating multi-task learning and reproducibility.
 
 ```python
 import tasksource
@@ -13,7 +13,7 @@ tasksource.bigbench(load_dataset('bigbench', 'movie_recommendation'))
 Each dataset is mapped to a `MultipleChoice`, `Classification`, or `TokenClassification` task with standardized fields.
 We do not support generation tasks as they are addressed by [promptsource](https://github.com/bigscience-workshop/promptsource).
 
-All implemented preprocessings can be found in [tasks.py](https://github.com/sileod/tasksource/blob/main/src/tasksource/tasks.py). Each preprocessing is a function that takes a dataset as input and returns a standardized dataset. The preprocessing is designed to be human-readable. Adding a new preprocessing only takes a few lines, e.g:
+All implemented preprocessings can be found in [tasks.py](https://github.com/sileod/tasksource/blob/main/src/tasksource/tasks.py). Each preprocessing is a function that takes a dataset as input and returns a standardized dataset. The preprocessing code is designed to be human-readable: adding a new preprocessing only takes a few lines, e.g:
 
 ```python
 cos_e = tasksource.MultipleChoice('question',
@@ -36,7 +36,7 @@ for _,x in df[df.task_type=="MultipleChoice"].iterrows():
     dataset = load_task(x.dataset_name,x.config_name, x.task_name)
 ```
 
-See supported tasks in [tasks.md](https://github.com/sileod/tasksource/blob/main/tasks.md) (+200 MultipleChoic tasks, +100 Classification tasks)
+See supported 364 tasks in [tasks.md](https://github.com/sileod/tasksource/blob/main/tasks.md) (+200 MultipleChoice tasks, +100 Classification tasks). Feel free to request or propose a new task.
 
  ### contact
  `damien.sileo@inria.fr`
