@@ -36,7 +36,7 @@ for _,x in df[df.task_type=="MultipleChoice"].iterrows():
     dataset = load_task(x.dataset_name,x.config_name, x.task_name)
 ```
 
-See supported tasks in [tasks.md](https://github.com/sileod/tasksource/blob/main/tasks.md) (+200 MultipleChoic tasks, +100 Classification tasks)
+See supported `364` tasks in [tasks.md](https://github.com/sileod/tasksource/blob/main/tasks.md) (+200 MultipleChoice tasks, +100 Classification tasks)
 
  ### contact
  `damien.sileo@inria.fr`
