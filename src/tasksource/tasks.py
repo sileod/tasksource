@@ -17,6 +17,8 @@ sick__entailment_BA = Classification('sentence_A','sentence_B','entailment_BA')
 
 snli = Classification(sentence1="premise", sentence2="hypothesis", labels="label")
 
+scitail = Classification("sentence1","sentence2","gold_label",config_name="snli_format")
+
 hans = Classification(sentence1="premise", sentence2="hypothesis", labels="label", splits=["train", "validation", None])
 
 wanli = Classification('premise','hypothesis','gold', dataset_name="alisawuffles/WANLI")
@@ -32,6 +34,18 @@ config_name=["reasoning_1hop","reasoning_2hop","usnli"]
 
 nan_nli = Classification("premise", "hypothesis", "label", dataset_name="joey234/nan-nli", config_name="joey234--nan-nli")
 
+gen_debiased_nli__snli_seq_z = Classification("premise","hypothesis","label",
+	dataset_name="pietrolesci/gen_debiased_nli", splits=["snli_seq_z",None,None])
+gen_debiased_nli__snli_z_aug = Classification("premise","hypothesis","label",
+	dataset_name="pietrolesci/gen_debiased_nli", splits=["snli_z_aug",None,None])
+gen_debiased_nli__snli_par_z = Classification("premise","hypothesis","label",
+	dataset_name="pietrolesci/gen_debiased_nli", splits=["snli_par_z",None,None])
+gen_debiased_nli__mnli_par_z = Classification("premise","hypothesis","label",
+	dataset_name="pietrolesci/gen_debiased_nli", splits=["mnli_par_z",None,None])
+gen_debiased_nli__mnli_z_aug = Classification("premise","hypothesis","label",
+	dataset_name="pietrolesci/gen_debiased_nli", splits=["mnli_z_aug",None,None])
+gen_debiased_nli__mnli_seq_z = Classification("premise","hypothesis","label",
+	dataset_name="pietrolesci/gen_debiased_nli", splits=["mnli_seq_z",None,None])
 
 paws___labeled_final   = Classification("sentence1", "sentence2", "label")
 paws___labeled_swap    = Classification("sentence1", "sentence2", "label", splits=["train", None, None])
@@ -39,7 +53,7 @@ paws___unlabeled_final = Classification("sentence1", "sentence2", "label", split
 
 quora = Classification(get.questions.text[0], get.questions.text[1], 'is_duplicate')
 medical_questions_pairs = Classification("question_1","question_2", "label")
-
+ 
 ###################### Token Classification #########################
 
 conll2003__pos_tags   = TokenClassification(tokens="tokens", labels='pos_tags')
@@ -100,6 +114,7 @@ quail = MultipleChoice(
     choices_list='answers',
     labels='correct_answer_id' 
 )
+
 
 #race___middle = MultipleChoice('question', choices_list='options', labels='answer')
 #race___high   = MultipleChoice('question', choices_list='options', labels='answer')
@@ -215,6 +230,7 @@ glue___rte = Classification(sentence1="sentence1", sentence2="sentence2", labels
 glue___wnli = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
 #glue___ax = Classification(sentence1="premise", sentence2="hypothesis", labels="label", splits=["test", None, None]) # fully masked
 
+
 super_glue___boolq = Classification(sentence1="question", labels="label")
 super_glue___cb = Classification(sentence1="premise", sentence2="hypothesis", labels="label")
 super_glue___multirc = Classification(sentence1="question", labels="label")
@@ -248,7 +264,7 @@ lex_glue___case_hold = MultipleChoice("context", choices_list='endings', labels=
 
 imdb = Classification(sentence1="text", labels="label", splits=["train", None, "test"])
 
-trec = Classification(sentence1="text", labels="fine_label", splits=["train", None, "test"])
+#trec = Classification(sentence1="text", labels="fine_label", splits=["train", None, "test"])
 
 rotten_tomatoes = Classification(sentence1="text", labels="label")
 
@@ -286,20 +302,17 @@ banking77 = Classification(sentence1="text", labels="label", splits=["train", No
 
 hate_speech_offensive = Classification(sentence1="tweet", labels="class", splits=["train", None, None])
 
-#yahoo_answers_topics = Classification(splits=["train", None, "test"], config_name=["yahoo_answers_topics"])
+#yahoo_answers_topics = Classification(splits=["train", None, "test"], config_name=["yahoo_answers_topics"]) #trivial
 
 hyperpartisan_news_detection___byarticle = Classification(sentence1="text", labels="hyperpartisan", splits=["train", None, None])
 hyperpartisan_news_detection___bypublisher = Classification(sentence1="text", labels="hyperpartisan", splits=["train", "validation", None])
 
-health_fact = Classification(sentence1="claim", labels="label")
-
 #go_emotions___raw = Classification(sentence1="text", splits=["train", None, None])
 go_emotions___simplified = Classification(sentence1="text", labels="labels")
 
-#daily_dialog = Classification()
+#daily_dialog = TokenClassification()
 
-
-#boolq = Classification(sentence1="question", splits=["train", "validation", None])
+#boolq = Classification(sentence1="question", splits=["train", "validation", None]) # in superglue
 
 #ecthr_cases___alleged_violation_prediction = Classification(labels="labels", dataset_name="ecthr_cases", config_name="alleged-violation-prediction")
 #ecthr_cases___violation_prediction = Classification(labels="labels", dataset_name="ecthr_cases", config_name="violation-prediction")
@@ -403,9 +416,74 @@ blog_authorship_corpus__job       = Classification(sentence1="text",labels="job"
 
 launch_open_question_type = Classification(sentence1="question", labels="resolve_type", dataset_name="launch/open_question_type")
 
+health_fact = Classification(sentence1="claim", labels="label")
+commonsense_qa = MultipleChoice(
+    "question",
+    choices_list=get.choices.text,
+    labels=lambda x: "ABCDE".index(x["answerKey"]),
+    splits=["train","validation",None]
+)
+mc_taco = Classification(
+    lambda x: f'{x["sentence"]} {x["question"]} {x["answer"]}',
+    labels="label",
+    splits=[ "validation",None,"test"]
+)
+
+ade_corpus_v2___Ade_corpus_v2_classification = Classification("text",labels="label")
+
+hlgd = Classification("headline_a", "headline_b", labels="label")
+
+glue__diagnostics = Classification("premise","hypothesis","label",
+    dataset_name="pietrolesci/glue_diagnostics",splits=["test",None,None])
+
+breaking_nli = Classification("sentence1","sentence2","label",
+    dataset_name="pietrolesci/breaking_nli", splits=["full",None,None])
+
+conj_nli = Classification("premise","hypothesis","label",
+    dataset_name="pietrolesci/conj_nli")
+
+robust_nli_is_sd = Classification("premise","hypothesis","label",
+    dataset_name="pietrolesci/robust_nli_is_sd")
+
+robust_nli_li_ts = Classification("premise","hypothesis","label",
+    dataset_name="pietrolesci/robust_nli_li_ts")
+
+fracas = Classification("premise","hypothesis","label",
+    dataset_name="pietrolesci/fracas")
+
+dialogue_nli = Classification("sentence1","sentence2","label",
+    dataset_name="pietrolesci/dialogue_nli")   
+
+dnc_nli = Classification("context","hypothesis","label",
+    dataset_name="pietrolesci/dnc")
+
+gpt3_nli = Classification("text_a","text_b","label",dataset_name="pietrolesci/gpt3_nli")
+
+recast_white__fnplus = Classification("text","hypothesis","label",
+    dataset_name="pietrolesci/recast_white",splits=['fnplus',None,None])
+recast_white__sprl = Classification("text","hypothesis","label",
+    dataset_name="pietrolesci/recast_white",splits=['sprl',None,None])
+recast_white__dpr = Classification("text","hypothesis","label",
+    dataset_name="pietrolesci/recast_white",splits=['dpr',None,None])
+
+
+
+joci = Classification("context","hypothesis","label", dataset_name="pietrolesci/joci",splits=['full',None,None])
+
+enfever_nli = Classification("evidence","claim","label", dataset_name="ctu-aic/enfever_nli")
+
+contrast_nli = Classification("premise", "hypothesis",	"label",dataset_name="martn-nguyen/contrast_nli")
+
+
 ###END
 ################### END OF SUPPORT ######################
 
+# discosense, discofuse
+
+circa = Classification(
+    sentence1=cat(["context","question-X"]),
+    sentence2="answer-Y",
+    labels="goldstandard2")
 
 tab_fact = Classification(labels="label", config_name=["tab_fact", "blind_test"])
 
@@ -421,7 +499,6 @@ sem_eval_2014_task_1 = Classification(sentence1="premise", sentence2="hypothesis
 
 gutenberg_time = Classification(splits=["train", None, None], config_name=["gutenberg"])
 
-hlgd = Classification(labels="label")
 
 clinc_oos = Classification(sentence1="text", config_name=["small", "imbalanced", "plus"])
 

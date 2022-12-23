@@ -7,7 +7,7 @@ import funcy as fc
 import exrex 
 import magicattr 
 import numpy as np
-
+import copy
 
 def get_column_names(dataset):
     cn = dataset.column_names
@@ -31,6 +31,7 @@ class Preprocessing(DotWiz):
                 del dataset[v]
             if k in dataset and not v: # obfuscated label
                 del dataset[k]
+        dataset = fix_splits(dataset)
 
         for k in list(dataset.keys()):
             if k not in self.default_splits:
@@ -164,6 +165,12 @@ regen = lambda x: list(exrex.generate(x))
 
 
 def fix_splits(dataset):
+
+    if len(dataset)==1 and "train" not in dataset:
+        k = list(dataset)[0]
+        dataset['train'] = copy.deepcopy(dataset[k])
+        del dataset[k]
+
     if 'auxiliary_train' in dataset:
         del dataset['auxiliary_train']
     
