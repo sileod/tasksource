@@ -29,6 +29,9 @@ class Preprocessing(DotWiz):
             if v and k!=v:
                 dataset[k]=dataset[v]
                 del dataset[v]
+            if k in dataset and not v: # obfuscated label
+                del dataset[k]
+
         for k in list(dataset.keys()):
             if k not in self.default_splits:
                 del dataset[k]
@@ -46,21 +49,6 @@ class Preprocessing(DotWiz):
         dataset = fix_labels(dataset)
         return dataset
     
-@dataclass
-class cat(Preprocessing):
-    fields:Union[str,list]=None
-    separator:str=' '
-        
-    def __call__(self, dataset, target):
-        def f(example):
-            y=[np.char.array(example[f])+sep 
-                   for f,sep in zip(self.fields[::-1],itertools.repeat(self.separator))]
-            y=list(sum(*y))
-            if len(y)==1:
-                y=y[0]
-            example[target]=y
-            return example
-        return dataset.map(f)
 
 @dataclass
 class cat(Preprocessing):
@@ -68,7 +56,7 @@ class cat(Preprocessing):
     separator:str=' '
         
     def __call__(self, example=None):
-        y=[np.char.array(example[f])+sep 
+        y=[np.char.array(example[f]) + sep 
                 for f,sep in zip(self.fields[::-1],itertools.repeat(self.separator))]
         y=list(sum(*y))
         if len(y)==1:
@@ -213,7 +201,7 @@ def fix_labels(dataset, label_key='labels'):
     if type(dataset['train'][label_key][0]) in [int,list,float]:
         return dataset
 
-    label_to_index = fc.flip(dict(enumerate(sorted(set(fc.flatten(dataset[k][label_key] for k in dataset))))))
+    label_to_index = fc.flip(dict(enumerate(sorted(set(fc.flatten(dataset[k][label_key] for k in {"train"}))))))
 
     def apply_label_to_index(example):
         example[label_key]=label_to_index[example[label_key]]

@@ -58,5 +58,5 @@ def load_preprocessing(dataset_name, config_name=None, task_name=None):
     y = y[y.task_name.map(lambda x:x==task_name)]
     return getattr(tasks,y.preprocessing_name.iloc[0])
 
-def load_task(*args,**kwargs):
-    return load_preprocessing(*args,**kwargs)(load_dataset(*args,**kwargs))
+def load_task(dataset_name,config_name=None,task_name=None):
+    return load_preprocessing(dataset_name,config_name,task_name)(load_dataset(dataset_name,config_name))
