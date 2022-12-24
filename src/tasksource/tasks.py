@@ -46,6 +46,66 @@ gen_debiased_nli__mnli_z_aug = Classification("premise","hypothesis","label",
 	dataset_name="pietrolesci/gen_debiased_nli", splits=["mnli_z_aug",None,None])
 gen_debiased_nli__mnli_seq_z = Classification("premise","hypothesis","label",
 	dataset_name="pietrolesci/gen_debiased_nli", splits=["mnli_seq_z",None,None])
+glue__diagnostics = Classification("premise","hypothesis","label",
+    dataset_name="pietrolesci/glue_diagnostics",splits=["test",None,None])
+
+breaking_nli = Classification("sentence1","sentence2","label",
+    dataset_name="pietrolesci/breaking_nli", splits=["full",None,None])
+
+conj_nli = Classification("premise","hypothesis","label",
+    dataset_name="pietrolesci/conj_nli")
+
+robust_nli_is_sd = Classification("premise","hypothesis","label",
+    dataset_name="pietrolesci/robust_nli_is_sd")
+
+robust_nli_li_ts = Classification("premise","hypothesis","label",
+    dataset_name="pietrolesci/robust_nli_li_ts")
+
+fracas = Classification("premise","hypothesis","label",
+    dataset_name="pietrolesci/fracas")
+
+dialogue_nli = Classification("sentence1","sentence2","label",
+    dataset_name="pietrolesci/dialogue_nli")   
+
+dnc_nli = Classification("context","hypothesis","label",
+    dataset_name="pietrolesci/dnc")
+
+gpt3_nli = Classification("text_a","text_b","label",dataset_name="pietrolesci/gpt3_nli")
+
+recast_white__fnplus = Classification("text","hypothesis","label",
+    dataset_name="pietrolesci/recast_white",splits=['fnplus',None,None])
+recast_white__sprl = Classification("text","hypothesis","label",
+    dataset_name="pietrolesci/recast_white",splits=['sprl',None,None])
+recast_white__dpr = Classification("text","hypothesis","label",
+    dataset_name="pietrolesci/recast_white",splits=['dpr',None,None])
+
+joci = Classification("context","hypothesis","label", dataset_name="pietrolesci/joci",splits=['full',None,None])
+
+enfever_nli = Classification("evidence","claim","label", dataset_name="ctu-aic/enfever_nli")
+
+contrast_nli = Classification("premise", "hypothesis",	"label",dataset_name="martn-nguyen/contrast_nli")
+
+robust_nli__IS_CS = Classification("premise","hypothesis","label",
+	dataset_name="pietrolesci/robust_nli", splits=["IS_CS",None,None])
+robust_nli__LI_LI = Classification("premise","hypothesis","label",
+	dataset_name="pietrolesci/robust_nli", splits=["LI_LI",None,None])
+robust_nli__ST_WO = Classification("premise","hypothesis","label",
+	dataset_name="pietrolesci/robust_nli", splits=["ST_WO",None,None])
+robust_nli__PI_SP = Classification("premise","hypothesis","label",
+	dataset_name="pietrolesci/robust_nli", splits=["PI_SP",None,None])
+robust_nli__PI_CD = Classification("premise","hypothesis","label",
+	dataset_name="pietrolesci/robust_nli", splits=["PI_CD",None,None])
+robust_nli__ST_SE = Classification("premise","hypothesis","label",
+	dataset_name="pietrolesci/robust_nli", splits=["ST_SE",None,None])
+robust_nli__ST_NE = Classification("premise","hypothesis","label",
+	dataset_name="pietrolesci/robust_nli", splits=["ST_NE",None,None])
+robust_nli__ST_LM = Classification("premise","hypothesis","label",
+	dataset_name="pietrolesci/robust_nli", splits=["ST_LM",None,None])
+
+add_one_rte = Classification("premise","hypothesis","label",
+    dataset_name="pietrolesci/add_one_rte",splits=["train","dev","test"])
+
+hlgd = Classification("headline_a", "headline_b", labels="label")
 
 paws___labeled_final   = Classification("sentence1", "sentence2", "label")
 paws___labeled_swap    = Classification("sentence1", "sentence2", "label", splits=["train", None, None])
@@ -417,6 +477,7 @@ blog_authorship_corpus__job       = Classification(sentence1="text",labels="job"
 launch_open_question_type = Classification(sentence1="question", labels="resolve_type", dataset_name="launch/open_question_type")
 
 health_fact = Classification(sentence1="claim", labels="label")
+
 commonsense_qa = MultipleChoice(
     "question",
     choices_list=get.choices.text,
@@ -431,59 +492,19 @@ mc_taco = Classification(
 
 ade_corpus_v2___Ade_corpus_v2_classification = Classification("text",labels="label")
 
-hlgd = Classification("headline_a", "headline_b", labels="label")
-
-glue__diagnostics = Classification("premise","hypothesis","label",
-    dataset_name="pietrolesci/glue_diagnostics",splits=["test",None,None])
-
-breaking_nli = Classification("sentence1","sentence2","label",
-    dataset_name="pietrolesci/breaking_nli", splits=["full",None,None])
-
-conj_nli = Classification("premise","hypothesis","label",
-    dataset_name="pietrolesci/conj_nli")
-
-robust_nli_is_sd = Classification("premise","hypothesis","label",
-    dataset_name="pietrolesci/robust_nli_is_sd")
-
-robust_nli_li_ts = Classification("premise","hypothesis","label",
-    dataset_name="pietrolesci/robust_nli_li_ts")
-
-fracas = Classification("premise","hypothesis","label",
-    dataset_name="pietrolesci/fracas")
-
-dialogue_nli = Classification("sentence1","sentence2","label",
-    dataset_name="pietrolesci/dialogue_nli")   
-
-dnc_nli = Classification("context","hypothesis","label",
-    dataset_name="pietrolesci/dnc")
-
-gpt3_nli = Classification("text_a","text_b","label",dataset_name="pietrolesci/gpt3_nli")
-
-recast_white__fnplus = Classification("text","hypothesis","label",
-    dataset_name="pietrolesci/recast_white",splits=['fnplus',None,None])
-recast_white__sprl = Classification("text","hypothesis","label",
-    dataset_name="pietrolesci/recast_white",splits=['sprl',None,None])
-recast_white__dpr = Classification("text","hypothesis","label",
-    dataset_name="pietrolesci/recast_white",splits=['dpr',None,None])
-
-
-
-joci = Classification("context","hypothesis","label", dataset_name="pietrolesci/joci",splits=['full',None,None])
-
-enfever_nli = Classification("evidence","claim","label", dataset_name="ctu-aic/enfever_nli")
-
-contrast_nli = Classification("premise", "hypothesis",	"label",dataset_name="martn-nguyen/contrast_nli")
+discosense = MultipleChoice("context",choices=regen("option\_[0-3]"),labels="label",
+    dataset_name="prajjwal1/discosense")
+    
+circa = Classification(
+    sentence1=cat(["context","question-X"]),
+    sentence2="answer-Y",
+    labels="goldstandard2")
 
 
 ###END
 ################### END OF SUPPORT ######################
 
-# discosense, discofuse
 
-circa = Classification(
-    sentence1=cat(["context","question-X"]),
-    sentence2="answer-Y",
-    labels="goldstandard2")
 
 tab_fact = Classification(labels="label", config_name=["tab_fact", "blind_test"])
 
@@ -508,7 +529,7 @@ nlu_evaluation_data = Classification(sentence1="text", labels="label", splits=["
 
 newspop = Classification(splits=["train", None, None])
 
-hatexplain = Classification()
+hatexplain = TokenClassification()
 
 bing_coronavirus_query_set = Classification(splits=["train", None, None], config_name=["country_2020-09-01_2020-09-30"])
 
