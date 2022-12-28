@@ -16,7 +16,8 @@ We do not support generation tasks as they are addressed by [promptsource](https
 All implemented preprocessings can be found in [tasks.py](https://github.com/sileod/tasksource/blob/main/src/tasksource/tasks.py). Each preprocessing is a function that takes a dataset as input and returns a standardized dataset. The preprocessing code is designed to be human-readable: adding a new preprocessing only takes a few lines, e.g:
 
 ```python
-cos_e = tasksource.MultipleChoice('question',
+cos_e = tasksource.MultipleChoice(
+    'question',
     choices_list='choices',
     labels= lambda x: x['choices_list'].index(x['answer']),
     config_name='v1.0')
