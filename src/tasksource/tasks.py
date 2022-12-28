@@ -28,8 +28,9 @@ recast = Classification(sentence1="context", sentence2="hypothesis", labels="lab
     'recast_verbcorner', 'recast_ner', 'recast_sentiment', 'recast_megaveridicality']
 )
 
-sileod_wep_probes = Classification(sentence1="context", sentence2="hypothesis", labels="label", dataset_name="sileod/wep-probes", 
-config_name=["reasoning_1hop","reasoning_2hop","usnli"]
+probability_words_nli = Classification(sentence1="context", sentence2="hypothesis", labels="label",
+    dataset_name="sileod/probability_words_nli", 
+    config_name=["reasoning_1hop","reasoning_2hop","usnli"]
 )
 
 nan_nli = Classification("premise", "hypothesis", "label", dataset_name="joey234/nan-nli", config_name="joey234--nan-nli")
@@ -54,12 +55,6 @@ breaking_nli = Classification("sentence1","sentence2","label",
 
 conj_nli = Classification("premise","hypothesis","label",
     dataset_name="pietrolesci/conj_nli")
-
-robust_nli_is_sd = Classification("premise","hypothesis","label",
-    dataset_name="pietrolesci/robust_nli_is_sd")
-
-robust_nli_li_ts = Classification("premise","hypothesis","label",
-    dataset_name="pietrolesci/robust_nli_li_ts")
 
 fracas = Classification("premise","hypothesis","label",
     dataset_name="pietrolesci/fracas")
@@ -101,6 +96,10 @@ robust_nli__ST_NE = Classification("premise","hypothesis","label",
 	dataset_name="pietrolesci/robust_nli", splits=["ST_NE",None,None])
 robust_nli__ST_LM = Classification("premise","hypothesis","label",
 	dataset_name="pietrolesci/robust_nli", splits=["ST_LM",None,None])
+robust_nli_is_sd = Classification("premise","hypothesis","label",
+    dataset_name="pietrolesci/robust_nli_is_sd")
+robust_nli_li_ts = Classification("premise","hypothesis","label",
+    dataset_name="pietrolesci/robust_nli_li_ts")
 
 add_one_rte = Classification("premise","hypothesis","label",
     dataset_name="pietrolesci/add_one_rte",splits=["train","dev","test"])
@@ -124,11 +123,17 @@ conll2003__ner_tags   = TokenClassification(tokens="tokens", labels='ner_tags')
 
 ######################## Multiple choice ###########################
 
+anthropic_rlhf = MultipleChoice(constant(''), ['chosen','rejected'], constant(0),
+    dataset_name="Anthropic/hh-rlhf")
+
+model_written_evals = MultipleChoice('question', ['answer_matching_behavior','answer_not_matching_behavior'], constant(0),
+    dataset_name="Anthropic/model-written-evals")
+
 bigbench = MultipleChoice(
     'inputs',
     choices_list='multiple_choice_targets',
     labels=lambda x:x['multiple_choice_scores'].index(1) if 1 in ['multiple_choice_scores'] else -1,
-    config_name=bigbench_discriminative_english # multiple choice tasks
+    config_name=bigbench_discriminative_english # english multiple choice tasks
 )
 
 blimp__hard = MultipleChoice(inputs=constant(''),
@@ -245,6 +250,7 @@ math_qa = MultipleChoice(
     labels = lambda x:'abcde'.index(x['correct'])   
 )
 
+
 ######################## Classification (other) ########################
 
 trec = Classification(sentence1="text", labels="fine_label")
@@ -304,12 +310,6 @@ super_glue___axg = Classification(sentence1="premise", sentence2="hypothesis", l
 
 tweet_eval = Classification(sentence1="text", labels="label", config_name=["emoji", "emotion", "hate", "irony", "offensive", "sentiment", "stance_abortion", "stance_atheism", "stance_climate", "stance_feminist", "stance_hillary"])
 
-anthropic_rlhf = MultipleChoice(constant(''), ['chosen','rejected'], constant(0),
-    dataset_name="Anthropic/hh-rlhf")
-
-model_written_evals = MultipleChoice('question', ['answer_matching_behavior','answer_not_matching_behavior'], constant(0),
-    dataset_name="Anthropic/model-written-evals")
-
 #lex_glue___ecthr_a = Classification(sentence1="text", labels="labels") # too long
 #lex_glue___ecthr_b = Classification(sentence1="text", labels="labels") # too long
 lex_glue___eurlex = Classification(sentence1="text", labels="labels") 
@@ -336,7 +336,7 @@ financial_phrasebank = Classification(sentence1="sentence", labels="label", spli
 
 poem_sentiment = Classification(sentence1="verse_text", labels="label")
 
-emotion = Classification(sentence1="text", labels="label")
+#emotion = Classification(sentence1="text", labels="label") # file not found
 
 dbpedia_14 = Classification(sentence1="content", labels="label", splits=["train", None, "test"], config_name=["dbpedia_14"])
 
@@ -500,19 +500,70 @@ circa = Classification(
     sentence2="answer-Y",
     labels="goldstandard2")
 
+code_x_glue_cc_defect_detection = Classification("func", labels="target")
+code_x_glue_cc_clone_detection_big_clone_bench = Classification("func1", "func2", "label")
+code_x_glue_cc_code_refinement = MultipleChoice(
+    constant(""), choices=["buggy","fixed"], labels=constant(0),
+    config_name="medium")
+effective_feedback_student_writing = Classification("discourse_text", labels="discourse_effectiveness",dataset_name="YaHi/EffectiveFeedbackStudentWriting")
+
+promptSentiment = Classification("text",labels="label",dataset_name="Ericwang/promptSentiment")
+promptNLI = Classification("premise","hypothesis",labels="label",dataset_name="Ericwang/promptNLI")
+promptSpoke = Classification("text",labels="label",dataset_name="Ericwang/promptSpoke")
+promptProficiency = Classification("text",labels="label",dataset_name="Ericwang/promptProficiency")
+promptGrammar = Classification("text",labels="label",dataset_name="Ericwang/promptGrammar")
+promptCoherence = Classification("text",labels="label",dataset_name="Ericwang/promptCoherence")
+
+phrase_similarity = Classification(
+    sentence1=cat(["phrase1","sentence1"], " : "),
+    sentence2=cat(["phrase2","sentence2"], " : "),
+    labels='label',
+    dataset_name="PiC/phrase_similarity"
+)
+
+exaggeration_detection = Classification(
+    sentence1="press_release_conclusion",
+    sentence2="abstract_conclusion",
+    labels="exaggeration_label", 
+    dataset_name="copenlu/scientific-exaggeration-detection"
+)
+quarel = Classification(
+    "question",
+    labels="answer_index"
+)
+
+mwong_fever_evidence_related = Classification(sentence1="claim", sentence2="evidence", labels="labels", splits=["train", "valid", "test"], dataset_name="mwong/fever-evidence-related", config_name="mwong--fever-related")
+
+numer_sense = Classification("sentence",labels="target",splits=["train",None,None])
+
+dynasent__r1 = Classification("sentence", labels="gold_label", 
+    dataset_name="dynabench/dynasent", config_name="dynabench.dynasent.r1.all")
+dynasent__r2 = Classification("sentence", labels="gold_label", 
+    dataset_name="dynabench/dynasent", config_name="dynabench.dynasent.r2.all")
+
+sarcasm_news = Classification("headline", labels="is_sarcastic",
+    dataset_name="raquiba/Sarcasm_News_Headline")
 
 ###END
 ################### END OF SUPPORT ######################
 
+# RuyuanWan/SChem_Disagreement
 
+crows_pairs = Classification(splits=["test", None, None], config_name=["crows_pairs"]) # not a task we want to perform well on
 
+jigsaw_unintended_bias = Classification(sentence1="comment_text", labels="rating", splits=["train", None, None])
+jigsaw_toxicity_pred = Classification(sentence1="comment_text", splits=["train", None, "test"])
+# has to be downloaded
+
+# proto_qa
 tab_fact = Classification(labels="label", config_name=["tab_fact", "blind_test"])
 
 tab_fact___blind_test = Classification(splits=["test", None, None])
 
 movie_rationales = Classification(labels="label")
 
-crows_pairs = Classification(splits=["test", None, None], config_name=["crows_pairs"])
+
+
 
 biosses = Classification(sentence1="sentence1", sentence2="sentence2", labels="score", splits=["train", None, None])
 
@@ -522,8 +573,6 @@ gutenberg_time = Classification(splits=["train", None, None], config_name=["gute
 
 
 clinc_oos = Classification(sentence1="text", config_name=["small", "imbalanced", "plus"])
-
-circa = Classification(sentence1="context", splits=["train", None, None])
 
 nlu_evaluation_data = Classification(sentence1="text", labels="label", splits=["train", None, None])
 
@@ -567,11 +616,9 @@ coastalcph_fairlex___cail = Classification(sentence1="text", labels="label", dat
 peer_read = Classification(config_name=["parsed_pdfs", "reviews"])
 
 
-jigsaw_unintended_bias = Classification(sentence1="comment_text", labels="rating", splits=["train", None, None])
 
 per_sent = Classification(splits=["train", "validation", None])
 
-jigsaw_toxicity_pred = Classification(sentence1="comment_text", splits=["train", None, "test"])
 
 diplomacy_detection = Classification()
 
@@ -661,8 +708,6 @@ jpwahle_etpc = Classification(splits=[None, None, None], dataset_name="jpwahle/e
 climatebert_environmental_claims = Classification(dataset_name="climatebert/environmental_claims", config_name="climatebert--environmental_claims")
 
 KheemDH_data = Classification(splits=["train", None, None], dataset_name="KheemDH/data", config_name="KheemDH--data")
-
-mwong_fever_evidence_related = Classification(sentence1="claim", sentence2="evidence", labels="labels", splits=["train", None, "test"], dataset_name="mwong/fever-evidence-related", config_name="mwong--fever-related")
 
 pacovaldez_stackoverflow_questions_2016 = Classification(dataset_name="pacovaldez/stackoverflow-questions-2016", config_name="pacovaldez--stackoverflow-questions-2016")
 

@@ -21,6 +21,12 @@ def parse_var_name(s):
         dataset_name = s
     return dataset_name,config_name,task_name
 
+def pretty_name(x):
+    dn = x.dataset_name.split("/")[-1]   
+    cn = x.config_name if x.config_name else ""
+    tn = x.task_name if x.task_name else ""
+    return f"{dn}/{cn}/{tn}".replace('//','/').rstrip('/')
+
 def list_tasks(tasks_path=f'{os.path.dirname(__file__)}/tasks.py'):
     task_order = open(tasks_path).readlines()
     task_order= task_order[:task_order.index('###END\n')]
@@ -30,7 +36,7 @@ def list_tasks(tasks_path=f'{os.path.dirname(__file__)}/tasks.py'):
 
     l = []
     for key in dir(tasks):
-        if not task_order.get(key,None):
+        if key not in task_order:
             continue
         value=getattr(tasks, key)
         if isinstance(value,Preprocessing):
@@ -46,6 +52,8 @@ def list_tasks(tasks_path=f'{os.path.dirname(__file__)}/tasks.py'):
                 'rank':task_order.get(key,None)}]   
     df=pd.DataFrame(l).explode('config_name')
     df = df.sort_values('rank')
+    df['id'] = df.apply(lambda x: pretty_name(x), axis=1)
+    df.insert(0, 'id', df.pop('id'))
     del df['rank']
     return df
 
@@ -58,5 +66,10 @@ def load_preprocessing(dataset_name, config_name=None, task_name=None):
     y = y[y.task_name.map(lambda x:x==task_name)]
     return getattr(tasks,y.preprocessing_name.iloc[0])
 
-def load_task(dataset_name,config_name=None,task_name=None):
-    return load_preprocessing(dataset_name,config_name,task_name)(load_dataset(dataset_name,config_name))
+
+
+def load_task(dataset_name,config_name=None,task_name=None,
+         max_rows=None, max_rows_eval=None):
+    dataset = load_dataset(dataset_name,config_name)
+    preprocessing = load_preprocessing(dataset_name,config_name,task_name) 
+    return preprocessing(dataset,max_rows, max_rows_eval)

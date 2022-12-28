@@ -8,6 +8,7 @@ import exrex
 import magicattr 
 import numpy as np
 import copy
+import datasets
 
 def get_column_names(dataset):
     cn = dataset.column_names
@@ -15,6 +16,13 @@ def get_column_names(dataset):
         return set(fc.flatten(cn.values()))
     else:
         return set(cn)
+
+def sample_dataset(dataset,n=10000, n_eval=1000):
+    for k in dataset:
+        n_k=(n if k=='train' else n_eval)
+        if n_k and len(dataset[k])>n_k:
+            dataset[k]=dataset[k].train_test_split(train_size=n_k)['train']
+    return dataset
 
 class Preprocessing(DotWiz):
     default_splits = ('train','validation','test')
@@ -24,7 +32,7 @@ class Preprocessing(DotWiz):
         x[target]=fn(x)
         return x
 
-    def __call__(self,dataset):
+    def __call__(self,dataset, max_rows=None, max_rows_eval=None):
         for k,v in zip(self.default_splits, self.splits):
             if v and k!=v:
                 dataset[k]=dataset[v]
@@ -36,6 +44,8 @@ class Preprocessing(DotWiz):
         for k in list(dataset.keys()):
             if k not in self.default_splits:
                 del dataset[k]
+        dataset = sample_dataset(dataset, max_rows, max_rows_eval)
+        
         dataset=dataset.rename_columns({v:k for k,v in self.to_dict().items()
                                         if (k and k not in {'splits','dataset_name','config_name'} 
                                         and type(v)==str and k!=v)})
@@ -49,7 +59,7 @@ class Preprocessing(DotWiz):
             get_column_names(dataset)-set(self.to_dict().keys()))
         dataset = fix_labels(dataset)
         return dataset
-    
+
 
 @dataclass
 class cat(Preprocessing):
@@ -95,6 +105,9 @@ class dotgetter:
     def __call__(self, example=None):
         return magicattr.get(DotWiz(example), self.path)
 
+    def __hash__(self):
+        return hash(self.path)
+
 
 @dataclass
 class ClassificationFields(Preprocessing):
@@ -121,8 +134,8 @@ class MultipleChoiceFields(Preprocessing):
         if not self.choices_list:
             delattr(self,'choices_list')
     
-    def __call__(self,dataset):
-        dataset = super().__call__(dataset)
+    def __call__(self,dataset, *args, **kwargs):
+        dataset = super().__call__(dataset, *args, **kwargs)
         if self.choices_list:
             dataset = dataset.filter(lambda x: 1<len(x['choices_list']))
             n_options = min([len(x) for k in dataset for x in dataset[k]['choices_list']])
@@ -214,4 +227,5 @@ def fix_labels(dataset, label_key='labels'):
         example[label_key]=label_to_index[example[label_key]]
         return example
     dataset=dataset.map(apply_label_to_index)
+    dataset=dataset.cast_column(label_key, datasets.Value(dtype='int64'))
     return dataset
