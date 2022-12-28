@@ -51,7 +51,7 @@ def list_tasks(tasks_path=f'{os.path.dirname(__file__)}/tasks.py'):
                 'task_type': value.__class__.__name__,'mapping': value,
                 'rank':task_order.get(key,None)}]   
     df=pd.DataFrame(l).explode('config_name')
-    df = df.sort_values('rank')
+    df = df.sort_values('rank').reset_index(drop=True)
     df['id'] = df.apply(lambda x: pretty_name(x), axis=1)
     df.insert(0, 'id', df.pop('id'))
     del df['rank']
