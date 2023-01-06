@@ -1,14 +1,20 @@
 from .preprocess import cat, get, regen, constant, Classification, TokenClassification, MultipleChoice
-from .metadata import bigbench_discriminative_english, blimp_hard
-from datasets import get_dataset_config_names
+from .metadata import bigbench_discriminative_english, blimp_hard, imppres_presupposition, imppres_implicature
+from datasets import get_dataset_config_names, ClassLabel
 
 # variable name: dataset___config__task
 
 ###################### NLI/paraphrase ###############################
 
-anli__r1 = Classification('premise','hypothesis','label', splits=['train_r1','dev_r1','test_r1'])
-anli__r2 = Classification('premise','hypothesis','label', splits=['train_r2','dev_r2','test_r2'])
-anli__r3 = Classification('premise','hypothesis','label', splits=['train_r3','dev_r3','test_r3'])
+
+babi_nli = Classification("premise", "hypothesis", "label",
+    dataset_name="metaeval/babi_nli",
+    config_name=set(get_dataset_config_names("metaeval/babi_nli"))-{"agents-motivations"}
+) # agents-motivations task is not as clear-cut as the others
+
+anli__a1 = Classification('premise','hypothesis','label', splits=['train_r1','dev_r1','test_r1'])
+anli__a2 = Classification('premise','hypothesis','label', splits=['train_r2','dev_r2','test_r2'])
+anli__a3 = Classification('premise','hypothesis','label', splits=['train_r3','dev_r3','test_r3'])
 
 sick__label         = Classification('sentence_A','sentence_B','label')
 sick__relatedness   = Classification('sentence_A','sentence_B','relatedness_score')
@@ -19,36 +25,23 @@ snli = Classification(sentence1="premise", sentence2="hypothesis", labels="label
 
 scitail = Classification("sentence1","sentence2","gold_label",config_name="snli_format")
 
-hans = Classification(sentence1="premise", sentence2="hypothesis", labels="label", splits=["train", "validation", None])
+hans = Classification(sentence1="premise", sentence2="hypothesis", labels="label")
 
 wanli = Classification('premise','hypothesis','gold', dataset_name="alisawuffles/WANLI")
 
 recast = Classification(sentence1="context", sentence2="hypothesis", labels="label", dataset_name="metaeval/recast",
     config_name=['recast_kg_relations', 'recast_puns', 'recast_factuality', 'recast_verbnet',
-    'recast_verbcorner', 'recast_ner', 'recast_sentiment', 'recast_megaveridicality']
-)
+    'recast_verbcorner', 'recast_ner', 'recast_sentiment', 'recast_megaveridicality'])
+
 
 probability_words_nli = Classification(sentence1="context", sentence2="hypothesis", labels="label",
     dataset_name="sileod/probability_words_nli", 
-    config_name=["reasoning_1hop","reasoning_2hop","usnli"]
-)
+    config_name=["reasoning_1hop","reasoning_2hop","usnli"])
 
 nan_nli = Classification("premise", "hypothesis", "label", dataset_name="joey234/nan-nli", config_name="joey234--nan-nli")
 
-gen_debiased_nli__snli_seq_z = Classification("premise","hypothesis","label",
-	dataset_name="pietrolesci/gen_debiased_nli", splits=["snli_seq_z",None,None])
-gen_debiased_nli__snli_z_aug = Classification("premise","hypothesis","label",
-	dataset_name="pietrolesci/gen_debiased_nli", splits=["snli_z_aug",None,None])
-gen_debiased_nli__snli_par_z = Classification("premise","hypothesis","label",
-	dataset_name="pietrolesci/gen_debiased_nli", splits=["snli_par_z",None,None])
-gen_debiased_nli__mnli_par_z = Classification("premise","hypothesis","label",
-	dataset_name="pietrolesci/gen_debiased_nli", splits=["mnli_par_z",None,None])
-gen_debiased_nli__mnli_z_aug = Classification("premise","hypothesis","label",
-	dataset_name="pietrolesci/gen_debiased_nli", splits=["mnli_z_aug",None,None])
-gen_debiased_nli__mnli_seq_z = Classification("premise","hypothesis","label",
-	dataset_name="pietrolesci/gen_debiased_nli", splits=["mnli_seq_z",None,None])
-glue__diagnostics = Classification("premise","hypothesis","label",
-    dataset_name="pietrolesci/glue_diagnostics",splits=["test",None,None])
+nli_fever = Classification("premise","hypothesis","label",
+    dataset_name="pietrolesci/nli_fever", splits=["train","dev",None])
 
 breaking_nli = Classification("sentence1","sentence2","label",
     dataset_name="pietrolesci/breaking_nli", splits=["full",None,None])
@@ -61,6 +54,10 @@ fracas = Classification("premise","hypothesis","label",
 
 dialogue_nli = Classification("sentence1","sentence2","label",
     dataset_name="pietrolesci/dialogue_nli")   
+
+mpe_nli = Classification("premise","hypothesis","label",
+    dataset_name="pietrolesci/mpe",
+    splits=["train","dev","test"])  
 
 dnc_nli = Classification("context","hypothesis","label",
     dataset_name="pietrolesci/dnc")
@@ -76,7 +73,7 @@ recast_white__dpr = Classification("text","hypothesis","label",
 
 joci = Classification("context","hypothesis","label", dataset_name="pietrolesci/joci",splits=['full',None,None])
 
-enfever_nli = Classification("evidence","claim","label", dataset_name="ctu-aic/enfever_nli")
+#enfever_nli = Classification("evidence","claim","label", dataset_name="ctu-aic/enfever_nli")
 
 contrast_nli = Classification("premise", "hypothesis",	"label",dataset_name="martn-nguyen/contrast_nli")
 
@@ -101,14 +98,49 @@ robust_nli_is_sd = Classification("premise","hypothesis","label",
 robust_nli_li_ts = Classification("premise","hypothesis","label",
     dataset_name="pietrolesci/robust_nli_li_ts")
 
+gen_debiased_nli__snli_seq_z = Classification("premise","hypothesis","label",
+	dataset_name="pietrolesci/gen_debiased_nli", splits=["snli_seq_z",None,None])
+gen_debiased_nli__snli_z_aug = Classification("premise","hypothesis","label",
+	dataset_name="pietrolesci/gen_debiased_nli", splits=["snli_z_aug",None,None])
+gen_debiased_nli__snli_par_z = Classification("premise","hypothesis","label",
+	dataset_name="pietrolesci/gen_debiased_nli", splits=["snli_par_z",None,None])
+gen_debiased_nli__mnli_par_z = Classification("premise","hypothesis","label",
+	dataset_name="pietrolesci/gen_debiased_nli", splits=["mnli_par_z",None,None])
+gen_debiased_nli__mnli_z_aug = Classification("premise","hypothesis","label",
+	dataset_name="pietrolesci/gen_debiased_nli", splits=["mnli_z_aug",None,None])
+gen_debiased_nli__mnli_seq_z = Classification("premise","hypothesis","label",
+	dataset_name="pietrolesci/gen_debiased_nli", splits=["mnli_seq_z",None,None])
+
 add_one_rte = Classification("premise","hypothesis","label",
     dataset_name="pietrolesci/add_one_rte",splits=["train","dev","test"])
+
+def imppres_post_process(ds,prefix=''):
+    # imppres entailment definition is either purely semantic or purely pragmatic
+    # because of that, we assign differentiate the labels from anli/mnli notation
+    return ds.cast_column('labels', ClassLabel(
+    names=[f'imppres{prefix}_entailment',f'imppres{prefix}_neutral',f'imppres{prefix}_contradiction']))
+
+imppres__presupposition = imppres__prag = Classification("premise","hypothesis","gold_label",
+    dataset_name="metaeval/imppres", config_name=imppres_presupposition,
+    post_process=imppres_post_process)
+
+imppres__prag = Classification("premise","hypothesis","gold_label_prag",
+    dataset_name="metaeval/imppres", config_name=imppres_implicature,
+    post_process=lambda x: imppres_post_process(x,'_prag'))
+
+imppres__log = Classification("premise","hypothesis","gold_label_log",
+    dataset_name="metaeval/imppres", config_name=imppres_implicature,
+    post_process=lambda x: imppres_post_process(x,'_log'))
+
+
+glue__diagnostics = Classification("premise","hypothesis","label",
+    dataset_name="pietrolesci/glue_diagnostics",splits=["test",None,None])
 
 hlgd = Classification("headline_a", "headline_b", labels="label")
 
 paws___labeled_final   = Classification("sentence1", "sentence2", "label")
 paws___labeled_swap    = Classification("sentence1", "sentence2", "label", splits=["train", None, None])
-paws___unlabeled_final = Classification("sentence1", "sentence2", "label", splits=["train", "validation", None])
+#paws___unlabeled_final = Classification("sentence1", "sentence2", "label")
 
 quora = Classification(get.questions.text[0], get.questions.text[1], 'is_duplicate')
 medical_questions_pairs = Classification("question_1","question_2", "label")
@@ -129,16 +161,32 @@ anthropic_rlhf = MultipleChoice(constant(''), ['chosen','rejected'], constant(0)
 model_written_evals = MultipleChoice('question', ['answer_matching_behavior','answer_not_matching_behavior'], constant(0),
     dataset_name="Anthropic/model-written-evals")
 
+
+truthful_qa___multiple_choice = MultipleChoice(
+    "question",
+    choices_list=get.mc1_targets.choices,
+    labels=constant(0)
+)
+
+fig_qa = MultipleChoice(
+    "startphrase",
+    choices=["ending1","ending2"],
+    labels="labels",
+    dataset_name="nightingal3/fig-qa",
+    splits=["train","validation",None]
+)
+
 bigbench = MultipleChoice(
     'inputs',
     choices_list='multiple_choice_targets',
     labels=lambda x:x['multiple_choice_scores'].index(1) if 1 in ['multiple_choice_scores'] else -1,
-    config_name=bigbench_discriminative_english # english multiple choice tasks
+    config_name=bigbench_discriminative_english - {"social_iqa"} # english multiple choice tasks, minus duplicates
 )
 
-blimp__hard = MultipleChoice(inputs=constant(''),
+blimp_hard = MultipleChoice(inputs=constant(''),
     choices=['sentence_good','sentence_bad'],
     labels=constant(0),
+    dataset_name="blimp",
     config_name=blimp_hard # tasks where GPT2 is at least 10% below  human accuracy
 )
 
@@ -180,6 +228,10 @@ quail = MultipleChoice(
     labels='correct_answer_id' 
 )
 
+head_qa___en = MultipleChoice("qtext",
+    choices_list = lambda x:[a['atext'] for a in x["answers"]],
+    labels = lambda x:[a['aid'] for a in x["answers"]].index(x["ra"])
+)
 
 #race___middle = MultipleChoice('question', choices_list='options', labels='answer')
 #race___high   = MultipleChoice('question', choices_list='options', labels='answer')
@@ -205,7 +257,7 @@ wiqa = MultipleChoice('question_stem',
     choices_list = lambda x: x['choices']['text'],
     labels='answer_label_as_choice')
 
-piqa = MultipleChoice('goal',['sol1','sol2'], 'label')
+piqa = MultipleChoice('goal', ['sol1','sol2'], 'label')
 
 hellaswag = MultipleChoice('ctx_a',
     choices_list=lambda x: [f'{x["ctx_b"]}{e}' for e in x["endings"]],
@@ -215,7 +267,9 @@ super_glue___copa = MultipleChoice('premise',['choice1','choice2'],'label')
 
 art = MultipleChoice(cat(['hypothesis_1','hypothesis_2']),
     ['observation_1','observation_2'],
-    labels=lambda x:x['label']-1)
+    labels=lambda x:x['label']-1,
+    splits=['train','validation',None]
+)
 
 
 hendrycks_test = MultipleChoice('question',labels='answer',choices_list='choices',splits=['test','dev','validation'],
@@ -226,7 +280,7 @@ winogrande = MultipleChoice('sentence',['option1','option2'],'answer',config_nam
     splits=['train','validation',None])
 
 codah = MultipleChoice('question_propmt',choices_list='candidate_answers',labels='correct_answer_idx',config_name='codah')
-    
+
 ai2_arc__challenge = MultipleChoice('question',
     choices_list=get.choices.text,  
     labels=lambda x: get.choices.label(x).index(x["answerKey"]),
@@ -253,6 +307,14 @@ math_qa = MultipleChoice(
 
 ######################## Classification (other) ########################
 
+utilitarianism = Classification("comparison",labels="label",
+dataset_name="")
+
+turingbench = Classification("Generation",labels="label",
+    dataset_name="turingbench/TuringBench",
+    splits=["train","validation",None])
+
+
 trec = Classification(sentence1="text", labels="fine_label")
 
 tals_vitaminc = Classification('claim','evidence','label', dataset_name="tals/vitaminc", config_name="tals--vitaminc")
@@ -262,7 +324,12 @@ hope_edi = Classification("text", labels="label", splits=["train", "validation",
 #fever___v1_0 = Classification(sentence1="claim", labels="label", splits=["train", "paper_dev", "paper_test"], dataset_name="fever", config_name="v1.0")
 #fever___v2_0 = Classification(sentence1="claim", labels="label", splits=[None, "validation", None], dataset_name="fever", config_name="v2.0")
 
-#strombergnlp_rumoureval_2019 = Classification("source_text", "reply_text", labels="label", dataset_name="strombergnlp/rumoureval_2019", config_name="RumourEval2019")
+rumoureval_2019 = Classification(
+    sentence1="source_text",
+    sentence2=lambda x: str(x["reply_text"]),
+    labels="label", dataset_name="strombergnlp/rumoureval_2019", config_name="RumourEval2019",
+    post_process=lambda ds:ds.filter(lambda x:x['labels']!=None)    
+)
 
 ethos___binary = Classification(sentence1="text", labels="label", splits=["train", None, None])
 ethos___multilabel = Classification(
@@ -273,24 +340,12 @@ ethos___multilabel = Classification(
     splits=["train", None, None]
 )
 
-discovery = Classification("sentence1", "sentence2", labels="label", config_name=["discovery"])
-
-pragmeval__single_input = Classification("sentence",labels="label",
-    config_name= ["emobank-arousal", "emobank-dominance", "emobank-valence", "squinky-formality", "squinky-implicature", 
-    "squinky-informativeness","switchboard","mrda","verifiability"])
-
-pragmeval__pairs = Classification("sentence1","sentence2",labels="label",
-    config_name= ["emergent", "gum", "pdtb", "persuasiveness-claimtype", 
-    "persuasiveness-eloquence", "persuasiveness-premisetype", "persuasiveness-relevance", "persuasiveness-specificity", 
-    "persuasiveness-strength", "sarcasm","stac"])
-
-
 glue___cola = Classification(sentence1="sentence", labels="label")
 glue___sst2 = Classification(sentence1="sentence", labels="label")
 glue___mrpc = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
 glue___qqp = Classification(sentence1="question1", sentence2="question2", labels="label")
 glue___stsb = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
-glue___mnli = Classification(sentence1="premise", sentence2="hypothesis", labels="label", splits=["train", "validation_matched", None])
+glue___mnli = Classification(sentence1="premise", sentence2="hypothesis", labels="label", splits=["train", None, "validation_matched"])
 glue___qnli = Classification(sentence1="question", labels="label")
 glue___rte = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
 glue___wnli = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
@@ -309,6 +364,19 @@ super_glue___wic = Classification(
 super_glue___axg = Classification(sentence1="premise", sentence2="hypothesis", labels="label", splits=["test", None, None])
 
 tweet_eval = Classification(sentence1="text", labels="label", config_name=["emoji", "emotion", "hate", "irony", "offensive", "sentiment", "stance_abortion", "stance_atheism", "stance_climate", "stance_feminist", "stance_hillary"])
+
+discovery = Classification("sentence1", "sentence2", labels="label", config_name=["discovery"])
+
+pragmeval_1 = Classification("sentence",labels="label",
+    dataset_name="pragmeval",
+    config_name= ["emobank-arousal", "emobank-dominance", "emobank-valence", "squinky-formality", "squinky-implicature", 
+    "squinky-informativeness","switchboard","mrda","verifiability"])
+
+pragmeval_2 = Classification("sentence1","sentence2",labels="label",
+    dataset_name="pragmeval",
+    config_name= ["emergent", "gum", "pdtb", "persuasiveness-claimtype", 
+    "persuasiveness-eloquence", "persuasiveness-premisetype", "persuasiveness-relevance", "persuasiveness-specificity", 
+    "persuasiveness-strength", "sarcasm","stac"])
 
 #lex_glue___ecthr_a = Classification(sentence1="text", labels="labels") # too long
 #lex_glue___ecthr_b = Classification(sentence1="text", labels="labels") # too long
@@ -332,7 +400,8 @@ ag_news = Classification(sentence1="text", labels="label", splits=["train", None
 
 yelp_review_full = Classification(sentence1="text", labels="label", splits=["train", None, "test"], config_name=["yelp_review_full"])
 
-financial_phrasebank = Classification(sentence1="sentence", labels="label", splits=["train", None, None], config_name=["sentences_allagree", "sentences_75agree", "sentences_66agree", "sentences_50agree"])
+financial_phrasebank = Classification(sentence1="sentence", labels="label", splits=["train", None, None],
+    config_name=["sentences_allagree"])
 
 poem_sentiment = Classification(sentence1="verse_text", labels="label")
 
@@ -364,13 +433,12 @@ hate_speech_offensive = Classification(sentence1="tweet", labels="class", splits
 
 #yahoo_answers_topics = Classification(splits=["train", None, "test"], config_name=["yahoo_answers_topics"]) #trivial
 
+
 hyperpartisan_news_detection___byarticle = Classification(sentence1="text", labels="hyperpartisan", splits=["train", None, None])
-hyperpartisan_news_detection___bypublisher = Classification(sentence1="text", labels="hyperpartisan", splits=["train", "validation", None])
+hyperpartisan_news_detection___bypublisher = Classification(sentence1="text", labels="hyperpartisan", splits=["train","validation", None])
 
 #go_emotions___raw = Classification(sentence1="text", splits=["train", None, None])
 go_emotions___simplified = Classification(sentence1="text", labels="labels")
-
-#daily_dialog = TokenClassification()
 
 #boolq = Classification(sentence1="question", splits=["train", "validation", None]) # in superglue
 
@@ -416,22 +484,10 @@ metaeval_crowdflower = Classification("text", labels="label",
 metaeval_ethics___commonsense = Classification(sentence1="text", labels="label", dataset_name="metaeval/ethics", config_name="commonsense")
 metaeval_ethics___deontology = Classification(sentence1="text", labels="label", dataset_name="metaeval/ethics", config_name="deontology")
 metaeval_ethics___justice = Classification(sentence1="text", labels="label", dataset_name="metaeval/ethics", config_name="justice")
-metaeval_ethics___utilitarianism = Classification(sentence1="text", labels="label", dataset_name="metaeval/ethics", config_name="utilitarianism")
+#metaeval_ethics___utilitarianism = Classification(sentence1="text", labels="label", dataset_name="metaeval/ethics", config_name="utilitarianism")
 metaeval_ethics___virtue = Classification(sentence1="sentence1", sentence2="sentence2", labels="label", dataset_name="metaeval/ethics", config_name="virtue")
 
-
 emo = Classification(sentence1="text", labels="label", splits=["train", None, "test"], config_name=["emo2019"])
-
-#md_gender_bias___gendered_words = Classification(splits=["train", None, None])
-#md_gender_bias___name_genders = Classification(splits=[None, None, None])
-#md_gender_bias___new_data = Classification(sentence1="text", labels="labels", splits=["train", None, None])
-#md_gender_bias___funpedia = Classification(sentence1="text")
-#md_gender_bias___image_chat = Classification()
-#md_gender_bias___wizard = Classification(sentence1="text")
-#md_gender_bias___convai2_inferred = Classification(sentence1="text")
-#md_gender_bias___light_inferred = Classification(sentence1="text")
-#md_gender_bias___opensubtitles_inferred = Classification(sentence1="text")
-#md_gender_bias___yelp_inferred = Classification(sentence1="text")
 
 google_wellformed_query = Classification(sentence1="content", labels="rating")
 
@@ -453,19 +509,10 @@ ncbi_disease = TokenClassification(tokens="tokens", labels="ner_tags", config_na
 
 acronym_identification = TokenClassification(labels="labels", tokens="tokens")
 
-#conllpp = TokenClassification(tokens="tokens", labels="pos_tags", config_name=["conllpp"])
-
 jnlpba = TokenClassification(tokens="tokens", labels="ner_tags", splits=["train", "validation", None], config_name=["jnlpba"])
 
 species_800 = TokenClassification(tokens="tokens", labels="ner_tags", config_name=["species_800"])
 
-#tner_tweetner7 = TokenClassification(tokens="tokens", labels="tags", splits=[None, None, None], dataset_name="tner/tweetner7", config_name="tweetner7")
-#tner_ontonotes5 = TokenClassification(tokens="tokens", labels="tags", dataset_name="tner/ontonotes5", config_name="ontonotes5")
-
-
-#strombergnlp_twitter_pos___foster = TokenClassification(tokens="tokens", labels="pos_tags", splits=[None, "validation", "test"], dataset_name="strombergnlp/twitter_pos", config_name="foster")
-#strombergnlp_twitter_pos___ritter = TokenClassification(tokens="tokens", labels="pos_tags", dataset_name="strombergnlp/twitter_pos", config_name="ritter")
-#strombergnlp_named_timexes = TokenClassification(tokens="tokens", labels="ntimex_tags", splits=["train", None, "test"], dataset_name="strombergnlp/named_timexes", config_name="named-timexes")
 SpeedOfMagic_ontonotes_english = TokenClassification(tokens="tokens", labels="ner_tags", dataset_name="SpeedOfMagic/ontonotes_english", config_name="SpeedOfMagic--ontonotes_english")
 
 
@@ -561,8 +608,14 @@ tab_fact = Classification(labels="label", config_name=["tab_fact", "blind_test"]
 tab_fact___blind_test = Classification(splits=["test", None, None])
 
 movie_rationales = Classification(labels="label")
+#conllpp = TokenClassification(tokens="tokens", labels="pos_tags", config_name=["conllpp"])
+#tner_tweetner7 = TokenClassification(tokens="tokens", labels="tags", splits=[None, None, None], dataset_name="tner/tweetner7", config_name="tweetner7")
+#tner_ontonotes5 = TokenClassification(tokens="tokens", labels="tags", dataset_name="tner/ontonotes5", config_name="ontonotes5")
 
 
+#strombergnlp_twitter_pos___foster = TokenClassification(tokens="tokens", labels="pos_tags", splits=[None, "validation", "test"], dataset_name="strombergnlp/twitter_pos", config_name="foster")
+#strombergnlp_twitter_pos___ritter = TokenClassification(tokens="tokens", labels="pos_tags", dataset_name="strombergnlp/twitter_pos", config_name="ritter")
+#strombergnlp_named_timexes = TokenClassification(tokens="tokens", labels="ntimex_tags", splits=["train", None, "test"], dataset_name="strombergnlp/named_timexes", config_name="named-timexes")
 
 
 biosses = Classification(sentence1="sentence1", sentence2="sentence2", labels="score", splits=["train", None, None])
@@ -615,10 +668,7 @@ coastalcph_fairlex___cail = Classification(sentence1="text", labels="label", dat
 
 peer_read = Classification(config_name=["parsed_pdfs", "reviews"])
 
-
-
 per_sent = Classification(splits=["train", "validation", None])
-
 
 diplomacy_detection = Classification()
 
@@ -658,13 +708,9 @@ bhavnicksm_sentihood = Classification(dataset_name="bhavnicksm/sentihood", confi
 
 cardiffnlp_tweet_topic_single = Classification(sentence1="text", labels="label", splits=[None, None, None], dataset_name="cardiffnlp/tweet_topic_single", config_name="tweet_topic_single")
 
-
 OxAISH_AL_LLM_wiki_toxic = Classification(sentence1="comment_text", labels="label", dataset_name="OxAISH-AL-LLM/wiki_toxic")
 
 carblacac_twitter_sentiment_analysis = Classification(sentence1="text", dataset_name="carblacac/twitter-sentiment-analysis")
-
-
-copenlu_scientific_exaggeration_detection = Classification(splits=["train", None, "test"], dataset_name="copenlu/scientific-exaggeration-detection", config_name="copenlu--scientific-exaggeration-detection")
 
 bdotloh_empathetic_dialogues_contexts = Classification(dataset_name="bdotloh/empathetic-dialogues-contexts", config_name="bdotloh--empathetic-dialogues-contexts")
 
@@ -799,10 +845,22 @@ medmcqa = MultipleChoice(inputs="question")
 
 sileod_movie_recommendation = Classification(sentence1="question", labels="label", splits=["test", None, None], dataset_name="sileod/movie_recommendation")
 
-nightingal3_fig_qa = MultipleChoice(dataset_name="nightingal3/fig-qa", config_name="nightingal3--fig-qa")
+nightingal3_fig_qa = MultipleChoice(dataset_name="nightingal3/fig-qa", config_name="nightingal3--fig-qa",
+    splits=['train','validation',None])
 
 
 sileod_discourse_marker_qa = Classification(sentence1="context", labels="label", splits=["test", None, None], dataset_name="sileod/discourse_marker_qa")
+
+#md_gender_bias___gendered_words = Classification(splits=["train", None, None])
+#md_gender_bias___name_genders = Classification(splits=[None, None, None])
+#md_gender_bias___new_data = Classification(sentence1="text", labels="labels", splits=["train", None, None])
+#md_gender_bias___funpedia = Classification(sentence1="text")
+#md_gender_bias___image_chat = Classification()
+#md_gender_bias___wizard = Classification(sentence1="text")
+#md_gender_bias___convai2_inferred = Classification(sentence1="text")
+#md_gender_bias___light_inferred = Classification(sentence1="text")
+#md_gender_bias___opensubtitles_inferred = Classification(sentence1="text")
+#md_gender_bias___yelp_inferred = Classification(sentence1="text")
 
 
 patriziobellan_PET___token_classification = TokenClassification(tokens="tokens", splits=["test", None, None], dataset_name="patriziobellan/PET", config_name="token-classification")

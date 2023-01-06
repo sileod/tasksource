@@ -17,6 +17,7 @@ def get_column_names(dataset):
     else:
         return set(cn)
 
+
 def sample_dataset(dataset,n=10000, n_eval=1000):
     for k in dataset:
         n_k=(n if k=='train' else n_eval)
@@ -26,7 +27,7 @@ def sample_dataset(dataset,n=10000, n_eval=1000):
 
 class Preprocessing(DotWiz):
     default_splits = ('train','validation','test')
-    
+        
     @staticmethod
     def __map_to_target(x,fn=lambda x:None, target=None):
         x[target]=fn(x)
@@ -51,13 +52,14 @@ class Preprocessing(DotWiz):
                                         and type(v)==str and k!=v)})
         for k in self.to_dict().keys():
             v=getattr(self, k)
-            if callable(v):
+            if callable(v) and k!="post_process":
                 dataset=dataset.map(self.__map_to_target,
                                     fn_kwargs={'fn':v,'target':k})
 
         dataset=dataset.remove_columns(
             get_column_names(dataset)-set(self.to_dict().keys()))
         dataset = fix_labels(dataset)
+        dataset = self.post_process(dataset)
         return dataset
 
 
@@ -162,6 +164,7 @@ class SharedFields:
     splits:list=Preprocessing.default_splits
     dataset_name:str = None
     config_name:str = None
+    post_process: callable = lambda x:x
 
 @dataclass
 class Classification(SharedFields, ClassificationFields): pass
