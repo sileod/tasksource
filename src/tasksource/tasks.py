@@ -7,14 +7,16 @@ from datasets import get_dataset_config_names, ClassLabel
 ###################### NLI/paraphrase ###############################
 
 
+anli__a1 = Classification('premise','hypothesis','label', splits=['train_r1','dev_r1','test_r1'])
+anli__a2 = Classification('premise','hypothesis','label', splits=['train_r2','dev_r2','test_r2'])
+anli__a3 = Classification('premise','hypothesis','label', splits=['train_r3','dev_r3','test_r3'])
+
+
 babi_nli = Classification("premise", "hypothesis", "label",
     dataset_name="metaeval/babi_nli",
     config_name=set(get_dataset_config_names("metaeval/babi_nli"))-{"agents-motivations"}
 ) # agents-motivations task is not as clear-cut as the others
 
-anli__a1 = Classification('premise','hypothesis','label', splits=['train_r1','dev_r1','test_r1'])
-anli__a2 = Classification('premise','hypothesis','label', splits=['train_r2','dev_r2','test_r2'])
-anli__a3 = Classification('premise','hypothesis','label', splits=['train_r3','dev_r3','test_r3'])
 
 sick__label         = Classification('sentence_A','sentence_B','label')
 sick__relatedness   = Classification('sentence_A','sentence_B','relatedness_score')
@@ -308,7 +310,20 @@ math_qa = MultipleChoice(
 ######################## Classification (other) ########################
 
 utilitarianism = Classification("comparison",labels="label",
-dataset_name="")
+dataset_name="metaeval/utilitarianism")
+
+amazon_counterfactual = Classification(
+    "text", labels="label",
+    dataset_name="mteb/amazon_counterfactual",
+    config_name="en")
+
+insincere_questions = Classification(
+    "text", labels="label",
+    dataset_name="SetFit/insincere-questions")
+
+toxic_conversations = Classification(
+    "text", labels="label",
+    dataset_name="SetFit/toxic_conversations")
 
 turingbench = Classification("Generation",labels="label",
     dataset_name="turingbench/TuringBench",
@@ -377,6 +392,10 @@ pragmeval_2 = Classification("sentence1","sentence2",labels="label",
     config_name= ["emergent", "gum", "pdtb", "persuasiveness-claimtype", 
     "persuasiveness-eloquence", "persuasiveness-premisetype", "persuasiveness-relevance", "persuasiveness-specificity", 
     "persuasiveness-strength", "sarcasm","stac"])
+
+silicone = Classification("Uterance",labels="Label",
+    config_name=['dyda_da', 'dyda_e', 'iemocap', 'maptask', 'meld_e', 'meld_s', 'oasis', 'sem'] # +['swda', 'mrda'] # in pragmeval
+)
 
 #lex_glue___ecthr_a = Classification(sentence1="text", labels="labels") # too long
 #lex_glue___ecthr_b = Classification(sentence1="text", labels="labels") # too long
@@ -590,6 +609,8 @@ dynasent__r2 = Classification("sentence", labels="gold_label",
 
 sarcasm_news = Classification("headline", labels="is_sarcastic",
     dataset_name="raquiba/Sarcasm_News_Headline")
+
+sem_eval_2010_task_8 = Classification("sentence",labels="relation")
 
 ###END
 ################### END OF SUPPORT ######################

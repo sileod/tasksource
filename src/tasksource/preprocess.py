@@ -34,6 +34,7 @@ class Preprocessing(DotWiz):
         return x
 
     def __call__(self,dataset, max_rows=None, max_rows_eval=None):
+        dataset = self.pre_process(dataset)
         for k,v in zip(self.default_splits, self.splits):
             if v and k!=v:
                 dataset[k]=dataset[v]
@@ -52,7 +53,7 @@ class Preprocessing(DotWiz):
                                         and type(v)==str and k!=v)})
         for k in self.to_dict().keys():
             v=getattr(self, k)
-            if callable(v) and k!="post_process":
+            if callable(v) and k not in {"post_process","pre_process"}:
                 dataset=dataset.map(self.__map_to_target,
                                     fn_kwargs={'fn':v,'target':k})
 
@@ -164,6 +165,7 @@ class SharedFields:
     splits:list=Preprocessing.default_splits
     dataset_name:str = None
     config_name:str = None
+    pre_process: callable = lambda x:x
     post_process: callable = lambda x:x
 
 @dataclass
