@@ -393,7 +393,7 @@ pragmeval_2 = Classification("sentence1","sentence2",labels="label",
     "persuasiveness-eloquence", "persuasiveness-premisetype", "persuasiveness-relevance", "persuasiveness-specificity", 
     "persuasiveness-strength", "sarcasm","stac"])
 
-silicone = Classification("Uterance",labels="Label",
+silicone = Classification("Utterance",labels="Label",
     config_name=['dyda_da', 'dyda_e', 'iemocap', 'maptask', 'meld_e', 'meld_s', 'oasis', 'sem'] # +['swda', 'mrda'] # in pragmeval
 )
 
