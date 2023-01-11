@@ -1,4 +1,4 @@
-# tasksource, 400+ tasks preprocessings for extreme multitask learning
+# tasksource, 400+ dataset preprocessings annotations for extreme multitask learning
 
 Huggingface Datasets is a great library, but it lacks standardization, and datasets require different preprocessings to be used interchangeably.
 `tasksource` is a collection of task preprocessings, facilitating multi-task learning and reproducibility.
