@@ -470,8 +470,12 @@ yahoo_answers_topics = Classification(
 stackoverflow_questions=Classification("title","body",labels="label",
     dataset_name="pacovaldez/stackoverflow-questions")
 
-hyperpartisan_news_detection___byarticle = Classification(sentence1="text", labels="hyperpartisan", splits=["train", None, None])
-hyperpartisan_news_detection___bypublisher = Classification(sentence1="text", labels="hyperpartisan", splits=["train","validation", None])
+#hyperpartisan_news_detection___byarticle = Classification(sentence1="text", labels="hyperpartisan", splits=["train", None, None])
+#hyperpartisan_news_detection___bypublisher = Classification(sentence1="text", labels="hyperpartisan", splits=["train","validation", None])
+
+hyperpartisan_news = Classification("text",labels="label",dataset_name="zapsdcn/hyperpartisan_news")
+scierc = Classification("text",labels="label",dataset_name="zapsdcn/sciie")
+citation_intent = Classification("text",labels="label",dataset_name="zapsdcn/citation_intent")
 
 #go_emotions___raw = Classification(sentence1="text", splits=["train", None, None])
 go_emotions___simplified = Classification(sentence1="text", labels="labels")
@@ -583,7 +587,8 @@ circa = Classification(
     labels="goldstandard2")
 
 code_x_glue_cc_defect_detection = Classification("func", labels="target")
-code_x_glue_cc_clone_detection_big_clone_bench = Classification("func1", "func2", "label")
+#code_x_glue_cc_clone_detection_big_clone_bench = Classification("func1", "func2", "label")
+
 code_x_glue_cc_code_refinement = MultipleChoice(
     constant(""), choices=["buggy","fixed"], labels=constant(0),
     config_name="medium")
