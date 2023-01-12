@@ -287,7 +287,7 @@ art = MultipleChoice(cat(['hypothesis_1','hypothesis_2']),
 
 
 hendrycks_test = MultipleChoice('question',labels='answer',choices_list='choices',splits=['test','dev','validation'],
-config_name=get_dataset_config_names("hendrycks_test")
+    config_name=get_dataset_config_names("hendrycks_test")
 )
 
 winogrande = MultipleChoice('sentence',['option1','option2'],'answer',config_name='winogrande_xl',
@@ -587,7 +587,8 @@ circa = Classification(
     labels="goldstandard2")
 
 code_x_glue_cc_defect_detection = Classification("func", labels="target")
-#code_x_glue_cc_clone_detection_big_clone_bench = Classification("func1", "func2", "label")
+
+#code_x_glue_cc_clone_detection_big_clone_bench = Classification("func1", "func2", "label") # in bigbench + too heavy (100g)
 
 code_x_glue_cc_code_refinement = MultipleChoice(
     constant(""), choices=["buggy","fixed"], labels=constant(0),
