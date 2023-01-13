@@ -209,7 +209,7 @@ def fix_splits(dataset):
         dataset['test']=validation_test['test']
 
     if 'test' in dataset and 'validation' not in dataset:
-        validation_test = dataset['test'].train_test_split(0.5, sseed=0)
+        validation_test = dataset['test'].train_test_split(0.5, seed=0)
         dataset['validation'] = validation_test['train']
         dataset['test']=validation_test['test']
 
