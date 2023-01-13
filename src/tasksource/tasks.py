@@ -190,7 +190,7 @@ bigbench = MultipleChoice(
     'inputs',
     choices_list='multiple_choice_targets',
     labels=lambda x:x['multiple_choice_scores'].index(1) if 1 in ['multiple_choice_scores'] else -1,
-    config_name=bigbench_discriminative_english - {"social_iqa"} # english multiple choice tasks, minus duplicates
+    config_name=bigbench_discriminative_english - {"social_i_qa","intersect_geometry"} # english multiple choice tasks, minus duplicates
 )
 
 blimp_hard = MultipleChoice(inputs=constant(''),
@@ -635,6 +635,11 @@ sarcasm_news = Classification("headline", labels="is_sarcastic",
 sem_eval_2010_task_8 = Classification("sentence",labels="relation")
 
 demo_org_auditor_review = Classification(sentence1="sentence", labels="label", splits=["train", None, "test"], dataset_name="demo-org/auditor_review", config_name="demo-org--auditor_review")
+
+medmcqa = MultipleChoice("question", choices=regen('op[a-d]'),labels='cop')
+
+aqua_rat___tokenized = MultipleChoice("question",choices_list="options",
+    labels=lambda x:"ABCDE".index(x['correct']))
 
 
 ###END
