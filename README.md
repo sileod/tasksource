@@ -35,6 +35,7 @@ Iterate over harmonized tasks:
 ```python
 for _, x in df[df.task_type=="MultipleChoice"].iterrows():
     dataset = load_task(x.dataset_name,x.config_name, x.task_name)
+    # all yielded dataset can be used interchangeably
 ```
 
 See supported 480+ tasks in [tasks.md](https://github.com/sileod/tasksource/blob/main/tasks.md) (+200 MultipleChoice tasks, +200 Classification tasks). Feel free to request or propose a new task.
