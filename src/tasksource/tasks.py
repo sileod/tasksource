@@ -279,6 +279,10 @@ balanced_copa = MultipleChoice('premise',['choice1','choice2'],'label',
     dataset_name="pkavumba/balanced-copa"
 )
 
+e_care = MultipleChoice('premise',['choice1','choice2'],'label',
+    dataset_name="12ml/e-CARE"
+)
+
 art = MultipleChoice(cat(['hypothesis_1','hypothesis_2']),
     ['observation_1','observation_2'],
     labels=lambda x:x['label']-1,
@@ -464,16 +468,15 @@ banking77 = Classification(sentence1="text", labels="label", splits=["train", No
 hate_speech_offensive = Classification(sentence1="tweet", labels="class", splits=["train", None, None])
 
 yahoo_answers_topics = Classification(
-    "question_title","answer",
-    splits=["train", None, "test"], config_name=["yahoo_answers_topics"]) 
+    "question_title","question_content",labels="topic")
 
 stackoverflow_questions=Classification("title","body",labels="label",
     dataset_name="pacovaldez/stackoverflow-questions")
 
-#hyperpartisan_news_detection___byarticle = Classification(sentence1="text", labels="hyperpartisan", splits=["train", None, None])
-#hyperpartisan_news_detection___bypublisher = Classification(sentence1="text", labels="hyperpartisan", splits=["train","validation", None])
-
+#hyperpartisan_news_detection___byarticle = Classification(sentence1="text", labels="hyperpartisan", splits=["train", None, None]) # files too heavy
+#hyperpartisan_news_detection___bypublisher = Classification(sentence1="text", labels="hyperpartisan", splits=["train","validation", None]) # files too heavy
 hyperpartisan_news = Classification("text",labels="label",dataset_name="zapsdcn/hyperpartisan_news")
+
 scierc = Classification("text",labels="label",dataset_name="zapsdcn/sciie")
 citation_intent = Classification("text",labels="label",dataset_name="zapsdcn/citation_intent")
 
@@ -641,6 +644,25 @@ medmcqa = MultipleChoice("question", choices=regen('op[a-d]'),labels='cop')
 aqua_rat___tokenized = MultipleChoice("question",choices_list="options",
     labels=lambda x:"ABCDE".index(x['correct']))
 
+dynasent_disagreement    = Classification("text", labels="binary_disagreement", dataset_name="RuyuanWan/Dynasent_Disagreement")
+politeness_disagreement  = Classification("text", labels="binary_disagreement", dataset_name="RuyuanWan/Politeness_Disagreement")
+sbic_disagreement        = Classification("text", labels="binary_disagreement", dataset_name="RuyuanWan/SBIC_Disagreement")
+schem_disagreement       = Classification("text", labels="binary_disagreement", dataset_name="RuyuanWan/SChem_Disagreement")
+dilemmas_disagreement    = Classification("text", labels="binary_disagreement", dataset_name="RuyuanWan/Dilemmas_Disagreement")
+
+logiqa = MultipleChoice(
+    cat(["context","query"]),
+    choices_list = 'options',
+    labels = "correct_option",
+    dataset_name="lucasmccabe/logiqa"
+)
+
+proto_qa = MultipleChoice(
+    "question",
+    choices_list=lambda x:x['answer-clusters']['answers'],
+    labels=lambda x: x['answer-clusters']['count'].index(max(x['answer-clusters']['count'])),
+    config_name='proto_qa'
+)
 
 ###END
 ################### END OF SUPPORT ######################
