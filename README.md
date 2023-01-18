@@ -51,6 +51,7 @@ I can help you integrate tasksource in your experiments. `damien.sileo@inria.fr`
 @article{sileo2023tasksource,
   title={tasksource: Structured Dataset Preprocessing Annotations for Frictionless Extreme Multi-Task Learning and Evaluation},
   author={Sileo, Damien},
+  url= {https://arxiv.org/abs/2301.05948},
   journal={arXiv preprint arXiv:2301.05948},
   year={2023}
 }
