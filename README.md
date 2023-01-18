@@ -7,7 +7,7 @@ Huggingface Datasets is a great library, but it lacks standardization, and datas
 import tasksource
 from datasets import load_dataset
 
-tasksource.bigbench(load_dataset('bigbench', 'movie_recommendation'))
+tasksource.bigbench(load_dataset('bigbench', 'movie_recommendation')) # returns standardized MultipleChoice dataset
 ```
 
 Each dataset is mapped to either `MultipleChoice`, `Classification`, or `TokenClassification` dataset with standardized fields.
