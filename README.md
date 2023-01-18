@@ -43,13 +43,11 @@ See supported 480+ tasks in [tasks.md](https://github.com/sileod/tasksource/blob
  ### Contact
 I can help you integrate tasksource in your experiments. `damien.sileo@inria.fr`
 ```bib
-@misc{sileod23-tasksource,
-  author = {Sileo, Damien},
-  doi = {10.5281/zenodo.7473446},
-  month = {01},
-  title = {{tasksource: preprocessings for reproducibility and multitask-learning}},
-  url = {https://github.com/sileod/tasksource},
-  version = {1.5.0},
-  year = {2023}}
+@article{sileo2023tasksource,
+  title={tasksource: Structured Dataset Preprocessing Annotations for Frictionless Extreme Multi-Task Learning and Evaluation},
+  author={Sileo, Damien},
+  journal={arXiv preprint arXiv:2301.05948},
+  year={2023}
+}
 ```
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
