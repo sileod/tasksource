@@ -40,6 +40,11 @@ for _, x in df[df.task_type=="MultipleChoice"].iterrows():
 
 See supported 480+ tasks in [tasks.md](https://github.com/sileod/tasksource/blob/main/tasks.md) (+200 MultipleChoice tasks, +200 Classification tasks). Feel free to request or propose a new task.
 
+### Pretrained model:
+
+I pretrained models on tasksource and obtained state-of-the-art results:
+<https://huggingface.co/sileod/deberta-v3-base-tasksource-nli>
+
  ### Contact
 I can help you integrate tasksource in your experiments. `damien.sileo@inria.fr`
 ```bib
