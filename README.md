@@ -47,6 +47,7 @@ I pretrained models on tasksource and obtained state-of-the-art results:
 
  ### Contact
 I can help you integrate tasksource in your experiments. `damien.sileo@inria.fr`
+More details on this [article:](https://arxiv.org/abs/2301.05948) 
 ```bib
 @article{sileo2023tasksource,
   title={tasksource: Structured Dataset Preprocessing Annotations for Frictionless Extreme Multi-Task Learning and Evaluation},
