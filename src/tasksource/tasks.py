@@ -17,13 +17,8 @@ babi_nli = Classification("premise", "hypothesis", "label",
     config_name=set(get_dataset_config_names("metaeval/babi_nli"))-{"agents-motivations"}
 ) # agents-motivations task is not as clear-cut as the others
 
-def ling_nli_postprocess(ds):
-    return ds.cast_column('labels', ClassLabel(
-    names=['entailment','neutral','contradiction']))
 
-ling_nli = Classification("premise_original","hypothesis_original","label",
-    dataset_name="metaeval/lingnli", post_process=ling_nli_postprocess
-)
+ling_nli = Classification("premise","hypothesis","label",dataset_name="metaeval/lingnli")
 
 
 sick__label         = Classification('sentence_A','sentence_B','label')
@@ -124,7 +119,7 @@ gen_debiased_nli__mnli_seq_z = Classification("premise","hypothesis","label",
 add_one_rte = Classification("premise","hypothesis","label",
     dataset_name="pietrolesci/add_one_rte",splits=["train","dev","test"])
 
-def imppres_post_process(ds,prefix=''):
+def _imppres_post_process(ds,prefix=''):
     # imppres entailment definition is either purely semantic or purely pragmatic
     # because of that, we assign differentiate the labels from anli/mnli notation
     return ds.cast_column('labels', ClassLabel(
@@ -132,15 +127,15 @@ def imppres_post_process(ds,prefix=''):
 
 imppres__presupposition = imppres__prag = Classification("premise","hypothesis","gold_label",
     dataset_name="metaeval/imppres", config_name=imppres_presupposition,
-    post_process=imppres_post_process)
+    post_process=_imppres_post_process)
 
 imppres__prag = Classification("premise","hypothesis","gold_label_prag",
     dataset_name="metaeval/imppres", config_name=imppres_implicature,
-    post_process=lambda x: imppres_post_process(x,'_prag'))
+    post_process=lambda x: _imppres_post_process(x,'_prag'))
 
 imppres__log = Classification("premise","hypothesis","gold_label_log",
     dataset_name="metaeval/imppres", config_name=imppres_implicature,
-    post_process=lambda x: imppres_post_process(x,'_log'))
+    post_process=lambda x: _imppres_post_process(x,'_log'))
 
 
 glue__diagnostics = Classification("premise","hypothesis","label",
@@ -312,13 +307,13 @@ definite_pronoun_resolution = MultipleChoice(
 
 swag=MultipleChoice(cat(["sent1","sent2"]),regen("ending[0-3]"),"label")
 
-def split_choices(s):
+def _split_choices(s):
     import re
     return [x.rstrip(', ') for x in re.split(r'[a-e] \) (.*?)',s) if x.strip(', ')]
 
 math_qa = MultipleChoice(
     'Problem', 
-    choices_list = lambda x: split_choices(x['options']),
+    choices_list = lambda x: _split_choices(x['options']),
     labels = lambda x:'abcde'.index(x['correct'])   
 )
 
@@ -500,7 +495,6 @@ relbert_lexical_relation_classification = Classification(sentence1="head", sente
 
 metaeval_linguisticprobing = Classification("sentence", labels="label", dataset_name="metaeval/linguisticprobing", 
     config_name=['subj_number',
-                'word_content',
                 'obj_number',
                 'past_present',
                 'sentence_length',
@@ -508,7 +502,7 @@ metaeval_linguisticprobing = Classification("sentence", labels="label", dataset_
                 'tree_depth',
                 'coordination_inversion',
                 'odd_man_out',
-                'bigram_shift']
+                'bigram_shift']#+['word_content'] #too many labels 
 )
 
 metaeval_crowdflower = Classification("text", labels="label",
@@ -664,5 +658,22 @@ proto_qa = MultipleChoice(
     config_name='proto_qa'
 )
 
-###END
-################### END OF SUPPORT ######################
+wiki_qa = Classification("question","answer","label")
+
+cycic_classification = Classification("question",labels="correct_answer",
+    dataset_name = "metaeval/cycic_classification")
+cycic_mc = MultipleChoice("question", choices=regen('answer\_option[0-4]'), labels="correct_answer",
+    dataset_name = "metaeval/cycic_multiplechoice")
+
+
+def _preprocess_chatgpt_detection(ex):
+    import random
+    label=random.random()<=0.5
+    ex['label']=label
+    ex['answer']=[ex['human_answers'],ex['chatgpt_answers']][label]
+    return ex
+    
+chatgpt_detection = Classification("question","answer","label",
+    dataset_name = 'Hello-SimpleAI/HC3', config_name="all",
+    pre_process=lambda dataset:dataset.map(_preprocess_chatgpt_detection)
+)

@@ -6,7 +6,7 @@ from .metadata import dataset_rank
 from datasets import load_dataset
 import funcy as fc
 import os
-
+from sorcery import dict_of
 
 def parse_var_name(s):
     config_name,task_name = None,None
@@ -29,7 +29,6 @@ def pretty_name(x):
 
 def list_tasks(tasks_path=f'{os.path.dirname(__file__)}/tasks.py'):
     task_order = open(tasks_path).readlines()
-    task_order= task_order[:task_order.index('###END\n')]
     task_order = [x.split('=')[0].rstrip() for x in task_order if '=' in x]
     task_order = [x for x in task_order if x.isidentifier()]
     task_order = fc.flip(dict(enumerate(task_order)))
@@ -59,17 +58,22 @@ def list_tasks(tasks_path=f'{os.path.dirname(__file__)}/tasks.py'):
 
 task_df = list_tasks()
 
-def load_preprocessing(dataset_name, config_name=None, task_name=None):
-    y = task_df
-    y = y[y.dataset_name.map(lambda x:x==dataset_name)]
-    y = y[y.config_name.map(lambda x:x==config_name)]
-    y = y[y.task_name.map(lambda x:x==task_name)]
-    return getattr(tasks,y.preprocessing_name.iloc[0])
+def dict_to_query(d=dict(), **kwargs):
+    d={**d,**kwargs}
+    return '&'.join([f'`{k}`=="{v}"' for k,v in d.items()])
 
+def load_preprocessing(tasks=tasks, **kwargs):
+    y = task_df.query(dict_to_query(**kwargs)).iloc[0]
+    preprocessing= getattr(tasks, y.preprocessing_name)
+    for c in 'dataset_name','config_name':
+        if not isinstance(getattr(preprocessing,c), str):
+             setattr(preprocessing,c,getattr(y,c))
+    return preprocessing
 
-
-def load_task(dataset_name,config_name=None,task_name=None,
+def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preprocessing_name=None,
          max_rows=None, max_rows_eval=None):
-    dataset = load_dataset(dataset_name,config_name)
-    preprocessing = load_preprocessing(dataset_name,config_name,task_name) 
+    query = dict_of(id, dataset_name, config_name, task_name,preprocessing_name)
+    query = {k:v for k,v in query.items() if v}
+    preprocessing = load_preprocessing(**query)
+    dataset = load_dataset(preprocessing.dataset_name, preprocessing.config_name)
     return preprocessing(dataset,max_rows, max_rows_eval)

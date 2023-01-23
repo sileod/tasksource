@@ -33,6 +33,9 @@ class Preprocessing(DotWiz):
         x[target]=fn(x)
         return x
 
+    def load(self):
+        return self(datasets.load_dataset(self.dataset_name,self.config_name))
+
     def __call__(self,dataset, max_rows=None, max_rows_eval=None):
         dataset = self.pre_process(dataset)
         for k,v in zip(self.default_splits, self.splits):
@@ -53,7 +56,7 @@ class Preprocessing(DotWiz):
                                         and type(v)==str and k!=v)})
         for k in self.to_dict().keys():
             v=getattr(self, k)
-            if callable(v) and k not in {"post_process","pre_process"}:
+            if callable(v) and k not in {"post_process","pre_process","load"}:
                 dataset=dataset.map(self.__map_to_target,
                                     fn_kwargs={'fn':v,'target':k})
 
