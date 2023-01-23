@@ -3,25 +3,10 @@
 Huggingface Datasets is a great library, but it lacks standardization, and datasets require preprocessing work to be used interchangeably.
 `tasksource` automates this and facilitates multi-task learning scaling and reproducibility.
 
-```python
-import tasksource
-from datasets import load_dataset
-
-tasksource.bigbench(load_dataset('bigbench', 'movie_recommendation')) # standardized MultipleChoice dataset
-```
-
 Each dataset is standardized to either `MultipleChoice`, `Classification`, or `TokenClassification` dataset with identical fields.
 We do not support generation tasks as they are addressed by [promptsource](https://github.com/bigscience-workshop/promptsource).
 
-All implemented preprocessings can be found in [tasks.py](https://github.com/sileod/tasksource/blob/main/src/tasksource/tasks.py) or [tasks.md](https://github.com/sileod/tasksource/blob/main/tasks.md). A preprocessing is a function that takes a dataset as input and returns a standardized dataset. The preprocessing annotation is designed to be concise human-readable:
-
-```python
-cos_e = tasksource.MultipleChoice(
-    'question',
-    choices_list='choices',
-    labels= lambda x: x['choices_list'].index(x['answer']),
-    config_name='v1.0')
-```
+All implemented preprocessings can be found in [tasks.py](https://github.com/sileod/tasksource/blob/main/src/tasksource/tasks.py) or [tasks.md](https://github.com/sileod/tasksource/blob/main/tasks.md). A preprocessing is a function that takes a dataset as input and returns a standardized dataset. The preprocessing annotation is designed to be concise human-readable.
 
 ### Installation and usage:
 `pip install tasksource`
@@ -43,7 +28,7 @@ See supported 490+ tasks in [tasks.md](https://github.com/sileod/tasksource/blob
 I pretrained models on tasksource and obtained state-of-the-art results:
 <https://huggingface.co/sileod/deberta-v3-base-tasksource-nli>
 
- ### Contact
+ ### Contact and citation
 I can help you integrate tasksource in your experiments. `damien.sileo@inria.fr`
 
 More details on this [article:](https://arxiv.org/abs/2301.05948) 
