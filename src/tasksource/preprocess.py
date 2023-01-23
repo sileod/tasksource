@@ -228,12 +228,11 @@ def fix_splits(dataset):
 def fix_labels(dataset, label_key='labels'):
     if type(dataset['train'][label_key][0]) in [int,list,float]:
         return dataset
-
-    label_to_index = fc.flip(dict(enumerate(sorted(set(fc.flatten(dataset[k][label_key] for k in {"train"}))))))
-
-    def apply_label_to_index(example):
-        example[label_key]=label_to_index[example[label_key]]
-        return example
-    dataset=dataset.map(apply_label_to_index)
-    dataset=dataset.cast_column(label_key, datasets.Value(dtype='int64'))
+    labels=set(fc.flatten(dataset[k][label_key] for k in {"train"}))
+    if set(labels)=={'entailment','neutral','contradiction'}:
+        order=lambda x:dict(fc.flip(enumerate(['entailment','neutral','contradiction']))).get(x,x)
+    else:
+        order=str
+    labels=sorted(labels, key=order)
+    dataset=dataset.cast_column(label_key, datasets.ClassLabel(names=labels))
     return dataset
