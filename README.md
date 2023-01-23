@@ -36,7 +36,7 @@ for id in df[df.task_type=="MultipleChoice"].id:
     # all yielded datasets can be used interchangeably
 ```
 
-See supported 480+ tasks in [tasks.md](https://github.com/sileod/tasksource/blob/main/tasks.md) (+200 MultipleChoice tasks, +200 Classification tasks). Feel free to request or propose a new task.
+See supported 480+ tasks in [tasks.md](https://github.com/sileod/tasksource/blob/main/tasks.md) (+200 MultipleChoice tasks, +200 Classification tasks). Feel free to request a new task.
 
 ### Pretrained model:
 
