@@ -677,3 +677,7 @@ chatgpt_detection = Classification("question","answer","label",
     dataset_name = 'Hello-SimpleAI/HC3', config_name="all",
     pre_process=lambda dataset:dataset.map(_preprocess_chatgpt_detection)
 )
+
+sts_companion = Classification("sentence1","sentence2","label",
+    dataset_name="metaeval/sts-companion"
+)
