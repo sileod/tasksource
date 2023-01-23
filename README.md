@@ -25,16 +25,13 @@ cos_e = tasksource.MultipleChoice(
 
 ### Installation and usage:
 `pip install tasksource`
-
-List tasks:
+Get the task index and iterate over harmonized tasks:
 ```python
 from tasksource import list_tasks, load_task
 df = list_tasks()
-```
-Iterate over harmonized tasks:
-```python
-for _, x in df[df.task_type=="MultipleChoice"].iterrows():
-    dataset = load_task(x.dataset_name,x.config_name, x.task_name)
+
+for id in df[df.task_type=="MultipleChoice"].id:
+    dataset = load_task(id)
     # all yielded datasets can be used interchangeably
 ```
 
