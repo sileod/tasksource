@@ -18,9 +18,6 @@ babi_nli = Classification("premise", "hypothesis", "label",
 ) # agents-motivations task is not as clear-cut as the others
 
 
-ling_nli = Classification("premise","hypothesis","label",dataset_name="metaeval/lingnli")
-
-
 sick__label         = Classification('sentence_A','sentence_B','label')
 sick__relatedness   = Classification('sentence_A','sentence_B','relatedness_score')
 sick__entailment_AB = Classification('sentence_A','sentence_B','entailment_AB')
@@ -583,13 +580,14 @@ circa = Classification(
     sentence2="answer-Y",
     labels="goldstandard2")
 
-code_x_glue_cc_defect_detection = Classification("func", labels="target")
+#code_x_glue_cc_defect_detection = Classification("func", labels="target")
 
 #code_x_glue_cc_clone_detection_big_clone_bench = Classification("func1", "func2", "label") # in bigbench + too heavy (100g)
 
-code_x_glue_cc_code_refinement = MultipleChoice(
-    constant(""), choices=["buggy","fixed"], labels=constant(0),
-    config_name="medium")
+#code_x_glue_cc_code_refinement = MultipleChoice(
+#    constant(""), choices=["buggy","fixed"], labels=constant(0),
+#    config_name="medium")
+
 effective_feedback_student_writing = Classification("discourse_text", labels="discourse_effectiveness",dataset_name="YaHi/EffectiveFeedbackStudentWriting")
 
 promptSentiment = Classification("text",labels="label",dataset_name="Ericwang/promptSentiment")
@@ -668,7 +666,7 @@ cycic_mc = MultipleChoice("question", choices=regen('answer\_option[0-4]'), labe
 
 def _preprocess_chatgpt_detection(ex):
     import random
-    label=random.random()<=0.5
+    label=random.random()<0.5
     ex['label']=label
     ex['answer']=[ex['human_answers'],ex['chatgpt_answers']][label]
     return ex
@@ -680,4 +678,14 @@ chatgpt_detection = Classification("question","answer","label",
 
 sts_companion = Classification("sentence1","sentence2","label",
     dataset_name="metaeval/sts-companion"
+)
+
+commonsense_qa_2 = Classification("question",labels="answer",
+dataset_name="metaeval/commonsense_qa_2.0")
+
+
+ling_nli = Classification("premise","hypothesis","label",dataset_name="metaeval/lingnli")
+
+monotonicity_entailment = Classification("sentence1", "sentence2", "gold_label",    
+    dataset_name="metaeval/monotonicity-entailment"
 )
