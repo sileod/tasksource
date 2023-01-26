@@ -1,4 +1,4 @@
-## tasksource: 490+ dataset harmonization preprocessings with structured annotations for frictionless extreme multi-task learning and evaluation
+## tasksource: 500+ dataset harmonization preprocessings with structured annotations for frictionless extreme multi-task learning and evaluation
 
 Huggingface Datasets is a great library, but it lacks standardization, and datasets require preprocessing work to be used interchangeably.
 `tasksource` automates this and facilitates multi-task learning scaling and reproducibility.
@@ -18,7 +18,7 @@ for id in df[df.task_type=="MultipleChoice"].id:
     # all yielded datasets can be used interchangeably
 ```
 
-See supported 490+ tasks in [tasks.md](https://github.com/sileod/tasksource/blob/main/tasks.md) (+200 MultipleChoice tasks, +200 Classification tasks). Feel free to request a new task.
+See supported 500+ tasks in [tasks.md](https://github.com/sileod/tasksource/blob/main/tasks.md) (+200 MultipleChoice tasks, +200 Classification tasks). Feel free to request a new task.
 
 ### Pretrained model:
 
