@@ -698,4 +698,11 @@ scinli = Classification("sentence1", "sentence2", labels="label",
     dataset_name="metaeval/scinli"
 )
 
-naturallogic = Classification("sent1","sent2","new_label",dataset_name="metaeval/naturallogic")
+naturallogic = Classification(" sent1 "," sent2 "," new_label ",dataset_name="metaeval/naturallogic")
+
+onestop_qa = MultipleChoice(cat(["paragraph","question"]),choices_list="answers",
+    labels=constant(0))
+
+moral_stories = MultipleChoice(cat(["situation","intention"]),
+    choices=['moral_action',"immoral_action"],labels=constant(0),
+    dataset_name="demelin/moral_stories", config_name="full")
