@@ -689,3 +689,13 @@ ling_nli = Classification("premise","hypothesis","label",dataset_name="metaeval/
 monotonicity_entailment = Classification("sentence1", "sentence2", "gold_label",    
     dataset_name="metaeval/monotonicity-entailment"
 )
+
+arct = MultipleChoice(cat(["reason","claim"]),choices=["warrant0","warrant1"],
+    labels="correctLabelW0orW1", dataset_name="metaeval/arct")
+
+scinli = Classification("sentence1", "sentence2", labels="label",
+    post_process=lambda x:x.shuffle(seed=0),
+    dataset_name="metaeval/scinli"
+)
+
+naturallogic = Classification("sent1","sent2","new_label",dataset_name="metaeval/naturallogic")
