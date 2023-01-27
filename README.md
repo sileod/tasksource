@@ -7,8 +7,6 @@ Each dataset is standardized to either `MultipleChoice`, `Classification`, or `T
 
 ### Installation and usage:
 `pip install tasksource`
-
-Get the task index and iterate over harmonized tasks:
 ```python
 from tasksource import list_tasks, load_task
 df = list_tasks()
