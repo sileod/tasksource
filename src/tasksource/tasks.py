@@ -1,7 +1,6 @@
 from .preprocess import cat, get, regen, constant, Classification, TokenClassification, MultipleChoice
 from .metadata import bigbench_discriminative_english, blimp_hard, imppres_presupposition, imppres_implicature
-from datasets import get_dataset_config_names, ClassLabel
-
+from datasets import get_dataset_config_names, ClassLabel, Dataset, DatasetDict
 # variable name: dataset___config__task
 
 ###################### NLI/paraphrase ###############################
@@ -649,12 +648,12 @@ logiqa = MultipleChoice(
     dataset_name="lucasmccabe/logiqa"
 )
 
-proto_qa = MultipleChoice(
-    "question",
-    choices_list=lambda x:x['answer-clusters']['answers'],
-    labels=lambda x: x['answer-clusters']['count'].index(max(x['answer-clusters']['count'])),
-    config_name='proto_qa'
-)
+#proto_qa = MultipleChoice(
+#    "question",
+#    choices_list=lambda x:x['answer-clusters']['answers'],
+#    labels=lambda x: x['answer-clusters']['count'].index(max(x['answer-clusters']['count'])),
+#    config_name='proto_qa'
+#)
 
 wiki_qa = Classification("question","answer","label")
 
@@ -706,3 +705,14 @@ onestop_qa = MultipleChoice(cat(["paragraph","question"]),choices_list="answers"
 moral_stories = MultipleChoice(cat(["situation","intention"]),
     choices=['moral_action',"immoral_action"],labels=constant(0),
     dataset_name="demelin/moral_stories", config_name="full")
+
+prost = MultipleChoice(cat(["context","ex_question"]), choices=['A','B','C','D'],labels="label",
+    dataset_name="corypaik/prost")
+
+dyna_hate = Classification("text",labels="label",dataset_name="aps/dynahate",splits=['train',None,None])
+
+syntactic_augmentation_nli = Classification('sentence1',"sentence2","gold_label",dataset_name="metaeval/syntactic-augmentation-nli")
+
+
+#autotnli = Classification("premises", "hypothesis", "label", dataset_name="metaeval/autotnli")
+#equate = Classification("sentence1", "sentence2", "gold_label",dataset_name="metaeval/equate")

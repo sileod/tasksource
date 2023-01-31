@@ -27,7 +27,6 @@ def sample_dataset(dataset,n=10000, n_eval=1000):
 
 class Preprocessing(DotWiz):
     default_splits = ('train','validation','test')
-        
     @staticmethod
     def __map_to_target(x,fn=lambda x:None, target=None):
         x[target]=fn(x)
@@ -170,6 +169,7 @@ class SharedFields:
     config_name:str = None
     pre_process: callable = lambda x:x
     post_process: callable = lambda x:x
+    #language:str="en"
 
 @dataclass
 class Classification(SharedFields, ClassificationFields): pass
