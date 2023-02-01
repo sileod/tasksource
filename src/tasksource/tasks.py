@@ -282,8 +282,9 @@ art = MultipleChoice(cat(['hypothesis_1','hypothesis_2']),
 )
 
 
-hendrycks_test = MultipleChoice('question',labels='answer',choices_list='choices',splits=['test','dev','validation'],
-    config_name=get_dataset_config_names("hendrycks_test")
+mmlu = MultipleChoice('question',labels='answer',choices_list='choices',splits=['test','dev','validation'],
+    dataset_name="tasksource/mmlu",
+    config_name=get_dataset_config_names("tasksource/mmlu")
 )
 
 winogrande = MultipleChoice('sentence',['option1','option2'],'answer',config_name='winogrande_xl',
