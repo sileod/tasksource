@@ -6,6 +6,7 @@ from .metadata import dataset_rank
 from datasets import load_dataset
 import funcy as fc
 import os
+import copy
 from sorcery import dict_of
 
 def parse_var_name(s):
@@ -63,8 +64,8 @@ def dict_to_query(d=dict(), **kwargs):
     return '&'.join([f'`{k}`=="{v}"' for k,v in d.items()])
 
 def load_preprocessing(tasks=tasks, **kwargs):
-    y = task_df.query(dict_to_query(**kwargs)).iloc[0]
-    preprocessing= getattr(tasks, y.preprocessing_name)
+    y = task_df.copy().query(dict_to_query(**kwargs)).iloc[0]
+    preprocessing= copy.deepcopy(getattr(tasks, y.preprocessing_name))
     for c in 'dataset_name','config_name':
         if not isinstance(getattr(preprocessing,c), str):
              setattr(preprocessing,c,getattr(y,c))

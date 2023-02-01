@@ -181,6 +181,7 @@ bigbench = MultipleChoice(
     'inputs',
     choices_list='multiple_choice_targets',
     labels=lambda x:x['multiple_choice_scores'].index(1) if 1 in ['multiple_choice_scores'] else -1,
+    dataset_name='tasksource/bigbench',
     config_name=bigbench_discriminative_english - {"social_i_qa","intersect_geometry"} # english multiple choice tasks, minus duplicates
 )
 
@@ -716,3 +717,7 @@ syntactic_augmentation_nli = Classification('sentence1',"sentence2","gold_label"
 
 #autotnli = Classification("premises", "hypothesis", "label", dataset_name="metaeval/autotnli")
 #equate = Classification("sentence1", "sentence2", "gold_label",dataset_name="metaeval/equate")
+
+conqada = Classification("sentence1","sentence2","label",dataset_name="lasha-nlp/CONDAQA",
+    pre_process = lambda ds:ds.filter(lambda x:x['label'] in {"DON'T KNOW","YES","NO"})
+)
