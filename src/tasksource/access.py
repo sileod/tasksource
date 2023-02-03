@@ -65,7 +65,8 @@ def dict_to_query(d=dict(), **kwargs):
 
 def load_preprocessing(tasks=tasks, **kwargs):
     y = task_df.copy().query(dict_to_query(**kwargs)).iloc[0]
-    preprocessing= copy.deepcopy(getattr(tasks, y.preprocessing_name))
+    preprocessing= copy.copy(getattr(tasks, y.preprocessing_name))
+    #preprocessing= getattr(tasks, y.preprocessing_name)
     for c in 'dataset_name','config_name':
         if not isinstance(getattr(preprocessing,c), str):
              setattr(preprocessing,c,getattr(y,c))
