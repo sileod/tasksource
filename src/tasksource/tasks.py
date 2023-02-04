@@ -722,3 +722,21 @@ syntactic_augmentation_nli = Classification('sentence1',"sentence2","gold_label"
 conqada = Classification("sentence1","sentence2","label",dataset_name="lasha-nlp/CONDAQA",
     pre_process = lambda ds:ds.filter(lambda x:x['label'] in {"DON'T KNOW","YES","NO"})
 )
+
+webgbpt_comparisons = MultipleChoice("question", choices=['answer0','answer1'],
+    labels=lambda x:int(x['score_1']>0),
+    dataset_name="openai/webgpt_comparisons")
+
+synthetic_instruct = MultipleChoice('prompt', choices=['chosen', 'rejected'],
+    labels=constant(0), dataset_name="Dahoas/synthetic-instruct-gptj-pairwise")
+
+scruples = Classification("text",labels="binarized_label",dataset_name="metaeval/scruples")
+
+wouldyourather = MultipleChoice(constant(''), choices=['option_a','option_b'],
+    labels= lambda x: x['votes_b']-x['votes_a'],
+    dataset_name="metaeval/wouldyourather")
+
+attempto_nli = Classification("premise","hypothesis","race_label",dataset_name="sileod/attempto-nli")
+
+defeasible_nli = Classification(cat(["Premise","Hypothesis"]),"Update",labels="UpdateType",
+    dataset_name="metaeval/defeasible-nli",config_name=['atomic', 'snli', 'social'])
