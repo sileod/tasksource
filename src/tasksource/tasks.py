@@ -733,7 +733,7 @@ synthetic_instruct = MultipleChoice('prompt', choices=['chosen', 'rejected'],
 scruples = Classification("text",labels="binarized_label",dataset_name="metaeval/scruples")
 
 wouldyourather = MultipleChoice(constant(''), choices=['option_a','option_b'],
-    labels= lambda x: int(x['votes_b']<['votes_a']),
+    labels= lambda x: int(x['votes_a']<['votes_b']),
     dataset_name="metaeval/wouldyourather")
 
 attempto_nli = Classification("premise","hypothesis","race_label",dataset_name="sileod/attempto-nli")
