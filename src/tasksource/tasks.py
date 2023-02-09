@@ -20,7 +20,7 @@ babi_nli = Classification("premise", "hypothesis", "label",
 sick__label         = Classification('sentence_A','sentence_B','label')
 sick__relatedness   = Classification('sentence_A','sentence_B','relatedness_score')
 sick__entailment_AB = Classification('sentence_A','sentence_B','entailment_AB')
-sick__entailment_BA = Classification('sentence_A','sentence_B','entailment_BA')
+#sick__entailment_BA = Classification('sentence_A','sentence_B','entailment_BA')
 
 snli = Classification(sentence1="premise", sentence2="hypothesis", labels="label")
 
@@ -159,9 +159,8 @@ conll2003__ner_tags   = TokenClassification(tokens="tokens", labels='ner_tags')
 anthropic_rlhf = MultipleChoice(constant(''), ['chosen','rejected'], constant(0),
     dataset_name="Anthropic/hh-rlhf")
 
-model_written_evals = MultipleChoice('question', ['answer_matching_behavior','answer_not_matching_behavior'], constant(0),
+model_written_evals = MultipleChoice('question', choices=['answer_matching_behavior','answer_not_matching_behavior'], labels=constant(0),  
     dataset_name="Anthropic/model-written-evals")
-
 
 truthful_qa___multiple_choice = MultipleChoice(
     "question",
@@ -668,14 +667,13 @@ cycic_mc = MultipleChoice("question", choices=regen('answer\_option[0-4]'), labe
 def _preprocess_chatgpt_detection(ex):
     import random
     label=random.random()<0.5
-    ex['label']=label
-    ex['answer']=[ex['human_answers'],ex['chatgpt_answers']][label]
+    ex['label']=int(label)
+    ex['answer']=[str(ex['human_answers'][0]),str(ex['chatgpt_answers'][0])][label]
     return ex
-    
-chatgpt_detection = Classification("question","answer","label",
-    dataset_name = 'Hello-SimpleAI/HC3', config_name="all",
-    pre_process=lambda dataset:dataset.map(_preprocess_chatgpt_detection)
-)
+
+#chatgpt_detection = Classification("question","answer","label",
+#    dataset_name = 'Hello-SimpleAI/HC3', config_name="all",
+#    pre_process=lambda dataset:dataset.map(_preprocess_chatgpt_detection))
 
 sts_companion = Classification("sentence1","sentence2","label",
     dataset_name="metaeval/sts-companion"
@@ -723,7 +721,7 @@ conqada = Classification("sentence1","sentence2","label",dataset_name="lasha-nlp
     pre_process = lambda ds:ds.filter(lambda x:x['label'] in {"DON'T KNOW","YES","NO"})
 )
 
-webgbpt_comparisons = MultipleChoice("question", choices=['answer0','answer1'],
+webgbpt_comparisons = MultipleChoice(get.question.full_text, choices=['answer_0','answer_1'],
     labels=lambda x:int(x['score_1']>0),
     dataset_name="openai/webgpt_comparisons")
 
@@ -732,11 +730,39 @@ synthetic_instruct = MultipleChoice('prompt', choices=['chosen', 'rejected'],
 
 scruples = Classification("text",labels="binarized_label",dataset_name="metaeval/scruples")
 
-wouldyourather = MultipleChoice(constant(''), choices=['option_a','option_b'],
-    labels= lambda x: int(x['votes_a']<['votes_b']),
+wouldyourather = MultipleChoice(constant('Most people would rather:'), choices=['option_a','option_b'],
+    labels= lambda x: int(x['votes_a']<x['votes_b']),
     dataset_name="metaeval/wouldyourather")
 
-attempto_nli = Classification("premise","hypothesis","race_label",dataset_name="sileod/attempto-nli")
+attempto_nli = Classification("premise","hypothesis",
+    lambda x:f'race-{x["race_label"]}',
+    dataset_name="sileod/attempto-nli")
 
 defeasible_nli = Classification(cat(["Premise","Hypothesis"]),"Update",labels="UpdateType",
-    dataset_name="metaeval/defeasible-nli",config_name=['atomic', 'snli', 'social'])
+    dataset_name="metaeval/defeasible-nli",config_name=['atomic', 'snli'])
+
+#defeasible_nli_social = Classification(cat(["SocialChemROT","Hypothesis"]),"Update",labels="UpdateType",
+#    dataset_name="metaeval/defeasible-nli",config_name='social')
+
+help_nli = Classification("sentence1","sentence2","gold_label",
+    dataset_name="metaeval/help-nli")
+    
+nli_veridicality_transitivity = Classification("sentence1","sentence2","gold_label",
+    dataset_name="metaeval/nli-veridicality-transitivity")
+
+nl_satisfiability= Classification("sentence",labels="label",
+    dataset_name="metaeval/natural-language-satisfiability")
+
+lonli = Classification("premise","hypothesis","label",
+    dataset_name="metaeval/lonli")
+
+dadc_limit = Classification("sentence1","sentence2","label",
+    dataset_name="metaeval/dadc-limit-nli")
+
+flute = Classification("premise","hypothesis","label",
+    dataset_name="ColumbiaNLP/FLUTE")
+
+#strategy_qa = Classification(lambda x:' '.join(x['facts']),'question','answer',
+#    dataset_name="metaeval/strategy-qa")
+strategy_qa = Classification('question',labels='answer',
+    dataset_name="metaeval/strategy-qa",splits=['train',None,None])
