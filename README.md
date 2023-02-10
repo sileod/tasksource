@@ -21,6 +21,7 @@ See supported 500+ tasks in [tasks.md](https://github.com/sileod/tasksource/blob
 ### Pretrained model:
 
 Text encoder pretrained on tasksource reached state-of-the-art results: [🤗/deberta-v3-base-tasksource-nli](https://hf.co/sileod/deberta-v3-base-tasksource-nli)
+Tasksource pretraining should be quite helpful for RLHF reward models pretraining.
 
  ### Contact and citation
 I can help you integrate tasksource in your experiments. `damien.sileo@inria.fr`
