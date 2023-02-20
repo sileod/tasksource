@@ -5,7 +5,6 @@ from datasets import get_dataset_config_names, ClassLabel, Dataset, DatasetDict
 
 ###################### NLI/paraphrase ###############################
 
-
 anli__a1 = Classification('premise','hypothesis','label', splits=['train_r1','dev_r1','test_r1'])
 anli__a2 = Classification('premise','hypothesis','label', splits=['train_r2','dev_r2','test_r2'])
 anli__a3 = Classification('premise','hypothesis','label', splits=['train_r3','dev_r3','test_r3'])
@@ -549,10 +548,10 @@ species_800 = TokenClassification(tokens="tokens", labels="ner_tags", config_nam
 SpeedOfMagic_ontonotes_english = TokenClassification(tokens="tokens", labels="ner_tags", dataset_name="SpeedOfMagic/ontonotes_english", config_name="SpeedOfMagic--ontonotes_english")
 
 
-blog_authorship_corpus__gender    = Classification(sentence1="text",labels="gender", splits=["train", "validation", None])
-blog_authorship_corpus__age       = Classification(sentence1="text",labels="age", splits=["train", "validation", None])
-blog_authorship_corpus__horoscope = Classification(sentence1="text",labels="horoscope", splits=["train", "validation", None])
-blog_authorship_corpus__job       = Classification(sentence1="text",labels="job", splits=["train", "validation", None])
+blog_authorship_corpus__gender    = Classification(sentence1="text",labels="gender")
+blog_authorship_corpus__age       = Classification(sentence1="text",labels="age")
+blog_authorship_corpus__horoscope = Classification(sentence1="text",labels="horoscope")
+blog_authorship_corpus__job       = Classification(sentence1="text",labels="job")
 
 launch_open_question_type = Classification(sentence1="question", labels="resolve_type", dataset_name="launch/open_question_type")
 
@@ -714,7 +713,7 @@ dyna_hate = Classification("text",labels="label",dataset_name="aps/dynahate",spl
 syntactic_augmentation_nli = Classification('sentence1',"sentence2","gold_label",dataset_name="metaeval/syntactic-augmentation-nli")
 
 
-#autotnli = Classification("premises", "hypothesis", "label", dataset_name="metaeval/autotnli")
+autotnli = Classification("premises", "hypothesis", "label", dataset_name="metaeval/autotnli")
 #equate = Classification("sentence1", "sentence2", "gold_label",dataset_name="metaeval/equate")
 
 conqada = Classification("sentence1","sentence2","label",dataset_name="lasha-nlp/CONDAQA",
@@ -766,3 +765,9 @@ flute = Classification("premise","hypothesis","label",
 #    dataset_name="metaeval/strategy-qa")
 strategy_qa = Classification('question',labels='answer',
     dataset_name="metaeval/strategy-qa",splits=['train',None,None])
+
+rlhf_summarization = MultipleChoice(get.info.post,
+    choices_list=lambda x: [x['summaries'][0]['text'],x['summaries'][1]['text']],
+    labels="choice",
+    dataset_name="openai/summarize_from_feedback",
+    config_name="comparisons")
