@@ -766,8 +766,17 @@ flute = Classification("premise","hypothesis","label",
 strategy_qa = Classification('question',labels='answer',
     dataset_name="metaeval/strategy-qa",splits=['train',None,None])
 
-rlhf_summarization = MultipleChoice(get.info.post,
+summarize_from_feedback = MultipleChoice(get.info.post,
     choices_list=lambda x: [x['summaries'][0]['text'],x['summaries'][1]['text']],
     labels="choice",
-    dataset_name="openai/summarize_from_feedback",
-    config_name="comparisons")
+    dataset_name="openai/summarize_from_feedback", config_name="comparisons",
+    pre_process = lambda ds:ds.filter(lambda x: type(get.info.post(x))==str)
+)
+
+folio = Classification(lambda x: " ".join(x.premises),"conclusion",
+    labels="label",
+    dataset_name="metaeval/folio")
+
+tomi_nli = Classification("premise","hypothesis","label",
+    dataset_name="metaeval/tomi-nli"
+)
