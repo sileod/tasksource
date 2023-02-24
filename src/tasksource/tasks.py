@@ -780,3 +780,12 @@ folio = Classification(lambda x: " ".join(x.premises),"conclusion",
 tomi_nli = Classification("premise","hypothesis","label",
     dataset_name="metaeval/tomi-nli"
 )
+
+avicenna = Classification("Premise 1","Premise 2","Syllogistic relation",
+    dataset_name="metaeval/avicenna")
+
+shp = MultipleChoice("history",
+    choices=['human_ref_A','human_ref_B'],
+    labels="labels",
+    dataset_name="stanfordnlp/SHP")
+
