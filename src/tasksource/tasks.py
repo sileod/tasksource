@@ -773,7 +773,7 @@ summarize_from_feedback = MultipleChoice(get.info.post,
     pre_process = lambda ds:ds.filter(lambda x: type(get.info.post(x))==str)
 )
 
-folio = Classification(lambda x: " ".join(x.premises),"conclusion",
+folio = Classification(lambda x: " ".join(x['premises']),"conclusion",
     labels="label",
     dataset_name="metaeval/folio")
 
@@ -789,3 +789,10 @@ shp = MultipleChoice("history",
     labels="labels",
     dataset_name="stanfordnlp/SHP")
 
+
+medqa_usmle = MultipleChoice('sent1',choices=regen('ending[0-3]'),labels='label',
+    dataset_name="GBaker/MedQA-USMLE-4-options-hf")
+
+wikimedqa = MultipleChoice("text",choices=regen('option\_[0-7]'),labels='label',
+    dataset_name="14-07-22/wikimedqa",
+    config_name=["medwiki"])
