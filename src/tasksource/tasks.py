@@ -5,6 +5,27 @@ from datasets import get_dataset_config_names, ClassLabel, Dataset, DatasetDict
 
 ###################### NLI/paraphrase ###############################
 
+glue___mnli = Classification(sentence1="premise", sentence2="hypothesis", labels="label", splits=["train", None, "validation_matched"])
+glue___mrpc = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
+glue___qqp = Classification(sentence1="question1", sentence2="question2", labels="label")
+glue___stsb = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
+glue___qnli = Classification(sentence1="question", labels="label")
+glue___rte = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
+glue___wnli = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
+#glue___ax = Classification(sentence1="premise", sentence2="hypothesis", labels="label", splits=["test", None, None]) # fully masked
+
+super_glue___boolq = Classification(sentence1="question", labels="label")
+super_glue___cb = Classification(sentence1="premise", sentence2="hypothesis", labels="label")
+super_glue___multirc = Classification(sentence1="question", labels="label")
+#super_glue___rte = Classification(sentence1="premise", sentence2="hypothesis", labels="label") # in glue
+super_glue___wic = Classification(
+    sentence1=cat(["word","sentence1"], " : "),
+    sentence2=cat(["word","sentence2"], " : "),
+    labels='label'
+)
+super_glue___axg = Classification(sentence1="premise", sentence2="hypothesis", labels="label", splits=["test", None, None])
+
+
 anli__a1 = Classification('premise','hypothesis','label', splits=['train_r1','dev_r1','test_r1'])
 anli__a2 = Classification('premise','hypothesis','label', splits=['train_r2','dev_r2','test_r2'])
 anli__a3 = Classification('premise','hypothesis','label', splits=['train_r3','dev_r3','test_r3'])
@@ -315,6 +336,8 @@ math_qa = MultipleChoice(
 
 
 ######################## Classification (other) ########################
+glue___cola = Classification(sentence1="sentence", labels="label")
+glue___sst2 = Classification(sentence1="sentence", labels="label")
 
 utilitarianism = Classification("comparison",labels="label",
 dataset_name="metaeval/utilitarianism")
@@ -361,29 +384,6 @@ ethos___multilabel = Classification(
     ],
     splits=["train", None, None]
 )
-
-glue___cola = Classification(sentence1="sentence", labels="label")
-glue___sst2 = Classification(sentence1="sentence", labels="label")
-glue___mrpc = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
-glue___qqp = Classification(sentence1="question1", sentence2="question2", labels="label")
-glue___stsb = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
-glue___mnli = Classification(sentence1="premise", sentence2="hypothesis", labels="label", splits=["train", None, "validation_matched"])
-glue___qnli = Classification(sentence1="question", labels="label")
-glue___rte = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
-glue___wnli = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
-#glue___ax = Classification(sentence1="premise", sentence2="hypothesis", labels="label", splits=["test", None, None]) # fully masked
-
-
-super_glue___boolq = Classification(sentence1="question", labels="label")
-super_glue___cb = Classification(sentence1="premise", sentence2="hypothesis", labels="label")
-super_glue___multirc = Classification(sentence1="question", labels="label")
-#super_glue___rte = Classification(sentence1="premise", sentence2="hypothesis", labels="label") # in glue
-super_glue___wic = Classification(
-    sentence1=cat(["word","sentence1"], " : "),
-    sentence2=cat(["word","sentence2"], " : "),
-    labels='label'
-)
-super_glue___axg = Classification(sentence1="premise", sentence2="hypothesis", labels="label", splits=["test", None, None])
 
 tweet_eval = Classification(sentence1="text", labels="label", config_name=["emoji", "emotion", "hate", "irony", "offensive", "sentiment", "stance_abortion", "stance_atheism", "stance_climate", "stance_feminist", "stance_hillary"])
 
@@ -525,12 +525,12 @@ google_wellformed_query = Classification(sentence1="content", labels="rating")
 
 tweets_hate_speech_detection = Classification(sentence1="tweet", labels="label", splits=["train", None, None])
 
-adv_glue___adv_sst2 = Classification(sentence1="sentence", labels="label", splits=["validation", None, None])
-adv_glue___adv_qqp = Classification(sentence1="question1", sentence2="question2", labels="label", splits=["validation", None, None])
-adv_glue___adv_mnli = Classification(sentence1="premise", sentence2="hypothesis", labels="label", splits=["validation", None, None])
-adv_glue___adv_mnli_mismatched = Classification(sentence1="premise", sentence2="hypothesis", labels="label", splits=["validation", None, None])
-adv_glue___adv_qnli = Classification(sentence1="question", labels="label", splits=["validation", None, None])
-adv_glue___adv_rte = Classification(sentence1="sentence1", sentence2="sentence2", labels="label", splits=["validation", None, None])
+#adv_glue___adv_sst2 = Classification(sentence1="sentence", labels="label", splits=["validation", None, None])
+#adv_glue___adv_qqp = Classification(sentence1="question1", sentence2="question2", labels="label", splits=["validation", None, None])
+#adv_glue___adv_mnli = Classification(sentence1="premise", sentence2="hypothesis", labels="label", splits=["validation", None, None])
+#adv_glue___adv_mnli_mismatched = Classification(sentence1="premise", sentence2="hypothesis", labels="label", splits=["validation", None, None])
+#adv_glue___adv_qnli = Classification(sentence1="question", labels="label", splits=["validation", None, None])
+#adv_glue___adv_rte = Classification(sentence1="sentence1", sentence2="sentence2", labels="label", splits=["validation", None, None])
 
 
 has_part = Classification("arg1","arg2", labels="score", splits=["train", None, None])
@@ -761,8 +761,6 @@ dadc_limit = Classification("sentence1","sentence2","label",
 flute = Classification("premise","hypothesis","label",
     dataset_name="ColumbiaNLP/FLUTE")
 
-#strategy_qa = Classification(lambda x:' '.join(x['facts']),'question','answer',
-#    dataset_name="metaeval/strategy-qa")
 strategy_qa = Classification('question',labels='answer',
     dataset_name="metaeval/strategy-qa",splits=['train',None,None])
 
@@ -796,3 +794,14 @@ medqa_usmle = MultipleChoice('sent1',choices=regen('ending[0-3]'),labels='label'
 wikimedqa = MultipleChoice("text",choices=regen('option\_[0-7]'),labels='label',
     dataset_name="14-07-22/wikimedqa",
     config_name=["medwiki"])
+
+cicero = MultipleChoice(lambda x: " ".join(x['Dialogue']),
+    choices_list="Choices", labels=lambda x:x['Human Written Answer'][0],
+    dataset_name="declare-lab/cicero")
+
+creak = Classification("sentence",labels="label",
+    dataset_name='amydeng2000/CREAK')
+
+mutual = MultipleChoice("article",choices_list="options",
+    labels=lambda x: "ABCD".index(x['answers']),
+    dataset_name="metaeval/mutual",splits=["train",None,None])
