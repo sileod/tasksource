@@ -6,13 +6,13 @@ from datasets import get_dataset_config_names, ClassLabel, Dataset, DatasetDict
 ###################### NLI/paraphrase ###############################
 
 glue___mnli = Classification(sentence1="premise", sentence2="hypothesis", labels="label", splits=["train", None, "validation_matched"])
-glue___mrpc = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
-glue___qqp = Classification(sentence1="question1", sentence2="question2", labels="label")
-glue___stsb = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
 glue___qnli = Classification(sentence1="question", labels="label")
 glue___rte = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
 glue___wnli = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
 #glue___ax = Classification(sentence1="premise", sentence2="hypothesis", labels="label", splits=["test", None, None]) # fully masked
+glue___mrpc = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
+glue___qqp = Classification(sentence1="question1", sentence2="question2", labels="label")
+glue___stsb = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
 
 super_glue___boolq = Classification(sentence1="question", labels="label")
 super_glue___cb = Classification(sentence1="premise", sentence2="hypothesis", labels="label")
@@ -805,3 +805,19 @@ creak = Classification("sentence",labels="label",
 mutual = MultipleChoice("article",choices_list="options",
     labels=lambda x: "ABCD".index(x['answers']),
     dataset_name="metaeval/mutual",splits=["train",None,None])
+
+
+neqa = MultipleChoice('prompt',choices_list='classes',labels="answer_index",
+    dataset_name="inverse-scaling/NeQA")
+quote_repetition = MultipleChoice('prompt',choices_list='classes',labels="answer_index",
+    dataset_name="inverse-scaling/quote-repetition")
+redefine_math = MultipleChoice('prompt',choices_list='classes',labels="answer_index",
+    dataset_name="inverse-scaling/redefine-math")
+
+puzzte = Classification("puzzle_text","question","answer",
+    dataset_name="metaeval/puzzte")
+
+implicatures = MultipleChoice(cat(['context','response'],"\n"),
+    choices=['correct_implicature','incorrect_implicature'],
+    labels=constant(0),
+    dataset_name='metaeval/implicatures')
