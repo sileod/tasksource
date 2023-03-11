@@ -12,8 +12,7 @@ from tasksource import list_tasks, load_task
 df = list_tasks()
 
 for id in df[df.task_type=="MultipleChoice"].id:
-    dataset = load_task(id)
-    # all yielded datasets can be used interchangeably
+    dataset = load_task(id) # all yielded datasets can be used interchangeably
 ```
 
 See supported 500+ tasks in [tasks.md](https://github.com/sileod/tasksource/blob/main/tasks.md) (+200 MultipleChoice tasks, +200 Classification tasks) and feel free to request a new task. Datasets are downloaded to `$HF_DATASETS_CACHE` (as any huggingface dataset), so be sure to have >100GB of space there.
