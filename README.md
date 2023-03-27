@@ -1,4 +1,4 @@
-## tasksource: 500+ dataset harmonization preprocessings with structured annotations for frictionless extreme multi-task learning and evaluation
+## tasksource: 500+ dataset harmonization preprocessings for frictionless extreme multi-task learning and evaluation
 
 Huggingface Datasets is a great library, but it lacks standardization, and datasets require preprocessing work to be used interchangeably.
 `tasksource` automates this and facilitates reproducible multi-task learning scaling and meta-learning.
