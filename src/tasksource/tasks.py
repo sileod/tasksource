@@ -255,10 +255,6 @@ head_qa___en = MultipleChoice("qtext",
     labels = lambda x:[a['aid'] for a in x["answers"]].index(x["ra"])
 )
 
-#race___middle = MultipleChoice('question', choices_list='options', labels='answer')
-#race___high   = MultipleChoice('question', choices_list='options', labels='answer')
-# too long input
-
 
 sciq = MultipleChoice(
     'question',
@@ -302,7 +298,7 @@ art = MultipleChoice(cat(['hypothesis_1','hypothesis_2']),
 )
 
 
-mmlu = MultipleChoice('question',labels='answer',choices_list='choices',splits=['test','dev','validation'],
+mmlu = MultipleChoice('question',labels='answer',choices_list='choices',splits=['validation','dev','test'],
     dataset_name="tasksource/mmlu",
     config_name=get_dataset_config_names("tasksource/mmlu")
 )
@@ -419,7 +415,7 @@ language_identification = Classification("text",labels="labels", dataset_name="p
 
 imdb = Classification(sentence1="text", labels="label", splits=["train", None, "test"])
 
-#trec = Classification(sentence1="text", labels="fine_label", splits=["train", None, "test"])
+#
 
 rotten_tomatoes = Classification(sentence1="text", labels="label")
 
@@ -533,7 +529,6 @@ tweets_hate_speech_detection = Classification(sentence1="tweet", labels="label",
 #adv_glue___adv_qnli = Classification(sentence1="question", labels="label", splits=["validation", None, None])
 #adv_glue___adv_rte = Classification(sentence1="sentence1", sentence2="sentence2", labels="label", splits=["validation", None, None])
 
-
 has_part = Classification("arg1","arg2", labels="score", splits=["train", None, None])
 
 wnut_17 = TokenClassification(tokens="tokens", labels="ner_tags", config_name=["wnut_17"])
@@ -547,7 +542,6 @@ jnlpba = TokenClassification(tokens="tokens", labels="ner_tags", splits=["train"
 species_800 = TokenClassification(tokens="tokens", labels="ner_tags", config_name=["species_800"])
 
 SpeedOfMagic_ontonotes_english = TokenClassification(tokens="tokens", labels="ner_tags", dataset_name="SpeedOfMagic/ontonotes_english", config_name="SpeedOfMagic--ontonotes_english")
-
 
 blog_authorship_corpus__gender    = Classification(sentence1="text",labels="gender")
 blog_authorship_corpus__age       = Classification(sentence1="text",labels="age")
@@ -676,26 +670,22 @@ def _preprocess_chatgpt_detection(ex):
 #    pre_process=lambda dataset:dataset.map(_preprocess_chatgpt_detection))
 
 sts_companion = Classification("sentence1","sentence2","label",
-    dataset_name="metaeval/sts-companion"
-)
+    dataset_name="metaeval/sts-companion")
 
 commonsense_qa_2 = Classification("question",labels="answer",
-dataset_name="metaeval/commonsense_qa_2.0")
-
+    dataset_name="metaeval/commonsense_qa_2.0")
 
 ling_nli = Classification("premise","hypothesis","label",dataset_name="metaeval/lingnli")
 
 monotonicity_entailment = Classification("sentence1", "sentence2", "gold_label",    
-    dataset_name="metaeval/monotonicity-entailment"
-)
+    dataset_name="metaeval/monotonicity-entailment")
 
 arct = MultipleChoice(cat(["reason","claim"]),choices=["warrant0","warrant1"],
     labels="correctLabelW0orW1", dataset_name="metaeval/arct")
 
 scinli = Classification("sentence1", "sentence2", labels="label",
     post_process=lambda x:x.shuffle(seed=0),
-    dataset_name="metaeval/scinli"
-)
+    dataset_name="metaeval/scinli")
 
 naturallogic = Classification(" sent1 "," sent2 "," new_label ",dataset_name="metaeval/naturallogic")
 
@@ -712,7 +702,6 @@ prost = MultipleChoice(cat(["context","ex_question"]), choices=['A','B','C','D']
 dyna_hate = Classification("text",labels="label",dataset_name="aps/dynahate",splits=['train',None,None])
 
 syntactic_augmentation_nli = Classification('sentence1',"sentence2","gold_label",dataset_name="metaeval/syntactic-augmentation-nli")
-
 
 autotnli = Classification("premises", "hypothesis", "label", dataset_name="metaeval/autotnli")
 #equate = Classification("sentence1", "sentence2", "gold_label",dataset_name="metaeval/equate")
@@ -777,8 +766,7 @@ folio = Classification(lambda x: " ".join(x['premises']),"conclusion",
     dataset_name="metaeval/folio")
 
 tomi_nli = Classification("premise","hypothesis","label",
-    dataset_name="metaeval/tomi-nli"
-)
+    dataset_name="metaeval/tomi-nli")
 
 avicenna = Classification("Premise 1","Premise 2","Syllogistic relation",
     dataset_name="metaeval/avicenna")
@@ -788,12 +776,11 @@ shp = MultipleChoice("history",
     labels="labels",
     dataset_name="stanfordnlp/SHP")
 
-
 medqa_usmle = MultipleChoice('sent1',choices=regen('ending[0-3]'),labels='label',
     dataset_name="GBaker/MedQA-USMLE-4-options-hf")
 
 wikimedqa = MultipleChoice("text",choices=regen('option\_[0-7]'),labels='label',
-    dataset_name="14-07-22/wikimedqa",
+    dataset_name="sileod/wikimedqa",
     config_name=["medwiki"])
 
 cicero = MultipleChoice(lambda x: " ".join(x['Dialogue']),
@@ -821,3 +808,29 @@ implicatures = MultipleChoice(cat(['context','response'],"\n"),
     choices=['correct_implicature','incorrect_implicature'],
     labels=constant(0),
     dataset_name='metaeval/implicatures')
+
+race = MultipleChoice('question', choices_list='options',
+    labels=lambda x:'ABCDE'.index(x['answer']),
+    config_name=['middle','high'])
+
+spartqa_yn=Classification("story","question","answer",
+    dataset_name="metaeval/spartqa-yn")
+
+spartqa_mc=MultipleChoice(cat(["story","question"]),choices_list="candidate_answers",labels="answer",
+    dataset_name="metaeval/spartqa-mchoice")
+
+temporal_nli = Classification("Premise","Hypothesis","Label",
+    dataset_name="metaeval/temporal-nli")
+
+riddle_sense = MultipleChoice("question", choices_list=get.choices.text, 
+    labels=lambda x : "ABCDE".index(x['answerKey']))
+
+clcd = Classification(
+    "sentence1","sentence2","label",
+    dataset_name="metaeval/clcd-english"
+)
+
+twentyquestions = Classification("question","subject","answer",dataset_name="maximedb/twentyquestions")
+
+reclor = MultipleChoice(cat(["context","question"]),choices_list="answers",labels="label",
+    dataset_name="metaeval/reclor",splits=['train','validation',None])
