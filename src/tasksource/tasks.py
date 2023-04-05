@@ -17,7 +17,10 @@ glue___stsb = Classification(sentence1="sentence1", sentence2="sentence2", label
 
 super_glue___boolq = Classification(sentence1="question", labels="label")
 super_glue___cb = Classification(sentence1="premise", sentence2="hypothesis", labels="label")
-super_glue___multirc = Classification(sentence1="question", labels="label")
+super_glue___multirc = Classification(
+    cat(["paragraph", "question","answer"], " : "),
+    labels='label'
+)
 #super_glue___rte = Classification(sentence1="premise", sentence2="hypothesis", labels="label") # in glue
 super_glue___wic = Classification(
     sentence1=cat(["word","sentence1"], " : "),
