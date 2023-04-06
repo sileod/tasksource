@@ -813,9 +813,12 @@ implicatures = MultipleChoice(cat(['context','response'],"\n"),
     labels=constant(0),
     dataset_name='metaeval/implicatures')
 
-race = MultipleChoice('question', choices_list='options',
+race = MultipleChoice(cat(['question','article'],'\n'), choices_list='options',
     labels=lambda x:'ABCDE'.index(x['answer']),
     config_name=['middle','high'])
+
+race_c = MultipleChoice(cat(['question','article'],'\n'),choices_list='option',labels='label',
+    dataset_name='metaeval/race-c')
 
 spartqa_yn=Classification("story","question","answer",
     dataset_name="metaeval/spartqa-yn")
