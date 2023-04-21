@@ -21,7 +21,8 @@ Pretrained Model
 ### Pretrained model:
 
 Text encoder pretrained on tasksource reached state-of-the-art results: [🤗/deberta-v3-base-tasksource-nli](https://hf.co/sileod/deberta-v3-base-tasksource-nli)
-Tasksource pretraining should be quite helpful for RLHF reward models pretraining.
+
+Tasksource pretraining is notably helpful for RLHF reward modeling.
 
  ### Contact and citation
 For help integrating tasksource into your experiments, please contact `damien.sileo@inria.fr`.
