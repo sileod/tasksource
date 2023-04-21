@@ -25,7 +25,7 @@ Text encoder pretrained on tasksource reached state-of-the-art results: [🤗/de
 Tasksource pretraining is notably helpful for RLHF reward modeling.
 
  ### Contact and citation
-For help integrating tasksource into your experiments, please contact `damien.sileo@inria.fr`.
+For help integrating tasksource into your experiments, please contact [damien.sileo@inria.fr](mailto:damien.sileo@inria.fr).
 
 For more details, refer to this [article:](https://arxiv.org/abs/2301.05948) 
 ```bib
