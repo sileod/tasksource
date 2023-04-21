@@ -7,7 +7,7 @@ def all(dataset_name):
 
 
 # english tasks (few, to keep balance between languages)
-from .tasks import anli__a1, anthropic_rlhf, dyna_hate, dynasent__r1
+from .tasks import anthropic_rlhf, dyna_hate, dynasent__r1
 
 xnli = Classification("premise","hypothesis","label",
     **all("MoritzLaurer/multilingual-NLI-26lang-2mil7")) 
