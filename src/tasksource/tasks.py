@@ -554,7 +554,9 @@ blog_authorship_corpus__job       = Classification(sentence1="text",labels="job"
 
 launch_open_question_type = Classification(sentence1="question", labels="resolve_type", dataset_name="launch/open_question_type")
 
-health_fact = Classification(sentence1="claim", labels="label")
+health_fact = Classification(sentence1="claim", labels="label",
+    pre_process = lambda ds:ds.filter(lambda x:x['label'] not in {-1})
+)
 
 commonsense_qa = MultipleChoice(
     "question",
@@ -841,3 +843,43 @@ twentyquestions = Classification("question","subject","answer",dataset_name="max
 
 reclor = MultipleChoice(cat(["context","question"]),choices_list="answers",labels="label",
     dataset_name="metaeval/reclor",splits=['train','validation',None])
+
+c_aug_imdb = Classification("Text",labels="Sentiment",
+    dataset_name='metaeval/counterfactually-augmented-imdb')
+
+c_aug_snli = Classification("sentence1","sentence2","gold_label",
+    dataset_name='metaeval/counterfactually-augmented-snli')
+
+cnli = Classification("premise","hypothesis","label",
+    dataset_name='metaeval/cnli')
+
+perturbed_boolq = Classification("question",labels="hard_label",
+    dataset_name='metaeval/boolq-natural-perturbations')
+
+#mega_acceptability = Classification("sentence",labels="average",
+#    dataset_name='metaeval/mega-acceptability-v2')
+
+graded_acceptability = Classification("text",labels="normalized_score",
+    dataset_name="metaeval/acceptability-prediction")
+
+equate = Classification("sentence1","sentence2","gold_label",
+    dataset_name='metaeval/equate')
+
+science_qa = MultipleChoice("question",choices_list="choices",labels="answer",
+    dataset_name="metaeval/ScienceQA_text_only")
+
+ekar=MultipleChoice("question",choices_list=get.choices.text,
+    labels=lambda x:"ABCD".index(x['answerKey']),
+dataset_name="Jiangjie/ekar_english")
+
+
+implicit_hate = Classification("post",labels="class",
+    dataset_name="metaeval/implicit-hate-stg1")
+
+nli_unambiguity = Classification("premise","hypothesis","gini",
+    dataset_name="metaeval/chaos-mnli-ambiguity"
+)
+
+headline_cause = Classification('left_title','right_title','label',
+    dataset_name='IlyaGusev/headline_cause',config_name='en_simple')
+#headline_cause Copied

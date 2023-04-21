@@ -28,7 +28,9 @@ def pretty_name(x):
     tn = x.task_name if x.task_name else ""
     return f"{dn}/{cn}/{tn}".replace('//','/').rstrip('/')
 
-def list_tasks(tasks_path=f'{os.path.dirname(__file__)}/tasks.py'):
+def list_tasks(tasks_path=f'{os.path.dirname(__file__)}/tasks.py',multilingual=False):
+    if multilingual:
+        tasks_path=tasks_path.replace('/tasks.py','mtasks.py')
     task_order = open(tasks_path).readlines()
     task_order = [x.split('=')[0].rstrip() for x in task_order if '=' in x]
     task_order = [x for x in task_order if x.isidentifier()]

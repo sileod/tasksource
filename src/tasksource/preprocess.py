@@ -89,7 +89,7 @@ def pretty(f):
                 
         def __call__(self, *args,**kwargs):
             return self.__f_arg(*args,**kwargs)
-            return 
+
         def __repr__(self):
             return f"{self.__f_arg.__qualname__ .split('.')[0]}({self.value})"
     return pretty_f
@@ -120,6 +120,10 @@ class ClassificationFields(Preprocessing):
     sentence2:str='sentence2'
     labels:str='labels'
 
+@dataclass
+class Seq2SeqLMFields(Preprocessing):
+    prompt:str='prompt'
+    output:str='output'
 
 @dataclass
 class TokenClassificationFields(Preprocessing):
@@ -179,7 +183,10 @@ class MultipleChoice(SharedFields, MultipleChoiceFields): pass
 
 @dataclass
 class TokenClassification(SharedFields, TokenClassificationFields): pass
-        
+
+@dataclass
+class Seq2SeqLM(SharedFields, Seq2SeqLMFields): pass
+
 get=dotgetter()
 constant = pretty(fc.constantly)
 regen = lambda x: list(exrex.generate(x))
