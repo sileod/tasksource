@@ -3,7 +3,12 @@ from .metadata import bigbench_discriminative_english, blimp_hard, imppres_presu
 from datasets import get_dataset_config_names, ClassLabel, Dataset, DatasetDict
 
 def all(dataset_name):
-    return dict(dataset_name=dataset_name, config_name=get_dataset_config_names(dataset_name))
+    try:
+        config_name=get_dataset_config_names(dataset_name)
+    except Exception as e:
+        print(dataset_name,e)
+        config_name=None
+    return dict(dataset_name=dataset_name, config_name=config_name)
 
 
 # english tasks (few, to keep balance between languages)
@@ -35,7 +40,7 @@ offenseval = Classification("text",labels="subtask_a",
     config_name=["ar","da","gr","tr"])
 
 disrpt_23 = Classification("unit1_sent","unit2_sent","label",
-    **all("metaeval/dsr"))
+    **all("metaeval/disrpt"))
 
 ner = TokenClassification("words","ner",
     dataset_name="xglue",config_name="ner")

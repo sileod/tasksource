@@ -61,14 +61,16 @@ def list_tasks(tasks_path=f'{os.path.dirname(__file__)}/tasks.py',multilingual=F
     del df['rank']
     return df
 
-task_df = list_tasks()
+task_df =list_tasks()
+mtask_df =list_tasks(multilingual=True)
 
 def dict_to_query(d=dict(), **kwargs):
     d={**d,**kwargs}
     return '&'.join([f'`{k}`=="{v}"' for k,v in d.items()])
 
 def load_preprocessing(tasks=tasks, **kwargs):
-    y = task_df.copy().query(dict_to_query(**kwargs)).iloc[0]
+    _tasks_df = (mtask_df if tasks==mtasks else task_df)
+    y = _tasks_df.copy().query(dict_to_query(**kwargs)).iloc[0]
     preprocessing= copy.copy(getattr(tasks, y.preprocessing_name))
     #preprocessing= getattr(tasks, y.preprocessing_name)
     for c in 'dataset_name','config_name':
@@ -77,9 +79,10 @@ def load_preprocessing(tasks=tasks, **kwargs):
     return preprocessing
 
 def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preprocessing_name=None,
-         max_rows=None, max_rows_eval=None):
+         max_rows=None, max_rows_eval=None, multilingual=False):
     query = dict_of(id, dataset_name, config_name, task_name,preprocessing_name)
     query = {k:v for k,v in query.items() if v}
-    preprocessing = load_preprocessing(**query)
+    _tasks = (mtasks if multilingual else tasks)
+    preprocessing = load_preprocessing(_tasks, **query)
     dataset = load_dataset(preprocessing.dataset_name, preprocessing.config_name)
     return preprocessing(dataset,max_rows, max_rows_eval)
