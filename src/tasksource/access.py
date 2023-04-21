@@ -1,7 +1,7 @@
 from .preprocess import Preprocessing
 import re
 import pandas as pd
-from . import tasks
+from . import tasks, mtasks
 from .metadata import dataset_rank
 from datasets import load_dataset
 import funcy as fc
@@ -30,17 +30,19 @@ def pretty_name(x):
 
 def list_tasks(tasks_path=f'{os.path.dirname(__file__)}/tasks.py',multilingual=False):
     if multilingual:
-        tasks_path=tasks_path.replace('/tasks.py','mtasks.py')
+        tasks_path=tasks_path.replace('/tasks.py','/mtasks.py')
     task_order = open(tasks_path).readlines()
     task_order = [x.split('=')[0].rstrip() for x in task_order if '=' in x]
     task_order = [x for x in task_order if x.isidentifier()]
     task_order = fc.flip(dict(enumerate(task_order)))
 
     l = []
-    for key in dir(tasks):
+    _tasks = (mtasks if multilingual else tasks)
+
+    for key in dir(_tasks):
         if key not in task_order:
             continue
-        value=getattr(tasks, key)
+        value=getattr(_tasks, key)
         if isinstance(value,Preprocessing):
             dataset_name, config_name, task_name = parse_var_name(key)
             dataset_name = (value.dataset_name if value.dataset_name else dataset_name)

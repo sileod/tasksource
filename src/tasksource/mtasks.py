@@ -5,9 +5,11 @@ from datasets import get_dataset_config_names, ClassLabel, Dataset, DatasetDict
 def all(dataset_name):
     return dict(dataset_name=dataset_name, config_name=get_dataset_config_names(dataset_name))
 
-from .tasks import anli__a1, anthropic_rlhf, dyna_hate, implicit_hate, dynasent__r1
 
-xnli = Classification("premise","hypothesis","label"
+# english tasks (few, to keep balance between languages)
+from .tasks import anli__a1, anthropic_rlhf, dyna_hate, dynasent__r1
+
+xnli = Classification("premise","hypothesis","label",
     **all("MoritzLaurer/multilingual-NLI-26lang-2mil7")) 
 
 stsb_multi_mt = Classification("sentence1","sentence2","similarity_score",
