@@ -88,7 +88,7 @@ mpe_nli = Classification("premise","hypothesis","label",
 dnc_nli = Classification("context","hypothesis","label",
     dataset_name="pietrolesci/dnc")
 
-gpt3_nli = Classification("text_a","text_b","label",dataset_name="pietrolesci/gpt3_nli")
+# gpt3_nli = Classification("text_a","text_b","label",dataset_name="pietrolesci/gpt3_nli") # not sound enough
 
 recast_white__fnplus = Classification("text","hypothesis","label",
     dataset_name="pietrolesci/recast_white",splits=['fnplus',None,None])
@@ -279,7 +279,7 @@ wiqa = MultipleChoice('question_stem',
     choices_list = lambda x: x['choices']['text'],
     labels='answer_label_as_choice')
 
-piqa = MultipleChoice('goal', ['sol1','sol2'], 'label')
+piqa = MultipleChoice('goal', choices=['sol1','sol2'], labels='label')
 
 hellaswag = MultipleChoice('ctx_a',
     choices_list=lambda x: [f'{x["ctx_b"]}{e}' for e in x["endings"]],
@@ -882,4 +882,13 @@ nli_unambiguity = Classification("premise","hypothesis","gini",
 
 headline_cause = Classification('left_title','right_title','label',
     dataset_name='IlyaGusev/headline_cause',config_name='en_simple')
-#headline_cause Copied
+
+logiqa_2 = Classification("premise","hypothesis","label",dataset_name="metaeval/logiqa-2.0-nli")
+
+
+_oast = dict(dataset_name="tasksource/oasst1_dense_flat",
+    pre_process = lambda ds:ds.remove_columns('labels').filter(lambda x:x['lang']=='en'))
+
+oasst1__quality = Classification("parent_text","text",labels="quality",**_oast)
+oasst1__toxicity = Classification("parent_text","text",labels="toxicity",**_oast)
+oasst1__helpfulness = Classification("parent_text","text",labels="helpfulness",**_oast)

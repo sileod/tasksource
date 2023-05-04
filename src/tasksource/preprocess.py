@@ -9,6 +9,7 @@ import magicattr
 import numpy as np
 import copy
 import datasets
+import time
 
 def get_column_names(dataset):
     cn = dataset.column_names
@@ -31,7 +32,7 @@ class Preprocessing(DotWiz):
     def __map_to_target(x,fn=lambda x:None, target=None):
         x[target]=fn(x)
         return x
-
+        
     def load(self):
         return self(datasets.load_dataset(self.dataset_name,self.config_name))
 
@@ -174,6 +175,7 @@ class SharedFields:
     pre_process: callable = lambda x:x
     post_process: callable = lambda x:x
     #language:str="en"
+    
 
 @dataclass
 class Classification(SharedFields, ClassificationFields): pass

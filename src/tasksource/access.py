@@ -1,13 +1,26 @@
 from .preprocess import Preprocessing
 import re
 import pandas as pd
-from . import tasks, mtasks
+from . import tasks
 from .metadata import dataset_rank
 from datasets import load_dataset
 import funcy as fc
 import os
 import copy
 from sorcery import dict_of
+from functools import cache
+
+
+
+class lazy_mtasks:
+    def __getattr__(self, name):
+        from . import mtasks
+        return getattr(mtasks, name)
+
+    def __dir__(self):
+        from . import mtasks
+        return dir(mtasks)
+lmtasks=lazy_mtasks()
 
 def parse_var_name(s):
     config_name,task_name = None,None
@@ -28,6 +41,7 @@ def pretty_name(x):
     tn = x.task_name if x.task_name else ""
     return f"{dn}/{cn}/{tn}".replace('//','/').rstrip('/')
 
+@cache
 def list_tasks(tasks_path=f'{os.path.dirname(__file__)}/tasks.py',multilingual=False):
     if multilingual:
         tasks_path=tasks_path.replace('/tasks.py','/mtasks.py')
@@ -37,7 +51,7 @@ def list_tasks(tasks_path=f'{os.path.dirname(__file__)}/tasks.py',multilingual=F
     task_order = fc.flip(dict(enumerate(task_order)))
 
     l = []
-    _tasks = (mtasks if multilingual else tasks)
+    _tasks = (lmtasks if multilingual else tasks)
 
     for key in dir(_tasks):
         if key not in task_order:
@@ -62,17 +76,16 @@ def list_tasks(tasks_path=f'{os.path.dirname(__file__)}/tasks.py',multilingual=F
     return df
 
 task_df =list_tasks()
-mtask_df =list_tasks(multilingual=True)
+#mtask_df =list_tasks(multilingual=True)
 
 def dict_to_query(d=dict(), **kwargs):
     d={**d,**kwargs}
     return '&'.join([f'`{k}`=="{v}"' for k,v in d.items()])
 
 def load_preprocessing(tasks=tasks, **kwargs):
-    _tasks_df = (mtask_df if tasks==mtasks else task_df)
+    _tasks_df = list_tasks(multilingual=tasks==lmtasks)
     y = _tasks_df.copy().query(dict_to_query(**kwargs)).iloc[0]
     preprocessing= copy.copy(getattr(tasks, y.preprocessing_name))
-    #preprocessing= getattr(tasks, y.preprocessing_name)
     for c in 'dataset_name','config_name':
         if not isinstance(getattr(preprocessing,c), str):
              setattr(preprocessing,c,getattr(y,c))
@@ -82,7 +95,7 @@ def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preproc
          max_rows=None, max_rows_eval=None, multilingual=False):
     query = dict_of(id, dataset_name, config_name, task_name,preprocessing_name)
     query = {k:v for k,v in query.items() if v}
-    _tasks = (mtasks if multilingual else tasks)
+    _tasks = (lmtasks if multilingual else tasks)
     preprocessing = load_preprocessing(_tasks, **query)
     dataset = load_dataset(preprocessing.dataset_name, preprocessing.config_name)
     return preprocessing(dataset,max_rows, max_rows_eval)
