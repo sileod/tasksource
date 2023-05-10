@@ -1,7 +1,7 @@
 ## tasksource: 500+ dataset harmonization preprocessings for frictionless extreme multi-task learning and evaluation
 
 Huggingface Datasets is an excellent library, but it lacks standardization, and datasets often require preprocessing work to be used interchangeably.
-`tasksource` streamlines interchangeable use of many datasets to scale evaluation or multi-task learning.
+`tasksource` streamlines interchangeable datasets usage to scale evaluation or multi-task learning.
 
 Each dataset is standardized to a  `MultipleChoice`, `Classification`, or `TokenClassification` with canonical fields. We focus on discriminative tasks (= with negative examples or classes) and do not yet support generation tasks as they are addressed by [promptsource](https://github.com/bigscience-workshop/promptsource). All implemented preprocessings are in [tasks.py](https://github.com/sileod/tasksource/blob/main/src/tasksource/tasks.py) or [tasks.md](https://github.com/sileod/tasksource/blob/main/tasks.md). A preprocessing is a function that accepts a dataset and returns the standardized dataset. Preprocessing code is concise and human-readable.
 
