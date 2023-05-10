@@ -109,18 +109,18 @@ anthropic_rlhf = MultipleChoice(constant(''), ['chosen','rejected'], constant(0)
 xglue_ner = TokenClassification("words","ner", dataset_name="xglue",config_name="ner")
 xglue_pos = TokenClassification("words","pos", dataset_name="xglue",config_name="pos")
 
-
-
 disrpt_23 = Classification("unit1_sent", "unit2_sent", "label",**all("metaeval/disrpt"))
 
-# udep__pos = TokenClassification('tokens','upos', **all('universal_dependencies'))
+udep__pos = TokenClassification('tokens','upos', **all('universal_dependencies'))
 
 def udep_post_process(ds):
     return ds.cast_column('labels', Sequence(ClassLabel(names=udep_labels)))
 
-udep__deprel = TokenClassification('tokens',lambda x:[udep_labels.index(a) for a in x['deprel']],
-    **all('universal_dependencies'),post_process=udep_post_process)
+#udep__deprel = TokenClassification('tokens',lambda x:[udep_labels.index(a) for a in x['deprel']],
+#    **all('universal_dependencies'),post_process=udep_post_process)
 
+oasst_rlhf = MultipleChoice("prompt",choices=['chosen','rejected'],labels=constant(0),
+    dataset_name="tasksource/oasst1_pairwise_rlhf_reward")
 
 #Classification(
 #    dataset_name='glue',config_name=['ocnli','afqmc'])

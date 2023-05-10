@@ -1,6 +1,6 @@
 from .preprocess import cat, get, regen, constant, Classification, TokenClassification, MultipleChoice
-from .metadata import bigbench_discriminative_english, blimp_hard, imppres_presupposition, imppres_implicature
-from datasets import get_dataset_config_names, ClassLabel, Dataset, DatasetDict
+from .metadata import bigbench_discriminative_english, blimp_hard, imppres_presupposition, imppres_implicature, udep_en_configs, udep_en_labels
+from datasets import get_dataset_config_names, Sequence, ClassLabel, Dataset, DatasetDict
 # variable name: dataset___config__task
 
 ###################### NLI/paraphrase ###############################
@@ -836,8 +836,7 @@ riddle_sense = MultipleChoice("question", choices_list=get.choices.text,
 
 clcd = Classification(
     "sentence1","sentence2","label",
-    dataset_name="metaeval/clcd-english"
-)
+    dataset_name="metaeval/clcd-english")
 
 twentyquestions = Classification("question","subject","answer",dataset_name="maximedb/twentyquestions")
 
@@ -872,13 +871,11 @@ ekar=MultipleChoice("question",choices_list=get.choices.text,
     labels=lambda x:"ABCD".index(x['answerKey']),
 dataset_name="Jiangjie/ekar_english")
 
-
 implicit_hate = Classification("post",labels="class",
     dataset_name="metaeval/implicit-hate-stg1")
 
 nli_unambiguity = Classification("premise","hypothesis","gini",
-    dataset_name="metaeval/chaos-mnli-ambiguity"
-)
+    dataset_name="metaeval/chaos-mnli-ambiguity")
 
 headline_cause = Classification('left_title','right_title','label',
     dataset_name='IlyaGusev/headline_cause',config_name='en_simple')
@@ -886,9 +883,32 @@ headline_cause = Classification('left_title','right_title','label',
 logiqa_2 = Classification("premise","hypothesis","label",dataset_name="metaeval/logiqa-2.0-nli")
 
 
-_oast = dict(dataset_name="tasksource/oasst1_dense_flat",
+_oasst = dict(dataset_name="tasksource/oasst1_dense_flat",
     pre_process = lambda ds:ds.remove_columns('labels').filter(lambda x:x['lang']=='en'))
 
-oasst1__quality = Classification("parent_text","text",labels="quality",**_oast)
-oasst1__toxicity = Classification("parent_text","text",labels="toxicity",**_oast)
-oasst1__helpfulness = Classification("parent_text","text",labels="helpfulness",**_oast)
+oasst1__quality = Classification("parent_text","text",labels="quality",**_oasst)
+oasst1__toxicity = Classification("parent_text","text",labels="toxicity",**_oasst)
+oasst1__helpfulness = Classification("parent_text","text",labels="helpfulness",**_oasst)
+
+para_rules = Classification("context","question","label",dataset_name="qbao775/PARARULE-Plus-Depth-2")
+
+mindgames = Classification("premise","hypothesis","label",dataset_name="sileod/mindgames")
+
+def _udep_post_process(ds):
+    return ds.cast_column('labels', Sequence(ClassLabel(names=udep_en_labels)))
+
+udep__deprel = TokenClassification('tokens',lambda x:[udep_en_labels.index(a) for a in x['deprel']],
+    config_name=udep_en_configs,dataset_name="universal_dependencies",post_process=_udep_post_process)
+
+ambient= Classification("premise","hypothesis","hypothesis_ambiguous",dataset_name="metaeval/ambient",
+    pre_process = lambda ds:ds.remove_columns('labels'))
+
+path_naturalness = MultipleChoice(constant(""),choices=['choice1','choice2'],labels="label",
+    dataset_name="metaeval/path-naturalness-prediction")
+
+cloth = MultipleChoice("sentence", choices_list=lambda x:[x["answer"]]+x["distractors"],labels=constant(0), dataset_name="AndyChiang/cloth")
+dgen  = MultipleChoice("sentence", choices_list=lambda x:[x["answer"]]+x["distractors"],labels=constant(0), dataset_name="AndyChiang/dgen")
+
+oasst_rlhf = MultipleChoice("prompt",choices=['chosen','rejected'],labels=constant(0),
+    dataset_name="tasksource/oasst1_pairwise_rlhf_reward",
+    pre_process = lambda ds:ds.filter(lambda x:x['lang']=='en'))
