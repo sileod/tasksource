@@ -255,3 +255,8 @@ def fix_labels(dataset, label_key='labels'):
     labels=sorted(labels, key=order)
     dataset=dataset.cast_column(label_key, datasets.ClassLabel(names=labels))
     return dataset
+
+def concatenate_dataset_dict(l):
+    """Concatenate a list of DatastDict objects sharing same splits and columns."""
+    keys=l[0].keys()
+    return DatasetDict({k: concatenate_datasets([x[k] for x in l]) for k in keys})

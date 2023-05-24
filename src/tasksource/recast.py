@@ -26,7 +26,7 @@ def render_token_classification(tokens,options,labels):
 def render_multiple_choice(prompt, options, labels):
     inputs=(prompt+'\n' if prompt else '')
     letters = string.ascii_uppercase[:len(options)]
-    inputs=f'{inputs}With no explanation, chose the best option from {render_options(letters)}.'    
+    inputs=f'With no explanation, chose the best option from {render_options(letters)}. {inputs}'    
     for letter, option in zip(letters, options):
         inputs+=f'\n{letter}: {option}'
         assert "{letter}" not in inputs
@@ -75,7 +75,7 @@ def recast_instruct(dataset):
     def recast_MultipleChoice(x):
         choices = [k for k in x if 'choice' in k]
         if all([x[c] in x['inputs'] for c in choices]):
-            return {"inputs":x['inputs'], 'targets': x[f"choice{x['labels']}"]}
+            return {"inputs":x['inputs'], 'targets': x[f"choice{x['labels']}"]+"."}
         else:
             return render_multiple_choice(x['inputs'],[x[c] for c in choices],x['labels'])
 
