@@ -109,7 +109,7 @@ anthropic_rlhf = MultipleChoice(constant(''), ['chosen','rejected'], constant(0)
 xglue_ner = TokenClassification("words","ner", dataset_name="xglue",config_name="ner")
 xglue_pos = TokenClassification("words","pos", dataset_name="xglue",config_name="pos")
 
-disrpt_23 = Classification("unit1_sent", "unit2_sent", "label",**all("metaeval/disrpt"))
+#disrpt_23 = Classification("unit1_sent", "unit2_sent", "label",**all("metaeval/disrpt"))
 
 udep__pos = TokenClassification('tokens','upos', **all('universal_dependencies'))
 

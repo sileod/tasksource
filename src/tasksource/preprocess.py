@@ -19,11 +19,11 @@ def get_column_names(dataset):
         return set(cn)
 
 
-def sample_dataset(dataset,n=10000, n_eval=1000):
+def sample_dataset(dataset,n=10000, n_eval=1000,seed=0):
     for k in dataset:
         n_k=(n if k=='train' else n_eval)
         if n_k and len(dataset[k])>n_k:
-            dataset[k]=dataset[k].train_test_split(train_size=n_k)['train']
+            dataset[k]=dataset[k].train_test_split(train_size=n_k,seed=seed)['train']
     return dataset
 
 class Preprocessing(DotWiz):
@@ -36,8 +36,10 @@ class Preprocessing(DotWiz):
     def load(self):
         return self(datasets.load_dataset(self.dataset_name,self.config_name))
 
-    def __call__(self,dataset, max_rows=None, max_rows_eval=None):
+    def __call__(self,dataset, max_rows=None, max_rows_eval=None,seed=0):
         dataset = self.pre_process(dataset)
+
+        # manage splits
         for k,v in zip(self.default_splits, self.splits):
             if v and k!=v:
                 dataset[k]=dataset[v]
@@ -49,11 +51,17 @@ class Preprocessing(DotWiz):
         for k in list(dataset.keys()):
             if k not in self.default_splits:
                 del dataset[k]
-        dataset = sample_dataset(dataset, max_rows, max_rows_eval)
+        dataset = sample_dataset(dataset, max_rows, max_rows_eval,seed=seed)
         
-        dataset=dataset.rename_columns({v:k for k,v in self.to_dict().items()
-                                        if (k and k not in {'splits','dataset_name','config_name'} 
-                                        and type(v)==str and k!=v)})
+        # field annotated with a string
+        substitutions = {v:k for k,v in self.to_dict().items()
+            if (k and k not in {'splits','dataset_name','config_name'} 
+            and type(v)==str and k!=v)}
+
+        dataset=dataset.remove_columns([c for c in substitutions.values() if c in dataset['train'].features and c not in substitutions])
+        dataset=dataset.rename_columns(substitutions)
+
+        # field annotated with a function                                
         for k in self.to_dict().keys():
             v=getattr(self, k)
             if callable(v) and k not in {"post_process","pre_process","load"}:
@@ -63,6 +71,7 @@ class Preprocessing(DotWiz):
         dataset=dataset.remove_columns(
             get_column_names(dataset)-set(self.to_dict().keys()))
         dataset = fix_labels(dataset)
+        dataset = fix_splits(dataset) # again: label mapping changed
         dataset = self.post_process(dataset)
         return dataset
 
@@ -193,6 +202,8 @@ get=dotgetter()
 constant = pretty(fc.constantly)
 regen = lambda x: list(exrex.generate(x))
 
+def name(label_name, classes):
+    return lambda x:classes[x[label_name]]
 
 def fix_splits(dataset):
 
@@ -204,10 +215,9 @@ def fix_splits(dataset):
     if 'auxiliary_train' in dataset:
         del dataset['auxiliary_train']
     
-    if 'test' in dataset:
+    if 'test' in dataset: # manage obfuscated labels
         if 'labels' in dataset['test'].features:
             if len(set(fc.flatten(dataset['test'].to_dict()['labels'])))==1:
-                 # obfuscated label
                 del dataset['test']
 
     if 'validation' in dataset and 'train' not in dataset:
@@ -232,7 +242,7 @@ def fix_splits(dataset):
         dataset["validation"] = val_test["train"]
         dataset["test"] = val_test["test"]
         
-    return dataset
+    return dataset 
 
 def fix_labels(dataset, label_key='labels'):
     if type(dataset['train'][label_key][0]) in [int,list,float]:

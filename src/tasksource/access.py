@@ -1,7 +1,7 @@
 from .preprocess import Preprocessing
 import re
 import pandas as pd
-from . import tasks
+from . import tasks, recast
 from .metadata import dataset_rank
 from datasets import load_dataset
 import funcy as fc
@@ -9,7 +9,7 @@ import os
 import copy
 from sorcery import dict_of
 from functools import cache
-
+import random
 
 
 class lazy_mtasks:
@@ -42,7 +42,7 @@ def pretty_name(x):
     return f"{dn}/{cn}/{tn}".replace('//','/').rstrip('/')
 
 @cache
-def list_tasks(tasks_path=f'{os.path.dirname(__file__)}/tasks.py',multilingual=False):
+def list_tasks(tasks_path=f'{os.path.dirname(__file__)}/tasks.py',multilingual=False,instruct=False, excluded=[]):
     if multilingual:
         tasks_path=tasks_path.replace('/tasks.py','/mtasks.py')
     task_order = open(tasks_path).readlines()
@@ -73,9 +73,12 @@ def list_tasks(tasks_path=f'{os.path.dirname(__file__)}/tasks.py',multilingual=F
     df['id'] = df.apply(lambda x: pretty_name(x), axis=1)
     df.insert(0, 'id', df.pop('id'))
     del df['rank']
+    if instruct:
+        df=df[df.id.map(lambda x: not any(a in x for a in recast.improper_labels))]
+    df=df[df.id.map(lambda x: not any(x in a for a in excluded))]
     return df
 
-task_df =list_tasks()
+#task_df =list_tasks()
 #mtask_df =list_tasks(multilingual=True)
 
 def dict_to_query(d=dict(), **kwargs):
@@ -92,10 +95,14 @@ def load_preprocessing(tasks=tasks, **kwargs):
     return preprocessing
 
 def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preprocessing_name=None,
-         max_rows=None, max_rows_eval=None, multilingual=False):
+         max_rows=None, max_rows_eval=None, multilingual=False, instruct=False, seed=0, **load_dataset_kwargs):
     query = dict_of(id, dataset_name, config_name, task_name,preprocessing_name)
     query = {k:v for k,v in query.items() if v}
     _tasks = (lmtasks if multilingual else tasks)
     preprocessing = load_preprocessing(_tasks, **query)
-    dataset = load_dataset(preprocessing.dataset_name, preprocessing.config_name)
-    return preprocessing(dataset,max_rows, max_rows_eval)
+    dataset = load_dataset(preprocessing.dataset_name, preprocessing.config_name, **load_dataset_kwargs)
+    dataset= preprocessing(dataset,max_rows, max_rows_eval)
+    dataset.task_type = preprocessing.__class__.__name__
+    if instruct:
+        dataset=recast.recast_instruct(dataset)
+    return dataset

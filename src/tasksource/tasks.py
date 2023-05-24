@@ -1,4 +1,4 @@
-from .preprocess import cat, get, regen, constant, Classification, TokenClassification, MultipleChoice
+from .preprocess import cat, get, regen, name, constant, Classification, TokenClassification, MultipleChoice
 from .metadata import bigbench_discriminative_english, blimp_hard, imppres_presupposition, imppres_implicature, udep_en_configs, udep_en_labels
 from datasets import get_dataset_config_names, Sequence, ClassLabel, Dataset, DatasetDict
 # variable name: dataset___config__task
@@ -47,7 +47,11 @@ sick__relatedness   = Classification('sentence_A','sentence_B','relatedness_scor
 sick__entailment_AB = Classification('sentence_A','sentence_B','entailment_AB')
 #sick__entailment_BA = Classification('sentence_A','sentence_B','entailment_BA')
 
-snli = Classification(sentence1="premise", sentence2="hypothesis", labels="label")
+def remove_neg_1(dataset):
+    return dataset.filter(lambda x:x['labels']!=-1)
+
+snli = Classification(sentence1="premise", sentence2="hypothesis", labels="label",
+    post_process=remove_neg_1)
 
 scitail = Classification("sentence1","sentence2","gold_label",config_name="snli_format")
 
@@ -55,7 +59,7 @@ hans = Classification(sentence1="premise", sentence2="hypothesis", labels="label
 
 wanli = Classification('premise','hypothesis','gold', dataset_name="alisawuffles/WANLI")
 
-recast = Classification(sentence1="context", sentence2="hypothesis", labels="label", dataset_name="metaeval/recast",
+recast_nli = Classification(sentence1="context", sentence2="hypothesis", labels="label", dataset_name="metaeval/recast",
     config_name=['recast_kg_relations', 'recast_puns', 'recast_factuality', 'recast_verbnet',
     'recast_verbcorner', 'recast_ner', 'recast_sentiment', 'recast_megaveridicality'])
 
@@ -72,8 +76,8 @@ nli_fever = Classification("premise","hypothesis","label",
 breaking_nli = Classification("sentence1","sentence2","label",
     dataset_name="pietrolesci/breaking_nli", splits=["full",None,None])
 
-conj_nli = Classification("premise","hypothesis","label",
-    dataset_name="pietrolesci/conj_nli")
+conj_nli = Classification("premise","hypothesis","label",post_process=remove_neg_1,
+    dataset_name="pietrolesci/conj_nli",splits=['train','dev',None])
 
 fracas = Classification("premise","hypothesis","label",
     dataset_name="pietrolesci/fracas")
@@ -97,11 +101,14 @@ recast_white__sprl = Classification("text","hypothesis","label",
 recast_white__dpr = Classification("text","hypothesis","label",
     dataset_name="pietrolesci/recast_white",splits=['dpr',None,None])
 
-joci = Classification("context","hypothesis","label", dataset_name="pietrolesci/joci",splits=['full',None,None])
+joci = Classification("context","hypothesis",
+    labels=lambda x: [None, "impossible", "technically possible", "plausible", "likely", "very likely"][x["original_label"]],
+    pre_process=lambda ds:ds.filter(lambda x:x['original_label']!=0),
+    dataset_name="pietrolesci/joci",splits=['full',None,None])
 
 #enfever_nli = Classification("evidence","claim","label", dataset_name="ctu-aic/enfever_nli")
 
-contrast_nli = Classification("premise", "hypothesis",	"label",dataset_name="martn-nguyen/contrast_nli")
+#contrast_nli = Classification("premise", "hypothesis",	"label",dataset_name="martn-nguyen/contrast_nli") # generated
 
 robust_nli__IS_CS = Classification("premise","hypothesis","label",
 	dataset_name="pietrolesci/robust_nli", splits=["IS_CS",None,None])
@@ -144,7 +151,7 @@ def _imppres_post_process(ds,prefix=''):
     # imppres entailment definition is either purely semantic or purely pragmatic
     # because of that, we assign differentiate the labels from anli/mnli notation
     return ds.cast_column('labels', ClassLabel(
-    names=[f'imppres{prefix}_entailment',f'imppres{prefix}_neutral',f'imppres{prefix}_contradiction']))
+    names=[f'{prefix}_entailment',f'{prefix}_neutral',f'{prefix}_contradiction']))
 
 imppres__presupposition = imppres__prag = Classification("premise","hypothesis","gold_label",
     dataset_name="metaeval/imppres", config_name=imppres_presupposition,
@@ -152,11 +159,11 @@ imppres__presupposition = imppres__prag = Classification("premise","hypothesis",
 
 imppres__prag = Classification("premise","hypothesis","gold_label_prag",
     dataset_name="metaeval/imppres", config_name=imppres_implicature,
-    post_process=lambda x: _imppres_post_process(x,'_prag'))
+    post_process=lambda x: _imppres_post_process(x,'pragmatic'))
 
 imppres__log = Classification("premise","hypothesis","gold_label_log",
     dataset_name="metaeval/imppres", config_name=imppres_implicature,
-    post_process=lambda x: _imppres_post_process(x,'_log'))
+    post_process=lambda x: _imppres_post_process(x,'logical'))
 
 
 glue__diagnostics = Classification("premise","hypothesis","label",
@@ -164,12 +171,12 @@ glue__diagnostics = Classification("premise","hypothesis","label",
 
 hlgd = Classification("headline_a", "headline_b", labels="label")
 
-paws___labeled_final   = Classification("sentence1", "sentence2", "label")
-paws___labeled_swap    = Classification("sentence1", "sentence2", "label", splits=["train", None, None])
+paws___labeled_final   = Classification("sentence1", "sentence2", name('label',['not_paraphrase','paraphrase']))
+paws___labeled_swap    = Classification("sentence1", "sentence2", name('label',['not_paraphrase','paraphrase']), splits=["train", None, None])
 #paws___unlabeled_final = Classification("sentence1", "sentence2", "label")
 
 quora = Classification(get.questions.text[0], get.questions.text[1], 'is_duplicate')
-medical_questions_pairs = Classification("question_1","question_2", "label")
+medical_questions_pairs = Classification("question_1","question_2", name("label",['False','True']))
  
 ###################### Token Classification #########################
 
@@ -270,7 +277,7 @@ social_i_qa = MultipleChoice(
     ['answerA','answerB','answerC'],
     'label')
 
-wiki_hop = MultipleChoice(
+wiki_hop___original = MultipleChoice(
     'question', 
     choices_list='candidates',
     labels=lambda x:x['choices_list'].index(x["answer"]))
@@ -288,12 +295,10 @@ hellaswag = MultipleChoice('ctx_a',
 super_glue___copa = MultipleChoice('premise',['choice1','choice2'],'label')
 
 balanced_copa = MultipleChoice('premise',['choice1','choice2'],'label',
-    dataset_name="pkavumba/balanced-copa"
-)
+    dataset_name="pkavumba/balanced-copa")
 
 e_care = MultipleChoice('premise',['choice1','choice2'],'label',
-    dataset_name="12ml/e-CARE"
-)
+    dataset_name="12ml/e-CARE")
 
 art = MultipleChoice(cat(['hypothesis_1','hypothesis_2']),
     ['observation_1','observation_2'],
@@ -323,7 +328,7 @@ definite_pronoun_resolution = MultipleChoice(
     labels="label",
     splits=['train',None,'test'])
 
-swag=MultipleChoice(cat(["sent1","sent2"]),regen("ending[0-3]"),"label")
+swag___regular=MultipleChoice(cat(["sent1","sent2"]),regen("ending[0-3]"),"label")
 
 def _split_choices(s):
     import re
@@ -349,7 +354,7 @@ amazon_counterfactual = Classification(
     config_name="en")
 
 insincere_questions = Classification(
-    "text", labels="label",
+    "text", labels="label_text",
     dataset_name="SetFit/insincere-questions")
 
 toxic_conversations = Classification(
@@ -543,7 +548,7 @@ acronym_identification = TokenClassification(labels="labels", tokens="tokens")
 
 jnlpba = TokenClassification(tokens="tokens", labels="ner_tags", splits=["train", "validation", None], config_name=["jnlpba"])
 
-species_800 = TokenClassification(tokens="tokens", labels="ner_tags", config_name=["species_800"])
+#species_800 = TokenClassification(tokens="tokens", labels="ner_tags", config_name=["species_800"]) missing files
 
 SpeedOfMagic_ontonotes_english = TokenClassification(tokens="tokens", labels="ner_tags", dataset_name="SpeedOfMagic/ontonotes_english", config_name="SpeedOfMagic--ontonotes_english")
 
@@ -578,7 +583,7 @@ discosense = MultipleChoice("context",choices=regen("option\_[0-3]"),labels="lab
 circa = Classification(
     sentence1=cat(["context","question-X"]),
     sentence2="answer-Y",
-    labels="goldstandard2")
+    labels="goldstandard2", post_process=remove_neg_1)
 
 #code_x_glue_cc_defect_detection = Classification("func", labels="target")
 
@@ -612,7 +617,7 @@ exaggeration_detection = Classification(
 )
 quarel = Classification(
     "question",
-    labels="answer_index"
+    labels=lambda x: "AB"[x["answer_index"]]
 )
 
 mwong_fever_evidence_related = Classification(sentence1="claim", sentence2="evidence", labels="labels", splits=["train", "valid", "test"], dataset_name="mwong/fever-evidence-related", config_name="mwong--fever-related")
@@ -656,9 +661,9 @@ logiqa = MultipleChoice(
 #    config_name='proto_qa'
 #)
 
-wiki_qa = Classification("question","answer","label")
+wiki_qa = Classification("question","answer", name("label",['False','True']))
 
-cycic_classification = Classification("question",labels="correct_answer",
+cycic_classification = Classification("question",labels=name("correct_answer",['False','True']),
     dataset_name = "metaeval/cycic_classification")
 cycic_mc = MultipleChoice("question", choices=regen('answer\_option[0-4]'), labels="correct_answer",
     dataset_name = "metaeval/cycic_multiplechoice")
@@ -739,7 +744,7 @@ defeasible_nli = Classification(cat(["Premise","Hypothesis"]),"Update",labels="U
 #defeasible_nli_social = Classification(cat(["SocialChemROT","Hypothesis"]),"Update",labels="UpdateType",
 #    dataset_name="metaeval/defeasible-nli",config_name='social')
 
-help_nli = Classification("sentence1","sentence2","gold_label",
+help_nli = Classification("ori_sentence","new_sentence","gold_label",
     dataset_name="metaeval/help-nli")
     
 nli_veridicality_transitivity = Classification("sentence1","sentence2","gold_label",
@@ -882,15 +887,16 @@ headline_cause = Classification('left_title','right_title','label',
 
 logiqa_2 = Classification("premise","hypothesis","label",dataset_name="metaeval/logiqa-2.0-nli")
 
-
 _oasst = dict(dataset_name="tasksource/oasst1_dense_flat",
-    pre_process = lambda ds:ds.remove_columns('labels').filter(lambda x:x['lang']=='en'))
+    pre_process = lambda ds:ds.filter(lambda x:x['lang']=='en'))
 
 oasst1__quality = Classification("parent_text","text",labels="quality",**_oasst)
 oasst1__toxicity = Classification("parent_text","text",labels="toxicity",**_oasst)
 oasst1__helpfulness = Classification("parent_text","text",labels="helpfulness",**_oasst)
 
-para_rules = Classification("context","question","label",dataset_name="qbao775/PARARULE-Plus-Depth-2")
+para_rules = Classification("context","question",
+    labels=name("label",["False","True"]),
+    dataset_name="qbao775/PARARULE-Plus")
 
 mindgames = Classification("premise","hypothesis","label",dataset_name="sileod/mindgames")
 
@@ -900,15 +906,39 @@ def _udep_post_process(ds):
 udep__deprel = TokenClassification('tokens',lambda x:[udep_en_labels.index(a) for a in x['deprel']],
     config_name=udep_en_configs,dataset_name="universal_dependencies",post_process=_udep_post_process)
 
-ambient= Classification("premise","hypothesis","hypothesis_ambiguous",dataset_name="metaeval/ambient",
-    pre_process = lambda ds:ds.remove_columns('labels'))
+ambient= Classification("premise","hypothesis","hypothesis_ambiguous",dataset_name="metaeval/ambient")
 
 path_naturalness = MultipleChoice(constant(""),choices=['choice1','choice2'],labels="label",
     dataset_name="metaeval/path-naturalness-prediction")
+
+civil_comments__toxicity = Classification("text",labels="toxicity")
+civil_comments__severe_toxicity = Classification("text",labels="severe_toxicity")
+civil_comments__obscene = Classification("text",labels="obscene")
+civil_comments__threat = Classification("text",labels="threat")
+civil_comments__insult = Classification("text",labels="insult")
+civil_comments__identity_attack = Classification("text",labels="identity_attack")
+civil_comments__sexual_explicit = Classification("text",labels="sexual_explicit")
 
 cloth = MultipleChoice("sentence", choices_list=lambda x:[x["answer"]]+x["distractors"],labels=constant(0), dataset_name="AndyChiang/cloth")
 dgen  = MultipleChoice("sentence", choices_list=lambda x:[x["answer"]]+x["distractors"],labels=constant(0), dataset_name="AndyChiang/dgen")
 
 oasst_rlhf = MultipleChoice("prompt",choices=['chosen','rejected'],labels=constant(0),
-    dataset_name="tasksource/oasst1_pairwise_rlhf_reward",
-    pre_process = lambda ds:ds.filter(lambda x:x['lang']=='en'))
+    dataset_name="tasksource/oasst1_pairwise_rlhf_reward")
+# mediabiasgroup/mbib-base
+
+i2d2 = Classification("sentence1",labels=name('label',['False','True']), dataset_name="tasksource/I2D2")
+
+arg_me = Classification('argument','conclusion','stance', dataset_name="webis/args_me")
+valueeval_stance = Classification("Premise","Conclusion","Stance", dataset_name="webis/Touche23-ValueEval")
+starcon = Classification('argument','topic','label',dataset_name="tasksource/starcon")
+
+banking77 = Classification("text",labels="label",dataset_name="PolyAI/banking77")
+
+ruletaker = Classification("context","text","label",dataset_name="tasksource/ruletaker")
+
+lsat_qa = MultipleChoice(
+    cat(['passage','question']),
+    choices_list='references',labels="gold_index",
+     dataset_name="lighteval/lsat_qa",config_name="all")
+    
+control = Classification('premise','hypothesis',"label",dataset_name="tasksource/ConTRoL-nli")
