@@ -981,7 +981,7 @@ moh   = Classification("context","expression","label", dataset_name="tasksource/
 vuac  = Classification("context","expression","label", dataset_name="tasksource/VUAC")
 trofi = Classification("context","expression","label", dataset_name="tasksource/TroFi")
 
-sharc_classification = Classification("snippet", cat(["scenario","question"]),labels="answer",dataset_name='sharc_modified',config_name='mod',
+sharc_classification = Classification("snippet", lambda x:f'{x["scenario"]}\n{x["question"]}' ,labels="answer",dataset_name='sharc_modified',config_name='mod',
     pre_process = lambda ds:ds.filter(lambda x:x['answer'] in {"Yes","No","Irrelevant"}))
 
 conceptrules_v2 = Classification("context", "text", "label", dataset_name="tasksource/conceptrules_v2")
