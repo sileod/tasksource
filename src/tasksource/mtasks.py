@@ -103,9 +103,6 @@ xcopa = MultipleChoice("premise",choices=['choice1','choice2'],labels="label",
 xstory = MultipleChoice(constant(''),choices=["text_right_ending","text_wrong_ending"],labels=constant(0),
     **all("juletxara/xstory_cloze"))
 
-anthropic_rlhf = MultipleChoice(constant(''), ['chosen','rejected'], constant(0),
-    dataset_name="Anthropic/hh-rlhf")
-
 xglue_ner = TokenClassification("words","ner", dataset_name="xglue",config_name="ner")
 xglue_pos = TokenClassification("words","pos", dataset_name="xglue",config_name="pos")
 

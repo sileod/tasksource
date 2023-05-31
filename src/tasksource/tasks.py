@@ -985,3 +985,8 @@ sharc_classification = Classification("snippet", lambda x:f'{x["scenario"]}\n{x[
     pre_process = lambda ds:ds.filter(lambda x:x['answer'] in {"Yes","No","Irrelevant"}))
 
 conceptrules_v2 = Classification("context", "text", "label", dataset_name="tasksource/conceptrules_v2")
+
+scidtb = Classification("unit1_txt","unit2_txt","label", dataset_name="metaeval/disrpt",config_name='eng.dep.scidtb')
+
+chunking = TokenClassification("tokens","chunk_tags", dataset_name="conll2000")
+few_nerd=TokenClassification("tokens","fine_ner_tags",dataset_name="DFKI-SLT/few-nerd",config_name='supervised')
