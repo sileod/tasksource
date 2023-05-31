@@ -29,7 +29,6 @@ def render_multiple_choice(prompt, options, labels):
     inputs=f'With no explanation, chose the best option from {render_options(letters)}. {inputs}'    
     for letter, option in zip(letters, options):
         inputs+=f'\n{letter}: {option}'
-        assert "{letter}" not in inputs
     targets = f'{letters[labels]}.'
     return dict_of(inputs, targets) 
 
@@ -38,6 +37,16 @@ def negative_sample_options(y, labels,N=4):
         return labels
     else:
         return [y]+random.sample([x for x in labels if x!=y], N-1)
+
+def shuffle_choices(x):
+    choices = sorted([k for k in x if 'choice' in k])
+    choices_texts = [x[c] for c in choices]
+    correct_choice =choices_texts[x['labels']]
+    random.shuffle(choices_texts)
+    for c, ct in zip(choices, choices_texts):
+        x[c]=ct
+    x["labels"]=choices_texts.index(correct_choice)
+    return x
 
 def recast_dataset_zero_shot_nli(dataset,N=4):
 
@@ -73,9 +82,10 @@ def recast_instruct(dataset):
         task_type = "TokenClassification"
 
     def recast_MultipleChoice(x):
-        choices = [k for k in x if 'choice' in k]
+        x=shuffle_choices(x)
+        choices = sorted([k for k in x if 'choice' in k])
         if all([x[c] in x['inputs'] for c in choices]):
-            return {"inputs":x['inputs'], 'targets': x[f"choice{x['labels']}"]+"."}
+            return {"inputs":x['inputs'], 'targets': x[f"choice{x['labels']}"].strip()+"."}
         else:
             return render_multiple_choice(x['inputs'],[x[c] for c in choices],x['labels'])
 
@@ -92,7 +102,7 @@ def recast_instruct(dataset):
         else:
             text=x['sentence1']
             
-        answer=labels.int2str(x['labels'])
+        answer=labels.int2str(x['labels']).strip()
         options= negative_sample_options(answer, labels._int2str)
         return render_classification(text, options, answer)
         

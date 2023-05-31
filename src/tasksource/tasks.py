@@ -6,7 +6,7 @@ from datasets import get_dataset_config_names, Sequence, ClassLabel, Dataset, Da
 ###################### NLI/paraphrase ###############################
 
 glue___mnli = Classification(sentence1="premise", sentence2="hypothesis", labels="label", splits=["train", None, "validation_matched"])
-glue___qnli = Classification(sentence1="question", labels="label")
+glue___qnli = Classification("question","sentence", labels="label")
 glue___rte = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
 glue___wnli = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
 #glue___ax = Classification(sentence1="premise", sentence2="hypothesis", labels="label", splits=["test", None, None]) # fully masked
@@ -175,7 +175,7 @@ paws___labeled_final   = Classification("sentence1", "sentence2", name('label',[
 paws___labeled_swap    = Classification("sentence1", "sentence2", name('label',['not_paraphrase','paraphrase']), splits=["train", None, None])
 #paws___unlabeled_final = Classification("sentence1", "sentence2", "label")
 
-quora = Classification(get.questions.text[0], get.questions.text[1], 'is_duplicate')
+#quora = Classification(get.questions.text[0], get.questions.text[1], 'is_duplicate') # in glue
 medical_questions_pairs = Classification("question_1","question_2", name("label",['False','True']))
  
 ###################### Token Classification #########################
@@ -339,6 +339,8 @@ math_qa = MultipleChoice(
     choices_list = lambda x: _split_choices(x['options']),
     labels = lambda x:'abcde'.index(x['correct'])   
 )
+
+#aqua_rat___tokenized = MultipleChoice("question",choices_list="options",labels=lambda x:"ABCDE".index(x['correct'])) in math_qa
 
 
 ######################## Classification (other) ########################
@@ -595,12 +597,12 @@ circa = Classification(
 
 effective_feedback_student_writing = Classification("discourse_text", labels="discourse_effectiveness",dataset_name="YaHi/EffectiveFeedbackStudentWriting")
 
-promptSentiment = Classification("text",labels="label",dataset_name="Ericwang/promptSentiment")
-promptNLI = Classification("premise","hypothesis",labels="label",dataset_name="Ericwang/promptNLI")
-promptSpoke = Classification("text",labels="label",dataset_name="Ericwang/promptSpoke")
-promptProficiency = Classification("text",labels="label",dataset_name="Ericwang/promptProficiency")
-promptGrammar = Classification("text",labels="label",dataset_name="Ericwang/promptGrammar")
-promptCoherence = Classification("text",labels="label",dataset_name="Ericwang/promptCoherence")
+#promptSentiment = Classification("text",labels="label",dataset_name="Ericwang/promptSentiment")
+#promptNLI = Classification("premise","hypothesis",labels="label",dataset_name="Ericwang/promptNLI")
+#promptSpoke = Classification("text",labels="label",dataset_name="Ericwang/promptSpoke")
+#promptProficiency = Classification("text",labels="label",dataset_name="Ericwang/promptProficiency")
+#promptGrammar = Classification("text",labels="label",dataset_name="Ericwang/promptGrammar")
+#promptCoherence = Classification("text",labels="label",dataset_name="Ericwang/promptCoherence")
 
 phrase_similarity = Classification(
     sentence1=cat(["phrase1","sentence1"], " : "),
@@ -638,8 +640,6 @@ demo_org_auditor_review = Classification(sentence1="sentence", labels="label", s
 
 medmcqa = MultipleChoice("question", choices=regen('op[a-d]'),labels='cop')
 
-aqua_rat___tokenized = MultipleChoice("question",choices_list="options",
-    labels=lambda x:"ABCDE".index(x['correct']))
 
 dynasent_disagreement    = Classification("text", labels="binary_disagreement", dataset_name="RuyuanWan/Dynasent_Disagreement")
 politeness_disagreement  = Classification("text", labels="binary_disagreement", dataset_name="RuyuanWan/Politeness_Disagreement")
@@ -924,7 +924,6 @@ dgen  = MultipleChoice("sentence", choices_list=lambda x:[x["answer"]]+x["distra
 
 oasst_rlhf = MultipleChoice("prompt",choices=['chosen','rejected'],labels=constant(0),
     dataset_name="tasksource/oasst1_pairwise_rlhf_reward")
-# mediabiasgroup/mbib-base
 
 i2d2 = Classification("sentence1",labels=name('label',['False','True']), dataset_name="tasksource/I2D2")
 
@@ -942,3 +941,47 @@ lsat_qa = MultipleChoice(
      dataset_name="lighteval/lsat_qa",config_name="all")
     
 control = Classification('premise','hypothesis',"label",dataset_name="tasksource/ConTRoL-nli")
+tracie = Classification("premise","hypothesis","answer",dataset_name='tasksource/tracie')
+sherliic = Classification("premise","hypothesis","label",dataset_name='tasksource/sherliic')
+
+sen_making__1 = MultipleChoice(constant('Chose most plausible:'), choices=['sentence0','sentence1'],labels='false', 
+    dataset_name="tasksource/sen-making")
+
+sen_making__2 = MultipleChoice(lambda x: [x['sentence0'],x['sentence1']][x['false']] + '\n is not plausible because :',
+    choices=['A','B','C'],labels=lambda x: 'ABC'.index(x['reason']), dataset_name="tasksource/sen-making")
+
+winowhy = Classification('sentence', lambda x: f'In "{x["wnli_sent1"]}", {x["wnli_sent2"]}',
+    labels=name('label',['False','True']), dataset_name="tasksource/winowhy")
+
+#for CFG in "cognitive-bias", "fake-news", "gender-bias", "hate-speech", "linguistic-bias", "political-bias", "racial-bias", "text-level-bias":
+#    print(f"mbib__{CFG.replace('-','_')} = Classification('text',labels=name('label',['not {CFG}','{CFG}']), dataset_name='mediabiasgroup/mbib-base', config_name='{CFG}')")
+
+mbib_cognitive_bias	= Classification('text',labels=name('label',['not cognitive-bias','cognitive-bias']), dataset_name='mediabiasgroup/mbib-base', config_name='cognitive-bias')
+mbib_fake_news	= Classification('text',labels=name('label',['not fake-news','fake-news']), dataset_name='mediabiasgroup/mbib-base', config_name='fake-news')
+mbib_gender_bias	= Classification('text',labels=name('label',['not gender-bias','gender-bias']), dataset_name='mediabiasgroup/mbib-base', config_name='gender-bias')
+mbib_hate_speech	= Classification('text',labels=name('label',['not hate-speech','hate-speech']), dataset_name='mediabiasgroup/mbib-base', config_name='hate-speech')
+mbib_linguistic_bias	= Classification('text',labels=name('label',['not linguistic-bias','linguistic-bias']), dataset_name='mediabiasgroup/mbib-base', config_name='linguistic-bias')
+mbib_political_bias	= Classification('text',labels=name('label',['not political-bias','political-bias']), dataset_name='mediabiasgroup/mbib-base', config_name='political-bias')
+mbib_racial_bias	= Classification('text',labels=name('label',['not racial-bias','racial-bias']), dataset_name='mediabiasgroup/mbib-base', config_name='racial-bias')
+mbib_text_level_bias	= Classification('text',labels=name('label',['not text-level-bias','text-level-bias']), dataset_name='mediabiasgroup/mbib-base', config_name='text-level-bias')
+
+robustLR = Classification("context","statement","label", dataset_name="tasksource/robustLR")
+
+cluttr = Classification("story","query", "target_text",dataset_name="CLUTRR/v1", config_name="gen_train234_test2to10")
+
+logical_fallacy = Classification("source_article", labels="logical_fallacies", dataset_name="tasksource/logical-fallacy")
+
+parade = Classification("Definition1","Definition2", labels=name('Binary labels',["not-paraphrase","paraphrase"]), dataset_name="tasksource/parade")
+
+cladder = Classification("given_info", "question", "answer",dataset_name="tasksource/cladder")
+
+subjectivity = Classification("Sentence",labels="Label",dataset_name="tasksource/subjectivity")
+
+moh   = Classification("context","expression","label", dataset_name="tasksource/MOH")
+vuac  = Classification("context","expression","label", dataset_name="tasksource/VUAC")
+trofi = Classification("context","expression","label", dataset_name="tasksource/TroFi")
+
+sharc_classification = Classification("snippet", cat(["scenario","question"]),labels="answer",dataset_name='sharc_modified',config_name='mod',
+    pre_process = lambda ds:ds.filter(lambda x:x['answer'] in {"Yes","No","Irrelevant"}))
+
+conceptrules_v2 = Classification("context", "text", "label", dataset_name="tasksource/conceptrules_v2")
