@@ -17,7 +17,21 @@ for id in df[df.task_type=="MultipleChoice"].id:
 
 Browse the 500+ curated tasks in tasks.md (200+ MultipleChoice tasks, 200+ Classification tasks), and feel free to request a new task. Datasets are downloaded to $HF_DATASETS_CACHE (like any Hugging Face dataset), so ensure you have more than 100GB of space available.
 
-Pretrained Model
+### Write and use custom preprocessings
+
+```python
+from tasksource import MultipleChoice, concatenate_dataset_dict
+winogrande = MultipleChoice('sentence',['option1','option2'],'answer',dataset_name='winogrande',config_name='winogrande_xl',
+    splits=['train','validation',None])
+codah = MultipleChoice('question_propmt',choices_list='candidate_answers',labels='correct_answer_idx',dataset_name='codah', config_name='codah')
+tasks = [winogrande.load(), codah().load()]) #  Aligned datasets (same columns) can be used interchangably  
+```
+
+### tasksource-instruct
+
+The repo also contains some recasting code that was used to convert tasksource datasets to instructions format, providing one of the richest instruction-tuning dataset:
+https://hf.co/datasets/tasksource/tasksource-instruct-v0
+
 ### Pretrained model:
 
 Text encoder pretrained on tasksource reached state-of-the-art results: [🤗/deberta-v3-base-tasksource-nli](https://hf.co/sileod/deberta-v3-base-tasksource-nli)
