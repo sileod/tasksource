@@ -17,6 +17,17 @@ for id in df[df.task_type=="MultipleChoice"].id:
 
 Browse the 500+ curated tasks in tasks.md (200+ MultipleChoice tasks, 200+ Classification tasks), and feel free to request a new task. Datasets are downloaded to $HF_DATASETS_CACHE (like any Hugging Face dataset), so ensure you have more than 100GB of space available.
 
+### Pretrained model:
+
+Text encoder pretrained on tasksource reached state-of-the-art results: [🤗/deberta-v3-base-tasksource-nli](https://hf.co/sileod/deberta-v3-base-tasksource-nli)
+
+Tasksource pretraining is notably helpful for RLHF reward modeling.
+
+### tasksource-instruct
+
+The repo also contains some recasting code that was used to convert tasksource datasets to instructions format, providing one of the richest instruction-tuning dataset:
+[🤗/tasksource-instruct-v0](https://hf.co/datasets/tasksource/tasksource-instruct-v0)
+
 ### Write and use custom preprocessings
 
 ```python
@@ -33,16 +44,6 @@ winogrande = MultipleChoice('sentence',['option1','option2'],'answer',
 tasks = [winogrande.load(), codah.load()]) #  Aligned datasets (same columns) can be used interchangably  
 ```
 
-### tasksource-instruct
-
-The repo also contains some recasting code that was used to convert tasksource datasets to instructions format, providing one of the richest instruction-tuning dataset:
-[🤗/tasksource-instruct-v0](https://hf.co/datasets/tasksource/tasksource-instruct-v0)
-
-### Pretrained model:
-
-Text encoder pretrained on tasksource reached state-of-the-art results: [🤗/deberta-v3-base-tasksource-nli](https://hf.co/sileod/deberta-v3-base-tasksource-nli)
-
-Tasksource pretraining is notably helpful for RLHF reward modeling.
 
  ### Contact and citation
 For help integrating tasksource into your experiments, please contact [damien.sileo@inria.fr](mailto:damien.sileo@inria.fr).
