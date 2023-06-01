@@ -36,7 +36,7 @@ tasks = [winogrande.load(), codah.load()]) #  Aligned datasets (same columns) ca
 ### tasksource-instruct
 
 The repo also contains some recasting code that was used to convert tasksource datasets to instructions format, providing one of the richest instruction-tuning dataset:
-https://hf.co/datasets/tasksource/tasksource-instruct-v0
+[🤗/tasksource-instruct-v0](https://hf.co/datasets/tasksource/tasksource-instruct-v0)
 
 ### Pretrained model:
 
