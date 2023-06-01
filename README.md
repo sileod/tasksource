@@ -21,6 +21,7 @@ Browse the 500+ curated tasks in tasks.md (200+ MultipleChoice tasks, 200+ Class
 
 ```python
 from tasksource import MultipleChoice, concatenate_dataset_dict
+
 codah = MultipleChoice('question_propmt',choices_list='candidate_answers',
     labels='correct_answer_idx',
     dataset_name='codah', config_name='codah')
@@ -29,7 +30,7 @@ winogrande = MultipleChoice('sentence',['option1','option2'],'answer',
     dataset_name='winogrande',config_name='winogrande_xl',
     splits=['train','validation',None]) # these test labels are not usable
     
-tasks = [winogrande.load(), codah().load()]) #  Aligned datasets (same columns) can be used interchangably  
+tasks = [winogrande.load(), codah.load()]) #  Aligned datasets (same columns) can be used interchangably  
 ```
 
 ### tasksource-instruct
