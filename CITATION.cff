@@ -1,0 +1,9 @@
+cff-version: 1.1.0
+message: "If you use this work, please cite it as below."
+authors:
+  - family-names: "Sileo"
+    given-names: "Damien"
+title: "tasksource: A Dataset Harmonization Framework for Streamlined NLP Multi-Task Learning and Evaluation"
+version: "1.0.0"
+date-released: 2023-01-01
+url: "https://arxiv.org/abs/2301.05948"
