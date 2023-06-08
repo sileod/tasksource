@@ -29,7 +29,7 @@ The repo also contains some recasting code that was used to convert tasksource d
 [🤗/tasksource-instruct-v0](https://hf.co/datasets/tasksource/tasksource-instruct-v0)
 
 
-## tasksource-label-nli
+### tasksource-label-nli
 
 We also recasts all classification tasks into entailment detection, to improve entailment-based zero-shot classification detection.
 [🤗/zero-shot-label-nli](https://huggingface.co/datasets/tasksource/zero-shot-label-nli)
