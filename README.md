@@ -25,13 +25,13 @@ Tasksource pretraining is notably helpful for RLHF reward modeling.
 
 ### tasksource-instruct
 
-The repo also contains some recasting code that was used to convert tasksource datasets to instructions format, providing one of the richest instruction-tuning dataset:
+The repo also contains some recasting code to convert tasksource datasets to instructions, providing one of the richest instruction-tuning datasets:
 [🤗/tasksource-instruct-v0](https://hf.co/datasets/tasksource/tasksource-instruct-v0)
 
 
 ### tasksource-label-nli
 
-We also recasts all classification tasks into entailment detection, to improve entailment-based zero-shot classification detection.
+We also recast all classification tasks into entailment detection, to improve entailment-based zero-shot classification detection.
 [🤗/zero-shot-label-nli](https://huggingface.co/datasets/tasksource/zero-shot-label-nli)
 
 ### Write and use custom preprocessings
