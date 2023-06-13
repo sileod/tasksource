@@ -31,7 +31,7 @@ The repo also contains some recasting code to convert tasksource datasets to ins
 
 ### tasksource-label-nli
 
-We also recast all classification tasks into entailment detection, to improve entailment-based zero-shot classification detection.
+We also recast all classification tasks into entailment detection, to improve entailment-based zero-shot classification detection:
 [🤗/zero-shot-label-nli](https://huggingface.co/datasets/tasksource/zero-shot-label-nli)
 
 ### Write and use custom preprocessings
