@@ -48,7 +48,7 @@ def shuffle_choices(x):
     x["labels"]=choices_texts.index(correct_choice)
     return x
 
-def recast_dataset_zero_shot_nli(dataset,N=4):
+def recast_dataset_classification_to_mc(dataset,N=4):
 
     def recast_split(d,N=N):
         labels = d.features['labels']

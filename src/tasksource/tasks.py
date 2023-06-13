@@ -979,14 +979,37 @@ subjectivity = Classification("Sentence",labels="Label",dataset_name="tasksource
 
 moh   = Classification("context","expression","label", dataset_name="tasksource/MOH")
 vuac  = Classification("context","expression","label", dataset_name="tasksource/VUAC")
-trofi = Classification("context","expression","label", dataset_name="tasksource/TroFi")
+trofi = Classification("context","expression","label", dataset_name="tasksource/TroFi", splits=['train',None,'test'])
 
-sharc_classification = Classification("snippet", lambda x:f'{x["scenario"]}\n{x["question"]}' ,labels="answer",dataset_name='sharc_modified',config_name='mod',
-    pre_process = lambda ds:ds.filter(lambda x:x['answer'] in {"Yes","No","Irrelevant"}))
+sharc_classification = Classification("snippet", lambda x:f'{x["scenario"]}\n{x["question"]}',
+    labels=lambda x:x["answer"] if x['answer'] in  {"Yes","No","Irrelevant"} else "Clarification needed",
+    dataset_name='sharc_modified',config_name='mod')
 
 conceptrules_v2 = Classification("context", "text", "label", dataset_name="tasksource/conceptrules_v2")
 
 scidtb = Classification("unit1_txt","unit2_txt","label", dataset_name="metaeval/disrpt",config_name='eng.dep.scidtb')
 
 chunking = TokenClassification("tokens","chunk_tags", dataset_name="conll2000")
-few_nerd=TokenClassification("tokens","fine_ner_tags",dataset_name="DFKI-SLT/few-nerd",config_name='supervised')
+
+few_nerd = TokenClassification("tokens","fine_ner_tags",dataset_name="DFKI-SLT/few-nerd",config_name='supervised')
+finer = TokenClassification('tokens','ner_tags',dataset_name='nlpaueb/finer-139')
+
+label_nli = Classification("premise","hypothesis","labels",dataset_name='tasksource/zero-shot-label-nli')
+
+com2sense = Classification("sent",labels="label",dataset_name="tasksource/com2sense",splits=['train',"validation",None])
+
+scone = Classification('sentence1_edited','sentence2_edited','gold_label_edited',dataset_name="tasksource/scone")
+
+winodict = MultipleChoice(cat(['definition','sentence']),['option1','option2'],'label',dataset_name='tasksource/winodict')
+
+fool_me_twice = Classification(
+    lambda x: " ".join(a['text'] for a in x['gold_evidence']),
+    'text', 'label', dataset_name='tasksource/fool-me-twice')
+
+monli = Classification("sentence1","sentence2","gold_label", dataset_name="tasksource/monli")
+
+causality = Classification('input',labels=name('label',['not_entailment','entailment']),dataset_name='causalnlp/corr2cause')
+
+lsat = MultipleChoice(cat(['passage','question']), choices_list='references',labels='gold_index',dataset_name='lighteval/lsat_qa',config_name='all')
+
+apt = Classification('text_a','text_b',name('labels',['not_paraphrase','paraprhase']),dataset_name='tasksource/apt')
