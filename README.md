@@ -37,7 +37,7 @@ We also recast all classification tasks into entailment detection, to improve en
 ### Write and use custom preprocessings
 
 ```python
-from tasksource import MultipleChoice, concatenate_dataset_dict
+from tasksource import MultipleChoice
 
 codah = MultipleChoice('question_propmt',choices_list='candidate_answers',
     labels='correct_answer_idx',
@@ -45,7 +45,7 @@ codah = MultipleChoice('question_propmt',choices_list='candidate_answers',
     
 winogrande = MultipleChoice('sentence',['option1','option2'],'answer',
     dataset_name='winogrande',config_name='winogrande_xl',
-    splits=['train','validation',None]) # these test labels are not usable
+    splits=['train','validation',None]) # test labels are not usable
     
 tasks = [winogrande.load(), codah.load()]) #  Aligned datasets (same columns) can be used interchangably  
 ```
