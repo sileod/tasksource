@@ -5,7 +5,7 @@ import string
 
 improper_labels = ['recast/recast_kg_relations','linguisticprobing',"lexglue/scotus","pragmeval/squinky","pragmeval/emobank",'pragmeval/persuasiveness']
 improper_labels += ['glue/stsb', 'sick/relatedness', 'joci', 'utilitarianism', 'amazon_counterfactual/en', 'toxic_conversations', 'ethos/multilabel', 'lex_glue/eurlex', 'lex_glue/unfair_tos', 'app_reviews', 'humicroedit/subtask-1', 'stackoverflow-questions', 'go_emotions/simplified', 'google_wellformed_query', 'has_part', 'blog_authorship_corpus/age', 'promptCoherence', 'Sarcasm_News_Headline', 'auditor_review/demo-org--auditor_review', 'Dynasent_Disagreement', 'Politeness_Disagreement', 'SBIC_Disagreement', 'SChem_Disagreement', 'Dilemmas_Disagreement', 'sts-companion', 'acceptability-prediction', 'chaos-mnli-ambiguity', 'headline_cause/en_simple', 'oasst1_dense_flat', 'civil_comments']
-
+improper_labels += ['stsb_multi_mt','MLMA_hate_speech']
 
 def render_options(options):
     options = [f'"{x}"' for x in options]
@@ -48,14 +48,14 @@ def shuffle_choices(x):
     x["labels"]=choices_texts.index(correct_choice)
     return x
 
-def recast_dataset_classification_to_mc(dataset,N=4):
+def recast_dataset_classification_to_mc(dataset,sep="[SEP]",N=4):
 
     def recast_split(d,N=N):
         labels = d.features['labels']
         df=d.to_pandas()
         df['inputs'] = df.sentence1
         if "sentence2" in df:
-            df['inputs'] +="[SEP]" + df.sentence2
+            df['inputs'] +=sep + df.sentence2
 
         N=min(N, len(labels.names))
         df['choices']=df.apply(lambda x:negative_sample_options(labels.int2str(x['labels']), labels.names,N),axis=1)     

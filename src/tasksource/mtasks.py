@@ -1,4 +1,4 @@
-from .preprocess import cat, get, regen, constant, Classification, TokenClassification, MultipleChoice
+from .preprocess import cat, get,name, regen, constant, Classification, TokenClassification, MultipleChoice
 from .metadata import udep_labels
 from datasets import get_dataset_config_names, ClassLabel, Dataset, DatasetDict, concatenate_datasets, Sequence
 
@@ -19,47 +19,34 @@ xnli = Classification("premise", "hypothesis", "label", **all("metaeval/xnli"))
 
 americas_nli = Classification("premise","hypothesis","label",config_name="all_languages")
 
-moritz_xnli = Classification("premise","hypothesis","label", 
+moritz_xnli = Classification("premise","hypothesis",name("label",["entailment", "neutral","contradiction"]), 
     pre_process=concatenate_configs, dataset_name="MoritzLaurer/multilingual-NLI-26lang-2mil7")
 
 stsb_multi_mt = Classification("sentence1", "sentence2",
     lambda x: float(x["similarity_score"]/5),
     **all('stsb_multi_mt'))
 
-pawsx = Classification("sentence1","sentence2","label", **all('paws-x'))
+pawsx = Classification("sentence1","sentence2",name('label',['not_paraphrase','paraphrase']), **all('paws-x'))
 
 miam = Classification("Utterance",labels="Label", **all('miam'))
 
 xstance = Classification("question", "comment", "label",
     **all("strombergnlp/x-stance"))
 
-sentiment = Classification("text",labels="label",
-    dataset_name="tyqiangz/multilingual-sentiments",config_name="all",
-    pre_process=lambda ds:ds.filter(lambda x: "amazon_reviews" not in x['source'])    
-)
 
-emotion = Classification("text",labels="emotion",dataset_name="metaeval/universal-joy")
-
-review_sentiment = Classification("review_body",labels="stars",
-    dataset_name="amazon_reviews_multi",config_name="all_languages")
-
-tweet_sentiment = Classification("text", labels="label",
-    **all('cardiffnlp/tweet_sentiment_multilingual'))
-
-offenseval = Classification(lambda x: str(x["text"]), labels="subtask_a",
+offenseval = Classification(lambda x: str(x["text"]), labels=name("subtask_a",['not offensive','offensive']),
+    pre_process=lambda ds:ds.filter(lambda x:  x['subtask_a'] in [0,1]),
     dataset_name='strombergnlp/offenseval_2020',
     config_name=["ar","da","gr","tr"])
 
 offenseval_dravidian = Classification("text",labels="label",config_name=['kannada','malayalam','tamil'])
 
-mlma_hate = Classification("tweet", labels="sentiment",
+mlma_hate = Classification("tweet", labels=lambda x:x["sentiment"].split('_'),
     dataset_name="nedjmaou/MLMA_hate_speech")
-
 
 qam = Classification("question","answer","label", dataset_name="xglue",config_name="qam")
 
-x_sum_factuality = Classification("summary","generated_summary","label",
-    dataset_name="ylacombe/xsum_factuality")
+#x_sum_factuality = Classification("summary","generated_summary","label", dataset_name="ylacombe/xsum_factuality")
 
 x_fact = Classification('evidence','claim','label', dataset_name="metaeval/x-fact")
 
@@ -72,8 +59,6 @@ xlwic = Classification(
     sentence1=cat(["target_word","context_1"], " : "),
     sentence2=cat(["target_word","context_2"], " : "),
     labels='label',dataset_name="pasinit/xlwic",config_name=['xlwic_de_de','xlwic_it_it','xlwic_fr_fr','xlwic_en_ko'])
-
-
 
 #[ "spam", "fails_task", "lang_mismatch", "pii", "not_appropriate", "hate_speech", "sexual_content", "quality", "toxicity", "humor", "helpfulness", "creativity", "violence" ]
 
@@ -119,10 +104,30 @@ def udep_post_process(ds):
 oasst_rlhf = MultipleChoice("prompt",choices=['chosen','rejected'],labels=constant(0),
     dataset_name="tasksource/oasst1_pairwise_rlhf_reward")
 
-#Classification(
+sentiment = Classification("text",labels="label", dataset_name="tyqiangz/multilingual-sentiments",config_name="all",
+    pre_process=lambda ds:ds.filter(lambda x: "amazon_reviews" not in x['source']) )
+tweet_sentiment = Classification("text", labels="label", **all('cardiffnlp/tweet_sentiment_multilingual'))
+review_sentiment = Classification("review_body",labels="stars", dataset_name="amazon_reviews_multi",config_name="all_languages")
+emotion = Classification("text",labels="emotion",dataset_name="metaeval/universal-joy")
+# in mms
+
+mms_sentiment = Classification("text",labels="label",dataset_name='Brand24/mms')
+
+mapa_fine = TokenClassification("tokens","coarse_grained",dataset_name='joelito/mapa')
+mapa_corase = TokenClassification("tokens","fine_grained",dataset_name='joelito/mapa')
+
+aces_ranking = MultipleChoice("source",choices=['good-translation','incorrect-translation'],labels=constant(0), dataset_name='nikitam/ACES')
+aces_phenomena = Classification('source','incorrect-translation','phenomena', dataset_name='nikitam/ACES')
+
+amazon_intent = Classification("utt",labels="intent",**all('AmazonScience/massive'))
 #    dataset_name='glue',config_name=['ocnli','afqmc'])
 
-# 
+tidy_as2=Classification("Question","Sentence","Label",dataset_name='tasksource/tydi-as2-balanced') 
+
+multiconer = TokenClassification("tokens","ner_tags_index", **all("MultiCoNER/multiconer_v2"))
+
+mtop = Classification("question",labels="intent", dataset_name="tasksource/mtop")
+
 #wino_x
 # clue, klue, indic_glue
 # SMS_Spam_Multilingual_Collection_Dataset

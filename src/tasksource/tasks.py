@@ -1,6 +1,7 @@
 from .preprocess import cat, get, regen, name, constant, Classification, TokenClassification, MultipleChoice
 from .metadata import bigbench_discriminative_english, blimp_hard, imppres_presupposition, imppres_implicature, udep_en_configs, udep_en_labels
 from datasets import get_dataset_config_names, Sequence, ClassLabel, Dataset, DatasetDict
+
 # variable name: dataset___config__task
 
 ###################### NLI/paraphrase ###############################
@@ -1008,8 +1009,27 @@ fool_me_twice = Classification(
 
 monli = Classification("sentence1","sentence2","gold_label", dataset_name="tasksource/monli")
 
-causality = Classification('input',labels=name('label',['not_entailment','entailment']),dataset_name='causalnlp/corr2cause')
+causality = Classification('premise','hypothesis','relation', dataset_name='tasksource/corr2cause')
 
 lsat = MultipleChoice(cat(['passage','question']), choices_list='references',labels='gold_index',dataset_name='lighteval/lsat_qa',config_name='all')
 
-apt = Classification('text_a','text_b',name('labels',['not_paraphrase','paraprhase']),dataset_name='tasksource/apt')
+apt = Classification('text_a','text_b',name('labels',['not_paraphrase','paraphrase']),dataset_name='tasksource/apt')
+
+#xsum_factuality = Classification("summary",labels="is_factual")
+
+financial_sentiment = Classification("text",labels="label",dataset_name="zeroshot/twitter-financial-news-sentiment")
+
+def _icl_rand(x):
+    import random
+    return random.Random(x['sentence1'][:50]).randint(0,1) #deterministic label for each input
+
+icl = Classification("inputs", lambda x: x['symbols'][_icl_rand(x)],
+    labels=lambda x: int(x['symbols'][_icl_rand(x)]==x['targets']),
+    dataset_name="tasksource/icl-symbol-tuning-instruct",
+    pre_process=lambda ds:ds.filter(lambda x:len(x['inputs'])<200*4), # 200 tokens of 4 char 
+    post_process=lambda ds:ds.cast_column('labels',ClassLabel(names=['False','True']))
+)
+
+space_nli = Classification("premises","hypothesis","label",dataset_name="tasksource/SpaceNLI")
+
+# hate_context
