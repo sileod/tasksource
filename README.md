@@ -1,4 +1,4 @@
-## tasksource ![](https://aeiljuispo.cloudimg.io/v7/https://s3.amazonaws.com/moonup/production/uploads/5fc0bcb41160c47d1d43856b/j06-U5e2Tifi2xOnTudqS.jpeg?w=20&h=20&f=face) 500+ curated datasets and preprocessings for instant and interchangeable use.
+## tasksource ![](https://aeiljuispo.cloudimg.io/v7/https://s3.amazonaws.com/moonup/production/uploads/5fc0bcb41160c47d1d43856b/j06-U5e2Tifi2xOnTudqS.jpeg?w=20&h=20&f=face) 500+ curated datasets and preprocessings for instant and interchangeable use
 
 Huggingface Datasets is an excellent library, but it lacks standardization, and datasets often require preprocessing work to be used interchangeably.
 `tasksource` streamlines interchangeable datasets usage to scale evaluation or multi-task learning.
