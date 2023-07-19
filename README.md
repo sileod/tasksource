@@ -9,7 +9,7 @@ Each dataset is standardized to a `MultipleChoice`, `Classification`, or `TokenC
 `pip install tasksource`
 ```python
 from tasksource import list_tasks, load_task
-df = list_tasks() # takes some time
+df = list_tasks(multilingual=False) # takes some time
 
 for id in df[df.task_type=="MultipleChoice"].id:
     dataset = load_task(id) # all yielded datasets can be used interchangeably
