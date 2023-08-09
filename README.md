@@ -20,7 +20,10 @@ Browse the 500+ curated tasks in tasks.md (200+ MultipleChoice tasks, 200+ Class
 ### Pretrained model:
 
 Text encoder pretrained on tasksource reached state-of-the-art results: [🤗/deberta-v3-base-tasksource-nli](https://hf.co/sileod/deberta-v3-base-tasksource-nli)
-Tasksource pretraining is notably helpful for RLHF reward modeling or any kind of classification, including zero-shot.
+
+Tasksource pretraining is notably helpful for RLHF reward modeling or any kind of classification, including zero-shot. You can also find a large, and a multilingual version.
+
+[u/conceptofmind](https://github.com/conceptofmind) also trained Llama on tasksource: [🤗/conceptofmind/Tasksource-Open-Llama-13b](https://hf.co/conceptofmind/Tasksource-Open-Llama-13b)
 
 ### tasksource-instruct
 
