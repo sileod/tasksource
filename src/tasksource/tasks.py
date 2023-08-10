@@ -934,7 +934,7 @@ starcon = Classification('argument','topic','label',dataset_name="tasksource/sta
 
 banking77 = Classification("text",labels="label",dataset_name="PolyAI/banking77")
 
-ruletaker = Classification("context","text","label",dataset_name="tasksource/ruletaker")
+ruletaker = Classification("context","question","label",dataset_name="tasksource/ruletaker")
 
 lsat_qa = MultipleChoice(
     cat(['passage','question']),
@@ -1032,4 +1032,36 @@ icl = Classification("inputs", lambda x: x['symbols'][_icl_rand(x)],
 
 space_nli = Classification("premises","hypothesis","label",dataset_name="tasksource/SpaceNLI")
 
-# hate_context
+propsegment = Classification("hypothesis","premise",
+    labels = lambda x:{'n':'neutral','e':'entailment','c':'contradiction'}[x['label']],
+    dataset_name="sihaochen/propsegment",config_name='nli')
+
+hatemoji = Classification('text',labels=name("label_gold", ['not-hate-speech','hate-speech']),
+    dataset_name="HannahRoseKirk/HatemojiBuild")
+
+regset = Classification("context",labels="answer",dataset_name='tasksource/regset')
+
+esci = Classification('query','product_text','esci_label',
+    dataset_name="tasksource/esci",
+    pre_process=lambda ds:ds.filter(lambda x:x['product_locale']=='us'))
+
+def _preprocess_chatbot_arena(ds):
+    ds=ds.filter(lambda x:x['winner'] in ["model_a","model_b"])
+    ds=ds.filter(lambda x:x['language']=="English")
+
+    def _unroll(x):
+        f=lambda x:"\n".join([f"{turn['role']}:\n{turn['content']}" for turn in x])
+        x['conversation_a'] = f(x['conversation_a'])
+        x['conversation_b'] = f(x['conversation_b'])
+        return x
+    ds=ds.map(_unroll)
+    return ds
+
+chatbot_arena = MultipleChoice(constant(""),
+    choices=["conversation_a","conversation_b"],
+    labels=lambda x: ["model_a","model_b"].index(x["winner"]),
+    dataset_name="lmsys/chatbot_arena_conversations",
+    pre_process=_preprocess_chatbot_arena)
+
+dnd_intent = Classification("examples",labels="label_names",
+    dataset_name='neurae/dnd_style_intents')

@@ -15,12 +15,13 @@ def concatenate_configs(dataset):
 
 # english tasks (few, to keep balance between languages)
 
+moritz_xnli = Classification("premise","hypothesis",name("label",["entailment", "neutral","contradiction"]), 
+    pre_process=concatenate_configs, 
+    dataset_name="MoritzLaurer/multilingual-NLI-26lang-2mil7")
+
 xnli = Classification("premise", "hypothesis", "label", **all("metaeval/xnli"))
 
 americas_nli = Classification("premise","hypothesis","label",config_name="all_languages")
-
-moritz_xnli = Classification("premise","hypothesis",name("label",["entailment", "neutral","contradiction"]), 
-    pre_process=concatenate_configs, dataset_name="MoritzLaurer/multilingual-NLI-26lang-2mil7")
 
 stsb_multi_mt = Classification("sentence1", "sentence2",
     lambda x: float(x["similarity_score"]/5),
@@ -85,8 +86,11 @@ xcsr = MultipleChoice(get.question.stem, choices_list=get.question.choices.text,
 xcopa = MultipleChoice("premise",choices=['choice1','choice2'],labels="label",
     **all('xcopa'))
 
-xstory = MultipleChoice(constant(''),choices=["text_right_ending","text_wrong_ending"],labels=constant(0),
-    **all("juletxara/xstory_cloze"))
+#xstory = MultipleChoice(constant(''),choices=["text_right_ending","text_wrong_ending"],labels=constant(0), **all("juletxara/xstory_cloze"))
+
+xstory = MultipleChoice(lambda x: "\n".join([x[f'input_sentence_{i}'] for i in range(1,5)]),
+    choices=["sentence_quiz1","sentence_quiz2"],labels=constant(0), **all("juletxara/xstory_cloze"))
+
 
 xglue_ner = TokenClassification("words","ner", dataset_name="xglue",config_name="ner")
 xglue_pos = TokenClassification("words","pos", dataset_name="xglue",config_name="pos")
@@ -127,6 +131,8 @@ tidy_as2=Classification("Question","Sentence","Label",dataset_name='tasksource/t
 multiconer = TokenClassification("tokens","ner_tags_index", **all("MultiCoNER/multiconer_v2"))
 
 mtop = Classification("question",labels="intent", dataset_name="tasksource/mtop")
+
+mlabel_nli = Classification("premise","hypothesis","labels",dataset_name="tasksource/multilingual-zero-shot-label-nli")
 
 #wino_x
 # clue, klue, indic_glue

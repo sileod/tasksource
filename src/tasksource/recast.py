@@ -4,8 +4,8 @@ from sorcery import dict_of
 import string
 
 improper_labels = ['recast/recast_kg_relations','linguisticprobing',"lexglue/scotus","pragmeval/squinky","pragmeval/emobank",'pragmeval/persuasiveness']
-improper_labels += ['glue/stsb', 'sick/relatedness', 'joci', 'utilitarianism', 'amazon_counterfactual/en', 'toxic_conversations', 'ethos/multilabel', 'lex_glue/eurlex', 'lex_glue/unfair_tos', 'app_reviews', 'humicroedit/subtask-1', 'stackoverflow-questions', 'go_emotions/simplified', 'google_wellformed_query', 'has_part', 'blog_authorship_corpus/age', 'promptCoherence', 'Sarcasm_News_Headline', 'auditor_review/demo-org--auditor_review', 'Dynasent_Disagreement', 'Politeness_Disagreement', 'SBIC_Disagreement', 'SChem_Disagreement', 'Dilemmas_Disagreement', 'sts-companion', 'acceptability-prediction', 'chaos-mnli-ambiguity', 'headline_cause/en_simple', 'oasst1_dense_flat', 'civil_comments']
-improper_labels += ['stsb_multi_mt','MLMA_hate_speech']
+improper_labels += ['glue/stsb', 'sick/relatedness', 'joci', 'utilitarianism', 'amazon_counterfactual/en', 'toxic_conversations', 'ethos/multilabel', 'lex_glue/eurlex','lex_glue/scotus', 'lex_glue/unfair_tos', 'app_reviews', 'humicroedit/subtask-1', 'stackoverflow-questions', 'go_emotions/simplified', 'google_wellformed_query', 'has_part', 'blog_authorship_corpus/age', 'promptCoherence', 'Sarcasm_News_Headline', 'auditor_review/demo-org--auditor_review', 'Dynasent_Disagreement', 'Politeness_Disagreement', 'SBIC_Disagreement', 'SChem_Disagreement', 'Dilemmas_Disagreement', 'sts-companion', 'acceptability-prediction', 'chaos-mnli-ambiguity', 'headline_cause/en_simple', 'oasst1_dense_flat', 'civil_comments']
+improper_labels += ['stsb_multi_mt','MLMA_hate_speech','icl-symbol-tuning-instruct']
 
 def render_options(options):
     options = [f'"{x}"' for x in options]
