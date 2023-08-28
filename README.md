@@ -19,7 +19,7 @@ Browse the 500+ curated tasks in tasks.md (200+ MultipleChoice tasks, 200+ Class
 
 You can now also use:
 ```python
-load_dataset("tasksource/data", "glue/rte",max_rows=30_00)
+load_dataset("tasksource/data", "glue/rte",max_rows=30_000)
 ```
 
 ### Pretrained models:
