@@ -17,6 +17,11 @@ for id in df[df.task_type=="MultipleChoice"].id:
 
 Browse the 500+ curated tasks in tasks.md (200+ MultipleChoice tasks, 200+ Classification tasks), and feel free to request a new task. Datasets are downloaded to $HF_DATASETS_CACHE (like any Hugging Face dataset), so ensure you have more than 100GB of space available.
 
+You can now also use:
+```python
+load_dataset("tasksource/data", "glue/rte",max_rows=30_00)
+```
+
 ### Pretrained models:
 
 Text encoder pretrained on tasksource reached state-of-the-art results: [🤗/deberta-v3-base-tasksource-nli](https://hf.co/sileod/deberta-v3-base-tasksource-nli)
