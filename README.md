@@ -57,8 +57,7 @@ winogrande = MultipleChoice('sentence',['option1','option2'],'answer',
 tasks = [winogrande.load(), codah.load()]) #  Aligned datasets (same columns) can be used interchangably  
 ```
 
- ### Contact and citation
-For help integrating tasksource into your experiments, please contact [damien.sileo@inria.fr](mailto:damien.sileo@inria.fr).
+ ### Citation and contact
 
 For more details, refer to this [article:](https://arxiv.org/abs/2301.05948) 
 ```bib
@@ -70,4 +69,6 @@ For more details, refer to this [article:](https://arxiv.org/abs/2301.05948)
   year={2023}
 }
 ```
+For help integrating tasksource into your experiments, please contact [damien.sileo@inria.fr](mailto:damien.sileo@inria.fr).
+
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
