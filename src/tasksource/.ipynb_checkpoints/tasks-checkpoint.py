@@ -1094,7 +1094,7 @@ sdoh_nli = Classification("premise","hypothesis",labels=lambda x:{True:"entailme
     dataset_name="tasksource/SDOH-NLI")
 
 scifact_entailment = Classification(lambda x:"\n".join(x["abstract"]),"claim",
-    labels=lambda x:x['verdict'].replace('NEI','NEUTRAL').lower(),
+    labels=lambda x:x['verdict'].replace('NEI','NEUTRAL'),
     dataset_name="allenai/scifact_entailment")
 
 feasibilityQA = Classification(cat(['knowledge','premise']),'hypothesis','binary_classification_label',
@@ -1104,20 +1104,3 @@ simple_pair = Classification("premise","hypothesis","label", dataset_name="tasks
 adjective_scale_probe = Classification("premise","hypothesis","label", dataset_name="tasksource/AdjectiveScaleProbe-nli")
 repectively_nli = Classification("premise","hypothesis","label",dataset_name="tasksource/resnli")
 
-spartun=MultipleChoice(cat(["story","question"]),choices_list="candidate_answers",
-    labels=lambda x: [c.lower() for c in x['choices_list']].index(x["answer"][0].lower()),
-    pre_process=lambda ds:ds.filter(lambda x:len(x['answer'])==1),
-    dataset_name="tasksource/SpaRTUN")
-
-resq=MultipleChoice(cat(["story","question"]),choices_list="candidate_answers",
-    labels=lambda x: [c.lower() for c in x['choices_list']].index(x["answer"][0].lower()),
-    pre_process=lambda ds:ds.filter(lambda x:len(x['answer'])==1),
-    dataset_name="tasksource/ReSQ")
-
-semantic_fragments_nli = Classification("sentence1","sentence2","gold_label",
-    dataset_name="tasksource/semantic_fragments_nli")
-
-moritz_zs_nli = Classification('text','hypothesis','labels',
-    pre_process=lambda ds:ds.filter(lambda x:x['task_name'] not in  ["mnli", "anli", "fevernli", "wanli", "lingnli"]),
-    dataset_name="MoritzLaurer/dataset_train_nli"
-) 
