@@ -189,8 +189,6 @@ conll2003__ner_tags   = TokenClassification(tokens="tokens", labels='ner_tags')
 
 ######################## Multiple choice ###########################
 
-anthropic_rlhf = MultipleChoice(constant(''), ['chosen','rejected'], constant(0),
-    dataset_name="Anthropic/hh-rlhf")
 
 model_written_evals = MultipleChoice('question', choices=['answer_matching_behavior','answer_not_matching_behavior'], labels=constant(0),  
     dataset_name="Anthropic/model-written-evals")
@@ -794,8 +792,8 @@ summarize_from_feedback = MultipleChoice(get.info.post,
 )
 
 folio = Classification(lambda x: " ".join(x['premises']),"conclusion",
-    labels="label",
-    dataset_name="metaeval/folio")
+    labels=lambda x:{'False':'contradiction','True':'entailment', 'Uncertain':'neutral'}.get(x["label"]),
+    dataset_name="tasksource/folio")
 
 tomi_nli = Classification("premise","hypothesis","label",
     dataset_name="metaeval/tomi-nli")
@@ -908,16 +906,13 @@ headline_cause = Classification('left_title','right_title','label',
 
 logiqa_2 = Classification("premise","hypothesis","label",dataset_name="metaeval/logiqa-2.0-nli")
 
-_oasst = dict(dataset_name="tasksource/oasst1_dense_flat",
+_oasst = dict(dataset_name="tasksource/oasst2_dense_flat",
     pre_process = lambda ds:ds.filter(lambda x:x['lang']=='en'))
 
 oasst1__quality = Classification("parent_text","text",labels="quality",**_oasst)
 oasst1__toxicity = Classification("parent_text","text",labels="toxicity",**_oasst)
 oasst1__helpfulness = Classification("parent_text","text",labels="helpfulness",**_oasst)
 
-para_rules = Classification("context","question",
-    labels=name("label",["False","True"]),
-    dataset_name="qbao775/PARARULE-Plus")
 
 mindgames = Classification("premise","hypothesis","label",dataset_name="sileod/mindgames")
 
@@ -943,9 +938,6 @@ civil_comments__sexual_explicit = Classification("text",labels="sexual_explicit"
 cloth = MultipleChoice("sentence", choices_list=lambda x:[x["answer"]]+x["distractors"],labels=constant(0), dataset_name="AndyChiang/cloth")
 dgen  = MultipleChoice("sentence", choices_list=lambda x:[x["answer"]]+x["distractors"],labels=constant(0), dataset_name="AndyChiang/dgen")
 
-oasst_rlhf = MultipleChoice("prompt",choices=['chosen','rejected'],labels=constant(0),
-    dataset_name="tasksource/oasst1_pairwise_rlhf_reward")
-
 i2d2 = Classification("sentence1",labels=name('label',['False','True']), dataset_name="tasksource/I2D2")
 
 arg_me = Classification('argument','conclusion','stance', dataset_name="webis/args_me")
@@ -954,7 +946,7 @@ starcon = Classification('argument','topic','label',dataset_name="tasksource/sta
 
 banking77 = Classification("text",labels="label",dataset_name="PolyAI/banking77")
 
-ruletaker = Classification("context","question","label",dataset_name="tasksource/ruletaker")
+
 
 lsat_qa = MultipleChoice(
     cat(['passage','question']),
@@ -1045,10 +1037,9 @@ def _icl_rand(x):
     return random.Random(x['sentence1'][:50]).randint(0,1) #deterministic label for each input
 
 icl = Classification("inputs", lambda x: x['symbols'][_icl_rand(x)],
-    labels=lambda x: int(x['symbols'][_icl_rand(x)]==x['targets']),
+    labels=lambda x: str(x['symbols'][_icl_rand(x)]==x['targets']),
     dataset_name="tasksource/icl-symbol-tuning-instruct",
     pre_process=lambda ds:ds.filter(lambda x:len(x['inputs'])<200*4), # 200 tokens of 4 char 
-    post_process=lambda ds:ds.cast_column('labels',ClassLabel(names=['False','True']))
 )
 
 space_nli = Classification("premises","hypothesis","label",dataset_name="tasksource/SpaceNLI")
@@ -1121,3 +1112,46 @@ moritz_zs_nli = Classification('text','hypothesis','labels',
     pre_process=lambda ds:ds.filter(lambda x:x['task_name'] not in  ["mnli", "anli", "fevernli", "wanli", "lingnli"]),
     dataset_name="MoritzLaurer/dataset_train_nli"
 ) 
+
+stepgame = Classification('story','question','label',dataset_name="tasksource/stepgame")
+
+def _nlgraph_binarize(x):
+    a=x['answer'].lower()
+    if "yes" in a: return "True"
+    if "no" in a: return "False"
+    assert False
+
+nlgraph = Classification('question',labels=_nlgraph_binarize,
+    pre_process=lambda ds:ds.filter(lambda x:x['task'] in "connectivity cycle hamilton"),
+    dataset_name="tasksource/nlgraph")
+
+oasst_rlhf = MultipleChoice("prompt",choices=['chosen','rejected'],labels=constant(0),
+    dataset_name="tasksource/oasst2_pairwise_rlhf_reward")
+
+anthropic_rlhf_helpfulness = MultipleChoice(constant('Most helpful assistant answer:'), ['chosen','rejected'], constant(0),
+    dataset_name="tasksource/hh-rlhf",config_name=["helpful-base", "helpful-online", "helpful-rejection-sampled"])
+
+anthropic_rlhf_harmless = MultipleChoice(constant('Most harmless assistant answer:'), ['chosen','rejected'], constant(0),
+    dataset_name="tasksource/hh-rlhf",config_name="harmless-base")
+
+ruletaker = Classification(
+    lambda x: 'What is not explicitly stated as true is considered false. \n' +x["context"], #closed world assumption
+    "question","label",dataset_name="tasksource/ruletaker")
+
+para_rules = Classification(
+    lambda x: 'What is not explicitly stated as true is considered false. \n' +x["context"], #closed world assumption
+    "question", labels=name("label",["False","True"]),
+    dataset_name="qbao775/PARARULE-Plus")
+
+proofwriter_deduction = Classification("theory","question","answer",
+    dataset_name="tasksource/proofwriter") #open world assumption
+
+logical_entailment = Classification("A","B","label",dataset_name='tasksource/logical-entailment')
+
+nope = Classification('premise','hypothesis',
+    labels=lambda x:dict(E='entailment',N='neutral',C='contradiction').get(x['label'],x['label']),
+    dataset_name='tasksource/nope')
+
+logicNLI = Classification('premise','hypothesis','label',dataset_name='tasksource/LogicNLI')
+
+#unigram_fol = Classification("premise","hypothesis","label",dataset_name='unigram/fol-01')
