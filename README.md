@@ -59,12 +59,22 @@ tasks = [winogrande.load(), codah.load()]) #  Aligned datasets (same columns) ca
 
 For more details, refer to this [article:](https://arxiv.org/abs/2301.05948) 
 ```bib
-@article{sileo2023tasksource,
-  title={tasksource: Structured Dataset Preprocessing Annotations for Frictionless Extreme Multi-Task Learning and Evaluation},
-  author={Sileo, Damien},
-  url= {https://arxiv.org/abs/2301.05948},
-  journal={arXiv preprint arXiv:2301.05948},
-  year={2023}
+@inproceedings{sileo-2024-tasksource,
+    title = "tasksource: A Large Collection of {NLP} tasks with a Structured Dataset Preprocessing Framework",
+    author = "Sileo, Damien",
+    editor = "Calzolari, Nicoletta  and
+      Kan, Min-Yen  and
+      Hoste, Veronique  and
+      Lenci, Alessandro  and
+      Sakti, Sakriani  and
+      Xue, Nianwen",
+    booktitle = "Proceedings of the 2024 Joint International Conference on Computational Linguistics, Language Resources and Evaluation (LREC-COLING 2024)",
+    month = may,
+    year = "2024",
+    address = "Torino, Italia",
+    publisher = "ELRA and ICCL",
+    url = "https://aclanthology.org/2024.lrec-main.1361",
+    pages = "15655--15684",
 }
 ```
 For help integrating tasksource into your experiments, please contact [damien.sileo@inria.fr](mailto:damien.sileo@inria.fr).
