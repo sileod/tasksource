@@ -62,12 +62,6 @@ For more details, refer to this [article:](https://arxiv.org/abs/2301.05948)
 @inproceedings{sileo-2024-tasksource,
     title = "tasksource: A Large Collection of {NLP} tasks with a Structured Dataset Preprocessing Framework",
     author = "Sileo, Damien",
-    editor = "Calzolari, Nicoletta  and
-      Kan, Min-Yen  and
-      Hoste, Veronique  and
-      Lenci, Alessandro  and
-      Sakti, Sakriani  and
-      Xue, Nianwen",
     booktitle = "Proceedings of the 2024 Joint International Conference on Computational Linguistics, Language Resources and Evaluation (LREC-COLING 2024)",
     month = may,
     year = "2024",
