@@ -109,8 +109,6 @@ joci = Classification("context","hypothesis",
 
 #enfever_nli = Classification("evidence","claim","label", dataset_name="ctu-aic/enfever_nli")
 
-#contrast_nli = Classification("premise", "hypothesis",	"label",dataset_name="martn-nguyen/contrast_nli") # generated
-
 robust_nli__IS_CS = Classification("premise","hypothesis","label",
 	dataset_name="pietrolesci/robust_nli", splits=["IS_CS",None,None])
 robust_nli__LI_LI = Classification("premise","hypothesis","label",
@@ -167,8 +165,8 @@ imppres__log = Classification("premise","hypothesis","gold_label_log",
     post_process=lambda x: _imppres_post_process(x,'logical'))
 
 
-glue__diagnostics = Classification("premise","hypothesis","label",
-    dataset_name="pietrolesci/glue_diagnostics",splits=["test",None,None])
+#glue__diagnostics = Classification("premise","hypothesis","label",
+#    dataset_name="pietrolesci/glue_diagnostics",splits=["test",None,None])
 
 hlgd = Classification("headline_a", "headline_b", labels="label")
 
@@ -177,7 +175,7 @@ paws___labeled_swap    = Classification("sentence1", "sentence2", name('label',[
 #paws___unlabeled_final = Classification("sentence1", "sentence2", "label")
 
 #quora = Classification(get.questions.text[0], get.questions.text[1], 'is_duplicate') # in glue
-medical_questions_pairs = Classification("question_1","question_2", name("label",['False','True']))
+medical_questions_pairs = Classification("question_1","question_2", name("label",['not similar','similar']))
  
 ###################### Token Classification #########################
 
@@ -410,7 +408,6 @@ tweet_eval_climate  = Classification(**stance_kwargs("climate"))
 tweet_eval_feminist = Classification(**stance_kwargs("feminist"))
 tweet_eval_hillary  = Classification(**stance_kwargs("Hillary"))
 
-    
 
 discovery = Classification("sentence1", "sentence2", labels="label", config_name=["discovery"])
 
@@ -443,8 +440,6 @@ language_identification = Classification("text",labels="labels", dataset_name="p
 
 imdb = Classification(sentence1="text", labels="label", splits=["train", None, "test"])
 
-#
-
 rotten_tomatoes = Classification(sentence1="text", labels="label")
 
 ag_news = Classification(sentence1="text", labels="label", splits=["train", None, "test"])
@@ -455,7 +450,6 @@ financial_phrasebank = Classification(sentence1="sentence", labels="label", spli
     config_name=["sentences_allagree"])
 
 poem_sentiment = Classification(sentence1="verse_text", labels="label")
-
 
 #emotion = Classification(sentence1="text", labels="label") # file not found
 
@@ -526,8 +520,8 @@ metaeval_linguisticprobing = Classification("sentence", labels="label", dataset_
                 'bigram_shift']#+['word_content'] #too many labels 
 )
 
-metaeval_crowdflower = Classification("text", labels="label",
- splits=["train", None, None], dataset_name="metaeval/crowdflower",
+crowdflower = Classification("text", labels="label",
+ splits=["train", None, None], dataset_name="tasksource/crowdflower",
  config_name=['sentiment_nuclear_power',
             'tweet_global_warming',
             'airline-sentiment',
@@ -539,10 +533,10 @@ metaeval_crowdflower = Classification("text", labels="label",
             'text_emotion']
 )
 
-metaeval_ethics___commonsense = Classification(sentence1="text", labels="label", dataset_name="metaeval/ethics", config_name="commonsense")
-metaeval_ethics___deontology = Classification(sentence1="text", labels="label", dataset_name="metaeval/ethics", config_name="deontology")
-metaeval_ethics___justice = Classification(sentence1="text", labels="label", dataset_name="metaeval/ethics", config_name="justice")
-metaeval_ethics___virtue = Classification(sentence1="sentence1", sentence2="sentence2", labels="label", dataset_name="metaeval/ethics", config_name="virtue")
+ethics___commonsense = Classification(sentence1="text", labels="label", dataset_name="metaeval/ethics", config_name="commonsense")
+ethics___deontology = Classification(sentence1="text", labels="label", dataset_name="metaeval/ethics", config_name="deontology")
+ethics___justice = Classification(sentence1="text", labels="label", dataset_name="metaeval/ethics", config_name="justice")
+ethics___virtue = Classification(sentence1="sentence1", sentence2="sentence2", labels="label", dataset_name="metaeval/ethics", config_name="virtue")
 
 emo = Classification(sentence1="text", labels="label", splits=["train", None, "test"], config_name=["emo2019"])
 
@@ -791,7 +785,7 @@ summarize_from_feedback = MultipleChoice(get.info.post,
     pre_process = lambda ds:ds.filter(lambda x: type(get.info.post(x))==str)
 )
 
-folio = Classification(lambda x: " ".join(x['premises']),"conclusion",
+folio = Classification("premises","conclusion",
     labels=lambda x:{'False':'contradiction','True':'entailment', 'Uncertain':'neutral'}.get(x["label"]),
     dataset_name="tasksource/folio")
 
@@ -945,13 +939,6 @@ valueeval_stance = Classification("Premise","Conclusion","Stance", dataset_name=
 starcon = Classification('argument','topic','label',dataset_name="tasksource/starcon")
 
 banking77 = Classification("text",labels="label",dataset_name="PolyAI/banking77")
-
-
-
-lsat_qa = MultipleChoice(
-    cat(['passage','question']),
-    choices_list='references',labels="gold_index",
-     dataset_name="lighteval/lsat_qa",config_name="all")
     
 control = Classification('premise','hypothesis',"label",dataset_name="tasksource/ConTRoL-nli")
 tracie = Classification("premise","hypothesis","answer",dataset_name='tasksource/tracie')
@@ -1079,7 +1066,10 @@ dnd_intent = Classification("examples",labels="label_names",
     dataset_name='neurae/dnd_style_intents')
 
 fld = Classification("context","hypothesis", "proof_label",
-    dataset_name="hitachi-nlp/FLD.v2")
+    dataset_name="hitachi-nlp/FLD.v2",config_name="default")
+
+flds = Classification("context","hypothesis", "proof_label",
+    dataset_name="hitachi-nlp/FLD.v2",config_name="star")
 
 sdoh_nli = Classification("premise","hypothesis",labels=lambda x:{True:"entailment",False:"not-entailment"}[x['label']],
     dataset_name="tasksource/SDOH-NLI")
@@ -1148,4 +1138,74 @@ proofwriter_deduction = Classification("theory","question","answer",
 
 logical_entailment = Classification("A","B","label",dataset_name='tasksource/logical-entailment')
 
+nope = Classification('premise','hypothesis',
+    labels=lambda x:dict(E='entailment',N='neutral',C='contradiction').get(x['label'],x['label']),
+    dataset_name='tasksource/nope')
+
+logicNLI = Classification('premise','hypothesis','label',dataset_name='tasksource/LogicNLI')
+
+contract_nli = Classification("premise","hypothesis","label", dataset_name="kiddothe2b/contract-nli",config_name="contractnli_a")
+
+nli4ct = Classification(lambda x: "\n".join(x['Primary_evidence']),'Statement',
+    dataset_name="AshtonIsNotHere/nli4ct_semeval2024",splits=['train','dev',None])
+
+lsat_ar = MultipleChoice(
+    cat(['context','question']),
+    choices_list='answers',labels="label",
+     dataset_name="tasksource/lsat-ar")
+    
+lsat_rc = MultipleChoice(
+    cat(['context','question']),
+    choices_list='answers',labels="label",
+     dataset_name="tasksource/lsat-rc")
+    
+biosift_nli = Classification("Abstract","Hypothesis",
+    labels=lambda x: {True:"entailment",False:"not-entailment"}[bool(x['Entailment'])],
+    dataset_name="AshtonIsNotHere/biosift-nli")
+
+brainteasers = MultipleChoice("question",
+    choices_list=lambda x:eval(x["choice_list"]),
+    labels="label",
+    dataset_name="tasksource/brainteasers",config_name=['WP','SP'])
+
+#GATED !
+#toxigen = Classification("text",labels="toxicity_human", dataset_name="skg/toxigen-data")
+
+persuasiveness = Classification("claim","argument",labels="persuasiveness_metric",dataset_name="Anthropic/persuasion")
+
+#ste_wic = Classification(cat("text_1","text_2"),
+#    lambda x:f"{x['target']} means the same thing in these texts",
+#    "gold_label_binary",
+#    dataset_name="cardiffnlp/super_tweeteval", config_name="tempo_wic",splits=['train','validation',None])
+
+#ste_nerd = Classification("text",
+#    lambda x:f"definition of {x['target']} here is 'x{['definition']}'",
+#    "gold_label_binary",
+#    dataset_name="cardiffnlp/super_tweeteval", config_name="tweet_nerd",splits=['train','validation',None])
+ 
+#ste_sim = Classification("text_1","text_2",lambda x:x['gold_score']/5,
+#    dataset_name="cardiffnlp/super_tweeteval",config_name="tweet_similarity",splits=['train','validation',None])
+
+#ste_intimacy = Classification("text_1",labels=lambda x:x['gold_score']/5,
+#    dataset_name="cardiffnlp/super_tweeteval",config_name="tweet_intimacy")
+
+#ccdv/patent-classification|abstract text label
+
+ambigNQ = Classification("question",labels=lambda x:{True:"ambiguous", False:"not ambiguous"}.get(x["ambig"]),
+    dataset_name="erbacher/AmbigNQ-clarifying-question")
+
+siga_nli = Classification("premise","statement","label",dataset_name="tasksource/SIGA-nli")
+
 #unigram_fol = Classification("premise","hypothesis","label",dataset_name='unigram/fol-01')
+
+gs_goal = MultipleChoice("sent2",regen("ending[0-3]"),"label",
+        dataset_name="tasksource/goal-step-wikihow",config_name="goal")
+
+gs_step = MultipleChoice("sent2",regen("ending[0-3]"),"label",
+        dataset_name="tasksource/goal-step-wikihow",config_name="step")
+
+gs_order = MultipleChoice("sent2",regen("ending[0-1]"),"label",
+        dataset_name="tasksource/goal-step-wikihow",config_name="order")
+
+paradise = MultipleChoice("sent2",regen("ending[0-1]"),"label",
+      dataset_name="GGLab/PARADISE")
