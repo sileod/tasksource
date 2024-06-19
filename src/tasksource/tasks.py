@@ -762,9 +762,6 @@ help_nli = Classification("ori_sentence","new_sentence","gold_label",
 nli_veridicality_transitivity = Classification("sentence1","sentence2","gold_label",
     dataset_name="metaeval/nli-veridicality-transitivity")
 
-nl_satisfiability= Classification("sentence",labels="label",
-    dataset_name="tasksource/natural-language-satisfiability")
-
 lonli = Classification("premise","hypothesis","label",
     dataset_name="tasksource/lonli")
 
@@ -1220,17 +1217,17 @@ idioms_nli = Classification('premise','hypothesis','label',dataset_name="tasksou
 
 lifeycle_entailment = Classification("premise","hypothesis","label",dataset_name='tasksource/lifecycle-entailment')
 
-helpsteer_2_helpfulness = Classification("prompt","response","helpfulness",dataset_name="nvidia/HelpSteer2")
-helpsteer_2_correctness = Classification("prompt", "response", "correctness", dataset_name="nvidia/HelpSteer2")
-helpsteer_2_coherence = Classification("prompt", "response", "coherence", dataset_name="nvidia/HelpSteer2")
-helpsteer_2_complexity = Classification("prompt", "response", "complexity", dataset_name="nvidia/HelpSteer2")
-helpsteer_2_verbosity = Classification("prompt", "response", "verbosity", dataset_name="nvidia/HelpSteer2")
+helpsteer_2__helpfulness = Classification("prompt","response","helpfulness",dataset_name="nvidia/HelpSteer2")
+helpsteer_2__correctness = Classification("prompt", "response", "correctness", dataset_name="nvidia/HelpSteer2")
+helpsteer_2__coherence = Classification("prompt", "response", "coherence", dataset_name="nvidia/HelpSteer2")
+helpsteer_2__complexity = Classification("prompt", "response", "complexity", dataset_name="nvidia/HelpSteer2")
+helpsteer_2__verbosity = Classification("prompt", "response", "verbosity", dataset_name="nvidia/HelpSteer2")
 
-helpsteer_helpfulness = Classification("prompt", "response", "helpfulness", dataset_name="nvidia/HelpSteer")
-helpsteer_correctness = Classification("prompt", "response", "correctness", dataset_name="nvidia/HelpSteer")
-helpsteer_coherence = Classification("prompt", "response", "coherence", dataset_name="nvidia/HelpSteer")
-helpsteer_complexity = Classification("prompt", "response", "complexity", dataset_name="nvidia/HelpSteer")
-helpsteer_verbosity = Classification("prompt", "response", "verbosity", dataset_name="nvidia/HelpSteer")
+helpsteer__helpfulness = Classification("prompt", "response", "helpfulness", dataset_name="nvidia/HelpSteer")
+helpsteer__correctness = Classification("prompt", "response", "correctness", dataset_name="nvidia/HelpSteer")
+helpsteer__coherence = Classification("prompt", "response", "coherence", dataset_name="nvidia/HelpSteer")
+helpsteer__complexity = Classification("prompt", "response", "complexity", dataset_name="nvidia/HelpSteer")
+helpsteer__verbosity = Classification("prompt", "response", "verbosity", dataset_name="nvidia/HelpSteer")
 
 msci_nli = Classification('sentence1','sentence2','label',dataset_name='sadat2307/MSciNLI')
 
