@@ -772,7 +772,7 @@ flute = Classification("premise","hypothesis","label",
     dataset_name="ColumbiaNLP/FLUTE")
 
 strategy_qa = Classification('question',labels='answer',
-    dataset_name="metaeval/strategy-qa",splits=['train',None,None])
+    dataset_name="tasksource/strategy-qa",splits=['train',None,None])
 
 summarize_from_feedback = MultipleChoice(get.info.post,
     choices_list=lambda x: [x['summaries'][0]['text'],x['summaries'][1]['text']],
@@ -951,6 +951,7 @@ winowhy = Classification('sentence', lambda x: f'In "{x["wnli_sent1"]}", {x["wnl
 #for CFG in "cognitive-bias", "fake-news", "gender-bias", "hate-speech", "linguistic-bias", "political-bias", "racial-bias", "text-level-bias":
 #    print(f"mbib__{CFG.replace('-','_')} = Classification('text',labels=name('label',['not {CFG}','{CFG}']), dataset_name='mediabiasgroup/mbib-base', config_name='{CFG}')")
 
+"""
 mbib_cognitive_bias	= Classification('text',labels=name('label',['not cognitive-bias','cognitive-bias']), dataset_name='mediabiasgroup/mbib-base', config_name='cognitive-bias')
 mbib_fake_news	= Classification('text',labels=name('label',['not fake-news','fake-news']), dataset_name='mediabiasgroup/mbib-base', config_name='fake-news')
 mbib_gender_bias	= Classification('text',labels=name('label',['not gender-bias','gender-bias']), dataset_name='mediabiasgroup/mbib-base', config_name='gender-bias')
@@ -959,6 +960,7 @@ mbib_linguistic_bias	= Classification('text',labels=name('label',['not linguisti
 mbib_political_bias	= Classification('text',labels=name('label',['not political-bias','political-bias']), dataset_name='mediabiasgroup/mbib-base', config_name='political-bias')
 mbib_racial_bias	= Classification('text',labels=name('label',['not racial-bias','racial-bias']), dataset_name='mediabiasgroup/mbib-base', config_name='racial-bias')
 mbib_text_level_bias	= Classification('text',labels=name('label',['not text-level-bias','text-level-bias']), dataset_name='mediabiasgroup/mbib-base', config_name='text-level-bias')
+"""
 
 robustLR = Classification("context","statement","label", dataset_name="tasksource/robustLR")
 
@@ -1021,7 +1023,7 @@ def _icl_rand(x):
 icl = Classification("inputs", lambda x: x['symbols'][_icl_rand(x)],
     labels=lambda x: str(x['symbols'][_icl_rand(x)]==x['targets']),
     dataset_name="tasksource/icl-symbol-tuning-instruct",
-    pre_process=lambda ds:ds.filter(lambda x:len(x['inputs'])<200*4), # 200 tokens of 4 char 
+    pre_process=lambda ds:ds.filter(lambda x:len(x['inputs'])<500*4), # 500 tokens of 4 char 
 )
 
 space_nli = Classification("premises","hypothesis","label",dataset_name="tasksource/SpaceNLI")
@@ -1234,4 +1236,16 @@ msci_nli = Classification('sentence1','sentence2','label',dataset_name='sadat230
 lex_glue___ecthr_a = Classification(sentence1="text", labels="labels",dataset_name="coastalcph/lex_glue",config_name="ecthr_a") # too long
 lex_glue___ecthr_b = Classification(sentence1="text", labels="labels") # too long
 
-ultrafeedback = MultipleChoice("question", choices=['response_j','reponse_k'],labels=constant(0), dataset_name="pushpdeep/UltraFeedback-paired")
+ultrafeedback = MultipleChoice("question", choices=['response_j','response_k'],labels=constant(0), dataset_name="pushpdeep/UltraFeedback-paired")
+
+essay_scoring = Classification("full_text",labels="score",dataset_name='tasksource/AES2-essay-scoring')
+
+argument_feedback = Classification("discourse_text",labels="discourse_effectiveness", dataset_name="tasksource/argument-feedback")
+
+eg = lambda x: Classification("full_text", labels=lambda y:int(y[x]), dataset_name="tasksource/english-grading")
+grading__cohesion = eg('cohesion')
+grading__syntax = eg('syntax')
+grading__vocabulary = eg('vocabulary')
+grading__phraseology = eg('phraseology')
+grading__grammar = eg('grammar')
+grading__conventions = eg('conventions')
