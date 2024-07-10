@@ -69,7 +69,7 @@ probability_words_nli = Classification(sentence1="context", sentence2="hypothesi
     dataset_name="sileod/probability_words_nli", 
     config_name=["reasoning_1hop","reasoning_2hop","usnli"])
 
-nan_nli = Classification("premise", "hypothesis", "label", dataset_name="joey234/nan-nli", config_name="joey234--nan-nli")
+nan_nli = Classification("premise", "hypothesis", "label", dataset_name="joey234/nan-nli")
 
 nli_fever = Classification("premise","hypothesis","label",
     dataset_name="pietrolesci/nli_fever", splits=["train","dev",None])
@@ -368,7 +368,7 @@ turingbench = Classification("Generation",labels="label",
 
 trec = Classification(sentence1="text", labels="fine_label")
 
-tals_vitaminc = Classification('claim','evidence','label', dataset_name="tals/vitaminc", config_name="tals--vitaminc")
+tals_vitaminc = Classification('claim','evidence','label', dataset_name="tals/vitaminc")
 
 hope_edi = Classification("text", labels="label", splits=["train", "validation", None], config_name=["english"])
 
@@ -484,7 +484,11 @@ stackoverflow_questions=Classification("title","body",labels="label",
 
 #hyperpartisan_news_detection___byarticle = Classification(sentence1="text", labels="hyperpartisan", splits=["train", None, None]) # files too heavy
 #hyperpartisan_news_detection___bypublisher = Classification(sentence1="text", labels="hyperpartisan", splits=["train","validation", None]) # files too heavy
-hyperpartisan_news = Classification("text",labels="label",dataset_name="zapsdcn/hyperpartisan_news")
+
+hyperpartisan_news = Classification(
+    "text",
+    labels=lambda x: {'true':'hyperpartisan','false':'not_hyperpartisan'}.get(x["label"]),
+    dataset_name="zapsdcn/hyperpartisan_news")
 
 scierc = Classification("text",labels="label",dataset_name="zapsdcn/sciie")
 citation_intent = Classification("text",labels="label",dataset_name="zapsdcn/citation_intent")
@@ -634,7 +638,7 @@ quarel = Classification(
     labels=lambda x: "AB"[x["answer_index"]]
 )
 
-mwong_fever_evidence_related = Classification(sentence1="claim", sentence2="evidence", labels="labels", splits=["train", "valid", "test"], dataset_name="mwong/fever-evidence-related", config_name="mwong--fever-related")
+mwong_fever_evidence_related = Classification(sentence1="claim", sentence2="evidence", labels="labels", splits=["train", "valid", "test"], dataset_name="mwong/fever-evidence-related")
 
 numer_sense = Classification("sentence",labels="target",splits=["train",None,None])
 
@@ -648,7 +652,9 @@ sarcasm_news = Classification("headline", labels="is_sarcastic",
 
 sem_eval_2010_task_8 = Classification("sentence",labels="relation")
 
-demo_org_auditor_review = Classification(sentence1="sentence", labels="label", splits=["train", None, "test"], dataset_name="demo-org/auditor_review", config_name="demo-org--auditor_review")
+auditor_review = Classification(sentence1="sentence",
+    labels=name("label",['negative','neutral','positive']),
+    dataset_name="demo-org/auditor_review")
 
 medmcqa = MultipleChoice("question", choices=regen('op[a-d]'),labels='cop')
 
@@ -1141,9 +1147,11 @@ nope = Classification('premise','hypothesis',
 
 logicNLI = Classification('premise','hypothesis','label',dataset_name='tasksource/LogicNLI')
 
-contract_nli = Classification("premise","hypothesis","label", dataset_name="kiddothe2b/contract-nli",config_name="contractnli_a")
+contract_nli__seg = Classification("premise","hypothesis","label", dataset_name="kiddothe2b/contract-nli",config_name="contractnli_a")
 
-nli4ct = Classification(lambda x: "\n".join(x['Primary_evidence']),'Statement',
+contract_nli__full = Classification("premise","hypothesis","label", dataset_name="kiddothe2b/contract-nli",config_name="contractnli_b")
+
+nli4ct = Classification(lambda x: "\n".join(x['Primary_evidence']),'Statement',"Label",
     dataset_name="AshtonIsNotHere/nli4ct_semeval2024",splits=['train','dev',None])
 
 lsat_ar = MultipleChoice(
@@ -1204,7 +1212,7 @@ unigram_fol = Classification("premise","hypothesis","label",dataset_name='unigra
 gs_order = MultipleChoice("sent2",regen("ending[0-1]"),"label",
         dataset_name="tasksource/goal-step-wikihow",config_name="order")
 
-paradise = MultipleChoice("sent2",regen("ending[0-1]"),"label",
+paradise = MultipleChoice("sent2",regen("ending[0-3]"),"label",
       dataset_name="GGLab/PARADISE")
 
 docnli = Classification("premise","hypothesis","label",dataset_name="tasksource/doc-nli")
@@ -1219,11 +1227,6 @@ idioms_nli = Classification('premise','hypothesis','label',dataset_name="tasksou
 
 lifeycle_entailment = Classification("premise","hypothesis","label",dataset_name='tasksource/lifecycle-entailment')
 
-helpsteer_2__helpfulness = Classification("prompt","response","helpfulness",dataset_name="nvidia/HelpSteer2")
-helpsteer_2__correctness = Classification("prompt", "response", "correctness", dataset_name="nvidia/HelpSteer2")
-helpsteer_2__coherence = Classification("prompt", "response", "coherence", dataset_name="nvidia/HelpSteer2")
-helpsteer_2__complexity = Classification("prompt", "response", "complexity", dataset_name="nvidia/HelpSteer2")
-helpsteer_2__verbosity = Classification("prompt", "response", "verbosity", dataset_name="nvidia/HelpSteer2")
 
 helpsteer__helpfulness = Classification("prompt", "response", "helpfulness", dataset_name="nvidia/HelpSteer")
 helpsteer__correctness = Classification("prompt", "response", "correctness", dataset_name="nvidia/HelpSteer")
@@ -1231,16 +1234,22 @@ helpsteer__coherence = Classification("prompt", "response", "coherence", dataset
 helpsteer__complexity = Classification("prompt", "response", "complexity", dataset_name="nvidia/HelpSteer")
 helpsteer__verbosity = Classification("prompt", "response", "verbosity", dataset_name="nvidia/HelpSteer")
 
+helpsteer_2__helpfulness = Classification("prompt","response","helpfulness",dataset_name="nvidia/HelpSteer2")
+helpsteer_2__correctness = Classification("prompt", "response", "correctness", dataset_name="nvidia/HelpSteer2")
+helpsteer_2__coherence = Classification("prompt", "response", "coherence", dataset_name="nvidia/HelpSteer2")
+helpsteer_2__complexity = Classification("prompt", "response", "complexity", dataset_name="nvidia/HelpSteer2")
+helpsteer_2__verbosity = Classification("prompt", "response", "verbosity", dataset_name="nvidia/HelpSteer2")
+
 msci_nli = Classification('sentence1','sentence2','label',dataset_name='sadat2307/MSciNLI')
 
-lex_glue___ecthr_a = Classification(sentence1="text", labels="labels",dataset_name="coastalcph/lex_glue",config_name="ecthr_a") # too long
-lex_glue___ecthr_b = Classification(sentence1="text", labels="labels") # too long
+#lex_glue___ecthr_a = Classification(sentence1="text", labels="labels",dataset_name="coastalcph/lex_glue",config_name="ecthr_a") # too long
+#lex_glue___ecthr_b = Classification(sentence1="text", labels="labels") # too long
 
 ultrafeedback = MultipleChoice("question", choices=['response_j','response_k'],labels=constant(0), dataset_name="pushpdeep/UltraFeedback-paired")
 
 essay_scoring = Classification("full_text",labels="score",dataset_name='tasksource/AES2-essay-scoring')
 
-argument_feedback = Classification("discourse_text",labels="discourse_effectiveness", dataset_name="tasksource/argument-feedback")
+#argument_feedback = Classification("discourse_text",labels="discourse_effectiveness", dataset_name="tasksource/argument-feedback")
 
 eg = lambda x: Classification("full_text", labels=lambda y:int(y[x]), dataset_name="tasksource/english-grading")
 grading__cohesion = eg('cohesion')
@@ -1249,3 +1258,15 @@ grading__vocabulary = eg('vocabulary')
 grading__phraseology = eg('phraseology')
 grading__grammar = eg('grammar')
 grading__conventions = eg('conventions')
+
+wice = Classification(lambda x: "\n".join(x['evidence']),'claim','label',
+    dataset_name='tasksource/wice')
+
+hover = Classification("evidence","claim","label",
+    dataset_name="Dzeniks/hover") 
+
+tasksource_dpo = MultipleChoice("prompt",choices=['chosen','rejected'],labels=constant(0),
+    dataset_name="tasksource/tasksource_dpo_pairs")
+
+seahorse = Classification('article',cat(["summary", "question"]),'answer',
+    dataset_name="tasksource/seahorse_summarization_evaluation")
