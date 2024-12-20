@@ -1265,8 +1265,14 @@ wice = Classification(lambda x: "\n".join(x['evidence']),'claim','label',
 hover = Classification("evidence","claim","label",
     dataset_name="Dzeniks/hover") 
 
+hover__nli = Classification("evidence","claim",name("label",["entailment","neutral","contradiction"]),
+    dataset_name="Dzeniks/hover-3way")
+
 tasksource_dpo = MultipleChoice("prompt",choices=['chosen','rejected'],labels=constant(0),
     dataset_name="tasksource/tasksource_dpo_pairs")
 
 seahorse = Classification('article',cat(["summary", "question"]),'answer',
     dataset_name="tasksource/seahorse_summarization_evaluation")
+
+mip = Classification("prompt",labels="y",
+    dataset_name="sileod/missing-item-prediction",config_name="contrastive")
