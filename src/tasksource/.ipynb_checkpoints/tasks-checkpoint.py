@@ -638,7 +638,8 @@ quarel = Classification(
     labels=lambda x: "AB"[x["answer_index"]]
 )
 
-mwong_fever_evidence_related = Classification(sentence1="claim", sentence2="evidence", labels="labels", splits=["train", "valid", "test"], dataset_name="mwong/fever-evidence-related")
+mwong_fever_evidence_related = Classification(sentence1="claim", sentence2="evidence", labels=name("labels",['unrelated','related']),
+    splits=["train", "valid", "test"], dataset_name="mwong/fever-evidence-related")
 
 numer_sense = Classification("sentence",labels="target",splits=["train",None,None])
 
@@ -1074,7 +1075,7 @@ fld = Classification("context","hypothesis", "proof_label",
 flds = Classification("context","hypothesis", "proof_label",
     dataset_name="hitachi-nlp/FLD.v2",config_name="star")
 
-sdoh_nli = Classification("premise","hypothesis",labels=lambda x:{True:"entailment",False:"not-entailment"}[x['label']],
+sdoh_nli = Classification("premise","hypothesis",labels=lambda x:{True:"entailment",False:"not_entailment"}[x['label']],
     dataset_name="tasksource/SDOH-NLI")
 
 scifact_entailment = Classification(lambda x:"\n".join(x["abstract"]),"claim",
@@ -1276,3 +1277,22 @@ seahorse = Classification('article',cat(["summary", "question"]),'answer',
 
 mip = Classification("prompt",labels="y",
     dataset_name="sileod/missing-item-prediction",config_name="contrastive")
+
+jigsaw_toxicity = Classification('comment_text',labels=name("toxic",["notthate","hate"]),
+    dataset_name="tasksource/jigsaw_toxicity")
+
+pol_nli = Classification("premise","hypothesis",labels=name('entailment',['entailment','not_entailment']),
+    dataset_name="mlburnham/Pol_NLI")
+
+synthetic_retrieval_nli = Classification('premise','hypothesis','label',dataset_name='tasksource/synthetic-retrieval-NLI',
+    config_name=["binary","count","position"],
+    pre_process=lambda ds:ds.filter(lambda x:x['n']<=2048))
+
+issue_similarity = Classification("text1","text2","label",
+    dataset_name="WhereIsAI/github-issue-similarity")
+
+#nli_l2 = Classification("sentence1","sentence2","labels",
+#    dataset_name="tasksource/merged-2l-nli")
+
+#nli_l3 =  Classification("sentence1","sentence2","labels",
+#    dataset_name="tasksource/merged-3l-nli")

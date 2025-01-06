@@ -100,6 +100,10 @@ def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preproc
     query = {k:v for k,v in query.items() if v}
     _tasks = (lmtasks if multilingual else tasks)
     preprocessing = load_preprocessing(_tasks, **query)
+
+    if "trust_remote_code" not in load_dataset_kwargs:
+        load_dataset_kwargs["trust_remote_code"] = True
+    
     dataset = load_dataset(preprocessing.dataset_name, preprocessing.config_name, **load_dataset_kwargs)
     dataset= preprocessing(dataset,max_rows, max_rows_eval)
     dataset.task_type = preprocessing.__class__.__name__
