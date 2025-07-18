@@ -304,11 +304,11 @@ art = MultipleChoice(cat(['hypothesis_1','hypothesis_2']),
     splits=['train','validation',None]
 )
 
-
-mmlu = MultipleChoice('question',labels='answer',choices_list='choices',splits=['validation','dev','test'],
-    dataset_name="tasksource/mmlu",
-    config_name=get_dataset_config_names("tasksource/mmlu")
-)
+# tasksource/mmlu not compatible with parquet
+# mmlu = MultipleChoice('question',labels='answer',choices_list='choices',splits=['validation','dev','test'],
+#    dataset_name="tasksource/mmlu",
+#    config_name=get_dataset_config_names("tasksource/mmlu")
+#)
 
 winogrande = MultipleChoice('sentence',['option1','option2'],'answer',config_name='winogrande_xl',
     splits=['train','validation',None])
