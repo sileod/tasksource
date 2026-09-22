@@ -124,6 +124,42 @@ aces_ranking = MultipleChoice("source",choices=['good-translation','incorrect-tr
 aces_phenomena = Classification('source','incorrect-translation','phenomena', dataset_name='nikitam/ACES')
 
 amazon_intent = Classification("utt",labels="intent",**all('AmazonScience/massive'))
+
+
+# modern multilingual classification / reward datasets
+
+masakhanews = Classification(
+    "headline", labels="category",
+    **all("masakhane/masakhanews"))
+
+nusax_sentiment = Classification(
+    "text", labels="label",
+    dataset_name="indonlp/NusaX-senti",
+    config_name=["ace", "ban", "bbc", "bjn", "bug", "eng", "ind", "jav",
+                 "mad", "min", "nij", "sun"])
+
+afrisenti = Classification(
+    "tweet", labels="label",
+    dataset_name="shmuhammad/AfriSenti-twitter-sentiment",
+    # Oromo and Tigrinya have no train split. Keep this list static so importing
+    # the task catalog does not require executing the dataset's legacy script.
+    config_name=["amh", "arq", "ary", "hau", "ibo", "kin", "pcm", "por",
+                 "swa", "tso", "twi", "yor"])
+
+def _helpsteer3_context(x):
+    return "\n".join(
+        f'{message["role"]}: {message["content"]}'
+        for message in x["context"]
+    )
+
+helpsteer3 = MultipleChoice(
+    _helpsteer3_context,
+    choices=["response1", "response2"],
+    labels=lambda x: int(x["overall_preference"] > 0),
+    dataset_name="nvidia/HelpSteer3", config_name="preference",
+    pre_process=lambda ds: ds.filter(lambda x: x["overall_preference"] != 0))
+
+
 #    dataset_name='glue',config_name=['ocnli','afqmc'])
 
 tidy_as2=Classification("Question","Sentence","Label",dataset_name='tasksource/tydi-as2-balanced') 

@@ -1229,6 +1229,117 @@ idioms_nli = Classification('premise','hypothesis','label',dataset_name="tasksou
 lifeycle_entailment = Classification("premise","hypothesis","label",dataset_name='tasksource/lifecycle-entailment')
 
 
+
+# modern classification / relation extraction datasets
+
+toxic_chat__toxicity = Classification(
+    "user_input", labels=name("toxicity", ["not toxic", "toxic"]),
+    dataset_name="lmsys/toxic-chat", config_name="toxicchat0124",
+    splits=["train", None, "test"])
+
+toxic_chat__jailbreaking = Classification(
+    "user_input", labels=name("jailbreaking", ["not jailbreak", "jailbreak"]),
+    dataset_name="lmsys/toxic-chat", config_name="toxicchat0124",
+    splits=["train", None, "test"])
+
+clinc_oos = Classification(
+    "text", labels="intent",
+    dataset_name="clinc/clinc_oos", config_name="plus")
+
+def _records(x):
+    if not isinstance(x, dict):
+        return x
+    return [dict(zip(x, values)) for values in zip(*(x[k] for k in x))]
+
+def _fewrel_relation_match(dataset):
+    rows = {}
+    for split in ["train_wiki", "val_wiki", "val_nyt"]:
+        data = dataset[split]
+        relations = {}
+        for x in data:
+            relations.setdefault(
+                x["relation"],
+                x["names"][0] if x["names"] and x["names"][0] else x["relation"],
+            )
+        relation_ids = sorted(relations)
+        next_relation = {
+            r: relation_ids[(i + 1) % len(relation_ids)]
+            for i, r in enumerate(relation_ids)
+        }
+        examples = []
+        for x in data:
+            text = " ".join(x["tokens"])
+            relation = relations[x["relation"]]
+            negative = relations[next_relation[x["relation"]]]
+            examples += [
+                {"text": text, "relation": relation, "label": 1},
+                {"text": text, "relation": negative, "label": 0},
+            ]
+        rows[split] = Dataset.from_list(examples)
+    return DatasetDict(rows)
+
+fewrel = Classification(
+    "text", "relation", "label",
+    dataset_name="thunlp/few_rel", config_name="default",
+    splits=["train_wiki", "val_wiki", "val_nyt"],
+    pre_process=_fewrel_relation_match)
+
+def _docred_relations(dataset):
+    rows = {}
+    for split in ["train_annotated", "validation"]:
+        examples = []
+        for x in dataset[split]:
+            text = "\n".join(" ".join(sent) for sent in x["sents"])
+            entities = [
+                " / ".join(dict.fromkeys(mention["name"] for mention in entity))
+                for entity in x["vertexSet"]
+            ]
+            for relation in _records(x["labels"]):
+                examples.append({
+                    "text": text,
+                    "entity_pair": f'{entities[relation["head"]]} -> {entities[relation["tail"]]}',
+                    "relation": relation["relation_text"] or relation["relation_id"],
+                })
+        rows[split] = Dataset.from_list(examples)
+    return DatasetDict(rows)
+
+docred = Classification(
+    "text", "entity_pair", "relation",
+    dataset_name="thunlp/docred",
+    splits=["train_annotated", "validation", None],
+    pre_process=_docred_relations)
+
+def _chemprot_relations(dataset):
+    rows = {}
+    for split in ["train", "validation", "test"]:
+        examples = []
+        for x in dataset[split]:
+            entities = {
+                entity["id"]: entity["text"]
+                for entity in _records(x["entities"])
+            }
+            for relation in _records(x["relations"]):
+                examples.append({
+                    "text": x["text"],
+                    "entity_pair": f'{entities[relation["arg1"]]} -> {entities[relation["arg2"]]}',
+                    "relation": relation["type"],
+                })
+        rows[split] = Dataset.from_list(examples)
+    return DatasetDict(rows)
+
+chemprot = Classification(
+    "text", "entity_pair", "relation",
+    dataset_name="bigbio/chemprot", config_name="chemprot_full_source",
+    pre_process=_chemprot_relations)
+
+pku_saferlhf__helpfulness = MultipleChoice(
+    "prompt", choices=["response_0", "response_1"], labels="better_response_id",
+    dataset_name="PKU-Alignment/PKU-SafeRLHF")
+
+pku_saferlhf__safety = MultipleChoice(
+    "prompt", choices=["response_0", "response_1"], labels="safer_response_id",
+    dataset_name="PKU-Alignment/PKU-SafeRLHF")
+
 helpsteer__helpfulness = Classification("prompt", "response", "helpfulness", dataset_name="nvidia/HelpSteer")
 helpsteer__correctness = Classification("prompt", "response", "correctness", dataset_name="nvidia/HelpSteer")
 helpsteer__coherence = Classification("prompt", "response", "coherence", dataset_name="nvidia/HelpSteer")

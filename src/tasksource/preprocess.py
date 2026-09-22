@@ -280,7 +280,7 @@ def fix_splits(dataset):
 def fix_labels(dataset, label_key='labels'):
     if type(dataset['train'][label_key][0]) in [int,list,float]:
         return dataset
-    labels=set(fc.flatten(dataset[k][label_key] for k in {"train"}))
+    labels=set(fc.flatten(list(dataset[k][label_key]) for k in {"train"}))
     if set(labels)=={'entailment','neutral','contradiction'}:
         order=lambda x:dict(fc.flip(enumerate(['entailment','neutral','contradiction']))).get(x,x)
     else:
