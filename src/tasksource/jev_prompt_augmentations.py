@@ -48,3 +48,15 @@ def instruction_variants(instruction, options):
     else:
         generic = GENERIC_CLASSIFICATION
     return tuple(dict.fromkeys((*specific, *generic)))
+
+
+def paired_state_variants(state):
+    """Return neutral formatting variants for canonical paired-text states."""
+    if not state.startswith("text_A: ") or "\ntext_B: " not in state:
+        return ()
+    text_a, text_b = state[len("text_A: "):].split("\ntext_B: ", 1)
+    return (
+        f"First text:\n{text_a}\n\nSecond text:\n{text_b}",
+        f"Passage A:\n{text_a}\n\nPassage B:\n{text_b}",
+        f"A: {text_a}\nB: {text_b}",
+    )

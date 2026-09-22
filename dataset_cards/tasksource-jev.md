@@ -64,6 +64,7 @@ direct row:
 | `label_verification` | 5% | A `noul` judgement asking whether a deterministically proposed label is correct. Correct and incorrect proposals are balanced. |
 | `criteria_permutation` | 5% | The same `choice` decision with options and targets permuted together, reducing option-position shortcuts. |
 | `instruction_paraphrase` | 5% | The same decision with a manually vetted equivalent instruction. Common NLI and sentiment label groups receive specific wording; other tasks use conservative generic alternatives. |
+| `paired_text_format` | 5% of paired rows | Neutral alternatives to repeated `text_A`/`text_B` field labels, without assuming a task-specific relation between the texts. |
 
 All transformations are derived exactly from the source target and introduce no
 teacher-generated claims. Candidate-subset decisions are a possible later

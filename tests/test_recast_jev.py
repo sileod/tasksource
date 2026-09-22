@@ -3,12 +3,8 @@ import unittest
 from datasets import ClassLabel, Dataset, DatasetDict, Features, Value
 
 from tasksource.recast import recast_jev, render_systemone
-from scripts.build_jev_dataset import (
-    augment_jev_internal,
-    diverse_cap,
-    pretty_order,
-    to_training_row,
-)
+from tasksource.jev_augmentations import augment_jev_internal
+from scripts.build_jev_dataset import diverse_cap, pretty_order, to_training_row
 
 
 class RecastJevTest(unittest.TestCase):
@@ -63,21 +59,22 @@ class RecastJevTest(unittest.TestCase):
 
     def test_internal_jev_augmentations_are_typed_and_idempotent(self):
         direct = Dataset.from_list([to_training_row({
-            "state": "Example",
+            "state": "text_A: Example A\ntext_B: Example B",
             "instructions": "Choose.",
             "criteria": ["negative", "positive"],
             "label": 1,
         }, index=0, task_id="demo", split="train")])
         augmented = augment_jev_internal(
             direct, noul_rate=1.0, score_rate=1.0, permutation_rate=1.0,
-            prompt_rate=1.0,
+            prompt_rate=1.0, paired_format_rate=1.0,
         )
         self.assertEqual(
-            augmented["kind"], ["choice", "noul", "score", "choice", "choice"]
+            augmented["kind"],
+            ["choice", "noul", "score", "choice", "choice", "choice"],
         )
         self.assertEqual(augmented["variant"], [
             "direct", "label_verification", "ordered_rubric",
-            "criteria_permutation", "instruction_paraphrase",
+            "criteria_permutation", "instruction_paraphrase", "paired_text_format",
         ])
         self.assertEqual(augmented[1]["options"], [])
         self.assertEqual(len(augmented[1]["target"]), 1)
@@ -85,8 +82,9 @@ class RecastJevTest(unittest.TestCase):
         self.assertEqual(augmented[3]["options"], ["positive", "negative"])
         self.assertEqual(augmented[3]["target"], [1.0, 0.0])
         self.assertNotEqual(augmented[4]["question"], augmented[0]["question"])
+        self.assertNotEqual(augmented[5]["state"], augmented[0]["state"])
         self.assertEqual(
-            len(augment_jev_internal(augmented, 1.0, 1.0, 1.0, 1.0)), 5
+            len(augment_jev_internal(augmented, 1.0, 1.0, 1.0, 1.0, 1.0)), 6
         )
 
     def test_pretty_order_only_changes_prefix(self):
