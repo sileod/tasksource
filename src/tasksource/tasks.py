@@ -1233,12 +1233,12 @@ lifeycle_entailment = Classification("premise","hypothesis","label",dataset_name
 # modern classification / relation extraction datasets
 
 toxic_chat__toxicity = Classification(
-    "user_input", labels="toxicity",
+    "user_input", labels=name("toxicity", ["not toxic", "toxic"]),
     dataset_name="lmsys/toxic-chat", config_name="toxicchat0124",
     splits=["train", None, "test"])
 
 toxic_chat__jailbreaking = Classification(
-    "user_input", labels="jailbreaking",
+    "user_input", labels=name("jailbreaking", ["not jailbreak", "jailbreak"]),
     dataset_name="lmsys/toxic-chat", config_name="toxicchat0124",
     splits=["train", None, "test"])
 

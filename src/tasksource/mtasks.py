@@ -129,20 +129,22 @@ amazon_intent = Classification("utt",labels="intent",**all('AmazonScience/massiv
 # modern multilingual classification / reward datasets
 
 masakhanews = Classification(
-    "headline_text", labels="label",
+    "headline", labels="category",
     **all("masakhane/masakhanews"))
 
 nusax_sentiment = Classification(
     "text", labels="label",
-    **all("indonlp/NusaX-senti"))
+    dataset_name="indonlp/NusaX-senti",
+    config_name=["ace", "ban", "bbc", "bjn", "bug", "eng", "ind", "jav",
+                 "mad", "min", "nij", "sun"])
 
 afrisenti = Classification(
     "tweet", labels="label",
     dataset_name="shmuhammad/AfriSenti-twitter-sentiment",
-    config_name=[
-        config for config in get_dataset_config_names("shmuhammad/AfriSenti-twitter-sentiment")
-        if config not in {"orm", "tir"}
-    ])
+    # Oromo and Tigrinya have no train split. Keep this list static so importing
+    # the task catalog does not require executing the dataset's legacy script.
+    config_name=["amh", "arq", "ary", "hau", "ibo", "kin", "pcm", "por",
+                 "swa", "tso", "twi", "yor"])
 
 def _helpsteer3_context(x):
     return "\n".join(
