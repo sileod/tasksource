@@ -161,13 +161,39 @@ def pretty_order(dataset, first_rows=1_000):
     return dataset.select(order)
 
 
-def publish_dataset(output, repo_id, pretty_rows=1_000):
+def diverse_cap(dataset, max_rows):
+    """Cap rows while covering sources evenly and preserving relative order."""
+    if max_rows is None or len(dataset) <= max_rows:
+        return dataset
+    sources = dataset["source"]
+    names = set(sources)
+    quota = max(1, max_rows // len(names))
+    counts = {name: 0 for name in names}
+    selected = []
+    deferred = []
+    for index, source in enumerate(sources):
+        if counts[source] < quota:
+            selected.append(index)
+            counts[source] += 1
+        else:
+            deferred.append(index)
+    if len(selected) < max_rows:
+        selected.extend(deferred[:max_rows - len(selected)])
+    return dataset.select(sorted(selected[:max_rows]))
+
+
+def publish_dataset(output, repo_id, pretty_rows=1_000, publish_rows=500_000):
     data_files = {}
     for split in ("train", "validation", "test"):
         files = sorted((output / "data").glob(f"{split}-*.parquet"))
         if files:
             data_files[split] = [str(path) for path in files]
     dataset = load_dataset("parquet", data_files=data_files)
+    if publish_rows:
+        weights = {"train": 0.90, "validation": 0.05, "test": 0.05}
+        for split in dataset:
+            cap = int(publish_rows * weights.get(split, 0))
+            dataset[split] = diverse_cap(dataset[split], cap)
     if "train" in dataset:
         dataset["train"] = pretty_order(dataset["train"], pretty_rows)
     api = HfApi()
@@ -338,7 +364,7 @@ def build(args):
         print(json.dumps(summary), flush=True)
 
     if args.upload:
-        publish_dataset(output, args.repo_id, args.pretty_rows)
+        publish_dataset(output, args.repo_id, args.pretty_rows, args.publish_rows)
 
 
 def parse_args():
@@ -365,6 +391,10 @@ def parse_args():
     parser.add_argument("--finalize", action="store_true")
     parser.add_argument("--upload", action="store_true")
     parser.add_argument("--repo-id", default="tasksource/tasksource-jev")
+    parser.add_argument(
+        "--publish-rows", type=int, default=500_000,
+        help="Maximum published rows across a 90/5/5 train/dev/test allocation; 0 disables.",
+    )
     parser.add_argument(
         "--pretty-rows", type=int, default=1_000,
         help="Deterministically interleave sources in this many leading train rows.",

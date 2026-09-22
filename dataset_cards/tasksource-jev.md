@@ -81,9 +81,11 @@ multiple-choice templates. This release applies `recast_jev` to compatible
 English and multilingual tasks, retains the standard train/validation/test splits, and records the
 Tasksource identifier in every row. Tasks that fail to download or preprocess
 are recorded by the build report rather than silently represented as complete.
-To keep very large sources balanced, the release caps each task at 30,000
+To keep very large sources balanced, the build caps each task at 30,000
 training rows and 3,000 validation or test rows using Tasksource's deterministic
-sampling (seed 0); smaller tasks are retained in full.
+sampling (seed 0). The published release is capped at 500,000 rows using a
+source-balanced 90/5/5 train/dev/test allocation; selection preserves relative
+row order.
 
 For a useful Dataset Viewer preview, only the first 1,000 training rows are
 ordered round-robin by `source`. This is a deterministic permutation, not a

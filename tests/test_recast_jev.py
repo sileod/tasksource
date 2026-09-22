@@ -3,7 +3,12 @@ import unittest
 from datasets import ClassLabel, Dataset, DatasetDict, Features, Value
 
 from tasksource.recast import recast_jev, render_systemone
-from scripts.build_jev_dataset import augment_jev_internal, pretty_order, to_training_row
+from scripts.build_jev_dataset import (
+    augment_jev_internal,
+    diverse_cap,
+    pretty_order,
+    to_training_row,
+)
 
 
 class RecastJevTest(unittest.TestCase):
@@ -81,6 +86,16 @@ class RecastJevTest(unittest.TestCase):
         ordered = pretty_order(dataset, first_rows=4)
         self.assertEqual(ordered["source"][:4], ["a", "b", "c", "a"])
         self.assertEqual(ordered["value"], [3, 0, 5, 4, 1, 2])
+
+    def test_diverse_cap_covers_sources_and_preserves_order(self):
+        dataset = Dataset.from_dict({
+            "source": ["a"] * 8 + ["b"] * 2 + ["c"] * 2,
+            "value": list(range(12)),
+        })
+        capped = diverse_cap(dataset, 6)
+        self.assertEqual(set(capped["source"]), {"a", "b", "c"})
+        self.assertEqual(capped["value"], sorted(capped["value"]))
+        self.assertEqual(len(capped), 6)
 
 
 if __name__ == "__main__":
