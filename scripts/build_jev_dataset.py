@@ -84,7 +84,11 @@ def pretty_order(dataset, first_rows=1_000):
     first_rows = min(first_rows, len(dataset))
     if first_rows < 2 or "source" not in dataset.column_names:
         return dataset
-    sources = dataset["source"]
+    # ``dataset["source"]`` is a lazy Column in recent datasets releases.
+    # Repeated scalar indexing inside the loops below repeatedly rebuilds an
+    # Arrow column and makes publication effectively quadratic.  Format the
+    # metadata columns once instead.
+    sources = dataset.select_columns(["source"])[:]["source"]
     names = sorted(set(sources))
     if len(names) < 2:
         return dataset
@@ -113,7 +117,11 @@ def diverse_cap(dataset, max_rows):
     """Cap rows while covering sources evenly and preserving relative order."""
     if max_rows is None or len(dataset) <= max_rows:
         return dataset
-    sources = dataset["source"]
+    metadata_columns = ["source"]
+    if "id" in dataset.column_names:
+        metadata_columns.append("id")
+    metadata = dataset.select_columns(metadata_columns)[:]
+    sources = metadata["source"]
     names = set(sources)
     quota = max(1, max_rows // len(names))
     selected = []
@@ -121,7 +129,11 @@ def diverse_cap(dataset, max_rows):
     buckets = {name: [] for name in names}
     for index, source in enumerate(sources):
         buckets[source].append(index)
-    ids = dataset["id"] if "id" in dataset.column_names else list(map(str, range(len(dataset))))
+    ids = (
+        metadata["id"]
+        if "id" in metadata
+        else list(map(str, range(len(dataset))))
+    )
     for name in sorted(names):
         ranked = sorted(
             buckets[name],
