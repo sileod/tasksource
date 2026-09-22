@@ -11,9 +11,10 @@ tags:
 - jev
 - system-one
 - runtime-defined-decisions
+- decision-models
 - multiple-choice
 size_categories:
-- 1M<n<10M
+- 100K<n<1M
 ---
 
 # tasksource-jev
@@ -26,10 +27,10 @@ bounded decision models; it is not tied to one Jev implementation.
 This is an independent data transformation. It is not an official TypeSafe Jev
 dataset and is not produced by or affiliated with TypeSafe or OpenJev.
 
-> **Preview release:** the first 105,000 examples are published now so the schema
-> and loading path can be tested while the full 575-task build runs. The preview
-> is versioned from completed tasks and will be replaced by the complete build,
-> which also includes compatible tasks from Tasksource's multilingual catalog.
+> **Build status:** a 105,000-example preview is currently available while the
+> source-balanced 500,000-row release is built from 730 selected English and
+> multilingual tasks. Checkpointed successes are retained and incompatible
+> upstream sources are reported explicitly.
 
 ## Schema
 
@@ -70,9 +71,9 @@ addition. Synthetic uncertainty, abstention, and nominal-to-ordinal conversions
 are intentionally excluded because one-hot classification labels do not justify
 them.
 For `noul`, `target` contains the scalar truth probability and `options` is empty;
-for `choice` and `score`, `target` is aligned with `options`. These lower-frequency
-variants exercise all three Jev primitives without paraphrasing or shuffling the
-canonical decision.
+for `choice` and `score`, `target` is aligned with `options`. The direct canonical
+decision is unchanged; lower-frequency variants are identified explicitly by
+the `variant` field.
 
 ```python
 from datasets import load_dataset

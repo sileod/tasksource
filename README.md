@@ -45,6 +45,8 @@ Tasksource classification and multiple-choice tasks can be recast as
 runtime-defined decisions. The canonical representation keeps the state,
 instructions, criteria, integer label, and textual answer separate:
 
+[🤗 tasksource/tasksource-jev](https://huggingface.co/datasets/tasksource/tasksource-jev)
+
 ```python
 from tasksource import load_task, render_systemone
 
@@ -52,9 +54,12 @@ dataset = load_task("glue/rte", recast="jev")
 request = render_systemone(dataset["train"][0], model="openjev")
 ```
 
-The conversion is deterministic: it does not shuffle or paraphrase criteria.
-This makes it a stable base for downstream augmentation and Jev/System One
-request rendering.
+The canonical conversion is deterministic: it does not shuffle or paraphrase
+criteria. The published 500k corpus adds explicit, deterministic, low-frequency
+subrecasts for label verification (`noul`), criterion-order invariance, and
+manually vetted instruction variation. Every row records its source, normalized
+`train`/`dev`/`test` split, and variant. MMLU, BIG-bench, and multilingual tasks
+are included; source and split metadata make evaluation exclusions direct.
 
 ### Write and use custom preprocessings
 
