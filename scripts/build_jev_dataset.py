@@ -18,6 +18,7 @@ from huggingface_hub import HfApi
 import numpy as np
 import pandas as pd
 from tasksource import list_tasks, load_task
+from tasksource.jev_prompt_augmentations import instruction_variants
 
 
 SUPPORTED_TYPES = {"Classification", "MultipleChoice"}
@@ -83,7 +84,10 @@ def _fraction(identifier, salt):
     return int.from_bytes(digest[:8], "big") / 2**64
 
 
-def augment_jev_internal(dataset, noul_rate=0.05, score_rate=0.01):
+def augment_jev_internal(
+    dataset, noul_rate=0.05, score_rate=0.0, permutation_rate=0.05,
+    prompt_rate=0.05,
+):
     """Add deterministic, low-frequency examples of Jev's other primitives.
 
     Noul examples ask whether a proposed label is correct. Score examples treat
@@ -92,14 +96,16 @@ def augment_jev_internal(dataset, noul_rate=0.05, score_rate=0.01):
     """
     if not len(dataset) or "variant" not in dataset.column_names:
         return dataset
-    if any(variant != "direct" for variant in dataset["variant"]):
-        return dataset
 
     augmented = []
+    existing_ids = set(dataset["id"])
     for row in dataset:
+        if row["variant"] != "direct":
+            continue
         options = row["options"]
         correct = max(range(len(row["target"])), key=row["target"].__getitem__)
-        if _fraction(row["id"], "noul") < noul_rate:
+        noul_id = row["id"] + ":noul-label-verification"
+        if noul_id not in existing_ids and _fraction(row["id"], "noul") < noul_rate:
             propose_correct = _fraction(row["id"], "noul-answer") < 0.5
             if propose_correct or len(options) == 1:
                 proposed = correct
@@ -108,23 +114,54 @@ def augment_jev_internal(dataset, noul_rate=0.05, score_rate=0.01):
                 proposed = (correct + offset) % len(options)
             augmented.append({
                 **row,
-                "id": row["id"] + ":noul-label-verification",
+                "id": noul_id,
                 "kind": "noul",
                 "options": [],
                 "target": [float(proposed == correct)],
                 "question": f'Is "{options[proposed]}" the correct label for this example?',
                 "variant": "label_verification",
             })
-        if len(options) >= 2 and _fraction(row["id"], "score") < score_rate:
+        score_id = row["id"] + ":score-ordered-rubric"
+        if (score_id not in existing_ids and len(options) >= 2
+                and _fraction(row["id"], "score") < score_rate):
             augmented.append({
                 **row,
-                "id": row["id"] + ":score-ordered-rubric",
+                "id": score_id,
                 "kind": "score",
                 "question": (
                     "Score the example using the ordered rubric in options; "
                     "the target distribution identifies the correct rubric level."
                 ),
                 "variant": "ordered_rubric",
+            })
+        permutation_id = row["id"] + ":choice-criteria-permutation"
+        if (permutation_id not in existing_ids and len(options) >= 2
+                and _fraction(row["id"], "permutation") < permutation_rate):
+            order = sorted(
+                range(len(options)),
+                key=lambda index: _fraction(row["id"], f"permutation-{index}"),
+            )
+            if order == list(range(len(options))):
+                order = order[1:] + order[:1]
+            augmented.append({
+                **row,
+                "id": permutation_id,
+                "options": [options[index] for index in order],
+                "target": [row["target"][index] for index in order],
+                "variant": "criteria_permutation",
+            })
+        prompt_id = row["id"] + ":choice-instruction-paraphrase"
+        if (prompt_id not in existing_ids
+                and _fraction(row["id"], "prompt") < prompt_rate):
+            variants = instruction_variants(row["question"], options)
+            variant_index = int(
+                _fraction(row["id"], "prompt-variant") * len(variants)
+            )
+            augmented.append({
+                **row,
+                "id": prompt_id,
+                "question": variants[min(variant_index, len(variants) - 1)],
+                "variant": "instruction_paraphrase",
             })
     if not augmented:
         return dataset
@@ -168,16 +205,18 @@ def diverse_cap(dataset, max_rows):
     sources = dataset["source"]
     names = set(sources)
     quota = max(1, max_rows // len(names))
-    counts = {name: 0 for name in names}
     selected = []
     deferred = []
+    buckets = {name: [] for name in names}
     for index, source in enumerate(sources):
-        if counts[source] < quota:
-            selected.append(index)
-            counts[source] += 1
-        else:
-            deferred.append(index)
+        buckets[source].append(index)
+    ids = dataset["id"] if "id" in dataset.column_names else list(map(str, range(len(dataset))))
+    for name in sorted(names):
+        ranked = sorted(buckets[name], key=lambda index: _fraction(ids[index], "publish-cap"))
+        selected.extend(ranked[:quota])
+        deferred.extend(ranked[quota:])
     if len(selected) < max_rows:
+        deferred.sort(key=lambda index: _fraction(ids[index], "publish-overflow"))
         selected.extend(deferred[:max_rows - len(selected)])
     return dataset.select(sorted(selected[:max_rows]))
 
@@ -221,7 +260,10 @@ def publish_dataset(output, repo_id, pretty_rows=1_000, publish_rows=500_000):
             )
 
 
-def migrate_legacy_shards(data_dir, noul_rate=0.05, score_rate=0.01):
+def migrate_legacy_shards(
+    data_dir, noul_rate=0.05, score_rate=0.0, permutation_rate=0.05,
+    prompt_rate=0.05,
+):
     """Upgrade resumable shards created before the public schema was finalized."""
     for path in sorted(data_dir.glob("*.parquet")):
         shard = load_dataset("parquet", data_files=str(path), split="train")
@@ -245,7 +287,9 @@ def migrate_legacy_shards(data_dir, noul_rate=0.05, score_rate=0.01):
                 upgraded = upgraded.add_column(
                     "split", [normalized_split(physical_split)] * len(upgraded)
                 )
-        upgraded = augment_jev_internal(upgraded, noul_rate, score_rate)
+        upgraded = augment_jev_internal(
+            upgraded, noul_rate, score_rate, permutation_rate, prompt_rate
+        )
         if upgraded.column_names == shard.column_names and len(upgraded) == len(shard):
             continue
         temporary = path.with_suffix(".parquet.tmp")
@@ -278,7 +322,10 @@ def build(args):
     output = args.output.resolve()
     data_dir = output / "data"
     data_dir.mkdir(parents=True, exist_ok=True)
-    migrate_legacy_shards(data_dir, args.noul_rate, args.score_rate)
+    migrate_legacy_shards(
+        data_dir, args.noul_rate, args.score_rate, args.permutation_rate,
+        args.prompt_rate,
+    )
     report_path = output / "build-report.jsonl"
     completed = read_completed(report_path)
     tasks = select_tasks(args)
@@ -308,7 +355,8 @@ def build(args):
                     remove_columns=split_dataset.column_names,
                 )
                 split_dataset = augment_jev_internal(
-                    split_dataset, args.noul_rate, args.score_rate
+                    split_dataset, args.noul_rate, args.score_rate,
+                    args.permutation_rate, args.prompt_rate,
                 )
                 path = data_dir / f"{split}-{slug(task_id)}.parquet"
                 split_dataset.to_parquet(path)
@@ -387,6 +435,14 @@ def parse_args():
     parser.add_argument(
         "--score-rate", type=float, default=0.0,
         help="Fraction receiving an ordered-rubric Score variant (off by default; use genuine ordinal sources).",
+    )
+    parser.add_argument(
+        "--permutation-rate", type=float, default=0.05,
+        help="Fraction receiving a deterministic criterion-order permutation.",
+    )
+    parser.add_argument(
+        "--prompt-rate", type=float, default=0.05,
+        help="Fraction receiving a vetted, meaning-preserving instruction variant.",
     )
     parser.add_argument("--finalize", action="store_true")
     parser.add_argument("--upload", action="store_true")

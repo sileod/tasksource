@@ -42,7 +42,7 @@ dataset and is not produced by or affiliated with TypeSafe or OpenJev.
 | `state` | string | Text or question on which the decision is based. Paired classification inputs are marked `text_A` and `text_B`. |
 | `question` | string | The decision requested from the model. |
 | `source` | string | Tasksource task identifier used to load the source data. |
-| `variant` | string | `direct`, `label_verification`, or `ordered_rubric`. |
+| `variant` | string | Direct decision or a named deterministic subrecast. |
 | `split` | string | Source split normalized to `train`, `dev`, or `test`. |
 
 Classification criteria are the source task's label names. Multiple-choice
@@ -52,6 +52,23 @@ questions to about 5% of rows. Ordered-rubric `score` augmentation is available
 for genuinely ordinal sources but is disabled by default. Native regression and
 ordinal recasting will be used for score examples rather than imposing an order
 on nominal classification labels.
+
+### Deterministic subrecasts
+
+The release adds two conservative, low-frequency variants while retaining every
+direct row:
+
+| variant | default rate | purpose |
+|---|---:|---|
+| `label_verification` | 5% | A `noul` judgement asking whether a deterministically proposed label is correct. Correct and incorrect proposals are balanced. |
+| `criteria_permutation` | 5% | The same `choice` decision with options and targets permuted together, reducing option-position shortcuts. |
+| `instruction_paraphrase` | 5% | The same decision with a manually vetted equivalent instruction. Common NLI and sentiment label groups receive specific wording; other tasks use conservative generic alternatives. |
+
+All transformations are derived exactly from the source target and introduce no
+teacher-generated claims. Candidate-subset decisions are a possible later
+addition. Synthetic uncertainty, abstention, and nominal-to-ordinal conversions
+are intentionally excluded because one-hot classification labels do not justify
+them.
 For `noul`, `target` contains the scalar truth probability and `options` is empty;
 for `choice` and `score`, `target` is aligned with `options`. These lower-frequency
 variants exercise all three Jev primitives without paraphrasing or shuffling the

@@ -68,15 +68,26 @@ class RecastJevTest(unittest.TestCase):
             "criteria": ["negative", "positive"],
             "label": 1,
         }, index=0, task_id="demo", split="train")])
-        augmented = augment_jev_internal(direct, noul_rate=1.0, score_rate=1.0)
-        self.assertEqual(augmented["kind"], ["choice", "noul", "score"])
+        augmented = augment_jev_internal(
+            direct, noul_rate=1.0, score_rate=1.0, permutation_rate=1.0,
+            prompt_rate=1.0,
+        )
+        self.assertEqual(
+            augmented["kind"], ["choice", "noul", "score", "choice", "choice"]
+        )
         self.assertEqual(augmented["variant"], [
-            "direct", "label_verification", "ordered_rubric"
+            "direct", "label_verification", "ordered_rubric",
+            "criteria_permutation", "instruction_paraphrase",
         ])
         self.assertEqual(augmented[1]["options"], [])
         self.assertEqual(len(augmented[1]["target"]), 1)
         self.assertEqual(augmented[2]["options"], ["negative", "positive"])
-        self.assertEqual(len(augment_jev_internal(augmented, 1.0, 1.0)), 3)
+        self.assertEqual(augmented[3]["options"], ["positive", "negative"])
+        self.assertEqual(augmented[3]["target"], [1.0, 0.0])
+        self.assertNotEqual(augmented[4]["question"], augmented[0]["question"])
+        self.assertEqual(
+            len(augment_jev_internal(augmented, 1.0, 1.0, 1.0, 1.0)), 5
+        )
 
     def test_pretty_order_only_changes_prefix(self):
         dataset = Dataset.from_dict({
