@@ -13,7 +13,7 @@ import subprocess
 import time
 from pathlib import Path
 
-from datasets import DatasetDict, load_dataset
+from datasets import Dataset, DatasetDict, concatenate_datasets, load_dataset
 from huggingface_hub import HfApi
 import numpy as np
 import pandas as pd
@@ -21,6 +21,10 @@ from tasksource import list_tasks, load_task
 
 
 SUPPORTED_TYPES = {"Classification", "MultipleChoice"}
+
+
+def normalized_split(split):
+    return "dev" if split == "validation" else split
 
 
 def slug(task_id):
@@ -69,7 +73,62 @@ def to_training_row(example, index, task_id, split):
         "state": example["state"],
         "question": example["instructions"],
         "source": task_id,
+        "variant": "direct",
+        "split": normalized_split(split),
     }
+
+
+def _fraction(identifier, salt):
+    digest = hashlib.sha256(f"{salt}:{identifier}".encode("utf-8")).digest()
+    return int.from_bytes(digest[:8], "big") / 2**64
+
+
+def augment_jev_internal(dataset, noul_rate=0.05, score_rate=0.01):
+    """Add deterministic, low-frequency examples of Jev's other primitives.
+
+    Noul examples ask whether a proposed label is correct. Score examples treat
+    the source criteria as an explicitly ordered rubric. Direct choice rows are
+    always retained, and calling this function twice is idempotent.
+    """
+    if not len(dataset) or "variant" not in dataset.column_names:
+        return dataset
+    if any(variant != "direct" for variant in dataset["variant"]):
+        return dataset
+
+    augmented = []
+    for row in dataset:
+        options = row["options"]
+        correct = max(range(len(row["target"])), key=row["target"].__getitem__)
+        if _fraction(row["id"], "noul") < noul_rate:
+            propose_correct = _fraction(row["id"], "noul-answer") < 0.5
+            if propose_correct or len(options) == 1:
+                proposed = correct
+            else:
+                offset = 1 + int(_fraction(row["id"], "noul-option") * (len(options) - 1))
+                proposed = (correct + offset) % len(options)
+            augmented.append({
+                **row,
+                "id": row["id"] + ":noul-label-verification",
+                "kind": "noul",
+                "options": [],
+                "target": [float(proposed == correct)],
+                "question": f'Is "{options[proposed]}" the correct label for this example?',
+                "variant": "label_verification",
+            })
+        if len(options) >= 2 and _fraction(row["id"], "score") < score_rate:
+            augmented.append({
+                **row,
+                "id": row["id"] + ":score-ordered-rubric",
+                "kind": "score",
+                "question": (
+                    "Score the example using the ordered rubric in options; "
+                    "the target distribution identifies the correct rubric level."
+                ),
+                "variant": "ordered_rubric",
+            })
+    if not augmented:
+        return dataset
+    return concatenate_datasets([dataset, Dataset.from_list(augmented, features=dataset.features)])
 
 
 def pretty_order(dataset, first_rows=1_000):
@@ -136,20 +195,33 @@ def publish_dataset(output, repo_id, pretty_rows=1_000):
             )
 
 
-def migrate_legacy_shards(data_dir):
+def migrate_legacy_shards(data_dir, noul_rate=0.05, score_rate=0.01):
     """Upgrade resumable shards created before the public schema was finalized."""
     for path in sorted(data_dir.glob("*.parquet")):
         shard = load_dataset("parquet", data_files=str(path), split="train")
-        if "id" in shard.column_names:
+        if "id" not in shard.column_names:
+            split = path.name.split("-", 1)[0]
+            task_id = shard[0]["task"]
+            upgraded = shard.map(
+                to_training_row,
+                with_indices=True,
+                fn_kwargs={"task_id": task_id, "split": split},
+                remove_columns=shard.column_names,
+            )
+        else:
+            upgraded = shard
+            if "variant" not in upgraded.column_names:
+                upgraded = upgraded.add_column("variant", ["direct"] * len(upgraded))
+            if "usage" in upgraded.column_names:
+                upgraded = upgraded.remove_columns("usage")
+            if "split" not in upgraded.column_names:
+                physical_split = path.name.split("-", 1)[0]
+                upgraded = upgraded.add_column(
+                    "split", [normalized_split(physical_split)] * len(upgraded)
+                )
+        upgraded = augment_jev_internal(upgraded, noul_rate, score_rate)
+        if upgraded.column_names == shard.column_names and len(upgraded) == len(shard):
             continue
-        split = path.name.split("-", 1)[0]
-        task_id = shard[0]["task"]
-        upgraded = shard.map(
-            to_training_row,
-            with_indices=True,
-            fn_kwargs={"task_id": task_id, "split": split},
-            remove_columns=shard.column_names,
-        )
         temporary = path.with_suffix(".parquet.tmp")
         upgraded.to_parquet(temporary)
         temporary.replace(path)
@@ -180,7 +252,7 @@ def build(args):
     output = args.output.resolve()
     data_dir = output / "data"
     data_dir.mkdir(parents=True, exist_ok=True)
-    migrate_legacy_shards(data_dir)
+    migrate_legacy_shards(data_dir, args.noul_rate, args.score_rate)
     report_path = output / "build-report.jsonl"
     completed = read_completed(report_path)
     tasks = select_tasks(args)
@@ -208,6 +280,9 @@ def build(args):
                     with_indices=True,
                     fn_kwargs={"task_id": task_id, "split": split},
                     remove_columns=split_dataset.column_names,
+                )
+                split_dataset = augment_jev_internal(
+                    split_dataset, args.noul_rate, args.score_rate
                 )
                 path = data_dir / f"{split}-{slug(task_id)}.parquet"
                 split_dataset.to_parquet(path)
@@ -279,6 +354,14 @@ def parse_args():
     )
     parser.add_argument("--max-rows", type=int, default=30_000)
     parser.add_argument("--max-rows-eval", type=int, default=3_000)
+    parser.add_argument(
+        "--noul-rate", type=float, default=0.05,
+        help="Fraction of direct rows receiving a label-verification Noul variant.",
+    )
+    parser.add_argument(
+        "--score-rate", type=float, default=0.0,
+        help="Fraction receiving an ordered-rubric Score variant (off by default; use genuine ordinal sources).",
+    )
     parser.add_argument("--finalize", action="store_true")
     parser.add_argument("--upload", action="store_true")
     parser.add_argument("--repo-id", default="tasksource/tasksource-jev")

@@ -36,17 +36,26 @@ dataset and is not produced by or affiliated with TypeSafe or OpenJev.
 | field | type | meaning |
 |---|---|---|
 | `id` | string | Stable identifier derived from task, split, and row index. |
-| `kind` | string | System One primitive. This release contains `choice` decisions. |
+| `kind` | string | System One primitive: `choice`, `noul`, or `score`. |
 | `options` | list of strings | Candidate labels or answers supplied at runtime. Order is significant. |
 | `target` | list of floats | One-hot target distribution aligned with `options`. |
 | `state` | string | Text or question on which the decision is based. Paired classification inputs are marked `text_A` and `text_B`. |
 | `question` | string | The decision requested from the model. |
 | `source` | string | Tasksource task identifier used to load the source data. |
+| `variant` | string | `direct`, `label_verification`, or `ordered_rubric`. |
+| `split` | string | Source split normalized to `train`, `dev`, or `test`. |
 
 Classification criteria are the source task's label names. Multiple-choice
-criteria are the answer choices. The canonical conversion is deterministic: it
-does not shuffle, paraphrase, rename, or subsample criteria. Those operations can
-be applied later without changing the base dataset.
+criteria are the answer choices. Every source row is retained as a direct
+`choice`. A deterministic augmentation pass adds label-verification `noul`
+questions to about 5% of rows. Ordered-rubric `score` augmentation is available
+for genuinely ordinal sources but is disabled by default. Native regression and
+ordinal recasting will be used for score examples rather than imposing an order
+on nominal classification labels.
+For `noul`, `target` contains the scalar truth probability and `options` is empty;
+for `choice` and `score`, `target` is aligned with `options`. These lower-frequency
+variants exercise all three Jev primitives without paraphrasing or shuffling the
+canonical decision.
 
 ```python
 from datasets import load_dataset
@@ -83,8 +92,8 @@ original relative order.
 
 The selected catalog includes 100 BIG-bench task configurations and all 57 MMLU
 subjects currently registered in Tasksource. Their original split identity is
-preserved. Because these are established benchmarks, users training on the
-aggregate should filter by `source` and split to avoid evaluation contamination.
+preserved in the row-level `split` field, with `validation` normalized to `dev`.
+This makes source/split exclusion explicit when constructing a training mixture.
 
 The repository includes `failed-tasks.json` and `outdated-datasets.json`.
 The latter specifically tracks upstream datasets that still depend on loading

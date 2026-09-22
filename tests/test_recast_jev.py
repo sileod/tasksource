@@ -3,7 +3,7 @@ import unittest
 from datasets import ClassLabel, Dataset, DatasetDict, Features, Value
 
 from tasksource.recast import recast_jev, render_systemone
-from scripts.build_jev_dataset import pretty_order, to_training_row
+from scripts.build_jev_dataset import augment_jev_internal, pretty_order, to_training_row
 
 
 class RecastJevTest(unittest.TestCase):
@@ -46,6 +46,32 @@ class RecastJevTest(unittest.TestCase):
         self.assertEqual(row["options"], ["zero", "one"])
         self.assertEqual(row["target"], [0.0, 1.0])
         self.assertEqual(row["source"], "demo/task")
+        self.assertEqual(row["variant"], "direct")
+        self.assertEqual(row["split"], "train")
+
+    def test_normalized_split_annotation(self):
+        row = to_training_row({
+            "state": "Question", "instructions": "Choose.",
+            "criteria": ["a", "b"], "label": 0,
+        }, index=0, task_id="mmlu/abstract_algebra", split="validation")
+        self.assertEqual(row["split"], "dev")
+
+    def test_internal_jev_augmentations_are_typed_and_idempotent(self):
+        direct = Dataset.from_list([to_training_row({
+            "state": "Example",
+            "instructions": "Choose.",
+            "criteria": ["negative", "positive"],
+            "label": 1,
+        }, index=0, task_id="demo", split="train")])
+        augmented = augment_jev_internal(direct, noul_rate=1.0, score_rate=1.0)
+        self.assertEqual(augmented["kind"], ["choice", "noul", "score"])
+        self.assertEqual(augmented["variant"], [
+            "direct", "label_verification", "ordered_rubric"
+        ])
+        self.assertEqual(augmented[1]["options"], [])
+        self.assertEqual(len(augmented[1]["target"]), 1)
+        self.assertEqual(augmented[2]["options"], ["negative", "positive"])
+        self.assertEqual(len(augment_jev_internal(augmented, 1.0, 1.0)), 3)
 
     def test_pretty_order_only_changes_prefix(self):
         dataset = Dataset.from_dict({
