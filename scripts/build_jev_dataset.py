@@ -15,6 +15,7 @@ from pathlib import Path
 
 from datasets import DatasetDict, load_dataset
 from huggingface_hub import HfApi
+import numpy as np
 import pandas as pd
 from tasksource import list_tasks, load_task
 
@@ -71,13 +72,45 @@ def to_training_row(example, index, task_id, split):
     }
 
 
-def publish_dataset(output, repo_id):
+def pretty_order(dataset, first_rows=1_000):
+    """Round-robin sources in a display prefix without shuffling the remainder."""
+    first_rows = min(first_rows, len(dataset))
+    if first_rows < 2 or "source" not in dataset.column_names:
+        return dataset
+    sources = dataset["source"]
+    names = sorted(set(sources))
+    if len(names) < 2:
+        return dataset
+    per_source = (first_rows + len(names) - 1) // len(names)
+    buckets = {name: [] for name in names}
+    for index, source in enumerate(sources):
+        bucket = buckets[source]
+        if len(bucket) < per_source:
+            bucket.append(index)
+    prefix = []
+    for offset in range(per_source):
+        for name in names:
+            if offset < len(buckets[name]):
+                prefix.append(buckets[name][offset])
+                if len(prefix) == first_rows:
+                    break
+        if len(prefix) == first_rows:
+            break
+    selected = np.zeros(len(dataset), dtype=bool)
+    selected[prefix] = True
+    order = np.concatenate((np.asarray(prefix), np.flatnonzero(~selected)))
+    return dataset.select(order)
+
+
+def publish_dataset(output, repo_id, pretty_rows=1_000):
     data_files = {}
     for split in ("train", "validation", "test"):
         files = sorted((output / "data").glob(f"{split}-*.parquet"))
         if files:
             data_files[split] = [str(path) for path in files]
     dataset = load_dataset("parquet", data_files=data_files)
+    if "train" in dataset:
+        dataset["train"] = pretty_order(dataset["train"], pretty_rows)
     api = HfApi()
     api.upload_file(
         path_or_fileobj=str(output / "README.md"),
@@ -230,7 +263,7 @@ def build(args):
         print(json.dumps(summary), flush=True)
 
     if args.upload:
-        publish_dataset(output, args.repo_id)
+        publish_dataset(output, args.repo_id, args.pretty_rows)
 
 
 def parse_args():
@@ -249,6 +282,10 @@ def parse_args():
     parser.add_argument("--finalize", action="store_true")
     parser.add_argument("--upload", action="store_true")
     parser.add_argument("--repo-id", default="tasksource/tasksource-jev")
+    parser.add_argument(
+        "--pretty-rows", type=int, default=1_000,
+        help="Deterministically interleave sources in this many leading train rows.",
+    )
     return parser.parse_args()
 
 

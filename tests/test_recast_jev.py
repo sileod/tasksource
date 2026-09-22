@@ -3,7 +3,7 @@ import unittest
 from datasets import ClassLabel, Dataset, DatasetDict, Features, Value
 
 from tasksource.recast import recast_jev, render_systemone
-from scripts.build_jev_dataset import to_training_row
+from scripts.build_jev_dataset import pretty_order, to_training_row
 
 
 class RecastJevTest(unittest.TestCase):
@@ -46,6 +46,15 @@ class RecastJevTest(unittest.TestCase):
         self.assertEqual(row["options"], ["zero", "one"])
         self.assertEqual(row["target"], [0.0, 1.0])
         self.assertEqual(row["source"], "demo/task")
+
+    def test_pretty_order_only_changes_prefix(self):
+        dataset = Dataset.from_dict({
+            "source": ["b", "b", "b", "a", "a", "c"],
+            "value": list(range(6)),
+        })
+        ordered = pretty_order(dataset, first_rows=4)
+        self.assertEqual(ordered["source"][:4], ["a", "b", "c", "a"])
+        self.assertEqual(ordered["value"], [3, 0, 5, 4, 1, 2])
 
 
 if __name__ == "__main__":

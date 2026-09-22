@@ -76,6 +76,11 @@ To keep very large sources balanced, the release caps each task at 30,000
 training rows and 3,000 validation or test rows using Tasksource's deterministic
 sampling (seed 0); smaller tasks are retained in full.
 
+For a useful Dataset Viewer preview, only the first 1,000 training rows are
+ordered round-robin by `source`. This is a deterministic permutation, not a
+random shuffle. After that display prefix, all remaining examples retain their
+original relative order.
+
 The selected catalog includes 100 BIG-bench task configurations and all 57 MMLU
 subjects currently registered in Tasksource. Their original split identity is
 preserved. Because these are established benchmarks, users training on the
