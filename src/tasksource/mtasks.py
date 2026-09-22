@@ -124,6 +124,40 @@ aces_ranking = MultipleChoice("source",choices=['good-translation','incorrect-tr
 aces_phenomena = Classification('source','incorrect-translation','phenomena', dataset_name='nikitam/ACES')
 
 amazon_intent = Classification("utt",labels="intent",**all('AmazonScience/massive'))
+
+
+# modern multilingual classification / reward datasets
+
+masakhanews = Classification(
+    "headline_text", labels="label",
+    **all("masakhane/masakhanews"))
+
+nusax_sentiment = Classification(
+    "text", labels="label",
+    **all("indonlp/NusaX-senti"))
+
+afrisenti = Classification(
+    "tweet", labels="label",
+    dataset_name="shmuhammad/AfriSenti-twitter-sentiment",
+    config_name=[
+        config for config in get_dataset_config_names("shmuhammad/AfriSenti-twitter-sentiment")
+        if config not in {"orm", "tir"}
+    ])
+
+def _helpsteer3_context(x):
+    return "\n".join(
+        f'{message["role"]}: {message["content"]}'
+        for message in x["context"]
+    )
+
+helpsteer3 = MultipleChoice(
+    _helpsteer3_context,
+    choices=["response1", "response2"],
+    labels=lambda x: int(x["overall_preference"] > 0),
+    dataset_name="nvidia/HelpSteer3", config_name="preference",
+    pre_process=lambda ds: ds.filter(lambda x: x["overall_preference"] != 0))
+
+
 #    dataset_name='glue',config_name=['ocnli','afqmc'])
 
 tidy_as2=Classification("Question","Sentence","Label",dataset_name='tasksource/tydi-as2-balanced') 
