@@ -1,7 +1,7 @@
 ---
 pretty_name: tasksource-jev
 language:
-- en
+- multilingual
 license: other
 task_categories:
 - text-classification
@@ -26,16 +26,22 @@ bounded decision models; it is not tied to one Jev implementation.
 This is an independent data transformation. It is not an official TypeSafe Jev
 dataset and is not produced by or affiliated with TypeSafe or OpenJev.
 
+> **Preview release:** the first 105,000 examples are published now so the schema
+> and loading path can be tested while the full 575-task build runs. The preview
+> is versioned from completed tasks and will be replaced by the complete build,
+> which also includes compatible tasks from Tasksource's multilingual catalog.
+
 ## Schema
 
 | field | type | meaning |
 |---|---|---|
+| `id` | string | Stable identifier derived from task, split, and row index. |
+| `kind` | string | System One primitive. This release contains `choice` decisions. |
+| `options` | list of strings | Candidate labels or answers supplied at runtime. Order is significant. |
+| `target` | list of floats | One-hot target distribution aligned with `options`. |
 | `state` | string | Text or question on which the decision is based. Paired classification inputs are marked `text_A` and `text_B`. |
-| `instructions` | string | The decision requested from the model. |
-| `criteria` | list of strings | Candidate labels or answers supplied at runtime. Order is significant. |
-| `label` | integer | Zero-based index of the correct criterion. |
-| `answer` | string | Criterion text at `criteria[label]`, included for convenience and validation. |
-| `task` | string | Tasksource task identifier used to load the source data. |
+| `question` | string | The decision requested from the model. |
+| `source` | string | Tasksource task identifier used to load the source data. |
 
 Classification criteria are the source task's label names. Multiple-choice
 criteria are the answer choices. The canonical conversion is deterministic: it
@@ -47,7 +53,7 @@ from datasets import load_dataset
 
 dataset = load_dataset("tasksource/tasksource-jev")
 row = dataset["train"][0]
-assert row["answer"] == row["criteria"][row["label"]]
+answer = row["options"][max(range(len(row["target"])), key=row["target"].__getitem__)]
 ```
 
 With Tasksource installed, the same representation can be produced directly:
@@ -63,7 +69,7 @@ request = render_systemone(dataset["train"][0], model="openjev")
 
 Tasksource standardizes heterogeneous datasets into common classification and
 multiple-choice templates. This release applies `recast_jev` to compatible
-English tasks, retains the standard train/validation/test splits, and records the
+English and multilingual tasks, retains the standard train/validation/test splits, and records the
 Tasksource identifier in every row. Tasks that fail to download or preprocess
 are recorded by the build report rather than silently represented as complete.
 To keep very large sources balanced, the release caps each task at 30,000
@@ -73,7 +79,7 @@ sampling (seed 0); smaller tasks are retained in full.
 The selected catalog includes 100 BIG-bench task configurations and all 57 MMLU
 subjects currently registered in Tasksource. Their original split identity is
 preserved. Because these are established benchmarks, users training on the
-aggregate should filter by `task` and split to avoid evaluation contamination.
+aggregate should filter by `source` and split to avoid evaluation contamination.
 
 The repository includes `failed-tasks.json` and `outdated-datasets.json`.
 The latter specifically tracks upstream datasets that still depend on loading
@@ -91,7 +97,7 @@ python scripts/build_jev_dataset.py --output build/tasksource-jev --finalize
 Tasksource is a preprocessing framework and catalog, not the original publisher
 of the constituent datasets. Copyright, license, and usage restrictions remain
 those of each upstream dataset. Users should consult the upstream dataset card
-identified by `task` before redistributing or using a subset. The aggregate is
+identified by `source` before redistributing or using a subset. The aggregate is
 therefore marked `license: other`; no single license is asserted over all rows.
 
 ## Citation

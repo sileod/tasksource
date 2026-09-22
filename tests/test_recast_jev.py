@@ -3,6 +3,7 @@ import unittest
 from datasets import ClassLabel, Dataset, DatasetDict, Features, Value
 
 from tasksource.recast import recast_jev, render_systemone
+from scripts.build_jev_dataset import to_training_row
 
 
 class RecastJevTest(unittest.TestCase):
@@ -33,6 +34,18 @@ class RecastJevTest(unittest.TestCase):
             list(request["questions"]["decision"]["criteria"]),
             ["zero", "one"],
         )
+
+    def test_common_jev_training_schema(self):
+        row = to_training_row({
+            "state": "Question",
+            "instructions": "Choose.",
+            "criteria": ["zero", "one"],
+            "label": 1,
+        }, index=3, task_id="demo/task", split="train")
+        self.assertEqual(row["kind"], "choice")
+        self.assertEqual(row["options"], ["zero", "one"])
+        self.assertEqual(row["target"], [0.0, 1.0])
+        self.assertEqual(row["source"], "demo/task")
 
 
 if __name__ == "__main__":

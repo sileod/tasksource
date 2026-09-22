@@ -13,6 +13,9 @@ import subprocess
 import time
 from pathlib import Path
 
+from datasets import DatasetDict, load_dataset
+from huggingface_hub import HfApi
+import pandas as pd
 from tasksource import list_tasks, load_task
 
 
@@ -51,13 +54,88 @@ def append_report(path, record):
         handle.flush()
 
 
+def to_training_row(example, index, task_id, split):
+    """Convert the lossless internal recast to the common Jev training schema."""
+    options = list(example["criteria"])
+    label = int(example["label"])
+    target = [0.0] * len(options)
+    target[label] = 1.0
+    return {
+        "id": f"{slug(task_id)}:{split}:{index}",
+        "kind": "choice",
+        "options": options,
+        "target": target,
+        "state": example["state"],
+        "question": example["instructions"],
+        "source": task_id,
+    }
+
+
+def publish_dataset(output, repo_id):
+    data_files = {}
+    for split in ("train", "validation", "test"):
+        files = sorted((output / "data").glob(f"{split}-*.parquet"))
+        if files:
+            data_files[split] = [str(path) for path in files]
+    dataset = load_dataset("parquet", data_files=data_files)
+    api = HfApi()
+    api.upload_file(
+        path_or_fileobj=str(output / "README.md"),
+        path_in_repo="README.md",
+        repo_id=repo_id,
+        repo_type="dataset",
+        commit_message="Add tasksource-jev dataset card",
+    )
+    dataset.push_to_hub(
+        repo_id,
+        max_shard_size="256MB",
+        commit_message="Publish tasksource-jev Parquet dataset",
+    )
+    for name in ("build-report.jsonl", "build-summary.json", "failed-tasks.json", "outdated-datasets.json"):
+        path = output / name
+        if path.exists():
+            api.upload_file(
+                path_or_fileobj=str(path),
+                path_in_repo=name,
+                repo_id=repo_id,
+                repo_type="dataset",
+                commit_message=f"Add {name}",
+            )
+
+
+def migrate_legacy_shards(data_dir):
+    """Upgrade resumable shards created before the public schema was finalized."""
+    for path in sorted(data_dir.glob("*.parquet")):
+        shard = load_dataset("parquet", data_files=str(path), split="train")
+        if "id" in shard.column_names:
+            continue
+        split = path.name.split("-", 1)[0]
+        task_id = shard[0]["task"]
+        upgraded = shard.map(
+            to_training_row,
+            with_indices=True,
+            fn_kwargs={"task_id": task_id, "split": split},
+            remove_columns=shard.column_names,
+        )
+        temporary = path.with_suffix(".parquet.tmp")
+        upgraded.to_parquet(temporary)
+        temporary.replace(path)
+
+
 def select_tasks(args):
     frame = list_tasks(instruct=True)
+    frame["multilingual"] = False
+    frame["source_id"] = frame.id
+    if not args.english_only:
+        multilingual = list_tasks(multilingual=True, instruct=True)
+        multilingual["multilingual"] = True
+        multilingual["source_id"] = "multilingual/" + multilingual.id
+        frame = pd.concat([frame, multilingual], ignore_index=True)
     frame = frame[frame.task_type.isin(SUPPORTED_TYPES)]
     if args.tasks:
         wanted = set(args.tasks)
-        frame = frame[frame.id.isin(wanted)]
-        missing = wanted - set(frame.id)
+        frame = frame[frame.source_id.isin(wanted)]
+        missing = wanted - set(frame.source_id)
         if missing:
             raise ValueError(f"Unknown or unsupported tasks: {sorted(missing)}")
     if args.limit:
@@ -69,13 +147,14 @@ def build(args):
     output = args.output.resolve()
     data_dir = output / "data"
     data_dir.mkdir(parents=True, exist_ok=True)
+    migrate_legacy_shards(data_dir)
     report_path = output / "build-report.jsonl"
     completed = read_completed(report_path)
     tasks = select_tasks(args)
     print(f"Selected {len(tasks)} tasks; {len(completed)} already complete", flush=True)
 
     for position, row in enumerate(tasks.itertuples(index=False), start=1):
-        task_id = row.id
+        task_id = row.source_id
         if task_id in completed:
             print(f"[{position}/{len(tasks)}] skip {task_id}", flush=True)
             continue
@@ -83,13 +162,20 @@ def build(args):
         print(f"[{position}/{len(tasks)}] build {task_id}", flush=True)
         try:
             dataset = load_task(
-                task_id,
+                row.id,
                 recast="jev",
+                multilingual=row.multilingual,
                 max_rows=args.max_rows,
                 max_rows_eval=args.max_rows_eval,
             )
             split_rows = {}
             for split, split_dataset in dataset.items():
+                split_dataset = split_dataset.map(
+                    to_training_row,
+                    with_indices=True,
+                    fn_kwargs={"task_id": task_id, "split": split},
+                    remove_columns=split_dataset.column_names,
+                )
                 path = data_dir / f"{split}-{slug(task_id)}.parquet"
                 split_dataset.to_parquet(path)
                 split_rows[split] = len(split_dataset)
@@ -115,7 +201,7 @@ def build(args):
 
     if args.finalize:
         shutil.copyfile(args.card, output / "README.md")
-        selected = set(tasks.id)
+        selected = set(tasks.source_id)
         latest = latest_records(report_path)
         failures = [
             latest[task] for task in sorted(selected & set(latest))
@@ -144,14 +230,7 @@ def build(args):
         print(json.dumps(summary), flush=True)
 
     if args.upload:
-        subprocess.run(
-            ["hf", "repo", "create", args.repo_id, "--repo-type", "dataset", "--exist-ok"],
-            check=True,
-        )
-        subprocess.run(
-            ["hf", "upload-large-folder", args.repo_id, str(output), "--repo-type", "dataset"],
-            check=True,
-        )
+        publish_dataset(output, args.repo_id)
 
 
 def parse_args():
@@ -161,6 +240,10 @@ def parse_args():
     parser.add_argument("--card", type=Path, default=root / "dataset_cards" / "tasksource-jev.md")
     parser.add_argument("--tasks", nargs="*")
     parser.add_argument("--limit", type=int)
+    parser.add_argument(
+        "--english-only", action="store_true",
+        help="Exclude the multilingual Tasksource catalog.",
+    )
     parser.add_argument("--max-rows", type=int, default=30_000)
     parser.add_argument("--max-rows-eval", type=int, default=3_000)
     parser.add_argument("--finalize", action="store_true")
