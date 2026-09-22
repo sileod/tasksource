@@ -1,7 +1,7 @@
 from .preprocess import Preprocessing
 import re
 import pandas as pd
-from . import tasks, recast
+from . import tasks, recast as recast_module
 from .metadata import dataset_rank
 from datasets import load_dataset
 import funcy as fc
@@ -74,7 +74,7 @@ def list_tasks(tasks_path=f'{os.path.dirname(__file__)}/tasks.py',multilingual=F
     df.insert(0, 'id', df.pop('id'))
     del df['rank']
     if instruct:
-        df=df[df.id.map(lambda x: not any(a in x for a in recast.improper_labels))]
+        df=df[df.id.map(lambda x: not any(a in x for a in recast_module.improper_labels))]
     df=df[df.id.map(lambda x: not any(x in a for a in excluded))]
     return df
 
@@ -95,7 +95,8 @@ def load_preprocessing(tasks=tasks, **kwargs):
     return preprocessing
 
 def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preprocessing_name=None,
-         max_rows=None, max_rows_eval=None, multilingual=False, instruct=False, seed=0, **load_dataset_kwargs):
+         max_rows=None, max_rows_eval=None, multilingual=False, instruct=False,
+         recast=None, seed=0, **load_dataset_kwargs):
     query = dict_of(id, dataset_name, config_name, task_name,preprocessing_name)
     query = {k:v for k,v in query.items() if v}
     _tasks = (lmtasks if multilingual else tasks)
@@ -107,6 +108,16 @@ def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preproc
     dataset = load_dataset(preprocessing.dataset_name, preprocessing.config_name, **load_dataset_kwargs)
     dataset= preprocessing(dataset,max_rows, max_rows_eval)
     dataset.task_type = preprocessing.__class__.__name__
-    if instruct:
-        dataset=recast.recast_instruct(dataset)
+    if instruct and recast not in (None, "instruct"):
+        raise ValueError("Use either instruct=True or recast=..., not both")
+    recast = "instruct" if instruct else recast
+    if recast == "instruct":
+        dataset = recast_module.recast_instruct(dataset)
+    elif recast == "jev":
+        source_id = id or preprocessing_name or preprocessing.dataset_name
+        if not (id or preprocessing_name) and preprocessing.config_name:
+            source_id = f"{source_id}/{preprocessing.config_name}"
+        dataset = recast_module.recast_jev(dataset, task=source_id)
+    elif recast is not None:
+        raise ValueError(f"Unknown recast format: {recast!r}")
     return dataset

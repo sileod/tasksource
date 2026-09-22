@@ -39,6 +39,23 @@ The repo also contains some recasting code to convert tasksource datasets to ins
 We also recast all classification tasks as natural language inference, to improve entailment-based zero-shot classification detection:
 [🤗/zero-shot-label-nli](https://huggingface.co/datasets/tasksource/zero-shot-label-nli)
 
+### tasksource-jev
+
+Tasksource classification and multiple-choice tasks can be recast as
+runtime-defined decisions. The canonical representation keeps the state,
+instructions, criteria, integer label, and textual answer separate:
+
+```python
+from tasksource import load_task, render_systemone
+
+dataset = load_task("glue/rte", recast="jev")
+request = render_systemone(dataset["train"][0], model="openjev")
+```
+
+The conversion is deterministic: it does not shuffle or paraphrase criteria.
+This makes it a stable base for downstream augmentation and Jev/System One
+request rendering.
+
 ### Write and use custom preprocessings
 
 ```python

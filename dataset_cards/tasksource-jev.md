@@ -1,0 +1,121 @@
+---
+pretty_name: tasksource-jev
+language:
+- en
+license: other
+task_categories:
+- text-classification
+- question-answering
+tags:
+- tasksource
+- jev
+- system-one
+- runtime-defined-decisions
+- multiple-choice
+size_categories:
+- 1M<n<10M
+---
+
+# tasksource-jev
+
+`tasksource-jev` recasts Tasksource classification and multiple-choice datasets
+as runtime-defined decisions. Each example supplies its state and candidate
+criteria at inference time. The dataset is intended for training and evaluating
+bounded decision models; it is not tied to one Jev implementation.
+
+This is an independent data transformation. It is not an official TypeSafe Jev
+dataset and is not produced by or affiliated with TypeSafe or OpenJev.
+
+## Schema
+
+| field | type | meaning |
+|---|---|---|
+| `state` | string | Text or question on which the decision is based. Paired classification inputs are marked `text_A` and `text_B`. |
+| `instructions` | string | The decision requested from the model. |
+| `criteria` | list of strings | Candidate labels or answers supplied at runtime. Order is significant. |
+| `label` | integer | Zero-based index of the correct criterion. |
+| `answer` | string | Criterion text at `criteria[label]`, included for convenience and validation. |
+| `task` | string | Tasksource task identifier used to load the source data. |
+
+Classification criteria are the source task's label names. Multiple-choice
+criteria are the answer choices. The canonical conversion is deterministic: it
+does not shuffle, paraphrase, rename, or subsample criteria. Those operations can
+be applied later without changing the base dataset.
+
+```python
+from datasets import load_dataset
+
+dataset = load_dataset("tasksource/tasksource-jev")
+row = dataset["train"][0]
+assert row["answer"] == row["criteria"][row["label"]]
+```
+
+With Tasksource installed, the same representation can be produced directly:
+
+```python
+from tasksource import load_task, render_systemone
+
+dataset = load_task("glue/rte", recast="jev")
+request = render_systemone(dataset["train"][0], model="openjev")
+```
+
+## Construction
+
+Tasksource standardizes heterogeneous datasets into common classification and
+multiple-choice templates. This release applies `recast_jev` to compatible
+English tasks, retains the standard train/validation/test splits, and records the
+Tasksource identifier in every row. Tasks that fail to download or preprocess
+are recorded by the build report rather than silently represented as complete.
+To keep very large sources balanced, the release caps each task at 30,000
+training rows and 3,000 validation or test rows using Tasksource's deterministic
+sampling (seed 0); smaller tasks are retained in full.
+
+The selected catalog includes 100 BIG-bench task configurations and all 57 MMLU
+subjects currently registered in Tasksource. Their original split identity is
+preserved. Because these are established benchmarks, users training on the
+aggregate should filter by `task` and split to avoid evaluation contamination.
+
+The repository includes `failed-tasks.json` and `outdated-datasets.json`.
+The latter specifically tracks upstream datasets that still depend on loading
+scripts no longer supported by current Hugging Face Datasets, so they can be
+migrated to data-only Parquet repositories and incorporated in a later build.
+
+The build is reproducible from the Tasksource repository:
+
+```bash
+python scripts/build_jev_dataset.py --output build/tasksource-jev --finalize
+```
+
+## Licensing and provenance
+
+Tasksource is a preprocessing framework and catalog, not the original publisher
+of the constituent datasets. Copyright, license, and usage restrictions remain
+those of each upstream dataset. Users should consult the upstream dataset card
+identified by `task` before redistributing or using a subset. The aggregate is
+therefore marked `license: other`; no single license is asserted over all rows.
+
+## Citation
+
+If this recast is useful, cite Tasksource, which provides the task collection and
+harmonization framework:
+
+```bibtex
+@inproceedings{sileo-2024-tasksource,
+    title = "tasksource: A Large Collection of {NLP} tasks with a Structured Dataset Preprocessing Framework",
+    author = "Sileo, Damien",
+    editor = "Calzolari, Nicoletta  and
+      Kan, Min-Yen  and
+      Hoste, Veronique  and
+      Lenci, Alessandro  and
+      Sakti, Sakriani  and
+      Xue, Nianwen",
+    booktitle = "Proceedings of the 2024 Joint International Conference on Computational Linguistics, Language Resources and Evaluation (LREC-COLING 2024)",
+    month = may,
+    year = "2024",
+    address = "Torino, Italia",
+    publisher = "ELRA and ICCL",
+    url = "https://aclanthology.org/2024.lrec-main.1361/",
+    pages = "15655--15684",
+    abstract = "The HuggingFace Datasets Hub hosts thousands of datasets, offering exciting opportunities for language model training and evaluation. However, datasets for a specific task type often have different structures, making harmonization challenging which prevents the interchangeable use of comparable datasets. As a result, multi-task training or evaluation necessitates manual work to fit data into task templates. Several initiatives independently tackle this issue by releasing harmonized datasets or providing harmonization codes to preprocess datasets into a consistent format. We identify patterns in such preprocessings, such as column renaming, or more complex patterns. We then propose an annotation framework that enables concise, readable, and reusable preprocessing annotations. tasksource annotates more than 600 task preprocessings and provides a backend to automate dataset alignment. We fine-tune a multi-task text encoder on all tasksource tasks, outperforming every publicly available text encoder of comparable parameter count according to an external evaluation."
+}
+```

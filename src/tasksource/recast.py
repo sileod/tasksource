@@ -2,6 +2,7 @@ import random
 from datasets import DatasetDict, Dataset
 from sorcery import dict_of
 import string
+from collections import OrderedDict
 
 improper_labels =['recast/recast_kg_relations','linguisticprobing',"lex_glue/scotus",'lexical_relation_classification/ROOT09',"pragmeval/squinky","pragmeval/emobank",'pragmeval/persuasiveness']
 improper_labels += ['glue/stsb', 'sick/relatedness', 'joci', 'utilitarianism', 'amazon_counterfactual/en', 'toxic_conversations', 'ethos/multilabel', 'lex_glue/eurlex', 'lex_glue/unfair_tos', 'app_reviews', 'humicroedit/subtask-1', 'stackoverflow-questions', 'go_emotions/simplified', 'google_wellformed_query', 'has_part', 'blog_authorship_corpus/age', 'promptCoherence', 'Sarcasm_News_Headline', 'auditor_review/demo-org--auditor_review', 'Dynasent_Disagreement', 'Politeness_Disagreement', 'SBIC_Disagreement', 'SChem_Disagreement', 'Dilemmas_Disagreement', 'sts-companion', 'acceptability-prediction', 'chaos-mnli-ambiguity', 'headline_cause/en_simple', 'oasst1_dense_flat', 'civil_comments']
@@ -112,4 +113,106 @@ def recast_instruct(dataset):
     dataset = dataset.map(eval(f"recast_{task_type}"))
     dataset = dataset.remove_columns([k for k in features if k not in ['inputs','targets']])
     return dataset
- 
+
+
+JEV_CLASSIFICATION_INSTRUCTIONS = "Choose the criterion that best describes the state."
+JEV_MULTIPLE_CHOICE_INSTRUCTIONS = "Choose the criterion that best answers the question."
+
+
+def _choice_columns(features):
+    """Return choice columns in numeric order (choice2 before choice10)."""
+    choices = [name for name in features if name.startswith("choice")]
+
+    def key(name):
+        suffix = name[len("choice"):]
+        return (0, int(suffix)) if suffix.isdigit() else (1, name)
+
+    return sorted(choices, key=key)
+
+
+def _jev_task_type(features):
+    if "sentence1" in features:
+        return "Classification"
+    if _choice_columns(features) and "inputs" in features:
+        return "MultipleChoice"
+    raise NotImplementedError(
+        "Jev recasting currently supports Classification and MultipleChoice tasks"
+    )
+
+
+def recast_jev(dataset, task=None):
+    """Recast a standardized Tasksource dataset as runtime-defined choices.
+
+    The output is deliberately model- and wire-format-independent. ``criteria``
+    contains the choices presented at runtime, ``label`` is their zero-based
+    index, and ``answer`` is the corresponding criterion text. No choices are
+    shuffled and no random augmentation is performed here.
+    """
+    if not isinstance(dataset, DatasetDict):
+        raise TypeError("recast_jev expects a datasets.DatasetDict")
+    if "train" not in dataset:
+        raise ValueError("recast_jev expects a train split")
+
+    features = dataset["train"].features
+    task_type = _jev_task_type(features)
+    labels = features.get("labels")
+
+    if task_type == "Classification":
+        if not hasattr(labels, "names"):
+            raise TypeError("Classification labels must use datasets.ClassLabel")
+        criteria = list(labels.names)
+
+        def convert(example):
+            state = example["sentence1"]
+            if "sentence2" in example:
+                state = f"text_A: {state}\ntext_B: {example['sentence2']}"
+            label = int(example["labels"])
+            return {
+                "state": state,
+                "instructions": JEV_CLASSIFICATION_INSTRUCTIONS,
+                "criteria": criteria,
+                "label": label,
+                "answer": criteria[label],
+                "task": task or "",
+            }
+
+    else:
+        choices = _choice_columns(features)
+
+        def convert(example):
+            criteria = [example[name] for name in choices]
+            label = int(example["labels"])
+            return {
+                "state": example["inputs"],
+                "instructions": JEV_MULTIPLE_CHOICE_INSTRUCTIONS,
+                "criteria": criteria,
+                "label": label,
+                "answer": criteria[label],
+                "task": task or "",
+            }
+
+    converted = dataset.map(convert)
+    keep = {"state", "instructions", "criteria", "label", "answer", "task"}
+    remove = [name for name in converted["train"].column_names if name not in keep]
+    if remove:
+        converted = converted.remove_columns(remove)
+    return converted
+
+
+def render_systemone(example, question_id="decision", model=None):
+    """Render one canonical Jev row as a System One choice request."""
+    criteria = list(example["criteria"])
+    if len(criteria) != len(set(criteria)):
+        raise ValueError("System One choice criterion names must be unique")
+    request = OrderedDict()
+    if model is not None:
+        request["model"] = model
+    request["state"] = example["state"]
+    request["questions"] = {
+        question_id: {
+            "type": "choice",
+            "instructions": example["instructions"],
+            "criteria": {criterion: None for criterion in criteria},
+        }
+    }
+    return dict(request)
