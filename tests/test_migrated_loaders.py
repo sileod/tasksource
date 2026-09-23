@@ -2,14 +2,84 @@ import unittest
 
 from datasets import Dataset, DatasetDict
 
+from tasksource.preprocess import cast_explicit_label_values
 from tasksource.tasks import (
+    _cogalexv_relations,
     _logiqa_options,
     _parse_jeggers_riddle_choices,
     _strip_option_prefix,
+    _support_shift_name,
+    _twentyquestions_answers,
+    _utilitarianism_comparisons,
 )
 
 
 class MigratedLoaderHelperTest(unittest.TestCase):
+    def test_utilitarianism_orientation_is_seeded_and_semantic(self):
+        import random
+
+        source = DatasetDict({"train": Dataset.from_dict({
+            "baseline": ["better", "pleasant"],
+            "less_pleasant": ["worse", "unpleasant"],
+        })})
+        random.seed(97)
+        state = random.getstate()
+        first = _utilitarianism_comparisons(source)
+        second = _utilitarianism_comparisons(source)
+        self.assertEqual(random.getstate(), state)
+        self.assertEqual(first["train"]["comparison"],
+                         second["train"]["comparison"])
+        for row, better, worse in zip(
+            first["train"], ["better", "pleasant"], ["worse", "unpleasant"]
+        ):
+            expected = (
+                f'"{better}" is better than "{worse}"'
+                if row["label"] == 1 else
+                f'"{worse}" is better than "{better}"'
+            )
+            self.assertEqual(row["comparison"], expected)
+
+    def test_twentyquestions_ontology_is_fixed_before_sampling(self):
+        source = DatasetDict({
+            "train": Dataset.from_dict({"answer": [None, "always", "never"]}),
+            "validation": Dataset.from_dict({"answer": ["irrelevant"]}),
+        })
+        mapped = _twentyquestions_answers(source)
+        self.assertEqual(len(mapped["train"]), 2)
+        self.assertIn("irrelevant", mapped["train"].features["answer"].names)
+        self.assertEqual(mapped["validation"][0]["answer"], 5)
+
+    def test_cogalexv_relations_are_readable_and_complete(self):
+        source = DatasetDict({
+            "train": Dataset.from_dict({"relation": ["ANT", "SYN"]}),
+            "test": Dataset.from_dict({"relation": ["PART_OF"]}),
+        })
+        mapped = _cogalexv_relations(source)
+        self.assertEqual(mapped["test"].features["relation"].names[2],
+                         "part-of relation")
+
+    def test_persuasion_shift_labels_are_signed_and_readable(self):
+        self.assertEqual(_support_shift_name(-1), "support decreases by 1 point")
+        self.assertEqual(_support_shift_name(0), "no change in support")
+        self.assertEqual(_support_shift_name(2), "support increases by 2 points")
+
+    def test_explicit_numeric_label_ontology_preserves_meaning(self):
+        source = DatasetDict({
+            "train": Dataset.from_dict({"labels": [1, 5]}),
+            "test": Dataset.from_dict({"labels": [2]}),
+        })
+        names = {stars: f"{stars} stars" for stars in range(1, 6)}
+        mapped = cast_explicit_label_values(source, names)
+        self.assertEqual(mapped["train"].features["labels"].names,
+                         list(names.values()))
+        self.assertEqual(mapped["train"]["labels"], [0, 4])
+        self.assertEqual(mapped["test"]["labels"], [1])
+
+    def test_explicit_numeric_label_ontology_rejects_unmapped_values(self):
+        source = DatasetDict({"train": Dataset.from_dict({"labels": [0, 3]})})
+        with self.assertRaisesRegex(ValueError, "Unmapped labels"):
+            cast_explicit_label_values(source, {0: "no", 1: "yes"})
+
     def test_aces_ontology_is_fixed_before_sampling(self):
         from tasksource.mtasks import _aces_phenomena_labels
 
@@ -21,6 +91,16 @@ class MigratedLoaderHelperTest(unittest.TestCase):
         self.assertEqual(mapped["train"].features["phenomena"].names,
                          ["addition", "deletion"])
         self.assertEqual(mapped["validation"][0]["phenomena"], 1)
+
+    def test_x_fact_ontology_covers_rare_dev_label(self):
+        from tasksource.mtasks import _x_fact_labels
+
+        source = DatasetDict({
+            "train": Dataset.from_dict({"label": ["false", "other"]}),
+            "dev": Dataset.from_dict({"label": ["other"]}),
+        })
+        mapped = _x_fact_labels(source)
+        self.assertEqual(mapped["dev"][0]["label"], 1)
 
     def test_strip_option_prefix(self):
         self.assertEqual(_strip_option_prefix("A.Some text"), "Some text")
@@ -104,6 +184,17 @@ class MigratedLoaderHelperTest(unittest.TestCase):
             "blog_authorship_corpus__job": "tasksource/blog_authorship_corpus",
             "emo": "oneonlee/cleansed_emocontext",
             "it_support_tickets": "tasksource/it-support-tickets",
+            "twentyquestions": "tasksource/twentyquestions",
+            "syntactic_augmentation_nli": "tasksource/syntactic-augmentation-nli",
+            "scruples": "tasksource/scruples",
+            "nli_veridicality_transitivity": "tasksource/nli-veridicality-transitivity",
+            "cnli": "tasksource/cnli",
+            "ambient": "tasksource/ambient",
+            "defeasible_nli": "tasksource/defeasible-nli",
+            "reclor": "tasksource/reclor",
+            "equate": "tasksource/equate",
+            "scidtb": "multilingual-discourse-hub/disrpt",
+            "utilitarianism": "csv",
         }
         legacy_scripts = {
             "piqa", "cosmos_qa", "PolyAI/banking77", "lucasmccabe/logiqa",
@@ -117,6 +208,7 @@ class MigratedLoaderHelperTest(unittest.TestCase):
 
         # jeggers mirror keeps original task id via basename
         self.assertEqual(en_tasks.riddle_sense.dataset_name, "jeggers/riddle_sense")
+        self.assertEqual(en_tasks.utilitarianism.task_id, "utilitarianism")
 
     def test_migrated_namespaces_and_raw_loader_ids(self):
         from tasksource import tasks as en_tasks
@@ -156,6 +248,13 @@ class MigratedLoaderHelperTest(unittest.TestCase):
         self.assertEqual(ml_tasks.miam.dataset_name, "csv")
         self.assertEqual(ml_tasks.mms_sentiment.dataset_name, "csv")
         self.assertEqual(ml_tasks.mms_sentiment.task_id, "mms")
+        self.assertEqual(ml_tasks.x_fact.dataset_name, "tasksource/x-fact")
+        self.assertEqual(ml_tasks.emotion.dataset_name, "tasksource/universal-joy")
+        self.assertEqual(
+            ml_tasks.review_sentiment.label_values,
+            {stars: f"{stars} star{'s' if stars != 1 else ''}"
+             for stars in range(1, 6)},
+        )
         self.assertEqual(
             ml_tasks.udep__pos.dataset_name,
             "universal-dependencies/universal_dependencies",

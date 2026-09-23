@@ -1,5 +1,54 @@
 # Loading-script migration notes (outdated-datasets.json, 125 entries / 63 families)
 
+## MetaEval namespace transfer (2026-09-23)
+
+All 27 datasets still owned by the `metaeval` Hub organization were moved to
+`tasksource/` with their basenames unchanged. No destination name collided;
+the old Hub URLs redirect to the new canonical repos. The transferred names
+are `acceptability-prediction`, `ambient`, `chaos-mnli-ambiguity`,
+`children-tom`, `cnli`, `ethics`, `figurative-nli`, `mega`,
+`mega-acceptability-v2`, `mindpixels`, `multilingual-persuasion`,
+`nli-veridicality-transitivity`, `nli4wills`, `offensive-humor`,
+`path-naturalness-prediction`, `rankme-nlg-acceptability`,
+`reqeval-ambiguity-detection`, `scruples`,
+`semantic-feature-production-norms`, `shinet-2hop`,
+`syntactic-augmentation-nli`, `twentyquestions`, `universal-joy`,
+`utilitarianism`, `wouldyourather`, `x-fact`, and `xnli`.
+
+`defeasible-nli`, `equate`, and `reclor` were already at `tasksource/` behind
+old MetaEval redirects; their active annotations now use the canonical IDs.
+`metaeval/disrpt` resolves to `multilingual-discourse-hub/disrpt` and was not
+part of this two-organization transfer. The active annotation uses that
+canonical URL. Dataset basenames (hence Tasksource task IDs) are unchanged.
+Three transferred repositories remain script-only on the Hub: `mega`,
+`utilitarianism`, and `xnli`. Active Tasksource annotations do not execute
+those scripts: utilitarianism reads the original Hendrycks CSVs with the
+script's seeded comparison orientation, and XNLI reads `facebook/xnli`.
+`mega` has no active Tasksource annotation; its source files remain in the
+transferred repo for a later data-only conversion.
+
+## Jev failure repair after the one-million-row release
+
+The first release completed 538/571 selected tasks. Thirty failures were
+integer labels without `ClassLabel` names, not failed downloads. Tasksource's
+`label_values` annotation now records an explicit, source-checked
+integer-to-name mapping and rejects any unmapped value. This covers the NLI
+families, HoVer, GitHub issue similarity, Amazon review stars, and
+persuasion-score levels without guessing a label order at recast time. The
+GitHub issue polarity was checked against positive and negative source pairs;
+the NLI mappings come
+from the [pietrolesci source cards](https://huggingface.co/pietrolesci/datasets);
+the persuasion scale is the source's signed shift in support, not a binary
+persuaded/not-persuaded label.
+
+The other three failures had different causes: `TroFi` declares an empty
+validation split in its card, so the annotation now loads its actual
+train/test Parquet files; `CogALexV` has no validation JSONL, so its annotation
+loads train/test and fixes its complete five-relation ontology before sampling;
+`twentyquestions` pointed at a missing repo, and now uses the transferred
+`tasksource/twentyquestions` data while omitting rows with no source answer.
+The old 33-task failure set passed a bounded Jev smoke after these repairs.
+
 Policy: prefer popular HF data-only repos with the same format (same basename to
 preserve Tasksource ids); preserve preprocessing, label meaning, and
 train/dev/test boundaries; keep BIG-bench, MMLU, BLiMP excluded.
@@ -148,7 +197,7 @@ Rebuilt from original sources (not lossy third-party reformats):
 |---|---|---|
 | AfriSenti-twitter-sentiment | 12 | `mteb/AfriSentiClassification` (popular data-only parquet; same 12 configs/splits; ints re-attached as `positive/neutral/negative`, order verified vs upstream TSVs). Own `tasksource/AfriSenti-twitter-sentiment` mirror DELETED per no-bloat rule. Ids become `AfriSentiClassification/<lang>` |
 | NusaX-senti | 12 | `mteb/NusaX-senti` (popular data-only parquet; same basename so ids preserved; ints re-attached as `negative/neutral/positive`, order verified). Own `tasksource/NusaX-senti` mirror DELETED per no-bloat rule |
-| ethics | 4 | `hendrycks/ethics` CSV files are read directly through the generic CSV loader with their original train/test/test_hard boundaries and virtue `[SEP]` split; no tasksource copy. `metaeval/ethics` was rebuilt in place earlier and left intact |
+| ethics | 4 | `hendrycks/ethics` CSV files are read directly through the generic CSV loader with their original train/test/test_hard boundaries and virtue `[SEP]` split. An earlier MetaEval mirror now lives at `tasksource/ethics`, but these annotations use the original files. |
 | xnli | 1 | `metaeval/xnli` → `facebook/xnli` English config (official data-only; `premise/hypothesis/label` and entailment/neutral/contradiction order checked; original `multilingual/xnli` task ID preserved) |
 
 `indonlp/NusaX-senti` is script-only, so the loadable `mteb/NusaX-senti` source is

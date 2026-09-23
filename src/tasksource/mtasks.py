@@ -77,7 +77,15 @@ qam = Classification("question","answer","label", dataset_name="tasksource/xglue
 
 #x_sum_factuality = Classification("summary","generated_summary","label", dataset_name="ylacombe/xsum_factuality")
 
-x_fact = Classification('evidence','claim','label', dataset_name="metaeval/x-fact")
+def _x_fact_labels(dataset):
+    # Use the full source train ontology before bounded sampling; "other" is
+    # rare enough to disappear from small train samples while remaining in dev.
+    names = sorted(set(dataset["train"]["label"]))
+    return dataset.cast_column("label", ClassLabel(names=names))
+
+x_fact = Classification(
+    'evidence', 'claim', 'label', dataset_name="tasksource/x-fact",
+    splits=["train", "dev", "test"], pre_process=_x_fact_labels)
 
 xgluenc = Classification('text', labels='label_text',
     dataset_name="SetFit/xglue_nc", task_id="xglue/nc")
@@ -127,7 +135,7 @@ xstory = MultipleChoice(lambda x: "\n".join([x[f'input_sentence_{i}'] for i in r
 xglue_ner = TokenClassification("words","ner", dataset_name="xglue",config_name="ner")
 xglue_pos = TokenClassification("words","pos", dataset_name="xglue",config_name="pos")
 
-#disrpt_23 = Classification("unit1_sent", "unit2_sent", "label",**all("metaeval/disrpt"))
+#disrpt_23 = Classification("unit1_sent", "unit2_sent", "label",**all("multilingual-discourse-hub/disrpt"))
 
 def _udep_cast_label_sequence(dataset, column):
     label_names = sorted({
@@ -178,8 +186,11 @@ tweet_sentiment = Classification(
         ]
         for split in ("train", "validation", "test")
     }})
-review_sentiment = Classification("review_body",labels="stars", dataset_name="goosmanlei/amazon_reviews_multi",config_name="all_languages")
-emotion = Classification("text",labels="emotion",dataset_name="metaeval/universal-joy")
+review_sentiment = Classification(
+    "review_body", labels="stars", dataset_name="goosmanlei/amazon_reviews_multi",
+    config_name="all_languages",
+    label_values={stars: f"{stars} star{'s' if stars != 1 else ''}" for stars in range(1, 6)})
+emotion = Classification("text",labels="emotion",dataset_name="tasksource/universal-joy")
 # in mms
 
 def _mms_label_filter(dataset):

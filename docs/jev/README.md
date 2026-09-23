@@ -26,6 +26,12 @@ and 3,000 evaluation source rows (half as many source sequences for token
 tasks, which emit up to two decisions each). The builder writes one resumable
 Parquet shard per task and split and records every attempt in
 `build-report.jsonl`.
+For source datasets that expose integer labels without `ClassLabel` metadata,
+Tasksource annotations can supply a source-verified `label_values` mapping.
+The adapter checks every observed value before assigning readable criteria;
+it does not infer label meanings from integer order. See
+[`migration-notes.md`](migration-notes.md) for the 2026-09-23 repairs and
+MetaEval namespace transfer.
 
 ## Smoke test
 

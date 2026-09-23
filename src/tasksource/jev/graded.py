@@ -113,10 +113,10 @@ FAMILIES = {
     "sick": Family("tasksource/sick", {"Sentence 1": "sentence_A", "Sentence 2": "sentence_B"}, dict(
         relatedness=noul("relatedness_score", "How related in meaning are the sentences, "
                                               "from 0 (unrelated) to 1 (closely related)?", low=1, high=5))),
-    "chaos_mnli": Family("metaeval/chaos-mnli-ambiguity", {"Premise": "premise", "Hypothesis": "hypothesis"}, dict(
+    "chaos_mnli": Family("tasksource/chaos-mnli-ambiguity", {"Premise": "premise", "Hypothesis": "hypothesis"}, dict(
         relation=choice("label_count", "How would annotators label the relation of the hypothesis to the premise?",
                         ["entailment", "neutral", "contradiction"]))),
-    "acceptability": Family("metaeval/acceptability-prediction", {"Sentence": "text"}, dict(
+    "acceptability": Family("tasksource/acceptability-prediction", {"Sentence": "text"}, dict(
         acceptability=noul("normalized_score", "How acceptable do native speakers find the sentence, "
                                                "from 0 (unacceptable) to 1 (fully acceptable)?"))),
 }

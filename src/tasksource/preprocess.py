@@ -79,6 +79,8 @@ class Preprocessing(DotWiz):
         dataset=dataset.remove_columns(
             get_column_names(dataset)-set(self.to_dict().keys()))
         dataset = fix_labels(dataset)
+        if self.label_values:
+            dataset = cast_explicit_label_values(dataset, self.label_values)
         dataset = fix_splits(dataset) # again: label mapping changed
         dataset = self.post_process(dataset)
         return dataset
@@ -212,6 +214,7 @@ class SharedFields:
     config_name:str = None
     task_id:str = None
     load_dataset_kwargs:dict = field(default_factory=dict)
+    label_values:dict = field(default_factory=dict)
     pre_process: callable = fc.identity
     post_process: callable = fc.identity
     #language:str="en"
@@ -291,6 +294,22 @@ def fix_labels(dataset, label_key='labels'):
     labels=sorted(labels, key=order)
     dataset=dataset.cast_column(label_key, datasets.ClassLabel(names=labels))
     return dataset
+
+
+def cast_explicit_label_values(dataset, value_to_name):
+    """Attach a verified ontology to numeric labels without guessing their order."""
+    values = list(value_to_name)
+    names = list(value_to_name.values())
+    if not values or len(set(names)) != len(names):
+        raise ValueError("Explicit label values must have distinct readable names")
+    for split, rows in dataset.items():
+        unknown = set(rows.unique("labels")) - set(values)
+        if unknown:
+            raise ValueError(f"Unmapped labels in {split}: {sorted(unknown, key=str)}")
+    if values != list(range(len(values))):
+        indices = {value: index for index, value in enumerate(values)}
+        dataset = dataset.map(lambda row: {"labels": indices[row["labels"]]})
+    return dataset.cast_column("labels", datasets.ClassLabel(names=names))
 
 def concatenate_dataset_dict(l):
     """Concatenate a list of DatastDict objects sharing same splits and columns."""

@@ -20,12 +20,15 @@ size_categories:
 
 # tasksource-jev-typed-decisions
 
-One million decisions from **538 Tasksource tasks across 304 dataset families**,
+One million decisions from **500+ Tasksource tasks across 300+ dataset families**,
 in a single format for models that receive their answer criteria at runtime.
 The value is breadth with traceable supervision: most rows inherit labels,
 ratings, or annotator votes from existing datasets, not labels invented by a
 teacher model. The `source` field identifies the originating task; existing
 train/dev/test boundaries are retained where the source provides them.
+The [Tasksource repository](https://github.com/sileod/tasksource) and
+[task catalog](https://github.com/sileod/tasksource/blob/main/tasks.md) document
+the source preprocessings.
 
 The coverage is deliberately wide: GLUE and SuperGLUE inference and language
 understanding; SNLI and XNLI; HellaSwag, PIQA, and ScienceQA; AG News,
