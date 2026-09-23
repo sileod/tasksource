@@ -12,6 +12,63 @@ tags:
 - procedural
 - synthetic
 - multi-question
+configs:
+- config_name: entity_belief_tracking
+  data_files:
+  - split: train
+    path: entity_belief_tracking/train-*.parquet
+  - split: validation
+    path: entity_belief_tracking/validation-*.parquet
+  - split: test
+    path: entity_belief_tracking/test-*.parquet
+- config_name: event_state_reconstruction
+  data_files:
+  - split: train
+    path: event_state_reconstruction/train-*.parquet
+  - split: validation
+    path: event_state_reconstruction/validation-*.parquet
+  - split: test
+    path: event_state_reconstruction/test-*.parquet
+- config_name: evidence_sufficiency
+  data_files:
+  - split: train
+    path: evidence_sufficiency/train-*.parquet
+  - split: validation
+    path: evidence_sufficiency/validation-*.parquet
+  - split: test
+    path: evidence_sufficiency/test-*.parquet
+- config_name: multi_view_adjudication
+  data_files:
+  - split: train
+    path: multi_view_adjudication/train-*.parquet
+  - split: validation
+    path: multi_view_adjudication/validation-*.parquet
+  - split: test
+    path: multi_view_adjudication/test-*.parquet
+- config_name: partial_observation_calibration
+  data_files:
+  - split: train
+    path: partial_observation_calibration/train-*.parquet
+  - split: validation
+    path: partial_observation_calibration/validation-*.parquet
+  - split: test
+    path: partial_observation_calibration/test-*.parquet
+- config_name: policy_applicability
+  data_files:
+  - split: train
+    path: policy_applicability/train-*.parquet
+  - split: validation
+    path: policy_applicability/validation-*.parquet
+  - split: test
+    path: policy_applicability/test-*.parquet
+- config_name: state_perturbation
+  data_files:
+  - split: train
+    path: state_perturbation/train-*.parquet
+  - split: validation
+    path: state_perturbation/validation-*.parquet
+  - split: test
+    path: state_perturbation/test-*.parquet
 ---
 
 # procedural-jev
@@ -57,7 +114,7 @@ train.
 As a multi-question Jev request, send `{"state": json.loads(row["state"]),
 "questions": json.loads(row["questions"])}` and compare with `row["answers"]`.
 The same rows are included, grouped by state, in
-[`tasksource/tasksource-jev`](https://huggingface.co/datasets/tasksource/tasksource-jev).
+[`tasksource/tasksource-jev-typed-decisions`](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions).
 
 ## Reproduction
 

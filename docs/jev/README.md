@@ -1,4 +1,4 @@
-# tasksource-jev build
+# tasksource-jev-typed-decisions build
 
 The builders live in [`scripts/`](../../scripts/); canonical recasts, token
 label handling, procedural generators, and augmentations live in
@@ -45,31 +45,49 @@ task-limited release.
 
 Use a fresh output directory for a new full release. The same command resumes
 an interrupted build: successful tasks are skipped, failed tasks are retried,
-and shards are preserved.
+and shards are preserved. A task is considered complete only if its reported
+Parquet shards still exist. Reuse an output directory only with the same code
+and settings; use a new directory when preprocessing changes.
 
 ```bash
-PYTHONPATH=.:src python scripts/build_jev_dataset.py --output build/tasksource-jev --finalize
+PYTHONPATH=.:src python scripts/build_jev_dataset.py \
+  --output build/tasksource-jev-typed-decisions --publish-rows 1000000 \
+  --baseline-failures /path/to/previous/outdated-datasets.json --finalize
 ```
 
+For an unattended build that publishes after automated target/schema/coverage
+checks, add `--upload` to that command. A failed task is recorded rather than
+silently omitted; `failed-tasks.json` is the complete current failure list,
+and `fixed-source-audit.json` compares previously failing task IDs. Native
+procedural configs, both enabled token sources, all three Jev primitives, and
+all safe augmentation variants are required before a 1M-row production upload.
+
 Before publishing, inspect `build-summary.json`, `failed-tasks.json`,
-`outdated-datasets.json`, and sample rows from every newly migrated source.
+`outdated-datasets.json`, `fixed-source-audit.json`, and sample rows from
+every newly migrated source. The optional `--baseline-failures` argument
+compares this build with a prior failure list; `build-manifest.json` records
+the selected sources, parameters, code revision, dirty-file list, and package
+versions.
 Check the `state`, readable `options`, `target`, original split, and any
-multiple questions sharing `group_id`. The release cap is 500,000 rows,
-allocated 90/5/5 to train/dev/test. It samples complete source-row groups;
+multiple questions sharing `group_id`. The release cap is 1,000,000 rows,
+allocated 90/5/5 to train/dev/test. It balances dataset families, samples
+their configs, and keeps complete source-row groups;
 the first 1,000 train rows are ordered for source and prompt variety without
 changing membership.
 
 Authenticate with the Hugging Face Hub, then publish the checked checkpoint:
 
 ```bash
-PYTHONPATH=.:src python scripts/build_jev_dataset.py --output build/tasksource-jev \
+PYTHONPATH=.:src python scripts/build_jev_dataset.py \
+  --output build/tasksource-jev-typed-decisions --publish-rows 1000000 \
   --skip-migrate --finalize-only --finalize --upload
 ```
 
 `--skip-migrate` is appropriate only when the existing shards already use
 the current schema. Omit `--finalize-only` to retry failed or newly added
 tasks before publishing. The upload writes the dataset card, train/dev/test
-Parquet, and build/failure reports to `tasksource/tasksource-jev`; use
+Parquet, and build/failure/audit reports to
+`tasksource/tasksource-jev-typed-decisions`; use
 `--repo-id` for another destination. Verify the remote split counts, source
 coverage, exclusions, and several rendered rows after upload.
 

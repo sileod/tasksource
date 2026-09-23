@@ -32,9 +32,13 @@ class ModernTaskPreprocessingTest(unittest.TestCase):
             "labels": {"head": [0], "tail": [1], "relation_id": ["P108"], "relation_text": ["employer"]},
         }
         source = DatasetDict({"train_annotated": Dataset.from_list([row]), "validation": Dataset.from_list([row])})
-        result = _docred_relations(source)["train_annotated"][0]
+        converted = _docred_relations(source)
+        result = converted["train_annotated"][0]
         self.assertEqual(result["entity_pair"], "Alice -> Acme / Acme Corp")
-        self.assertEqual(result["relation"], "employer")
+        self.assertEqual(
+            converted["train_annotated"].features["relation"].names, ["employer"]
+        )
+        self.assertEqual(result["relation"], 0)
 
     def test_chemprot_columnar_entities_and_relations(self):
         row = {

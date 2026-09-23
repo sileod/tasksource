@@ -1,6 +1,6 @@
 from .preprocess import cat, get, regen, name, constant, Classification, TokenClassification, MultipleChoice
-from .metadata import bigbench_discriminative_english, blimp_hard, imppres_presupposition, imppres_implicature, udep_en_configs, udep_en_labels
-from datasets import get_dataset_config_names, Sequence, ClassLabel, Dataset, DatasetDict
+from .metadata import bigbench_discriminative_english, blimp_hard, imppres_presupposition, imppres_implicature, udep_en_configs
+from datasets import get_dataset_config_names, Sequence, ClassLabel, Dataset, DatasetDict, Features, Value
 
 # variable name: dataset___config__task
 
@@ -43,20 +43,69 @@ babi_nli = Classification("premise", "hypothesis", "label",
 ) # agents-motivations task is not as clear-cut as the others
 
 
-sick__label         = Classification('sentence_A','sentence_B','label')
-sick__relatedness   = Classification('sentence_A','sentence_B','relatedness_score')
-sick__entailment_AB = Classification('sentence_A','sentence_B','entailment_AB')
+sick__label         = Classification('sentence_A','sentence_B','label', dataset_name="tasksource/sick")
+sick__relatedness   = Classification('sentence_A','sentence_B','relatedness_score', dataset_name="tasksource/sick")
+sick__entailment_AB = Classification('sentence_A','sentence_B','entailment_AB', dataset_name="tasksource/sick")
 #sick__entailment_BA = Classification('sentence_A','sentence_B','entailment_BA')
 
 def remove_neg_1(dataset):
     return dataset.filter(lambda x:x['labels']!=-1)
+
+def _parse_jeggers_riddle_choices(batch):
+    import ast
+    choices = batch["choices"]
+    if isinstance(choices, str):
+        try:
+            choices = ast.literal_eval(choices)
+        except Exception:
+            choices = [choices]
+    stripped = [
+        c.split(": ", 1)[1] if isinstance(c, str) and ": " in c else c
+        for c in choices
+    ]
+    return {"choices": {"text": stripped, "label": [None] * len(stripped)}}
+
+def _strip_option_prefix(text):
+    import re
+    if isinstance(text, str):
+        return re.sub(r'^[A-E][\.\):]\s*', '', text).strip()
+    return text
+
+def _concat_splits_to_train(dataset, splits=("train", "test")):
+    """Merge listed splits into train (reproduces single-pool sources)."""
+    from datasets import concatenate_datasets, DatasetDict
+    parts = [dataset[s] for s in splits if s in dataset]
+    merged = concatenate_datasets(parts) if len(parts) > 1 else parts[0]
+    out = DatasetDict({"train": merged})
+    for k in dataset:
+        if k not in splits:
+            out[k] = dataset[k]
+    return out
+
+def _logiqa_options(example):
+    import ast
+    opts = example.get("options")
+    if isinstance(opts, str):
+        try:
+            opts = ast.literal_eval(opts)
+        except Exception:
+            opts = [opts]
+    opts = [_strip_option_prefix(o) for o in opts]
+    ans = example.get("answer", "A")
+    if isinstance(ans, int):
+        label = ans
+    else:
+        ans = str(ans).strip().rstrip('.').upper()
+        label = ord(ans[0]) - ord('A') if ans and ans[0] in "ABCD" else 0
+    return {"options": opts, "correct_option": label, "query": example.get("question", "")}
 
 snli = Classification(sentence1="premise", sentence2="hypothesis", labels="label",
     post_process=remove_neg_1)
 
 scitail = Classification("sentence1","sentence2","gold_label",config_name="snli_format")
 
-hans = Classification(sentence1="premise", sentence2="hypothesis", labels="label")
+hans = Classification(sentence1="sentence1", sentence2="sentence2", labels="labels",
+    dataset_name="tasksource/hans")
 
 wanli = Classification('premise','hypothesis','gold', dataset_name="alisawuffles/WANLI")
 
@@ -168,7 +217,7 @@ imppres__log = Classification("premise","hypothesis","gold_label_log",
 #glue__diagnostics = Classification("premise","hypothesis","label",
 #    dataset_name="pietrolesci/glue_diagnostics",splits=["test",None,None])
 
-hlgd = Classification("headline_a", "headline_b", labels="label")
+hlgd = Classification("headline_a", "headline_b", labels="label", dataset_name="tasksource/hlgd")
 
 paws___labeled_final   = Classification("sentence1", "sentence2", name('label',['not_paraphrase','paraphrase']))
 paws___labeled_swap    = Classification("sentence1", "sentence2", name('label',['not_paraphrase','paraphrase']), splits=["train", None, None])
@@ -226,13 +275,36 @@ cos_e = MultipleChoice('question',
     labels= lambda x: x['choices_list'].index(x['answer']),
     config_name='v1.0')
 
-cosmos_qa = MultipleChoice(cat(['context','question']),regen('answer[0-3]'),'label')
+cosmos_qa = MultipleChoice(cat(['context','question']),regen('answer[0-3]'),'label',
+    dataset_name="Samsoup/cosmos_qa")
+
+def _preprocess_dream(dataset):
+    def expand(batch):
+        out = {"dialogue": [], "question": [], "choice": [], "answer": []}
+        for record in batch["text"]:
+            dialogue, questions = record[0], record[1]
+            for qa in questions:
+                out["dialogue"].append(dialogue)
+                out["question"].append(qa["question"])
+                out["choice"].append(qa["choice"])
+                out["answer"].append(qa["answer"])
+        return out
+
+    return dataset.map(
+        expand, batched=True, remove_columns=dataset["train"].column_names
+    )
 
 dream = MultipleChoice(
     lambda x:"\n".join(x['dialogue']+[x['question']]),
     choices_list='choice',
-    labels=lambda x:x['choices_list'].index(x['answer'])
-)
+    labels=lambda x:x['choices_list'].index(x['answer']),
+    dataset_name="json", task_id="dream",
+    load_dataset_kwargs={"data_files": {
+        "train": "https://raw.githubusercontent.com/nlpdata/dream/master/data/train.json",
+        "validation": "https://raw.githubusercontent.com/nlpdata/dream/master/data/dev.json",
+        "test": "https://raw.githubusercontent.com/nlpdata/dream/master/data/test.json",
+    }},
+    pre_process=_preprocess_dream)
 
 openbookqa = MultipleChoice(
     'question_stem',
@@ -261,7 +333,9 @@ quail = MultipleChoice(
 
 head_qa___en = MultipleChoice("qtext",
     choices_list = lambda x:[a['atext'] for a in x["answers"]],
-    labels = lambda x:[a['aid'] for a in x["answers"]].index(x["ra"])
+    labels = lambda x:[a['aid'] for a in x["answers"]].index(x["ra"]),
+    dataset_name="EleutherAI/headqa", config_name="en",
+    task_id="head_qa/en"
 )
 
 
@@ -273,18 +347,23 @@ sciq = MultipleChoice(
 social_i_qa = MultipleChoice(
     'question',
     ['answerA','answerB','answerC'],
-    'label')
+    'label',
+    dataset_name="tasksource/social_i_qa")
 
 wiki_hop___original = MultipleChoice(
-    'question', 
+    'query',
     choices_list='candidates',
-    labels=lambda x:x['choices_list'].index(x["answer"]))
+    labels=lambda x:x['choices_list'].index(x["answer"]),
+    dataset_name="MoE-UNC/wikihop", config_name="default",
+    task_id="wiki_hop/original")
 
 wiqa = MultipleChoice('question_stem',
     choices_list = lambda x: x['choices']['text'],
-    labels='answer_label_as_choice')
+    labels='answer_label_as_choice',
+    dataset_name="tasksource/wiqa")
 
-piqa = MultipleChoice('goal', choices=['sol1','sol2'], labels='label')
+piqa = MultipleChoice('goal', choices=['sol1','sol2'], labels='label',
+    dataset_name="baber/piqa")
 
 hellaswag = MultipleChoice('ctx_a',
     choices_list=lambda x: [f'{x["ctx_b"]}{e}' for e in x["endings"]],
@@ -335,7 +414,8 @@ def _split_choices(s):
 math_qa = MultipleChoice(
     'Problem', 
     choices_list = lambda x: _split_choices(x['options']),
-    labels = lambda x:'abcde'.index(x['correct'])   
+    labels = lambda x:'abcde'.index(x['correct']),
+    dataset_name="tasksource/math_qa"
 )
 
 #aqua_rat___tokenized = MultipleChoice("question",choices_list="options",labels=lambda x:"ABCDE".index(x['correct'])) in math_qa
@@ -362,15 +442,31 @@ toxic_conversations = Classification(
     dataset_name="SetFit/toxic_conversations")
 
 turingbench = Classification("Generation",labels="label",
-    dataset_name="turingbench/TuringBench",
-    splits=["train","validation",None])
+    dataset_name="csv", task_id="TuringBench",
+    load_dataset_kwargs={"data_files": {
+        "train": "hf://datasets/jana4/turingbench-humanized/TuringBench/AA/train.csv",
+        "validation": "hf://datasets/jana4/turingbench-humanized/TuringBench/AA/valid.csv",
+        "test": "hf://datasets/jana4/turingbench-humanized/TuringBench/AA/test.csv",
+    }}, splits=["train","validation",None])
 
 
-trec = Classification(sentence1="text", labels="fine_label")
+trec = Classification(sentence1="text", labels="fine_label",
+    dataset_name="tasksource/trec")
 
 tals_vitaminc = Classification('claim','evidence','label', dataset_name="tals/vitaminc")
 
-hope_edi = Classification("text", labels="label", splits=["train", "validation", None], config_name=["english"])
+hope_edi = Classification(
+    "text", labels="label", splits=["train", "validation", None],
+    dataset_name="csv", task_id="hope_edi/english",
+    load_dataset_kwargs={
+        "data_files": {
+            "train": "https://drive.google.com/uc?id=1ydsOTvBZXKqcRvXawOuePrJ99slOEbkk&export=download&confirm=t",
+            "validation": "https://drive.google.com/uc?id=1pvpPA97kybx5IyotR9HNuqP4T5ktEtr4&export=download&confirm=t",
+        },
+        "delimiter": "\t",
+        "column_names": ["text", "label", "dummy"],
+    },
+)
 
 #fever___v1_0 = Classification(sentence1="claim", labels="label", splits=["train", "paper_dev", "paper_test"], dataset_name="fever", config_name="v1.0")
 #fever___v2_0 = Classification(sentence1="claim", labels="label", splits=[None, "validation", None], dataset_name="fever", config_name="v2.0")
@@ -378,11 +474,20 @@ hope_edi = Classification("text", labels="label", splits=["train", "validation",
 rumoureval_2019 = Classification(
     sentence1="source_text",
     sentence2=lambda x: str(x["reply_text"]),
-    labels="label", dataset_name="strombergnlp/rumoureval_2019", config_name="RumourEval2019",
-    post_process=lambda ds:ds.filter(lambda x:x['labels']!=None)    
+    labels="label", dataset_name="csv",
+    task_id="rumoureval_2019/RumourEval2019",
+    load_dataset_kwargs={"data_files": {
+        "train": "hf://datasets/strombergnlp/rumoureval_2019/rumoureval2019_train.csv",
+        "validation": "hf://datasets/strombergnlp/rumoureval_2019/rumoureval2019_val.csv",
+        "test": "hf://datasets/strombergnlp/rumoureval_2019/rumoureval2019_test.csv",
+    }},
+    post_process=lambda ds: ds.filter(lambda x: x['labels'] is not None)
 )
 
-ethos___binary = Classification(sentence1="text", labels="label", splits=["train", None, None])
+ethos = Classification(sentence1="text", labels=name("label", ["no hate speech", "hate speech"]),
+    splits=["train", None, None], dataset_name="SetFit/ethos_binary",
+    task_id="ethos/binary",
+    pre_process=lambda ds: _concat_splits_to_train(ds, ("train", "test")))
 ethos___multilabel = Classification(
     'text',
     labels=lambda x: [x[c] for c in
@@ -424,6 +529,7 @@ pragmeval_2 = Classification("sentence1","sentence2",labels="label",
     "persuasiveness-strength", "sarcasm","stac"])
 
 silicone = Classification("Utterance",labels="Label",
+    dataset_name="tasksource/silicone",
     config_name=['dyda_da', 'dyda_e', 'iemocap', 'maptask', 'meld_e', 'meld_s', 'oasis', 'sem'] # +['swda', 'mrda'] # in pragmeval
 )
 
@@ -445,8 +551,10 @@ ag_news = Classification(sentence1="text", labels="label", splits=["train", None
 
 yelp_review_full = Classification(sentence1="text", labels="label", splits=["train", None, "test"], config_name=["yelp_review_full"])
 
-financial_phrasebank = Classification(sentence1="sentence", labels="label", splits=["train", None, None],
-    config_name=["sentences_allagree"])
+financial_phrasebank = Classification(sentence1="text", labels="label", splits=["train", None, None],
+    dataset_name="ghbacct/financial-phrasebank-all-agree-classification",
+    task_id="financial_phrasebank/sentences_allagree",
+    pre_process=lambda ds: _concat_splits_to_train(ds, ("train", "test")))
 
 poem_sentiment = Classification(sentence1="verse_text", labels="label")
 
@@ -460,7 +568,8 @@ app_reviews = Classification("review", labels="star", splits=["train", None, Non
 
 # multi_nli = Classification(sentence1="premise", sentence2="hypothesis", labels="label", splits=["train", "validation_matched", None]) #glue
 
-hate_speech18 = Classification(sentence1="text", labels="label", splits=["train", None, None])
+hate_speech18 = Classification(sentence1="text", labels="label", splits=["train", None, None],
+    dataset_name="tasksource/hate_speech18")
 
 sms_spam = Classification(sentence1="sms", labels="label", splits=["train", None, None])
 
@@ -468,7 +577,7 @@ humicroedit___subtask_1 = Classification("original", "edit", labels="meanGrade",
 humicroedit___subtask_2 = Classification(
     sentence1=cat(['original1','edit1'],' : '),
     sentence2=cat(['original2','edit2'],' : '),
-    labels="label", dataset_name="humicroedit", config_name="subtask-2")
+    labels="label", dataset_name="tasksource/humicroedit", config_name="subtask-2")
 
 snips_built_in_intents = Classification(sentence1="text", labels="label", splits=["train", None, None])
 
@@ -502,13 +611,20 @@ go_emotions___simplified = Classification(sentence1="text", labels="labels")
 #ecthr_cases___violation_prediction = Classification(labels="labels", dataset_name="ecthr_cases", config_name="violation-prediction")
 #   too long
 
-scicite = Classification(sentence1="string", labels="label",dataset_name="allenai/scicite")
+scicite = Classification(sentence1="string", labels="label",dataset_name="tasksource/scicite")
 
-liar = Classification(sentence1="statement", labels="label")
+liar = Classification(sentence1="statement", labels="label",
+    dataset_name="tasksource/liar")
 
 relbert_lexical_relation_classification = Classification(sentence1="head", sentence2="tail", labels="relation",
- dataset_name="relbert/lexical_relation_classification",
- config_name=["BLESS","CogALexV","EVALution","K&H+N","ROOT09"])
+ dataset_name="json",
+ config_name=["BLESS","CogALexV","EVALution","K&H+N","ROOT09"],
+ task_id="lexical_relation_classification/{config_name}",
+ load_dataset_kwargs={"data_files": {
+     "train": "hf://datasets/relbert/lexical_relation_classification/dataset/{config_name}/train.jsonl",
+     "validation": "hf://datasets/relbert/lexical_relation_classification/dataset/{config_name}/val.jsonl",
+     "test": "hf://datasets/relbert/lexical_relation_classification/dataset/{config_name}/test.jsonl",
+ }})
 
 
 linguisticprobing = Classification("sentence", labels="label", dataset_name="tasksource/linguisticprobing", 
@@ -536,12 +652,59 @@ crowdflower = Classification("text", labels="label",
             'text_emotion']
 )
 
-ethics___commonsense = Classification(sentence1="text", labels="label", dataset_name="metaeval/ethics", config_name="commonsense")
-ethics___deontology = Classification(sentence1="text", labels="label", dataset_name="metaeval/ethics", config_name="deontology")
-ethics___justice = Classification(sentence1="text", labels="label", dataset_name="metaeval/ethics", config_name="justice")
-ethics___virtue = Classification(sentence1="sentence1", sentence2="sentence2", labels="label", dataset_name="metaeval/ethics", config_name="virtue")
+def _ethics_binary_label(x):
+    value = str(x["label"])
+    if value in {"0", "acceptable"}:
+        return "acceptable"
+    return "unacceptable"
 
-emo = Classification(sentence1="text", labels="label", splits=["train", None, "test"], config_name=["emo2019"])
+def _ethics_virtue_first(x):
+    return x["scenario"].rsplit(" [SEP] ", 1)[0]
+
+def _ethics_virtue_second(x):
+    return x["scenario"].rsplit(" [SEP] ", 1)[1]
+
+ethics___commonsense = Classification(
+    sentence1="input", labels=_ethics_binary_label,
+    dataset_name="csv", task_id="ethics/commonsense",
+    load_dataset_kwargs={"data_files": {
+        "train": "hf://datasets/hendrycks/ethics/data/commonsense/train.csv",
+        "validation": "hf://datasets/hendrycks/ethics/data/commonsense/test.csv",
+        "test": "hf://datasets/hendrycks/ethics/data/commonsense/test_hard.csv",
+    }})
+ethics___deontology = Classification(
+    sentence1="scenario", labels=_ethics_binary_label,
+    dataset_name="csv", task_id="ethics/deontology",
+    load_dataset_kwargs={"data_files": {
+        "train": "hf://datasets/hendrycks/ethics/data/deontology/train.csv",
+        "validation": "hf://datasets/hendrycks/ethics/data/deontology/test.csv",
+        "test": "hf://datasets/hendrycks/ethics/data/deontology/test_hard.csv",
+    }})
+ethics___justice = Classification(
+    sentence1="scenario", labels=_ethics_binary_label,
+    dataset_name="csv", task_id="ethics/justice",
+    load_dataset_kwargs={"data_files": {
+        "train": "hf://datasets/hendrycks/ethics/data/justice/train.csv",
+        "validation": "hf://datasets/hendrycks/ethics/data/justice/test.csv",
+        "test": "hf://datasets/hendrycks/ethics/data/justice/test_hard.csv",
+    }})
+ethics___virtue = Classification(
+    sentence1=_ethics_virtue_first, sentence2=_ethics_virtue_second,
+    labels=_ethics_binary_label,
+    dataset_name="csv", task_id="ethics/virtue",
+    load_dataset_kwargs={"data_files": {
+        "train": "hf://datasets/hendrycks/ethics/data/virtue/train.csv",
+        "validation": "hf://datasets/hendrycks/ethics/data/virtue/test.csv",
+        "test": "hf://datasets/hendrycks/ethics/data/virtue/test_hard.csv",
+    }})
+
+def _emocontext_text(x):
+    return " ".join(str(x[field]) for field in ("turn1", "turn2", "turn3"))
+
+emo = Classification(sentence1=_emocontext_text,
+    labels=name("label", ["others", "happy", "sad", "angry"]),
+    splits=["train", None, "test"],
+    dataset_name="oneonlee/cleansed_emocontext", task_id="emo/emo2019")
 
 google_wellformed_query = Classification(sentence1="content", labels="rating")
 
@@ -568,16 +731,26 @@ jnlpba = TokenClassification(tokens="tokens", labels="ner_tags", splits=["train"
 
 SpeedOfMagic_ontonotes_english = TokenClassification(tokens="tokens", labels="ner_tags", dataset_name="SpeedOfMagic/ontonotes_english", config_name="SpeedOfMagic--ontonotes_english")
 
-blog_authorship_corpus__gender    = Classification(sentence1="text",labels="gender")
+blog_authorship_corpus__gender    = Classification(sentence1="text",labels="gender",
+    dataset_name="tasksource/blog_authorship_corpus")
 blog_authorship_corpus__age       = Classification(sentence1="text",labels="age")
 #blog_authorship_corpus__horoscope = Classification(sentence1="text",labels="horoscope")
-blog_authorship_corpus__job       = Classification(sentence1="text",labels="job")
+blog_authorship_corpus__job       = Classification(sentence1="text",labels="topic",
+    dataset_name="tasksource/blog_authorship_corpus",
+    pre_process=lambda ds: _cast_blog_topics(ds))
 
-launch_open_question_type = Classification(sentence1="question", labels="resolve_type", dataset_name="launch/open_question_type")
+def _cast_blog_topics(dataset):
+    labels = sorted(set(dataset["train"]["topic"]))
+    return DatasetDict({
+        split: rows.cast_column("topic", ClassLabel(names=labels))
+        for split, rows in dataset.items()
+    })
+
+launch_open_question_type = Classification(sentence1="question", labels="resolve_type", dataset_name="Korea-MES/open_question_type")
 
 health_fact = Classification(sentence1="claim", labels="label",
-    pre_process = lambda ds:ds.filter(lambda x:x['label'] not in {-1})
-)
+    pre_process=lambda ds: ds.filter(lambda x: x['label'] not in {-1}),
+    dataset_name="marcov/health_fact_promptsource", task_id="health_fact")
 
 commonsense_qa = MultipleChoice(
     "question",
@@ -588,13 +761,18 @@ commonsense_qa = MultipleChoice(
 mc_taco = Classification(
     lambda x: f'{x["sentence"]} {x["question"]} {x["answer"]}',
     labels="label",
-    splits=[ "validation",None,"test"]
+    splits=[ "validation",None,"test"],
+    dataset_name="marcov/mc_taco_promptsource", task_id="mc_taco"
 )
 
 ade_corpus_v2___Ade_corpus_v2_classification = Classification("text",labels="label")
 
 discosense = MultipleChoice("context",choices=regen("option\_[0-3]"),labels="label",
-    dataset_name="prajjwal1/discosense")
+    dataset_name="json", task_id="discosense",
+    load_dataset_kwargs={"data_files": {
+        "train": "https://raw.githubusercontent.com/prajjwal1/discosense/main/data/discosense_train.json",
+        "test": "https://raw.githubusercontent.com/prajjwal1/discosense/main/data/discosense_test.json",
+    }})
     
 circa = Classification(
     sentence1=cat(["context","question-X"]),
@@ -624,7 +802,8 @@ phrase_similarity = Classification(
     sentence1=cat(["phrase1","sentence1"], " : "),
     sentence2=cat(["phrase2","sentence2"], " : "),
     labels='label',
-    dataset_name="PiC/phrase_similarity"
+    dataset_name="Deehan1866/processed_phrase_similarity",
+    task_id="phrase_similarity"
 )
 
 exaggeration_detection = Classification(
@@ -641,12 +820,31 @@ quarel = Classification(
 mwong_fever_evidence_related = Classification(sentence1="claim", sentence2="evidence", labels=name("labels",['unrelated','related']),
     splits=["train", "valid", "test"], dataset_name="mwong/fever-evidence-related")
 
-numer_sense = Classification("sentence",labels="target",splits=["train",None,None])
+numer_sense = Classification(
+    "sentence", labels="target", splits=["train", None, None],
+    dataset_name="csv", task_id="numer_sense",
+    load_dataset_kwargs={
+        "data_files": {
+            "train": "https://raw.githubusercontent.com/INK-USC/NumerSense/main/data/train.masked.tsv"
+        },
+        "delimiter": "\t",
+        "column_names": ["sentence", "target"],
+    },
+)
 
-dynasent__r1 = Classification("sentence", labels="gold_label", 
-    dataset_name="dynabench/dynasent", config_name="dynabench.dynasent.r1.all")
-dynasent__r2 = Classification("sentence", labels="gold_label", 
-    dataset_name="dynabench/dynasent", config_name="dynabench.dynasent.r2.all")
+def _dynasent_ternary(dataset):
+    return dataset.filter(
+        lambda row: row["gold_label"] in {"positive", "negative", "neutral"}
+    )
+
+dynasent___r1 = Classification(
+    "sentence", labels="gold_label", dataset_name="tasksource/dynasent",
+    config_name="r1", task_id="dynasent/dynabench.dynasent.{config_name}.all/{config_name}",
+    pre_process=_dynasent_ternary)
+dynasent___r2 = Classification(
+    "sentence", labels="gold_label", dataset_name="tasksource/dynasent",
+    config_name="r2", task_id="dynasent/dynabench.dynasent.{config_name}.all/{config_name}",
+    pre_process=_dynasent_ternary)
 
 sarcasm_news = Classification("headline", labels="is_sarcastic",
     dataset_name="raquiba/Sarcasm_News_Headline")
@@ -670,7 +868,8 @@ logiqa = MultipleChoice(
     cat(["context","query"]),
     choices_list = 'options',
     labels = "correct_option",
-    dataset_name="lucasmccabe/logiqa"
+    dataset_name="fireworks-ai/logiqa",
+    pre_process=lambda ds: ds.map(_logiqa_options)
 )
 
 #proto_qa = MultipleChoice(
@@ -724,12 +923,18 @@ onestop_qa = MultipleChoice(cat(["paragraph","question"]),choices_list="answers"
 
 moral_stories = MultipleChoice(cat(["situation","intention"]),
     choices=['moral_action',"immoral_action"],labels=constant(0),
-    dataset_name="demelin/moral_stories", config_name="full")
+    dataset_name="LabHC/moral_stories", task_id="moral_stories/full")
 
-prost = MultipleChoice(cat(["context","ex_question"]), choices=['A','B','C','D'],labels="label",
-    dataset_name="corypaik/prost")
+def _prost_label(x):
+    value = str(x["label"]).strip()
+    return "ABCD".index(value) if value in "ABCD" else int(value)
 
-dyna_hate = Classification("text",labels="label",dataset_name="aps/dynahate",splits=['train',None,None])
+prost = MultipleChoice(cat(["context","ex_question"]), choices=['A','B','C','D'],
+    labels=_prost_label, dataset_name="json", task_id="prost",
+    load_dataset_kwargs={"data_files":
+        "hf://datasets/corypaik/prost/data/default.jsonl"})
+
+dyna_hate = Classification("text",labels="label",dataset_name="tasksource/dynahate",splits=['train',None,None])
 
 syntactic_augmentation_nli = Classification('sentence1',"sentence2","gold_label",dataset_name="metaeval/syntactic-augmentation-nli")
 
@@ -740,9 +945,16 @@ conqada = Classification("sentence1","sentence2","label",dataset_name="lasha-nlp
     pre_process = lambda ds:ds.filter(lambda x:x['label'] in {"DON'T KNOW","YES","NO"})
 )
 
-webgbpt_comparisons = MultipleChoice(get.question.full_text, choices=['answer_0','answer_1'],
-    labels=lambda x:int(x['score_1']>0),
-    dataset_name="openai/webgpt_comparisons")
+def _webgpt_question_text(row):
+    import ast
+    value = row["question"]
+    question = ast.literal_eval(value) if isinstance(value, str) else value
+    return question["full_text"]
+
+webgpt_comparisons = MultipleChoice(
+    _webgpt_question_text, choices=['answer_0','answer_1'],
+    labels=lambda x:int(float(x['score_1']) > 0),
+    dataset_name="heegyu/webgpt_comparisons_ko", task_id="webgpt_comparisons")
 
 synthetic_instruct = MultipleChoice('prompt', choices=['chosen', 'rejected'],
     labels=constant(0), dataset_name="Dahoas/synthetic-instruct-gptj-pairwise")
@@ -784,7 +996,8 @@ strategy_qa = Classification('question',labels='answer',
 summarize_from_feedback = MultipleChoice(get.info.post,
     choices_list=lambda x: [x['summaries'][0]['text'],x['summaries'][1]['text']],
     labels="choice",
-    dataset_name="openai/summarize_from_feedback", config_name="comparisons",
+    dataset_name="vwxyzjn/summarize_from_feedback_oai_preprocessing",
+    task_id="summarize_from_feedback/comparisons",
     pre_process = lambda ds:ds.filter(lambda x: type(get.info.post(x))==str)
 )
 
@@ -852,8 +1065,10 @@ spartqa_mc=MultipleChoice(cat(["story","question"]),choices_list="candidate_answ
 temporal_nli = Classification("Premise","Hypothesis","Label",
     dataset_name="tasksource/temporal-nli")
 
-riddle_sense = MultipleChoice("question", choices_list=get.choices.text, 
-    labels=lambda x : "ABCDE".index(x['answerKey']))
+riddle_sense = MultipleChoice("question", choices_list=get.choices.text,
+    labels=lambda x : "ABCDE".index(x['answerKey']),
+    dataset_name="jeggers/riddle_sense",
+    pre_process=lambda ds: ds.map(_parse_jeggers_riddle_choices))
 
 clcd = Classification(
     "sentence1","sentence2","label",
@@ -912,11 +1127,23 @@ oasst1__helpfulness = Classification("parent_text","text",labels="helpfulness",*
 
 mindgames = Classification("premise","hypothesis","label",dataset_name="sileod/mindgames")
 
-def _udep_post_process(ds):
-    return ds.cast_column('labels', Sequence(ClassLabel(names=udep_en_labels)))
+def _udep_deprel_pre_process(dataset):
+    labels = sorted({
+        label
+        for split in dataset.values()
+        for sequence in split["deprel"]
+        for label in sequence
+    })
+    return DatasetDict({
+        name: split.cast_column("deprel", Sequence(ClassLabel(names=labels)))
+        for name, split in dataset.items()
+    })
 
-udep__deprel = TokenClassification('tokens',lambda x:[udep_en_labels.index(a) for a in x['deprel']],
-    config_name=udep_en_configs,dataset_name="universal_dependencies",post_process=_udep_post_process)
+udep__deprel = TokenClassification(
+    "tokens", "deprel",
+    config_name=udep_en_configs,
+    dataset_name="universal-dependencies/universal_dependencies",
+    pre_process=_udep_deprel_pre_process)
 
 ambient= Classification("premise","hypothesis","hypothesis_ambiguous",dataset_name="metaeval/ambient")
 
@@ -936,11 +1163,39 @@ dgen  = MultipleChoice("sentence", choices_list=lambda x:[x["answer"]]+x["distra
 
 i2d2 = Classification("sentence1",labels=name('label',['False','True']), dataset_name="tasksource/I2D2")
 
-arg_me = Classification('argument','conclusion','stance', dataset_name="webis/args_me")
-valueeval_stance = Classification("Premise","Conclusion","Stance", dataset_name="webis/Touche23-ValueEval")
+def _preprocess_args_me(dataset):
+    import ast
+
+    def extract(row):
+        premises = row["premises"]
+        if isinstance(premises, str):
+            premises = ast.literal_eval(premises)
+        premise = premises[0]
+        return {"argument": premise["text"], "stance": premise["stance"]}
+
+    return dataset.map(extract)
+
+arg_me = Classification(
+    'argument', 'conclusion', 'stance', dataset_name="json", task_id="args_me",
+    load_dataset_kwargs={
+        "data_files": "hf://datasets/webis/args_me/args-me.jsonl"
+    },
+    pre_process=_preprocess_args_me)
+valueeval_stance = Classification(
+    "Premise", "Conclusion", "Stance", dataset_name="csv",
+    task_id="Touche23-ValueEval",
+    load_dataset_kwargs={"data_files": {
+        "train": "https://zenodo.org/records/7879430/files/arguments-training.tsv",
+        "validation": "https://zenodo.org/records/7879430/files/arguments-validation.tsv",
+        "test": "https://zenodo.org/records/7879430/files/arguments-test.tsv",
+    }, "delimiter": "\t"})
 starcon = Classification('argument','topic','label',dataset_name="tasksource/starcon")
 
-banking77 = Classification("text",labels="label",dataset_name="PolyAI/banking77")
+banking77 = Classification("text",labels="label",dataset_name="legacy-datasets/banking77")
+
+it_support_tickets = Classification(
+    "text", labels="label", dataset_name="tasksource/it-support-tickets",
+    splits=["train", None, "test"])
     
 control = Classification('premise','hypothesis',"label",dataset_name="tasksource/ConTRoL-nli")
 tracie = Classification("premise","hypothesis","answer",dataset_name='tasksource/tracie')
@@ -971,7 +1226,21 @@ mbib_text_level_bias	= Classification('text',labels=name('label',['not text-leve
 
 robustLR = Classification("context","statement","label", dataset_name="tasksource/robustLR")
 
-cluttr = Classification("story","query", "target_text",dataset_name="CLUTRR/v1", config_name="gen_train234_test2to10")
+def _cast_cluttr_labels(dataset):
+    labels = sorted({label for rows in dataset.values() for label in rows["target_text"]})
+    return DatasetDict({
+        split: rows.cast_column("target_text", ClassLabel(names=labels))
+        for split, rows in dataset.items()
+    })
+
+cluttr = Classification(
+    "story", "query", "target_text", dataset_name="json",
+    task_id="v1/gen_train234_test2to10",
+    load_dataset_kwargs={"data_files": {
+        "train": "hf://datasets/kendrivp/CLUTRR_v1_extracted/gen_train234_test2to10/CLUTRR_v1_gen_train234_test2to10_train.json",
+        "validation": "hf://datasets/kendrivp/CLUTRR_v1_extracted/gen_train234_test2to10/CLUTRR_v1_gen_train234_test2to10_validation.json",
+        "test": "hf://datasets/kendrivp/CLUTRR_v1_extracted/gen_train234_test2to10/CLUTRR_v1_gen_train234_test2to10_test.json",
+    }}, pre_process=_cast_cluttr_labels)
 
 logical_fallacy = Classification("source_article", labels="logical_fallacies", dataset_name="tasksource/logical-fallacy")
 
@@ -985,9 +1254,21 @@ moh   = Classification("context","expression","label", dataset_name="tasksource/
 vuac  = Classification("context","expression","label", dataset_name="tasksource/VUAC")
 trofi = Classification("context","expression","label", dataset_name="tasksource/TroFi", splits=['train',None,'test'])
 
+def _strip_sharc_extras(dataset):
+    columns = dataset["train"].column_names
+    extras = ["utterance_id", "tree_id", "source_url", "history", "evidence"]
+    if columns is None:
+        return dataset.remove_columns(extras)
+    return dataset.remove_columns([name for name in extras if name in columns])
+
 sharc_classification = Classification("snippet", lambda x:f'{x["scenario"]}\n{x["question"]}',
     labels=lambda x:x["answer"] if x['answer'] in  {"Yes","No","Irrelevant"} else "Clarification needed",
-    dataset_name='sharc_modified',config_name='mod')
+    dataset_name='json', task_id='sharc_modified/mod',
+    load_dataset_kwargs={"data_files": {
+        "train": "https://raw.githubusercontent.com/nikhilweee/neural-conv-qa/master/datasets/mod_train.json",
+        "validation": "https://raw.githubusercontent.com/nikhilweee/neural-conv-qa/master/datasets/mod_dev.json",
+    }, "streaming": True},
+    pre_process=_strip_sharc_extras)
 
 conceptrules_v2 = Classification("context", "text", "label", dataset_name="tasksource/conceptrules_v2")
 
@@ -1037,7 +1318,12 @@ space_nli = Classification("premises","hypothesis","label",dataset_name="tasksou
 
 propsegment = Classification("hypothesis","premise",
     labels = lambda x:{'n':'neutral','e':'entailment','c':'contradiction'}[x['label']],
-    dataset_name="sihaochen/propsegment",config_name='nli')
+    dataset_name="json", task_id="propsegment/nli",
+    load_dataset_kwargs={"data_files": {
+        "train": "https://raw.githubusercontent.com/schen149/PropSegmEnt/main/propnli.train.jsonl",
+        "validation": "https://raw.githubusercontent.com/schen149/PropSegmEnt/main/propnli.dev.jsonl",
+        "test": "https://raw.githubusercontent.com/schen149/PropSegmEnt/main/propnli.test.jsonl",
+    }})
 
 hatemoji = Classification('text',labels=name("label_gold", ['not-hate-speech','hate-speech']),
     dataset_name="HannahRoseKirk/HatemojiBuild")
@@ -1080,7 +1366,7 @@ sdoh_nli = Classification("premise","hypothesis",labels=lambda x:{True:"entailme
 
 scifact_entailment = Classification(lambda x:"\n".join(x["abstract"]),"claim",
     labels=lambda x:x['verdict'].replace('NEI','NEUTRAL').lower(),
-    dataset_name="allenai/scifact_entailment")
+    dataset_name="tasksource/scifact_entailment")
 
 feasibilityQA = Classification(cat(['knowledge','premise']),'hypothesis','binary_classification_label',
     dataset_name="tasksource/feasibilityQA")
@@ -1148,9 +1434,9 @@ nope = Classification('premise','hypothesis',
 
 logicNLI = Classification('premise','hypothesis','label',dataset_name='tasksource/LogicNLI')
 
-contract_nli__seg = Classification("premise","hypothesis","label", dataset_name="kiddothe2b/contract-nli",config_name="contractnli_a")
+contract_nli__seg = Classification("premise","hypothesis","label", dataset_name="tasksource/contract-nli",config_name="contractnli_a")
 
-contract_nli__full = Classification("premise","hypothesis","label", dataset_name="kiddothe2b/contract-nli",config_name="contractnli_b")
+contract_nli__full = Classification("premise","hypothesis","label", dataset_name="tasksource/contract-nli",config_name="contractnli_b")
 
 nli4ct = Classification(lambda x: "\n".join(x['Primary_evidence']),'Statement',"Label",
     dataset_name="AshtonIsNotHere/nli4ct_semeval2024",splits=['train','dev',None])
@@ -1275,14 +1561,30 @@ def _fewrel_relation_match(dataset):
                 {"text": text, "relation": relation, "label": 1},
                 {"text": text, "relation": negative, "label": 0},
             ]
-        rows[split] = Dataset.from_list(examples)
+        rows[split] = Dataset.from_list(examples).cast_column(
+            "label", ClassLabel(names=["negative", "positive"]))
     return DatasetDict(rows)
 
 fewrel = Classification(
     "text", "relation", "label",
-    dataset_name="thunlp/few_rel", config_name="default",
+    dataset_name="tasksource/few_rel", config_name="default",
     splits=["train_wiki", "val_wiki", "val_nyt"],
     pre_process=_fewrel_relation_match)
+
+def _yufei_docred_to_columnar(dataset):
+    """Map YufeiHFUT raw labels ({h,t,r}) to the columnar form _docred_relations expects."""
+    out = {}
+    for split in dataset:
+        def convert(x):
+            labels = x["labels"] or []
+            return {"labels": {
+                "head": [r["h"] for r in labels],
+                "tail": [r["t"] for r in labels],
+                "relation_id": [r["r"] for r in labels],
+                "relation_text": [r["r"] for r in labels],
+            }}
+        out[split] = dataset[split].map(convert)
+    return DatasetDict(out)
 
 def _docred_relations(dataset):
     rows = {}
@@ -1301,13 +1603,23 @@ def _docred_relations(dataset):
                     "relation": relation["relation_text"] or relation["relation_id"],
                 })
         rows[split] = Dataset.from_list(examples)
-    return DatasetDict(rows)
+    relation_names = sorted({
+        relation for split_rows in rows.values() for relation in split_rows["relation"]
+    })
+    return DatasetDict({
+        split: split_rows.cast_column("relation", ClassLabel(names=relation_names))
+        for split, split_rows in rows.items()
+    })
 
 docred = Classification(
     "text", "entity_pair", "relation",
-    dataset_name="thunlp/docred",
+    dataset_name="json", task_id="docred",
     splits=["train_annotated", "validation", None],
-    pre_process=_docred_relations)
+    load_dataset_kwargs={"data_files": {
+        "train_annotated": "hf://datasets/YufeiHFUT/DocRED_origin/train_annotated.json",
+        "validation": "hf://datasets/YufeiHFUT/DocRED_origin/dev.json",
+    }},
+    pre_process=lambda ds: _docred_relations(_yufei_docred_to_columnar(ds)))
 
 def _chemprot_relations(dataset):
     rows = {}

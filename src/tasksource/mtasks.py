@@ -1,5 +1,4 @@
 from .preprocess import cat, get,name, regen, constant, Classification, TokenClassification, MultipleChoice
-from .metadata import udep_labels
 from datasets import get_dataset_config_names, ClassLabel, Dataset, DatasetDict, concatenate_datasets, Sequence
 
 def all(dataset_name):
@@ -19,7 +18,8 @@ moritz_xnli = Classification("premise","hypothesis",name("label",["entailment", 
     pre_process=concatenate_configs, 
     dataset_name="MoritzLaurer/multilingual-NLI-26lang-2mil7")
 
-xnli = Classification("premise", "hypothesis", "label", **all("metaeval/xnli"))
+xnli = Classification("premise", "hypothesis", "label",
+    dataset_name="facebook/xnli", config_name="en", task_id="xnli")
 
 americas_nli = Classification("premise","hypothesis","label",config_name="all_languages")
 
@@ -29,37 +29,69 @@ stsb_multi_mt = Classification("sentence1", "sentence2",
 
 pawsx = Classification("sentence1","sentence2",name('label',['not_paraphrase','paraphrase']), **all('paws-x'))
 
-miam = Classification("Utterance",labels="Label", **all('miam'))
+MIAM_DIHANA_LABELS = [
+    "Afirmacion", "Apertura", "Cierre", "Confirmacion", "Espera",
+    "Indefinida", "Negacion", "No_entendido", "Nueva_consulta",
+    "Pregunta", "Respuesta",
+]
 
-xstance = Classification("question", "comment", "label",
-    **all("strombergnlp/x-stance"))
+def _miam_preprocess(dataset):
+    dataset = dataset.rename_column("Dialogue_Act", "Label")
+    return dataset.cast_column("Label", ClassLabel(names=MIAM_DIHANA_LABELS))
+
+miam = Classification(
+    "Utterance", labels="Label", dataset_name="csv", task_id="miam",
+    load_dataset_kwargs={"data_files": {
+        "train": "https://raw.githubusercontent.com/eusip/MIAM/main/dihana/train.csv",
+        "validation": "https://raw.githubusercontent.com/eusip/MIAM/main/dihana/dev.csv",
+        "test": "https://raw.githubusercontent.com/eusip/MIAM/main/dihana/test.csv",
+    }},
+    pre_process=_miam_preprocess)
+
+def _xstance_question(x):
+    lang = x.get("language") or "en"
+    return x.get("question_" + lang) or x.get("question_en") or ""
+
+xstance = Classification(_xstance_question, "comment", "stance_label",
+    dataset_name="michiel/xstance", task_id="x-stance")
 
 
-offenseval = Classification(lambda x: str(x["text"]), labels=name("subtask_a",['not offensive','offensive']),
-    pre_process=lambda ds:ds.filter(lambda x:  x['subtask_a'] in [0,1]),
-    dataset_name='strombergnlp/offenseval_2020',
-    config_name=["ar","da","gr","tr"])
+def _offenseval_mapping(dataset_name, config_name, task_id):
+    return dict(
+        sentence1=lambda x: str(x["text"]),
+        labels=name("subtask_a", ['not offensive', 'offensive']),
+        pre_process=lambda ds: ds.filter(lambda x: x['subtask_a'] in [0, 1]),
+        dataset_name=dataset_name, config_name=config_name, task_id=task_id)
+
+offenseval_ar = Classification(**_offenseval_mapping('khalidalt/offenseval_2020_ar', None, 'offenseval_2020/ar'))
+offenseval_da = Classification(**_offenseval_mapping('tasksource/offenseval_2020', 'da', 'offenseval_2020/da'))
+offenseval_gr = Classification(**_offenseval_mapping('tasksource/offenseval_2020', 'gr', 'offenseval_2020/gr'))
+offenseval_tr = Classification(**_offenseval_mapping('tasksource/offenseval_2020', 'tr', 'offenseval_2020/tr'))
 
 offenseval_dravidian = Classification("text",labels="label",config_name=['kannada','malayalam','tamil'])
 
 mlma_hate = Classification("tweet", labels=lambda x:x["sentiment"].split('_'),
     dataset_name="nedjmaou/MLMA_hate_speech")
 
-qam = Classification("question","answer","label", dataset_name="xglue",config_name="qam")
+qam = Classification("question","answer","label", dataset_name="tasksource/xglue",config_name="qam")
 
 #x_sum_factuality = Classification("summary","generated_summary","label", dataset_name="ylacombe/xsum_factuality")
 
 x_fact = Classification('evidence','claim','label', dataset_name="metaeval/x-fact")
 
-xglue___nc = Classification('news_body',labels='news_category')
-xglue___qadsm = Classification('query','ad_description','relevance_label')
-xglue___qam = Classification('question','answer','label')
-xglue___wpr = Classification('query','web_page_snippet','relavance_label') # relavance_label : sic
+xgluenc = Classification('text', labels='label_text',
+    dataset_name="SetFit/xglue_nc", task_id="xglue/nc")
+xglue___qadsm = Classification('query','ad_description','relevance_label',
+    dataset_name="tasksource/xglue", config_name="qadsm")
+xglue___qam = Classification('question','answer','label',
+    dataset_name="tasksource/xglue", config_name="qam")
+xglue___wpr = Classification('query','web_page_snippet','relavance_label',
+    dataset_name="tasksource/xglue", config_name="wpr") # relavance_label : sic
 
 xlwic = Classification(
     sentence1=cat(["target_word","context_1"], " : "),
     sentence2=cat(["target_word","context_2"], " : "),
-    labels='label',dataset_name="pasinit/xlwic",config_name=['xlwic_de_de','xlwic_it_it','xlwic_fr_fr','xlwic_en_ko'])
+    labels='label',dataset_name="tasksource/xlwic",config_name=['xlwic_de_de','xlwic_it_it','xlwic_fr_fr','xlwic_en_ko'])
 
 #[ "spam", "fails_task", "lang_mismatch", "pii", "not_appropriate", "hate_speech", "sexual_content", "quality", "toxicity", "humor", "helpfulness", "creativity", "violence" ]
 
@@ -97,10 +129,25 @@ xglue_pos = TokenClassification("words","pos", dataset_name="xglue",config_name=
 
 #disrpt_23 = Classification("unit1_sent", "unit2_sent", "label",**all("metaeval/disrpt"))
 
-udep__pos = TokenClassification('tokens','upos', **all('universal_dependencies'))
+def _udep_cast_label_sequence(dataset, column):
+    label_names = sorted({
+        label
+        for split in dataset.values()
+        for sequence in split[column]
+        for label in sequence
+    })
+    return DatasetDict({
+        name: split.cast_column(column, Sequence(ClassLabel(names=label_names)))
+        for name, split in dataset.items()
+    })
+
+udep__pos = TokenClassification(
+    'tokens', 'upos',
+    pre_process=lambda ds: _udep_cast_label_sequence(ds, 'upos'),
+    **all('universal-dependencies/universal_dependencies'))
 
 def udep_post_process(ds):
-    return ds.cast_column('labels', Sequence(ClassLabel(names=udep_labels)))
+    return _udep_cast_label_sequence(ds, 'labels')
 
 #udep__deprel = TokenClassification('tokens',lambda x:[udep_labels.index(a) for a in x['deprel']],
 #    **all('universal_dependencies'),post_process=udep_post_process)
@@ -108,22 +155,75 @@ def udep_post_process(ds):
 oasst_rlhf = MultipleChoice("prompt",choices=['chosen','rejected'],labels=constant(0),
     dataset_name="tasksource/oasst1_pairwise_rlhf_reward")
 
-sentiment = Classification("text",labels="label", dataset_name="tyqiangz/multilingual-sentiments",config_name="all",
-    pre_process=lambda ds:ds.filter(lambda x: "amazon_reviews" not in x['source']) )
-tweet_sentiment = Classification("text", labels="label", **all('cardiffnlp/tweet_sentiment_multilingual'))
-review_sentiment = Classification("review_body",labels="stars", dataset_name="amazon_reviews_multi",config_name="all_languages")
+sentiment = Classification(
+    "text", labels="label", dataset_name="csv", config_name=None,
+    task_id="multilingual-sentiments/all",
+    load_dataset_kwargs={"data_files": {
+        "train": "https://raw.githubusercontent.com/tyqiangz/multilingual-sentiment-datasets/main/data/all/train.csv",
+        "validation": "https://raw.githubusercontent.com/tyqiangz/multilingual-sentiment-datasets/main/data/all/valid.csv",
+        "test": "https://raw.githubusercontent.com/tyqiangz/multilingual-sentiment-datasets/main/data/all/test.csv",
+    }},
+    pre_process=lambda ds: ds.filter(lambda x: "amazon_reviews" not in x['source']))
+_TWEET_SENTIMENT_LANGS = [
+    "arabic", "english", "french", "german", "hindi", "italian",
+    "portuguese", "spanish",
+]
+tweet_sentiment = Classification(
+    "text", labels=lambda x: ["negative", "neutral", "positive"][int(x["label"])],
+    dataset_name="json", task_id="tweet_sentiment_multilingual",
+    load_dataset_kwargs={"data_files": {
+        split: [
+            f"hf://datasets/mteb/tweet_sentiment_multilingual/{split}/{lang}.jsonl.gz"
+            for lang in _TWEET_SENTIMENT_LANGS
+        ]
+        for split in ("train", "validation", "test")
+    }})
+review_sentiment = Classification("review_body",labels="stars", dataset_name="goosmanlei/amazon_reviews_multi",config_name="all_languages")
 emotion = Classification("text",labels="emotion",dataset_name="metaeval/universal-joy")
 # in mms
 
-mms_sentiment = Classification("text",labels="label",dataset_name='Brand24/mms')
+def _mms_label_filter(dataset):
+    valid = {"negative", "neutral", "positive"}
+    dataset = dataset.filter(
+        lambda x: x["label"] in [-1, 0, 1] or x["label"] in valid
+    )
+
+    def normalize(row):
+        if row["label"] in valid:
+            return {"label": row["label"]}
+        return {
+            "label": ["negative", "neutral", "positive"][int(row["label"]) + 1]
+        }
+
+    return dataset.map(normalize)
+
+mms_sentiment = Classification(
+    "text", labels="label", dataset_name="csv", task_id="mms",
+    load_dataset_kwargs={
+        "data_files": {"train": "hf://datasets/Brand24/mms/data/**/*.tsv"},
+        "delimiter": "\t",
+        "column_names": ["label", "text", "cleanlab_self_confidence"],
+        "streaming": True,
+    },
+    pre_process=_mms_label_filter)
 
 mapa_fine = TokenClassification("tokens","coarse_grained",dataset_name='joelito/mapa')
 mapa_corase = TokenClassification("tokens","fine_grained",dataset_name='joelito/mapa')
 
-aces_ranking = MultipleChoice("source",choices=['good-translation','incorrect-translation'],labels=constant(0), dataset_name='nikitam/ACES')
-aces_phenomena = Classification('source','incorrect-translation','phenomena', dataset_name='nikitam/ACES')
+aces_ranking = MultipleChoice("source",choices=['good-translation','incorrect-translation'],labels=constant(0), dataset_name='nikitam/ACES', config_name='ACES', task_id='ACES/ranking')
+def _aces_phenomena_labels(dataset):
+    # The catalog samples before fixing string labels; build the ontology from
+    # the full source so rare phenomena in dev/test are not silently invalid.
+    names = sorted(set(dataset["train"]["phenomena"]))
+    return dataset.cast_column("phenomena", ClassLabel(names=names))
 
-amazon_intent = Classification("utt",labels="intent",**all('AmazonScience/massive'))
+aces_phenomena = Classification('source','incorrect-translation','phenomena',
+    dataset_name='nikitam/ACES', config_name='ACES',
+    task_id='ACES/phenomena', pre_process=_aces_phenomena_labels)
+
+amazon_intent = Classification("text",labels="label",
+    dataset_name='mteb/MassiveIntentClassification', config_name="en",
+    task_id="massive")
 
 
 # modern multilingual classification / reward datasets
@@ -133,14 +233,15 @@ masakhanews = Classification(
     **all("masakhane/masakhanews"))
 
 nusax_sentiment = Classification(
-    "text", labels="label",
-    dataset_name="indonlp/NusaX-senti",
+    "text", labels=name("label", ["negative", "neutral", "positive"]),
+    dataset_name="mteb/NusaX-senti",
     config_name=["ace", "ban", "bbc", "bjn", "bug", "eng", "ind", "jav",
                  "mad", "min", "nij", "sun"])
 
 afrisenti = Classification(
-    "tweet", labels="label",
-    dataset_name="shmuhammad/AfriSenti-twitter-sentiment",
+    "text", labels=name("label", ["positive", "neutral", "negative"]),
+    dataset_name="mteb/AfriSentiClassification",
+    task_id="AfriSenti-twitter-sentiment/{config_name}",
     # Oromo and Tigrinya have no train split. Keep this list static so importing
     # the task catalog does not require executing the dataset's legacy script.
     config_name=["amh", "arq", "ary", "hau", "ibo", "kin", "pcm", "por",

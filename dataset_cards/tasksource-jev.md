@@ -1,5 +1,5 @@
 ---
-pretty_name: tasksource-jev
+pretty_name: tasksource-jev-typed-decisions
 language:
 - multilingual
 license: other
@@ -15,12 +15,12 @@ tags:
 - decision-models
 - multiple-choice
 size_categories:
-- 100K<n<1M
+- 1M<n<10M
 ---
 
-# tasksource-jev
+# tasksource-jev-typed-decisions
 
-`tasksource-jev` recasts Tasksource classification, multiple-choice, and selected
+`tasksource-jev-typed-decisions` recasts Tasksource classification, multiple-choice, and selected
 token-classification datasets
 as runtime-defined decisions. Each example supplies its state and candidate
 criteria at inference time. The dataset is intended for training and evaluating
@@ -29,8 +29,10 @@ bounded decision models; it is not tied to one Jev implementation.
 This is an independent data transformation. It is not an official TypeSafe Jev
 dataset and is not produced by or affiliated with TypeSafe or OpenJev.
 
-The current release is capped at 500,000 decisions across English and
-multilingual tasks. Build reports identify completed and failed source tasks.
+The release targets 1,000,000 decisions across English, multilingual, graded,
+and procedural sources. Build reports identify completed and failed source
+tasks; `release-audit.json` records the published source-family, primitive,
+and augmentation mix.
 
 ## Schema
 
@@ -41,7 +43,7 @@ multilingual tasks. Build reports identify completed and failed source tasks.
 | `question_id` | string | Identifies a question within that group. |
 | `kind` | string | System One primitive: `choice`, `noul`, or `score`. |
 | `options` | list of strings | Candidate labels or answers supplied at runtime. Order is significant. |
-| `target` | list of floats | One-hot target distribution aligned with `options`. |
+| `target` | list of floats | A choice/score distribution aligned with `options`, or one truth probability for `noul`. Tasksource labels are one-hot; native graded sources may have soft targets. |
 | `state` | string | Text or question on which the decision is based. Token decisions include the sentence, marked target, and target index. |
 | `question` | string | The decision requested from the model. |
 | `source` | string | Tasksource task identifier used to load the source data. |
@@ -58,12 +60,11 @@ Only `Sequence(ClassLabel)` or equivalent `List(ClassLabel)` ontologies with
 2–32 readable labels qualify. This release includes CoNLL-2003 NER and WNUT-17
 token decisions from checked data-only mirrors; see
 [token-source-status.md](token-source-status.md) for the source audit and backlog.
-The `group_id` lets several questions share one source row without a costly
-global grouping pass. A deterministic augmentation pass adds label-verification `noul`
-questions to about 5% of rows. Ordered-rubric `score` augmentation is available
-for genuinely ordinal sources but is disabled by default. Native regression and
-ordinal recasting will be used for score examples rather than imposing an order
-on nominal classification labels.
+The `group_id` lets several questions share one source row without grouping
+full-text examples. A deterministic augmentation pass adds label-verification
+`noul` questions to about 5% of Tasksource rows. Ordered-rubric `score`
+augmentation is disabled for nominal labels; native ordinal and graded sources
+provide genuine Score supervision instead.
 
 In the canonical Tasksource recast, related token rows also carry
 `shared_state`, `source_row`, and distinct `question_id` values. Pass rows from
@@ -122,7 +123,7 @@ equivalents without adding rows. The canonical recast remains fixed.
 ```python
 from datasets import load_dataset
 
-dataset = load_dataset("tasksource/tasksource-jev")
+dataset = load_dataset("tasksource/tasksource-jev-typed-decisions")
 row = dataset["train"][0]
 answer = row["options"][max(range(len(row["target"])), key=row["target"].__getitem__)]
 ```
@@ -143,12 +144,13 @@ multiple-choice templates. This release applies `recast_jev` to compatible
 English and multilingual tasks, retains the standard train/validation/test splits, and records the
 Tasksource identifier in every row. Tasks that fail to download or preprocess
 are recorded by the build report rather than silently represented as complete.
-To keep very large sources balanced, the build caps each task at 30,000
+To keep very large sources bounded, the build caps each task at 30,000
 training rows and 3,000 validation or test rows using Tasksource's deterministic
-sampling (seed 0). The published release is capped at 500,000 rows using a
-source-balanced 90/5/5 train/dev/test allocation. It samples complete
-source-row groups, so related token and augmentation questions remain together,
-and preserves relative row order.
+sampling (seed 0). The published release is capped at 1,000,000 rows using a
+90/5/5 train/dev/test allocation. The cap balances dataset families rather than
+giving every config a separate global quota, while sampling across configs
+within each family. It keeps complete source-row groups, so related token,
+graded, procedural, and augmentation questions remain together.
 
 For a useful Dataset Viewer preview, only the first 1,000 training rows are
 ordered round-robin by `source`, with a deterministic mix of direct,
@@ -159,7 +161,8 @@ relative order.
 BIG-bench, MMLU, and BLiMP are excluded from this release. Original split
 identity is preserved in `split`, with `validation` normalized to `dev`.
 
-The repository includes `failed-tasks.json` and `outdated-datasets.json`.
+The repository includes `failed-tasks.json`, `outdated-datasets.json`,
+`fixed-source-audit.json`, `build-manifest.json`, and `release-audit.json`.
 The latter specifically tracks upstream datasets that still depend on loading
 scripts no longer supported by current Hugging Face Datasets, so they can be
 migrated to data-only Parquet repositories and incorporated in a later build.
@@ -169,7 +172,8 @@ The build is resumable from the Tasksource repository; the
 documents validation, publication, and the limits of exact reproducibility:
 
 ```bash
-PYTHONPATH=.:src python scripts/build_jev_dataset.py --output build/tasksource-jev --finalize
+PYTHONPATH=.:src python scripts/build_jev_dataset.py \
+  --output build/tasksource-jev-typed-decisions --publish-rows 1000000 --finalize
 ```
 
 ## Licensing and provenance
