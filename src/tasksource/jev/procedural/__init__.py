@@ -2,7 +2,7 @@
 
 Each module exposes ``generate(rng, level)`` returning a ``Problem`` whose
 answers are derived from the state by the rules the state itself states.
-``jev/build_procedural.py`` publishes them as ``tasksource/procedural-jev``,
+``scripts/build_procedural_jev.py`` publishes them as ``tasksource/procedural-jev``,
 one config per task.
 """
 

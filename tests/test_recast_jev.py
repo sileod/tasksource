@@ -8,7 +8,7 @@ from tasksource.jev.prompt_augmentations import (
     published_pair_style, published_question_style,
 )
 from tasksource.jev.augmentations import augment_jev_internal
-from jev.build import (
+from scripts.build_jev_dataset import (
     diverse_cap, diversify_published_prompts, exclude_publish_sources,
     pretty_order, to_training_row,
 )
