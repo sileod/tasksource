@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build and optionally publish the tasksource-jev dataset.
+"""Build and optionally publish the tasksource-jev-typed-decisions dataset.
 
 Each task/split is written as its own Parquet shard, making interrupted builds
 resumable. The JSONL report is append-only and records successes and failures.
@@ -7,10 +7,14 @@ resumable. The JSONL report is append-only and records successes and failures.
 
 import argparse
 import hashlib
+import importlib.metadata
 import json
+import math
 import shutil
 import subprocess
+import sys
 import time
+from collections import Counter, deque
 from pathlib import Path
 
 from datasets import Dataset, DatasetDict, Features, List, Value, concatenate_datasets, load_dataset
@@ -20,6 +24,7 @@ import pandas as pd
 from tasksource import list_tasks, load_task
 from tasksource import tasks as english_tasks
 from tasksource.access import load_preprocessing
+from tasksource.preprocess import sample_dataset
 from tasksource.jev.augmentations import augment_jev_internal, stable_fraction
 from tasksource.jev.prompt_augmentations import (
     published_pair_style, published_question_style,
@@ -74,6 +79,7 @@ def load_native_task(source_id, max_rows, max_rows_eval):
         rows = graded.load_family(source_id[len(graded.SOURCE_PREFIX):], max_rows, max_rows_eval)
     else:
         dataset = load_dataset(procedural.REPO_ID, source_id[len(procedural.SOURCE_PREFIX):])
+        dataset = sample_dataset(dataset, max_rows, max_rows_eval)
         rows = {split: [row for index, example in enumerate(examples)
                         for row in procedural.jev_rows(example, source_id, normalized_split(split), index)]
                 for split, examples in dataset.items()}
@@ -93,15 +99,82 @@ def slug(task_id):
     return f"{readable}-{digest}"
 
 
-def read_completed(report_path):
+def read_completed(report_path, data_dir=None):
     completed = set()
     if not report_path.exists():
         return completed
     for line in report_path.read_text().splitlines():
         record = json.loads(line)
         if record["status"] == "ok":
-            completed.add(record["task"])
+            task = record["task"]
+            splits = record.get("rows", {})
+            if data_dir is None or (
+                splits and all(
+                    (data_dir / f"{split}-{slug(task)}.parquet").exists()
+                    for split in splits
+                )
+            ):
+                completed.add(task)
     return completed
+
+
+def build_manifest(args, tasks):
+    """Record enough provenance to rerun the pipeline from the same inputs."""
+    root = Path(__file__).resolve().parents[1]
+    def display_path(value):
+        try:
+            return str(value.resolve().relative_to(root))
+        except ValueError:
+            return value.name
+
+    def git(*arguments):
+        result = subprocess.run(
+            ["git", *arguments], cwd=root, capture_output=True, check=False
+        )
+        return result.stdout
+    status = git("status", "--porcelain").decode("utf-8", "replace").splitlines()
+    diff = git("diff", "--binary", "HEAD", "--", "src", "scripts", "dataset_cards")
+    versions = {}
+    for package in ("datasets", "huggingface_hub", "pyarrow", "numpy", "pandas"):
+        try:
+            versions[package] = importlib.metadata.version(package)
+        except importlib.metadata.PackageNotFoundError:
+            versions[package] = None
+    return {
+        "git_commit": git("rev-parse", "HEAD").decode().strip(),
+        "git_diff_sha256": hashlib.sha256(diff).hexdigest(),
+        "working_tree_changes": status,
+        "python": sys.version.split()[0],
+        "packages": versions,
+        "parameters": {
+            key: display_path(value) if isinstance(value, Path) else value
+            for key, value in vars(args).items()
+        },
+        "selected_sources": list(tasks.source_id),
+    }
+
+
+def fixed_source_audit(baseline_path, selected, latest):
+    """Compare previously script-bound task IDs with this build's results."""
+    if baseline_path is None:
+        return None
+    baseline = json.loads(baseline_path.read_text(encoding="utf-8"))
+    old_ids = sorted({record["task"] for record in baseline})
+    audit = {"succeeded": [], "failed": [], "not_attempted": [],
+             "not_in_current_catalog": []}
+    for source in old_ids:
+        if source not in selected:
+            audit["not_in_current_catalog"].append(source)
+        elif source not in latest:
+            audit["not_attempted"].append(source)
+        elif latest[source]["status"] == "ok":
+            audit["succeeded"].append(source)
+        else:
+            audit["failed"].append({
+                "task": source,
+                "error": latest[source].get("error", ""),
+            })
+    return audit
 
 
 def latest_records(report_path):
@@ -197,8 +270,37 @@ def pretty_order(dataset, first_rows=1_000):
     return dataset.select(order)
 
 
+def source_family(source):
+    """Balance dataset families, not each configuration as an independent task."""
+    parts = source.split("/")
+    if parts[0] in {"multilingual", "graded", "procedural-jev"} and len(parts) > 1:
+        return "/".join(parts[:2])
+    return parts[0]
+
+
+def _ranked_family_groups(source_buckets, identifiers):
+    """Round-robin source configs while keeping each source-row group intact."""
+    active = deque()
+    for source in sorted(source_buckets):
+        groups = {}
+        for index in source_buckets[source]:
+            groups.setdefault(source_row_group(identifiers[index]), []).append(index)
+        active.append(iter(sorted(
+            groups.items(),
+            key=lambda item: stable_fraction(item[0], "publish-cap"),
+        )))
+    while active:
+        iterator = active.popleft()
+        try:
+            group = next(iterator)
+        except StopIteration:
+            continue
+        yield group
+        active.append(iterator)
+
+
 def diverse_cap(dataset, max_rows):
-    """Cap rows by source without separating questions from a source example."""
+    """Cap by dataset family, sampling configs and preserving question groups."""
     if max_rows is None or len(dataset) <= max_rows:
         return dataset
     metadata_columns = ["source"]
@@ -206,38 +308,34 @@ def diverse_cap(dataset, max_rows):
         metadata_columns.append("id")
     metadata = dataset.select_columns(metadata_columns)[:]
     sources = metadata["source"]
-    names = set(sources)
-    quota = max(1, max_rows // len(names))
     selected = []
     deferred = []
-    buckets = {name: [] for name in names}
+    buckets = {}
     for index, source in enumerate(sources):
-        buckets[source].append(index)
-    base_possible = sum(min(quota, len(bucket)) for bucket in buckets.values())
+        family = source_family(source)
+        buckets.setdefault(family, {}).setdefault(source, []).append(index)
+    quota = max(1, max_rows // len(buckets))
+    family_sizes = {
+        family: sum(len(indices) for indices in configs.values())
+        for family, configs in buckets.items()
+    }
+    base_possible = sum(min(quota, size) for size in family_sizes.values())
     overflow_needed = max_rows - base_possible
-    total_extra = sum(max(0, len(bucket) - quota) for bucket in buckets.values())
+    total_extra = sum(max(0, size - quota) for size in family_sizes.values())
     ids = (
         metadata["id"]
         if "id" in metadata
         else list(map(str, range(len(dataset))))
     )
-    for name in sorted(names):
-        extra = max(0, len(buckets[name]) - quota)
+    for family in sorted(buckets):
+        extra = max(0, family_sizes[family] - quota)
         overflow_limit = (
             32 + (overflow_needed * extra + total_extra - 1) // total_extra
             if extra and total_extra else 0
         )
-        groups = {}
-        for index in buckets[name]:
-            group_id = source_row_group(ids[index])
-            groups.setdefault(group_id, []).append(index)
-        ranked = sorted(
-            groups.items(),
-            key=lambda item: stable_fraction(item[0], "publish-cap"),
-        )
         source_rows = 0
         source_deferred = 0
-        for group_id, indices in ranked:
+        for group_id, indices in _ranked_family_groups(buckets[family], ids):
             if source_rows + len(indices) <= quota:
                 selected.extend(indices)
                 source_rows += len(indices)
@@ -334,8 +432,33 @@ def diversify_published_prompts(dataset):
     return dataset.map(convert, batched=True, batch_size=1_000)
 
 
+def validate_decisions(rows, split):
+    """Check the training target against its primitive before publication."""
+    columns = rows.select_columns(["id", "kind", "options", "target"])
+    for batch in columns.iter(batch_size=10_000):
+        for identifier, kind, options, target in zip(
+            batch["id"], batch["kind"], batch["options"], batch["target"]
+        ):
+            if kind == "noul":
+                valid = (
+                    not options and len(target) == 1
+                    and math.isfinite(target[0]) and 0 <= target[0] <= 1
+                )
+            else:
+                valid = (
+                    kind in {"choice", "score"} and len(options) >= 2
+                    and len(options) == len(target)
+                    and all(math.isfinite(value) and value >= 0 for value in target)
+                    and math.isclose(sum(target), 1.0, abs_tol=1e-5)
+                )
+            if not valid:
+                raise ValueError(
+                    f"Invalid {kind} target in {split}, decision {identifier}"
+                )
+
+
 def publish_dataset(
-    output, repo_id, pretty_rows=1_000, publish_rows=500_000,
+    output, repo_id, pretty_rows=1_000, publish_rows=1_000_000,
     allowed_sources=None, procedural_share=0.1,
 ):
     data_files = {}
@@ -361,14 +484,22 @@ def publish_dataset(
                     f"Group-preserving cap produced {len(dataset[split])} "
                     f"rather than {cap} rows in {split}"
                 )
+            if (repo_id == "tasksource/tasksource-jev-typed-decisions"
+                    and publish_rows >= 1_000_000 and len(dataset[split]) != cap):
+                raise ValueError(
+                    f"One-million-row release requires {cap} {split} rows, "
+                    f"but only {len(dataset[split])} were selected"
+                )
     dataset = DatasetDict({
         split: diversify_published_prompts(add_question_groups(split_dataset))
         for split, split_dataset in dataset.items()
     })
     if "train" in dataset:
         dataset["train"] = pretty_order(dataset["train"], pretty_rows)
+    release_audit = {"repo_id": repo_id, "requested_rows": publish_rows, "splits": {}}
     for split, rows in dataset.items():
-        metadata = rows.select_columns(["id", "source", "split"])[:]
+        validate_decisions(rows, split)
+        metadata = rows.select_columns(["id", "source", "split", "kind", "variant"])[:]
         if len(set(metadata["id"])) != len(rows):
             raise ValueError(f"Duplicate Jev decision IDs in {split}")
         if any(source.startswith(PUBLISH_EXCLUDED_PREFIXES) for source in metadata["source"]):
@@ -377,26 +508,62 @@ def publish_dataset(
             raise ValueError(f"Unselected source in {split}")
         if set(metadata["split"]) != {normalized_split(split)}:
             raise ValueError(f"Mixed source split annotations in {split}")
+        source_counts = Counter(metadata["source"])
+        family_counts = Counter()
+        for source, count in source_counts.items():
+            family_counts[source_family(source)] += count
+        release_audit["splits"][split] = {
+            "rows": len(rows),
+            "sources": dict(sorted(source_counts.items())),
+            "families": dict(sorted(family_counts.items())),
+            "kinds": dict(sorted(Counter(metadata["kind"]).items())),
+            "variants": dict(sorted(Counter(metadata["variant"]).items())),
+        }
         print(f"Publish {split}: {len(rows)} rows, {len(set(metadata['source']))} sources", flush=True)
         if split == "train":
             preview = rows.select(range(min(pretty_rows, len(rows))))
             variants = preview.select_columns(["variant"])[:]["variant"]
             variant_counts = pd.Series(variants).value_counts().to_dict()
             print(f"Preview variants: {variant_counts}", flush=True)
+    if repo_id == "tasksource/tasksource-jev-typed-decisions" and publish_rows >= 1_000_000:
+        train = release_audit["splits"]["train"]
+        missing = sorted(
+            (set(JEV_TOKEN_TASKS) | {
+                procedural.SOURCE_PREFIX + name for name in procedural.TASKS
+            }) - set(train["sources"])
+        )
+        missing_kinds = sorted({"choice", "noul", "score"} - set(train["kinds"]))
+        missing_variants = sorted({
+            "direct", "label_verification", "criteria_permutation",
+            "instruction_paraphrase", "paired_text_format",
+        } - set(train["variants"]))
+        if missing or missing_kinds or missing_variants:
+            raise ValueError(
+                "Required release coverage missing: "
+                f"sources={missing}, kinds={missing_kinds}, variants={missing_variants}"
+            )
+    (output / "release-audit.json").write_text(
+        json.dumps(release_audit, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
     api = HfApi()
     api.upload_file(
         path_or_fileobj=str(output / "README.md"),
         path_in_repo="README.md",
         repo_id=repo_id,
         repo_type="dataset",
-        commit_message="Add tasksource-jev dataset card",
+        commit_message="Add tasksource-jev-typed-decisions dataset card",
     )
     dataset.push_to_hub(
         repo_id,
         max_shard_size="256MB",
-        commit_message="Publish tasksource-jev Parquet dataset",
+        commit_message="Publish tasksource-jev-typed-decisions Parquet dataset",
     )
-    for name in ("build-report.jsonl", "build-summary.json", "failed-tasks.json", "outdated-datasets.json", "token-source-status.md"):
+    for name in (
+        "build-report.jsonl", "build-summary.json", "build-manifest.json",
+        "failed-tasks.json", "outdated-datasets.json", "fixed-source-audit.json",
+        "release-audit.json", "token-source-status.md",
+    ):
         path = output / name
         if path.exists():
             api.upload_file(
@@ -475,7 +642,9 @@ def select_tasks(args):
             raise ValueError(f"Unknown or unsupported tasks: {sorted(missing)}")
     if args.limit:
         frame = frame.head(args.limit)
-    return frame
+    # Two catalog aliases can resolve to the same source/config. Never run
+    # either twice or let a later shard silently overwrite the first one.
+    return frame.drop_duplicates("source_id", keep="first").reset_index(drop=True)
 
 
 def build(args):
@@ -488,9 +657,15 @@ def build(args):
             args.prompt_rate, args.paired_format_rate,
         )
     report_path = output / "build-report.jsonl"
-    completed = read_completed(report_path)
+    completed = read_completed(report_path, data_dir)
     tasks = select_tasks(args)
     print(f"Selected {len(tasks)} tasks; {len(completed)} already complete", flush=True)
+    manifest_path = output / "build-manifest.json"
+    if not manifest_path.exists():
+        manifest_path.write_text(
+            json.dumps(build_manifest(args, tasks), indent=2, ensure_ascii=False) + "\n",
+            encoding="utf-8",
+        )
 
     for position, row in enumerate(
         () if args.finalize_only else tasks.itertuples(index=False), start=1
@@ -582,6 +757,15 @@ def build(args):
         (output / "build-summary.json").write_text(
             json.dumps(summary, indent=2) + "\n", encoding="utf-8"
         )
+        fix_audit = fixed_source_audit(args.baseline_failures, selected, latest)
+        if fix_audit is not None:
+            (output / "fixed-source-audit.json").write_text(
+                json.dumps(fix_audit, indent=2, ensure_ascii=False) + "\n",
+                encoding="utf-8",
+            )
+            print("Previously failed sources: " + json.dumps({
+                key: len(value) for key, value in fix_audit.items()
+            }), flush=True)
         print(json.dumps(summary), flush=True)
 
     if args.upload:
@@ -595,7 +779,7 @@ def build(args):
 def parse_args():
     root = Path(__file__).resolve().parents[1]
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, default=root / "build" / "tasksource-jev")
+    parser.add_argument("--output", type=Path, default=root / "build" / "tasksource-jev-typed-decisions")
     parser.add_argument("--card", type=Path, default=root / "dataset_cards" / "tasksource-jev.md")
     parser.add_argument("--tasks", nargs="*")
     parser.add_argument("--limit", type=int)
@@ -635,9 +819,13 @@ def parse_args():
         help="Reuse checkpointed shards already written with the current schema.",
     )
     parser.add_argument("--upload", action="store_true")
-    parser.add_argument("--repo-id", default="tasksource/tasksource-jev")
+    parser.add_argument("--repo-id", default="tasksource/tasksource-jev-typed-decisions")
     parser.add_argument(
-        "--publish-rows", type=int, default=500_000,
+        "--baseline-failures", type=Path,
+        help="Previous failed/outdated-datasets.json; writes fixed-source-audit.json.",
+    )
+    parser.add_argument(
+        "--publish-rows", type=int, default=1_000_000,
         help="Maximum published rows across a 90/5/5 train/dev/test allocation; 0 disables.",
     )
     parser.add_argument(

@@ -3,7 +3,7 @@ import re
 import pandas as pd
 from . import tasks, recast as recast_module
 from .metadata import dataset_rank
-from datasets import load_dataset
+from datasets import load_dataset, Dataset, DatasetDict, IterableDatasetDict
 import funcy as fc
 import os
 import copy
@@ -70,7 +70,10 @@ def list_tasks(tasks_path=f'{os.path.dirname(__file__)}/tasks.py',multilingual=F
                 'rank':task_order.get(key,None)}]   
     df=pd.DataFrame(l).explode('config_name')
     df = df.sort_values('rank').reset_index(drop=True)
-    df['id'] = df.apply(lambda x: pretty_name(x), axis=1)
+    df['id'] = df.apply(
+        lambda x: x.mapping.task_id.format(config_name=x.config_name)
+        if x.mapping.task_id and "{config_name}" in x.mapping.task_id
+        else (x.mapping.task_id or pretty_name(x)), axis=1)
     df.insert(0, 'id', df.pop('id'))
     del df['rank']
     if instruct:
@@ -84,6 +87,18 @@ def list_tasks(tasks_path=f'{os.path.dirname(__file__)}/tasks.py',multilingual=F
 def dict_to_query(d=dict(), **kwargs):
     d={**d,**kwargs}
     return '&'.join([f'`{k}`=="{v}"' for k,v in d.items()])
+
+def _format_loader_kwargs(value, **context):
+    """Resolve per-config placeholders in generic-builder data_files settings."""
+    if isinstance(value, str):
+        return value.format(**context)
+    if isinstance(value, list):
+        return [_format_loader_kwargs(v, **context) for v in value]
+    if isinstance(value, tuple):
+        return tuple(_format_loader_kwargs(v, **context) for v in value)
+    if isinstance(value, dict):
+        return {k: _format_loader_kwargs(v, **context) for k, v in value.items()}
+    return value
 
 def load_preprocessing(tasks=tasks, **kwargs):
     _tasks_df = list_tasks(multilingual=tasks==lmtasks)
@@ -102,10 +117,34 @@ def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preproc
     _tasks = (lmtasks if multilingual else tasks)
     preprocessing = load_preprocessing(_tasks, **query)
 
-    if "trust_remote_code" not in load_dataset_kwargs:
-        load_dataset_kwargs["trust_remote_code"] = True
-    
-    dataset = load_dataset(preprocessing.dataset_name, preprocessing.config_name, **load_dataset_kwargs)
+    # All tasksource datasets are now data-only (Parquet); no loading script,
+    # so trust_remote_code is unnecessary (and rejected by datasets>=3 for scripts).
+    load_dataset_kwargs.pop("trust_remote_code", None)
+
+    source_kwargs = _format_loader_kwargs(
+        copy.deepcopy(preprocessing.load_dataset_kwargs),
+        config_name=preprocessing.config_name or "",
+    )
+    source_kwargs.update(load_dataset_kwargs)
+    source_config = preprocessing.config_name
+    if preprocessing.dataset_name in {"csv", "json", "text", "parquet"}:
+        source_config = None
+    dataset = load_dataset(
+        preprocessing.dataset_name, source_config, **source_kwargs
+    )
+    if isinstance(dataset, IterableDatasetDict):
+        # Keep bounded streaming sources (e.g. multilingual sentiment pools)
+        # bounded before materializing them. Apply source filtering first, then
+        # deterministically shuffle a finite buffer and take the same limits
+        # used by ordinary Tasksource sampling.
+        dataset = preprocessing.pre_process(dataset)
+        materialized = {}
+        for split, rows in dataset.items():
+            limit = max_rows if split == "train" else max_rows_eval
+            if limit:
+                rows = rows.shuffle(seed=seed, buffer_size=max(10_000, limit)).take(limit)
+            materialized[split] = Dataset.from_list(list(rows))
+        dataset = DatasetDict(materialized)
     dataset= preprocessing(dataset,max_rows, max_rows_eval)
     dataset.task_type = preprocessing.__class__.__name__
     if instruct and recast not in (None, "instruct"):

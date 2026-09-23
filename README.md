@@ -39,13 +39,13 @@ The repo also contains some recasting code to convert tasksource datasets to ins
 We also recast all classification tasks as natural language inference, to improve entailment-based zero-shot classification detection:
 [🤗/zero-shot-label-nli](https://huggingface.co/datasets/tasksource/zero-shot-label-nli)
 
-### tasksource-jev
+### tasksource-jev-typed-decisions
 
 Tasksource classification, multiple-choice, and vetted token tasks can be recast as
 runtime-defined decisions. The canonical representation keeps the state,
 instructions, criteria, integer label, and textual answer separate:
 
-[🤗 tasksource/tasksource-jev](https://huggingface.co/datasets/tasksource/tasksource-jev)
+[🤗 tasksource/tasksource-jev-typed-decisions](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions)
 
 The [Jev build runbook](docs/jev/README.md) covers smoke tests, resumable builds,
 validation, and publication.

@@ -1,6 +1,6 @@
 from collections.abc import Iterable
 from dotwiz import DotWiz
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Union
 import itertools
 import funcy as fc
@@ -41,7 +41,8 @@ class Preprocessing(DotWiz):
         return x
         
     def load(self):
-        return self(datasets.load_dataset(self.dataset_name,self.config_name))
+        return self(datasets.load_dataset(
+            self.dataset_name, self.config_name, **self.load_dataset_kwargs))
 
     def __call__(self,dataset, max_rows=None, max_rows_eval=None,seed=0):
         dataset = self.pre_process(dataset)
@@ -62,7 +63,7 @@ class Preprocessing(DotWiz):
         
         # field annotated with a string
         substitutions = {v:k for k,v in self.to_dict().items()
-            if (k and k not in {'splits','dataset_name','config_name'} 
+            if (k and k not in {'splits','dataset_name','config_name','task_id','load_dataset_kwargs'}
             and type(v)==str and k!=v)}
 
         dataset=dataset.remove_columns([c for c in substitutions.values() if c in dataset['train'].features and c not in substitutions])
@@ -209,6 +210,8 @@ class SharedFields:
     splits:list=Preprocessing.default_splits
     dataset_name:str = None
     config_name:str = None
+    task_id:str = None
+    load_dataset_kwargs:dict = field(default_factory=dict)
     pre_process: callable = fc.identity
     post_process: callable = fc.identity
     #language:str="en"

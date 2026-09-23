@@ -126,12 +126,14 @@ def main(args):
     if args.upload:
         api = HfApi()
         api.create_repo(args.repo_id, repo_type="dataset", exist_ok=True)
-        api.upload_file(path_or_fileobj=str(args.card), path_in_repo="README.md",
-                        repo_id=args.repo_id, repo_type="dataset",
-                        commit_message="Add procedural-jev dataset card")
         for task, dataset in built.items():
             dataset.push_to_hub(args.repo_id, config_name=task,
                                 commit_message=f"Publish {task}")
+        # The card explicitly maps each config to its Parquet files. Upload it
+        # last so named configs remain loadable after push_to_hub updates metadata.
+        api.upload_file(path_or_fileobj=str(args.card), path_in_repo="README.md",
+                        repo_id=args.repo_id, repo_type="dataset",
+                        commit_message="Document procedural-jev configurations")
 
 
 if __name__ == "__main__":

@@ -1,4 +1,5 @@
 import unittest
+from collections import Counter
 
 from datasets import ClassLabel, Dataset, DatasetDict, Features, Sequence, Value
 
@@ -10,7 +11,8 @@ from tasksource.jev.prompt_augmentations import (
 from tasksource.jev.augmentations import augment_jev_internal
 from scripts.build_jev_dataset import (
     diverse_cap, diversify_published_prompts, exclude_publish_sources,
-    pretty_order, to_training_row,
+    fixed_source_audit, pretty_order, read_completed, slug, source_family,
+    to_training_row, validate_decisions,
 )
 
 
@@ -165,6 +167,76 @@ class RecastJevTest(unittest.TestCase):
             group = identifier.rsplit(":", 1)[0]
             group_counts[group] = group_counts.get(group, 0) + 1
         self.assertEqual(sorted(group_counts.values()), [2, 2])
+
+    def test_diverse_cap_balances_families_and_samples_configs(self):
+        sources = ["family/a"] * 40 + ["family/b"] * 40 + ["other/task"] * 40
+        dataset = Dataset.from_dict({
+            "source": sources,
+            "id": [f"{source.replace('/', '-')}:train:{index}" for index, source in enumerate(sources)],
+        })
+        capped = diverse_cap(dataset, 40)
+        counts = Counter(capped["source"])
+        self.assertEqual(counts["other/task"], 20)
+        self.assertEqual(counts["family/a"], 10)
+        self.assertEqual(counts["family/b"], 10)
+        self.assertEqual(source_family("multilingual/xcsr/fr"), "multilingual/xcsr")
+        self.assertEqual(source_family("graded/helpsteer"), "graded/helpsteer")
+        self.assertEqual(source_family("procedural-jev/policy_applicability"),
+                         "procedural-jev/policy_applicability")
+
+    def test_completed_tasks_require_their_parquet_shards(self):
+        import json
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            data_dir = root / "data"
+            data_dir.mkdir()
+            (root / "build-report.jsonl").write_text(json.dumps({
+                "task": "glue/rte", "status": "ok", "rows": {"train": 2},
+            }) + "\n")
+            report = root / "build-report.jsonl"
+            self.assertEqual(read_completed(report, data_dir), set())
+            (data_dir / f"train-{slug('glue/rte')}.parquet").touch()
+            self.assertEqual(read_completed(report, data_dir), {"glue/rte"})
+
+    def test_fixed_source_audit_separates_failures_and_renames(self):
+        import json
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+
+        with TemporaryDirectory() as directory:
+            baseline = Path(directory) / "failures.json"
+            baseline.write_text(json.dumps([
+                {"task": "fixed"}, {"task": "broken"}, {"task": "old-name"},
+            ]))
+            audit = fixed_source_audit(
+                baseline, {"fixed", "broken"},
+                {"fixed": {"status": "ok"}, "broken": {
+                    "status": "error", "error": "bad source",
+                }},
+            )
+            self.assertEqual(audit["succeeded"], ["fixed"])
+            self.assertEqual(audit["failed"], [
+                {"task": "broken", "error": "bad source"},
+            ])
+            self.assertEqual(audit["not_in_current_catalog"], ["old-name"])
+
+    def test_publish_target_validation_covers_all_three_primitives(self):
+        good = Dataset.from_dict({
+            "id": ["choice", "noul", "score"],
+            "kind": ["choice", "noul", "score"],
+            "options": [["a", "b"], [], ["low", "high"]],
+            "target": [[0.25, 0.75], [0.4], [0.0, 1.0]],
+        })
+        validate_decisions(good, "train")
+        bad = Dataset.from_dict({
+            "id": ["bad"], "kind": ["score"],
+            "options": [["low", "high"]], "target": [[0.0, 0.0]],
+        })
+        with self.assertRaisesRegex(ValueError, "Invalid score target"):
+            validate_decisions(bad, "train")
 
     def test_token_classification_is_readable_bounded_and_deterministic(self):
         features = Features({
