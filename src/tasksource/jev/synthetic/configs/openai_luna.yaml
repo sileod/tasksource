@@ -26,14 +26,18 @@ sampler:
 
 critic:
   enabled: true
-  provider: openai
+  provider:
+    name: openai
+    api_key_env: OPENAI_API_KEY
+    base_url: https://api.openai.com/v1
+    model: gpt-6-luna
   model: gpt-6-luna
   prompt_version: critic_v1
   temperature: 0.0
 
 annotator:
-  name: jev
-  version: jev-1.0
+  name: mock
+  version: mock-0.1
   base_url: ""
   api_key_env: JEV_API_KEY
   model: jev-1

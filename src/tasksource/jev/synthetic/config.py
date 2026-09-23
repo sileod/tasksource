@@ -37,18 +37,23 @@ class SamplerConfig:
 @dataclass
 class CriticConfig:
     enabled: bool = True
-    provider: str = "albert"
-    model: str = "DeepSeek-V4-Flash"
+    # Full provider config, independent of the generator provider, so
+    # e.g. Luna generation + Albert/DeepSeek critic works correctly.
+    # When `provider` is absent, it inherits the generator provider.
+    provider: ProviderConfig | None = None
+    model: str = "deepseek-v4-flash-0731"
     prompt_version: str = "critic_v1"
     temperature: float = 0.0
 
 
 @dataclass
 class AnnotatorConfig:
-    name: str = "jev"
+    # Explicit: "mock" = deterministic heuristic placeholder (offline
+    # pilot/tests only; labeled as such in outputs), "jev" = real Jev
+    # endpoint. "jev" FAILS LOUDLY when the client is unavailable —
+    # heuristic output must never masquerade as Jev judgments.
+    name: str = "mock"
     version: str = "mock-0.1"
-    # Real Jev endpoint (TypeSafe/OpenJev-compatible) — optional.
-    # When unset, a deterministic heuristic annotator is used (pilot/tests).
     base_url: str = ""
     api_key_env: str = "JEV_API_KEY"
     model: str = "jev-mock"
@@ -88,14 +93,21 @@ class AppConfig:
     selection: SelectionConfig = field(default_factory=SelectionConfig)
     split: SplitConfig = field(default_factory=SplitConfig)
 
+    def critic_provider(self) -> ProviderConfig:
+        """Resolved critic provider (explicit, else the generator provider)."""
+        return self.critic.provider if self.critic.provider is not None else self.provider
+
     def to_dict(self) -> dict:
+        critic = dict(self.critic.__dict__)
+        critic["provider"] = (self.critic.provider.__dict__
+                              if self.critic.provider is not None else None)
         return {
             "run_name": self.run_name,
             "output_dir": self.output_dir,
             "provider": self.provider.__dict__,
             "generation": self.generation.__dict__,
             "sampler": self.sampler.__dict__,
-            "critic": self.critic.__dict__,
+            "critic": critic,
             "annotator": self.annotator.__dict__,
             "selection": self.selection.__dict__,
             "split": self.split.__dict__,
@@ -118,13 +130,25 @@ def load_config(path: str) -> AppConfig:
         raw = yaml.safe_load(handle) or {}
     defaults = AppConfig().to_dict()
     merged = _merge(defaults, raw)
+    provider = ProviderConfig(**merged["provider"])
+    critic_raw = merged["critic"]
+    critic_provider_raw = critic_raw.pop("provider", None)
+    if isinstance(critic_provider_raw, dict):
+        critic_provider = ProviderConfig(**critic_provider_raw)
+    elif isinstance(critic_provider_raw, str):
+        # Legacy: bare name inherits the generator's connection details.
+        critic_provider = ProviderConfig(
+            name=critic_provider_raw, api_key_env=provider.api_key_env,
+            base_url=provider.base_url, model=critic_raw.get("model", provider.model))
+    else:
+        critic_provider = None  # inherit the generator provider at use site
     return AppConfig(
         run_name=merged["run_name"],
         output_dir=merged["output_dir"],
-        provider=ProviderConfig(**merged["provider"]),
+        provider=provider,
         generation=GenerationConfig(**merged["generation"]),
         sampler=SamplerConfig(**merged["sampler"]),
-        critic=CriticConfig(**merged["critic"]),
+        critic=CriticConfig(provider=critic_provider, **critic_raw),
         annotator=AnnotatorConfig(**merged["annotator"]),
         selection=SelectionConfig(**merged["selection"]),
         split=SplitConfig(**merged["split"]),

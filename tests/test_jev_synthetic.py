@@ -1,8 +1,14 @@
 """Tests for the synthetic Jev dataset-construction package (offline, mock only)."""
 
+import copy
+import json
+import tempfile
 import unittest
+from collections import Counter
+from pathlib import Path
 
 from tasksource.jev.synthetic import annotate as annot_mod
+from tasksource.jev.synthetic import critic as critic_mod
 from tasksource.jev.synthetic import dedup as dedup_mod
 from tasksource.jev.synthetic import providers
 from tasksource.jev.synthetic import select as select_mod
@@ -10,7 +16,10 @@ from tasksource.jev.synthetic import specs as specs_mod
 from tasksource.jev.synthetic import split as split_mod
 from tasksource.jev.synthetic import validate as validate_mod
 from tasksource.jev.synthetic.config import AppConfig, load_config
-from tasksource.jev.synthetic.generate import mock_realization
+from tasksource.jev.synthetic.generate import (
+    generation_cache_key,
+    mock_realization,
+)
 from tasksource.jev.synthetic.schemas import (
     bundle_to_flat_rows,
     flat_to_training_row,
@@ -42,7 +51,6 @@ class SamplerTest(unittest.TestCase):
 
     def test_format_coverage_and_mixing(self):
         specs = specs_mod.sample_specs(_cfg().sampler, 2000)
-        from collections import Counter
         formats = Counter(q["format"] for s in specs for q in s["questions"])
         total = sum(formats.values())
         self.assertTrue(abs(formats["choice"] / total - 0.40) < 0.05)
@@ -51,17 +59,50 @@ class SamplerTest(unittest.TestCase):
         mixed = sum(1 for s in multi if len({q["format"] for q in s["questions"]}) >= 2)
         self.assertGreater(mixed / len(multi), 0.70)
 
+    def test_all_three_formats_guaranteed(self):
+        import random
+        weights = {"choice": 0.40, "noul": 0.30, "score": 0.30}
+        for n in (3, 4):
+            for seed in range(50):
+                rng = random.Random(seed)
+                sampled = specs_mod.sample_formats(rng, n, weights, 0.85, 1.0)
+                self.assertEqual(set(sampled), {"choice", "noul", "score"},
+                                 f"n={n} seed={seed}: {sampled}")
+
+    def test_skills_distinct_within_state(self):
+        specs = specs_mod.sample_specs(_cfg().sampler, 500)
+        for spec in specs:
+            skills = [q["skill"] for q in spec["questions"]]
+            self.assertEqual(len(skills), len(set(skills)),
+                             f"{spec['state_id']}: {skills}")
+
+    def test_taxonomy_scale(self):
+        self.assertGreaterEqual(len(specs_mod.DOMAINS), 30)
+        self.assertGreaterEqual(len(specs_mod.SKILLS), 20)
+        self.assertGreaterEqual(len(specs_mod.STYLES), 10)
+        self.assertGreaterEqual(len(specs_mod.EVIDENCE_STRUCTURES), 8)
+        self.assertGreaterEqual(len(specs_mod.AMBIGUITY_LEVELS), 5)
+
+    def test_score_specs_have_ordered_criteria(self):
+        specs = specs_mod.sample_specs(_cfg().sampler, 500)
+        score_qs = [q for s in specs for q in s["questions"] if q["format"] == "score"]
+        self.assertTrue(len(score_qs) > 50)
+        for q in score_qs:
+            self.assertGreaterEqual(len(q["criteria"]), 3)
+            self.assertEqual(len(q["criteria"]), q["max"] - q["min"] + 1)
+        numeric = sum(1 for q in score_qs if q["criteria"][0] == q["criteria"][0].strip()
+                      and q["criteria"][0].lstrip("-").isdigit())
+        self.assertGreater(numeric, 0)
+        self.assertGreater(len(score_qs) - numeric, 0)  # semantic rubrics too
+
 
 class BundleTest(unittest.TestCase):
     def test_mock_bundles_validate(self):
         specs = specs_mod.sample_specs(_cfg().sampler, 20)
-        bad = 0
         for spec in specs:
             bundle = mock_realization(spec)
             errors = validate_mod.validate_bundle(bundle, spec)
-            if errors:
-                bad += 1
-        self.assertEqual(bad, 0)
+            self.assertEqual(errors, [], f"{spec['state_id']}: {errors}")
 
     def test_flat_preserves_grouping(self):
         spec = specs_mod.sample_specs(_cfg().sampler, 5)[0]
@@ -71,24 +112,121 @@ class BundleTest(unittest.TestCase):
         self.assertTrue(all(r["state_id"] == bundle["state_id"] for r in rows))
         self.assertTrue(all(r["bundle_size"] == len(rows) for r in rows))
 
-    def test_training_targets_sum_to_one(self):
-        specs = specs_mod.sample_specs(_cfg().sampler, 10)
+    def test_training_targets_aligned(self):
+        specs = specs_mod.sample_specs(_cfg().sampler, 30)
+        seen_score = False
         for spec in specs:
             bundle = mock_realization(spec)
-            annotated = annot_mod.annotate_bundle(bundle, "mock-0.1")
+            annotated = annot_mod.annotate_bundle(bundle, _cfg().annotator)
             for question, ann in zip(annotated["questions"], annotated["annotations"]):
-                flat = bundle_to_flat_rows(annotated)[0]  # grouping check only
                 row = flat_to_training_row(
                     {"format": question["format"], "question_id": question["question_id"],
                      "state": "s", "question": "q",
                      "options": question.get("options", [])},
                     ann["probabilities"])
                 if question["format"] == "noul":
+                    self.assertEqual(row["options"], [])
                     self.assertEqual(len(row["target"]), 1)
                 else:
+                    seen_score = seen_score or question["format"] == "score"
+                    self.assertTrue(len(row["options"]) >= 2)
+                    self.assertEqual(len(row["target"]), len(row["options"]))
                     self.assertAlmostEqual(sum(row["target"]), 1.0, places=4)
-            break
-        self.assertTrue(flat["state_id"].startswith("state_"))
+        self.assertTrue(seen_score)
+
+
+class AnnotatorGatingTest(unittest.TestCase):
+    def test_mock_is_labeled_mock(self):
+        spec = specs_mod.sample_specs(_cfg().sampler, 3)[0]
+        bundle = mock_realization(spec)
+        annotated = annot_mod.annotate_bundle(bundle, _cfg().annotator)
+        for ann in annotated["annotations"]:
+            self.assertEqual(ann["annotator"], "mock")
+            self.assertNotEqual(ann["annotator"], "jev")
+
+    def test_jev_without_endpoint_fails_loudly(self):
+        from tasksource.jev.synthetic.config import AnnotatorConfig
+        spec = specs_mod.sample_specs(_cfg().sampler, 1)[0]
+        bundle = mock_realization(spec)
+        cfg = AnnotatorConfig(name="jev", version="jev-test", base_url="",
+                              api_key_env="DEFINITELY_UNSET_XYZ", model="jev-test")
+        with self.assertRaises(RuntimeError):
+            annot_mod.annotate_bundle(bundle, cfg)
+
+    def test_jev_without_key_fails_loudly(self):
+        import os
+        from tasksource.jev.synthetic.config import AnnotatorConfig
+        os.environ.pop("DEFINITELY_UNSET_XYZ", None)
+        spec = specs_mod.sample_specs(_cfg().sampler, 1)[0]
+        bundle = mock_realization(spec)
+        cfg = AnnotatorConfig(name="jev", version="jev-test",
+                              base_url="https://example.invalid",
+                              api_key_env="DEFINITELY_UNSET_XYZ", model="jev-test")
+        with self.assertRaises(RuntimeError):
+            annot_mod.annotate_bundle(bundle, cfg)
+
+    def test_unknown_annotator_rejected(self):
+        from tasksource.jev.synthetic.config import AnnotatorConfig
+        spec = specs_mod.sample_specs(_cfg().sampler, 1)[0]
+        bundle = mock_realization(spec)
+        with self.assertRaises(ValueError):
+            annot_mod.annotate_bundle(bundle, AnnotatorConfig(name="oracle"))
+
+
+class CriticTest(unittest.TestCase):
+    def test_critic_uses_own_provider(self):
+        cfg = _cfg()
+        from tasksource.jev.synthetic.config import ProviderConfig
+        cfg.provider = ProviderConfig(name="openai", api_key_env="OPENAI_API_KEY",
+                                      base_url="https://api.openai.com/v1", model="gpt-6-luna")
+        cfg.critic.provider = ProviderConfig(
+            name="albert", api_key_env="ALBERT_API_KEY",
+            base_url="https://albert.api.etalab.gouv.fr/v1",
+            model="deepseek-v4-flash-0731")
+        resolved = cfg.critic_provider()
+        self.assertEqual(resolved.name, "albert")
+        self.assertEqual(resolved.base_url, "https://albert.api.etalab.gouv.fr/v1")
+
+    def test_critic_inherits_generator_provider(self):
+        cfg = _cfg()
+        cfg.critic.provider = None
+        self.assertEqual(cfg.critic_provider().name, cfg.provider.name)
+
+    def test_critic_results_cached_by_content_hash(self):
+        cfg = _cfg()
+        cfg.provider.name = "mock"
+        specs = specs_mod.sample_specs(cfg.sampler, 3)
+        bundles = [mock_realization(s) for s in specs]
+        with tempfile.TemporaryDirectory() as tmp:
+            raw = Path(tmp)
+            first = critic_mod.critique_bundles(cfg, bundles, raw)
+            files_after_first = sorted(p.name for p in raw.glob("*.json"))
+            second = critic_mod.critique_bundles(cfg, bundles, raw)
+            files_after_second = sorted(p.name for p in raw.glob("*.json"))
+        self.assertEqual(first, second)
+        self.assertEqual(files_after_first, files_after_second)
+        # Cache files are content-hashed, not state_id-named.
+        self.assertTrue(all(not p.startswith("state_") for p in files_after_first))
+
+
+class CacheKeyTest(unittest.TestCase):
+    def test_unrelated_settings_do_not_invalidate_generation(self):
+        cfg = _cfg()
+        before = generation_cache_key(cfg)
+        cfg.split.train = 0.5
+        cfg.selection.max_per_family = 10
+        cfg.annotator.version = "mock-0.2"
+        cfg.sampler.seed = 999
+        self.assertEqual(generation_cache_key(cfg), before)
+
+    def test_generation_settings_change_the_key(self):
+        cfg = _cfg()
+        before = generation_cache_key(cfg)
+        cfg.generation.temperature = 0.1
+        self.assertNotEqual(generation_cache_key(cfg), before)
+        cfg2 = _cfg()
+        cfg2.provider.model = "other-model"
+        self.assertNotEqual(generation_cache_key(cfg2), before)
 
 
 class DedupTest(unittest.TestCase):
@@ -127,7 +265,7 @@ class SelectTest(unittest.TestCase):
         cfg = _cfg()
         specs = specs_mod.sample_specs(cfg.sampler, 60)
         bundles = [mock_realization(s) for s in specs]
-        annotated = annot_mod.annotate_bundles(bundles, "mock-0.1")
+        annotated = annot_mod.annotate_bundles(bundles, cfg.annotator)
         result = select_mod.select_bundles(annotated, cfg.selection)
         self.assertEqual(len(result["selected"]), len(annotated))
         self.assertEqual(sum(result["diagnostics"]["plan"].values()), len(annotated))
@@ -149,17 +287,39 @@ class PreflightTest(unittest.TestCase):
 
 
 class ConfigTest(unittest.TestCase):
-    def test_albert_and_luna_configs_load(self):
-        from pathlib import Path
-        base = Path(__file__).resolve().parents[1] / "src" / "tasksource" / "jev" / "synthetic" / "configs"
-        # When installed, fall back to the package directory.
+    def _config_dir(self):
+        from pathlib import Path as _Path
+        base = _Path(__file__).resolve().parents[1] / "src" / "tasksource" / "jev" / "synthetic" / "configs"
         if not base.exists():
             import tasksource.jev.synthetic as pkg
-            base = Path(pkg.__file__).parent / "configs"
+            base = _Path(pkg.__file__).parent / "configs"
+        return base
+
+    def test_all_configs_load(self):
+        base = self._config_dir()
         for name in ("albert_deepseek_v4_flash.yaml", "openai_luna.yaml", "mock_pilot.yaml"):
             cfg = load_config(str(base / name))
             self.assertTrue(cfg.provider.model)
             self.assertTrue(cfg.provider.api_key_env)
+            # Serializes cleanly into the run manifest.
+            json.dumps(cfg.to_dict())
+
+    def test_configs_use_explicit_mock_annotator(self):
+        base = self._config_dir()
+        for name in ("albert_deepseek_v4_flash.yaml", "openai_luna.yaml", "mock_pilot.yaml"):
+            cfg = load_config(str(base / name))
+            self.assertEqual(cfg.annotator.name, "mock")
+
+    def test_critic_provider_independent_of_generator(self):
+        base = self._config_dir()
+        cfg = load_config(str(base / "albert_deepseek_v4_flash.yaml"))
+        critic = cfg.critic_provider()
+        self.assertEqual(critic.name, "albert")
+        self.assertIn("albert", critic.base_url)
+        # Generator and critic can diverge: simulate Luna gen + Albert critic.
+        other = copy.deepcopy(cfg)
+        other.provider.name = "openai"
+        self.assertEqual(other.critic_provider().name, "albert")
 
 
 if __name__ == "__main__":

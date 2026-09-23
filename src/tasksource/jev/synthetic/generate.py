@@ -27,8 +27,30 @@ def prompt_hash(prompt: str) -> str:
     return hashlib.sha256(prompt.encode("utf-8")).hexdigest()[:16]
 
 
+def generation_cache_key(cfg) -> str:
+    """Hash ONLY generation-relevant settings.
+
+    Changing split/selection/annotator settings must not invalidate
+    cached LLM generations.
+    """
+    relevant = {
+        "provider": cfg.provider.name,
+        "base_url": cfg.provider.base_url,
+        "model": cfg.provider.model,
+        "temperature": cfg.generation.temperature,
+        "max_output_tokens": cfg.generation.max_output_tokens,
+        "prompt_version": cfg.generation.prompt_version,
+    }
+    return hashlib.sha256(
+        json.dumps(relevant, sort_keys=True).encode("utf-8")).hexdigest()[:16]
+
+
 def render_prompt(prompt_template: str, spec: dict) -> str:
     return prompt_template.replace("{{SPEC_JSON}}", json.dumps(spec, indent=2, ensure_ascii=False))
+
+
+def numeric_range(qspec: dict) -> list[str]:
+    return [str(i) for i in range(int(qspec.get("min", 0)), int(qspec.get("max", 5)) + 1)]
 
 
 def mock_realization(spec: dict) -> dict:
@@ -55,10 +77,11 @@ def mock_realization(spec: dict) -> dict:
                               "question": f"Does this {topic} need {qspec['skill']}?",
                               "skill": qspec["skill"]})
         else:
+            criteria = list(qspec.get("criteria") or numeric_range(qspec))
             questions.append({"question_id": qid, "format": "score",
                               "question": f"Rate {qspec['skill']} for this {topic}.",
                               "min": qspec.get("min", 0), "max": qspec.get("max", 5),
-                              "skill": qspec["skill"]})
+                              "options": criteria, "skill": qspec["skill"]})
     bundle = dict(spec)
     bundle["state"] = state
     bundle["questions"] = questions
@@ -111,6 +134,10 @@ def parse_bundle(text: str, spec: dict) -> dict:
         if qspec["format"] == "score":
             entry["min"] = q.get("min", qspec.get("min", 0))
             entry["max"] = q.get("max", qspec.get("max", 5))
+            # Ordered criteria travel with the question (Jev target aligns
+            # to them); fall back to the spec criteria if the model omits
+            # them (validation enforces verbatim reuse against the spec).
+            entry["options"] = list(q.get("options") or qspec.get("criteria") or [])
         questions.append(entry)
     bundle = dict(spec)
     bundle["state"] = data.get("state", "")
@@ -181,7 +208,7 @@ async def generate_bundles_async(cfg, specs: list[dict], raw_dir: Path) -> list[
     raw_dir.mkdir(parents=True, exist_ok=True)
     prompt_template = load_prompt(cfg.generation.prompt_version)
     p_hash = prompt_hash(prompt_template)
-    c_hash = hashlib.sha256(json.dumps(cfg.to_dict(), sort_keys=True).encode()).hexdigest()[:16]
+    c_hash = generation_cache_key(cfg)
     client = None
     if cfg.provider.name != "mock":
         api_key = providers.require_api_key(cfg.provider)

@@ -25,7 +25,7 @@ from . import specs as specs_mod
 from . import split as split_mod
 from . import validate as validate_mod
 from .config import load_config
-from .generate import PROMPTS_DIR, generate_bundles, prompt_hash
+from .generate import PROMPTS_DIR, generate_bundles, generation_cache_key, prompt_hash
 from .schemas import bundle_to_flat_rows, flat_to_training_row
 
 STAGES = ("specs", "generate", "validate", "critic", "dedup",
@@ -95,7 +95,13 @@ def stage_generate(cfg, run_dir: Path) -> list[dict]:
         if prompt_file.exists():
             prompt_hashes[name] = prompt_hash(prompt_file.read_text(encoding="utf-8"))
     manifest_mod.write_manifest(
-        manifest_path, manifest_mod.build_manifest(cfg, preflight, {"candidates": len(bundles)}, prompt_hashes))
+        manifest_path, manifest_mod.build_manifest(
+            cfg, preflight, {"candidates": len(bundles),
+                             "generate_cache_key": generation_cache_key(cfg),
+                             "annotator": cfg.annotator.name,
+                             "critic_provider": cfg.critic_provider().name,
+                             "critic_model": cfg.critic.model},
+            prompt_hashes))
     # Keep spec lookup for validation.
     (run_dir / "_spec_by_id.json").write_text(json.dumps(spec_by_id), encoding="utf-8")
     return bundles
@@ -138,7 +144,7 @@ def stage_dedup(cfg, run_dir: Path) -> list[dict]:
 def stage_annotate(cfg, run_dir: Path) -> list[dict]:
     source = run_dir / "deduped.jsonl"
     bundles = _read_bundles(source if source.exists() else run_dir / "validated.jsonl")
-    annotated = annot_mod.annotate_bundles(bundles, cfg.annotator.version)
+    annotated = annot_mod.annotate_bundles(bundles, cfg.annotator)
     _write_bundles(run_dir / "annotated.jsonl", annotated)
     _to_frame(annotated).to_parquet(run_dir / "annotated.parquet", index=False)
     # Persist raw Jev annotation artifacts.

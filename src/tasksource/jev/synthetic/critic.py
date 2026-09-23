@@ -2,22 +2,37 @@
 
 Deterministic validation cannot tell whether all questions genuinely
 refer to the same state or test distinct skills; the critic can.
-Kept separate from generation so later you can mix e.g. DeepSeek
-generation + Luna critic.
+The critic uses its OWN provider config (see CriticConfig), so e.g.
+Luna generation + Albert/DeepSeek critic works correctly.
+
+Critic calls are cached like generation calls:
+    hash(critic model + temperature + prompt hash + canonical bundle)
+and raw API responses are preserved.
 """
 
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import json
 from pathlib import Path
 
 from . import providers
-from .generate import PROMPTS_DIR, prompt_hash, render_prompt
+from .generate import PROMPTS_DIR, extract_json_object, prompt_hash
 
 
 def load_critic_prompt(version: str) -> str:
     return (PROMPTS_DIR / f"{version}.txt").read_text(encoding="utf-8")
+
+
+def critic_cache_key(model: str, temperature: float, prompt: str, bundle: dict) -> str:
+    canonical = json.dumps(
+        {"state_id": bundle.get("state_id"), "state": bundle.get("state"),
+         "questions": bundle.get("questions")},
+        sort_keys=True, ensure_ascii=False)
+    return hashlib.sha256(
+        f"{model}\n{temperature}\n{prompt_hash(prompt)}\n{canonical}".encode("utf-8")
+    ).hexdigest()
 
 
 def mock_critique(bundle: dict) -> dict:
@@ -29,9 +44,19 @@ def mock_critique(bundle: dict) -> dict:
 
 
 async def _critique_one(sem, client, model: str, temperature: float,
-                        template: str, bundle: dict) -> dict:
+                        template: str, bundle: dict, raw_dir: Path) -> dict:
+    key = critic_cache_key(model, temperature, template, bundle)
+    cached = raw_dir / f"{key}.json"
+    if cached.exists():
+        record = json.loads(cached.read_text(encoding="utf-8"))
+        return {"state_id": bundle["state_id"], **record["verdict"]}
     if client is None:
-        return mock_critique(bundle)
+        verdict = mock_critique(bundle)
+        cached.write_text(json.dumps(
+            {"cache_key": key, "state_id": bundle["state_id"],
+             "provider": "mock", "model": model, "verdict": verdict},
+            ensure_ascii=False, indent=2), encoding="utf-8")
+        return {"state_id": bundle["state_id"], **verdict}
     payload = {"state_id": bundle["state_id"], "state": bundle["state"],
                "questions": bundle["questions"]}
     prompt = template.replace("{{BUNDLE_JSON}}", json.dumps(payload, ensure_ascii=False, indent=2))
@@ -40,9 +65,20 @@ async def _critique_one(sem, client, model: str, temperature: float,
             client, model, [{"role": "user", "content": prompt}],
             temperature=temperature, max_tokens=1000)
     try:
-        return json.loads(result["text"])
-    except json.JSONDecodeError:
-        return {"pass": False, "issues": ["unparseable critic response"], "score": 0.0}
+        verdict = extract_json_object(result["text"])
+        verdict = {"pass": bool(verdict.get("pass", False)),
+                   "issues": list(verdict.get("issues", [])),
+                   "score": float(verdict.get("score", 0.0))}
+    except (ValueError, json.JSONDecodeError, TypeError):
+        verdict = {"pass": False, "issues": ["unparseable critic response"], "score": 0.0}
+    cached.write_text(json.dumps(
+        {"cache_key": key, "state_id": bundle["state_id"],
+         "provider": "critic", "requested_model": model,
+         "returned_model": result["returned_model"],
+         "raw_response": result["raw"], "raw_text": result["text"],
+         "verdict": verdict},
+        ensure_ascii=False, indent=2), encoding="utf-8")
+    return {"state_id": bundle["state_id"], **verdict}
 
 
 async def critique_bundles_async(cfg, bundles: list[dict], raw_dir: Path) -> list[dict]:
@@ -50,27 +86,22 @@ async def critique_bundles_async(cfg, bundles: list[dict], raw_dir: Path) -> lis
     if not cfg.critic.enabled:
         return [{"state_id": b["state_id"], "pass": True, "issues": [], "score": 1.0} for b in bundles]
     template = load_critic_prompt(cfg.critic.prompt_version)
+    provider = cfg.critic_provider()
     client = None
-    model = cfg.critic.model
-    temperature = cfg.critic.temperature
-    if cfg.provider.name != "mock":
-        from .config import ProviderConfig
-        critic_provider = ProviderConfig(name=cfg.provider.name,
-                                         api_key_env=cfg.provider.api_key_env,
-                                         base_url=cfg.provider.base_url, model=model)
-        client = providers.make_client(critic_provider, providers.require_api_key(critic_provider))
-    else:
-        client = None
-    sem = asyncio.Semaphore(max(1, cfg.generation.concurrency))
-    out = await asyncio.gather(*[_critique_one(sem, client, model, temperature, template, b)
-                                 for b in bundles])
-    results = []
-    for bundle, verdict in zip(bundles, out):
-        verdict = {"state_id": bundle["state_id"], **verdict}
-        (raw_dir / f"{bundle['state_id']}.json").write_text(
-            json.dumps(verdict, ensure_ascii=False, indent=2), encoding="utf-8")
-        results.append(verdict)
-    return results
+    if provider.name != "mock":
+        client = providers.make_client(provider, providers.require_api_key(provider))
+    try:
+        sem = asyncio.Semaphore(max(1, cfg.generation.concurrency))
+        out = await asyncio.gather(*[_critique_one(sem, client, cfg.critic.model,
+                                                   cfg.critic.temperature, template, b, raw_dir)
+                                     for b in bundles])
+    finally:
+        if client is not None:
+            try:
+                await client.close()
+            except Exception:
+                pass
+    return list(out)
 
 
 def critique_bundles(cfg, bundles: list[dict], raw_dir: Path) -> list[dict]:

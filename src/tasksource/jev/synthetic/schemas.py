@@ -108,4 +108,11 @@ def validate_bundle_shape(bundle: dict) -> list[str]:
                 errors.append(f"score {qid} needs min/max")
             elif not question["min"] < question["max"]:
                 errors.append(f"score {qid} needs min<max")
+            # Tasksource represents score as ORDERED CRITERIA (options)
+            # with the target aligned to them — options=[] is invalid.
+            options = question.get("options") or []
+            if len(options) < 3:
+                errors.append(f"score {qid} needs >=3 ordered criteria as options")
+            if len(set(options)) != len(options):
+                errors.append(f"score {qid} has duplicate criteria")
     return errors

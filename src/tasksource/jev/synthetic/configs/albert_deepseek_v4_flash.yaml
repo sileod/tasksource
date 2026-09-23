@@ -1,4 +1,6 @@
 # Albert / deepseek-v4-flash-0731 generator (initial).
+# Cross-provider experiment: point `provider` at Luna and keep this
+# Albert critic block unchanged (or vice versa) — config only.
 run_name: deepseek_v4_flash_v1
 output_dir: .synthetic_runs
 
@@ -13,7 +15,7 @@ generation:
   concurrency: 10
   max_output_tokens: 4000
   seed: 42
-  prompt_version: generate_v1
+  prompt_version: generate_v2
   n_states: 1000
 
 sampler:
@@ -26,14 +28,18 @@ sampler:
 
 critic:
   enabled: true
-  provider: albert
+  provider:
+    name: albert
+    api_key_env: ALBERT_API_KEY
+    base_url: https://albert.api.etalab.gouv.fr/v1
+    model: deepseek-v4-flash-0731
   model: deepseek-v4-flash-0731
   prompt_version: critic_v1
   temperature: 0.0
 
 annotator:
-  name: jev
-  version: jev-1.0
+  name: mock
+  version: mock-0.1
   base_url: ""
   api_key_env: JEV_API_KEY
   model: jev-1

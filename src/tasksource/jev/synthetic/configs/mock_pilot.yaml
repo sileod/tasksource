@@ -13,7 +13,7 @@ generation:
   concurrency: 8
   max_output_tokens: 4000
   seed: 42
-  prompt_version: generate_v1
+  prompt_version: generate_v2
   n_states: 20
 
 sampler:
@@ -26,13 +26,17 @@ sampler:
 
 critic:
   enabled: true
-  provider: mock
+  provider:
+    name: mock
+    api_key_env: ALBERT_API_KEY
+    base_url: mock://
+    model: mock-generator
   model: mock-generator
   prompt_version: critic_v1
   temperature: 0.0
 
 annotator:
-  name: jev
+  name: mock
   version: mock-0.1
   base_url: ""
   api_key_env: JEV_API_KEY
