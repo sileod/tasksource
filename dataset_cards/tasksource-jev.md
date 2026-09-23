@@ -71,6 +71,28 @@ one `source_row` to `render_systemone_group(rows)` to obtain a single Jev
 request with several questions over the same sentence. The Parquet view keeps
 one decision per row so it can be shuffled, sampled, or streamed normally.
 
+### Graded sources
+
+Sources labelled with ratings, annotator fractions, or vote distributions are
+recast natively rather than dropped (sources `graded/<family>`, defined in
+`src/tasksource/jev/graded.py`). Ordinal ratings become `score` questions
+with stated levels (HelpSteer, essay grading, app stars, JOCI plausibility),
+bounded quantities become `noul` rescaled to [0, 1] (STS similarity, SICK
+relatedness, acceptability, OASST and Civil Comments annotator rates), and
+ChaosNLI's 100 votes become a soft `choice` target. Sibling annotations of one
+input share a state: a HelpSteer response carries five `score` questions, an
+OASST reply thirteen `noul` questions, a Civil Comments comment seven.
+
+### Procedural sources
+
+About 10% of each split comes from
+[`tasksource/procedural-jev`](https://huggingface.co/datasets/tasksource/procedural-jev)
+(sources `procedural-jev/<config>`): generated JSON states with two or three
+native questions each, mixing `choice`, `noul` (including exact posterior
+probabilities), and `score` over ordered rubrics. Every question over a state
+shares its `group_id`, and the cap keeps groups whole. These rows are never
+augmented, so their wording is exactly as generated.
+
 ### Deterministic subrecasts
 
 The release adds conservative, low-frequency variants while retaining every

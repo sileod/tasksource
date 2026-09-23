@@ -13,7 +13,7 @@ import subprocess
 import time
 from pathlib import Path
 
-from datasets import DatasetDict, load_dataset
+from datasets import Dataset, DatasetDict, Features, List, Value, concatenate_datasets, load_dataset
 from huggingface_hub import HfApi
 import numpy as np
 import pandas as pd
@@ -24,6 +24,7 @@ from tasksource.jev.augmentations import augment_jev_internal, stable_fraction
 from tasksource.jev.prompt_augmentations import (
     published_pair_style, published_question_style,
 )
+from tasksource.jev import graded, procedural
 from tasksource.jev.recast import recast_jev
 
 
@@ -52,6 +53,34 @@ def load_jev_task(row, max_rows, max_rows_eval):
     source = load_dataset(*mirror)
     standardized = preprocessing(source, max_rows, max_rows_eval)
     return recast_jev(standardized, task=row.source_id)
+
+
+TRAINING_FEATURES = Features({
+    "id": Value("string"), "kind": Value("string"), "options": List(Value("string")),
+    "target": List(Value("float64")), "state": Value("string"), "question": Value("string"),
+    "source": Value("string"), "variant": Value("string"), "split": Value("string"),
+})
+
+
+NATIVE_SOURCES = (
+    [procedural.SOURCE_PREFIX + name for name in sorted(procedural.TASKS)]
+    + [graded.SOURCE_PREFIX + name for name in graded.FAMILIES]
+)
+
+
+def load_native_task(source_id, max_rows, max_rows_eval):
+    """Sources authored as typed Jev questions, grouped by state (no recast)."""
+    if source_id.startswith(graded.SOURCE_PREFIX):
+        rows = graded.load_family(source_id[len(graded.SOURCE_PREFIX):], max_rows, max_rows_eval)
+    else:
+        dataset = load_dataset(procedural.REPO_ID, source_id[len(procedural.SOURCE_PREFIX):])
+        rows = {split: [row for index, example in enumerate(examples)
+                        for row in procedural.jev_rows(example, source_id, normalized_split(split), index)]
+                for split, examples in dataset.items()}
+    return DatasetDict({
+        split: Dataset.from_list(split_rows, features=TRAINING_FEATURES)
+        for split, split_rows in rows.items() if split_rows  # e.g. hidden test labels
+    })
 
 
 def normalized_split(split):
@@ -227,6 +256,25 @@ def diverse_cap(dataset, max_rows):
     return dataset.select(sorted(selected))
 
 
+def share_cap(dataset, max_rows, procedural_share):
+    """Reserve a fixed share of the cap for procedural sources.
+
+    Under the per-source quota, seven generators would get under 2% of the
+    rows although they are the only source of Score, graded Noul, and
+    multi-question states. A fixed share also stays put as sources come and go.
+    """
+    sources = dataset.select_columns(["source"])[:]["source"]
+    generated = [i for i, source in enumerate(sources) if source.startswith(procedural.SOURCE_PREFIX)]
+    if max_rows is None or not generated or len(generated) == len(dataset):
+        return diverse_cap(dataset, max_rows)
+    generated_rows = min(len(generated), int(max_rows * procedural_share))
+    other = sorted(set(range(len(dataset))) - set(generated))
+    return concatenate_datasets([
+        diverse_cap(dataset.select(other), max_rows - generated_rows),
+        diverse_cap(dataset.select(generated), generated_rows),
+    ])
+
+
 def source_row_group(identifier):
     """The stable source-row prefix shared by direct and variant questions."""
     return ":".join(identifier.split(":", 3)[:3])
@@ -288,7 +336,7 @@ def diversify_published_prompts(dataset):
 
 def publish_dataset(
     output, repo_id, pretty_rows=1_000, publish_rows=500_000,
-    allowed_sources=None,
+    allowed_sources=None, procedural_share=0.1,
 ):
     data_files = {}
     for split in ("train", "validation", "test"):
@@ -307,7 +355,7 @@ def publish_dataset(
         for split in dataset:
             cap = int(publish_rows * weights.get(split, 0))
             available = len(dataset[split])
-            dataset[split] = diverse_cap(dataset[split], cap)
+            dataset[split] = share_cap(dataset[split], cap, procedural_share)
             if available >= cap and len(dataset[split]) != cap:
                 raise ValueError(
                     f"Group-preserving cap produced {len(dataset[split])} "
@@ -408,6 +456,10 @@ def select_tasks(args):
         multilingual["source_id"] = "multilingual/" + multilingual.id
         frame = pd.concat([frame, multilingual], ignore_index=True)
     frame = frame[frame.task_type.isin(SUPPORTED_TYPES)]
+    frame = pd.concat([frame, pd.DataFrame([
+        {"id": source, "source_id": source, "task_type": "NativeJev", "multilingual": False}
+        for source in NATIVE_SOURCES
+    ])], ignore_index=True)
     frame = frame[
         ~frame.source_id.str.startswith(PUBLISH_EXCLUDED_PREFIXES, na=False)
     ]
@@ -455,9 +507,17 @@ def build(args):
             if row.task_type == "TokenClassification":
                 max_rows = max(1, max_rows // 2)
                 max_rows_eval = max(1, max_rows_eval // 2)
-            dataset = load_jev_task(row, max_rows, max_rows_eval)
+            if row.task_type == "NativeJev":
+                dataset = load_native_task(task_id, max_rows, max_rows_eval)
+            else:
+                dataset = load_jev_task(row, max_rows, max_rows_eval)
             split_rows = {}
             for split, split_dataset in dataset.items():
+                if row.task_type == "NativeJev":
+                    path = data_dir / f"{split}-{slug(task_id)}.parquet"
+                    split_dataset.to_parquet(path)
+                    split_rows[split] = len(split_dataset)
+                    continue
                 split_dataset = split_dataset.map(
                     to_training_row,
                     with_indices=True,
@@ -528,6 +588,7 @@ def build(args):
         publish_dataset(
             output, args.repo_id, args.pretty_rows, args.publish_rows,
             allowed_sources=set(tasks.source_id),
+            procedural_share=args.procedural_share,
         )
 
 
@@ -582,6 +643,10 @@ def parse_args():
     parser.add_argument(
         "--pretty-rows", type=int, default=1_000,
         help="Deterministically interleave sources in this many leading train rows.",
+    )
+    parser.add_argument(
+        "--procedural-share", type=float, default=0.1,
+        help="Fraction of each capped split reserved for procedural-jev sources.",
     )
     return parser.parse_args()
 
