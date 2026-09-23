@@ -6,6 +6,7 @@ license: other
 task_categories:
 - text-classification
 - question-answering
+- token-classification
 tags:
 - tasksource
 - jev
@@ -19,7 +20,8 @@ size_categories:
 
 # tasksource-jev
 
-`tasksource-jev` recasts Tasksource classification and multiple-choice datasets
+`tasksource-jev` recasts Tasksource classification, multiple-choice, and selected
+token-classification datasets
 as runtime-defined decisions. Each example supplies its state and candidate
 criteria at inference time. The dataset is intended for training and evaluating
 bounded decision models; it is not tied to one Jev implementation.
@@ -27,20 +29,20 @@ bounded decision models; it is not tied to one Jev implementation.
 This is an independent data transformation. It is not an official TypeSafe Jev
 dataset and is not produced by or affiliated with TypeSafe or OpenJev.
 
-> **Build status:** a 105,000-example preview is currently available while the
-> source-balanced 500,000-row release is built from 730 selected English and
-> multilingual tasks. Checkpointed successes are retained and incompatible
-> upstream sources are reported explicitly.
+The current release is capped at 500,000 decisions across English and
+multilingual tasks. Build reports identify completed and failed source tasks.
 
 ## Schema
 
 | field | type | meaning |
 |---|---|---|
 | `id` | string | Stable identifier derived from task, split, and row index. |
+| `group_id` | string | Identifies decisions derived from the same source row. |
+| `question_id` | string | Identifies a question within that group. |
 | `kind` | string | System One primitive: `choice`, `noul`, or `score`. |
 | `options` | list of strings | Candidate labels or answers supplied at runtime. Order is significant. |
 | `target` | list of floats | One-hot target distribution aligned with `options`. |
-| `state` | string | Text or question on which the decision is based. Paired classification inputs are marked `text_A` and `text_B`. |
+| `state` | string | Text or question on which the decision is based. Token decisions include the sentence, marked target, and target index. |
 | `question` | string | The decision requested from the model. |
 | `source` | string | Tasksource task identifier used to load the source data. |
 | `variant` | string | Direct decision or a named deterministic subrecast. |
@@ -48,7 +50,16 @@ dataset and is not produced by or affiliated with TypeSafe or OpenJev.
 
 Classification criteria are the source task's label names. Multiple-choice
 criteria are the answer choices. Every source row is retained as a direct
-`choice`. A deterministic augmentation pass adds label-verification `noul`
+`choice` for classification and multiple choice. For selected token tasks, at
+most two token questions are sampled deterministically from each source
+sequence; one non-`O` token is preferred when available. BIO/BILOU boundaries
+and compact POS or dependency labels are expanded into readable criteria.
+Only `Sequence(ClassLabel)` or equivalent `List(ClassLabel)` ontologies with
+2–32 readable labels qualify. This release includes CoNLL-2003 NER and WNUT-17
+token decisions from checked data-only mirrors; see
+[token-source-status.md](token-source-status.md) for the source audit and backlog.
+The `group_id` lets several questions share one source row without a costly
+global grouping pass. A deterministic augmentation pass adds label-verification `noul`
 questions to about 5% of rows. Ordered-rubric `score` augmentation is available
 for genuinely ordinal sources but is disabled by default. Native regression and
 ordinal recasting will be used for score examples rather than imposing an order
@@ -56,7 +67,7 @@ on nominal classification labels.
 
 ### Deterministic subrecasts
 
-The release adds two conservative, low-frequency variants while retaining every
+The release adds conservative, low-frequency variants while retaining every
 direct row:
 
 | variant | default rate | purpose |
@@ -111,10 +122,8 @@ ordered round-robin by `source`. This is a deterministic permutation, not a
 random shuffle. After that display prefix, all remaining examples retain their
 original relative order.
 
-The selected catalog includes 100 BIG-bench task configurations and all 57 MMLU
-subjects currently registered in Tasksource. Their original split identity is
-preserved in the row-level `split` field, with `validation` normalized to `dev`.
-This makes source/split exclusion explicit when constructing a training mixture.
+BIG-bench, MMLU, and BLiMP are excluded from this release. Original split
+identity is preserved in `split`, with `validation` normalized to `dev`.
 
 The repository includes `failed-tasks.json` and `outdated-datasets.json`.
 The latter specifically tracks upstream datasets that still depend on loading

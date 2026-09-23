@@ -13,15 +13,42 @@ import subprocess
 import time
 from pathlib import Path
 
-from datasets import load_dataset
+from datasets import DatasetDict, load_dataset
 from huggingface_hub import HfApi
 import numpy as np
 import pandas as pd
 from tasksource import list_tasks, load_task
+from tasksource import tasks as english_tasks
+from tasksource.access import load_preprocessing
 from tasksource.jev_augmentations import augment_jev_internal, stable_fraction
+from tasksource.recast import recast_jev
 
 
-SUPPORTED_TYPES = {"Classification", "MultipleChoice"}
+SUPPORTED_TYPES = {"Classification", "MultipleChoice", "TokenClassification"}
+PUBLISH_EXCLUDED_PREFIXES = ("bigbench/", "mmlu/", "blimp/")
+JEV_TOKEN_TASKS = {
+    "conll2003/ner_tags", "wnut_17/wnut_17",
+}
+TOKEN_SOURCE_MIRRORS = {
+    # Data-only copies; each retains the original columns, ClassLabel names,
+    # and train/validation/test boundaries used by the Tasksource annotation.
+    "conll2003/ner_tags": ("tomaarsen/conll2003", None),
+    "wnut_17/wnut_17": ("flaitenberger/wnut_17", None),
+}
+
+
+def load_jev_task(row, max_rows, max_rows_eval):
+    """Use audited data-only mirrors for otherwise script-bound token tasks."""
+    mirror = TOKEN_SOURCE_MIRRORS.get(row.source_id)
+    if mirror is None:
+        return load_task(
+            row.id, recast="jev", multilingual=row.multilingual,
+            max_rows=max_rows, max_rows_eval=max_rows_eval,
+        )
+    preprocessing = load_preprocessing(english_tasks, id=row.id)
+    source = load_dataset(*mirror)
+    standardized = preprocessing(source, max_rows, max_rows_eval)
+    return recast_jev(standardized, task=row.source_id)
 
 
 def normalized_split(split):
@@ -66,8 +93,12 @@ def to_training_row(example, index, task_id, split):
     label = int(example["label"])
     target = [0.0] * len(options)
     target[label] = 1.0
+    source_row = example.get("source_row", index)
+    question_id = example.get("question_id", "decision")
+    group_id = f"{slug(task_id)}:{split}:{source_row}"
+    row_id = group_id if question_id == "decision" else f"{group_id}:{question_id}"
     return {
-        "id": f"{slug(task_id)}:{split}:{index}",
+        "id": row_id,
         "kind": "choice",
         "options": options,
         "target": target,
@@ -149,6 +180,36 @@ def diverse_cap(dataset, max_rows):
     return dataset.select(sorted(selected[:max_rows]))
 
 
+def exclude_publish_sources(dataset, prefixes=PUBLISH_EXCLUDED_PREFIXES):
+    """Exclude benchmark families from the release without deleting build shards."""
+    if not prefixes or "source" not in dataset.column_names:
+        return dataset
+    sources = dataset.select_columns(["source"])[:]["source"]
+    keep = [
+        index for index, source in enumerate(sources)
+        if not source.startswith(prefixes)
+    ]
+    return dataset if len(keep) == len(dataset) else dataset.select(keep)
+
+
+def add_question_groups(dataset):
+    """Backfill grouping metadata in preexisting Parquet shards."""
+    if "group_id" in dataset.column_names:
+        return dataset
+    ids = dataset.select_columns(["id"])[:]["id"]
+    group_ids = []
+    question_ids = []
+    for identifier in ids:
+        parts = identifier.split(":")
+        if len(parts) > 3 and parts[3].startswith("token-"):
+            group_ids.append(":".join(parts[:3]))
+            question_ids.append(":".join(parts[3:]))
+        else:
+            group_ids.append(":".join(parts[:3]))
+            question_ids.append("decision" if len(parts) == 3 else ":".join(parts[3:]))
+    return dataset.add_column("group_id", group_ids).add_column("question_id", question_ids)
+
+
 def publish_dataset(output, repo_id, pretty_rows=1_000, publish_rows=500_000):
     data_files = {}
     for split in ("train", "validation", "test"):
@@ -156,13 +217,30 @@ def publish_dataset(output, repo_id, pretty_rows=1_000, publish_rows=500_000):
         if files:
             data_files[split] = [str(path) for path in files]
     dataset = load_dataset("parquet", data_files=data_files)
+    dataset = DatasetDict({
+        split: exclude_publish_sources(split_dataset)
+        for split, split_dataset in dataset.items()
+    })
     if publish_rows:
         weights = {"train": 0.90, "validation": 0.05, "test": 0.05}
         for split in dataset:
             cap = int(publish_rows * weights.get(split, 0))
             dataset[split] = diverse_cap(dataset[split], cap)
+    dataset = DatasetDict({
+        split: add_question_groups(split_dataset)
+        for split, split_dataset in dataset.items()
+    })
     if "train" in dataset:
         dataset["train"] = pretty_order(dataset["train"], pretty_rows)
+    for split, rows in dataset.items():
+        metadata = rows.select_columns(["id", "source", "split"])[:]
+        if len(set(metadata["id"])) != len(rows):
+            raise ValueError(f"Duplicate Jev decision IDs in {split}")
+        if any(source.startswith(PUBLISH_EXCLUDED_PREFIXES) for source in metadata["source"]):
+            raise ValueError(f"Excluded benchmark source in {split}")
+        if set(metadata["split"]) != {normalized_split(split)}:
+            raise ValueError(f"Mixed source split annotations in {split}")
+        print(f"Publish {split}: {len(rows)} rows, {len(set(metadata['source']))} sources", flush=True)
     api = HfApi()
     api.upload_file(
         path_or_fileobj=str(output / "README.md"),
@@ -176,7 +254,7 @@ def publish_dataset(output, repo_id, pretty_rows=1_000, publish_rows=500_000):
         max_shard_size="256MB",
         commit_message="Publish tasksource-jev Parquet dataset",
     )
-    for name in ("build-report.jsonl", "build-summary.json", "failed-tasks.json", "outdated-datasets.json"):
+    for name in ("build-report.jsonl", "build-summary.json", "failed-tasks.json", "outdated-datasets.json", "token-source-status.md"):
         path = output / name
         if path.exists():
             api.upload_file(
@@ -236,6 +314,13 @@ def select_tasks(args):
         multilingual["source_id"] = "multilingual/" + multilingual.id
         frame = pd.concat([frame, multilingual], ignore_index=True)
     frame = frame[frame.task_type.isin(SUPPORTED_TYPES)]
+    frame = frame[
+        ~frame.source_id.str.startswith(PUBLISH_EXCLUDED_PREFIXES, na=False)
+    ]
+    frame = frame[
+        (frame.task_type != "TokenClassification")
+        | frame.source_id.isin(JEV_TOKEN_TASKS)
+    ]
     if args.tasks:
         wanted = set(args.tasks)
         frame = frame[frame.source_id.isin(wanted)]
@@ -251,16 +336,19 @@ def build(args):
     output = args.output.resolve()
     data_dir = output / "data"
     data_dir.mkdir(parents=True, exist_ok=True)
-    migrate_legacy_shards(
-        data_dir, args.noul_rate, args.score_rate, args.permutation_rate,
-        args.prompt_rate, args.paired_format_rate,
-    )
+    if not args.skip_migrate:
+        migrate_legacy_shards(
+            data_dir, args.noul_rate, args.score_rate, args.permutation_rate,
+            args.prompt_rate, args.paired_format_rate,
+        )
     report_path = output / "build-report.jsonl"
     completed = read_completed(report_path)
     tasks = select_tasks(args)
     print(f"Selected {len(tasks)} tasks; {len(completed)} already complete", flush=True)
 
-    for position, row in enumerate(tasks.itertuples(index=False), start=1):
+    for position, row in enumerate(
+        () if args.finalize_only else tasks.itertuples(index=False), start=1
+    ):
         task_id = row.source_id
         if task_id in completed:
             print(f"[{position}/{len(tasks)}] skip {task_id}", flush=True)
@@ -268,13 +356,12 @@ def build(args):
         started = time.time()
         print(f"[{position}/{len(tasks)}] build {task_id}", flush=True)
         try:
-            dataset = load_task(
-                row.id,
-                recast="jev",
-                multilingual=row.multilingual,
-                max_rows=args.max_rows,
-                max_rows_eval=args.max_rows_eval,
-            )
+            max_rows = args.max_rows
+            max_rows_eval = args.max_rows_eval
+            if row.task_type == "TokenClassification":
+                max_rows = max(1, max_rows // 2)
+                max_rows_eval = max(1, max_rows_eval // 2)
+            dataset = load_jev_task(row, max_rows, max_rows_eval)
             split_rows = {}
             for split, split_dataset in dataset.items():
                 split_dataset = split_dataset.map(
@@ -313,6 +400,7 @@ def build(args):
 
     if args.finalize:
         shutil.copyfile(args.card, output / "README.md")
+        shutil.copyfile(args.card.parent / "jev-token-source-status.md", output / "token-source-status.md")
         selected = set(tasks.source_id)
         latest = latest_records(report_path)
         failures = [
@@ -335,6 +423,7 @@ def build(args):
             "failed_tasks": len(failures),
             "outdated_datasets": len(outdated),
             "parquet_files": len(list(data_dir.glob("*.parquet"))),
+            "excluded_source_families": list(PUBLISH_EXCLUDED_PREFIXES),
         }
         (output / "build-summary.json").write_text(
             json.dumps(summary, indent=2) + "\n", encoding="utf-8"
@@ -379,6 +468,14 @@ def parse_args():
         help="Fraction of paired-text rows receiving neutral field-label variation.",
     )
     parser.add_argument("--finalize", action="store_true")
+    parser.add_argument(
+        "--finalize-only", action="store_true",
+        help="Refresh reports and publish from checkpointed shards without retrying tasks.",
+    )
+    parser.add_argument(
+        "--skip-migrate", action="store_true",
+        help="Reuse checkpointed shards already written with the current schema.",
+    )
     parser.add_argument("--upload", action="store_true")
     parser.add_argument("--repo-id", default="tasksource/tasksource-jev")
     parser.add_argument(

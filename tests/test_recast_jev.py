@@ -1,10 +1,13 @@
 import unittest
 
-from datasets import ClassLabel, Dataset, DatasetDict, Features, Value
+from datasets import ClassLabel, Dataset, DatasetDict, Features, Sequence, Value
 
-from tasksource.recast import recast_jev, render_systemone
+from tasksource.recast import recast_jev, render_systemone, render_systemone_group
+from tasksource.jev_token_labels import normalize_token_label
 from tasksource.jev_augmentations import augment_jev_internal
-from scripts.build_jev_dataset import diverse_cap, pretty_order, to_training_row
+from scripts.build_jev_dataset import (
+    diverse_cap, exclude_publish_sources, pretty_order, to_training_row,
+)
 
 
 class RecastJevTest(unittest.TestCase):
@@ -54,7 +57,7 @@ class RecastJevTest(unittest.TestCase):
         row = to_training_row({
             "state": "Question", "instructions": "Choose.",
             "criteria": ["a", "b"], "label": 0,
-        }, index=0, task_id="mmlu/abstract_algebra", split="validation")
+        }, index=0, task_id="demo/task", split="validation")
         self.assertEqual(row["split"], "dev")
 
     def test_internal_jev_augmentations_are_typed_and_idempotent(self):
@@ -105,6 +108,104 @@ class RecastJevTest(unittest.TestCase):
         self.assertEqual(set(capped["source"]), {"a", "b", "c"})
         self.assertEqual(capped["value"], sorted(capped["value"]))
         self.assertEqual(len(capped), 6)
+
+    def test_token_classification_is_readable_bounded_and_deterministic(self):
+        features = Features({
+            "tokens": Sequence(Value("string")),
+            "labels": Sequence(ClassLabel(names=["O", "B-PER", "I-PER"])),
+        })
+        source = DatasetDict({"train": Dataset.from_dict({
+            "tokens": [["Obama", "met", "Obama"]],
+            "labels": [[1, 0, 2]],
+        }, features=features)})
+        first = recast_jev(source, task="conll2003/ner_tags")["train"]
+        second = recast_jev(source, task="conll2003/ner_tags")["train"]
+        self.assertEqual(len(first), 2)
+        self.assertEqual(first[:], second[:])
+        self.assertIn("beginning of a person entity", first[0]["criteria"])
+        self.assertIn("Target token at position", first[0]["state"])
+        self.assertEqual(first[0]["state"].count("[TARGET:"), 1)
+        self.assertEqual(first[0]["source_row"], first[1]["source_row"])
+        self.assertNotEqual(first[0]["question_id"], first[1]["question_id"])
+        grouped = render_systemone_group(first)
+        self.assertEqual(len(grouped["questions"]), 2)
+        self.assertEqual(grouped["state"], "Sentence: Obama met Obama")
+        self.assertTrue(all("position" in q["instructions"] for q in grouped["questions"].values()))
+        rows = [to_training_row(example, index, "conll2003/ner_tags", "train")
+                for index, example in enumerate(first)]
+        self.assertEqual(rows[0]["id"].rsplit(":", 1)[0], rows[1]["id"].rsplit(":", 1)[0])
+
+    def test_pos_labels_are_expanded(self):
+        features = Features({
+            "tokens": Sequence(Value("string")),
+            "labels": Sequence(ClassLabel(names=["NOUN", "PROPN", "VERB"])),
+        })
+        source = DatasetDict({"train": Dataset.from_dict({
+            "tokens": [["Ada", "writes"]], "labels": [[1, 2]],
+        }, features=features)})
+        rows = recast_jev(source)["train"]
+        self.assertEqual(rows[0]["criteria"], ["noun", "proper noun", "verb"])
+        self.assertEqual(
+            normalize_token_label("B-ORG"), "beginning of an organization entity"
+        )
+        self.assertEqual(
+            normalize_token_label("I-creative-work"), "inside a creative work entity"
+        )
+
+    def test_anonymous_token_labels_are_rejected(self):
+        features = Features({
+            "tokens": Sequence(Value("string")),
+            "labels": Sequence(ClassLabel(names=["LABEL_0", "LABEL_1"])),
+        })
+        source = DatasetDict({"train": Dataset.from_dict({
+            "tokens": [["x"]], "labels": [[0]],
+        }, features=features)})
+        with self.assertRaisesRegex(NotImplementedError, "semantically readable"):
+            recast_jev(source)
+
+    def test_token_splits_remain_separate(self):
+        features = Features({
+            "tokens": Sequence(Value("string")),
+            "labels": Sequence(ClassLabel(names=["O", "B-PER"])),
+        })
+        source = DatasetDict({
+            "train": Dataset.from_dict({"tokens": [["Ada"]], "labels": [[1]]}, features=features),
+            "test": Dataset.from_dict({"tokens": [["Grace"]], "labels": [[1]]}, features=features),
+        })
+        converted = recast_jev(source)
+        self.assertEqual(set(converted), {"train", "test"})
+        self.assertIn("Ada", converted["train"][0]["state"])
+        self.assertIn("Grace", converted["test"][0]["state"])
+
+    def test_large_token_ontology_is_rejected(self):
+        features = Features({
+            "tokens": Sequence(Value("string")),
+            "labels": Sequence(ClassLabel(names=[f"semantic_{i}" for i in range(33)])),
+        })
+        source = DatasetDict({"train": Dataset.from_dict({
+            "tokens": [["x"]], "labels": [[0]],
+        }, features=features)})
+        with self.assertRaisesRegex(NotImplementedError, "semantically readable"):
+            recast_jev(source)
+
+    def test_misaligned_token_labels_are_rejected(self):
+        features = Features({
+            "tokens": Sequence(Value("string")),
+            "labels": Sequence(ClassLabel(names=["O", "B-PER"])),
+        })
+        source = DatasetDict({"train": Dataset.from_dict({
+            "tokens": [["Ada", "writes"]], "labels": [[1]],
+        }, features=features)})
+        with self.assertRaisesRegex(ValueError, "lengths differ"):
+            recast_jev(source)
+
+    def test_release_excludes_named_benchmark_families(self):
+        dataset = Dataset.from_dict({
+            "source": ["bigbench/a", "mmlu/b", "blimp/c", "glue/rte"],
+            "value": [0, 1, 2, 3],
+        })
+        kept = exclude_publish_sources(dataset)
+        self.assertEqual(kept["source"], ["glue/rte"])
 
 
 if __name__ == "__main__":

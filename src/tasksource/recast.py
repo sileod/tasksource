@@ -1,8 +1,15 @@
 import random
-from datasets import DatasetDict, Dataset
+from datasets import ClassLabel, DatasetDict, Dataset, List, Sequence
 from sorcery import dict_of
 import string
 from collections import OrderedDict
+
+from .jev_augmentations import stable_fraction
+from .jev_token_labels import (
+    MAX_JEV_TOKENS_PER_SEQUENCE,
+    normalize_token_label,
+    readable_token_labels,
+)
 
 improper_labels =['recast/recast_kg_relations','linguisticprobing',"lex_glue/scotus",'lexical_relation_classification/ROOT09',"pragmeval/squinky","pragmeval/emobank",'pragmeval/persuasiveness']
 improper_labels += ['glue/stsb', 'sick/relatedness', 'joci', 'utilitarianism', 'amazon_counterfactual/en', 'toxic_conversations', 'ethos/multilabel', 'lex_glue/eurlex', 'lex_glue/unfair_tos', 'app_reviews', 'humicroedit/subtask-1', 'stackoverflow-questions', 'go_emotions/simplified', 'google_wellformed_query', 'has_part', 'blog_authorship_corpus/age', 'promptCoherence', 'Sarcasm_News_Headline', 'auditor_review/demo-org--auditor_review', 'Dynasent_Disagreement', 'Politeness_Disagreement', 'SBIC_Disagreement', 'SChem_Disagreement', 'Dilemmas_Disagreement', 'sts-companion', 'acceptability-prediction', 'chaos-mnli-ambiguity', 'headline_cause/en_simple', 'oasst1_dense_flat', 'civil_comments']
@@ -135,8 +142,51 @@ def _jev_task_type(features):
         return "Classification"
     if _choice_columns(features) and "inputs" in features:
         return "MultipleChoice"
+    if "tokens" in features and "labels" in features:
+        labels = features["labels"]
+        if not isinstance(labels, (Sequence, List)) or not isinstance(labels.feature, ClassLabel):
+            raise NotImplementedError(
+                "TokenClassification labels must be Sequence(ClassLabel) or List(ClassLabel) for JEV"
+            )
+        if not readable_token_labels(labels.feature.names):
+            raise NotImplementedError(
+                "TokenClassification labels are not semantically readable for JEV"
+            )
+        return "TokenClassification"
     raise NotImplementedError(
-        "Jev recasting currently supports Classification and MultipleChoice tasks"
+        "Jev recasting currently supports Classification, MultipleChoice, and "
+        "readable TokenClassification tasks"
+    )
+
+
+def _token_question_indices(tokens, labels, names, identifier):
+    """Select at most two deterministic token judgments from one sequence."""
+    valid = [index for index in range(min(len(tokens), len(labels))) if 0 <= int(labels[index]) < len(names)]
+    if not valid:
+        return []
+    default = names.index("O") if "O" in names else None
+    non_default = [index for index in valid if default is None or int(labels[index]) != default]
+    ranked_non_default = sorted(
+        non_default,
+        key=lambda index: stable_fraction(f"{identifier}:{index}", "token-primary"),
+    )
+    selected = ranked_non_default[:1]
+    remaining = [index for index in valid if index not in selected]
+    remaining.sort(
+        key=lambda index: stable_fraction(f"{identifier}:{index}", "token-secondary")
+    )
+    selected.extend(remaining[: MAX_JEV_TOKENS_PER_SEQUENCE - len(selected)])
+    return selected
+
+
+def _token_state(tokens, target_index):
+    marked = list(tokens)
+    marked[target_index] = f"[TARGET: {tokens[target_index]}]"
+    sentence = " ".join(tokens)
+    return (
+        f"Sentence: {sentence}\n"
+        f"Target token at position {target_index}: {tokens[target_index]}\n"
+        f"Marked sentence: {' '.join(marked)}"
     )
 
 
@@ -176,7 +226,7 @@ def recast_jev(dataset, task=None):
                 "task": task or "",
             }
 
-    else:
+    elif task_type == "MultipleChoice":
         choices = _choice_columns(features)
 
         def convert(example):
@@ -190,6 +240,57 @@ def recast_jev(dataset, task=None):
                 "answer": criteria[label],
                 "task": task or "",
             }
+
+    else:
+        raw_names = list(labels.feature.names)
+        criteria = [normalize_token_label(name) for name in raw_names]
+        if len(criteria) != len(set(criteria)):
+            raise NotImplementedError(
+                "TokenClassification labels collapse to duplicate readable JEV criteria"
+            )
+
+        def convert_batch(batch, indices):
+            output = {
+                "state": [], "instructions": [], "criteria": [], "label": [],
+                "answer": [], "task": [], "shared_state": [],
+                "question_id": [], "source_row": [], "target_index": [],
+                "target_token": [],
+            }
+            for tokens, token_labels, source_index in zip(
+                batch["tokens"], batch["labels"], indices
+            ):
+                if len(tokens) != len(token_labels):
+                    raise ValueError(
+                        f"Token and label lengths differ at source row {source_index}"
+                    )
+                identifier = f"{task or 'token-task'}:{source_index}"
+                for token_index in _token_question_indices(
+                    tokens, token_labels, raw_names, identifier
+                ):
+                    label = int(token_labels[token_index])
+                    output["state"].append(_token_state(tokens, token_index))
+                    output["instructions"].append(
+                        "Choose the criterion that best labels the target token."
+                    )
+                    output["criteria"].append(criteria)
+                    output["label"].append(label)
+                    output["answer"].append(criteria[label])
+                    output["task"].append(task or "")
+                    output["shared_state"].append(f"Sentence: {' '.join(tokens)}")
+                    output["question_id"].append(f"token-{token_index}")
+                    output["source_row"].append(source_index)
+                    output["target_index"].append(token_index)
+                    output["target_token"].append(tokens[token_index])
+            return output
+
+        converted = dataset.map(
+            convert_batch,
+            batched=True,
+            batch_size=1_000,
+            with_indices=True,
+            remove_columns=dataset["train"].column_names,
+        )
+        return converted
 
     converted = dataset.map(convert)
     keep = {"state", "instructions", "criteria", "label", "answer", "task"}
@@ -215,4 +316,38 @@ def render_systemone(example, question_id="decision", model=None):
             "criteria": {criterion: None for criterion in criteria},
         }
     }
+    return dict(request)
+
+
+def render_systemone_group(examples, model=None):
+    """Render related decisions over one source state as a multi-question request."""
+    examples = list(examples)
+    if not examples:
+        raise ValueError("At least one decision is required")
+    state = examples[0].get("shared_state", examples[0]["state"])
+    request = OrderedDict()
+    if model is not None:
+        request["model"] = model
+    request["state"] = state
+    questions = {}
+    for example in examples:
+        if example.get("shared_state", example["state"]) != state:
+            raise ValueError("Grouped decisions must share one state")
+        question_id = example.get("question_id", "decision")
+        if question_id in questions:
+            raise ValueError(f"Duplicate question id: {question_id}")
+        criteria = list(example["criteria"])
+        if len(criteria) != len(set(criteria)):
+            raise ValueError("System One choice criterion names must be unique")
+        instructions = example["instructions"]
+        if "target_index" in example:
+            instructions += (
+                f" Target token at position {example['target_index']}: "
+                f"{example['target_token']}"
+            )
+        questions[question_id] = {
+            "type": "choice", "instructions": instructions,
+            "criteria": {criterion: None for criterion in criteria},
+        }
+    request["questions"] = questions
     return dict(request)
