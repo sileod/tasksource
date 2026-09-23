@@ -65,7 +65,7 @@ Generation is deterministic (row `i` of a split is seeded by `task:split:i`).
 From a [tasksource](https://github.com/sileod/tasksource) checkout:
 
 ```bash
-PYTHONPATH=.:src python jev/build_procedural.py --output build/procedural-jev --upload
+PYTHONPATH=.:src python scripts/build_procedural_jev.py --output build/procedural-jev --upload
 ```
 
 Generators live in `src/tasksource/jev/procedural/`.

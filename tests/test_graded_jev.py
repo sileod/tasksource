@@ -4,7 +4,7 @@ from datasets import Dataset
 
 from tasksource.jev.augmentations import augment_jev_internal
 from tasksource.jev.graded import FAMILIES, jev_rows, likert, noul, score
-from jev.build import TRAINING_FEATURES, source_row_group
+from scripts.build_jev_dataset import TRAINING_FEATURES, source_row_group
 
 
 class GradedJevTest(unittest.TestCase):

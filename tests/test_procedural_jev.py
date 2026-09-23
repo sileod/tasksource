@@ -8,8 +8,8 @@ from datasets import Dataset
 from tasksource.jev.augmentations import augment_jev_internal
 from tasksource.jev.procedural import TASKS, jev_rows
 from tasksource.jev.recast import render_systemone_group
-from jev.build import TRAINING_FEATURES, share_cap, source_row_group
-from jev.build_procedural import build_task
+from scripts.build_jev_dataset import TRAINING_FEATURES, share_cap, source_row_group
+from scripts.build_procedural_jev import build_task
 
 
 def _intent(state):

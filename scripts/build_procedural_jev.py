@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate and optionally upload tasksource/procedural-jev, one config per task.
+"""Generate and optionally publish tasksource/procedural-jev, one config per task.
 
 Every row is one generated state with several typed Jev questions over it
 (`questions`, `answers` as JSON), plus one flat label column per question so

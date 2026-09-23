@@ -1,10 +1,10 @@
 # tasksource-jev build
 
-This directory owns the dataset release workflow. The canonical recast, token
-label handling, and conservative augmentations live in
-[`src/tasksource/jev/`](../src/tasksource/jev/). The public
+The builders live in [`scripts/`](../../scripts/); canonical recasts, token
+label handling, procedural generators, and augmentations live in
+[`src/tasksource/jev/`](../../src/tasksource/jev/). The public
 `tasksource.recast_jev` and `load_task(..., recast="jev")` APIs are unchanged.
-The dataset card is [`dataset_cards/tasksource-jev.md`](../dataset_cards/tasksource-jev.md).
+The release card is [`dataset_cards/tasksource-jev.md`](../../dataset_cards/tasksource-jev.md).
 
 ## Environment and inputs
 
@@ -15,9 +15,13 @@ working from a checkout. The release was last exercised with
 `numpy==1.26.4`, and `pandas==2.2.3`; these are recorded environment
 versions, not a complete lockfile.
 
-The builder reads the current English and multilingual Tasksource catalogs.
-It excludes BIG-bench, MMLU, and BLiMP and only enables token tasks whose
-labels and source rows have been checked. Per-task defaults are 30,000 train
+The builder reads the current English and multilingual Tasksource catalogs
+plus the native graded and procedural Jev sources. Publish
+[`procedural-jev`](../../dataset_cards/procedural-jev.md) first if it should
+be included; the default public cap reserves up to 10% for those sources
+(`--procedural-share`). The builder excludes BIG-bench, MMLU, and BLiMP and
+only enables token tasks whose labels and source rows have been checked.
+Per-task defaults are 30,000 train
 and 3,000 evaluation source rows (half as many source sequences for token
 tasks, which emit up to two decisions each). The builder writes one resumable
 Parquet shard per task and split and records every attempt in
@@ -28,7 +32,7 @@ Parquet shard per task and split and records every attempt in
 Build a small, non-publishing example in a fresh output directory:
 
 ```bash
-PYTHONPATH=.:src python jev/build.py --output build/jev-smoke \
+PYTHONPATH=.:src python scripts/build_jev_dataset.py --output build/jev-smoke \
   --tasks glue/rte --max-rows 50 --max-rows-eval 20 --finalize
 PYTHONPATH=.:src pytest -q -c /dev/null tests/test_recast_jev.py
 ```
@@ -44,7 +48,7 @@ an interrupted build: successful tasks are skipped, failed tasks are retried,
 and shards are preserved.
 
 ```bash
-PYTHONPATH=.:src python jev/build.py --output build/tasksource-jev --finalize
+PYTHONPATH=.:src python scripts/build_jev_dataset.py --output build/tasksource-jev --finalize
 ```
 
 Before publishing, inspect `build-summary.json`, `failed-tasks.json`,
@@ -58,7 +62,7 @@ changing membership.
 Authenticate with the Hugging Face Hub, then publish the checked checkpoint:
 
 ```bash
-PYTHONPATH=.:src python jev/build.py --output build/tasksource-jev \
+PYTHONPATH=.:src python scripts/build_jev_dataset.py --output build/tasksource-jev \
   --skip-migrate --finalize-only --finalize --upload
 ```
 
@@ -79,5 +83,9 @@ commit, environment versions, build report, and upstream revisions when an
 exactly repeatable snapshot matters. Existing shards can reproduce the
 publication step without refetching upstream sources.
 
-The old `scripts/build_jev_dataset.py` path remains as a compatibility
-entry point.
+The separate procedural corpus is built by
+[`scripts/build_procedural_jev.py`](../../scripts/build_procedural_jev.py);
+its schema and provenance are documented in the
+[`procedural-jev` card](../../dataset_cards/procedural-jev.md). The synthetic
+generation pipeline is a package entry point:
+`python -m tasksource.jev.synthetic.run --config <config.yaml>`.
