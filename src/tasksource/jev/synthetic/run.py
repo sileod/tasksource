@@ -144,15 +144,13 @@ def stage_dedup(cfg, run_dir: Path) -> list[dict]:
 def stage_annotate(cfg, run_dir: Path) -> list[dict]:
     source = run_dir / "deduped.jsonl"
     bundles = _read_bundles(source if source.exists() else run_dir / "validated.jsonl")
-    annotated = annot_mod.annotate_bundles(bundles, cfg.annotator)
-    _write_bundles(run_dir / "annotated.jsonl", annotated)
-    _to_frame(annotated).to_parquet(run_dir / "annotated.parquet", index=False)
-    # Persist raw Jev annotation artifacts.
+    # Real Jev responses are cached by content hash in raw/jev (never re-paid);
+    # mock annotations are deterministic and free.
     jev_dir = run_dir / "raw" / "jev"
     jev_dir.mkdir(parents=True, exist_ok=True)
-    for bundle in annotated:
-        (jev_dir / f"{bundle['state_id']}.json").write_text(
-            json.dumps(bundle.get("annotations", []), ensure_ascii=False, indent=2), encoding="utf-8")
+    annotated = annot_mod.annotate_bundles(bundles, cfg.annotator, cache_dir=jev_dir)
+    _write_bundles(run_dir / "annotated.jsonl", annotated)
+    _to_frame(annotated).to_parquet(run_dir / "annotated.parquet", index=False)
     return annotated
 
 
@@ -168,6 +166,8 @@ def stage_select(cfg, run_dir: Path, n_target: int | None = None) -> list[dict]:
 def stage_split(cfg, run_dir: Path) -> list[dict]:
     selected = _read_bundles(run_dir / "selected.jsonl")
     with_splits = split_mod.assign_splits(selected, cfg.split)
+    report = split_mod.verify_splits(with_splits, cfg.split.ood_fraction, cfg.split.seed_salt)
+    (run_dir / "split_report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
     _write_bundles(run_dir / "final.jsonl", with_splits)
     _to_frame(with_splits).to_parquet(run_dir / "final.parquet", index=False)
     return with_splits

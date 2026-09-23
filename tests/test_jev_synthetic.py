@@ -238,6 +238,43 @@ class DedupTest(unittest.TestCase):
         self.assertEqual(len(kept), len(bundles))
         self.assertEqual(len(dropped), len(bundles))
 
+    def test_near_duplicates_dropped(self):
+        specs = specs_mod.sample_specs(_cfg().sampler, 3)
+        bundles = [mock_realization(s) for s in specs]
+        near = dict(bundles[0])
+        near = {**near, "state_id": "state_999999",
+                "state": near["state"] + " Extra trailing sentence here."}
+        # Jaccard ~0.86: dropped at 0.8, kept at 0.9 (threshold semantics).
+        kept, dropped = dedup_mod.dedup_bundles(bundles + [near], threshold=0.8)
+        self.assertEqual(len(kept), len(bundles))
+        self.assertIn("state_999999", dropped)
+        kept, _ = dedup_mod.dedup_bundles(bundles + [near], threshold=0.9)
+        self.assertEqual(len(kept), len(bundles) + 1)
+
+    def test_distinct_states_kept(self):
+        specs = specs_mod.sample_specs(_cfg().sampler, 50)
+        bundles = [mock_realization(s) for s in specs]
+        kept, dropped = dedup_mod.dedup_bundles(bundles)
+        self.assertEqual(len(kept) + len(dropped), len(bundles))
+        by_id = {b["state_id"]: b for b in bundles}
+        kept_ids = {b["state_id"] for b in kept}
+        for sid in dropped:
+            self.assertTrue(
+                any(dedup_mod.jaccard(by_id[sid]["state"], by_id[k]["state"]) >= 0.9
+                    for k in kept_ids),
+                f"{sid} dropped without a >=0.9 near-duplicate")
+
+    def test_scales_to_thousands(self):
+        import time
+        specs = specs_mod.sample_specs(_cfg().sampler, 2000)
+        bundles = [mock_realization(s) for s in specs]
+        start = time.time()
+        kept, dropped = dedup_mod.dedup_bundles(bundles)
+        elapsed = time.time() - start
+        # Mock states share boilerplate, so some are genuine near-dups.
+        self.assertEqual(len(kept) + len(dropped), len(bundles))
+        self.assertLess(elapsed, 30, f"2000-state dedup took {elapsed:.1f}s")
+
 
 class SplitTest(unittest.TestCase):
     def test_family_stays_together(self):
@@ -259,6 +296,24 @@ class SplitTest(unittest.TestCase):
         second = [b["split"] for b in split_mod.assign_splits(bundles, cfg.split)]
         self.assertEqual(first, second)
 
+    def test_ood_is_genuinely_compositional(self):
+        cfg = _cfg()
+        specs = specs_mod.sample_specs(cfg.sampler, 300)
+        bundles = [mock_realization(s) for s in specs]
+        assigned = split_mod.assign_splits(bundles, cfg.split)
+        # verify_splits raises on any held-out pair leaking into train.
+        report = split_mod.verify_splits(
+            assigned, cfg.split.ood_fraction, cfg.split.seed_salt)
+        self.assertGreater(report["n_held_out_pairs"], 0)
+        self.assertGreater(report["split_counts"].get("ood", 0), 0)
+        held = set(report["held_out_pairs"])
+        for bundle in assigned:
+            pairs = {f"{d}::{s}" for d, s in split_mod.bundle_pairs(bundle)}
+            if bundle["split"] == "ood":
+                self.assertTrue(pairs & held)
+            if bundle["split"] == "train":
+                self.assertFalse(pairs & held)
+
 
 class SelectTest(unittest.TestCase):
     def test_plan_sums_to_total(self):
@@ -269,6 +324,60 @@ class SelectTest(unittest.TestCase):
         result = select_mod.select_bundles(annotated, cfg.selection)
         self.assertEqual(len(result["selected"]), len(annotated))
         self.assertEqual(sum(result["diagnostics"]["plan"].values()), len(annotated))
+
+
+class JevParsingTest(unittest.TestCase):
+    def _question(self, fmt, options=None):
+        return {"question_id": "q0", "format": fmt, "question": "Q?",
+                "options": options or []}
+
+    def test_noul(self):
+        probs, entry = annot_mod._jev_probabilities(
+            self._question("noul"), {"q0": {"type": "noul", "noul": 0.73}})
+        self.assertEqual(probs, [0.73])
+
+    def test_choice_ordered_by_options(self):
+        probs, _ = annot_mod._jev_probabilities(
+            self._question("choice", ["b", "a"]),
+            {"q0": {"type": "choice", "choice": "a",
+                    "probabilities": {"a": 0.8, "b": 0.2}, "confidence": 0.7}})
+        self.assertEqual(probs, [0.2, 0.8])
+
+    def test_score_index_keyed_with_legend(self):
+        probs, _ = annot_mod._jev_probabilities(
+            self._question("score", ["low", "high"]),
+            {"q0": {"type": "score", "score": 0.9,
+                    "legend": {"0": "low", "1": "high"},
+                    "probabilities": {"0": 0.1, "1": 0.9}, "confidence": 0.8}})
+        self.assertEqual(probs, [0.1, 0.9])
+
+    def test_score_legend_drift_rejected(self):
+        with self.assertRaises(RuntimeError):
+            annot_mod._jev_probabilities(
+                self._question("score", ["low", "high"]),
+                {"q0": {"type": "score", "score": 0.9,
+                        "legend": {"0": "low", "1": "RENAMED"},
+                        "probabilities": {"0": 0.1, "1": 0.9}}})
+
+    def test_missing_entry_rejected(self):
+        with self.assertRaises(RuntimeError):
+            annot_mod._jev_probabilities(self._question("noul"), {})
+
+    def test_decisions_url(self):
+        from tasksource.jev.synthetic.config import AnnotatorConfig
+        cfg = AnnotatorConfig(name="jev", base_url="https://openrouter.ai/",
+                              api_path="/api/alpha/decisions")
+        self.assertEqual(annot_mod.decisions_url(cfg),
+                         "https://openrouter.ai/api/alpha/decisions")
+
+    def test_score_criteria_capped_at_ten(self):
+        for lo, hi in specs_mod.SCORE_RANGES:
+            self.assertLessEqual(hi - lo + 1, 10)
+        specs = specs_mod.sample_specs(_cfg().sampler, 500)
+        for spec in specs:
+            for q in spec["questions"]:
+                if q["format"] == "score":
+                    self.assertLessEqual(len(q["criteria"]), 10)
 
 
 class PreflightTest(unittest.TestCase):

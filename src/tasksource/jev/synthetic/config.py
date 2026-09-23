@@ -55,6 +55,9 @@ class AnnotatorConfig:
     name: str = "mock"
     version: str = "mock-0.1"
     base_url: str = ""
+    # Path appended to base_url for the decisions call, e.g.
+    # OpenRouter: base_url=https://openrouter.ai/api + api_path=/api/alpha/decisions
+    api_path: str = "/api/alpha/decisions"
     api_key_env: str = "JEV_API_KEY"
     model: str = "jev-mock"
 

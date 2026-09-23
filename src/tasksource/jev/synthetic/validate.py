@@ -50,8 +50,8 @@ def validate_bundle(bundle: dict, spec: dict | None = None) -> list[str]:
                     errors.append(f"option count mismatch for {q.get('question_id')}")
             if qspec.get("format") == "score":
                 options = q.get("options", [])
-                if not 3 <= len(options) <= 11:
-                    errors.append(f"score {q.get('question_id')} needs 3..11 criteria")
+                if not 3 <= len(options) <= 10:
+                    errors.append(f"score {q.get('question_id')} needs 3..10 criteria")
                 if qspec.get("criteria") and list(options) != list(qspec["criteria"]):
                     errors.append(
                         f"score {q.get('question_id')} must reuse the spec criteria verbatim")

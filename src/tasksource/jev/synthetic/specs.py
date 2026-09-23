@@ -120,7 +120,8 @@ DOMAIN_STYLES = {
                          "meeting_notes", "vendor_ticket"],
 }
 
-SCORE_RANGES = [(0, 2), (0, 3), (0, 4), (0, 5), (1, 5), (0, 10)]
+# Numeric scales (the Decisions API accepts at most 10 score levels).
+SCORE_RANGES = [(0, 2), (0, 3), (0, 4), (0, 5), (1, 5), (1, 10)]
 
 # Named ordered rubrics (3-7 levels); numeric scales cover the rest.
 SEMANTIC_RUBRICS = [

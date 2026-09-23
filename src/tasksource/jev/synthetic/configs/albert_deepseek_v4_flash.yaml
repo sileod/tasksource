@@ -42,7 +42,18 @@ annotator:
   version: mock-0.1
   base_url: ""
   api_key_env: JEV_API_KEY
-  model: jev-1
+  model: jev-mock
+
+# Real Jev annotation (OpenRouter Decisions API): replace the block above with:
+# annotator:
+#   name: jev
+#   version: jev-1.13
+#   base_url: https://openrouter.ai
+#   api_path: /api/alpha/decisions
+#   api_key_env: OPENROUTER_API_KEY
+#   model: ~typesafe/jev-latest
+# `name: jev` fails loudly without a reachable endpoint + key; the key
+# itself travels via environment and is never written to disk.
 
 selection:
   buckets: {"very_confident": 0.20, "confident": 0.30, "moderately_ambiguous": 0.30,
