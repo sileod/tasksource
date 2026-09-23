@@ -4,9 +4,13 @@ from datasets import ClassLabel, Dataset, DatasetDict, Features, Sequence, Value
 
 from tasksource.recast import recast_jev, render_systemone, render_systemone_group
 from tasksource.jev_token_labels import normalize_token_label
+from tasksource.jev_prompt_augmentations import (
+    published_pair_style, published_question_style,
+)
 from tasksource.jev_augmentations import augment_jev_internal
 from scripts.build_jev_dataset import (
-    diverse_cap, exclude_publish_sources, pretty_order, to_training_row,
+    diverse_cap, diversify_published_prompts, exclude_publish_sources,
+    pretty_order, to_training_row,
 )
 
 
@@ -99,6 +103,42 @@ class RecastJevTest(unittest.TestCase):
         self.assertEqual(ordered["source"][:4], ["a", "b", "c", "a"])
         self.assertEqual(ordered["value"], [3, 0, 5, 4, 1, 2])
 
+    def test_pretty_order_exposes_prompt_variants(self):
+        dataset = Dataset.from_dict({
+            "source": ["a"] * 3 + ["b"] * 3,
+            "variant": ["direct", "instruction_paraphrase", "paired_text_format"] * 2,
+            "value": list(range(6)),
+        })
+        ordered = pretty_order(dataset, first_rows=4)
+        self.assertEqual(ordered["source"][:4], ["a", "b", "a", "b"])
+        self.assertGreaterEqual(len(set(ordered["variant"][:4])), 2)
+        prefix = set(ordered["value"][:4])
+        self.assertEqual(ordered["value"][4:], [i for i in range(6) if i not in prefix])
+
+    def test_paired_public_style_keeps_related_questions_consistent(self):
+        state = "text_A: Rain fell.\ntext_B: The ground is wet."
+        styled, question = published_pair_style(
+            state, "Classify the relationship between text_A and text_B.", 0.9
+        )
+        self.assertIn("A: Rain fell.", styled)
+        self.assertNotIn("text_A", question)
+        dataset = Dataset.from_dict({
+            "group_id": ["demo:train:0", "demo:train:0"],
+            "state": [state, state],
+            "question": ["Choose the criterion.", "Choose the criterion."],
+            "options": [["entailment", "contradiction"]] * 2,
+        })
+        varied = diversify_published_prompts(dataset)
+        self.assertEqual(varied["state"][0], varied["state"][1])
+        self.assertEqual(varied["question"][0], varied["question"][1])
+        self.assertNotEqual(
+            published_question_style(
+                "Choose the criterion that best describes the state.",
+                ["entailment", "contradiction"], state, 0.3,
+            ),
+            "Choose the criterion that best describes the state.",
+        )
+
     def test_diverse_cap_covers_sources_and_preserves_order(self):
         dataset = Dataset.from_dict({
             "source": ["a"] * 8 + ["b"] * 2 + ["c"] * 2,
@@ -108,6 +148,23 @@ class RecastJevTest(unittest.TestCase):
         self.assertEqual(set(capped["source"]), {"a", "b", "c"})
         self.assertEqual(capped["value"], sorted(capped["value"]))
         self.assertEqual(len(capped), 6)
+
+    def test_diverse_cap_keeps_related_questions_together(self):
+        dataset = Dataset.from_dict({
+            "source": ["ner"] * 6,
+            "id": [
+                "ner:train:0:token-0", "ner:train:0:token-1",
+                "ner:train:1:token-0", "ner:train:1:token-1",
+                "ner:train:2:token-0", "ner:train:2:token-1",
+            ],
+        })
+        capped = diverse_cap(dataset, 4)
+        self.assertEqual(len(capped), 4)
+        group_counts = {}
+        for identifier in capped["id"]:
+            group = identifier.rsplit(":", 1)[0]
+            group_counts[group] = group_counts.get(group, 0) + 1
+        self.assertEqual(sorted(group_counts.values()), [2, 2])
 
     def test_token_classification_is_readable_bounded_and_deterministic(self):
         features = Features({

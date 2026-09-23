@@ -21,6 +21,9 @@ from tasksource import list_tasks, load_task
 from tasksource import tasks as english_tasks
 from tasksource.access import load_preprocessing
 from tasksource.jev_augmentations import augment_jev_internal, stable_fraction
+from tasksource.jev_prompt_augmentations import (
+    published_pair_style, published_question_style,
+)
 from tasksource.recast import recast_jev
 
 
@@ -119,16 +122,37 @@ def pretty_order(dataset, first_rows=1_000):
     # Repeated scalar indexing inside the loops below repeatedly rebuilds an
     # Arrow column and makes publication effectively quadratic.  Format the
     # metadata columns once instead.
-    sources = dataset.select_columns(["source"])[:]["source"]
+    display_columns = ["source"]
+    if "variant" in dataset.column_names:
+        display_columns.append("variant")
+    display = dataset.select_columns(display_columns)[:]
+    sources = display["source"]
+    variants = display.get("variant")
     names = sorted(set(sources))
     if len(names) < 2:
         return dataset
     per_source = (first_rows + len(names) - 1) // len(names)
     buckets = {name: [] for name in names}
+    first_by_variant = {name: {} for name in names} if variants else None
     for index, source in enumerate(sources):
         bucket = buckets[source]
         if len(bucket) < per_source:
             bucket.append(index)
+        if variants:
+            first_by_variant[source].setdefault(variants[index], index)
+    if variants:
+        primary = ("direct", "instruction_paraphrase", "paired_text_format")
+        for name in names:
+            offset = min(int(stable_fraction(name, "preview-variant") * 3), 2)
+            priority = (
+                *primary[offset:], *primary[:offset],
+                "criteria_permutation", "label_verification",
+            )
+            chosen = [
+                first_by_variant[name][variant]
+                for variant in priority if variant in first_by_variant[name]
+            ]
+            buckets[name] = list(dict.fromkeys((*chosen, *buckets[name])))[:per_source]
     prefix = []
     for offset in range(per_source):
         for name in names:
@@ -145,7 +169,7 @@ def pretty_order(dataset, first_rows=1_000):
 
 
 def diverse_cap(dataset, max_rows):
-    """Cap rows while covering sources evenly and preserving relative order."""
+    """Cap rows by source without separating questions from a source example."""
     if max_rows is None or len(dataset) <= max_rows:
         return dataset
     metadata_columns = ["source"]
@@ -160,24 +184,52 @@ def diverse_cap(dataset, max_rows):
     buckets = {name: [] for name in names}
     for index, source in enumerate(sources):
         buckets[source].append(index)
+    base_possible = sum(min(quota, len(bucket)) for bucket in buckets.values())
+    overflow_needed = max_rows - base_possible
+    total_extra = sum(max(0, len(bucket) - quota) for bucket in buckets.values())
     ids = (
         metadata["id"]
         if "id" in metadata
         else list(map(str, range(len(dataset))))
     )
     for name in sorted(names):
-        ranked = sorted(
-            buckets[name],
-            key=lambda index: stable_fraction(ids[index], "publish-cap"),
+        extra = max(0, len(buckets[name]) - quota)
+        overflow_limit = (
+            32 + (overflow_needed * extra + total_extra - 1) // total_extra
+            if extra and total_extra else 0
         )
-        selected.extend(ranked[:quota])
-        deferred.extend(ranked[quota:])
+        groups = {}
+        for index in buckets[name]:
+            group_id = source_row_group(ids[index])
+            groups.setdefault(group_id, []).append(index)
+        ranked = sorted(
+            groups.items(),
+            key=lambda item: stable_fraction(item[0], "publish-cap"),
+        )
+        source_rows = 0
+        source_deferred = 0
+        for group_id, indices in ranked:
+            if source_rows + len(indices) <= quota:
+                selected.extend(indices)
+                source_rows += len(indices)
+            elif source_deferred < overflow_limit:
+                deferred.append((group_id, indices))
+                source_deferred += 1
     if len(selected) < max_rows:
         deferred.sort(
-            key=lambda index: stable_fraction(ids[index], "publish-overflow")
+            key=lambda item: stable_fraction(item[0], "publish-overflow")
         )
-        selected.extend(deferred[:max_rows - len(selected)])
-    return dataset.select(sorted(selected[:max_rows]))
+        for _, indices in deferred:
+            if len(selected) + len(indices) <= max_rows:
+                selected.extend(indices)
+            if len(selected) == max_rows:
+                break
+    return dataset.select(sorted(selected))
+
+
+def source_row_group(identifier):
+    """The stable source-row prefix shared by direct and variant questions."""
+    return ":".join(identifier.split(":", 3)[:3])
 
 
 def exclude_publish_sources(
@@ -205,12 +257,33 @@ def add_question_groups(dataset):
     for identifier in ids:
         parts = identifier.split(":")
         if len(parts) > 3 and parts[3].startswith("token-"):
-            group_ids.append(":".join(parts[:3]))
+            group_ids.append(source_row_group(identifier))
             question_ids.append(":".join(parts[3:]))
         else:
-            group_ids.append(":".join(parts[:3]))
+            group_ids.append(source_row_group(identifier))
             question_ids.append("decision" if len(parts) == 3 else ":".join(parts[3:]))
     return dataset.add_column("group_id", group_ids).add_column("question_id", question_ids)
+
+
+def diversify_published_prompts(dataset):
+    """Vary safe paired-field wording by source row without multiplying rows."""
+    def convert(batch):
+        states = []
+        questions = []
+        for group_id, state, question, options in zip(
+            batch["group_id"], batch["state"], batch["question"], batch["options"]
+        ):
+            styled_state, styled_question = published_pair_style(
+                state, question, stable_fraction(group_id, "published-pair-style")
+            )
+            styled_question = published_question_style(
+                styled_question, options, styled_state,
+                stable_fraction(group_id, "published-question-style"),
+            )
+            states.append(styled_state)
+            questions.append(styled_question)
+        return {"state": states, "question": questions}
+    return dataset.map(convert, batched=True, batch_size=1_000)
 
 
 def publish_dataset(
@@ -233,9 +306,15 @@ def publish_dataset(
         weights = {"train": 0.90, "validation": 0.05, "test": 0.05}
         for split in dataset:
             cap = int(publish_rows * weights.get(split, 0))
+            available = len(dataset[split])
             dataset[split] = diverse_cap(dataset[split], cap)
+            if available >= cap and len(dataset[split]) != cap:
+                raise ValueError(
+                    f"Group-preserving cap produced {len(dataset[split])} "
+                    f"rather than {cap} rows in {split}"
+                )
     dataset = DatasetDict({
-        split: add_question_groups(split_dataset)
+        split: diversify_published_prompts(add_question_groups(split_dataset))
         for split, split_dataset in dataset.items()
     })
     if "train" in dataset:
@@ -251,6 +330,11 @@ def publish_dataset(
         if set(metadata["split"]) != {normalized_split(split)}:
             raise ValueError(f"Mixed source split annotations in {split}")
         print(f"Publish {split}: {len(rows)} rows, {len(set(metadata['source']))} sources", flush=True)
+        if split == "train":
+            preview = rows.select(range(min(pretty_rows, len(rows))))
+            variants = preview.select_columns(["variant"])[:]["variant"]
+            variant_counts = pd.Series(variants).value_counts().to_dict()
+            print(f"Preview variants: {variant_counts}", flush=True)
     api = HfApi()
     api.upload_file(
         path_or_fileobj=str(output / "README.md"),

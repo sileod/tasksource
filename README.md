@@ -62,6 +62,8 @@ manually vetted instruction variation. Every row records its source, normalized
 `train`/`dev`/`test` split, and variant. BIG-bench, MMLU, and BLiMP are excluded.
 The flat rows carry `group_id` and `question_id`; `render_systemone_group`
 combines related canonical decisions into one multi-question request.
+Publication keeps each source-row group together under the 500k cap and uses
+reviewed question and paired-field wording to reduce repeated boilerplate.
 
 ### Write and use custom preprocessings
 

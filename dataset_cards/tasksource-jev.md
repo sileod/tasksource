@@ -89,9 +89,13 @@ addition. Synthetic uncertainty, abstention, and nominal-to-ordinal conversions
 are intentionally excluded because one-hot classification labels do not justify
 them.
 For `noul`, `target` contains the scalar truth probability and `options` is empty;
-for `choice` and `score`, `target` is aligned with `options`. The direct canonical
-decision is unchanged; lower-frequency variants are identified explicitly by
-the `variant` field.
+for `choice` and `score`, `target` is aligned with `options`. The direct answer
+and criteria are unchanged; lower-frequency variants are identified by
+`variant`. In the published view, paired-text field names also use
+deterministic, hand-written alternatives (`First text` / `Second text`,
+`Passage A` / `Passage B`, or `A` / `B`) to reduce repeated `text_A` / `text_B`
+boilerplate. Common direct question wording is likewise chosen from vetted
+equivalents without adding rows. The canonical recast remains fixed.
 
 ```python
 from datasets import load_dataset
@@ -120,13 +124,15 @@ are recorded by the build report rather than silently represented as complete.
 To keep very large sources balanced, the build caps each task at 30,000
 training rows and 3,000 validation or test rows using Tasksource's deterministic
 sampling (seed 0). The published release is capped at 500,000 rows using a
-source-balanced 90/5/5 train/dev/test allocation; selection preserves relative
-row order.
+source-balanced 90/5/5 train/dev/test allocation. It samples complete
+source-row groups, so related token and augmentation questions remain together,
+and preserves relative row order.
 
 For a useful Dataset Viewer preview, only the first 1,000 training rows are
-ordered round-robin by `source`. This is a deterministic permutation, not a
-random shuffle. After that display prefix, all remaining examples retain their
-original relative order.
+ordered round-robin by `source`, with a deterministic mix of direct,
+instruction, and paired-format variants where available. This changes display
+order, not membership. After that prefix, remaining examples retain their
+relative order.
 
 BIG-bench, MMLU, and BLiMP are excluded from this release. Original split
 identity is preserved in `split`, with `validation` normalized to `dev`.

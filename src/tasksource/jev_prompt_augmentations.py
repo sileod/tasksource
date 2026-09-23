@@ -23,11 +23,11 @@ GENERIC_MULTIPLE_CHOICE = (
 # set matches. These are manually reviewed semantic equivalences.
 LABEL_GROUP_VARIANTS = {
     frozenset({"entailment", "neutral", "contradiction"}): (
-        "Classify the relationship between text_A and text_B.",
+        "Classify the relationship between the first and second texts.",
         "Choose the natural-language inference relation that best applies.",
     ),
     frozenset({"entailment", "contradiction"}): (
-        "Decide whether text_A entails or contradicts text_B.",
+        "Decide whether the first text entails or contradicts the second.",
     ),
     frozenset({"negative", "neutral", "positive"}): (
         "Classify the sentiment expressed in the state.",
@@ -36,6 +36,15 @@ LABEL_GROUP_VARIANTS = {
     frozenset({"negative", "positive"}): (
         "Classify the state as negative or positive.",
     ),
+}
+
+# Checkpointed shards may contain the earlier field-specific wording. These
+# exact rewrites let the public view vary field labels without a mismatch.
+PAIR_QUESTION_REWRITES = {
+    "Classify the relationship between text_A and text_B.":
+        "Classify the relationship between the first and second texts.",
+    "Decide whether text_A entails or contradicts text_B.":
+        "Decide whether the first text entails or contradicts the second.",
 }
 
 
@@ -60,3 +69,29 @@ def paired_state_variants(state):
         f"Passage A:\n{text_a}\n\nPassage B:\n{text_b}",
         f"A: {text_a}\nB: {text_b}",
     )
+
+
+def published_pair_style(state, question, fraction):
+    """Choose one vetted paired-field format for the public training view."""
+    question = PAIR_QUESTION_REWRITES.get(question, question)
+    variants = paired_state_variants(state)
+    if not variants or "text_A" in question or "text_B" in question:
+        return state, question
+    formats = (state, *variants)
+    return formats[min(int(fraction * len(formats)), len(formats) - 1)], question
+
+
+def published_question_style(question, options, state, fraction):
+    """Use reviewed equivalent requests in the public view without extra rows."""
+    if question not in (CLASSIFICATION_INSTRUCTION, MULTIPLE_CHOICE_INSTRUCTION):
+        return question
+    candidates = instruction_variants(question, options)
+    labels = frozenset(str(option).strip().casefold() for option in options)
+    paired = state.startswith(("text_A: ", "First text:\n", "Passage A:\n", "A: "))
+    if question == CLASSIFICATION_INSTRUCTION and not paired and labels in {
+        frozenset({"entailment", "neutral", "contradiction"}),
+        frozenset({"entailment", "contradiction"}),
+    }:
+        candidates = GENERIC_CLASSIFICATION
+    styles = (question, *candidates)
+    return styles[min(int(fraction * len(styles)), len(styles) - 1)]
