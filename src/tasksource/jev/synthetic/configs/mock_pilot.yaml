@@ -1,0 +1,50 @@
+# Offline pilot (no network): deterministic mock provider.
+run_name: mock_pilot_v1
+output_dir: .synthetic_runs
+
+provider:
+  name: mock
+  api_key_env: ALBERT_API_KEY
+  base_url: mock://
+  model: mock-generator
+
+generation:
+  temperature: 0.8
+  concurrency: 8
+  max_output_tokens: 4000
+  seed: 42
+  prompt_version: generate_v1
+  n_states: 20
+
+sampler:
+  seed: 42
+  n_states: 20
+  questions_per_state: {"1": 0.60, "2": 0.25, "3": 0.10, "4": 0.05}
+  question_formats: {"choice": 0.40, "noul": 0.30, "score": 0.30}
+  probability_mixed_formats: 0.85
+  probability_all_formats_if_n_ge_3: 0.70
+
+critic:
+  enabled: true
+  provider: mock
+  model: mock-generator
+  prompt_version: critic_v1
+  temperature: 0.0
+
+annotator:
+  name: jev
+  version: mock-0.1
+  base_url: ""
+  api_key_env: JEV_API_KEY
+  model: jev-mock
+
+selection:
+  buckets: {"very_confident": 0.20, "confident": 0.30, "moderately_ambiguous": 0.30,
+            "high_ambiguity": 0.15, "near_uniform": 0.05}
+
+split:
+  train: 0.85
+  validation: 0.075
+  test: 0.075
+  ood_fraction: 0.05
+  seed_salt: jev-synthetic-split-v1
