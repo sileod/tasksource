@@ -65,6 +65,12 @@ for genuinely ordinal sources but is disabled by default. Native regression and
 ordinal recasting will be used for score examples rather than imposing an order
 on nominal classification labels.
 
+In the canonical Tasksource recast, related token rows also carry
+`shared_state`, `source_row`, and distinct `question_id` values. Pass rows from
+one `source_row` to `render_systemone_group(rows)` to obtain a single Jev
+request with several questions over the same sentence. The Parquet view keeps
+one decision per row so it can be shuffled, sampled, or streamed normally.
+
 ### Deterministic subrecasts
 
 The release adds conservative, low-frequency variants while retaining every
