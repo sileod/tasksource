@@ -14,198 +14,98 @@ tags:
 - runtime-defined-decisions
 - decision-models
 - multiple-choice
-size_categories:
-- 1M<n<10M
 ---
 
 # tasksource-jev-typed-decisions
 
-`tasksource-jev-typed-decisions` recasts Tasksource classification, multiple-choice, and selected
-token-classification datasets
-as runtime-defined decisions. Each example supplies its state and candidate
-criteria at inference time. The dataset is intended for training and evaluating
-bounded decision models; it is not tied to one Jev implementation.
+Hundreds of source tasks, one typed-decision format. This dataset recasts
+Tasksource's broad collection of NLP datasets as decisions whose criteria are
+supplied with each example, rather than fixed in a model head. Much of that
+breadth comes from human-written or human-annotated English and multilingual
+data: classification, question answering, and selected token tasks. The
+source catalog now also includes newly sourced
+[IT support tickets](https://huggingface.co/datasets/tasksource/it-support-tickets)
+with seven categories assigned by support professionals. A separate procedural
+slice adds multi-question states and calibrated targets; it is identified by its
+`procedural-jev/` source prefix, not presented as human-authored data.
 
-This is an independent data transformation. It is not an official TypeSafe Jev
-dataset and is not produced by or affiliated with TypeSafe or OpenJev.
+This is useful when training a decision model to handle *new label sets at
+runtime*: the same columns cover sentiment, inference, intent, entity tags,
+ticket routing, graded judgments, and more. Tasksource supplies the breadth;
+the Jev recast supplies a consistent `state + question + criteria → target`
+interface. The project is independent of TypeSafe and OpenJev.
 
-The release targets 1,000,000 decisions across English, multilingual, graded,
-and procedural sources. Build reports identify completed and failed source
-tasks; `release-audit.json` records the published source-family, primitive,
-and augmentation mix.
+## Data at a glance
 
-## Schema
-
-| field | type | meaning |
-|---|---|---|
-| `id` | string | Stable identifier derived from task, split, and row index. |
-| `group_id` | string | Identifies decisions derived from the same source row. |
-| `question_id` | string | Identifies a question within that group. |
-| `kind` | string | System One primitive: `choice`, `noul`, or `score`. |
-| `options` | list of strings | Candidate labels or answers supplied at runtime. Order is significant. |
-| `target` | list of floats | A choice/score distribution aligned with `options`, or one truth probability for `noul`. Tasksource labels are one-hot; native graded sources may have soft targets. |
-| `state` | string | Text or question on which the decision is based. Token decisions include the sentence, marked target, and target index. |
-| `question` | string | The decision requested from the model. |
-| `source` | string | Tasksource task identifier used to load the source data. |
-| `variant` | string | Direct decision or a named deterministic subrecast. |
-| `split` | string | Source split normalized to `train`, `dev`, or `test`. |
-
-Classification criteria are the source task's label names. Multiple-choice
-criteria are the answer choices. Every source row is retained as a direct
-`choice` for classification and multiple choice. For selected token tasks, at
-most two token questions are sampled deterministically from each source
-sequence; one non-`O` token is preferred when available. BIO/BILOU boundaries
-and compact POS or dependency labels are expanded into readable criteria.
-Only `Sequence(ClassLabel)` or equivalent `List(ClassLabel)` ontologies with
-2–32 readable labels qualify. This release includes CoNLL-2003 NER and WNUT-17
-token decisions from checked data-only mirrors; see
-[token-source-status.md](token-source-status.md) for the source audit and backlog.
-The `group_id` lets several questions share one source row without grouping
-full-text examples. A deterministic augmentation pass adds label-verification
-`noul` questions to about 5% of Tasksource rows. Ordered-rubric `score`
-augmentation is disabled for nominal labels; native ordinal and graded sources
-provide genuine Score supervision instead.
-
-In the canonical Tasksource recast, related token rows also carry
-`shared_state`, `source_row`, and distinct `question_id` values. Pass rows from
-one `source_row` to `render_systemone_group(rows)` to obtain a single Jev
-request with several questions over the same sentence. The Parquet view keeps
-one decision per row so it can be shuffled, sampled, or streamed normally.
-
-### Graded sources
-
-Sources labelled with ratings, annotator fractions, or vote distributions are
-recast natively rather than dropped (sources `graded/<family>`, defined in
-`src/tasksource/jev/graded.py`). Ordinal ratings become `score` questions
-with stated levels (HelpSteer, essay grading, app stars, JOCI plausibility),
-bounded quantities become `noul` rescaled to [0, 1] (STS similarity, SICK
-relatedness, acceptability, OASST and Civil Comments annotator rates), and
-ChaosNLI's 100 votes become a soft `choice` target. Sibling annotations of one
-input share a state: a HelpSteer response carries five `score` questions, an
-OASST reply thirteen `noul` questions, a Civil Comments comment seven.
-
-### Procedural sources
-
-About 10% of each split comes from
-[`tasksource/procedural-jev`](https://huggingface.co/datasets/tasksource/procedural-jev)
-(sources `procedural-jev/<config>`): generated JSON states with two or three
-native questions each, mixing `choice`, `noul` (including exact posterior
-probabilities), and `score` over ordered rubrics. Every question over a state
-shares its `group_id`, and the cap keeps groups whole. These rows are never
-augmented, so their wording is exactly as generated.
-
-### Deterministic subrecasts
-
-The release adds conservative, low-frequency variants while retaining every
-direct row:
-
-| variant | default rate | purpose |
-|---|---:|---|
-| `label_verification` | 5% | A `noul` judgement asking whether a deterministically proposed label is correct. Correct and incorrect proposals are balanced. |
-| `criteria_permutation` | 5% | The same `choice` decision with options and targets permuted together, reducing option-position shortcuts. |
-| `instruction_paraphrase` | 5% | The same decision with a manually vetted equivalent instruction. Common NLI and sentiment label groups receive specific wording; other tasks use conservative generic alternatives. |
-| `paired_text_format` | 5% of paired rows | Neutral alternatives to repeated `text_A`/`text_B` field labels, without assuming a task-specific relation between the texts. |
-
-All transformations are derived exactly from the source target and introduce no
-teacher-generated claims. Candidate-subset decisions are a possible later
-addition. Synthetic uncertainty, abstention, and nominal-to-ordinal conversions
-are intentionally excluded because one-hot classification labels do not justify
-them.
-For `noul`, `target` contains the scalar truth probability and `options` is empty;
-for `choice` and `score`, `target` is aligned with `options`. The direct answer
-and criteria are unchanged; lower-frequency variants are identified by
-`variant`. In the published view, paired-text field names also use
-deterministic, hand-written alternatives (`First text` / `Second text`,
-`Passage A` / `Passage B`, or `A` / `B`) to reduce repeated `text_A` / `text_B`
-boilerplate. Common direct question wording is likewise chosen from vetted
-equivalents without adding rows. The canonical recast remains fixed.
+| column | meaning |
+|---|---|
+| `state` | Text or structured input to judge. |
+| `question` | What to decide about that state. |
+| `kind` | `choice`, `noul` (truth probability), or `score` (ordered levels). |
+| `options` | Runtime criteria for `choice`/`score`; empty for `noul`. |
+| `target` | Distribution aligned with `options`, or one probability for `noul`. |
+| `source`, `split`, `variant` | Provenance, original train/dev/test identity, and transformation. |
+| `id`, `group_id`, `question_id` | Decision identity and questions sharing a source example. |
 
 ```python
 from datasets import load_dataset
 
-dataset = load_dataset("tasksource/tasksource-jev-typed-decisions")
-row = dataset["train"][0]
-answer = row["options"][max(range(len(row["target"])), key=row["target"].__getitem__)]
+ds = load_dataset("tasksource/tasksource-jev-typed-decisions")
+row = ds["train"][0]
+print(row["state"], row["question"], row["options"], row["target"])
 ```
 
-With Tasksource installed, the same representation can be produced directly:
+Most Tasksource classification targets are one-hot. Native graded sources add
+soft distributions or ordinal scores where the original annotation supports
+them; no uncertainty is invented from a hard label. Selected CoNLL-2003 and
+WNUT-17 token tasks ask at most two readable BIO-tag questions per sentence.
+Several questions can share a `group_id`; Parquet keeps one decision per row
+for easy streaming and shuffling. The
+[procedural source](https://huggingface.co/datasets/tasksource/procedural-jev)
+contributes `choice`, `noul`, and `score` questions over shared states.
 
-```python
-from tasksource import load_task, render_systemone
+Deterministic, low-frequency variants include label verification, criterion
+permutation, vetted instruction paraphrases, and paired-text field wording.
+The `variant` column identifies them. The source's direct decision remains in
+the data. The first 1,000 training rows are interleaved for a more useful
+Dataset Viewer preview; this changes order, not membership.
 
-dataset = load_task("glue/rte", recast="jev")
-request = render_systemone(dataset["train"][0], model="openjev")
-```
+The release builder targets up to one million rows with a 90/5/5
+train/dev/test allocation. It balances source *families* while sampling their
+configs, keeps multi-question groups intact, and excludes BIG-bench, MMLU,
+and BLiMP. Consult the Hub split counts for the currently published size.
 
-## Construction
+## Provenance and limits
 
-Tasksource standardizes heterogeneous datasets into common classification and
-multiple-choice templates. This release applies `recast_jev` to compatible
-English and multilingual tasks, retains the standard train/validation/test splits, and records the
-Tasksource identifier in every row. Tasks that fail to download or preprocess
-are recorded by the build report rather than silently represented as complete.
-To keep very large sources bounded, the build caps each task at 30,000
-training rows and 3,000 validation or test rows using Tasksource's deterministic
-sampling (seed 0). The published release is capped at 1,000,000 rows using a
-90/5/5 train/dev/test allocation. The cap balances dataset families rather than
-giving every config a separate global quota, while sampling across configs
-within each family. It keeps complete source-row groups, so related token,
-graded, procedural, and augmentation questions remain together.
+Tasksource harmonizes the source datasets; it does not own their content.
+Human-authored, crowd-annotated, and procedural rows should not be treated as
+interchangeable evidence. Use `source` to inspect the original dataset and
+its license before reuse. The aggregate has `license: other` because no single
+upstream license covers every row. The ticket source, for example, is the
+[Benitez Pereira collection](https://doi.org/10.5281/zenodo.7648117), not
+synthetic ticket text.
 
-For a useful Dataset Viewer preview, only the first 1,000 training rows are
-ordered round-robin by `source`, with a deterministic mix of direct,
-instruction, and paired-format variants where available. This changes display
-order, not membership. After that prefix, remaining examples retain their
-relative order.
-
-BIG-bench, MMLU, and BLiMP are excluded from this release. Original split
-identity is preserved in `split`, with `validation` normalized to `dev`.
-
-The repository includes `failed-tasks.json`, `outdated-datasets.json`,
-`fixed-source-audit.json`, `build-manifest.json`, and `release-audit.json`.
-The latter specifically tracks upstream datasets that still depend on loading
-scripts no longer supported by current Hugging Face Datasets, so they can be
-migrated to data-only Parquet repositories and incorporated in a later build.
-
-The build is resumable from the Tasksource repository; the
-[Jev build runbook](https://github.com/sileod/tasksource/blob/main/docs/jev/README.md)
-documents validation, publication, and the limits of exact reproducibility:
-
-```bash
-PYTHONPATH=.:src python scripts/build_jev_dataset.py \
-  --output build/tasksource-jev-typed-decisions --publish-rows 1000000 --finalize
-```
-
-## Licensing and provenance
-
-Tasksource is a preprocessing framework and catalog, not the original publisher
-of the constituent datasets. Copyright, license, and usage restrictions remain
-those of each upstream dataset. Users should consult the upstream dataset card
-identified by `source` before redistributing or using a subset. The aggregate is
-therefore marked `license: other`; no single license is asserted over all rows.
+Some upstream tasks fail to load or preprocess; the build records those
+failures instead of implying complete coverage. The builder writes
+`failed-tasks.json`, `fixed-source-audit.json`, `build-manifest.json`, and
+`release-audit.json`. The
+[build runbook](https://github.com/sileod/tasksource/blob/main/docs/jev/README.md)
+documents the resumable Parquet pipeline, validation, and reproducibility
+boundary. For an uncapped canonical recast, use
+`load_task("glue/rte", recast="jev")` in Tasksource.
 
 ## Citation
 
-If this recast is useful, cite Tasksource, which provides the task collection and
-harmonization framework:
+If this recast is useful, cite the Tasksource collection and preprocessing
+framework:
 
 ```bibtex
 @inproceedings{sileo-2024-tasksource,
-    title = "tasksource: A Large Collection of {NLP} tasks with a Structured Dataset Preprocessing Framework",
-    author = "Sileo, Damien",
-    editor = "Calzolari, Nicoletta  and
-      Kan, Min-Yen  and
-      Hoste, Veronique  and
-      Lenci, Alessandro  and
-      Sakti, Sakriani  and
-      Xue, Nianwen",
-    booktitle = "Proceedings of the 2024 Joint International Conference on Computational Linguistics, Language Resources and Evaluation (LREC-COLING 2024)",
-    month = may,
-    year = "2024",
-    address = "Torino, Italia",
-    publisher = "ELRA and ICCL",
-    url = "https://aclanthology.org/2024.lrec-main.1361/",
-    pages = "15655--15684",
-    abstract = "The HuggingFace Datasets Hub hosts thousands of datasets, offering exciting opportunities for language model training and evaluation. However, datasets for a specific task type often have different structures, making harmonization challenging which prevents the interchangeable use of comparable datasets. As a result, multi-task training or evaluation necessitates manual work to fit data into task templates. Several initiatives independently tackle this issue by releasing harmonized datasets or providing harmonization codes to preprocess datasets into a consistent format. We identify patterns in such preprocessings, such as column renaming, or more complex patterns. We then propose an annotation framework that enables concise, readable, and reusable preprocessing annotations. tasksource annotates more than 600 task preprocessings and provides a backend to automate dataset alignment. We fine-tune a multi-task text encoder on all tasksource tasks, outperforming every publicly available text encoder of comparable parameter count according to an external evaluation."
+  title = {tasksource: A Large Collection of {NLP} tasks with a Structured Dataset Preprocessing Framework},
+  author = {Sileo, Damien},
+  booktitle = {Proceedings of the 2024 Joint International Conference on Computational Linguistics, Language Resources and Evaluation (LREC-COLING 2024)},
+  year = {2024},
+  pages = {15655--15684},
+  url = {https://aclanthology.org/2024.lrec-main.1361/}
 }
 ```
