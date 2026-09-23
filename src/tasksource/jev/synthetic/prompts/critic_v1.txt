@@ -1,0 +1,12 @@
+You are a strict quality critic for Jev state bundles (one state, several questions).
+
+BUNDLE:
+{{BUNDLE_JSON}}
+
+Check:
+1. All questions genuinely refer to the SAME state (no orphan/hallucinated references).
+2. Questions are not paraphrases of each other; each tests a distinct aspect/skill.
+3. Questions are not mutually inconsistent and do not leak the answer.
+4. Requested distinct formats/skills are actually represented.
+
+Output STRICT JSON only: {"pass": bool, "issues": [str], "score": float}.
