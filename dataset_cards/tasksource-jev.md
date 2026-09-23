@@ -142,10 +142,12 @@ The latter specifically tracks upstream datasets that still depend on loading
 scripts no longer supported by current Hugging Face Datasets, so they can be
 migrated to data-only Parquet repositories and incorporated in a later build.
 
-The build is reproducible from the Tasksource repository:
+The build is resumable from the Tasksource repository; the
+[Jev build runbook](https://github.com/sileod/tasksource/blob/main/jev/README.md)
+documents validation, publication, and the limits of exact reproducibility:
 
 ```bash
-python scripts/build_jev_dataset.py --output build/tasksource-jev --finalize
+PYTHONPATH=.:src python jev/build.py --output build/tasksource-jev --finalize
 ```
 
 ## Licensing and provenance

@@ -1,4 +1,4 @@
-"""Readable criterion names for conservative Jev token-task adapters."""
+"""Readable criterion names for conservative Jev token adapters."""
 
 import re
 

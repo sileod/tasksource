@@ -4,7 +4,7 @@ import hashlib
 
 from datasets import Dataset, concatenate_datasets
 
-from .jev_prompt_augmentations import instruction_variants, paired_state_variants
+from .prompt_augmentations import instruction_variants, paired_state_variants
 
 
 def stable_fraction(identifier, salt):

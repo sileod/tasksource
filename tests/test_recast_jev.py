@@ -3,12 +3,12 @@ import unittest
 from datasets import ClassLabel, Dataset, DatasetDict, Features, Sequence, Value
 
 from tasksource.recast import recast_jev, render_systemone, render_systemone_group
-from tasksource.jev_token_labels import normalize_token_label
-from tasksource.jev_prompt_augmentations import (
+from tasksource.jev.token_labels import normalize_token_label
+from tasksource.jev.prompt_augmentations import (
     published_pair_style, published_question_style,
 )
-from tasksource.jev_augmentations import augment_jev_internal
-from scripts.build_jev_dataset import (
+from tasksource.jev.augmentations import augment_jev_internal
+from jev.build import (
     diverse_cap, diversify_published_prompts, exclude_publish_sources,
     pretty_order, to_training_row,
 )

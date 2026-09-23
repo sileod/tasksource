@@ -1,4 +1,4 @@
-"""Hand-authored, meaning-preserving instruction variants for Jev recasts.
+"""Hand-authored, meaning-preserving instruction variants for Jev decisions.
 
 Keep this module deliberately small. Variants may change only the wording of
 the decision request; they must never add facts, uncertainty, or label meaning.

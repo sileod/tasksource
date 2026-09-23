@@ -47,6 +47,9 @@ instructions, criteria, integer label, and textual answer separate:
 
 [🤗 tasksource/tasksource-jev](https://huggingface.co/datasets/tasksource/tasksource-jev)
 
+The [Jev build runbook](jev/README.md) covers smoke tests, resumable builds,
+validation, and publication.
+
 ```python
 from tasksource import load_task, render_systemone
 
