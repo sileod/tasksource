@@ -180,14 +180,17 @@ def diverse_cap(dataset, max_rows):
     return dataset.select(sorted(selected[:max_rows]))
 
 
-def exclude_publish_sources(dataset, prefixes=PUBLISH_EXCLUDED_PREFIXES):
-    """Exclude benchmark families from the release without deleting build shards."""
-    if not prefixes or "source" not in dataset.column_names:
+def exclude_publish_sources(
+    dataset, prefixes=PUBLISH_EXCLUDED_PREFIXES, allowed_sources=None
+):
+    """Keep only current, allowed source tasks without deleting build shards."""
+    if "source" not in dataset.column_names:
         return dataset
     sources = dataset.select_columns(["source"])[:]["source"]
     keep = [
         index for index, source in enumerate(sources)
         if not source.startswith(prefixes)
+        and (allowed_sources is None or source in allowed_sources)
     ]
     return dataset if len(keep) == len(dataset) else dataset.select(keep)
 
@@ -210,7 +213,10 @@ def add_question_groups(dataset):
     return dataset.add_column("group_id", group_ids).add_column("question_id", question_ids)
 
 
-def publish_dataset(output, repo_id, pretty_rows=1_000, publish_rows=500_000):
+def publish_dataset(
+    output, repo_id, pretty_rows=1_000, publish_rows=500_000,
+    allowed_sources=None,
+):
     data_files = {}
     for split in ("train", "validation", "test"):
         files = sorted((output / "data").glob(f"{split}-*.parquet"))
@@ -218,7 +224,9 @@ def publish_dataset(output, repo_id, pretty_rows=1_000, publish_rows=500_000):
             data_files[split] = [str(path) for path in files]
     dataset = load_dataset("parquet", data_files=data_files)
     dataset = DatasetDict({
-        split: exclude_publish_sources(split_dataset)
+        split: exclude_publish_sources(
+            split_dataset, allowed_sources=allowed_sources
+        )
         for split, split_dataset in dataset.items()
     })
     if publish_rows:
@@ -238,6 +246,8 @@ def publish_dataset(output, repo_id, pretty_rows=1_000, publish_rows=500_000):
             raise ValueError(f"Duplicate Jev decision IDs in {split}")
         if any(source.startswith(PUBLISH_EXCLUDED_PREFIXES) for source in metadata["source"]):
             raise ValueError(f"Excluded benchmark source in {split}")
+        if allowed_sources is not None and not set(metadata["source"]) <= allowed_sources:
+            raise ValueError(f"Unselected source in {split}")
         if set(metadata["split"]) != {normalized_split(split)}:
             raise ValueError(f"Mixed source split annotations in {split}")
         print(f"Publish {split}: {len(rows)} rows, {len(set(metadata['source']))} sources", flush=True)
@@ -431,7 +441,10 @@ def build(args):
         print(json.dumps(summary), flush=True)
 
     if args.upload:
-        publish_dataset(output, args.repo_id, args.pretty_rows, args.publish_rows)
+        publish_dataset(
+            output, args.repo_id, args.pretty_rows, args.publish_rows,
+            allowed_sources=set(tasks.source_id),
+        )
 
 
 def parse_args():

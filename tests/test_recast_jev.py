@@ -201,10 +201,10 @@ class RecastJevTest(unittest.TestCase):
 
     def test_release_excludes_named_benchmark_families(self):
         dataset = Dataset.from_dict({
-            "source": ["bigbench/a", "mmlu/b", "blimp/c", "glue/rte"],
-            "value": [0, 1, 2, 3],
+            "source": ["bigbench/a", "mmlu/b", "blimp/c", "glue/rte", "retired/task"],
+            "value": [0, 1, 2, 3, 4],
         })
-        kept = exclude_publish_sources(dataset)
+        kept = exclude_publish_sources(dataset, allowed_sources={"glue/rte"})
         self.assertEqual(kept["source"], ["glue/rte"])
 
 
