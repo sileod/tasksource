@@ -175,7 +175,11 @@ class MultipleChoiceFields(Preprocessing):
                 dataset = dataset.map(self.flatten_choice_list, fn_kwargs={'n_options':n_options})
             else:
                 n_options = max(lengths) if max_options is None else min(max_options, max(lengths))
-                dataset = dataset.map(self.ordered_choice_list, fn_kwargs={'n_options':n_options})
+                features = dataset['train'].features.copy()  # explicit: a batch of padding alone would type as null
+                del features['choices_list']
+                features.update({f'choice{i}': datasets.Value('string') for i in range(n_options)})
+                dataset = dataset.map(self.ordered_choice_list, fn_kwargs={'n_options':n_options},
+                                      remove_columns=['choices_list'], features=features)
         elif gold_first:
             dataset = dataset.map(self.sample_choices, fn_kwargs={'n_options':MAX_MC_OPTIONS})
         elif max_options is not None:
@@ -348,6 +352,9 @@ def fix_splits(dataset):
 def fix_labels(dataset, label_key='labels'):
     if type(dataset['train'][label_key][0]) in [int,list,float]:
         return dataset
+    if type(dataset['train'][label_key][0])==bool:  # names must be strings: "False", "True"
+        features=dataset['train'].features.copy(); features[label_key]=datasets.Value('string')
+        dataset=dataset.map(lambda x:{label_key:str(x[label_key])}, features=features)
     labels=set(fc.flatten(list(dataset[k][label_key]) for k in dataset))  # a label seen only in eval splits must not crash
     if set(labels)=={'entailment','neutral','contradiction'}:
         order=lambda x:dict(fc.flip(enumerate(['entailment','neutral','contradiction']))).get(x,x)

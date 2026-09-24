@@ -131,7 +131,7 @@ def recast_jev(dataset, task=None, question=None):
     if task_type == "Classification":
         if not hasattr(labels, "names"):
             raise TypeError("Classification labels must use datasets.ClassLabel")
-        criteria = list(labels.names)
+        criteria = [str(name) for name in labels.names]
         if not _valid_criteria(criteria):
             raise ValueError(
                 f"Classification label names must be present and unique: {criteria}"
