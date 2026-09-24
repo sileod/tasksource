@@ -66,7 +66,7 @@ babi_nli = Classification("premise", "hypothesis", "label",
 sick__label         = Classification('sentence_A','sentence_B','label', dataset_name="tasksource/sick")
 sick__relatedness   = Classification('sentence_A','sentence_B','relatedness_score', dataset_name="tasksource/sick",
     question="How related are the two sentences, from 1 (unrelated) to 5 (very related)?")
-sick__entailment_AB = Classification('sentence_A','sentence_B','entailment_AB', dataset_name="tasksource/sick")
+
 
 def remove_neg_1(dataset):
     return dataset.filter(lambda x:x['labels']!=-1)

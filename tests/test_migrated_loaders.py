@@ -81,7 +81,7 @@ class MigratedLoaderHelperTest(unittest.TestCase):
             cast_explicit_label_values(source, {0: "no", 1: "yes"})
 
     def test_aces_ontology_is_fixed_before_sampling(self):
-        from tasksource.multilingual_tasks import _aces_phenomena_labels
+        from tasksource.parked import _aces_phenomena_labels
 
         source = DatasetDict({
             "train": Dataset.from_dict({"phenomena": ["addition", "deletion"]}),

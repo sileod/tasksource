@@ -218,17 +218,6 @@ mms_sentiment = Classification("text", labels="label", dataset_name="parquet", t
 mapa_coarse = TokenClassification("tokens","coarse_grained",dataset_name='joelito/mapa', task_id="mapa/coarse_grained")
 mapa_fine = TokenClassification("tokens","fine_grained",dataset_name='joelito/mapa', task_id="mapa/fine_grained")
 
-aces_ranking = MultipleChoice("source",choices=['good-translation','incorrect-translation'],labels=constant(0), question="Which is the correct translation?", dataset_name='nikitam/ACES', config_name='ACES', task_id='ACES/ranking')
-def _aces_phenomena_labels(dataset):
-    # The catalog samples before fixing string labels; build the ontology from
-    # the full source so rare phenomena in dev/test are not silently invalid.
-    names = sorted(set(dataset["train"]["phenomena"]))
-    return dataset.cast_column("phenomena", ClassLabel(names=names))
-
-aces_phenomena = Classification('source','incorrect-translation','phenomena',
-    dataset_name='nikitam/ACES', config_name='ACES',
-    task_id='ACES/phenomena', pre_process=_aces_phenomena_labels)
-
 amazon_intent = Classification("text",labels="label",
     dataset_name='mteb/MassiveIntentClassification', config_name="en",
     task_id="massive")

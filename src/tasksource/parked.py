@@ -221,6 +221,22 @@ truthful_qa___multiple_choice = MultipleChoice(
     labels=constant(0)
 )
 
+# ACES is a challenge set for evaluating translation metrics
+from datasets import ClassLabel  # noqa: E402
+aces_ranking = MultipleChoice("source",choices=['good-translation','incorrect-translation'],labels=constant(0), question="Which is the correct translation?", dataset_name='nikitam/ACES', config_name='ACES', task_id='ACES/ranking')
+def _aces_phenomena_labels(dataset):
+    # The catalog samples before fixing string labels; build the ontology from
+    # the full source so rare phenomena in dev/test are not silently invalid.
+    names = sorted(set(dataset["train"]["phenomena"]))
+    return dataset.cast_column("phenomena", ClassLabel(names=names))
+
+aces_phenomena = Classification('source','incorrect-translation','phenomena',
+    dataset_name='nikitam/ACES', config_name='ACES',
+    task_id='ACES/phenomena', pre_process=_aces_phenomena_labels)
+
+# the entailment direction of sick/label, which is listed
+sick__entailment_AB = Classification('sentence_A','sentence_B','entailment_AB', dataset_name="tasksource/sick")
+
 KINDS = {
     "evaluation": "evaluation benchmark: useful for evaluation, kept out of training",
     "duplicate": "duplicates or is covered by a listed task",
@@ -241,7 +257,7 @@ PARKED = {
     'bigbench': ('evaluation', 'BIG-bench is an evaluation suite'),
     'glue___ax': ('evaluation', 'test-only diagnostic set, labels masked'),
     'super_glue___rte': ('duplicate', 'duplicate of glue/rte'),
-    'sick__entailment_BA': ('duplicate', 'same pairs as sick/entailment_AB'),
+    'sick__entailment_BA': ('duplicate', 'restates sick/label as B-to-A entailment'),
     'gpt3_nli': ('unsound', 'generated labels not sound enough'),
     'enfever_nli': ('duplicate', 'overlaps FEVER-based NLI tasks'),
     'glue__diagnostics': ('evaluation', 'diagnostic benchmark'),
@@ -294,6 +310,9 @@ PARKED = {
     'neqa': ('evaluation', 'Inverse Scaling Prize evaluation probe; few-shot prompt baked into the inputs'),
     'quote_repetition': ('evaluation', 'Inverse Scaling Prize evaluation probe; few-shot prompt baked into the inputs'),
     'redefine_math': ('evaluation', 'Inverse Scaling Prize evaluation probe; "Q: ... A:" prompt baked into the inputs'),
+    'aces_ranking': ('evaluation', 'ACES is a challenge set for evaluating translation metrics'),
+    'aces_phenomena': ('evaluation', 'ACES is a challenge set for evaluating translation metrics'),
+    'sick__entailment_AB': ('duplicate', 'restates sick/label as A-to-B entailment'),
     'effective_feedback_student_writing': ('unavailable', 'source discontinued; see argument_feedback in tasks.py'),
 }
 REASONS = {key: reason for key, (_, reason) in PARKED.items()}
