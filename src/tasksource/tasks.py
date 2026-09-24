@@ -59,7 +59,7 @@ anli__a3 = Classification('premise','hypothesis','label', splits=['train_r3','de
 
 babi_nli = Classification("premise", "hypothesis", "label",
     dataset_name="tasksource/babi_nli",
-    config_name=set(get_dataset_config_names("tasksource/babi_nli"))-{"agents-motivations"}
+    config_name=sorted(set(get_dataset_config_names("tasksource/babi_nli"))-{"agents-motivations"})
 ) # agents-motivations task is not as clear-cut as the others
 
 

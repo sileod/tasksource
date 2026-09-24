@@ -5,6 +5,7 @@ import pandas as pd
 from . import tasks, recast as recast_module
 from .metadata import dataset_rank
 from .metadata.originals import ORIGINALS
+from .metadata.canonical import CANONICAL
 from datasets import load_dataset, Dataset, DatasetDict, IterableDatasetDict
 import funcy as fc
 import os
@@ -71,12 +72,14 @@ def list_tasks(tasks_path=f'{os.path.dirname(__file__)}/tasks.py',multilingual=F
                 'task_type': value.__class__.__name__,'mapping': value,
                 'rank':task_order.get(key,None)}]   
     df=pd.DataFrame(l).explode('config_name')
+    df=df.astype(object).where(df.notna(), None)  # keep None: pandas 3 string columns and explode turn it into NaN
     df = df.sort_values('rank').reset_index(drop=True)
     df['id'] = df.apply(
         lambda x: x.mapping.task_id.format(config_name=x.config_name)
         if x.mapping.task_id and "{config_name}" in x.mapping.task_id
         else (x.mapping.task_id or pretty_name(x)), axis=1)
     df.insert(0, 'id', df.pop('id'))
+    df['dataset_name'] = df.dataset_name.map(lambda n: CANONICAL.get(n, n))  # after the ids, which keep the short names
     del df['rank']
     if instruct:
         df=df[df.id.map(lambda x: not any(a in x for a in recast_module.improper_labels))]
@@ -134,6 +137,7 @@ def load_preprocessing(tasks=tasks, **kwargs):
     for c in 'dataset_name','config_name':
         if not isinstance(getattr(preprocessing,c), str):
              setattr(preprocessing,c,getattr(y,c))
+    preprocessing.dataset_name = CANONICAL.get(preprocessing.dataset_name, preprocessing.dataset_name)
     return preprocessing
 
 def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preprocessing_name=None,
@@ -147,6 +151,8 @@ def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preproc
     """
     query = dict_of(id, dataset_name, config_name, task_name,preprocessing_name)
     query = {k:v for k,v in query.items() if v}
+    if 'dataset_name' in query:
+        query['dataset_name'] = CANONICAL.get(query['dataset_name'], query['dataset_name'])
     _tasks = (lmtasks if multilingual else tasks)
     preprocessing = load_preprocessing(_tasks, **query)
 
