@@ -237,6 +237,26 @@ aces_phenomena = Classification('source','incorrect-translation','phenomena',
 # the entailment direction of sick/label, which is listed
 sick__entailment_AB = Classification('sentence_A','sentence_B','entailment_AB', dataset_name="tasksource/sick")
 
+# IMPPRES is a diagnostic set for NLI pragmatics (Jeretic et al., 2020); its only split is labeled train
+from .metadata import imppres_presupposition, imppres_implicature  # noqa: E402
+def _imppres_post_process(ds,prefix=''):
+    # imppres entailment definition is either purely semantic or purely pragmatic
+    # because of that, we assign differentiate the labels from anli/mnli notation
+    return ds.cast_column('labels', ClassLabel(
+    names=[f'{prefix}_entailment',f'{prefix}_neutral',f'{prefix}_contradiction']))
+
+imppres__presupposition = Classification("premise","hypothesis","gold_label",
+    dataset_name="tasksource/imppres", config_name=imppres_presupposition,
+    post_process=lambda x: _imppres_post_process(x,'presupposition'))
+
+imppres__prag = Classification("premise","hypothesis","gold_label_prag",
+    dataset_name="tasksource/imppres", config_name=imppres_implicature,
+    post_process=lambda x: _imppres_post_process(x,'pragmatic'))
+
+imppres__log = Classification("premise","hypothesis","gold_label_log",
+    dataset_name="tasksource/imppres", config_name=imppres_implicature,
+    post_process=lambda x: _imppres_post_process(x,'logical'))
+
 KINDS = {
     "evaluation": "evaluation benchmark: useful for evaluation, kept out of training",
     "duplicate": "duplicates or is covered by a listed task",
@@ -313,6 +333,9 @@ PARKED = {
     'aces_ranking': ('evaluation', 'ACES is a challenge set for evaluating translation metrics'),
     'aces_phenomena': ('evaluation', 'ACES is a challenge set for evaluating translation metrics'),
     'sick__entailment_AB': ('duplicate', 'restates sick/label as A-to-B entailment'),
+    'imppres__presupposition': ('evaluation', 'IMPPRES is a diagnostic set for NLI pragmatics, not training data'),
+    'imppres__prag': ('evaluation', 'IMPPRES is a diagnostic set for NLI pragmatics, not training data'),
+    'imppres__log': ('evaluation', 'IMPPRES is a diagnostic set for NLI pragmatics, not training data'),
     'effective_feedback_student_writing': ('unavailable', 'source discontinued; see argument_feedback in tasks.py'),
 }
 REASONS = {key: reason for key, (_, reason) in PARKED.items()}

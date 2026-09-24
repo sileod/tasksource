@@ -94,7 +94,7 @@ following each source's own train/dev/test splits where it has them.
     Label-verification and packed questions carry it too.
 - **Variants.** Low-frequency, deterministic variants cover label verification as `noul`, criterion order, and instruction wording.
 - **Packing.** Up to 10% of each classification task's examples are packed, two to four at a time, into `packed_derived` states. Their questions (an item's label, agreement, existence, counts) follow exactly from the gold labels.
-- **Mixing.** Dataset families are balanced and related questions are kept together.
+- **Mixing.** Dataset families get equal shares, scaled by [hand-set weights](https://github.com/sileod/tasksource/blob/main/src/tasksource/metadata/weights.py) (more for adversarial NLI, long documents and preference pairs; less for templated probes). Related questions are kept together.
   - The first 1,000 train rows are interleaved to show variety in the Dataset Viewer; the rest is shuffled.
   - Evaluation benchmarks (BIG-bench, MMLU, BLiMP, MATH test, ...) are left out so they stay clean for evaluation.
 - **Audit trail.** The [source mix](release-audit.json), [failed source list](failed-tasks.json), and [build manifest](build-manifest.json) ship with the data.

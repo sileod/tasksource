@@ -24,6 +24,7 @@ import numpy as np
 import pandas as pd
 from tasksource import list_tasks, load_task
 from tasksource.preprocess import sample_dataset
+from tasksource.metadata.weights import task_weight
 from tasksource.jev.augmentations import augment_jev_internal, stable_fraction
 from tasksource.jev.prompt_augmentations import (
     published_pair_style, published_question_style,
@@ -388,20 +389,24 @@ def diverse_cap(dataset, max_rows):
     for index, source in enumerate(sources):
         family = source_family(source)
         buckets.setdefault(family, {}).setdefault(source, []).append(index)
-    quota = max(1, max_rows // len(buckets))
+    # each family's share of the cap scales with its weight (metadata/weights.py)
+    weights = {family: max(task_weight(source) for source in configs) for family, configs in buckets.items()}
+    total_weight = sum(weights.values())
+    quotas = {family: max(1, int(max_rows * weight / total_weight)) for family, weight in weights.items()}
     family_sizes = {
         family: sum(len(indices) for indices in configs.values())
         for family, configs in buckets.items()
     }
-    base_possible = sum(min(quota, size) for size in family_sizes.values())
+    base_possible = sum(min(quotas[family], size) for family, size in family_sizes.items())
     overflow_needed = max_rows - base_possible
-    total_extra = sum(max(0, size - quota) for size in family_sizes.values())
+    total_extra = sum(max(0, size - quotas[family]) for family, size in family_sizes.items())
     ids = (
         metadata["id"]
         if "id" in metadata
         else list(map(str, range(len(dataset))))
     )
     for family in sorted(buckets):
+        quota = quotas[family]
         extra = max(0, family_sizes[family] - quota)
         overflow_limit = (
             32 + (overflow_needed * extra + total_extra - 1) // total_extra

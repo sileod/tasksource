@@ -1,5 +1,5 @@
 from .preprocess import cat, get, regen, name, constant, Classification, TokenClassification, MultipleChoice
-from .metadata import imppres_presupposition, imppres_implicature, udep_en_configs
+from .metadata import udep_en_configs
 from datasets import get_dataset_config_names, Sequence, ClassLabel, Dataset, DatasetDict, Features, Value
 import html
 from collections import Counter
@@ -220,25 +220,6 @@ gen_debiased_nli__mnli_seq_z = Classification("premise","hypothesis","label",
 add_one_rte = Classification("premise","hypothesis","label",
     dataset_name="pietrolesci/add_one_rte",splits=["train","dev","test"],
     label_values=ENTAILMENT_LABEL_VALUES)
-
-def _imppres_post_process(ds,prefix=''):
-    # imppres entailment definition is either purely semantic or purely pragmatic
-    # because of that, we assign differentiate the labels from anli/mnli notation
-    return ds.cast_column('labels', ClassLabel(
-    names=[f'{prefix}_entailment',f'{prefix}_neutral',f'{prefix}_contradiction']))
-
-imppres__presupposition = Classification("premise","hypothesis","gold_label",
-    dataset_name="tasksource/imppres", config_name=imppres_presupposition,
-    post_process=lambda x: _imppres_post_process(x,'presupposition'))
-
-imppres__prag = Classification("premise","hypothesis","gold_label_prag",
-    dataset_name="tasksource/imppres", config_name=imppres_implicature,
-    post_process=lambda x: _imppres_post_process(x,'pragmatic'))
-
-imppres__log = Classification("premise","hypothesis","gold_label_log",
-    dataset_name="tasksource/imppres", config_name=imppres_implicature,
-    post_process=lambda x: _imppres_post_process(x,'logical'))
-
 
 hlgd = Classification("headline_a", "headline_b", labels="label", dataset_name="tasksource/hlgd")
 
