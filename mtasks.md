@@ -1,554 +1,554 @@
 550 multilingual tasks. Load one with `load_task(id, multilingual=True)`; the annotations are in [multilingual_tasks.py](src/tasksource/multilingual_tasks.py), and tasks kept out on purpose are in [parked.py](src/tasksource/parked.py).
 
-| id | type | dataset | config | question | fields |
-|---|---|---|---|---|---|
-| multilingual-NLI-26lang-2mil7 | Classification | [MoritzLaurer/multilingual-NLI-26lang-2mil7](https://hf.co/datasets/MoritzLaurer/multilingual-NLI-26lang-2mil7) |  |  | sentence1=premise, sentence2=hypothesis, labels=fn, pre_process |
-| xnli | Classification | [facebook/xnli](https://hf.co/datasets/facebook/xnli) | en |  | sentence1=premise, sentence2=hypothesis, labels=label |
-| americas_nli/all_languages | Classification | [nala-cub/americas_nli](https://hf.co/datasets/nala-cub/americas_nli) | all_languages |  | sentence1=premise, sentence2=hypothesis, labels=label |
-| stsb_multi_mt/es | Classification | [PhilipMay/stsb_multi_mt](https://hf.co/datasets/PhilipMay/stsb_multi_mt) | es | How similar are the two sentences, from 0 (unrelated) to 1 (equivalent)? | labels=fn |
-| stsb_multi_mt/de | Classification | [PhilipMay/stsb_multi_mt](https://hf.co/datasets/PhilipMay/stsb_multi_mt) | de | How similar are the two sentences, from 0 (unrelated) to 1 (equivalent)? | labels=fn |
-| stsb_multi_mt/it | Classification | [PhilipMay/stsb_multi_mt](https://hf.co/datasets/PhilipMay/stsb_multi_mt) | it | How similar are the two sentences, from 0 (unrelated) to 1 (equivalent)? | labels=fn |
-| stsb_multi_mt/fr | Classification | [PhilipMay/stsb_multi_mt](https://hf.co/datasets/PhilipMay/stsb_multi_mt) | fr | How similar are the two sentences, from 0 (unrelated) to 1 (equivalent)? | labels=fn |
-| stsb_multi_mt/pl | Classification | [PhilipMay/stsb_multi_mt](https://hf.co/datasets/PhilipMay/stsb_multi_mt) | pl | How similar are the two sentences, from 0 (unrelated) to 1 (equivalent)? | labels=fn |
-| stsb_multi_mt/pt | Classification | [PhilipMay/stsb_multi_mt](https://hf.co/datasets/PhilipMay/stsb_multi_mt) | pt | How similar are the two sentences, from 0 (unrelated) to 1 (equivalent)? | labels=fn |
-| stsb_multi_mt/ru | Classification | [PhilipMay/stsb_multi_mt](https://hf.co/datasets/PhilipMay/stsb_multi_mt) | ru | How similar are the two sentences, from 0 (unrelated) to 1 (equivalent)? | labels=fn |
-| stsb_multi_mt/zh | Classification | [PhilipMay/stsb_multi_mt](https://hf.co/datasets/PhilipMay/stsb_multi_mt) | zh | How similar are the two sentences, from 0 (unrelated) to 1 (equivalent)? | labels=fn |
-| stsb_multi_mt/nl | Classification | [PhilipMay/stsb_multi_mt](https://hf.co/datasets/PhilipMay/stsb_multi_mt) | nl | How similar are the two sentences, from 0 (unrelated) to 1 (equivalent)? | labels=fn |
-| stsb_multi_mt/en | Classification | [PhilipMay/stsb_multi_mt](https://hf.co/datasets/PhilipMay/stsb_multi_mt) | en | How similar are the two sentences, from 0 (unrelated) to 1 (equivalent)? | labels=fn |
-| paws-x/fr | Classification | [google-research-datasets/paws-x](https://hf.co/datasets/google-research-datasets/paws-x) | fr |  | labels=fn |
-| paws-x/ja | Classification | [google-research-datasets/paws-x](https://hf.co/datasets/google-research-datasets/paws-x) | ja |  | labels=fn |
-| paws-x/ko | Classification | [google-research-datasets/paws-x](https://hf.co/datasets/google-research-datasets/paws-x) | ko |  | labels=fn |
-| paws-x/zh | Classification | [google-research-datasets/paws-x](https://hf.co/datasets/google-research-datasets/paws-x) | zh |  | labels=fn |
-| paws-x/es | Classification | [google-research-datasets/paws-x](https://hf.co/datasets/google-research-datasets/paws-x) | es |  | labels=fn |
-| paws-x/de | Classification | [google-research-datasets/paws-x](https://hf.co/datasets/google-research-datasets/paws-x) | de |  | labels=fn |
-| paws-x/en | Classification | [google-research-datasets/paws-x](https://hf.co/datasets/google-research-datasets/paws-x) | en |  | labels=fn |
-| miam | Classification | csv |  |  | sentence1=Utterance, labels=Label, pre_process |
-| x-stance | Classification | [michiel/xstance](https://hf.co/datasets/michiel/xstance) |  |  | sentence1=fn, sentence2=comment, labels=stance_label |
-| offenseval_2020/ar | Classification | [khalidalt/offenseval_2020_ar](https://hf.co/datasets/khalidalt/offenseval_2020_ar) |  |  | sentence1=fn, labels=fn, pre_process |
-| offenseval_2020/da | Classification | [tasksource/offenseval_2020](https://hf.co/datasets/tasksource/offenseval_2020) | da |  | sentence1=fn, labels=fn, pre_process |
-| offenseval_2020/gr | Classification | [tasksource/offenseval_2020](https://hf.co/datasets/tasksource/offenseval_2020) | gr |  | sentence1=fn, labels=fn, pre_process |
-| offenseval_2020/tr | Classification | [tasksource/offenseval_2020](https://hf.co/datasets/tasksource/offenseval_2020) | tr |  | sentence1=fn, labels=fn, pre_process |
-| offenseval_dravidian/tamil | Classification | [community-datasets/offenseval_dravidian](https://hf.co/datasets/community-datasets/offenseval_dravidian) | tamil |  | sentence1=text, labels=label |
-| offenseval_dravidian/malayalam | Classification | [community-datasets/offenseval_dravidian](https://hf.co/datasets/community-datasets/offenseval_dravidian) | malayalam |  | sentence1=text, labels=label |
-| offenseval_dravidian/kannada | Classification | [community-datasets/offenseval_dravidian](https://hf.co/datasets/community-datasets/offenseval_dravidian) | kannada |  | sentence1=text, labels=label |
-| MLMA_hate_speech | Classification | [nedjmaou/MLMA_hate_speech](https://hf.co/datasets/nedjmaou/MLMA_hate_speech) |  |  | sentence1=tweet, labels=sentiment, pre_process |
-| x-fact | Classification | [tasksource/x-fact](https://hf.co/datasets/tasksource/x-fact) |  |  | sentence1=evidence, sentence2=claim, labels=label, splits=[train, dev, test], pre_process |
-| xglue/nc | Classification | [SetFit/xglue_nc](https://hf.co/datasets/SetFit/xglue_nc) |  |  | sentence1=text, labels=label_text |
-| xglue/qadsm | Classification | [tasksource/xglue](https://hf.co/datasets/tasksource/xglue) | qadsm | Is the ad relevant to the query? | sentence1=query, sentence2=ad_description, labels=relevance_label |
-| xglue/qam | Classification | [tasksource/xglue](https://hf.co/datasets/tasksource/xglue) | qam | Does the passage answer the query? | sentence1=question, sentence2=answer, labels=label |
-| xglue/wpr | Classification | [tasksource/xglue](https://hf.co/datasets/tasksource/xglue) | wpr | How relevant is the web page to the query? | sentence1=query, sentence2=web_page_snippet, labels=relavance_label |
-| xlwic/xlwic_fr_fr | Classification | [tasksource/xlwic](https://hf.co/datasets/tasksource/xlwic) | xlwic_fr_fr |  | sentence1=fn, sentence2=context_2, labels=label |
-| xlwic/xlwic_en_ko | Classification | [tasksource/xlwic](https://hf.co/datasets/tasksource/xlwic) | xlwic_en_ko |  | sentence1=fn, sentence2=context_2, labels=label |
-| xlwic/xlwic_it_it | Classification | [tasksource/xlwic](https://hf.co/datasets/tasksource/xlwic) | xlwic_it_it |  | sentence1=fn, sentence2=context_2, labels=label |
-| xlwic/xlwic_de_de | Classification | [tasksource/xlwic](https://hf.co/datasets/tasksource/xlwic) | xlwic_de_de |  | sentence1=fn, sentence2=context_2, labels=label |
-| oasst1_dense_flat/quality | Classification | [tasksource/oasst1_dense_flat](https://hf.co/datasets/tasksource/oasst1_dense_flat) |  | How good is the reply, from 0 (low quality) to 1 (high quality)? | sentence1=parent_text, sentence2=text, labels=quality, pre_process |
-| oasst1_dense_flat/toxicity | Classification | [tasksource/oasst1_dense_flat](https://hf.co/datasets/tasksource/oasst1_dense_flat) |  | How toxic is the reply, from 0 (not toxic) to 1 (very toxic)? | sentence1=parent_text, sentence2=text, labels=toxicity, pre_process |
-| oasst1_dense_flat/helpfulness | Classification | [tasksource/oasst1_dense_flat](https://hf.co/datasets/tasksource/oasst1_dense_flat) |  | How helpful is the reply, from 0 (unhelpful) to 1 (helpful)? | sentence1=parent_text, sentence2=text, labels=helpfulness, pre_process |
-| language-identification | Classification | [papluca/language-identification](https://hf.co/datasets/papluca/language-identification) |  | What language is this text in? | sentence1=text, labels=fn |
-| wili_2018 | Classification | [MartinThoma/wili_2018](https://hf.co/datasets/MartinThoma/wili_2018) |  | What language is this text in? | sentence1=sentence, labels=label, pre_process |
-| exams/multilingual | MultipleChoice | [mhardalov/exams](https://hf.co/datasets/mhardalov/exams) | multilingual |  | inputs=fn, labels=fn, choices_list=fn, pre_process |
-| xcsr/X-CSQA-jap | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | X-CSQA-jap |  | inputs=fn, labels=fn, choices_list=fn |
-| xcsr/X-CSQA-it | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | X-CSQA-it |  | inputs=fn, labels=fn, choices_list=fn |
-| xcsr/X-CSQA-hi | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | X-CSQA-hi |  | inputs=fn, labels=fn, choices_list=fn |
-| xcsr/X-CSQA-de | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | X-CSQA-de |  | inputs=fn, labels=fn, choices_list=fn |
-| xcsr/X-CSQA-es | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | X-CSQA-es |  | inputs=fn, labels=fn, choices_list=fn |
-| xcsr/X-CSQA-nl | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | X-CSQA-nl |  | inputs=fn, labels=fn, choices_list=fn |
-| xcsr/X-CSQA-ar | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | X-CSQA-ar |  | inputs=fn, labels=fn, choices_list=fn |
-| xcsr/X-CSQA-fr | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | X-CSQA-fr |  | inputs=fn, labels=fn, choices_list=fn |
-| xcsr/X-CSQA-pl | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | X-CSQA-pl |  | inputs=fn, labels=fn, choices_list=fn |
-| xcsr/X-CSQA-en | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | X-CSQA-en |  | inputs=fn, labels=fn, choices_list=fn |
-| xcsr/X-CSQA-ru | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | X-CSQA-ru |  | inputs=fn, labels=fn, choices_list=fn |
-| xcsr/X-CSQA-pt | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | X-CSQA-pt |  | inputs=fn, labels=fn, choices_list=fn |
-| xcsr/X-CSQA-vi | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | X-CSQA-vi |  | inputs=fn, labels=fn, choices_list=fn |
-| xcsr/X-CSQA-zh | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | X-CSQA-zh |  | inputs=fn, labels=fn, choices_list=fn |
-| xcsr/X-CSQA-ur | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | X-CSQA-ur |  | inputs=fn, labels=fn, choices_list=fn |
-| xcsr/X-CSQA-sw | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | X-CSQA-sw |  | inputs=fn, labels=fn, choices_list=fn |
-| xcsr/X-CODAH-ar | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | X-CODAH-ar | Which sentence is most plausible? | inputs=fn, labels=fn, choices_list=fn |
-| xcsr/X-CODAH-pl | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | X-CODAH-pl | Which sentence is most plausible? | inputs=fn, labels=fn, choices_list=fn |
-| xcsr/X-CODAH-pt | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | X-CODAH-pt | Which sentence is most plausible? | inputs=fn, labels=fn, choices_list=fn |
-| xcsr/X-CODAH-ru | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | X-CODAH-ru | Which sentence is most plausible? | inputs=fn, labels=fn, choices_list=fn |
-| xcsr/X-CODAH-sw | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | X-CODAH-sw | Which sentence is most plausible? | inputs=fn, labels=fn, choices_list=fn |
-| xcsr/X-CODAH-vi | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | X-CODAH-vi | Which sentence is most plausible? | inputs=fn, labels=fn, choices_list=fn |
-| xcsr/X-CODAH-zh | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | X-CODAH-zh | Which sentence is most plausible? | inputs=fn, labels=fn, choices_list=fn |
-| xcsr/X-CODAH-ur | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | X-CODAH-ur | Which sentence is most plausible? | inputs=fn, labels=fn, choices_list=fn |
-| xcsr/X-CODAH-jap | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | X-CODAH-jap | Which sentence is most plausible? | inputs=fn, labels=fn, choices_list=fn |
-| xcsr/X-CODAH-it | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | X-CODAH-it | Which sentence is most plausible? | inputs=fn, labels=fn, choices_list=fn |
-| xcsr/X-CODAH-hi | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | X-CODAH-hi | Which sentence is most plausible? | inputs=fn, labels=fn, choices_list=fn |
-| xcsr/X-CODAH-fr | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | X-CODAH-fr | Which sentence is most plausible? | inputs=fn, labels=fn, choices_list=fn |
-| xcsr/X-CODAH-es | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | X-CODAH-es | Which sentence is most plausible? | inputs=fn, labels=fn, choices_list=fn |
-| xcsr/X-CODAH-en | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | X-CODAH-en | Which sentence is most plausible? | inputs=fn, labels=fn, choices_list=fn |
-| xcsr/X-CODAH-de | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | X-CODAH-de | Which sentence is most plausible? | inputs=fn, labels=fn, choices_list=fn |
-| xcsr/X-CODAH-nl | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | X-CODAH-nl | Which sentence is most plausible? | inputs=fn, labels=fn, choices_list=fn |
-| xcopa/qu | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) | qu |  | inputs=fn, labels=label, choice0=choice1, choice1=choice2 |
-| xcopa/et | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) | et |  | inputs=fn, labels=label, choice0=choice1, choice1=choice2 |
-| xcopa/ht | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) | ht |  | inputs=fn, labels=label, choice0=choice1, choice1=choice2 |
-| xcopa/id | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) | id |  | inputs=fn, labels=label, choice0=choice1, choice1=choice2 |
-| xcopa/it | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) | it |  | inputs=fn, labels=label, choice0=choice1, choice1=choice2 |
-| xcopa/sw | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) | sw |  | inputs=fn, labels=label, choice0=choice1, choice1=choice2 |
-| xcopa/translation-ht | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) | translation-ht |  | inputs=fn, labels=label, choice0=choice1, choice1=choice2 |
-| xcopa/th | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) | th |  | inputs=fn, labels=label, choice0=choice1, choice1=choice2 |
-| xcopa/tr | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) | tr |  | inputs=fn, labels=label, choice0=choice1, choice1=choice2 |
-| xcopa/translation-et | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) | translation-et |  | inputs=fn, labels=label, choice0=choice1, choice1=choice2 |
-| xcopa/translation-id | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) | translation-id |  | inputs=fn, labels=label, choice0=choice1, choice1=choice2 |
-| xcopa/translation-sw | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) | translation-sw |  | inputs=fn, labels=label, choice0=choice1, choice1=choice2 |
-| xcopa/translation-ta | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) | translation-ta |  | inputs=fn, labels=label, choice0=choice1, choice1=choice2 |
-| xcopa/translation-th | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) | translation-th |  | inputs=fn, labels=label, choice0=choice1, choice1=choice2 |
-| xcopa/translation-tr | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) | translation-tr |  | inputs=fn, labels=label, choice0=choice1, choice1=choice2 |
-| xcopa/translation-vi | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) | translation-vi |  | inputs=fn, labels=label, choice0=choice1, choice1=choice2 |
-| xcopa/translation-zh | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) | translation-zh |  | inputs=fn, labels=label, choice0=choice1, choice1=choice2 |
-| xcopa/vi | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) | vi |  | inputs=fn, labels=label, choice0=choice1, choice1=choice2 |
-| xcopa/zh | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) | zh |  | inputs=fn, labels=label, choice0=choice1, choice1=choice2 |
-| xcopa/ta | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) | ta |  | inputs=fn, labels=label, choice0=choice1, choice1=choice2 |
-| xcopa/translation-it | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) | translation-it |  | inputs=fn, labels=label, choice0=choice1, choice1=choice2 |
-| xstory_cloze/eu | MultipleChoice | [juletxara/xstory_cloze](https://hf.co/datasets/juletxara/xstory_cloze) | eu | Which ending continues the story? | inputs=fn, labels=fn, choice0=sentence_quiz1, choice1=sentence_quiz2 |
-| xstory_cloze/my | MultipleChoice | [juletxara/xstory_cloze](https://hf.co/datasets/juletxara/xstory_cloze) | my | Which ending continues the story? | inputs=fn, labels=fn, choice0=sentence_quiz1, choice1=sentence_quiz2 |
-| xstory_cloze/hi | MultipleChoice | [juletxara/xstory_cloze](https://hf.co/datasets/juletxara/xstory_cloze) | hi | Which ending continues the story? | inputs=fn, labels=fn, choice0=sentence_quiz1, choice1=sentence_quiz2 |
-| xstory_cloze/te | MultipleChoice | [juletxara/xstory_cloze](https://hf.co/datasets/juletxara/xstory_cloze) | te | Which ending continues the story? | inputs=fn, labels=fn, choice0=sentence_quiz1, choice1=sentence_quiz2 |
-| xstory_cloze/sw | MultipleChoice | [juletxara/xstory_cloze](https://hf.co/datasets/juletxara/xstory_cloze) | sw | Which ending continues the story? | inputs=fn, labels=fn, choice0=sentence_quiz1, choice1=sentence_quiz2 |
-| xstory_cloze/id | MultipleChoice | [juletxara/xstory_cloze](https://hf.co/datasets/juletxara/xstory_cloze) | id | Which ending continues the story? | inputs=fn, labels=fn, choice0=sentence_quiz1, choice1=sentence_quiz2 |
-| xstory_cloze/ar | MultipleChoice | [juletxara/xstory_cloze](https://hf.co/datasets/juletxara/xstory_cloze) | ar | Which ending continues the story? | inputs=fn, labels=fn, choice0=sentence_quiz1, choice1=sentence_quiz2 |
-| xstory_cloze/es | MultipleChoice | [juletxara/xstory_cloze](https://hf.co/datasets/juletxara/xstory_cloze) | es | Which ending continues the story? | inputs=fn, labels=fn, choice0=sentence_quiz1, choice1=sentence_quiz2 |
-| xstory_cloze/zh | MultipleChoice | [juletxara/xstory_cloze](https://hf.co/datasets/juletxara/xstory_cloze) | zh | Which ending continues the story? | inputs=fn, labels=fn, choice0=sentence_quiz1, choice1=sentence_quiz2 |
-| xstory_cloze/ru | MultipleChoice | [juletxara/xstory_cloze](https://hf.co/datasets/juletxara/xstory_cloze) | ru | Which ending continues the story? | inputs=fn, labels=fn, choice0=sentence_quiz1, choice1=sentence_quiz2 |
-| xstory_cloze/en | MultipleChoice | [juletxara/xstory_cloze](https://hf.co/datasets/juletxara/xstory_cloze) | en | Which ending continues the story? | inputs=fn, labels=fn, choice0=sentence_quiz1, choice1=sentence_quiz2 |
-| disrpt/eus.rst.ert.rels | Classification | [multilingual-discourse-hub/disrpt](https://hf.co/datasets/multilingual-discourse-hub/disrpt) | eus.rst.ert.rels |  | sentence1=unit1_txt, sentence2=unit2_txt, labels=label |
-| disrpt/deu.rst.pcc.rels | Classification | [multilingual-discourse-hub/disrpt](https://hf.co/datasets/multilingual-discourse-hub/disrpt) | deu.rst.pcc.rels |  | sentence1=unit1_txt, sentence2=unit2_txt, labels=label |
-| disrpt/fas.rst.prstc.rels | Classification | [multilingual-discourse-hub/disrpt](https://hf.co/datasets/multilingual-discourse-hub/disrpt) | fas.rst.prstc.rels |  | sentence1=unit1_txt, sentence2=unit2_txt, labels=label |
-| disrpt/fra.sdrt.annodis.rels | Classification | [multilingual-discourse-hub/disrpt](https://hf.co/datasets/multilingual-discourse-hub/disrpt) | fra.sdrt.annodis.rels |  | sentence1=unit1_txt, sentence2=unit2_txt, labels=label |
-| disrpt/nld.rst.nldt.rels | Classification | [multilingual-discourse-hub/disrpt](https://hf.co/datasets/multilingual-discourse-hub/disrpt) | nld.rst.nldt.rels |  | sentence1=unit1_txt, sentence2=unit2_txt, labels=label |
-| disrpt/por.rst.cstn.rels | Classification | [multilingual-discourse-hub/disrpt](https://hf.co/datasets/multilingual-discourse-hub/disrpt) | por.rst.cstn.rels |  | sentence1=unit1_txt, sentence2=unit2_txt, labels=label |
-| disrpt/rus.rst.rrt.rels | Classification | [multilingual-discourse-hub/disrpt](https://hf.co/datasets/multilingual-discourse-hub/disrpt) | rus.rst.rrt.rels |  | sentence1=unit1_txt, sentence2=unit2_txt, labels=label |
-| disrpt/spa.rst.rststb.rels | Classification | [multilingual-discourse-hub/disrpt](https://hf.co/datasets/multilingual-discourse-hub/disrpt) | spa.rst.rststb.rels |  | sentence1=unit1_txt, sentence2=unit2_txt, labels=label |
-| disrpt/tha.pdtb.tdtb.rels | Classification | [multilingual-discourse-hub/disrpt](https://hf.co/datasets/multilingual-discourse-hub/disrpt) | tha.pdtb.tdtb.rels |  | sentence1=unit1_txt, sentence2=unit2_txt, labels=label |
-| disrpt/zho.rst.gcdt.rels | Classification | [multilingual-discourse-hub/disrpt](https://hf.co/datasets/multilingual-discourse-hub/disrpt) | zho.rst.gcdt.rels |  | sentence1=unit1_txt, sentence2=unit2_txt, labels=label |
-| universal_dependencies/sga_dipsgg/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | sga_dipsgg |  | labels=upos, pre_process |
-| universal_dependencies/orv_torot/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | orv_torot |  | labels=upos, pre_process |
-| universal_dependencies/ang_cairo/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ang_cairo |  | labels=upos, pre_process |
-| universal_dependencies/fro_altm/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | fro_altm |  | labels=upos, pre_process |
-| universal_dependencies/oge_glc/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | oge_glc |  | labels=upos, pre_process |
-| universal_dependencies/sga_dipwbg/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | sga_dipwbg |  | labels=upos, pre_process |
-| universal_dependencies/orv_ruthenian/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | orv_ruthenian |  | labels=upos, pre_process |
-| universal_dependencies/fro_profiterole/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | fro_profiterole |  | labels=upos, pre_process |
-| universal_dependencies/orv_rnc/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | orv_rnc |  | labels=upos, pre_process |
-| universal_dependencies/kpv_ikdp/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | kpv_ikdp |  | labels=upos, pre_process |
-| universal_dependencies/cu_proiel/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | cu_proiel |  | labels=upos, pre_process |
-| universal_dependencies/or_odtb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | or_odtb |  | labels=upos, pre_process |
-| universal_dependencies/oc_ttb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | oc_ttb |  | labels=upos, pre_process |
-| universal_dependencies/no_nynorsk/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | no_nynorsk |  | labels=upos, pre_process |
-| universal_dependencies/no_bokmaal/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | no_bokmaal |  | labels=upos, pre_process |
-| universal_dependencies/pro_corag/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | pro_corag |  | labels=upos, pre_process |
-| universal_dependencies/gya_autogramm/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | gya_autogramm |  | labels=upos, pre_process |
-| universal_dependencies/kmr_kurmanji/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | kmr_kurmanji |  | labels=upos, pre_process |
-| universal_dependencies/sme_giella/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | sme_giella |  | labels=upos, pre_process |
-| universal_dependencies/orv_birchbark/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | orv_birchbark |  | labels=upos, pre_process |
-| universal_dependencies/otk_clausal/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | otk_clausal |  | labels=upos, pre_process |
-| universal_dependencies/pay_chibergis/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | pay_chibergis |  | labels=upos, pre_process |
-| universal_dependencies/ota_dudu/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ota_dudu |  | labels=upos, pre_process |
-| universal_dependencies/pt_porttinari/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | pt_porttinari |  | labels=upos, pre_process |
-| universal_dependencies/pt_petrogold/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | pt_petrogold |  | labels=upos, pre_process |
-| universal_dependencies/pt_gsd/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | pt_gsd |  | labels=upos, pre_process |
-| universal_dependencies/pt_dantestocks/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | pt_dantestocks |  | labels=upos, pre_process |
-| universal_dependencies/pt_bosque/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | pt_bosque |  | labels=upos, pre_process |
-| universal_dependencies/qpm_philotis/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | qpm_philotis |  | labels=upos, pre_process |
-| universal_dependencies/pl_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | pl_pud |  | labels=upos, pre_process |
-| universal_dependencies/pl_pdb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | pl_pdb |  | labels=upos, pre_process |
-| universal_dependencies/ota_boun/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ota_boun |  | labels=upos, pre_process |
-| universal_dependencies/pl_mpdt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | pl_mpdt |  | labels=upos, pre_process |
-| universal_dependencies/xpg_kul/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | xpg_kul |  | labels=upos, pre_process |
-| universal_dependencies/yrl_complin/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | yrl_complin |  | labels=upos, pre_process |
-| universal_dependencies/fa_seraji/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | fa_seraji |  | labels=upos, pre_process |
-| universal_dependencies/fa_perdt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | fa_perdt |  | labels=upos, pre_process |
-| universal_dependencies/pad_tuecl/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | pad_tuecl |  | labels=upos, pre_process |
-| universal_dependencies/ps_sikaram/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ps_sikaram |  | labels=upos, pre_process |
-| universal_dependencies/ps_prince/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ps_prince |  | labels=upos, pre_process |
-| universal_dependencies/ota_tuecl/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ota_tuecl |  | labels=upos, pre_process |
-| universal_dependencies/pl_lfg/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | pl_lfg |  | labels=upos, pre_process |
-| universal_dependencies/ne_bk/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ne_bk |  | labels=upos, pre_process |
-| universal_dependencies/gun_thomas/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | gun_thomas |  | labels=upos, pre_process |
-| universal_dependencies/nap_rb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | nap_rb |  | labels=upos, pre_process |
-| universal_dependencies/lij_glt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | lij_glt |  | labels=upos, pre_process |
-| universal_dependencies/lv_lvtb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | lv_lvtb |  | labels=upos, pre_process |
-| universal_dependencies/lv_cairo/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | lv_cairo |  | labels=upos, pre_process |
-| universal_dependencies/la_udante/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | la_udante |  | labels=upos, pre_process |
-| universal_dependencies/la_proiel/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | la_proiel |  | labels=upos, pre_process |
-| universal_dependencies/la_perseus/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | la_perseus |  | labels=upos, pre_process |
-| universal_dependencies/la_llct/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | la_llct |  | labels=upos, pre_process |
-| universal_dependencies/la_ittb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | la_ittb |  | labels=upos, pre_process |
-| universal_dependencies/lt_alksnis/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | lt_alksnis |  | labels=upos, pre_process |
-| universal_dependencies/la_circse/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | la_circse |  | labels=upos, pre_process |
-| universal_dependencies/ky_tuecl/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ky_tuecl |  | labels=upos, pre_process |
-| universal_dependencies/ky_ktmu/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ky_ktmu |  | labels=upos, pre_process |
-| universal_dependencies/ko_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ko_pud |  | labels=upos, pre_process |
-| universal_dependencies/ko_littleprince/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ko_littleprince |  | labels=upos, pre_process |
-| universal_dependencies/ko_ksl/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ko_ksl |  | labels=upos, pre_process |
-| universal_dependencies/ko_kaist/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ko_kaist |  | labels=upos, pre_process |
-| universal_dependencies/ko_gsd/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ko_gsd |  | labels=upos, pre_process |
-| universal_dependencies/pt_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | pt_pud |  | labels=upos, pre_process |
-| universal_dependencies/ltg_cairo/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ltg_cairo |  | labels=upos, pre_process |
-| universal_dependencies/yrk_tundra/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | yrk_tundra |  | labels=upos, pre_process |
-| universal_dependencies/lt_hse/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | lt_hse |  | labels=upos, pre_process |
-| universal_dependencies/nds_lsdc/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | nds_lsdc |  | labels=upos, pre_process |
-| universal_dependencies/pcm_nsc/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | pcm_nsc |  | labels=upos, pre_process |
-| universal_dependencies/nmf_suansu/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | nmf_suansu |  | labels=upos, pre_process |
-| universal_dependencies/myu_tudet/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | myu_tudet |  | labels=upos, pre_process |
-| universal_dependencies/mdf_jr/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | mdf_jr |  | labels=upos, pre_process |
-| universal_dependencies/frm_profiterole/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | frm_profiterole |  | labels=upos, pre_process |
-| universal_dependencies/frm_altm/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | frm_altm |  | labels=upos, pre_process |
-| universal_dependencies/axm_armtdp/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | axm_armtdp |  | labels=upos, pre_process |
-| universal_dependencies/kpv_lattice/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | kpv_lattice |  | labels=upos, pre_process |
-| universal_dependencies/olo_kkpp/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | olo_kkpp |  | labels=upos, pre_process |
-| universal_dependencies/mr_ufal/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | mr_ufal |  | labels=upos, pre_process |
-| universal_dependencies/gv_cadhan/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | gv_cadhan |  | labels=upos, pre_process |
-| universal_dependencies/mt_mudt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | mt_mudt |  | labels=upos, pre_process |
-| universal_dependencies/ml_ufal/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ml_ufal |  | labels=upos, pre_process |
-| universal_dependencies/mpu_tudet/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | mpu_tudet |  | labels=upos, pre_process |
-| universal_dependencies/qaf_arabizi/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | qaf_arabizi |  | labels=upos, pre_process |
-| universal_dependencies/jaa_jarawara/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | jaa_jarawara |  | labels=upos, pre_process |
-| universal_dependencies/mk_mtb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | mk_mtb |  | labels=upos, pre_process |
-| universal_dependencies/lb_luxbank/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | lb_luxbank |  | labels=upos, pre_process |
-| universal_dependencies/mr_cmupan/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | mr_cmupan |  | labels=upos, pre_process |
-| universal_dependencies/pa_cs/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | pa_cs |  | labels=upos, pre_process |
-| universal_dependencies/tr_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | tr_pud |  | labels=upos, pre_process |
-| universal_dependencies/ro_art/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ro_art |  | labels=upos, pre_process |
-| universal_dependencies/uk_parlamint/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | uk_parlamint |  | labels=upos, pre_process |
-| universal_dependencies/uk_iu/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | uk_iu |  | labels=upos, pre_process |
-| universal_dependencies/qtd_sagt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | qtd_sagt |  | labels=upos, pre_process |
-| universal_dependencies/qti_butr/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | qti_butr |  | labels=upos, pre_process |
-| universal_dependencies/tr_tuecl/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | tr_tuecl |  | labels=upos, pre_process |
-| universal_dependencies/tr_tourism/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | tr_tourism |  | labels=upos, pre_process |
-| universal_dependencies/koi_uh/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | koi_uh |  | labels=upos, pre_process |
-| universal_dependencies/tr_penn/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | tr_penn |  | labels=upos, pre_process |
-| universal_dependencies/xum_ikuvina/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | xum_ikuvina |  | labels=upos, pre_process |
-| universal_dependencies/tr_kenet/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | tr_kenet |  | labels=upos, pre_process |
-| universal_dependencies/tr_gb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | tr_gb |  | labels=upos, pre_process |
-| universal_dependencies/tr_framenet/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | tr_framenet |  | labels=upos, pre_process |
-| universal_dependencies/tr_boun/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | tr_boun |  | labels=upos, pre_process |
-| universal_dependencies/tr_atis/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | tr_atis |  | labels=upos, pre_process |
-| universal_dependencies/tpn_tudet/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | tpn_tudet |  | labels=upos, pre_process |
-| universal_dependencies/tn_popapolelo/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | tn_popapolelo |  | labels=upos, pre_process |
-| universal_dependencies/th_tud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | th_tud |  | labels=upos, pre_process |
-| universal_dependencies/th_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | th_pud |  | labels=upos, pre_process |
-| universal_dependencies/tr_imst/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | tr_imst |  | labels=upos, pre_process |
-| universal_dependencies/hsb_ufal/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | hsb_ufal |  | labels=upos, pre_process |
-| universal_dependencies/ur_udtb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ur_udtb |  | labels=upos, pre_process |
-| universal_dependencies/ug_udt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ug_udt |  | labels=upos, pre_process |
-| universal_dependencies/zza_zsd/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | zza_zsd |  | labels=upos, pre_process |
-| universal_dependencies/say_autogramm/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | say_autogramm |  | labels=upos, pre_process |
-| universal_dependencies/ess_sli/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ess_sli |  | labels=upos, pre_process |
-| universal_dependencies/yo_ytb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | yo_ytb |  | labels=upos, pre_process |
-| universal_dependencies/yi_yitb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | yi_yitb |  | labels=upos, pre_process |
-| universal_dependencies/sah_yktdt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | sah_yktdt |  | labels=upos, pre_process |
-| universal_dependencies/sjo_xdt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | sjo_xdt |  | labels=upos, pre_process |
-| universal_dependencies/xav_xdt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | xav_xdt |  | labels=upos, pre_process |
-| universal_dependencies/wo_wtb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | wo_wtb |  | labels=upos, pre_process |
-| universal_dependencies/nhi_mesotree/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | nhi_mesotree |  | labels=upos, pre_process |
-| universal_dependencies/hyw_armtdp/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | hyw_armtdp |  | labels=upos, pre_process |
-| universal_dependencies/cy_ccg/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | cy_ccg |  | labels=upos, pre_process |
-| universal_dependencies/wbp_ufal/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | wbp_ufal |  | labels=upos, pre_process |
-| universal_dependencies/vi_vtb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | vi_vtb |  | labels=upos, pre_process |
-| universal_dependencies/vi_tuecl/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | vi_tuecl |  | labels=upos, pre_process |
-| universal_dependencies/vep_vwt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | vep_vwt |  | labels=upos, pre_process |
-| universal_dependencies/uz_uzudt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | uz_uzudt |  | labels=upos, pre_process |
-| universal_dependencies/uz_ut/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | uz_ut |  | labels=upos, pre_process |
-| universal_dependencies/uz_tuecl/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | uz_tuecl |  | labels=upos, pre_process |
-| universal_dependencies/qte_tect/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | qte_tect |  | labels=upos, pre_process |
-| universal_dependencies/pa_rang/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | pa_rang |  | labels=upos, pre_process |
-| universal_dependencies/te_mtg/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | te_mtg |  | labels=upos, pre_process |
-| universal_dependencies/tt_nmctt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | tt_nmctt |  | labels=upos, pre_process |
-| universal_dependencies/sd_isra/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | sd_isra |  | labels=upos, pre_process |
-| universal_dependencies/scn_stb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | scn_stb |  | labels=upos, pre_process |
-| universal_dependencies/wuu_shud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | wuu_shud |  | labels=upos, pre_process |
-| universal_dependencies/sr_set/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | sr_set |  | labels=upos, pre_process |
-| universal_dependencies/gd_arcosg/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | gd_arcosg |  | labels=upos, pre_process |
-| universal_dependencies/sa_vedic/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | sa_vedic |  | labels=upos, pre_process |
-| universal_dependencies/sa_ufal/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | sa_ufal |  | labels=upos, pre_process |
-| universal_dependencies/ruc_rdt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ruc_rdt |  | labels=upos, pre_process |
-| universal_dependencies/si_appuwa/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | si_appuwa |  | labels=upos, pre_process |
-| universal_dependencies/ru_taiga/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ru_taiga |  | labels=upos, pre_process |
-| universal_dependencies/ru_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ru_pud |  | labels=upos, pre_process |
-| universal_dependencies/ru_poetry/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ru_poetry |  | labels=upos, pre_process |
-| universal_dependencies/ru_gsd/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ru_gsd |  | labels=upos, pre_process |
-| universal_dependencies/ro_tuecl/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ro_tuecl |  | labels=upos, pre_process |
-| universal_dependencies/ro_simonero/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ro_simonero |  | labels=upos, pre_process |
-| universal_dependencies/ro_rrt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ro_rrt |  | labels=upos, pre_process |
-| universal_dependencies/ro_nonstandard/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ro_nonstandard |  | labels=upos, pre_process |
-| universal_dependencies/ro_moldoro/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ro_moldoro |  | labels=upos, pre_process |
-| universal_dependencies/ru_syntagrus/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ru_syntagrus |  | labels=upos, pre_process |
-| universal_dependencies/si_stb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | si_stb |  | labels=upos, pre_process |
-| universal_dependencies/sms_giellagas/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | sms_giellagas |  | labels=upos, pre_process |
-| universal_dependencies/sk_snk/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | sk_snk |  | labels=upos, pre_process |
-| universal_dependencies/ta_ttb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ta_ttb |  | labels=upos, pre_process |
-| universal_dependencies/ta_mwtt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ta_mwtt |  | labels=upos, pre_process |
-| universal_dependencies/tl_ugnayan/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | tl_ugnayan |  | labels=upos, pre_process |
-| universal_dependencies/tl_trg/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | tl_trg |  | labels=upos, pre_process |
-| universal_dependencies/swl_sslc/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | swl_sslc |  | labels=upos, pre_process |
-| universal_dependencies/sv_talbanken/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | sv_talbanken |  | labels=upos, pre_process |
-| universal_dependencies/sv_swell/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | sv_swell |  | labels=upos, pre_process |
-| universal_dependencies/sv_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | sv_pud |  | labels=upos, pre_process |
-| universal_dependencies/sv_old/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | sv_old |  | labels=upos, pre_process |
-| universal_dependencies/sv_lines/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | sv_lines |  | labels=upos, pre_process |
-| universal_dependencies/ssp_lse/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ssp_lse |  | labels=upos, pre_process |
-| universal_dependencies/es_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | es_pud |  | labels=upos, pre_process |
-| universal_dependencies/es_gsd/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | es_gsd |  | labels=upos, pre_process |
-| universal_dependencies/es_coser/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | es_coser |  | labels=upos, pre_process |
-| universal_dependencies/es_ancora/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | es_ancora |  | labels=upos, pre_process |
-| universal_dependencies/sdh_garrusi/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | sdh_garrusi |  | labels=upos, pre_process |
-| universal_dependencies/ajp_madar/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ajp_madar |  | labels=upos, pre_process |
-| universal_dependencies/sl_sst/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | sl_sst |  | labels=upos, pre_process |
-| universal_dependencies/sl_ssj/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | sl_ssj |  | labels=upos, pre_process |
-| universal_dependencies/eme_tudet/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | eme_tudet |  | labels=upos, pre_process |
-| universal_dependencies/quc_iu/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | quc_iu |  | labels=upos, pre_process |
-| universal_dependencies/it_kiparlaforest/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | it_kiparlaforest |  | labels=upos, pre_process |
-| universal_dependencies/kk_ktb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | kk_ktb |  | labels=upos, pre_process |
-| universal_dependencies/cs_pdtc/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | cs_pdtc |  | labels=upos, pre_process |
-| universal_dependencies/cs_fictree/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | cs_fictree |  | labels=upos, pre_process |
-| universal_dependencies/cs_cltt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | cs_cltt |  | labels=upos, pre_process |
-| universal_dependencies/cs_cac/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | cs_cac |  | labels=upos, pre_process |
-| universal_dependencies/hr_set/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | hr_set |  | labels=upos, pre_process |
-| universal_dependencies/cop_scriptorium/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | cop_scriptorium |  | labels=upos, pre_process |
-| universal_dependencies/cop_bohairic/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | cop_bohairic |  | labels=upos, pre_process |
-| universal_dependencies/lzh_tuecl/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | lzh_tuecl |  | labels=upos, pre_process |
-| universal_dependencies/lzh_kyoto/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | lzh_kyoto |  | labels=upos, pre_process |
-| universal_dependencies/xcl_caval/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | xcl_caval |  | labels=upos, pre_process |
-| universal_dependencies/ckt_hse/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ckt_hse |  | labels=upos, pre_process |
-| universal_dependencies/ctn_ctntb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ctn_ctntb |  | labels=upos, pre_process |
-| universal_dependencies/zh_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | zh_pud |  | labels=upos, pre_process |
-| universal_dependencies/zh_patentchar/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | zh_patentchar |  | labels=upos, pre_process |
-| universal_dependencies/zh_hk/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | zh_hk |  | labels=upos, pre_process |
-| universal_dependencies/zh_gsdsimp/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | zh_gsdsimp |  | labels=upos, pre_process |
-| universal_dependencies/naq_kdt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | naq_kdt |  | labels=upos, pre_process |
-| universal_dependencies/cs_poetry/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | cs_poetry |  | labels=upos, pre_process |
-| universal_dependencies/cs_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | cs_pud |  | labels=upos, pre_process |
-| universal_dependencies/da_ddt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | da_ddt |  | labels=upos, pre_process |
-| universal_dependencies/nl_alpino/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | nl_alpino |  | labels=upos, pre_process |
-| universal_dependencies/eo_prago/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | eo_prago |  | labels=upos, pre_process |
-| universal_dependencies/eo_cairo/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | eo_cairo |  | labels=upos, pre_process |
-| universal_dependencies/myv_jr/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | myv_jr |  | labels=upos, pre_process |
-| universal_dependencies/en_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | en_pud |  | labels=upos, pre_process |
-| universal_dependencies/en_pronouns/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | en_pronouns |  | labels=upos, pre_process |
-| universal_dependencies/en_partut/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | en_partut |  | labels=upos, pre_process |
-| universal_dependencies/en_littleprince/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | en_littleprince |  | labels=upos, pre_process |
-| universal_dependencies/en_lines/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | en_lines |  | labels=upos, pre_process |
-| universal_dependencies/zh_cfl/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | zh_cfl |  | labels=upos, pre_process |
-| universal_dependencies/en_gumreddit/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | en_gumreddit |  | labels=upos, pre_process |
-| universal_dependencies/en_gentle/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | en_gentle |  | labels=upos, pre_process |
-| universal_dependencies/en_ewt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | en_ewt |  | labels=upos, pre_process |
-| universal_dependencies/en_eslspok/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | en_eslspok |  | labels=upos, pre_process |
-| universal_dependencies/en_ctetex/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | en_ctetex |  | labels=upos, pre_process |
-| universal_dependencies/en_childes/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | en_childes |  | labels=upos, pre_process |
-| universal_dependencies/en_atis/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | en_atis |  | labels=upos, pre_process |
-| universal_dependencies/egy_pc/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | egy_pc |  | labels=upos, pre_process |
-| universal_dependencies/nl_lassysmall/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | nl_lassysmall |  | labels=upos, pre_process |
-| universal_dependencies/en_gum/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | en_gum |  | labels=upos, pre_process |
-| universal_dependencies/zh_beginner/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | zh_beginner |  | labels=upos, pre_process |
-| universal_dependencies/ckb_mukri/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ckb_mukri |  | labels=upos, pre_process |
-| universal_dependencies/ceb_gja/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ceb_gja |  | labels=upos, pre_process |
-| universal_dependencies/ar_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ar_pud |  | labels=upos, pre_process |
-| universal_dependencies/ar_padt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ar_padt |  | labels=upos, pre_process |
-| universal_dependencies/apu_ufpa/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | apu_ufpa |  | labels=upos, pre_process |
-| universal_dependencies/hbo_ptnk/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | hbo_ptnk |  | labels=upos, pre_process |
-| universal_dependencies/grc_ptnk/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | grc_ptnk |  | labels=upos, pre_process |
-| universal_dependencies/grc_proiel/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | grc_proiel |  | labels=upos, pre_process |
-| universal_dependencies/grc_perseus/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | grc_perseus |  | labels=upos, pre_process |
-| universal_dependencies/am_att/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | am_att |  | labels=upos, pre_process |
-| universal_dependencies/hy_armtdp/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | hy_armtdp |  | labels=upos, pre_process |
-| universal_dependencies/gsw_uzh/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | gsw_uzh |  | labels=upos, pre_process |
-| universal_dependencies/sq_tsa/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | sq_tsa |  | labels=upos, pre_process |
-| universal_dependencies/sq_staf/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | sq_staf |  | labels=upos, pre_process |
-| universal_dependencies/aqz_tudet/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | aqz_tudet |  | labels=upos, pre_process |
-| universal_dependencies/akk_riao/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | akk_riao |  | labels=upos, pre_process |
-| universal_dependencies/akk_pisandub/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | akk_pisandub |  | labels=upos, pre_process |
-| universal_dependencies/af_afribooms/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | af_afribooms |  | labels=upos, pre_process |
-| universal_dependencies/ab_abnc/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ab_abnc |  | labels=upos, pre_process |
-| universal_dependencies/abq_atb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | abq_atb |  | labels=upos, pre_process |
-| universal_dependencies/gsw_divital/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | gsw_divital |  | labels=upos, pre_process |
-| universal_dependencies/et_edt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | et_edt |  | labels=upos, pre_process |
-| universal_dependencies/hy_bsut/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | hy_bsut |  | labels=upos, pre_process |
-| universal_dependencies/aii_as/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | aii_as |  | labels=upos, pre_process |
-| universal_dependencies/ca_ancora/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ca_ancora |  | labels=upos, pre_process |
-| universal_dependencies/cpg_tuecl/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | cpg_tuecl |  | labels=upos, pre_process |
-| universal_dependencies/cpg_amgic/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | cpg_amgic |  | labels=upos, pre_process |
-| universal_dependencies/yue_hk/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | yue_hk |  | labels=upos, pre_process |
-| universal_dependencies/bxr_bdt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | bxr_bdt |  | labels=upos, pre_process |
-| universal_dependencies/bg_btb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | bg_btb |  | labels=upos, pre_process |
-| universal_dependencies/br_keb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | br_keb |  | labels=upos, pre_process |
-| universal_dependencies/brh_kholum/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | brh_kholum |  | labels=upos, pre_process |
-| universal_dependencies/as_aiw/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | as_aiw |  | labels=upos, pre_process |
-| universal_dependencies/bor_bdt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | bor_bdt |  | labels=upos, pre_process |
-| universal_dependencies/bho_bhtb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | bho_bhtb |  | labels=upos, pre_process |
-| universal_dependencies/bn_bru/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | bn_bru |  | labels=upos, pre_process |
-| universal_dependencies/be_hse/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | be_hse |  | labels=upos, pre_process |
-| universal_dependencies/bej_autogramm/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | bej_autogramm |  | labels=upos, pre_process |
-| universal_dependencies/bar_maibaam/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | bar_maibaam |  | labels=upos, pre_process |
-| universal_dependencies/eu_bdt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | eu_bdt |  | labels=upos, pre_process |
-| universal_dependencies/bm_crb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | bm_crb |  | labels=upos, pre_process |
-| universal_dependencies/az_tuecl/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | az_tuecl |  | labels=upos, pre_process |
-| universal_dependencies/sab_chibergis/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | sab_chibergis |  | labels=upos, pre_process |
-| universal_dependencies/et_ewt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | et_ewt |  | labels=upos, pre_process |
-| universal_dependencies/zh_gsd/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | zh_gsd |  | labels=upos, pre_process |
-| universal_dependencies/fo_oft/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | fo_oft |  | labels=upos, pre_process |
-| universal_dependencies/ga_idt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ga_idt |  | labels=upos, pre_process |
-| universal_dependencies/ga_cadhan/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ga_cadhan |  | labels=upos, pre_process |
-| universal_dependencies/id_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | id_pud |  | labels=upos, pre_process |
-| universal_dependencies/id_gsd/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | id_gsd |  | labels=upos, pre_process |
-| universal_dependencies/id_csui/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | id_csui |  | labels=upos, pre_process |
-| universal_dependencies/arh_chibergis/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | arh_chibergis |  | labels=upos, pre_process |
-| universal_dependencies/is_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | is_pud |  | labels=upos, pre_process |
-| universal_dependencies/is_modern/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | is_modern |  | labels=upos, pre_process |
-| universal_dependencies/is_icepahc/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | is_icepahc |  | labels=upos, pre_process |
-| universal_dependencies/is_gc/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | is_gc |  | labels=upos, pre_process |
-| universal_dependencies/hu_szeged/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | hu_szeged |  | labels=upos, pre_process |
-| universal_dependencies/hit_hittb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | hit_hittb |  | labels=upos, pre_process |
-| universal_dependencies/hi_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | hi_pud |  | labels=upos, pre_process |
-| universal_dependencies/hi_hdtb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | hi_hdtb |  | labels=upos, pre_process |
-| universal_dependencies/azz_itml/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | azz_itml |  | labels=upos, pre_process |
-| universal_dependencies/he_postrab/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | he_postrab |  | labels=upos, pre_process |
-| universal_dependencies/he_iahltwiki/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | he_iahltwiki |  | labels=upos, pre_process |
-| universal_dependencies/ga_twittirish/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ga_twittirish |  | labels=upos, pre_process |
-| universal_dependencies/it_isdt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | it_isdt |  | labels=upos, pre_process |
-| universal_dependencies/it_markit/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | it_markit |  | labels=upos, pre_process |
-| universal_dependencies/it_old/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | it_old |  | labels=upos, pre_process |
-| universal_dependencies/arr_tudet/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | arr_tudet |  | labels=upos, pre_process |
-| universal_dependencies/fo_farpahc/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | fo_farpahc |  | labels=upos, pre_process |
-| universal_dependencies/xnr_kdtb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | xnr_kdtb |  | labels=upos, pre_process |
-| universal_dependencies/kbc_unicamp/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | kbc_unicamp |  | labels=upos, pre_process |
-| universal_dependencies/urb_tudet/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | urb_tudet |  | labels=upos, pre_process |
-| universal_dependencies/jv_csui/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | jv_csui |  | labels=upos, pre_process |
-| universal_dependencies/ja_pudluw/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ja_pudluw |  | labels=upos, pre_process |
-| universal_dependencies/ja_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ja_pud |  | labels=upos, pre_process |
-| universal_dependencies/he_iahltknesset/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | he_iahltknesset |  | labels=upos, pre_process |
-| universal_dependencies/ja_gsdluw/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ja_gsdluw |  | labels=upos, pre_process |
-| universal_dependencies/ja_bccwjluw/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ja_bccwjluw |  | labels=upos, pre_process |
-| universal_dependencies/it_vit/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | it_vit |  | labels=upos, pre_process |
-| universal_dependencies/it_valico/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | it_valico |  | labels=upos, pre_process |
-| universal_dependencies/it_twittiro/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | it_twittiro |  | labels=upos, pre_process |
-| universal_dependencies/it_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | it_pud |  | labels=upos, pre_process |
-| universal_dependencies/it_postwita/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | it_postwita |  | labels=upos, pre_process |
-| universal_dependencies/it_partut/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | it_partut |  | labels=upos, pre_process |
-| universal_dependencies/it_parlamint/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | it_parlamint |  | labels=upos, pre_process |
-| universal_dependencies/ja_gsd/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ja_gsd |  | labels=upos, pre_process |
-| universal_dependencies/he_htb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | he_htb |  | labels=upos, pre_process |
-| universal_dependencies/krl_kkpp/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | krl_kkpp |  | labels=upos, pre_process |
-| universal_dependencies/ha_southernautogramm/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ha_southernautogramm |  | labels=upos, pre_process |
-| universal_dependencies/gl_treegal/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | gl_treegal |  | labels=upos, pre_process |
-| universal_dependencies/gl_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | gl_pud |  | labels=upos, pre_process |
-| universal_dependencies/gl_ctg/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | gl_ctg |  | labels=upos, pre_process |
-| universal_dependencies/qfn_fame/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | qfn_fame |  | labels=upos, pre_process |
-| universal_dependencies/fr_sequoia/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | fr_sequoia |  | labels=upos, pre_process |
-| universal_dependencies/fr_rhapsodie/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | fr_rhapsodie |  | labels=upos, pre_process |
-| universal_dependencies/fr_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | fr_pud |  | labels=upos, pre_process |
-| universal_dependencies/fr_poitevindivital/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | fr_poitevindivital |  | labels=upos, pre_process |
-| universal_dependencies/ka_glc/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ka_glc |  | labels=upos, pre_process |
-| universal_dependencies/fr_partut/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | fr_partut |  | labels=upos, pre_process |
-| universal_dependencies/fr_gsd/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | fr_gsd |  | labels=upos, pre_process |
-| universal_dependencies/fr_fqb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | fr_fqb |  | labels=upos, pre_process |
-| universal_dependencies/fr_alts/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | fr_alts |  | labels=upos, pre_process |
-| universal_dependencies/fi_tdt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | fi_tdt |  | labels=upos, pre_process |
-| universal_dependencies/fi_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | fi_pud |  | labels=upos, pre_process |
-| universal_dependencies/fi_ood/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | fi_ood |  | labels=upos, pre_process |
-| universal_dependencies/fi_ftb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | fi_ftb |  | labels=upos, pre_process |
-| universal_dependencies/ha_westernautogramm/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ha_westernautogramm |  | labels=upos, pre_process |
-| universal_dependencies/fr_parisstories/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | fr_parisstories |  | labels=upos, pre_process |
-| universal_dependencies/de_gsd/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | de_gsd |  | labels=upos, pre_process |
-| universal_dependencies/ka_gnc/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ka_gnc |  | labels=upos, pre_process |
-| universal_dependencies/el_messinian/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | el_messinian |  | labels=upos, pre_process |
-| universal_dependencies/ht_autogramm/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ht_autogramm |  | labels=upos, pre_process |
-| universal_dependencies/ht_adolphe/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ht_adolphe |  | labels=upos, pre_process |
-| universal_dependencies/gwi_tuecl/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | gwi_tuecl |  | labels=upos, pre_process |
-| universal_dependencies/gu_gujtb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | gu_gujtb |  | labels=upos, pre_process |
-| universal_dependencies/gn_oldtudet/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | gn_oldtudet |  | labels=upos, pre_process |
-| universal_dependencies/gub_tudet/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | gub_tudet |  | labels=upos, pre_process |
-| universal_dependencies/de_hdt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | de_hdt |  | labels=upos, pre_process |
-| universal_dependencies/el_lesbian/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | el_lesbian |  | labels=upos, pre_process |
-| universal_dependencies/el_gud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | el_gud |  | labels=upos, pre_process |
-| universal_dependencies/el_glcii/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | el_glcii |  | labels=upos, pre_process |
-| universal_dependencies/el_gdt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | el_gdt |  | labels=upos, pre_process |
-| universal_dependencies/el_cretan/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | el_cretan |  | labels=upos, pre_process |
-| universal_dependencies/got_proiel/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | got_proiel |  | labels=upos, pre_process |
-| universal_dependencies/gor_bungololombi/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | gor_bungololombi |  | labels=upos, pre_process |
-| universal_dependencies/aln_gps/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | aln_gps |  | labels=upos, pre_process |
-| universal_dependencies/de_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | de_pud |  | labels=upos, pre_process |
-| universal_dependencies/de_lit/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | de_lit |  | labels=upos, pre_process |
-| universal_dependencies/ha_easternautogramm/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ha_easternautogramm |  | labels=upos, pre_process |
-| universal_dependencies/ha_northernautogramm/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ha_northernautogramm |  | labels=upos, pre_process |
-| oasst1_pairwise_rlhf_reward | MultipleChoice | [tasksource/oasst1_pairwise_rlhf_reward](https://hf.co/datasets/tasksource/oasst1_pairwise_rlhf_reward) |  | Which reply is better? | inputs=prompt, labels=fn, choice0=chosen, choice1=rejected |
-| multilingual-sentiments/all | Classification | [tasksource/multilingual-sentiments](https://hf.co/datasets/tasksource/multilingual-sentiments) |  |  | sentence1=text, labels=label, pre_process |
-| tweet_sentiment_multilingual | Classification | json |  |  | sentence1=text, labels=fn |
-| amazon_reviews_multi/all_languages | Classification | [goosmanlei/amazon_reviews_multi](https://hf.co/datasets/goosmanlei/amazon_reviews_multi) | all_languages |  | sentence1=review_body, labels=stars, label_values={…} |
-| universal-joy | Classification | [tasksource/universal-joy](https://hf.co/datasets/tasksource/universal-joy) |  |  | sentence1=text, labels=emotion |
-| mms | Classification | parquet |  |  | sentence1=text, labels=label, pre_process |
-| mapa/coarse_grained | TokenClassification | [joelito/mapa](https://hf.co/datasets/joelito/mapa) |  |  | labels=coarse_grained |
-| mapa/fine_grained | TokenClassification | [joelito/mapa](https://hf.co/datasets/joelito/mapa) |  |  | labels=fine_grained |
-| massive | Classification | [mteb/MassiveIntentClassification](https://hf.co/datasets/mteb/MassiveIntentClassification) | en |  | sentence1=text, labels=label |
-| masakhanews/yor | Classification | [masakhane/masakhanews](https://hf.co/datasets/masakhane/masakhanews) | yor |  | sentence1=headline, labels=category |
-| masakhanews/xho | Classification | [masakhane/masakhanews](https://hf.co/datasets/masakhane/masakhanews) | xho |  | sentence1=headline, labels=category |
-| masakhanews/tir | Classification | [masakhane/masakhanews](https://hf.co/datasets/masakhane/masakhanews) | tir |  | sentence1=headline, labels=category |
-| masakhanews/swa | Classification | [masakhane/masakhanews](https://hf.co/datasets/masakhane/masakhanews) | swa |  | sentence1=headline, labels=category |
-| masakhanews/som | Classification | [masakhane/masakhanews](https://hf.co/datasets/masakhane/masakhanews) | som |  | sentence1=headline, labels=category |
-| masakhanews/sna | Classification | [masakhane/masakhanews](https://hf.co/datasets/masakhane/masakhanews) | sna |  | sentence1=headline, labels=category |
-| masakhanews/pcm | Classification | [masakhane/masakhanews](https://hf.co/datasets/masakhane/masakhanews) | pcm |  | sentence1=headline, labels=category |
-| masakhanews/orm | Classification | [masakhane/masakhanews](https://hf.co/datasets/masakhane/masakhanews) | orm |  | sentence1=headline, labels=category |
-| masakhanews/lug | Classification | [masakhane/masakhanews](https://hf.co/datasets/masakhane/masakhanews) | lug |  | sentence1=headline, labels=category |
-| masakhanews/lin | Classification | [masakhane/masakhanews](https://hf.co/datasets/masakhane/masakhanews) | lin |  | sentence1=headline, labels=category |
-| masakhanews/ibo | Classification | [masakhane/masakhanews](https://hf.co/datasets/masakhane/masakhanews) | ibo |  | sentence1=headline, labels=category |
-| masakhanews/hau | Classification | [masakhane/masakhanews](https://hf.co/datasets/masakhane/masakhanews) | hau |  | sentence1=headline, labels=category |
-| masakhanews/fra | Classification | [masakhane/masakhanews](https://hf.co/datasets/masakhane/masakhanews) | fra |  | sentence1=headline, labels=category |
-| masakhanews/eng | Classification | [masakhane/masakhanews](https://hf.co/datasets/masakhane/masakhanews) | eng |  | sentence1=headline, labels=category |
-| masakhanews/run | Classification | [masakhane/masakhanews](https://hf.co/datasets/masakhane/masakhanews) | run |  | sentence1=headline, labels=category |
-| masakhanews/amh | Classification | [masakhane/masakhanews](https://hf.co/datasets/masakhane/masakhanews) | amh |  | sentence1=headline, labels=category |
-| NusaX-senti/sun | Classification | [mteb/NusaX-senti](https://hf.co/datasets/mteb/NusaX-senti) | sun |  | sentence1=text, labels=fn |
-| NusaX-senti/ban | Classification | [mteb/NusaX-senti](https://hf.co/datasets/mteb/NusaX-senti) | ban |  | sentence1=text, labels=fn |
-| NusaX-senti/nij | Classification | [mteb/NusaX-senti](https://hf.co/datasets/mteb/NusaX-senti) | nij |  | sentence1=text, labels=fn |
-| NusaX-senti/min | Classification | [mteb/NusaX-senti](https://hf.co/datasets/mteb/NusaX-senti) | min |  | sentence1=text, labels=fn |
-| NusaX-senti/mad | Classification | [mteb/NusaX-senti](https://hf.co/datasets/mteb/NusaX-senti) | mad |  | sentence1=text, labels=fn |
-| NusaX-senti/jav | Classification | [mteb/NusaX-senti](https://hf.co/datasets/mteb/NusaX-senti) | jav |  | sentence1=text, labels=fn |
-| NusaX-senti/ind | Classification | [mteb/NusaX-senti](https://hf.co/datasets/mteb/NusaX-senti) | ind |  | sentence1=text, labels=fn |
-| NusaX-senti/eng | Classification | [mteb/NusaX-senti](https://hf.co/datasets/mteb/NusaX-senti) | eng |  | sentence1=text, labels=fn |
-| NusaX-senti/bug | Classification | [mteb/NusaX-senti](https://hf.co/datasets/mteb/NusaX-senti) | bug |  | sentence1=text, labels=fn |
-| NusaX-senti/bjn | Classification | [mteb/NusaX-senti](https://hf.co/datasets/mteb/NusaX-senti) | bjn |  | sentence1=text, labels=fn |
-| NusaX-senti/ace | Classification | [mteb/NusaX-senti](https://hf.co/datasets/mteb/NusaX-senti) | ace |  | sentence1=text, labels=fn |
-| NusaX-senti/bbc | Classification | [mteb/NusaX-senti](https://hf.co/datasets/mteb/NusaX-senti) | bbc |  | sentence1=text, labels=fn |
-| AfriSenti-twitter-sentiment/yor | Classification | [mteb/AfriSentiClassification](https://hf.co/datasets/mteb/AfriSentiClassification) | yor |  | sentence1=text, labels=fn |
-| AfriSenti-twitter-sentiment/ary | Classification | [mteb/AfriSentiClassification](https://hf.co/datasets/mteb/AfriSentiClassification) | ary |  | sentence1=text, labels=fn |
-| AfriSenti-twitter-sentiment/hau | Classification | [mteb/AfriSentiClassification](https://hf.co/datasets/mteb/AfriSentiClassification) | hau |  | sentence1=text, labels=fn |
-| AfriSenti-twitter-sentiment/ibo | Classification | [mteb/AfriSentiClassification](https://hf.co/datasets/mteb/AfriSentiClassification) | ibo |  | sentence1=text, labels=fn |
-| AfriSenti-twitter-sentiment/arq | Classification | [mteb/AfriSentiClassification](https://hf.co/datasets/mteb/AfriSentiClassification) | arq |  | sentence1=text, labels=fn |
-| AfriSenti-twitter-sentiment/kin | Classification | [mteb/AfriSentiClassification](https://hf.co/datasets/mteb/AfriSentiClassification) | kin |  | sentence1=text, labels=fn |
-| AfriSenti-twitter-sentiment/pcm | Classification | [mteb/AfriSentiClassification](https://hf.co/datasets/mteb/AfriSentiClassification) | pcm |  | sentence1=text, labels=fn |
-| AfriSenti-twitter-sentiment/por | Classification | [mteb/AfriSentiClassification](https://hf.co/datasets/mteb/AfriSentiClassification) | por |  | sentence1=text, labels=fn |
-| AfriSenti-twitter-sentiment/swa | Classification | [mteb/AfriSentiClassification](https://hf.co/datasets/mteb/AfriSentiClassification) | swa |  | sentence1=text, labels=fn |
-| AfriSenti-twitter-sentiment/tso | Classification | [mteb/AfriSentiClassification](https://hf.co/datasets/mteb/AfriSentiClassification) | tso |  | sentence1=text, labels=fn |
-| AfriSenti-twitter-sentiment/twi | Classification | [mteb/AfriSentiClassification](https://hf.co/datasets/mteb/AfriSentiClassification) | twi |  | sentence1=text, labels=fn |
-| AfriSenti-twitter-sentiment/amh | Classification | [mteb/AfriSentiClassification](https://hf.co/datasets/mteb/AfriSentiClassification) | amh |  | sentence1=text, labels=fn |
-| clue/ocnli | Classification | [clue/clue](https://hf.co/datasets/clue/clue) | ocnli |  | labels=label, splits=[train, validation, None] |
-| clue/afqmc | Classification | [clue/clue](https://hf.co/datasets/clue/clue) | afqmc |  | labels=label, splits=[train, validation, None], label_values={…} |
-| clue/tnews | Classification | [clue/clue](https://hf.co/datasets/clue/clue) | tnews |  | sentence1=sentence, labels=label, splits=[train, validation, None], label_values={…} |
-| klue/nli | Classification | [klue/klue](https://hf.co/datasets/klue/klue) | nli |  | sentence1=premise, sentence2=hypothesis, labels=label, splits=[train, validation, None] |
-| klue/ynat | Classification | [klue/klue](https://hf.co/datasets/klue/klue) | ynat |  | sentence1=title, labels=label, splits=[train, validation, None], label_values={…} |
-| klue/sts | Classification | [klue/klue](https://hf.co/datasets/klue/klue) | sts |  | labels=fn, splits=[train, validation, None], label_values={…} |
-| indic_glue/iitp-mr.hi/sentiment | Classification | [ai4bharat/indic_glue](https://hf.co/datasets/ai4bharat/indic_glue) | iitp-mr.hi |  | sentence1=text, labels=label_text, pre_process |
-| indic_glue/actsa-sc.te/sentiment | Classification | [ai4bharat/indic_glue](https://hf.co/datasets/ai4bharat/indic_glue) | actsa-sc.te |  | sentence1=text, labels=label_text, pre_process |
-| indic_glue/iitp-pr.hi/sentiment | Classification | [ai4bharat/indic_glue](https://hf.co/datasets/ai4bharat/indic_glue) | iitp-pr.hi |  | sentence1=text, labels=label_text, pre_process |
-| indic_glue/inltkh.te/sentiment | Classification | [ai4bharat/indic_glue](https://hf.co/datasets/ai4bharat/indic_glue) | inltkh.te |  | sentence1=text, labels=label_text, pre_process |
-| indic_glue/sna.bn/news | Classification | [ai4bharat/indic_glue](https://hf.co/datasets/ai4bharat/indic_glue) | sna.bn |  | sentence1=text, labels=label |
-| indic_glue/bbca.hi/news | Classification | [ai4bharat/indic_glue](https://hf.co/datasets/ai4bharat/indic_glue) | bbca.hi |  | sentence1=text, labels=label |
-| indic_glue/inltkh | Classification | parquet |  |  | sentence1=text, labels=label_text, pre_process |
-| indic_glue/md.hi/discourse_mode | Classification | [ai4bharat/indic_glue](https://hf.co/datasets/ai4bharat/indic_glue) | md.hi |  | sentence1=sentence, labels=discourse_mode |
-| indic_glue/wstp | MultipleChoice | parquet |  | Which title fits this section? | inputs=sectionText, labels=fn, choice0=titleA, choice1=titleB, choice2=titleC, choice3=titleD |
-| tydi-as2-balanced | Classification | [tasksource/tydi-as2-balanced](https://hf.co/datasets/tasksource/tydi-as2-balanced) |  |  | sentence1=Question, sentence2=Sentence, labels=Label |
-| conll2002/nl | TokenClassification | parquet | nl |  | labels=ner_tags |
-| conll2002/es | TokenClassification | parquet | es |  | labels=ner_tags |
-| multiconer_v2/Italian (IT) | TokenClassification | parquet | Italian (IT) |  | labels=ner_tags_index |
-| multiconer_v2/Swedish (SV) | TokenClassification | parquet | Swedish (SV) |  | labels=ner_tags_index |
-| multiconer_v2/Spanish (ES) | TokenClassification | parquet | Spanish (ES) |  | labels=ner_tags_index |
-| multiconer_v2/Ukrainian (UK) | TokenClassification | parquet | Ukrainian (UK) |  | labels=ner_tags_index |
-| multiconer_v2/Hindi (HI) | TokenClassification | parquet | Hindi (HI) |  | labels=ner_tags_index |
-| multiconer_v2/Bangla (BN) | TokenClassification | parquet | Bangla (BN) |  | labels=ner_tags_index |
-| multiconer_v2/French (FR) | TokenClassification | parquet | French (FR) |  | labels=ner_tags_index |
-| multiconer_v2/Farsi (FA) | TokenClassification | parquet | Farsi (FA) |  | labels=ner_tags_index |
-| multiconer_v2/English (EN) | TokenClassification | parquet | English (EN) |  | labels=ner_tags_index |
-| multiconer_v2/Chinese (ZH) | TokenClassification | parquet | Chinese (ZH) |  | labels=ner_tags_index |
-| multiconer_v2/German (DE) | TokenClassification | parquet | German (DE) |  | labels=ner_tags_index |
-| multiconer_v2/Portuguese (PT) | TokenClassification | parquet | Portuguese (PT) |  | labels=ner_tags_index |
-| mtop | Classification | [tasksource/mtop](https://hf.co/datasets/tasksource/mtop) |  |  | sentence1=question, labels=intent |
-| multilingual-zero-shot-label-nli | Classification | [tasksource/multilingual-zero-shot-label-nli](https://hf.co/datasets/tasksource/multilingual-zero-shot-label-nli) |  |  | sentence1=premise, sentence2=hypothesis |
+| id | type | dataset | question |
+|---|---|---|---|
+| multilingual-NLI-26lang-2mil7 | Classification | [MoritzLaurer/multilingual-NLI-26lang-2mil7](https://hf.co/datasets/MoritzLaurer/multilingual-NLI-26lang-2mil7) |  |
+| xnli | Classification | [facebook/xnli](https://hf.co/datasets/facebook/xnli) |  |
+| americas_nli/all_languages | Classification | [nala-cub/americas_nli](https://hf.co/datasets/nala-cub/americas_nli) |  |
+| stsb_multi_mt/es | Classification | [PhilipMay/stsb_multi_mt](https://hf.co/datasets/PhilipMay/stsb_multi_mt) | How similar are the two sentences, from 0 (unrelated) to 1 (equivalent)? |
+| stsb_multi_mt/de | Classification | [PhilipMay/stsb_multi_mt](https://hf.co/datasets/PhilipMay/stsb_multi_mt) | How similar are the two sentences, from 0 (unrelated) to 1 (equivalent)? |
+| stsb_multi_mt/it | Classification | [PhilipMay/stsb_multi_mt](https://hf.co/datasets/PhilipMay/stsb_multi_mt) | How similar are the two sentences, from 0 (unrelated) to 1 (equivalent)? |
+| stsb_multi_mt/fr | Classification | [PhilipMay/stsb_multi_mt](https://hf.co/datasets/PhilipMay/stsb_multi_mt) | How similar are the two sentences, from 0 (unrelated) to 1 (equivalent)? |
+| stsb_multi_mt/pl | Classification | [PhilipMay/stsb_multi_mt](https://hf.co/datasets/PhilipMay/stsb_multi_mt) | How similar are the two sentences, from 0 (unrelated) to 1 (equivalent)? |
+| stsb_multi_mt/pt | Classification | [PhilipMay/stsb_multi_mt](https://hf.co/datasets/PhilipMay/stsb_multi_mt) | How similar are the two sentences, from 0 (unrelated) to 1 (equivalent)? |
+| stsb_multi_mt/ru | Classification | [PhilipMay/stsb_multi_mt](https://hf.co/datasets/PhilipMay/stsb_multi_mt) | How similar are the two sentences, from 0 (unrelated) to 1 (equivalent)? |
+| stsb_multi_mt/zh | Classification | [PhilipMay/stsb_multi_mt](https://hf.co/datasets/PhilipMay/stsb_multi_mt) | How similar are the two sentences, from 0 (unrelated) to 1 (equivalent)? |
+| stsb_multi_mt/nl | Classification | [PhilipMay/stsb_multi_mt](https://hf.co/datasets/PhilipMay/stsb_multi_mt) | How similar are the two sentences, from 0 (unrelated) to 1 (equivalent)? |
+| stsb_multi_mt/en | Classification | [PhilipMay/stsb_multi_mt](https://hf.co/datasets/PhilipMay/stsb_multi_mt) | How similar are the two sentences, from 0 (unrelated) to 1 (equivalent)? |
+| paws-x/fr | Classification | [google-research-datasets/paws-x](https://hf.co/datasets/google-research-datasets/paws-x) |  |
+| paws-x/ja | Classification | [google-research-datasets/paws-x](https://hf.co/datasets/google-research-datasets/paws-x) |  |
+| paws-x/ko | Classification | [google-research-datasets/paws-x](https://hf.co/datasets/google-research-datasets/paws-x) |  |
+| paws-x/zh | Classification | [google-research-datasets/paws-x](https://hf.co/datasets/google-research-datasets/paws-x) |  |
+| paws-x/es | Classification | [google-research-datasets/paws-x](https://hf.co/datasets/google-research-datasets/paws-x) |  |
+| paws-x/de | Classification | [google-research-datasets/paws-x](https://hf.co/datasets/google-research-datasets/paws-x) |  |
+| paws-x/en | Classification | [google-research-datasets/paws-x](https://hf.co/datasets/google-research-datasets/paws-x) |  |
+| miam | Classification | csv |  |
+| x-stance | Classification | [michiel/xstance](https://hf.co/datasets/michiel/xstance) |  |
+| offenseval_2020/ar | Classification | [khalidalt/offenseval_2020_ar](https://hf.co/datasets/khalidalt/offenseval_2020_ar) |  |
+| offenseval_2020/da | Classification | [tasksource/offenseval_2020](https://hf.co/datasets/tasksource/offenseval_2020) |  |
+| offenseval_2020/gr | Classification | [tasksource/offenseval_2020](https://hf.co/datasets/tasksource/offenseval_2020) |  |
+| offenseval_2020/tr | Classification | [tasksource/offenseval_2020](https://hf.co/datasets/tasksource/offenseval_2020) |  |
+| offenseval_dravidian/tamil | Classification | [community-datasets/offenseval_dravidian](https://hf.co/datasets/community-datasets/offenseval_dravidian) |  |
+| offenseval_dravidian/malayalam | Classification | [community-datasets/offenseval_dravidian](https://hf.co/datasets/community-datasets/offenseval_dravidian) |  |
+| offenseval_dravidian/kannada | Classification | [community-datasets/offenseval_dravidian](https://hf.co/datasets/community-datasets/offenseval_dravidian) |  |
+| MLMA_hate_speech | Classification | [nedjmaou/MLMA_hate_speech](https://hf.co/datasets/nedjmaou/MLMA_hate_speech) |  |
+| x-fact | Classification | [tasksource/x-fact](https://hf.co/datasets/tasksource/x-fact) |  |
+| xglue/nc | Classification | [SetFit/xglue_nc](https://hf.co/datasets/SetFit/xglue_nc) |  |
+| xglue/qadsm | Classification | [tasksource/xglue](https://hf.co/datasets/tasksource/xglue) | Is the ad relevant to the query? |
+| xglue/qam | Classification | [tasksource/xglue](https://hf.co/datasets/tasksource/xglue) | Does the passage answer the query? |
+| xglue/wpr | Classification | [tasksource/xglue](https://hf.co/datasets/tasksource/xglue) | How relevant is the web page to the query? |
+| xlwic/xlwic_fr_fr | Classification | [tasksource/xlwic](https://hf.co/datasets/tasksource/xlwic) |  |
+| xlwic/xlwic_en_ko | Classification | [tasksource/xlwic](https://hf.co/datasets/tasksource/xlwic) |  |
+| xlwic/xlwic_it_it | Classification | [tasksource/xlwic](https://hf.co/datasets/tasksource/xlwic) |  |
+| xlwic/xlwic_de_de | Classification | [tasksource/xlwic](https://hf.co/datasets/tasksource/xlwic) |  |
+| oasst1_dense_flat/quality | Classification | [tasksource/oasst1_dense_flat](https://hf.co/datasets/tasksource/oasst1_dense_flat) | How good is the reply, from 0 (low quality) to 1 (high quality)? |
+| oasst1_dense_flat/toxicity | Classification | [tasksource/oasst1_dense_flat](https://hf.co/datasets/tasksource/oasst1_dense_flat) | How toxic is the reply, from 0 (not toxic) to 1 (very toxic)? |
+| oasst1_dense_flat/helpfulness | Classification | [tasksource/oasst1_dense_flat](https://hf.co/datasets/tasksource/oasst1_dense_flat) | How helpful is the reply, from 0 (unhelpful) to 1 (helpful)? |
+| language-identification | Classification | [papluca/language-identification](https://hf.co/datasets/papluca/language-identification) | What language is this text in? |
+| wili_2018 | Classification | [MartinThoma/wili_2018](https://hf.co/datasets/MartinThoma/wili_2018) | What language is this text in? |
+| exams/multilingual | MultipleChoice | [mhardalov/exams](https://hf.co/datasets/mhardalov/exams) |  |
+| xcsr/X-CSQA-jap | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) |  |
+| xcsr/X-CSQA-it | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) |  |
+| xcsr/X-CSQA-hi | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) |  |
+| xcsr/X-CSQA-de | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) |  |
+| xcsr/X-CSQA-es | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) |  |
+| xcsr/X-CSQA-nl | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) |  |
+| xcsr/X-CSQA-ar | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) |  |
+| xcsr/X-CSQA-fr | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) |  |
+| xcsr/X-CSQA-pl | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) |  |
+| xcsr/X-CSQA-en | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) |  |
+| xcsr/X-CSQA-ru | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) |  |
+| xcsr/X-CSQA-pt | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) |  |
+| xcsr/X-CSQA-vi | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) |  |
+| xcsr/X-CSQA-zh | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) |  |
+| xcsr/X-CSQA-ur | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) |  |
+| xcsr/X-CSQA-sw | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) |  |
+| xcsr/X-CODAH-ar | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | Which sentence is most plausible? |
+| xcsr/X-CODAH-pl | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | Which sentence is most plausible? |
+| xcsr/X-CODAH-pt | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | Which sentence is most plausible? |
+| xcsr/X-CODAH-ru | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | Which sentence is most plausible? |
+| xcsr/X-CODAH-sw | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | Which sentence is most plausible? |
+| xcsr/X-CODAH-vi | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | Which sentence is most plausible? |
+| xcsr/X-CODAH-zh | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | Which sentence is most plausible? |
+| xcsr/X-CODAH-ur | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | Which sentence is most plausible? |
+| xcsr/X-CODAH-jap | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | Which sentence is most plausible? |
+| xcsr/X-CODAH-it | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | Which sentence is most plausible? |
+| xcsr/X-CODAH-hi | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | Which sentence is most plausible? |
+| xcsr/X-CODAH-fr | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | Which sentence is most plausible? |
+| xcsr/X-CODAH-es | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | Which sentence is most plausible? |
+| xcsr/X-CODAH-en | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | Which sentence is most plausible? |
+| xcsr/X-CODAH-de | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | Which sentence is most plausible? |
+| xcsr/X-CODAH-nl | MultipleChoice | [INK-USC/xcsr](https://hf.co/datasets/INK-USC/xcsr) | Which sentence is most plausible? |
+| xcopa/qu | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) |  |
+| xcopa/et | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) |  |
+| xcopa/ht | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) |  |
+| xcopa/id | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) |  |
+| xcopa/it | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) |  |
+| xcopa/sw | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) |  |
+| xcopa/translation-ht | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) |  |
+| xcopa/th | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) |  |
+| xcopa/tr | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) |  |
+| xcopa/translation-et | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) |  |
+| xcopa/translation-id | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) |  |
+| xcopa/translation-sw | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) |  |
+| xcopa/translation-ta | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) |  |
+| xcopa/translation-th | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) |  |
+| xcopa/translation-tr | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) |  |
+| xcopa/translation-vi | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) |  |
+| xcopa/translation-zh | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) |  |
+| xcopa/vi | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) |  |
+| xcopa/zh | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) |  |
+| xcopa/ta | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) |  |
+| xcopa/translation-it | MultipleChoice | [cambridgeltl/xcopa](https://hf.co/datasets/cambridgeltl/xcopa) |  |
+| xstory_cloze/eu | MultipleChoice | [juletxara/xstory_cloze](https://hf.co/datasets/juletxara/xstory_cloze) | Which ending continues the story? |
+| xstory_cloze/my | MultipleChoice | [juletxara/xstory_cloze](https://hf.co/datasets/juletxara/xstory_cloze) | Which ending continues the story? |
+| xstory_cloze/hi | MultipleChoice | [juletxara/xstory_cloze](https://hf.co/datasets/juletxara/xstory_cloze) | Which ending continues the story? |
+| xstory_cloze/te | MultipleChoice | [juletxara/xstory_cloze](https://hf.co/datasets/juletxara/xstory_cloze) | Which ending continues the story? |
+| xstory_cloze/sw | MultipleChoice | [juletxara/xstory_cloze](https://hf.co/datasets/juletxara/xstory_cloze) | Which ending continues the story? |
+| xstory_cloze/id | MultipleChoice | [juletxara/xstory_cloze](https://hf.co/datasets/juletxara/xstory_cloze) | Which ending continues the story? |
+| xstory_cloze/ar | MultipleChoice | [juletxara/xstory_cloze](https://hf.co/datasets/juletxara/xstory_cloze) | Which ending continues the story? |
+| xstory_cloze/es | MultipleChoice | [juletxara/xstory_cloze](https://hf.co/datasets/juletxara/xstory_cloze) | Which ending continues the story? |
+| xstory_cloze/zh | MultipleChoice | [juletxara/xstory_cloze](https://hf.co/datasets/juletxara/xstory_cloze) | Which ending continues the story? |
+| xstory_cloze/ru | MultipleChoice | [juletxara/xstory_cloze](https://hf.co/datasets/juletxara/xstory_cloze) | Which ending continues the story? |
+| xstory_cloze/en | MultipleChoice | [juletxara/xstory_cloze](https://hf.co/datasets/juletxara/xstory_cloze) | Which ending continues the story? |
+| disrpt/eus.rst.ert.rels | Classification | [multilingual-discourse-hub/disrpt](https://hf.co/datasets/multilingual-discourse-hub/disrpt) |  |
+| disrpt/deu.rst.pcc.rels | Classification | [multilingual-discourse-hub/disrpt](https://hf.co/datasets/multilingual-discourse-hub/disrpt) |  |
+| disrpt/fas.rst.prstc.rels | Classification | [multilingual-discourse-hub/disrpt](https://hf.co/datasets/multilingual-discourse-hub/disrpt) |  |
+| disrpt/fra.sdrt.annodis.rels | Classification | [multilingual-discourse-hub/disrpt](https://hf.co/datasets/multilingual-discourse-hub/disrpt) |  |
+| disrpt/nld.rst.nldt.rels | Classification | [multilingual-discourse-hub/disrpt](https://hf.co/datasets/multilingual-discourse-hub/disrpt) |  |
+| disrpt/por.rst.cstn.rels | Classification | [multilingual-discourse-hub/disrpt](https://hf.co/datasets/multilingual-discourse-hub/disrpt) |  |
+| disrpt/rus.rst.rrt.rels | Classification | [multilingual-discourse-hub/disrpt](https://hf.co/datasets/multilingual-discourse-hub/disrpt) |  |
+| disrpt/spa.rst.rststb.rels | Classification | [multilingual-discourse-hub/disrpt](https://hf.co/datasets/multilingual-discourse-hub/disrpt) |  |
+| disrpt/tha.pdtb.tdtb.rels | Classification | [multilingual-discourse-hub/disrpt](https://hf.co/datasets/multilingual-discourse-hub/disrpt) |  |
+| disrpt/zho.rst.gcdt.rels | Classification | [multilingual-discourse-hub/disrpt](https://hf.co/datasets/multilingual-discourse-hub/disrpt) |  |
+| universal_dependencies/sga_dipsgg/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/orv_torot/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ang_cairo/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/fro_altm/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/oge_glc/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/sga_dipwbg/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/orv_ruthenian/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/fro_profiterole/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/orv_rnc/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/kpv_ikdp/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/cu_proiel/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/or_odtb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/oc_ttb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/no_nynorsk/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/no_bokmaal/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/pro_corag/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/gya_autogramm/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/kmr_kurmanji/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/sme_giella/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/orv_birchbark/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/otk_clausal/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/pay_chibergis/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ota_dudu/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/pt_porttinari/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/pt_petrogold/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/pt_gsd/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/pt_dantestocks/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/pt_bosque/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/qpm_philotis/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/pl_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/pl_pdb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ota_boun/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/pl_mpdt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/xpg_kul/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/yrl_complin/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/fa_seraji/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/fa_perdt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/pad_tuecl/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ps_sikaram/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ps_prince/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ota_tuecl/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/pl_lfg/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ne_bk/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/gun_thomas/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/nap_rb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/lij_glt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/lv_lvtb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/lv_cairo/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/la_udante/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/la_proiel/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/la_perseus/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/la_llct/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/la_ittb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/lt_alksnis/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/la_circse/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ky_tuecl/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ky_ktmu/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ko_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ko_littleprince/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ko_ksl/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ko_kaist/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ko_gsd/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/pt_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ltg_cairo/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/yrk_tundra/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/lt_hse/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/nds_lsdc/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/pcm_nsc/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/nmf_suansu/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/myu_tudet/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/mdf_jr/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/frm_profiterole/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/frm_altm/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/axm_armtdp/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/kpv_lattice/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/olo_kkpp/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/mr_ufal/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/gv_cadhan/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/mt_mudt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ml_ufal/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/mpu_tudet/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/qaf_arabizi/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/jaa_jarawara/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/mk_mtb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/lb_luxbank/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/mr_cmupan/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/pa_cs/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/tr_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ro_art/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/uk_parlamint/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/uk_iu/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/qtd_sagt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/qti_butr/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/tr_tuecl/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/tr_tourism/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/koi_uh/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/tr_penn/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/xum_ikuvina/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/tr_kenet/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/tr_gb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/tr_framenet/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/tr_boun/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/tr_atis/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/tpn_tudet/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/tn_popapolelo/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/th_tud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/th_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/tr_imst/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/hsb_ufal/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ur_udtb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ug_udt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/zza_zsd/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/say_autogramm/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ess_sli/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/yo_ytb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/yi_yitb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/sah_yktdt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/sjo_xdt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/xav_xdt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/wo_wtb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/nhi_mesotree/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/hyw_armtdp/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/cy_ccg/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/wbp_ufal/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/vi_vtb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/vi_tuecl/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/vep_vwt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/uz_uzudt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/uz_ut/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/uz_tuecl/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/qte_tect/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/pa_rang/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/te_mtg/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/tt_nmctt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/sd_isra/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/scn_stb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/wuu_shud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/sr_set/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/gd_arcosg/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/sa_vedic/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/sa_ufal/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ruc_rdt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/si_appuwa/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ru_taiga/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ru_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ru_poetry/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ru_gsd/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ro_tuecl/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ro_simonero/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ro_rrt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ro_nonstandard/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ro_moldoro/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ru_syntagrus/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/si_stb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/sms_giellagas/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/sk_snk/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ta_ttb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ta_mwtt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/tl_ugnayan/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/tl_trg/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/swl_sslc/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/sv_talbanken/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/sv_swell/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/sv_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/sv_old/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/sv_lines/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ssp_lse/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/es_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/es_gsd/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/es_coser/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/es_ancora/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/sdh_garrusi/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ajp_madar/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/sl_sst/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/sl_ssj/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/eme_tudet/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/quc_iu/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/it_kiparlaforest/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/kk_ktb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/cs_pdtc/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/cs_fictree/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/cs_cltt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/cs_cac/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/hr_set/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/cop_scriptorium/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/cop_bohairic/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/lzh_tuecl/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/lzh_kyoto/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/xcl_caval/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ckt_hse/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ctn_ctntb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/zh_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/zh_patentchar/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/zh_hk/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/zh_gsdsimp/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/naq_kdt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/cs_poetry/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/cs_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/da_ddt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/nl_alpino/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/eo_prago/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/eo_cairo/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/myv_jr/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/en_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/en_pronouns/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/en_partut/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/en_littleprince/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/en_lines/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/zh_cfl/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/en_gumreddit/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/en_gentle/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/en_ewt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/en_eslspok/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/en_ctetex/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/en_childes/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/en_atis/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/egy_pc/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/nl_lassysmall/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/en_gum/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/zh_beginner/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ckb_mukri/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ceb_gja/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ar_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ar_padt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/apu_ufpa/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/hbo_ptnk/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/grc_ptnk/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/grc_proiel/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/grc_perseus/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/am_att/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/hy_armtdp/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/gsw_uzh/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/sq_tsa/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/sq_staf/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/aqz_tudet/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/akk_riao/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/akk_pisandub/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/af_afribooms/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ab_abnc/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/abq_atb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/gsw_divital/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/et_edt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/hy_bsut/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/aii_as/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ca_ancora/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/cpg_tuecl/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/cpg_amgic/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/yue_hk/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/bxr_bdt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/bg_btb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/br_keb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/brh_kholum/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/as_aiw/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/bor_bdt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/bho_bhtb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/bn_bru/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/be_hse/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/bej_autogramm/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/bar_maibaam/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/eu_bdt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/bm_crb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/az_tuecl/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/sab_chibergis/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/et_ewt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/zh_gsd/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/fo_oft/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ga_idt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ga_cadhan/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/id_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/id_gsd/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/id_csui/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/arh_chibergis/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/is_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/is_modern/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/is_icepahc/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/is_gc/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/hu_szeged/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/hit_hittb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/hi_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/hi_hdtb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/azz_itml/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/he_postrab/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/he_iahltwiki/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ga_twittirish/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/it_isdt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/it_markit/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/it_old/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/arr_tudet/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/fo_farpahc/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/xnr_kdtb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/kbc_unicamp/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/urb_tudet/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/jv_csui/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ja_pudluw/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ja_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/he_iahltknesset/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ja_gsdluw/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ja_bccwjluw/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/it_vit/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/it_valico/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/it_twittiro/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/it_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/it_postwita/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/it_partut/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/it_parlamint/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ja_gsd/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/he_htb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/krl_kkpp/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ha_southernautogramm/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/gl_treegal/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/gl_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/gl_ctg/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/qfn_fame/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/fr_sequoia/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/fr_rhapsodie/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/fr_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/fr_poitevindivital/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ka_glc/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/fr_partut/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/fr_gsd/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/fr_fqb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/fr_alts/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/fi_tdt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/fi_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/fi_ood/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/fi_ftb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ha_westernautogramm/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/fr_parisstories/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/de_gsd/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ka_gnc/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/el_messinian/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ht_autogramm/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ht_adolphe/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/gwi_tuecl/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/gu_gujtb/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/gn_oldtudet/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/gub_tudet/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/de_hdt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/el_lesbian/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/el_gud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/el_glcii/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/el_gdt/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/el_cretan/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/got_proiel/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/gor_bungololombi/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/aln_gps/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/de_pud/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/de_lit/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ha_easternautogramm/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| universal_dependencies/ha_northernautogramm/pos | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| oasst1_pairwise_rlhf_reward | MultipleChoice | [tasksource/oasst1_pairwise_rlhf_reward](https://hf.co/datasets/tasksource/oasst1_pairwise_rlhf_reward) | Which reply is better? |
+| multilingual-sentiments/all | Classification | [tasksource/multilingual-sentiments](https://hf.co/datasets/tasksource/multilingual-sentiments) |  |
+| tweet_sentiment_multilingual | Classification | json |  |
+| amazon_reviews_multi/all_languages | Classification | [goosmanlei/amazon_reviews_multi](https://hf.co/datasets/goosmanlei/amazon_reviews_multi) |  |
+| universal-joy | Classification | [tasksource/universal-joy](https://hf.co/datasets/tasksource/universal-joy) |  |
+| mms | Classification | parquet |  |
+| mapa/coarse_grained | TokenClassification | [joelito/mapa](https://hf.co/datasets/joelito/mapa) |  |
+| mapa/fine_grained | TokenClassification | [joelito/mapa](https://hf.co/datasets/joelito/mapa) |  |
+| massive | Classification | [mteb/MassiveIntentClassification](https://hf.co/datasets/mteb/MassiveIntentClassification) |  |
+| masakhanews/yor | Classification | [masakhane/masakhanews](https://hf.co/datasets/masakhane/masakhanews) |  |
+| masakhanews/xho | Classification | [masakhane/masakhanews](https://hf.co/datasets/masakhane/masakhanews) |  |
+| masakhanews/tir | Classification | [masakhane/masakhanews](https://hf.co/datasets/masakhane/masakhanews) |  |
+| masakhanews/swa | Classification | [masakhane/masakhanews](https://hf.co/datasets/masakhane/masakhanews) |  |
+| masakhanews/som | Classification | [masakhane/masakhanews](https://hf.co/datasets/masakhane/masakhanews) |  |
+| masakhanews/sna | Classification | [masakhane/masakhanews](https://hf.co/datasets/masakhane/masakhanews) |  |
+| masakhanews/pcm | Classification | [masakhane/masakhanews](https://hf.co/datasets/masakhane/masakhanews) |  |
+| masakhanews/orm | Classification | [masakhane/masakhanews](https://hf.co/datasets/masakhane/masakhanews) |  |
+| masakhanews/lug | Classification | [masakhane/masakhanews](https://hf.co/datasets/masakhane/masakhanews) |  |
+| masakhanews/lin | Classification | [masakhane/masakhanews](https://hf.co/datasets/masakhane/masakhanews) |  |
+| masakhanews/ibo | Classification | [masakhane/masakhanews](https://hf.co/datasets/masakhane/masakhanews) |  |
+| masakhanews/hau | Classification | [masakhane/masakhanews](https://hf.co/datasets/masakhane/masakhanews) |  |
+| masakhanews/fra | Classification | [masakhane/masakhanews](https://hf.co/datasets/masakhane/masakhanews) |  |
+| masakhanews/eng | Classification | [masakhane/masakhanews](https://hf.co/datasets/masakhane/masakhanews) |  |
+| masakhanews/run | Classification | [masakhane/masakhanews](https://hf.co/datasets/masakhane/masakhanews) |  |
+| masakhanews/amh | Classification | [masakhane/masakhanews](https://hf.co/datasets/masakhane/masakhanews) |  |
+| NusaX-senti/sun | Classification | [mteb/NusaX-senti](https://hf.co/datasets/mteb/NusaX-senti) |  |
+| NusaX-senti/ban | Classification | [mteb/NusaX-senti](https://hf.co/datasets/mteb/NusaX-senti) |  |
+| NusaX-senti/nij | Classification | [mteb/NusaX-senti](https://hf.co/datasets/mteb/NusaX-senti) |  |
+| NusaX-senti/min | Classification | [mteb/NusaX-senti](https://hf.co/datasets/mteb/NusaX-senti) |  |
+| NusaX-senti/mad | Classification | [mteb/NusaX-senti](https://hf.co/datasets/mteb/NusaX-senti) |  |
+| NusaX-senti/jav | Classification | [mteb/NusaX-senti](https://hf.co/datasets/mteb/NusaX-senti) |  |
+| NusaX-senti/ind | Classification | [mteb/NusaX-senti](https://hf.co/datasets/mteb/NusaX-senti) |  |
+| NusaX-senti/eng | Classification | [mteb/NusaX-senti](https://hf.co/datasets/mteb/NusaX-senti) |  |
+| NusaX-senti/bug | Classification | [mteb/NusaX-senti](https://hf.co/datasets/mteb/NusaX-senti) |  |
+| NusaX-senti/bjn | Classification | [mteb/NusaX-senti](https://hf.co/datasets/mteb/NusaX-senti) |  |
+| NusaX-senti/ace | Classification | [mteb/NusaX-senti](https://hf.co/datasets/mteb/NusaX-senti) |  |
+| NusaX-senti/bbc | Classification | [mteb/NusaX-senti](https://hf.co/datasets/mteb/NusaX-senti) |  |
+| AfriSenti-twitter-sentiment/yor | Classification | [mteb/AfriSentiClassification](https://hf.co/datasets/mteb/AfriSentiClassification) |  |
+| AfriSenti-twitter-sentiment/ary | Classification | [mteb/AfriSentiClassification](https://hf.co/datasets/mteb/AfriSentiClassification) |  |
+| AfriSenti-twitter-sentiment/hau | Classification | [mteb/AfriSentiClassification](https://hf.co/datasets/mteb/AfriSentiClassification) |  |
+| AfriSenti-twitter-sentiment/ibo | Classification | [mteb/AfriSentiClassification](https://hf.co/datasets/mteb/AfriSentiClassification) |  |
+| AfriSenti-twitter-sentiment/arq | Classification | [mteb/AfriSentiClassification](https://hf.co/datasets/mteb/AfriSentiClassification) |  |
+| AfriSenti-twitter-sentiment/kin | Classification | [mteb/AfriSentiClassification](https://hf.co/datasets/mteb/AfriSentiClassification) |  |
+| AfriSenti-twitter-sentiment/pcm | Classification | [mteb/AfriSentiClassification](https://hf.co/datasets/mteb/AfriSentiClassification) |  |
+| AfriSenti-twitter-sentiment/por | Classification | [mteb/AfriSentiClassification](https://hf.co/datasets/mteb/AfriSentiClassification) |  |
+| AfriSenti-twitter-sentiment/swa | Classification | [mteb/AfriSentiClassification](https://hf.co/datasets/mteb/AfriSentiClassification) |  |
+| AfriSenti-twitter-sentiment/tso | Classification | [mteb/AfriSentiClassification](https://hf.co/datasets/mteb/AfriSentiClassification) |  |
+| AfriSenti-twitter-sentiment/twi | Classification | [mteb/AfriSentiClassification](https://hf.co/datasets/mteb/AfriSentiClassification) |  |
+| AfriSenti-twitter-sentiment/amh | Classification | [mteb/AfriSentiClassification](https://hf.co/datasets/mteb/AfriSentiClassification) |  |
+| clue/ocnli | Classification | [clue/clue](https://hf.co/datasets/clue/clue) |  |
+| clue/afqmc | Classification | [clue/clue](https://hf.co/datasets/clue/clue) |  |
+| clue/tnews | Classification | [clue/clue](https://hf.co/datasets/clue/clue) |  |
+| klue/nli | Classification | [klue/klue](https://hf.co/datasets/klue/klue) |  |
+| klue/ynat | Classification | [klue/klue](https://hf.co/datasets/klue/klue) |  |
+| klue/sts | Classification | [klue/klue](https://hf.co/datasets/klue/klue) |  |
+| indic_glue/iitp-mr.hi/sentiment | Classification | [ai4bharat/indic_glue](https://hf.co/datasets/ai4bharat/indic_glue) |  |
+| indic_glue/actsa-sc.te/sentiment | Classification | [ai4bharat/indic_glue](https://hf.co/datasets/ai4bharat/indic_glue) |  |
+| indic_glue/iitp-pr.hi/sentiment | Classification | [ai4bharat/indic_glue](https://hf.co/datasets/ai4bharat/indic_glue) |  |
+| indic_glue/inltkh.te/sentiment | Classification | [ai4bharat/indic_glue](https://hf.co/datasets/ai4bharat/indic_glue) |  |
+| indic_glue/sna.bn/news | Classification | [ai4bharat/indic_glue](https://hf.co/datasets/ai4bharat/indic_glue) |  |
+| indic_glue/bbca.hi/news | Classification | [ai4bharat/indic_glue](https://hf.co/datasets/ai4bharat/indic_glue) |  |
+| indic_glue/inltkh | Classification | parquet |  |
+| indic_glue/md.hi/discourse_mode | Classification | [ai4bharat/indic_glue](https://hf.co/datasets/ai4bharat/indic_glue) |  |
+| indic_glue/wstp | MultipleChoice | parquet | Which title fits this section? |
+| tydi-as2-balanced | Classification | [tasksource/tydi-as2-balanced](https://hf.co/datasets/tasksource/tydi-as2-balanced) |  |
+| conll2002/nl | TokenClassification | parquet |  |
+| conll2002/es | TokenClassification | parquet |  |
+| multiconer_v2/Italian (IT) | TokenClassification | parquet |  |
+| multiconer_v2/Swedish (SV) | TokenClassification | parquet |  |
+| multiconer_v2/Spanish (ES) | TokenClassification | parquet |  |
+| multiconer_v2/Ukrainian (UK) | TokenClassification | parquet |  |
+| multiconer_v2/Hindi (HI) | TokenClassification | parquet |  |
+| multiconer_v2/Bangla (BN) | TokenClassification | parquet |  |
+| multiconer_v2/French (FR) | TokenClassification | parquet |  |
+| multiconer_v2/Farsi (FA) | TokenClassification | parquet |  |
+| multiconer_v2/English (EN) | TokenClassification | parquet |  |
+| multiconer_v2/Chinese (ZH) | TokenClassification | parquet |  |
+| multiconer_v2/German (DE) | TokenClassification | parquet |  |
+| multiconer_v2/Portuguese (PT) | TokenClassification | parquet |  |
+| mtop | Classification | [tasksource/mtop](https://hf.co/datasets/tasksource/mtop) |  |
+| multilingual-zero-shot-label-nli | Classification | [tasksource/multilingual-zero-shot-label-nli](https://hf.co/datasets/tasksource/multilingual-zero-shot-label-nli) |  |
