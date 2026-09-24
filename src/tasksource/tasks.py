@@ -686,7 +686,7 @@ def _cogalexv_relations(dataset):
         "relation", ClassLabel(names=list(COGALEXV_RELATIONS.values())))
 
 relbert_cogalexv = Classification(
- sentence1="head", sentence2="tail", labels="relation", dataset_name="json",
+ sentence1="head", sentence2="tail", labels="relation", dataset_name="json", question=LEXICAL_RELATION_QUESTION,
  task_id="lexical_relation_classification/CogALexV",
  load_dataset_kwargs={"data_files": {
      "train": "hf://datasets/relbert/lexical_relation_classification/dataset/CogALexV/train.jsonl",
@@ -833,8 +833,8 @@ commonsense_qa = MultipleChoice(
     splits=["train","validation",None]
 )
 mc_taco = Classification(
-    lambda x: f'{x["sentence"]} {x["question"]} {x["answer"]}',
-    labels="label",
+    lambda x: f'{x["sentence"]}\n{x["question"]}', "answer",
+    labels="label", question="Is this answer plausible?",
     splits=[ "validation",None,"test"],
     dataset_name="marcov/mc_taco_promptsource", task_id="mc_taco"
 )
