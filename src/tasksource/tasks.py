@@ -275,33 +275,12 @@ cos_e = MultipleChoice('question',
 cosmos_qa = MultipleChoice(cat(['context','question']),regen('answer[0-3]'),'label',
     dataset_name="Samsoup/cosmos_qa")
 
-def _preprocess_dream(dataset):
-    def expand(batch):
-        out = {"dialogue": [], "question": [], "choice": [], "answer": []}
-        for record in batch["text"]:
-            dialogue, questions = record[0], record[1]
-            for qa in questions:
-                out["dialogue"].append(dialogue)
-                out["question"].append(qa["question"])
-                out["choice"].append(qa["choice"])
-                out["answer"].append(qa["answer"])
-        return out
-
-    return dataset.map(
-        expand, batched=True, remove_columns=dataset["train"].column_names
-    )
-
 dream = MultipleChoice(
     lambda x:"\n".join(x['dialogue']+[x['question']]),
     choices_list='choice',
     labels=lambda x:x['choices_list'].index(x['answer']),
-    dataset_name="json", task_id="dream",
-    load_dataset_kwargs={"data_files": {
-        "train": "https://raw.githubusercontent.com/nlpdata/dream/master/data/train.json",
-        "validation": "https://raw.githubusercontent.com/nlpdata/dream/master/data/dev.json",
-        "test": "https://raw.githubusercontent.com/nlpdata/dream/master/data/test.json",
-    }},
-    pre_process=_preprocess_dream)
+    dataset_name="dataset-org/dream", task_id="dream",
+    load_dataset_kwargs=dict(revision=PARQUET, data_dir="plain_text"))
 
 openbookqa = MultipleChoice(
     'question_stem',
@@ -1218,6 +1197,7 @@ implicit_hate = Classification("post",labels="class",
     dataset_name="tasksource/implicit-hate-stg1")
 
 nli_unambiguity = Classification("premise","hypothesis","gini",
+    question="How much would annotators agree on the inference, from 0 (evenly split) to 1 (unanimous)?",
     dataset_name="tasksource/chaos-mnli-ambiguity")
 
 headline_cause = Classification('left_title', 'right_title', 'label', dataset_name='json', task_id='headline_cause/en_simple',

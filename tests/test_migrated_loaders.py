@@ -160,7 +160,7 @@ class MigratedLoaderHelperTest(unittest.TestCase):
             "math_qa": "tasksource/math_qa",
             "cluttr": "tasksource/clutrr",
             "docred": "json",
-            "dream": "json",
+            "dream": "dataset-org/dream",
             "hate_speech18": "tasksource/hate_speech18",
             "ethos": "SetFit/ethos_binary",
             "fewrel": "tasksource/few_rel",
