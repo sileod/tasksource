@@ -304,6 +304,11 @@ indic_glue__section_title = MultipleChoice("sectionText", question="Which title 
 tidy_as2=Classification("Question","Sentence","Label",dataset_name='tasksource/tydi-as2-balanced') 
 
 # the Hub's parquet export of the script-only dataset; the MULTI config is the union of the others
+# CoNLL-2002 Spanish and Dutch NER, from the Hub's parquet export of the script-only dataset
+conll2002 = TokenClassification("tokens", "ner_tags", dataset_name="parquet", task_id="conll2002/{config_name}", config_name=["es", "nl"],
+    load_dataset_kwargs={"data_files": {split: f"hf://datasets/eriktks/conll2002@refs%2Fconvert%2Fparquet/{{config_name}}/{split}/*.parquet"
+                                        for split in ("train", "validation", "test")}})
+
 multiconer = TokenClassification("tokens", "ner_tags_index", dataset_name="parquet", task_id="multiconer_v2/{config_name}",
     config_name=["Bangla (BN)", "Chinese (ZH)", "English (EN)", "Farsi (FA)", "French (FR)", "German (DE)", "Hindi (HI)",
                  "Italian (IT)", "Portuguese (PT)", "Spanish (ES)", "Swedish (SV)", "Ukrainian (UK)"],

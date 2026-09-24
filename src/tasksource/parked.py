@@ -231,7 +231,7 @@ KINDS = {
 }
 
 PARKED = {
-    'xglue__ner': ('duplicate', 'repackages CoNLL-2002/2003 NER, which conll2003 and the multilingual NER tasks cover; script-only'),
+    'xglue__ner': ('duplicate', 'repackages CoNLL-2002/2003 NER, which conll2002 (es, nl) and conll2003 (en) cover; the German part is not openly licensed; script-only'),
     'xglue__pos': ('duplicate', 'repackages Universal Dependencies POS, which udep__pos covers; script-only'),
     'udep__deprel_multilingual': ('unsound', 'all-language variant of udep__deprel; relation labels depend on the head word, which the task does not show'),
     'has_part': ('unsound', 'labels are model confidence scores, nearly all above 0.99'),
