@@ -151,6 +151,12 @@ def stage_annotate(cfg, run_dir: Path) -> list[dict]:
     annotated = annot_mod.annotate_bundles(bundles, cfg.annotator, cache_dir=jev_dir)
     _write_bundles(run_dir / "annotated.jsonl", annotated)
     _to_frame(annotated).to_parquet(run_dir / "annotated.parquet", index=False)
+    manifest_path = run_dir / "manifest.json"
+    if manifest_path.exists():
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest.setdefault("counts", {})["annotator"] = cfg.annotator.name
+        manifest["annotation_config"] = cfg.annotator.__dict__
+        manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
     return annotated
 
 

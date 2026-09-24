@@ -15,6 +15,7 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import json
+import time
 from pathlib import Path
 
 from . import providers
@@ -43,8 +44,25 @@ def mock_critique(bundle: dict) -> dict:
     return {"pass": not issues, "issues": issues, "score": 1.0 if not issues else 0.0}
 
 
+class RequestPacer:
+    """Space critic calls so a batch stays below the provider's minute limit."""
+
+    def __init__(self, requests_per_minute: int):
+        self.interval = 60.0 / max(1, requests_per_minute)
+        self.next_start = 0.0
+        self.lock = asyncio.Lock()
+
+    async def wait(self) -> None:
+        async with self.lock:
+            now = time.monotonic()
+            if now < self.next_start:
+                await asyncio.sleep(self.next_start - now)
+            self.next_start = time.monotonic() + self.interval
+
+
 async def _critique_one(sem, client, model: str, temperature: float,
-                        template: str, bundle: dict, raw_dir: Path) -> dict:
+                        template: str, bundle: dict, raw_dir: Path,
+                        pacer: RequestPacer | None = None) -> dict:
     key = critic_cache_key(model, temperature, template, bundle)
     cached = raw_dir / f"{key}.json"
     if cached.exists():
@@ -61,6 +79,8 @@ async def _critique_one(sem, client, model: str, temperature: float,
                "questions": bundle["questions"]}
     prompt = template.replace("{{BUNDLE_JSON}}", json.dumps(payload, ensure_ascii=False, indent=2))
     async with sem:
+        if pacer is not None:
+            await pacer.wait()
         result = await providers.chat_complete(
             client, model, [{"role": "user", "content": prompt}],
             temperature=temperature, max_tokens=1000)
@@ -92,8 +112,10 @@ async def critique_bundles_async(cfg, bundles: list[dict], raw_dir: Path) -> lis
         client = providers.make_client(provider, providers.require_api_key(provider))
     try:
         sem = asyncio.Semaphore(max(1, cfg.generation.concurrency))
+        pacer = RequestPacer(cfg.critic.requests_per_minute) if client is not None else None
         out = await asyncio.gather(*[_critique_one(sem, client, cfg.critic.model,
-                                                   cfg.critic.temperature, template, b, raw_dir)
+                                                   cfg.critic.temperature, template, b, raw_dir,
+                                                   pacer)
                                      for b in bundles])
     finally:
         if client is not None:

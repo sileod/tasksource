@@ -104,6 +104,23 @@ class BundleTest(unittest.TestCase):
             errors = validate_mod.validate_bundle(bundle, spec)
             self.assertEqual(errors, [], f"{spec['state_id']}: {errors}")
 
+    def test_noul_requires_probability_for_a_proposition(self):
+        valid = [
+            "Does this ticket need escalation?",
+            "Based on the report, what is the likelihood that the vendor will fail?",
+            "How likely is the customer to cancel the contract?",
+        ]
+        invalid = [
+            "What is the most likely root cause of the failure?",
+            "Which team should own this ticket?",
+            "According to the report, what is the timestamp on the monitor?",
+            "List all of the action items assigned to the agent.",
+        ]
+        for text in valid:
+            self.assertTrue(validate_mod.valid_noul_question(text), text)
+        for text in invalid:
+            self.assertFalse(validate_mod.valid_noul_question(text), text)
+
     def test_flat_preserves_grouping(self):
         spec = specs_mod.sample_specs(_cfg().sampler, 5)[0]
         bundle = mock_realization(spec)

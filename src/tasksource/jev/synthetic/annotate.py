@@ -167,6 +167,8 @@ def _jev_probabilities(question: dict, answers: dict) -> tuple[list[float], dict
 def annotate_bundle_jev(bundle: dict, annotator_cfg, api_key: str,
                         cache_dir: Path | None = None) -> dict:
     """Annotate one bundle against the real Jev endpoint (fail loudly)."""
+    if cache_dir is not None:
+        cache_dir.mkdir(parents=True, exist_ok=True)
     key = jev_cache_key(bundle, annotator_cfg)
     cached_path = cache_dir / f"{key}.json" if cache_dir is not None else None
     if cached_path is not None and cached_path.exists():

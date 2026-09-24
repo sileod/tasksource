@@ -44,6 +44,7 @@ class CriticConfig:
     model: str = "deepseek-v4-flash-0731"
     prompt_version: str = "critic_v1"
     temperature: float = 0.0
+    requests_per_minute: int = 40
 
 
 @dataclass

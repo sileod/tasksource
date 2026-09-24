@@ -9,6 +9,21 @@ from .schemas import validate_bundle_shape
 LEAK_TOKENS = ("difficulty", "ambiguity", "skill", "distractor",
                "state_length", "evidence", "certainty")
 ANSWER_LEAK = re.compile(r"correct (answer|option|choice)|answer is\b", re.IGNORECASE)
+OPEN_QUESTION = re.compile(r"\b(?:what|which|who|where|when)\b", re.IGNORECASE)
+EVENT_PROBABILITY = re.compile(
+    r"\b(?:likelihood|probability|chance|risk|confidence)\s+that\b|"
+    r"\bhow\s+(?:likely|probable|confident)\b", re.IGNORECASE)
+
+
+def valid_noul_question(text: str) -> bool:
+    """A noul target is a probability for one proposition, not a free-form answer."""
+    if EVENT_PROBABILITY.search(text):
+        return True
+    if OPEN_QUESTION.search(text) or re.search(r"\bhow\b", text, re.IGNORECASE):
+        return False
+    return bool(re.search(
+        r"\b(?:is|are|was|were|do|does|did|can|could|should|would|will|"
+        r"has|have|had|may|might|must)\b", text, re.IGNORECASE))
 
 
 def validate_bundle(bundle: dict, spec: dict | None = None) -> list[str]:
@@ -31,6 +46,9 @@ def validate_bundle(bundle: dict, spec: dict | None = None) -> list[str]:
             errors.append("empty/truncated question")
         if ANSWER_LEAK.search(text):
             errors.append("question leaks correct answer phrasing")
+    for q in bundle.get("questions", []):
+        if q.get("format") == "noul" and not valid_noul_question(q.get("question", "")):
+            errors.append(f"noul {q.get('question_id')} must ask about one yes/no proposition")
     if len(set(texts)) != len(texts):
         errors.append("duplicate question texts in bundle")
     options_seen = [tuple(q.get("options", [])) for q in bundle.get("questions", []) if q.get("format") == "choice"]
