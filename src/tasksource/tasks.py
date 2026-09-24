@@ -965,7 +965,7 @@ logiqa = MultipleChoice(
 )
 
 
-wiki_qa = Classification("question","answer", name("label",['False','True']))
+wiki_qa = Classification("question","answer", name("label",['False','True']), question="Does this sentence answer the question?")
 
 cycic_classification = Classification("question",labels=name("correct_answer",['False','True']),
     dataset_name = "tasksource/cycic_classification")
@@ -1027,14 +1027,14 @@ def _webgpt_question_text(row):
 
 webgpt_comparisons = MultipleChoice(
     _webgpt_question_text, choices=['answer_0','answer_1'],
-    labels=lambda x:int(float(x['score_1']) > 0),
+    labels=lambda x:int(float(x['score_1']) > 0), question="Which answer did the human rater prefer?",
     dataset_name="heegyu/webgpt_comparisons_ko", task_id="webgpt_comparisons",
     # score_1 == 0 is a tie (27% of rows), which the label would read as answer_0 winning
     pre_process=lambda ds: ds.filter(lambda x: float(x['score_1']) != 0
         and str(x['answer_0']).strip() and str(x['answer_1']).strip()))
 
 synthetic_instruct = MultipleChoice('prompt', choices=['chosen', 'rejected'],
-    labels=constant(0), dataset_name="Dahoas/synthetic-instruct-gptj-pairwise")
+    labels=constant(0), question="Which response is better?", dataset_name="Dahoas/synthetic-instruct-gptj-pairwise")
 
 scruples = Classification("text",labels="binarized_label", question="Was the author in the right or in the wrong?",dataset_name="tasksource/scruples")
 
@@ -1482,7 +1482,7 @@ nlgraph = Classification('question',labels=_nlgraph_binarize,
     pre_process=lambda ds:ds.filter(lambda x:x['task'] in "connectivity cycle hamilton"),
     dataset_name="tasksource/nlgraph")
 
-oasst_rlhf = MultipleChoice("prompt",choices=['chosen','rejected'],labels=constant(0),
+oasst_rlhf = MultipleChoice("prompt",choices=['chosen','rejected'],labels=constant(0), question="Which reply is better?",
     dataset_name="tasksource/oasst2_pairwise_rlhf_reward")
 
 def _hh_split(ds):
@@ -1502,12 +1502,11 @@ anthropic_rlhf_harmless = MultipleChoice("dialogue",
     dataset_name="tasksource/hh-rlhf",config_name="harmless-base")
 
 ruletaker = Classification(
-    lambda x: 'What is not explicitly stated as true is considered false. \n' +x["context"], #closed world assumption
-    "question","label",dataset_name="tasksource/ruletaker")
+    "context", "question", question="Does the statement follow from the context? What is not explicitly stated as true is considered false.",
+    labels="label", dataset_name="tasksource/ruletaker")
 
 para_rules = Classification(
-    lambda x: 'What is not explicitly stated as true is considered false. \n' +x["context"], #closed world assumption
-    "question", labels=name("label",["False","True"]),
+    "context", "question", question="Is the statement true? What is not explicitly stated as true is considered false.", labels=name("label",["False","True"]),
     dataset_name="qbao775/PARARULE-Plus")
 
 proofwriter_deduction = Classification("theory","question","answer",
@@ -1801,7 +1800,7 @@ helpsteer_3___feedback = Classification(
 msci_nli = Classification('sentence1','sentence2','label',dataset_name='sadat2307/MSciNLI')
 
 
-ultrafeedback = MultipleChoice("question", choices=['response_j','response_k'],labels=constant(0), dataset_name="pushpdeep/UltraFeedback-paired")
+ultrafeedback = MultipleChoice("question", choices=['response_j','response_k'],labels=constant(0), question="Which response is better?", dataset_name="pushpdeep/UltraFeedback-paired")
 
 essay_scoring = Classification("full_text", labels="score", question="What holistic score does this student essay deserve?",
     dataset_name='tasksource/AES2-essay-scoring',
@@ -1830,7 +1829,7 @@ hover = Classification("evidence","claim","label",
 hover__nli = Classification("evidence","claim",name("label",["entailment","neutral","contradiction"]),
     dataset_name="Dzeniks/hover-3way")
 
-tasksource_dpo = MultipleChoice("prompt",choices=['chosen','rejected'],labels=constant(0),
+tasksource_dpo = MultipleChoice("prompt",choices=['chosen','rejected'],labels=constant(0), question="Which response is better?",
     dataset_name="tasksource/tasksource_dpo_pairs")
 
 seahorse = Classification('article',cat(["summary", "question"]),'answer',

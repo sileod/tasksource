@@ -164,7 +164,7 @@ udep__pos = TokenClassification(
 def udep_post_process(ds):
     return _udep_cast_label_sequence(ds, 'labels')
 
-oasst_rlhf = MultipleChoice("prompt",choices=['chosen','rejected'],labels=constant(0),
+oasst_rlhf = MultipleChoice("prompt",choices=['chosen','rejected'],labels=constant(0), question="Which reply is better?",
     dataset_name="tasksource/oasst1_pairwise_rlhf_reward")
 
 # the tweet sources duplicate tweet_sentiment_multilingual and amazon_reviews_multi is its own task
