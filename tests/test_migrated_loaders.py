@@ -217,7 +217,7 @@ class MigratedLoaderHelperTest(unittest.TestCase):
 
         for var in [
             "ethics___commonsense", "ethics___deontology",
-            "ethics___justice", "ethics___virtue",
+            "ethics___justice",
         ]:
             self.assertEqual(
                 getattr(en_tasks, var).dataset_name, "csv"
@@ -239,7 +239,8 @@ class MigratedLoaderHelperTest(unittest.TestCase):
         )
         self.assertEqual(en_tasks.hope_edi.dataset_name, "csv")
         self.assertEqual(en_tasks.numer_sense.dataset_name, "tasksource/numer_sense")
-        self.assertEqual(en_tasks.arg_me.dataset_name, "json")
+        self.assertEqual(en_tasks.arg_me.dataset_name, "webis/args_me")
+        self.assertEqual(en_tasks.ethics___virtue.dataset_name, "hendrycks/ethics")
         self.assertEqual(ml_tasks.sentiment.dataset_name, "tasksource/multilingual-sentiments")
         self.assertEqual(en_tasks.emo.dataset_name,
                          "oneonlee/cleansed_emocontext")

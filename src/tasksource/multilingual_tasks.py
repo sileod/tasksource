@@ -26,9 +26,9 @@ americas_nli = Classification("premise","hypothesis","label",config_name="all_la
 
 stsb_multi_mt = Classification("sentence1", "sentence2",
     lambda x: float(x["similarity_score"]/5),
-    **all('stsb_multi_mt'))
+    **all('PhilipMay/stsb_multi_mt'))
 
-pawsx = Classification("sentence1","sentence2",name('label',['not_paraphrase','paraphrase']), **all('paws-x'))
+pawsx = Classification("sentence1","sentence2",name('label',['not_paraphrase','paraphrase']), **all('google-research-datasets/paws-x'))
 
 MIAM_DIHANA_LABELS = [
     "Afirmacion", "Apertura", "Cierre", "Confirmacion", "Espera",
@@ -119,17 +119,15 @@ exams = MultipleChoice(get.question.stem, choices_list=get.question.choices.text
 xcsr = MultipleChoice(lambda x: x['question']['stem'].strip() or 'Most plausible:', # X-CODAH stems are empty
     choices_list=get.question.choices.text,
     labels=lambda x:'ABCDE'.index(x['answerKey']),
-    **all('xcsr'))
+    **all('INK-USC/xcsr'))
 
 xcopa = MultipleChoice(_copa_input,choices=['choice1','choice2'],labels="label",
-    **all('xcopa'))
+    **all('cambridgeltl/xcopa'))
 
 xstory = MultipleChoice(lambda x: "\n".join([x[f'input_sentence_{i}'] for i in range(1,5)]),
     choices=["sentence_quiz1","sentence_quiz2"],labels=constant(0), **all("juletxara/xstory_cloze"))
 
 
-xglue_ner = TokenClassification("words","ner", dataset_name="xglue",config_name="ner")
-xglue_pos = TokenClassification("words","pos", dataset_name="xglue",config_name="pos")
 
 # DISRPT discourse relations between two units. Relation inventories differ per corpus, so each is its
 # own task; keep corpora with at least 1,600 training pairs, minus the English ones tasksource already
@@ -297,7 +295,12 @@ indic_glue__section_title = MultipleChoice("sectionText", question="Which title 
 
 tidy_as2=Classification("Question","Sentence","Label",dataset_name='tasksource/tydi-as2-balanced') 
 
-multiconer = TokenClassification("tokens","ner_tags_index", **all("MultiCoNER/multiconer_v2"))
+# the Hub's parquet export of the script-only dataset; the MULTI config is the union of the others
+multiconer = TokenClassification("tokens", "ner_tags_index", dataset_name="parquet", task_id="multiconer_v2/{config_name}",
+    config_name=["Bangla (BN)", "Chinese (ZH)", "English (EN)", "Farsi (FA)", "French (FR)", "German (DE)", "Hindi (HI)",
+                 "Italian (IT)", "Portuguese (PT)", "Spanish (ES)", "Swedish (SV)", "Ukrainian (UK)"],
+    load_dataset_kwargs={"data_files": {split: f"hf://datasets/MultiCoNER/multiconer_v2@refs%2Fconvert%2Fparquet/{{config_name}}/{split}/*.parquet"
+                                        for split in ("train", "validation", "test")}})
 
 mtop = Classification("question",labels="intent", dataset_name="tasksource/mtop")
 

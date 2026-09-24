@@ -198,6 +198,11 @@ udep__deprel_multilingual = TokenClassification('tokens', 'deprel',
     pre_process=lambda ds: _udep_cast_label_sequence(ds, 'deprel'),
     **_all_configs('universal-dependencies/universal_dependencies'))
 
+# xglue's NER and POS configs repackage CoNLL-2002/2003 and Universal Dependencies (tasks listed
+# elsewhere) and exist only behind a loading script
+xglue__ner = TokenClassification("words", "ner", dataset_name="microsoft/xglue", config_name="ner")
+xglue__pos = TokenClassification("words", "pos", dataset_name="microsoft/xglue", config_name="pos")
+
 KINDS = {
     "evaluation": "evaluation benchmark: useful for evaluation, kept out of training",
     "duplicate": "duplicates or is covered by a listed task",
@@ -208,6 +213,8 @@ KINDS = {
 }
 
 PARKED = {
+    'xglue__ner': ('duplicate', 'repackages CoNLL-2002/2003 NER, which conll2003 and the multilingual NER tasks cover; script-only'),
+    'xglue__pos': ('duplicate', 'repackages Universal Dependencies POS, which udep__pos covers; script-only'),
     'udep__deprel_multilingual': ('unsound', 'all-language variant of udep__deprel; relation labels depend on the head word, which the task does not show'),
     'has_part': ('unsound', 'labels are model confidence scores, nearly all above 0.99'),
     'recast___recast_kg_relations': ('unsound', 'label semantics (1-6) are undocumented'),

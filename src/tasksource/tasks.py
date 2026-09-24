@@ -6,6 +6,9 @@ from collections import Counter
 import random
 import re
 
+# the Hub's automatic parquet export of script-only datasets (same splits and features)
+PARQUET = "refs/convert/parquet"
+
 # Integer encodings documented by the corresponding source dataset cards.
 NLI_LABEL_VALUES = {0: "entailment", 1: "neutral", 2: "contradiction"}
 ENTAILMENT_LABEL_VALUES = {0: "not-entailed", 1: "entailed"}
@@ -765,12 +768,8 @@ ethics___justice = Classification(
 ethics___virtue = Classification(
     sentence1=_ethics_virtue_first, sentence2=_ethics_virtue_second,
     labels=name("label", ["trait not shown", "trait shown"]),
-    dataset_name="csv", task_id="ethics/virtue",
-    load_dataset_kwargs={"data_files": {
-        "train": "hf://datasets/hendrycks/ethics/data/virtue/train.csv",
-        "validation": "hf://datasets/hendrycks/ethics/data/virtue/test.csv",
-        "test": "hf://datasets/hendrycks/ethics/data/virtue/test_hard.csv",
-    }})
+    dataset_name="hendrycks/ethics", config_name="default", task_id="ethics/virtue",
+    load_dataset_kwargs=dict(revision=PARQUET, data_dir="virtue"))
 
 def _emocontext_text(x):
     return " ".join(x[field] for field in ("turn1", "turn2", "turn3") if x[field] is not None)
@@ -793,14 +792,22 @@ tweets_hate_speech_detection = Classification(sentence1="tweet", labels="label",
 wnut_17 = TokenClassification(tokens="tokens", labels="ner_tags", dataset_name="flaitenberger/wnut_17",
     task_id="wnut_17/wnut_17")  # data-only mirror
 
-ncbi_disease = TokenClassification(tokens="tokens", labels="ner_tags", config_name=["ncbi_disease"])
+ncbi_disease = TokenClassification(tokens="tokens", labels="ner_tags", dataset_name="ncbi/ncbi_disease",
+    task_id="ncbi_disease/ncbi_disease", load_dataset_kwargs=dict(revision=PARQUET, data_dir="ncbi_disease"))
 
-acronym_identification = TokenClassification(labels="labels", tokens="tokens")
+acronym_identification = TokenClassification(labels="labels", tokens="tokens",
+    dataset_name="amirveyseh/acronym_identification", task_id="acronym_identification")
 
-jnlpba = TokenClassification(tokens="tokens", labels="ner_tags", splits=["train", "validation", None], config_name=["jnlpba"])
+jnlpba = TokenClassification(tokens="tokens", labels="ner_tags", splits=["train", "validation", None],
+    dataset_name="jnlpba/jnlpba", task_id="jnlpba/jnlpba", load_dataset_kwargs=dict(revision=PARQUET, data_dir="jnlpba"))
 
 
-SpeedOfMagic_ontonotes_english = TokenClassification(tokens="tokens", labels="ner_tags", dataset_name="SpeedOfMagic/ontonotes_english", config_name="SpeedOfMagic--ontonotes_english")
+# the parquet export lost the tag names; these are the ones the dataset card documents
+_ONTONOTES_TAGS = ["O"] + [f"{p}-{t}" for t in ["PERSON", "NORP", "FAC", "ORG", "GPE", "LOC", "PRODUCT", "DATE", "TIME",
+    "PERCENT", "MONEY", "QUANTITY", "ORDINAL", "CARDINAL", "EVENT", "WORK_OF_ART", "LAW", "LANGUAGE"] for p in "BI"]
+SpeedOfMagic_ontonotes_english = TokenClassification(tokens="tokens", labels="ner_tags", dataset_name="SpeedOfMagic/ontonotes_english",
+    task_id="ontonotes_english/SpeedOfMagic--ontonotes_english", load_dataset_kwargs=dict(revision=PARQUET),
+    pre_process=lambda ds: ds.cast_column("ner_tags", Sequence(ClassLabel(names=_ONTONOTES_TAGS))))
 
 blog_authorship_corpus__gender    = Classification(sentence1="text",labels="gender", question="What is the blogger's gender?",
     dataset_name="tasksource/blog_authorship_corpus")
@@ -1242,24 +1249,9 @@ dgen  = MultipleChoice("sentence", choices_list=lambda x:[x["answer"]]+x["distra
 
 i2d2 = Classification("sentence1",labels=name('label',['False','True']), dataset_name="tasksource/I2D2")
 
-def _preprocess_args_me(dataset):
-    import ast
-
-    def extract(row):
-        premises = row["premises"]
-        if isinstance(premises, str):
-            premises = ast.literal_eval(premises)
-        premise = premises[0]
-        return {"argument": premise["text"], "stance": premise["stance"]}
-
-    return dataset.map(extract)
-
 arg_me = Classification(
-    'argument', 'conclusion', 'stance', dataset_name="json", task_id="args_me",
-    load_dataset_kwargs={
-        "data_files": "hf://datasets/webis/args_me/args-me.jsonl"
-    },
-    pre_process=_preprocess_args_me)
+    'argument', 'conclusion', 'stance', dataset_name="webis/args_me", task_id="args_me",
+    load_dataset_kwargs=dict(revision=PARQUET, data_dir="corpus"))  # one argument per row
 valueeval_stance = Classification(
     "Premise", "Conclusion", "Stance", dataset_name="csv",
     task_id="Touche23-ValueEval",
@@ -1320,10 +1312,12 @@ conceptrules_v2 = Classification("context", "text", "label", dataset_name="tasks
 
 scidtb = Classification("unit1_txt","unit2_txt","label", dataset_name="multilingual-discourse-hub/disrpt",config_name='eng.dep.scidtb.rels')
 
-chunking = TokenClassification("tokens","chunk_tags", dataset_name="conll2000")
+chunking = TokenClassification("tokens","chunk_tags", dataset_name="eriktks/conll2000", task_id="conll2000",
+    load_dataset_kwargs=dict(revision=PARQUET))
 
 few_nerd = TokenClassification("tokens","fine_ner_tags",dataset_name="DFKI-SLT/few-nerd",config_name='supervised')
-finer = TokenClassification('tokens','ner_tags',dataset_name='nlpaueb/finer-139')
+finer = TokenClassification('tokens','ner_tags',dataset_name='nlpaueb/finer-139',
+    load_dataset_kwargs=dict(revision=PARQUET, data_dir="finer-139"))
 
 label_nli = Classification("premise","hypothesis","labels",dataset_name='tasksource/zero-shot-label-nli')
 
