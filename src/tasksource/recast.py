@@ -4,11 +4,12 @@ from sorcery import dict_of
 import string
 
 improper_labels =['recast/recast_kg_relations','linguisticprobing',"lex_glue/scotus",'lexical_relation_classification/ROOT09',"pragmeval/squinky","pragmeval/emobank",'pragmeval/persuasiveness']
-improper_labels += ['glue/stsb', 'sick/relatedness', 'joci', 'amazon_counterfactual/en', 'toxic_conversations', 'ethos/multilabel', 'lex_glue/eurlex', 'lex_glue/unfair_tos', 'app_reviews', 'humicroedit/subtask-1', 'stackoverflow-questions', 'go_emotions/simplified', 'google_wellformed_query', 'has_part', 'blog_authorship_corpus/age', 'promptCoherence', 'Sarcasm_News_Headline', 'auditor_review/demo-org--auditor_review', 'Dynasent_Disagreement', 'Politeness_Disagreement', 'SBIC_Disagreement', 'SChem_Disagreement', 'Dilemmas_Disagreement', 'sts-companion', 'acceptability-prediction', 'chaos-mnli-ambiguity', 'headline_cause/en_simple', 'oasst1_dense_flat', 'civil_comments']
+improper_labels += ['glue/stsb', 'sick/relatedness', 'joci', 'amazon_counterfactual/en', 'toxic_conversations', 'ethos/multilabel', 'lex_glue/eurlex', 'lex_glue/unfair_tos', 'app_reviews', 'humicroedit/subtask-1', 'stackoverflow-questions', 'go_emotions/simplified', 'google_wellformed_query', 'has_part', 'blog_authorship_corpus/age', 'promptCoherence', 'Sarcasm_News_Headline', 'auditor_review/demo-org--auditor_review', 'sts-companion', 'acceptability-prediction', 'chaos-mnli-ambiguity', 'headline_cause/en_simple', 'oasst1_dense_flat', 'civil_comments']
 
 improper_labels += ['stsb_multi_mt','MLMA_hate_speech','icl-symbol-tuning-instruct','zero-shot-label-nli']
 
-improper_labels += ['essay-scoring','english-grading','HelpSteer','oasst2']
+# HelpSteer ratings and preferences are graded Jev families instead
+improper_labels += ['essay-scoring','english-grading','HelpSteer/','HelpSteer2/','HelpSteer3/preference','oasst2']
 
 def render_options(options):
     options = [f'"{x}"' for x in options]
