@@ -28,6 +28,7 @@ ORIGINALS = {
     "tasksource/multilingual-sentiments": ["tyqiangz/multilingual-sentiments"],
     "tasksource/math_qa": ["allenai/math_qa"],
     "tasksource/numer_sense": ["INK-USC/numer_sense"],
+    "tasksource/prm800k_dpo": ["tasksource/PRM800K"],
     "tasksource/scicite": ["allenai/scicite"],
     "tasksource/scifact_entailment": ["allenai/scifact_entailment"],
     "tasksource/sharc": ["nikhilweee/sharc_modified"],

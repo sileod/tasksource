@@ -1773,6 +1773,13 @@ msci_nli = Classification('sentence1','sentence2','label',dataset_name='sadat230
 
 ultrafeedback = MultipleChoice("question", choices=['response_j','response_k'],labels=constant(0), dataset_name="pushpdeep/UltraFeedback-paired")
 
+# PRM800K math solutions: chosen solutions are human-validated and correct, rejected ones flawed and wrong;
+# the step config compares next steps after a prefix that reached a verified answer
+prm800k_dpo___solution = MultipleChoice("prompt", choices=["chosen", "rejected"], labels=constant(0),
+    question="Which solution is correct?", dataset_name="tasksource/prm800k_dpo", config_name="solution")
+prm800k_dpo___step = MultipleChoice("prompt", choices=["chosen", "rejected"], labels=constant(0),
+    question="Which next step is correct?", dataset_name="tasksource/prm800k_dpo", config_name="step")
+
 essay_scoring = Classification("full_text", labels="score", question="What holistic score does this student essay deserve?",
     dataset_name='tasksource/AES2-essay-scoring',
     label_values={score: f"{score} out of 6" for score in range(1, 7)})
