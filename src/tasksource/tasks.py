@@ -1810,6 +1810,7 @@ essay_scoring = Classification("full_text", labels="score", question="What holis
     label_values={score: f"{score} out of 6" for score in range(1, 7)})
 
 argument_feedback = Classification(lambda x: f"{x['discourse_type']}: {x['discourse_text']}",
+    question="How effective is this element of the student's argument?",
     labels="discourse_effectiveness", dataset_name="tasksource/argument-feedback")
 
 # analytic scores from 1 to 5 in half points, averaged over raters; rounded half up
@@ -1838,7 +1839,8 @@ tasksource_dpo = MultipleChoice("prompt",choices=['chosen','rejected'],labels=co
 seahorse = Classification('article',cat(["summary", "question"]),'answer',
     dataset_name="tasksource/seahorse_summarization_evaluation")
 
-mip = Classification("prompt",labels="y",
+mip = Classification(lambda x: x["prompt"].split("\nProvide no explanation")[0].strip(),  # drop the answer-format instruction
+    labels=lambda x: x["y"].rstrip(".").lower(),
     dataset_name="sileod/missing-item-prediction",config_name="contrastive")
 
 jigsaw_toxicity = Classification('comment_text',labels=name("toxic",["not toxic","toxic"]),
