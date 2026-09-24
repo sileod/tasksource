@@ -26,7 +26,7 @@ def audit(task_id, multilingual):
                 rows.append(dict(tokens=" ".join(ex["tokens"])[:120]))
             else:
                 rows.append(dict(s1=str(ex["sentence1"])[:220], s2=str(ex.get("sentence2", ""))[:160],
-                                 gold=names[ex["labels"]] if names else ex["labels"]))
+                                 gold=names[ex["labels"]] if names and isinstance(ex["labels"], int) else ex["labels"]))
         return dict(task=task_id, ml=multilingual, type=d.task_type, question=d.question,
                     names=[str(n)[:40] for n in names[:15]] if names else None, n_names=len(names) if names else None,
                     rows=rows)
