@@ -600,7 +600,14 @@ lex_glue___unfair_tos = Classification(sentence1="text", labels="labels",
     question="Which kind of unfair term, if any, does this terms-of-service clause contain?")
 lex_glue___case_hold = MultipleChoice("context", choices_list='endings', labels="label")
 
-language_identification = Classification("text",labels="labels", dataset_name="papluca/language-identification")
+# langcodes names ISO codes; WiLI also uses a few Wikipedia codes langcodes misreads
+_WIKIPEDIA_LANGUAGES = {"roa-tara": "Tarantino", "map-bms": "Banyumasan", "be-tarask": "Belarusian (Taraškievica)"}
+def language_name(code):
+    import langcodes
+    return _WIKIPEDIA_LANGUAGES.get(code) or langcodes.get(code).display_name()
+
+language_identification = Classification("text",labels=lambda x: language_name(x["labels"]), question="What language is this text in?",
+    dataset_name="papluca/language-identification")
 
 ################ Automatically generated (verified)##########
 

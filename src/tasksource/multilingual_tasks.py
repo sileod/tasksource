@@ -1,5 +1,5 @@
 from .preprocess import cat, get,name, regen, constant, Classification, TokenClassification, MultipleChoice
-from .tasks import _copa_input
+from .tasks import _copa_input, language_name
 from datasets import get_dataset_config_names, ClassLabel, Dataset, DatasetDict, concatenate_datasets, Sequence
 
 def all(dataset_name):
@@ -110,8 +110,10 @@ oasst1__helpfulness = Classification("parent_text","text",labels="helpfulness", 
     pre_process = lambda ds:ds.remove_columns('labels'))
 
 
-language_identification = Classification("text",labels="labels", dataset_name="papluca/language-identification")
-wili_2018_langid = Classification("sentence",labels="label",dataset_name="wili_2018")
+language_identification = Classification("text",labels=lambda x: language_name(x["labels"]), question="What language is this text in?",
+    dataset_name="papluca/language-identification")
+wili_2018_langid = Classification("sentence",labels="label",dataset_name="wili_2018", question="What language is this text in?",
+    pre_process=lambda ds: ds.cast_column("label", ClassLabel(names=[language_name(c) for c in ds["train"].features["label"].names])))
 
 exams = MultipleChoice(get.question.stem, choices_list=get.question.choices.text,
     labels=lambda x:'ABCDE'.index(x['answerKey']),
