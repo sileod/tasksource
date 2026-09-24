@@ -374,6 +374,9 @@ def _ranked_family_groups(source_buckets, identifiers):
         active.append(iterator)
 
 
+MAX_MULTILINGUAL_SHARE = 0.2  # a ceiling on multilingual families' share of each format
+
+
 def diverse_cap(dataset, max_rows):
     """Cap by dataset family, sampling configs and preserving question groups."""
     if max_rows is None or len(dataset) <= max_rows:
@@ -391,6 +394,12 @@ def diverse_cap(dataset, max_rows):
         buckets.setdefault(family, {}).setdefault(source, []).append(index)
     # each family's share of the cap scales with its weight (metadata/weights.py)
     weights = {family: max(task_weight(source) for source in configs) for family, configs in buckets.items()}
+    multilingual = sum(weight for family, weight in weights.items() if family.startswith("multilingual/"))
+    english = sum(weights.values()) - multilingual
+    if english and multilingual > MAX_MULTILINGUAL_SHARE * (english + multilingual):
+        scale = MAX_MULTILINGUAL_SHARE * english / ((1 - MAX_MULTILINGUAL_SHARE) * multilingual)
+        weights = {family: weight * scale if family.startswith("multilingual/") else weight
+                   for family, weight in weights.items()}
     total_weight = sum(weights.values())
     quotas = {family: max(1, int(max_rows * weight / total_weight)) for family, weight in weights.items()}
     family_sizes = {

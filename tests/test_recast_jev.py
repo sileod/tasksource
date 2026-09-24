@@ -200,6 +200,12 @@ class RecastJevTest(unittest.TestCase):
         self.assertGreater(counts["anli/a1"], 2 * counts["plain"])
         self.assertLess(counts["linguisticprobing/x"], counts["plain"])
 
+    def test_diverse_cap_caps_multilingual_share(self):
+        sources = [f"multilingual/m{i % 8}" for i in range(400)] + [f"e{i % 2}" for i in range(400)]
+        dataset = Dataset.from_dict({"source": sources, "id": [f"s:train:{i}" for i in range(800)]})
+        counts = Counter(source.startswith("multilingual/") for source in diverse_cap(dataset, 100)["source"])
+        self.assertLessEqual(counts[True], 20)
+
     def test_diverse_cap_keeps_related_questions_together(self):
         dataset = Dataset.from_dict({
             "source": ["ner"] * 6,
