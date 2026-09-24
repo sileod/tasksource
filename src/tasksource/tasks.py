@@ -1773,12 +1773,23 @@ msci_nli = Classification('sentence1','sentence2','label',dataset_name='sadat230
 
 ultrafeedback = MultipleChoice("question", choices=['response_j','response_k'],labels=constant(0), dataset_name="pushpdeep/UltraFeedback-paired")
 
+def _without_math_test(dataset):
+    # PRM800K's train split holds ~2k MATH test problems (its own test split is MATH-500); train only on
+    # problems from MATH train, like any benchmark whose train split is fine but test split is not
+    from datasets import load_dataset
+    normalize = lambda text: " ".join(text.split())
+    test = {normalize(problem) for config in get_dataset_config_names("EleutherAI/hendrycks_math")
+            for problem in load_dataset("EleutherAI/hendrycks_math", config, split="test")["problem"]}
+    return dataset.filter(lambda x: normalize(x["prompt"]) not in test)
+
 # PRM800K math solutions: chosen solutions are human-validated and correct, rejected ones flawed and wrong;
 # the step config compares next steps after a prefix that reached a verified answer
 prm800k_dpo___solution = MultipleChoice("prompt", choices=["chosen", "rejected"], labels=constant(0),
-    question="Which solution is correct?", dataset_name="tasksource/prm800k_dpo", config_name="solution")
+    question="Which solution is correct?", dataset_name="tasksource/prm800k_dpo", config_name="solution",
+    pre_process=_without_math_test, splits=["train", None, None])  # the source test split is MATH-500
 prm800k_dpo___step = MultipleChoice("prompt", choices=["chosen", "rejected"], labels=constant(0),
-    question="Which next step is correct?", dataset_name="tasksource/prm800k_dpo", config_name="step")
+    question="Which next step is correct?", dataset_name="tasksource/prm800k_dpo", config_name="step",
+    splits=["train", None, None])  # the source test split is MATH-500; train has no MATH test problems
 
 essay_scoring = Classification("full_text", labels="score", question="What holistic score does this student essay deserve?",
     dataset_name='tasksource/AES2-essay-scoring',
