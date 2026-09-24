@@ -622,10 +622,12 @@ humicroedit___subtask_1 = Classification(lambda x: f"Original: {x['headline']}",
     labels=lambda x: int(x["meanGrade"] + 0.5),
     label_values={0: "not funny", 1: "slightly funny", 2: "moderately funny", 3: "funny"},
     dataset_name="tasksource/humicroedit", config_name="subtask-1")
-humicroedit___subtask_2 = Classification(
-    sentence1=cat(['original1','edit1'],' : '),
-    sentence2=cat(['original2','edit2'],' : '),
-    labels="label", dataset_name="tasksource/humicroedit", config_name="subtask-2")
+def _humicroedit(i):  # the headline with its <word/> replaced by the edit
+    return lambda x: re.sub(r"<[^>]*/>", x[f"edit{i}"], x[f"original{i}"])
+humicroedit___subtask_2 = Classification(_humicroedit(1), _humicroedit(2),
+    labels="label", question="Which edited headline is funnier?",
+    label_values={0: "equally funny", 1: "first headline", 2: "second headline"},
+    dataset_name="tasksource/humicroedit", config_name="subtask-2")
 
 snips_built_in_intents = Classification(sentence1="text", labels="label", splits=["train", None, None])
 
