@@ -550,14 +550,27 @@ discovery = Classification("sentence1", "sentence2", labels="label", config_name
 
 pragmeval_1 = Classification("sentence",labels="label",
     dataset_name="pragmeval",
-    config_name= ["emobank-arousal", "emobank-dominance", "emobank-valence", "squinky-formality", "squinky-implicature", 
-    "squinky-informativeness","switchboard","mrda","verifiability"])
+    config_name= ["switchboard","mrda","verifiability"])
 
 pragmeval_2 = Classification("sentence1","sentence2",labels="label",
     dataset_name="pragmeval",
-    config_name= ["emergent", "gum", "pdtb", "persuasiveness-claimtype", 
-    "persuasiveness-eloquence", "persuasiveness-premisetype", "persuasiveness-relevance", "persuasiveness-specificity", 
-    "persuasiveness-strength", "sarcasm","stac"])
+    config_name= ["emergent", "gum", "pdtb", "persuasiveness-claimtype", "persuasiveness-premisetype", "sarcasm","stac"])
+
+# low/high scales over the same inputs: the label names the scale
+def _pragmeval_scale(config, scale, *inputs):
+    return Classification(*inputs, labels="label", dataset_name="pragmeval", config_name=config, task_id=f"pragmeval/{config}",
+        label_values={0: f"low {scale}", 1: f"high {scale}"})
+
+pragmeval__emobank_arousal = _pragmeval_scale("emobank-arousal", "emotional arousal", "sentence")
+pragmeval__emobank_dominance = _pragmeval_scale("emobank-dominance", "dominance (sense of control)", "sentence")
+pragmeval__emobank_valence = _pragmeval_scale("emobank-valence", "valence (pleasantness)", "sentence")
+pragmeval__squinky_formality = _pragmeval_scale("squinky-formality", "formality", "sentence")
+pragmeval__squinky_implicature = _pragmeval_scale("squinky-implicature", "implicature (implied beyond what is said)", "sentence")
+pragmeval__squinky_informativeness = _pragmeval_scale("squinky-informativeness", "informativeness", "sentence")
+pragmeval__persuasiveness_eloquence = _pragmeval_scale("persuasiveness-eloquence", "eloquence", "sentence1", "sentence2")
+pragmeval__persuasiveness_relevance = _pragmeval_scale("persuasiveness-relevance", "relevance", "sentence1", "sentence2")
+pragmeval__persuasiveness_specificity = _pragmeval_scale("persuasiveness-specificity", "specificity", "sentence1", "sentence2")
+pragmeval__persuasiveness_strength = _pragmeval_scale("persuasiveness-strength", "argument strength", "sentence1", "sentence2")
 
 silicone = Classification("Utterance",labels="Label",
     dataset_name="tasksource/silicone",
@@ -660,7 +673,14 @@ scicite = Classification(sentence1="string", labels="label",dataset_name="taskso
 liar = Classification(sentence1="statement", labels="label",
     dataset_name="tasksource/liar")
 
-relbert_lexical_relation_classification = Classification(sentence1="head", sentence2="tail", labels="relation",
+# the source relation codes, spelled out (EVALution names are already readable)
+LEXICAL_RELATIONS = {"attri": "attribute", "coord": "co-hyponym", "COORD": "co-hyponym", "sibl": "co-hyponym",
+    "hyper": "hypernym", "HYPER": "hypernym", "hypo": "hyponym", "mero": "meronym",
+    "random": "unrelated", "RANDOM": "unrelated", "false": "unrelated"}
+LEXICAL_RELATION_QUESTION = "How is the second word related to the first?"
+
+relbert_lexical_relation_classification = Classification(sentence1="head", sentence2="tail",
+ labels=lambda x: LEXICAL_RELATIONS.get(x["relation"], x["relation"]), question=LEXICAL_RELATION_QUESTION,
  dataset_name="json",
  config_name=["BLESS","EVALution","K&H+N","ROOT09"],
  task_id="lexical_relation_classification/{config_name}",
