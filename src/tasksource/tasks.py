@@ -1307,7 +1307,7 @@ sen_making__2 = MultipleChoice(lambda x: [x['sentence0'],x['sentence1']][x['fals
     question="Why is this statement implausible?", choices=['A','B','C'],labels=lambda x: 'ABC'.index(x['reason']), dataset_name="tasksource/sen-making")
 
 winowhy = Classification('sentence', lambda x: f'In "{x["wnli_sent1"]}", {x["wnli_sent2"]}',
-    labels=name('label',['False','True']), dataset_name="tasksource/winowhy")
+    labels=name('label',['False','True']), question="Is this explanation correct?", dataset_name="tasksource/winowhy")
 
 
 robustLR = Classification("context","statement","label", dataset_name="tasksource/robustLR")
@@ -1320,7 +1320,7 @@ parade = Classification("Definition1","Definition2", labels=name('Binary labels'
 
 cladder = Classification("given_info", "question", "answer",dataset_name="tasksource/cladder")
 
-subjectivity = Classification("Sentence",labels="Label",dataset_name="tasksource/subjectivity")
+subjectivity = Classification("Sentence",labels=lambda x: {"OBJ": "objective", "SUBJ": "subjective"}[x["Label"]],dataset_name="tasksource/subjectivity")
 
 moh   = Classification("context","expression","label", dataset_name="tasksource/MOH")
 vuac  = Classification("context","expression","label", dataset_name="tasksource/VUAC")
@@ -1335,7 +1335,7 @@ sharc_classification = Classification("snippet",
     lambda x: "\n".join(part for part in (x["scenario"], x["question"], x["history"]) if part),
     labels="label", dataset_name="tasksource/sharc")
 
-conceptrules_v2 = Classification("context", "text", "label", dataset_name="tasksource/conceptrules_v2")
+conceptrules_v2 = Classification("context", "text", "label", question="Is the statement true given the context?", dataset_name="tasksource/conceptrules_v2")
 
 scidtb = Classification("unit1_txt","unit2_txt","label", dataset_name="multilingual-discourse-hub/disrpt",config_name='eng.dep.scidtb.rels')
 
@@ -1375,7 +1375,7 @@ def _icl_rand(x):
     return random.Random(x['sentence1'][:50]).randint(0,1) #deterministic label for each input
 
 icl = Classification("inputs", lambda x: x['symbols'][_icl_rand(x)],
-    labels=lambda x: str(x['symbols'][_icl_rand(x)]==x['targets']),
+    labels=lambda x: str(x['symbols'][_icl_rand(x)]==x['targets']), question="Is this the right label for the last input?",
     dataset_name="tasksource/icl-symbol-tuning-instruct",
     pre_process=lambda ds:ds.filter(lambda x:len(x['inputs'])<500*4), # 500 tokens of 4 char 
 )
@@ -1394,7 +1394,7 @@ propsegment = Classification("hypothesis","premise",
 hatemoji = Classification('text',labels=name("label_gold", ['not-hate-speech','hate-speech']),
     dataset_name="HannahRoseKirk/HatemojiBuild")
 
-regset = Classification("context",labels="answer",dataset_name='tasksource/regset')
+regset = Classification("context",labels="answer", question="Does the string match the regular expression?",dataset_name='tasksource/regset')
 
 def _esci_product(x): # product_text writes missing fields as 'None' lines
     fields = ['product_title','product_brand','product_color','product_description','product_bullet_point']
@@ -1412,8 +1412,7 @@ def _preprocess_chatbot_arena(ds):
         # single-turn: the prompt is the state and the replies are the options
         single = x['turn'] == 1
         f=lambda x:"\n".join([f"{turn['role']}:\n{turn['content']}" for turn in x])
-        x['prompt'] = (f"{x['conversation_a'][0]['content']}\n\nReply the user preferred:" if single
-            else "Conversation whose assistant the user preferred:")
+        x['prompt'] = x['conversation_a'][0]['content'] if single else ""
         x['conversation_a'] = x['conversation_a'][1]['content'] if single else f(x['conversation_a'])
         x['conversation_b'] = x['conversation_b'][1]['content'] if single else f(x['conversation_b'])
         return x
@@ -1422,7 +1421,7 @@ def _preprocess_chatbot_arena(ds):
 
 chatbot_arena = MultipleChoice("prompt",
     choices=["conversation_a","conversation_b"],
-    labels=lambda x: ["model_a","model_b"].index(x["winner"]),
+    labels=lambda x: ["model_a","model_b"].index(x["winner"]), question="Which assistant did the user prefer?",
     dataset_name="lmsys/chatbot_arena_conversations",
     pre_process=_preprocess_chatbot_arena)
 
