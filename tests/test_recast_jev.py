@@ -191,7 +191,7 @@ class RecastJevTest(unittest.TestCase):
         self.assertEqual(len(capped), 6)
 
     def test_diverse_cap_follows_family_weights(self):
-        # anli/ is weighted 3 and linguisticprobing/ 0.25 in metadata/weights.py
+        # anli is weighted 3 and linguisticprobing 0.1 in metadata/weights.py
         dataset = Dataset.from_dict({
             "source": ["anli/a1"] * 100 + ["plain"] * 100 + ["linguisticprobing/x"] * 100,
             "id": [f"s:train:{i}" for i in range(300)],

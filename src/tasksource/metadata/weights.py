@@ -1,29 +1,25 @@
 """Relative sampling weights for builders that mix many tasks (Jev, instruct, label-nli).
 
-A weight scales a task family's share of the mix; the default is 1. They are
-judgment calls, not measurements: templated or probing data teaches little per
-extra row, while human-written adversarial and long-document data stays varied.
-Patterns are regular expressions searched in the task id (``multilingual/`` ids
-included); the first match wins.
+Every task weighs 1 except a few groups: templated probes teach little per
+extra row, while hard human-written NLI, long documents and preference pairs
+stay varied. A builder scales a task's rows (or its family's share) by the
+weight. Patterns are regular expressions searched in the task id, first match
+wins; keep the list short.
 """
 
 import re
 
-WEIGHTS = [
-    # templated or synthetic probes: a few thousand rows show the pattern
-    (r"^(linguisticprobing|robust_nli|gen_debiased_nli)", 0.25),
-    (r"^babi_nli", 0.5),
-    # long documents and summaries: varied inputs, few alternatives elsewhere
-    (r"^(doc-nli|ConTRoL-nli|mctest-nli|summarize_from_feedback|seahorse_summarization_evaluation)", 5),
-    # human-written adversarial or hard NLI and sentiment
-    (r"^(anli/|WANLI|dynasent/|FOL-nli|(multilingual/)?xnli)", 3),
-    # preference pairs
-    (r"(_dpo|dpo_pairs)", 3),
-]
+WEIGHTS = {
+    r"(linguisticprobing|robust_nli|gen_debiased_nli)": 0.1,
+    r"universal_dependencies": 0.2,
+    r"(label_nli|dpo|dataset_train_nli)": 5,
+    r"(anli|WANLI|dynasent/|xnli|FOL-nli)": 3,
+    r"(doc-nli|ConTRoL|mctest-nli|summ)": 5,
+}
 
 
 def task_weight(task_id):
-    for pattern, weight in WEIGHTS:
+    for pattern, weight in WEIGHTS.items():
         if re.search(pattern, task_id):
             return weight
     return 1
