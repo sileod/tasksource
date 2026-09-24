@@ -23,6 +23,7 @@ from datasets import Dataset, concatenate_datasets
 
 from . import graded, procedural
 from .augmentations import stable_fraction
+from .prompt_augmentations import CLASSIFICATION_INSTRUCTION
 from .length import LengthBudget
 
 
@@ -220,6 +221,9 @@ def _build_pack(members, rows, names, prefix, budget, max_questions):
     labels = [rows[m]["target"].index(1.0) for m in display]
     state = render_state([rows[m]["state"] for m in display])
     group_id = f"{prefix}:pack-{pack_id}"
+    # a task's own question says what the labels judge ("What stance does the tweet take on feminism?")
+    task_question = rows[members[0]]["question"]
+    context = "" if task_question == CLASSIFICATION_INSTRUCTION else f'Each item answers: "{task_question}"\n'
     candidates = []
     for operator in OPERATORS:
         for params in operator.params(labels, len(names), pack_id):
@@ -232,7 +236,7 @@ def _build_pack(members, rows, names, prefix, budget, max_questions):
                 "kind": operator.kind,
                 "options": operator.options(labels, names),
                 "target": operator.target(labels, params, len(names)),
-                "question": operator.question(params, names),
+                "question": context + operator.question(params, names),
                 "_family": operator.family,
             })
     questions = _select_questions(candidates, f"pack-questions:{pack_id}", max_questions)
@@ -359,7 +363,7 @@ def add_packed_classification(
         raise ValueError(f"max_items must be in 2..{len(LETTERS)}")
     budget = budget or LengthBudget()
     rows = dataset.select_columns(
-        ["id", "kind", "options", "target", "state", "source", "variant", "split"]
+        ["id", "kind", "options", "target", "state", "question", "source", "variant", "split"]
     ).to_list()
     groups = {}
     for index, row in enumerate(rows):

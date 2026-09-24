@@ -113,6 +113,15 @@ class RecastJevTest(unittest.TestCase):
         augmented = augment_jev_internal(direct, 0.0, 0.0, 0.0, 1.0, 0.0)
         self.assertEqual(augmented["question"], ["Is this search query a well-formed question?"])
 
+    def test_label_verification_keeps_the_task_question(self):
+        from tasksource.jev.augmentations import verification_question
+        self.assertEqual(verification_question("Choose the criterion that best describes the state.", "positive"),
+                         'Is "positive" the correct label for this example?')
+        self.assertEqual(verification_question("Choose the criterion that best answers the question.", "Paris"),
+                         'Is "Paris" the correct answer to the question?')
+        self.assertEqual(verification_question("What stance does the tweet take on feminism?", "against"),
+                         'What stance does the tweet take on feminism? Is "against" the correct answer?')
+
     def test_pretty_order_prefix_then_shuffled_tail(self):
         dataset = Dataset.from_dict({
             "source": ["b", "b", "b", "a", "a", "c"],

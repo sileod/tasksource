@@ -16,6 +16,15 @@ def stable_fraction(identifier, salt):
     return int.from_bytes(digest[:8], "big") / 2**64
 
 
+def verification_question(question, option):
+    """Ask whether one option is right, keeping the task's own question when it has one."""
+    if question == CLASSIFICATION_INSTRUCTION:
+        return f'Is "{option}" the correct label for this example?'
+    if question == MULTIPLE_CHOICE_INSTRUCTION:
+        return f'Is "{option}" the correct answer to the question?'
+    return f'{question} Is "{option}" the correct answer?'
+
+
 def augment_jev_internal(
     dataset,
     noul_rate=0.05,
@@ -58,7 +67,7 @@ def augment_jev_internal(
                 "kind": "noul",
                 "options": [],
                 "target": [float(proposed == correct)],
-                "question": f'Is "{options[proposed]}" the correct label for this example?',
+                "question": verification_question(row["question"], options[proposed]),
                 "variant": "label_verification",
             })
 

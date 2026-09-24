@@ -89,11 +89,14 @@ following each source's own train/dev/test splits where it has them.
   - Multiple-choice rows keep every option in a per-row order.
   - A final "all/none of the above" reads "all/none of the other options".
   - Options that cite other options by letter or number keep their order.
+  - The question is the task's own when its inputs alone do not say what to predict
+    ("What stance does the tweet take on feminism?"), and a generic instruction otherwise.
+    Label-verification and packed questions carry it too.
 - **Variants.** Low-frequency, deterministic variants cover label verification as `noul`, criterion order, and instruction wording.
 - **Packing.** Up to 10% of each classification task's examples are packed, two to four at a time, into `packed_derived` states. Their questions (an item's label, agreement, existence, counts) follow exactly from the gold labels.
 - **Mixing.** Dataset families are balanced and related questions are kept together.
   - The first 1,000 train rows are interleaved to show variety in the Dataset Viewer; the rest is shuffled.
-  - BIG-bench, MMLU, and BLiMP are left out so they stay clean for evaluation.
+  - Evaluation benchmarks (BIG-bench, MMLU, BLiMP, MATH test, ...) are left out so they stay clean for evaluation.
 - **Audit trail.** The [source mix](release-audit.json), [failed source list](failed-tasks.json), and [build manifest](build-manifest.json) ship with the data.
 - **Reproducible.** The [build runbook](https://github.com/sileod/tasksource/blob/main/docs/jev/README.md) rebuilds the release from [Tasksource](https://github.com/sileod/tasksource)'s [task catalog](https://github.com/sileod/tasksource/blob/main/tasks.md).
 
