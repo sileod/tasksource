@@ -2,6 +2,7 @@ from .preprocess import cat, get, regen, name, constant, Classification, TokenCl
 from .metadata import bigbench_discriminative_english, blimp_hard, imppres_presupposition, imppres_implicature, udep_en_configs
 from datasets import get_dataset_config_names, Sequence, ClassLabel, Dataset, DatasetDict, Features, Value
 import random
+import re
 
 # Integer encodings documented by the corresponding source dataset cards.
 NLI_LABEL_VALUES = {0: "entailment", 1: "neutral", 2: "contradiction"}
@@ -216,9 +217,9 @@ def _imppres_post_process(ds,prefix=''):
     return ds.cast_column('labels', ClassLabel(
     names=[f'{prefix}_entailment',f'{prefix}_neutral',f'{prefix}_contradiction']))
 
-imppres__presupposition = imppres__prag = Classification("premise","hypothesis","gold_label",
+imppres__presupposition = Classification("premise","hypothesis","gold_label",
     dataset_name="tasksource/imppres", config_name=imppres_presupposition,
-    post_process=_imppres_post_process)
+    post_process=lambda x: _imppres_post_process(x,'presupposition'))
 
 imppres__prag = Classification("premise","hypothesis","gold_label_prag",
     dataset_name="tasksource/imppres", config_name=imppres_implicature,
@@ -252,7 +253,7 @@ conll2003__ner_tags   = TokenClassification(tokens="tokens", labels='ner_tags')
 ######################## Multiple choice ###########################
 
 
-model_written_evals = MultipleChoice('question', choices=['answer_matching_behavior','answer_not_matching_behavior'], labels=constant(0),  
+model_written_evals = MultipleChoice('question', choices_list=lambda x: [x['answer_matching_behavior'].strip(), x['answer_not_matching_behavior'].strip()], labels=constant(0),  
     dataset_name="Anthropic/model-written-evals")
 
 truthful_qa___multiple_choice = MultipleChoice(
@@ -380,8 +381,14 @@ wiqa = MultipleChoice('question_stem',
 piqa = MultipleChoice('goal', choices=['sol1','sol2'], labels='label',
     dataset_name="baber/piqa")
 
-hellaswag = MultipleChoice('ctx_a',
-    choices_list=lambda x: [f'{x["ctx_b"]}{e}' for e in x["endings"]],
+def _hellaswag_text(text):
+    # WikiHow items carry [header]/[title]/[step] tags; same cleanup as lm-eval-harness
+    text = re.sub(r"\[.*?\]", "", text.strip().replace(" [title]", ". "))
+    return re.sub(r"\s+", " ", text).strip()
+
+hellaswag = MultipleChoice(lambda x: _hellaswag_text(x['ctx_a']),
+    # ctx_b is the lowercased start of the sentence each ending completes
+    choices_list=lambda x: [_hellaswag_text(f'{x["ctx_b"][:1].upper()}{x["ctx_b"][1:]} {e}') for e in x["endings"]],
     labels='label', splits=['train','validation',None])
 
 def _copa_input(x):
