@@ -802,12 +802,12 @@ jnlpba = TokenClassification(tokens="tokens", labels="ner_tags", splits=["train"
 
 SpeedOfMagic_ontonotes_english = TokenClassification(tokens="tokens", labels="ner_tags", dataset_name="SpeedOfMagic/ontonotes_english", config_name="SpeedOfMagic--ontonotes_english")
 
-blog_authorship_corpus__gender    = Classification(sentence1="text",labels="gender",
+blog_authorship_corpus__gender    = Classification(sentence1="text",labels="gender", question="What is the blogger's gender?",
     dataset_name="tasksource/blog_authorship_corpus")
-blog_authorship_corpus__age       = Classification(sentence1="text",
+blog_authorship_corpus__age       = Classification(sentence1="text", question="What is the blogger's age group?",
     labels=lambda x: "13-17" if x["age"] <= 17 else "23-27" if x["age"] <= 27 else "33-48",  # the corpus age groups
     dataset_name="tasksource/blog_authorship_corpus")
-blog_authorship_corpus__job       = Classification(sentence1="text",labels="topic",
+blog_authorship_corpus__job       = Classification(sentence1="text",labels="topic", question="In which industry does the blogger work?",
     dataset_name="tasksource/blog_authorship_corpus",
     pre_process=lambda ds: _cast_blog_topics(ds))
 
@@ -1223,18 +1223,19 @@ path_naturalness = MultipleChoice(constant(''),choices=['choice1','choice2'],lab
     question="Which chain of relations is more natural?",
     dataset_name="tasksource/path-naturalness-prediction")
 
-def _civil(attribute, negative, positive):
+def _civil(attribute, negative, positive, flag):
     # attributes are the share of raters who flagged the comment; keep clear cases
     return Classification("text", labels=lambda x: [negative, positive][x[attribute] >= 0.5],
+        question=f"Would most raters flag this comment as {flag}?",
         pre_process=lambda ds: ds.filter(lambda x: not 0.1 <= x[attribute] < 0.5), dataset_name="google/civil_comments")
 
-civil_comments__toxicity = _civil("toxicity", "not toxic", "toxic")
-civil_comments__severe_toxicity = _civil("severe_toxicity", "not severely toxic", "severely toxic")
-civil_comments__obscene = _civil("obscene", "not obscene", "obscene")
-civil_comments__threat = _civil("threat", "no threat", "threat")
-civil_comments__insult = _civil("insult", "not insulting", "insulting")
-civil_comments__identity_attack = _civil("identity_attack", "no identity attack", "identity attack")
-civil_comments__sexual_explicit = _civil("sexual_explicit", "not sexually explicit", "sexually explicit")
+civil_comments__toxicity = _civil("toxicity", "not toxic", "toxic", "toxic")
+civil_comments__severe_toxicity = _civil("severe_toxicity", "not severely toxic", "severely toxic", "severely toxic")
+civil_comments__obscene = _civil("obscene", "not obscene", "obscene", "obscene")
+civil_comments__threat = _civil("threat", "no threat", "threat", "a threat")
+civil_comments__insult = _civil("insult", "not insulting", "insulting", "insulting")
+civil_comments__identity_attack = _civil("identity_attack", "no identity attack", "identity attack", "an identity attack")
+civil_comments__sexual_explicit = _civil("sexual_explicit", "not sexually explicit", "sexually explicit", "sexually explicit")
 
 cloth = MultipleChoice("sentence", choices_list=lambda x:[x["answer"]]+x["distractors"],labels=constant(0), dataset_name="AndyChiang/cloth")
 dgen  = MultipleChoice("sentence", choices_list=lambda x:[x["answer"]]+x["distractors"],labels=constant(0), dataset_name="AndyChiang/dgen")
@@ -1575,12 +1576,13 @@ lifeycle_entailment = Classification("premise","hypothesis","label",dataset_name
 # modern classification / relation extraction datasets
 
 toxic_chat__toxicity = Classification(
-    "user_input", labels=name("toxicity", ["not toxic", "toxic"]),
+    "user_input", labels=name("toxicity", ["not toxic", "toxic"]), question="Is this user prompt toxic?",
     dataset_name="lmsys/toxic-chat", config_name="toxicchat0124",
     splits=["train", None, "test"])
 
 toxic_chat__jailbreaking = Classification(
     "user_input", labels=name("jailbreaking", ["not jailbreak", "jailbreak"]),
+    question="Is this user prompt a jailbreak attempt?",
     dataset_name="lmsys/toxic-chat", config_name="toxicchat0124",
     splits=["train", None, "test"])
 
