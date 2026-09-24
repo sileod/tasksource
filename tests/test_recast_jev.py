@@ -96,14 +96,27 @@ class RecastJevTest(unittest.TestCase):
             len(augment_jev_internal(augmented, 1.0, 1.0, 1.0, 1.0, 1.0)), 6
         )
 
-    def test_pretty_order_only_changes_prefix(self):
+    def test_pretty_order_prefix_then_shuffled_tail(self):
         dataset = Dataset.from_dict({
             "source": ["b", "b", "b", "a", "a", "c"],
             "value": list(range(6)),
         })
         ordered = pretty_order(dataset, first_rows=4)
         self.assertEqual(ordered["source"][:4], ["a", "b", "c", "a"])
-        self.assertEqual(ordered["value"], [3, 0, 5, 4, 1, 2])
+        self.assertEqual(ordered["value"][:4], [3, 0, 5, 4])
+        self.assertEqual(sorted(ordered["value"][4:]), [1, 2])
+
+    def test_pretty_order_spreads_trailing_sources(self):
+        dataset = Dataset.from_dict({
+            "source": ["tasks"] * 900 + ["procedural-jev/x"] * 100,
+            "value": list(range(1000)),
+        })
+        ordered = pretty_order(dataset, first_rows=10)
+        self.assertEqual(ordered["value"], pretty_order(dataset, first_rows=10)["value"])
+        self.assertEqual(sorted(ordered["value"]), list(range(1000)))
+        halves = [ordered["source"][10:505], ordered["source"][505:]]
+        for half in halves:
+            self.assertGreater(half.count("procedural-jev/x"), 25)
 
     def test_pretty_order_exposes_prompt_variants(self):
         dataset = Dataset.from_dict({
@@ -115,7 +128,7 @@ class RecastJevTest(unittest.TestCase):
         self.assertEqual(ordered["source"][:4], ["a", "b", "a", "b"])
         self.assertGreaterEqual(len(set(ordered["variant"][:4])), 2)
         prefix = set(ordered["value"][:4])
-        self.assertEqual(ordered["value"][4:], [i for i in range(6) if i not in prefix])
+        self.assertEqual(sorted(ordered["value"][4:]), [i for i in range(6) if i not in prefix])
 
     def test_paired_public_style_keeps_related_questions_consistent(self):
         state = "text_A: Rain fell.\ntext_B: The ground is wet."

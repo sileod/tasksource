@@ -5,6 +5,7 @@ from collections import OrderedDict
 from datasets import ClassLabel, DatasetDict, List, Sequence
 
 from .augmentations import stable_fraction
+from .options import permute_choices
 from .token_labels import (
     MAX_JEV_TOKENS_PER_SEQUENCE,
     normalize_token_label,
@@ -25,6 +26,12 @@ def _choice_columns(features):
         return (0, int(suffix)) if suffix.isdigit() else (1, name)
 
     return sorted(choices, key=key)
+
+
+def _valid_criteria(criteria):
+    """Jev criteria are runtime names: present, non-blank, and unique."""
+    texts = [str(c).strip() for c in criteria if c is not None]
+    return len(texts) == len(criteria) and all(texts) and len(set(texts)) == len(texts)
 
 
 def _jev_task_type(features):
@@ -85,7 +92,9 @@ def recast_jev(dataset, task=None):
 
     The output is model- and wire-format-independent. ``criteria`` contains
     the runtime choices, ``label`` their zero-based index, and ``answer``
-    the matching criterion. Augmentation is deliberately separate.
+    the matching criterion. Multiple-choice criteria are permuted
+    deterministically per source row so the gold slot carries no signal;
+    augmentation is otherwise deliberately separate.
     """
     if not isinstance(dataset, DatasetDict):
         raise TypeError("recast_jev expects a datasets.DatasetDict")
@@ -100,6 +109,10 @@ def recast_jev(dataset, task=None):
         if not hasattr(labels, "names"):
             raise TypeError("Classification labels must use datasets.ClassLabel")
         criteria = list(labels.names)
+        if not _valid_criteria(criteria):
+            raise ValueError(
+                f"Classification label names must be present and unique: {criteria}"
+            )
 
         def convert(example):
             state = example["sentence1"]
@@ -118,9 +131,18 @@ def recast_jev(dataset, task=None):
     elif task_type == "MultipleChoice":
         choices = _choice_columns(features)
 
-        def convert(example):
-            criteria = [example[name] for name in choices]
+        def convert(example, index, split):
+            # Jev preprocessing pads variable-length choice lists with None.
+            present = [name for name in choices if example[name] is not None]
             label = int(example["labels"])
+            if 0 <= label < len(choices) and example[choices[label]] is None:
+                present = choices  # missing gold: keep None so the row is filtered
+            if 0 <= label < len(choices):
+                label = present.index(choices[label])
+            criteria, label = permute_choices(
+                [example[name] for name in present], label,
+                f"{task or ''}:{split}:{index}",
+            )
             return {
                 "state": example["inputs"],
                 "instructions": JEV_MULTIPLE_CHOICE_INSTRUCTIONS,
@@ -129,6 +151,12 @@ def recast_jev(dataset, task=None):
                 "answer": criteria[label],
                 "task": task or "",
             }
+
+        converted = DatasetDict({
+            split: rows.map(convert, with_indices=True, fn_kwargs={"split": split})
+            .filter(lambda row: _valid_criteria(row["criteria"]))
+            for split, rows in dataset.items()
+        })
 
     else:
         raw_names = list(labels.feature.names)
@@ -180,7 +208,8 @@ def recast_jev(dataset, task=None):
             remove_columns=dataset["train"].column_names,
         )
 
-    converted = dataset.map(convert)
+    if task_type == "Classification":
+        converted = dataset.map(convert)
     keep = {"state", "instructions", "criteria", "label", "answer", "task"}
     remove = [name for name in converted["train"].column_names if name not in keep]
     if remove:

@@ -1,4 +1,5 @@
-from .preprocess import Preprocessing
+from .preprocess import Preprocessing, MultipleChoiceFields
+from .jev.options import JEV_MAX_MC_OPTIONS
 import re
 import pandas as pd
 from . import tasks, recast as recast_module
@@ -145,7 +146,11 @@ def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preproc
                 rows = rows.shuffle(seed=seed, buffer_size=max(10_000, limit)).take(limit)
             materialized[split] = Dataset.from_list(list(rows))
         dataset = DatasetDict(materialized)
-    dataset= preprocessing(dataset,max_rows, max_rows_eval)
+    options = {}
+    if recast == "jev" and isinstance(preprocessing, MultipleChoiceFields):
+        # Jev permutes criteria itself and needs every source option.
+        options = dict(gold_first=False, max_options=JEV_MAX_MC_OPTIONS)
+    dataset= preprocessing(dataset,max_rows, max_rows_eval, **options)
     dataset.task_type = preprocessing.__class__.__name__
     if instruct and recast not in (None, "instruct"):
         raise ValueError("Use either instruct=True or recast=..., not both")

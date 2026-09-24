@@ -79,6 +79,8 @@ class Preprocessing(DotWiz):
         dataset=dataset.remove_columns(
             get_column_names(dataset)-set(self.to_dict().keys()))
         dataset = fix_labels(dataset)
+        if self.label_values:
+            dataset = cast_explicit_label_values(dataset, self.label_values)
         dataset = fix_splits(dataset) # again: label mapping changed
         dataset = self.post_process(dataset)
         return dataset
@@ -161,17 +163,55 @@ class MultipleChoiceFields(Preprocessing):
         if not self.choices_list:
             delattr(self,'choices_list')
     
-    def __call__(self,dataset, *args, **kwargs):
+    def __call__(self,dataset, *args, gold_first=True, max_options=MAX_MC_OPTIONS, **kwargs):
+        """``gold_first=False`` keeps source option order and, with
+        ``max_options=None``, every option (padding short rows with None)."""
         dataset = super().__call__(dataset, *args, **kwargs)
         if self.choices_list:
             dataset = dataset.filter(lambda x: 1<len(x['choices_list']))
-            n_options = min([len(x) for k in dataset for x in dataset[k]['choices_list']])
-            n_options = min(MAX_MC_OPTIONS,n_options)
-            dataset = dataset.map(self.flatten_choice_list, fn_kwargs={'n_options':n_options})
-
-        else:
+            lengths = [len(x) for k in dataset for x in dataset[k]['choices_list']]
+            if gold_first:
+                n_options = min(MAX_MC_OPTIONS,min(lengths))
+                dataset = dataset.map(self.flatten_choice_list, fn_kwargs={'n_options':n_options})
+            else:
+                n_options = max(lengths) if max_options is None else min(max_options, max(lengths))
+                dataset = dataset.map(self.ordered_choice_list, fn_kwargs={'n_options':n_options})
+        elif gold_first:
             dataset = dataset.map(self.sample_choices, fn_kwargs={'n_options':MAX_MC_OPTIONS})
+        elif max_options is not None:
+            dataset = dataset.map(self.ordered_sample_choices, fn_kwargs={'n_options':max_options})
         return dataset
+
+    @staticmethod
+    def _ordered_subset(choices, label, n_options):
+        """Keep the gold answer and the first negatives, in source order."""
+        if len(choices) <= n_options:
+            return list(choices), label
+        if not 0 <= label < len(choices):
+            return list(choices[:n_options]), label
+        negatives = [i for i in range(len(choices)) if i != label][:n_options-1]
+        kept = sorted([label, *negatives])
+        return [choices[i] for i in kept], kept.index(label)
+
+    @staticmethod
+    def ordered_choice_list(x, n_options=None):
+        choices, x['labels'] = MultipleChoiceFields._ordered_subset(
+            x['choices_list'], x['labels'], n_options)
+        for i in range(n_options):
+            x[f'choice{i}'] = choices[i] if i < len(choices) else None
+        del x['choices_list']
+        return x
+
+    @staticmethod
+    def ordered_sample_choices(x, n_options=None):
+        names = [c for c in x if 'choice' in c]
+        choices, x['labels'] = MultipleChoiceFields._ordered_subset(
+            [x[c] for c in names], x['labels'], n_options)
+        for c in names:
+            del x[c]
+        for i,o in enumerate(choices):
+            x[f'choice{i}']=o
+        return x
 
     @staticmethod
     def flatten_choice_list(x, n_options=None):
@@ -212,6 +252,7 @@ class SharedFields:
     config_name:str = None
     task_id:str = None
     load_dataset_kwargs:dict = field(default_factory=dict)
+    label_values:dict = field(default_factory=dict)
     pre_process: callable = fc.identity
     post_process: callable = fc.identity
     #language:str="en"
@@ -291,6 +332,22 @@ def fix_labels(dataset, label_key='labels'):
     labels=sorted(labels, key=order)
     dataset=dataset.cast_column(label_key, datasets.ClassLabel(names=labels))
     return dataset
+
+
+def cast_explicit_label_values(dataset, value_to_name):
+    """Attach a verified ontology to numeric labels without guessing their order."""
+    values = list(value_to_name)
+    names = list(value_to_name.values())
+    if not values or len(set(names)) != len(names):
+        raise ValueError("Explicit label values must have distinct readable names")
+    for split, rows in dataset.items():
+        unknown = set(rows.unique("labels")) - set(values)
+        if unknown:
+            raise ValueError(f"Unmapped labels in {split}: {sorted(unknown, key=str)}")
+    if values != list(range(len(values))):
+        indices = {value: index for index, value in enumerate(values)}
+        dataset = dataset.map(lambda row: {"labels": indices[row["labels"]]})
+    return dataset.cast_column("labels", datasets.ClassLabel(names=names))
 
 def concatenate_dataset_dict(l):
     """Concatenate a list of DatastDict objects sharing same splits and columns."""
