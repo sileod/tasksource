@@ -2,10 +2,11 @@
 
     PYTHONPATH=src python scripts/write_task_catalogs.py
 
-One single-line row per task: its id, type, source dataset and question. The
-annotation details are in tasks.py / multilingual_tasks.py.
+A quick glance at every task: its id (linked to the annotation), type, source
+dataset, and whether it has a question.
 """
 
+import re
 from pathlib import Path
 
 from tasksource import list_tasks
@@ -23,8 +24,16 @@ def dataset_link(name):
     return f"[{name}](https://hf.co/datasets/{name})"
 
 
+def annotation_lines(source):
+    """Line number of each top-level annotation assignment."""
+    return {m.group(1): source.count("\n", 0, m.start()) + 1
+            for m in re.finditer(r"^(\w+)\s*=", source, flags=re.M)}
+
+
 def write(path, multilingual):
     tasks = list_tasks(multilingual=multilingual)
+    module = f"src/tasksource/{'multilingual_tasks' if multilingual else 'tasks'}.py"
+    lines_of = annotation_lines((ROOT / module).read_text())
     lines = [
         f"{len(tasks)} {'multilingual' if multilingual else 'English'} tasks. Load one with "
         f"`load_task(id{', multilingual=True' if multilingual else ''})`; the annotations are in "
@@ -33,12 +42,12 @@ def write(path, multilingual):
         "[parked.py](src/tasksource/parked.py).",
         "",
         "| id | type | dataset | question |",
-        "|---|---|---|---|",
+        "|---|---|---|:-:|",
     ]
     for row in tasks.itertuples():
         lines.append("| " + " | ".join([
-            cell(row.id), row.task_type, dataset_link(row.dataset_name),
-            cell(getattr(row.mapping, "question", None)),
+            f"[{cell(row.id)}]({module}#L{lines_of[row.preprocessing_name]})", row.task_type,
+            dataset_link(row.dataset_name), "✓" if getattr(row.mapping, "question", None) else "",
         ]) + " |")
     path.write_text("\n".join(lines) + "\n")
     print(f"{path.name}: {len(tasks)} tasks")
