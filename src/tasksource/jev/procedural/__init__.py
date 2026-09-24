@@ -10,16 +10,16 @@ import json
 
 from . import (
     entity_belief_tracking, event_state_reconstruction, evidence_sufficiency,
-    multi_view_adjudication, partial_observation_calibration,
-    policy_applicability, state_perturbation,
+    multi_view_adjudication, needle_retrieval, partial_observation_calibration,
+    policy_applicability, record_aggregation, state_perturbation, table_lookup,
 )
 
 TASKS = {
     module.__name__.rsplit(".", 1)[-1]: module
     for module in (
         entity_belief_tracking, event_state_reconstruction, evidence_sufficiency,
-        multi_view_adjudication, partial_observation_calibration,
-        policy_applicability, state_perturbation,
+        multi_view_adjudication, needle_retrieval, partial_observation_calibration,
+        policy_applicability, record_aggregation, state_perturbation, table_lookup,
     )
 }
 

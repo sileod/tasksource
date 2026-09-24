@@ -28,14 +28,16 @@ def generate_split(task, split, rows, levels, exclude, max_attempts=50):
         rng = random.Random(f"{task}:{split}:{index}")
         level = rng.choice(levels)
         problem = module.generate(rng, level)
-        key = json.dumps(problem.state, sort_keys=True)
+        text = isinstance(problem.state, str)
+        state = problem.state if text else json.dumps(problem.state, ensure_ascii=False)
+        key = state if text else json.dumps(problem.state, sort_keys=True)
         if key in seen:
             continue
         seen.add(key)
         out.append({
             "id": f"{task}:{split}:{len(out)}",
             "level": level,
-            "state": json.dumps(problem.state, ensure_ascii=False),
+            "state": state,
             "questions": json.dumps(problem.questions, ensure_ascii=False),
             "answers": json.dumps(problem.answers, ensure_ascii=False),
         })

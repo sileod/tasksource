@@ -45,6 +45,14 @@ configs:
     path: multi_view_adjudication/validation-*.parquet
   - split: test
     path: multi_view_adjudication/test-*.parquet
+- config_name: needle_retrieval
+  data_files:
+  - split: train
+    path: needle_retrieval/train-*.parquet
+  - split: validation
+    path: needle_retrieval/validation-*.parquet
+  - split: test
+    path: needle_retrieval/test-*.parquet
 - config_name: partial_observation_calibration
   data_files:
   - split: train
@@ -61,6 +69,14 @@ configs:
     path: policy_applicability/validation-*.parquet
   - split: test
     path: policy_applicability/test-*.parquet
+- config_name: record_aggregation
+  data_files:
+  - split: train
+    path: record_aggregation/train-*.parquet
+  - split: validation
+    path: record_aggregation/validation-*.parquet
+  - split: test
+    path: record_aggregation/test-*.parquet
 - config_name: state_perturbation
   data_files:
   - split: train
@@ -69,12 +85,21 @@ configs:
     path: state_perturbation/validation-*.parquet
   - split: test
     path: state_perturbation/test-*.parquet
+- config_name: table_lookup
+  data_files:
+  - split: train
+    path: table_lookup/train-*.parquet
+  - split: validation
+    path: table_lookup/validation-*.parquet
+  - split: test
+    path: table_lookup/test-*.parquet
 ---
 
 # procedural-jev
 
 Procedurally generated decision problems. Each row is one structured state
-(JSON) with **several typed questions over that same state**, following the
+(JSON, or a table, CSV, key=value lines, or prose for the retrieval and
+aggregation configs) with **several typed questions over that same state**, following the
 Jev / System One request shape: `choice` (pick one criterion), `noul` (a
 number in [0, 1]; a probability or a yes/no), and `score` (an ordered rubric).
 Every answer is computed exactly from the state by rules that the state
@@ -91,9 +116,12 @@ is not produced by or affiliated with TypeSafe or OpenJev.
 | `event_state_reconstruction` | `current_owner` (choice), `is_open` (noul), `current_severity` (score) |
 | `evidence_sufficiency` | `claim_supported` (noul), `has_conflict` (noul), `strongest_support_origin` (choice) |
 | `multi_view_adjudication` | `intent` (choice), `is_urgent` (noul), `workflow_impact` (score) |
+| `needle_retrieval` | `value_of_id` (choice), `id_has_value` (noul), `id_listed` (noul); up to ~300 records whose ids differ from the target by one or two digits |
 | `partial_observation_calibration` | `incident_real` (noul, exact Bayesian posterior) |
 | `policy_applicability` | `access_allowed` (noul), `governing_policy` (choice), `review_risk` (score) |
+| `record_aggregation` | `count_in_category` (score), `largest_quantity` (choice), `any_out_of_stock` (noul), `total_above` (noul) |
 | `state_perturbation` | `material_change` (noul), `changed_dimension` (choice), `risk_direction` (score) |
+| `table_lookup` | `find_person` (choice, two-condition filter), `manager_of` (choice, join), `started_before` (noul), `count_matching` (score) |
 
 ## Schema
 
@@ -101,7 +129,7 @@ is not produced by or affiliated with TypeSafe or OpenJev.
 |---|---|
 | `id` | `task:split:index` |
 | `level` | Difficulty level (0–4); larger levels add events, records, sensors, or distractors. |
-| `state` | The state, as a JSON string. |
+| `state` | The state: a JSON string, or rendered text for the retrieval and aggregation configs. |
 | `questions` | JSON object of named System One questions (`type`, `instructions`, `criteria`). |
 | `answers` | JSON object of reference answers, in the System One `answers` shape. |
 | one column per question | Flat label, for browsing and filtering: a `ClassLabel` for choice, score, and yes/no noul questions; a float for graded noul (`incident_real`). |

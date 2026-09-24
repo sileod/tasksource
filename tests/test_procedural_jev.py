@@ -126,6 +126,54 @@ class ProceduralJevTest(unittest.TestCase):
         groups = Counter(source_row_group(i) for i in ids)
         self.assertEqual(set(groups.values()), {3})
 
+    def test_needle_retrieval_gold_follows_records(self):
+        for problem in self.samples("needle_retrieval", 300):
+            d, a = problem.data, problem.answers
+            value = {r["id"]: r[d["field"]] for r in d["records"]}
+            self.assertEqual(a["value_of_id"]["choice"], value[d["key"]])
+            self.assertEqual(a["id_has_value"]["noul"], float(value[d["key"]] == d["proposed"]))
+            self.assertEqual(a["id_listed"]["noul"], float(d["probe"] in value))
+            for record in d["records"]:  # every rendering keeps every record
+                self.assertIn(record["id"], problem.state)
+
+    def test_record_aggregation_gold_follows_items(self):
+        for problem in self.samples("record_aggregation", 300):
+            d, a = problem.data, problem.answers
+            members = [i for i in d["items"] if i["category"] == d["category"]]
+            self.assertEqual(a["count_in_category"]["score"], len(members))
+            self.assertEqual(a["any_out_of_stock"]["noul"], float(any(not i["in_stock"] for i in members)))
+            self.assertEqual(a["total_above"]["noul"],
+                             float(sum(i["quantity"] for i in members) > d["threshold"]))
+            pool = members if d["scope_category"] else d["items"]
+            top = max(i["quantity"] for i in pool)
+            leaders = [i["item"] for i in pool if i["quantity"] == top]
+            self.assertEqual(leaders, [a["largest_quantity"]["choice"]])
+
+    def test_table_lookup_gold_follows_tables(self):
+        for problem in self.samples("table_lookup", 300):
+            d, a = problem.data, problem.answers
+            people = {p["name"]: p for p in d["people"]}
+            target = people[d["person"]]
+            matching = [p["name"] for p in d["people"]
+                        if (p["team"], p["city"]) == (target["team"], target["city"])]
+            self.assertEqual(matching, [a["find_person"]["choice"]])
+            managers = {t["team"]: t["manager"] for t in d["teams"]}
+            subject = people[d["subject"]]
+            self.assertEqual(a["manager_of"]["choice"], managers[subject["team"]])
+            self.assertEqual(a["started_before"]["noul"], float(subject["start_year"] < d["year"]))
+            self.assertEqual(a["count_matching"]["score"], sum(
+                p["city"] == d["city"] and p["start_year"] >= d["since"] for p in d["people"]))
+
+    def test_rendered_tasks_vary_wording_and_build(self):
+        for task in ("needle_retrieval", "record_aggregation", "table_lookup"):
+            problems = self.samples(task, 100)
+            for qid in problems[0].questions:
+                wordings = {tuple(p.questions[qid]["instructions"].split()[:2]) for p in problems}
+                self.assertGreater(len(wordings), 1, (task, qid))
+            dataset = build_task(task, {"train": 300, "validation": 30, "test": 30}, [0, 1, 2])
+            self.assertIsInstance(dataset["test"][0]["state"], str)
+            self.assertFalse(dataset["test"][0]["state"].startswith('"'))
+
 
 if __name__ == "__main__":
     unittest.main()
