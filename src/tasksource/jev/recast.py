@@ -1,5 +1,7 @@
 """Canonical Tasksource-to-Jev recasts and System One request rendering."""
 
+import html
+import re
 from collections import OrderedDict
 
 from datasets import ClassLabel, DatasetDict, List, Sequence
@@ -15,6 +17,21 @@ from .token_labels import (
 
 JEV_CLASSIFICATION_INSTRUCTIONS = "Choose the criterion that best describes the state."
 JEV_MULTIPLE_CHOICE_INSTRUCTIONS = "Choose the criterion that best answers the question."
+
+
+_LINE_BREAK = re.compile(r"<br\s*/?>", re.IGNORECASE)
+_ENTITY = re.compile(r"&(?:amp|lt|gt|quot|apos|#39|#x27);")
+
+
+def clean_text(text):
+    """Undo HTML escaping left in source text (tweets, WikiHow contexts):
+    ``<br>`` becomes a newline and standard entities are decoded; other markup stays."""
+    if not isinstance(text, str):
+        return text
+    text = _LINE_BREAK.sub("\n", text)
+    for _ in range(2):  # tweets are sometimes escaped twice (&amp;amp;)
+        text = _ENTITY.sub(lambda m: html.unescape(m.group(0)), text)
+    return text
 
 
 def _choice_columns(features):
@@ -115,9 +132,9 @@ def recast_jev(dataset, task=None):
             )
 
         def convert(example):
-            state = example["sentence1"]
+            state = clean_text(example["sentence1"])
             if "sentence2" in example:
-                state = f"text_A: {state}\ntext_B: {example['sentence2']}"
+                state = f"text_A: {state}\ntext_B: {clean_text(example['sentence2'])}"
             label = int(example["labels"])
             return {
                 "state": state,
@@ -140,11 +157,11 @@ def recast_jev(dataset, task=None):
             if 0 <= label < len(choices):
                 label = present.index(choices[label])
             criteria, label = permute_choices(
-                [example[name] for name in present], label,
+                [clean_text(example[name]) for name in present], label,
                 f"{task or ''}:{split}:{index}",
             )
             return {
-                "state": example["inputs"],
+                "state": clean_text(example["inputs"]),
                 "instructions": JEV_MULTIPLE_CHOICE_INSTRUCTIONS,
                 "criteria": criteria,
                 "label": label,

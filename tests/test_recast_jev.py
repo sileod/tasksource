@@ -32,6 +32,15 @@ class RecastJevTest(unittest.TestCase):
         self.assertEqual(row["task"], "demo")
         self.assertIn("text_A: A", row["state"])
 
+    def test_states_undo_html_escaping(self):
+        features = Features({"sentence1": Value("string"), "labels": ClassLabel(names=["a", "b"])})
+        source = DatasetDict({"train": Dataset.from_dict({
+            "sentence1": ["Tom &amp; Jerry &amp;amp; co &gt; you<br>next<br />line <b>kept</b>"],
+            "labels": [0],
+        }, features=features)})
+        self.assertEqual(recast_jev(source)["train"][0]["state"],
+                         "Tom & Jerry & co > you\nnext\nline <b>kept</b>")
+
     def test_multiple_choice_and_renderer(self):
         source = DatasetDict({"train": Dataset.from_dict({
             "inputs": ["Question"], "choice0": ["zero"],
