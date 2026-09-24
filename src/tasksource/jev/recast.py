@@ -4,6 +4,7 @@ import html
 import re
 from collections import OrderedDict
 
+import ftfy
 from datasets import ClassLabel, DatasetDict, List, Sequence
 
 from .augmentations import stable_fraction
@@ -24,11 +25,11 @@ _ENTITY = re.compile(r"&(?:amp|lt|gt|quot|apos|#39|#x27);")
 
 
 def clean_text(text):
-    """Undo HTML escaping left in source text (tweets, WikiHow contexts):
-    ``<br>`` becomes a newline and standard entities are decoded; other markup stays."""
+    """Undo encoding damage left in source text: mojibake (``â€™``, ``Ã³``),
+    HTML escaping in tweets, and ``<br>`` breaks in WikiHow contexts. Other markup stays."""
     if not isinstance(text, str):
         return text
-    text = _LINE_BREAK.sub("\n", text)
+    text = _LINE_BREAK.sub("\n", ftfy.fix_encoding(text))
     for _ in range(2):  # tweets are sometimes escaped twice (&amp;amp;)
         text = _ENTITY.sub(lambda m: html.unescape(m.group(0)), text)
     return text

@@ -396,8 +396,9 @@ balanced_copa = MultipleChoice(_copa_input,['choice1','choice2'],'label',
 e_care = MultipleChoice(_copa_input,['choice1','choice2'],'label',
     dataset_name="12ml/e-CARE")
 
-art = MultipleChoice(cat(['hypothesis_1','hypothesis_2']),
-    ['observation_1','observation_2'],
+art = MultipleChoice(
+    lambda x: f"Beginning: {x['observation_1']}\nEnding: {x['observation_2']}\nWhat happened in between?",
+    ['hypothesis_1','hypothesis_2'],
     labels=lambda x:x['label']-1,
     splits=['train','validation',None]
 )
@@ -419,7 +420,7 @@ ai2_arc__challenge = MultipleChoice('question',
     config_name=["ARC-Challenge","ARC-Easy"])
 
 definite_pronoun_resolution = MultipleChoice(
-    inputs=cat(["sentence","pronoun"],' : '),
+    inputs=lambda x: f"{x['sentence']}\nWho or what does \"{x['pronoun']}\" refer to?",
     choices_list='candidates',
     labels="label",
     splits=['train',None,'test'])
