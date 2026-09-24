@@ -1,4 +1,5 @@
 from .preprocess import cat, get,name, regen, constant, Classification, TokenClassification, MultipleChoice
+from .tasks import _copa_input
 from datasets import get_dataset_config_names, ClassLabel, Dataset, DatasetDict, concatenate_datasets, Sequence
 
 def all(dataset_name):
@@ -119,11 +120,12 @@ exams = MultipleChoice(get.question.stem, choices_list=get.question.choices.text
     dataset_name="exams", config_name='multilingual',
     pre_process=lambda ds:ds.filter(lambda x:  x['answerKey'] in "ABCDE"))
 
-xcsr = MultipleChoice(get.question.stem, choices_list=get.question.choices.text,
+xcsr = MultipleChoice(lambda x: x['question']['stem'].strip() or 'Most plausible:', # X-CODAH stems are empty
+    choices_list=get.question.choices.text,
     labels=lambda x:'ABCDE'.index(x['answerKey']),
     **all('xcsr'))
 
-xcopa = MultipleChoice("premise",choices=['choice1','choice2'],labels="label",
+xcopa = MultipleChoice(_copa_input,choices=['choice1','choice2'],labels="label",
     **all('xcopa'))
 
 #xstory = MultipleChoice(constant(''),choices=["text_right_ending","text_wrong_ending"],labels=constant(0), **all("juletxara/xstory_cloze"))

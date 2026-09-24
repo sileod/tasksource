@@ -1226,7 +1226,7 @@ udep__deprel = TokenClassification(
 
 ambient= Classification("premise","hypothesis","hypothesis_ambiguous",dataset_name="tasksource/ambient")
 
-path_naturalness = MultipleChoice(constant(""),choices=['choice1','choice2'],labels="label",
+path_naturalness = MultipleChoice(constant("Most natural chain of relations:"),choices=['choice1','choice2'],labels="label",
     dataset_name="tasksource/path-naturalness-prediction")
 
 civil_comments__toxicity = Classification("text",labels="toxicity")
@@ -1280,7 +1280,7 @@ control = Classification('premise','hypothesis',"label",dataset_name="tasksource
 tracie = Classification("premise","hypothesis","answer",dataset_name='tasksource/tracie')
 sherliic = Classification("premise","hypothesis","label",dataset_name='tasksource/sherliic')
 
-sen_making__1 = MultipleChoice(constant('Chose most plausible:'), choices=['sentence0','sentence1'],labels='false', 
+sen_making__1 = MultipleChoice(constant('Choose most plausible:'), choices=['sentence0','sentence1'],labels='false', 
     dataset_name="tasksource/sen-making")
 
 sen_making__2 = MultipleChoice(lambda x: [x['sentence0'],x['sentence1']][x['false']] + '\n is not plausible because :',
@@ -1434,7 +1434,7 @@ def _preprocess_chatbot_arena(ds):
     ds=ds.map(_unroll)
     return ds
 
-chatbot_arena = MultipleChoice(constant(""),
+chatbot_arena = MultipleChoice(constant("Conversation whose assistant the user preferred:"),
     choices=["conversation_a","conversation_b"],
     labels=lambda x: ["model_a","model_b"].index(x["winner"]),
     dataset_name="lmsys/chatbot_arena_conversations",
