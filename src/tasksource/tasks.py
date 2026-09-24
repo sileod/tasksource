@@ -17,7 +17,6 @@ glue___mnli = Classification(sentence1="premise", sentence2="hypothesis", labels
 glue___qnli = Classification("question","sentence", labels="label")
 glue___rte = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
 glue___wnli = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
-#glue___ax = Classification(sentence1="premise", sentence2="hypothesis", labels="label", splits=["test", None, None]) # fully masked
 
 glue___mrpc = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
 glue___qqp = Classification(sentence1="question1", sentence2="question2", labels="label")
@@ -32,7 +31,6 @@ super_glue___multirc = Classification(
     'answer',
     labels=name('label', ['incorrect answer', 'correct answer'])
 )
-#super_glue___rte = Classification(sentence1="premise", sentence2="hypothesis", labels="label") # in glue
 super_glue___wic = Classification(
     sentence1=lambda x: f"Word: {x['word']}\n{x['sentence1']}",
     sentence2="sentence2",
@@ -55,7 +53,6 @@ babi_nli = Classification("premise", "hypothesis", "label",
 sick__label         = Classification('sentence_A','sentence_B','label', dataset_name="tasksource/sick")
 sick__relatedness   = Classification('sentence_A','sentence_B','relatedness_score', dataset_name="tasksource/sick")
 sick__entailment_AB = Classification('sentence_A','sentence_B','entailment_AB', dataset_name="tasksource/sick")
-#sick__entailment_BA = Classification('sentence_A','sentence_B','entailment_BA')
 
 def remove_neg_1(dataset):
     return dataset.filter(lambda x:x['labels']!=-1)
@@ -153,7 +150,6 @@ mpe_nli = Classification("premise","hypothesis","label",
 dnc_nli = Classification("context","hypothesis","label",
     dataset_name="pietrolesci/dnc", label_values=ENTAILMENT_LABEL_VALUES)
 
-# gpt3_nli = Classification("text_a","text_b","label",dataset_name="pietrolesci/gpt3_nli") # not sound enough
 
 recast_white__fnplus = Classification("text","hypothesis","label",
     dataset_name="pietrolesci/recast_white",splits=['fnplus',None,None],
@@ -170,7 +166,6 @@ joci = Classification("context","hypothesis",
     pre_process=lambda ds:ds.filter(lambda x:x['original_label']!=0),
     dataset_name="pietrolesci/joci",splits=['full',None,None])
 
-#enfever_nli = Classification("evidence","claim","label", dataset_name="ctu-aic/enfever_nli")
 
 robust_nli__IS_CS = Classification("premise","hypothesis","label",
 	dataset_name="pietrolesci/robust_nli", splits=["IS_CS",None,None], label_values=NLI_LABEL_VALUES)
@@ -231,16 +226,11 @@ imppres__log = Classification("premise","hypothesis","gold_label_log",
     post_process=lambda x: _imppres_post_process(x,'logical'))
 
 
-#glue__diagnostics = Classification("premise","hypothesis","label",
-#    dataset_name="pietrolesci/glue_diagnostics",splits=["test",None,None])
-
 hlgd = Classification("headline_a", "headline_b", labels="label", dataset_name="tasksource/hlgd")
 
 paws___labeled_final   = Classification("sentence1", "sentence2", name('label',['not_paraphrase','paraphrase']))
 paws___labeled_swap    = Classification("sentence1", "sentence2", name('label',['not_paraphrase','paraphrase']), splits=["train", None, None])
-#paws___unlabeled_final = Classification("sentence1", "sentence2", "label")
 
-#quora = Classification(get.questions.text[0], get.questions.text[1], 'is_duplicate') # in glue
 medical_questions_pairs = Classification("question_1","question_2", name("label",['not similar','similar']))
  
 ###################### Token Classification #########################
@@ -249,7 +239,6 @@ conll2003__pos_tags   = TokenClassification(tokens="tokens", labels='pos_tags')
 conll2003__chunk_tags = TokenClassification(tokens="tokens", labels='chunk_tags')
 conll2003__ner_tags   = TokenClassification(tokens="tokens", labels='ner_tags')
 
-#tner___tweebank_ner    = TokenClassification(tokens="tokens", labels="tags")
 
 ######################## Multiple choice ###########################
 
@@ -274,11 +263,10 @@ fig_qa = MultipleChoice(
 bigbench = MultipleChoice(
     'inputs',
     choices_list='multiple_choice_targets',
-    labels=lambda x:x['multiple_choice_scores'].index(1) if 1 in ['multiple_choice_scores'] else -1,
+    labels=lambda x:x['multiple_choice_scores'].index(1) if 1 in x['multiple_choice_scores'] else -1,
     dataset_name='tasksource/bigbench',
     config_name=bigbench_discriminative_english - {"social_i_qa","intersect_geometry"} # english multiple choice tasks, minus duplicates
 )
-#"goal_step_wikihow"
 
 blimp_hard = MultipleChoice(inputs=constant(''),
     choices=['sentence_good','sentence_bad'],
@@ -446,8 +434,6 @@ math_qa = MultipleChoice(
     dataset_name="tasksource/math_qa"
 )
 
-#aqua_rat___tokenized = MultipleChoice("question",choices_list="options",labels=lambda x:"ABCDE".index(x['correct'])) in math_qa
-
 
 ######################## Classification (other) ########################
 glue___cola = Classification(sentence1="sentence", labels="label")
@@ -513,8 +499,6 @@ hope_edi = Classification(
     },
 )
 
-#fever___v1_0 = Classification(sentence1="claim", labels="label", splits=["train", "paper_dev", "paper_test"], dataset_name="fever", config_name="v1.0")
-#fever___v2_0 = Classification(sentence1="claim", labels="label", splits=[None, "validation", None], dataset_name="fever", config_name="v2.0")
 
 rumoureval_2019 = Classification(
     sentence1="source_text",
@@ -611,7 +595,7 @@ financial_phrasebank = Classification(sentence1="text", labels="label", splits=[
 
 poem_sentiment = Classification(sentence1="verse_text", labels="label")
 
-#emotion = Classification(sentence1="text", labels="label") # file not found
+emotion = Classification(sentence1="text", labels="label", dataset_name="dair-ai/emotion")
 
 dbpedia_14 = Classification(sentence1="content", labels="label", splits=["train", None, "test"], config_name=["dbpedia_14"])
 
@@ -619,7 +603,6 @@ amazon_polarity = Classification(sentence1="content", labels="label", splits=["t
 
 app_reviews = Classification("review", labels="star", splits=["train", None, None])
 
-# multi_nli = Classification(sentence1="premise", sentence2="hypothesis", labels="label", splits=["train", "validation_matched", None]) #glue
 
 hate_speech18 = Classification(sentence1="text", labels="label", splits=["train", None, None],
     dataset_name="tasksource/hate_speech18",
@@ -647,8 +630,6 @@ yahoo_answers_topics = Classification(
 stackoverflow_questions=Classification("title","body",labels="label",
     dataset_name="pacovaldez/stackoverflow-questions")
 
-#hyperpartisan_news_detection___byarticle = Classification(sentence1="text", labels="hyperpartisan", splits=["train", None, None]) # files too heavy
-#hyperpartisan_news_detection___bypublisher = Classification(sentence1="text", labels="hyperpartisan", splits=["train","validation", None]) # files too heavy
 
 hyperpartisan_news = Classification(
     "text",
@@ -658,14 +639,8 @@ hyperpartisan_news = Classification(
 scierc = Classification("text",labels="label",dataset_name="zapsdcn/sciie")
 citation_intent = Classification("text",labels="label",dataset_name="zapsdcn/citation_intent")
 
-#go_emotions___raw = Classification(sentence1="text", splits=["train", None, None])
 go_emotions___simplified = Classification(sentence1="text", labels="labels")
 
-#boolq = Classification(sentence1="question", splits=["train", "validation", None]) # in superglue
-
-#ecthr_cases___alleged_violation_prediction = Classification(labels="labels", dataset_name="ecthr_cases", config_name="alleged-violation-prediction")
-#ecthr_cases___violation_prediction = Classification(labels="labels", dataset_name="ecthr_cases", config_name="violation-prediction")
-#   too long
 
 scicite = Classification(sentence1="string", labels="label",dataset_name="tasksource/scicite")
 
@@ -789,12 +764,6 @@ google_wellformed_query = Classification(sentence1="content", labels="rating")
 
 tweets_hate_speech_detection = Classification(sentence1="tweet", labels="label", splits=["train", None, None])
 
-#adv_glue___adv_sst2 = Classification(sentence1="sentence", labels="label", splits=["validation", None, None])
-#adv_glue___adv_qqp = Classification(sentence1="question1", sentence2="question2", labels="label", splits=["validation", None, None])
-#adv_glue___adv_mnli = Classification(sentence1="premise", sentence2="hypothesis", labels="label", splits=["validation", None, None])
-#adv_glue___adv_mnli_mismatched = Classification(sentence1="premise", sentence2="hypothesis", labels="label", splits=["validation", None, None])
-#adv_glue___adv_qnli = Classification(sentence1="question", labels="label", splits=["validation", None, None])
-#adv_glue___adv_rte = Classification(sentence1="sentence1", sentence2="sentence2", labels="label", splits=["validation", None, None])
 
 has_part = Classification("arg1","arg2", labels="score", splits=["train", None, None])
 
@@ -806,14 +775,12 @@ acronym_identification = TokenClassification(labels="labels", tokens="tokens")
 
 jnlpba = TokenClassification(tokens="tokens", labels="ner_tags", splits=["train", "validation", None], config_name=["jnlpba"])
 
-#species_800 = TokenClassification(tokens="tokens", labels="ner_tags", config_name=["species_800"]) missing files
 
 SpeedOfMagic_ontonotes_english = TokenClassification(tokens="tokens", labels="ner_tags", dataset_name="SpeedOfMagic/ontonotes_english", config_name="SpeedOfMagic--ontonotes_english")
 
 blog_authorship_corpus__gender    = Classification(sentence1="text",labels="gender",
     dataset_name="tasksource/blog_authorship_corpus")
 blog_authorship_corpus__age       = Classification(sentence1="text",labels="age")
-#blog_authorship_corpus__horoscope = Classification(sentence1="text",labels="horoscope")
 blog_authorship_corpus__job       = Classification(sentence1="text",labels="topic",
     dataset_name="tasksource/blog_authorship_corpus",
     pre_process=lambda ds: _cast_blog_topics(ds))
@@ -846,7 +813,7 @@ mc_taco = Classification(
 
 ade_corpus_v2___Ade_corpus_v2_classification = Classification("text",labels="label")
 
-discosense = MultipleChoice("context",choices=regen("option\_[0-3]"),labels="label",
+discosense = MultipleChoice("context",choices=regen(r"option_[0-3]"),labels="label",
     dataset_name="json", task_id="discosense",
     load_dataset_kwargs={"data_files": {
         "train": "https://raw.githubusercontent.com/prajjwal1/discosense/main/data/discosense_train.json",
@@ -858,24 +825,9 @@ circa = Classification(
     sentence2="answer-Y",
     labels="goldstandard2", post_process=remove_neg_1)
 
-#code_x_glue_cc_defect_detection = Classification("func", labels="target")
+code_x_glue_cc_defect_detection = Classification("func", labels=lambda x: ["no defect", "defect"][int(x["target"])],
+    dataset_name="google/code_x_glue_cc_defect_detection")
 
-#code_x_glue_cc_clone_detection_big_clone_bench = Classification("func1", "func2", "label") # in bigbench + too heavy (100g)
-
-#code_x_glue_cc_code_refinement = MultipleChoice(
-#    constant(""), choices=["buggy","fixed"], labels=constant(0),
-#    config_name="medium")
-
-#effective_feedback_student_writing = Classification("discourse_text", 
-#labels="discourse_effectiveness",dataset_name="YaHi/EffectiveFeedbackStudentWriting")
-# discontinued /!\
-
-#promptSentiment = Classification("text",labels="label",dataset_name="Ericwang/promptSentiment")
-#promptNLI = Classification("premise","hypothesis",labels="label",dataset_name="Ericwang/promptNLI")
-#promptSpoke = Classification("text",labels="label",dataset_name="Ericwang/promptSpoke")
-#promptProficiency = Classification("text",labels="label",dataset_name="Ericwang/promptProficiency")
-#promptGrammar = Classification("text",labels="label",dataset_name="Ericwang/promptGrammar")
-#promptCoherence = Classification("text",labels="label",dataset_name="Ericwang/promptCoherence")
 
 phrase_similarity = Classification(
     sentence1=lambda x: f"Phrase: {x['phrase1']}\n{x['sentence1']}",
@@ -899,17 +851,7 @@ quarel = Classification(
 mwong_fever_evidence_related = Classification(sentence1="claim", sentence2="evidence", labels=name("labels",['unrelated','related']),
     splits=["train", "valid", "test"], dataset_name="mwong/fever-evidence-related")
 
-numer_sense = Classification(
-    "sentence", labels="target", splits=["train", None, None],
-    dataset_name="csv", task_id="numer_sense",
-    load_dataset_kwargs={
-        "data_files": {
-            "train": "https://raw.githubusercontent.com/INK-USC/NumerSense/main/data/train.masked.tsv"
-        },
-        "delimiter": "\t",
-        "column_names": ["sentence", "target"],
-    },
-)
+numer_sense = Classification("sentence", labels="target", dataset_name="tasksource/numer_sense")
 
 def _dynasent_ternary(dataset):
     return dataset.filter(
@@ -951,31 +893,14 @@ logiqa = MultipleChoice(
     pre_process=lambda ds: ds.map(_logiqa_options)
 )
 
-#proto_qa = MultipleChoice(
-#    "question",
-#    choices_list=lambda x:x['answer-clusters']['answers'],
-#    labels=lambda x: x['answer-clusters']['count'].index(max(x['answer-clusters']['count'])),
-#    config_name='proto_qa'
-#)
 
 wiki_qa = Classification("question","answer", name("label",['False','True']))
 
 cycic_classification = Classification("question",labels=name("correct_answer",['False','True']),
     dataset_name = "tasksource/cycic_classification")
-cycic_mc = MultipleChoice("question", choices=regen('answer\_option[0-4]'), labels="correct_answer",
+cycic_mc = MultipleChoice("question", choices=regen(r"answer_option[0-4]"), labels="correct_answer",
     dataset_name = "tasksource/cycic_multiplechoice")
 
-
-def _preprocess_chatgpt_detection(ex):
-    import random
-    label=random.random()<0.5
-    ex['label']=int(label)
-    ex['answer']=[str(ex['human_answers'][0]),str(ex['chatgpt_answers'][0])][label]
-    return ex
-
-#chatgpt_detection = Classification("question","answer","label",
-#    dataset_name = 'Hello-SimpleAI/HC3', config_name="all",
-#    pre_process=lambda dataset:dataset.map(_preprocess_chatgpt_detection))
 
 sts_companion = Classification("sentence1","sentence2","label",
     dataset_name="tasksource/sts-companion")
@@ -1018,7 +943,6 @@ dyna_hate = Classification("text",labels="label",dataset_name="tasksource/dynaha
 syntactic_augmentation_nli = Classification('sentence1',"sentence2","gold_label",dataset_name="tasksource/syntactic-augmentation-nli")
 
 autotnli = Classification("premises", "hypothesis", "label", dataset_name="tasksource/autotnli")
-#equate = Classification("sentence1", "sentence2", "gold_label",dataset_name="tasksource/equate")
 
 conqada = Classification("sentence1","sentence2","label",dataset_name="lasha-nlp/CONDAQA",
     pre_process = lambda ds:ds.filter(lambda x:x['label'] in {"DON'T KNOW","YES","NO"})
@@ -1047,15 +971,12 @@ wouldyourather = MultipleChoice(constant('Most people would rather:'), choices=[
     labels= lambda x: int(x['votes_a']<x['votes_b']),
     dataset_name="tasksource/wouldyourather")
 
-#attempto_nli = Classification("premise","hypothesis",
-#    lambda x:f'race-{x["race_label"]}',
-#    dataset_name="sileod/attempto-nli")
 
 defeasible_nli = Classification(cat(["Premise","Hypothesis"]),"Update",labels="UpdateType",
     dataset_name="tasksource/defeasible-nli",config_name=['atomic', 'snli'])
 
-#defeasible_nli_social = Classification(cat(["SocialChemROT","Hypothesis"]),"Update",labels="UpdateType",
-#    dataset_name="tasksource/defeasible-nli",config_name='social')
+defeasible_nli_social = Classification("Hypothesis", "Update", labels="UpdateType",
+    dataset_name="tasksource/defeasible-nli", config_name='social')  # social has no premise
 
 help_nli = Classification("ori_sentence","new_sentence","gold_label",
     dataset_name="tasksource/help-nli")
@@ -1093,15 +1014,18 @@ tomi_nli = Classification("premise","hypothesis","label",
 avicenna = Classification("Premise 1","Premise 2","Syllogistic relation",
     dataset_name="tasksource/avicenna")
 
-shp = MultipleChoice("history",
+shp = MultipleChoice(
+    lambda x: f"r/{x['domain'].rsplit('_', 1)[0]}: {x['history']}\n\nWhich reply did readers prefer?",
     choices=['human_ref_A','human_ref_B'],
-    labels="labels",
+    labels=lambda x: 1 - x['labels'],  # labels is 1 when A is preferred
+    # the SHP authors recommend a score ratio of at least 2; closer pairs are near ties
+    pre_process=lambda ds: ds.filter(lambda x: x['score_ratio'] >= 2),
     dataset_name="stanfordnlp/SHP")
 
 medqa_usmle = MultipleChoice('sent1',choices=regen('ending[0-3]'),labels='label',
     dataset_name="GBaker/MedQA-USMLE-4-options-hf")
 
-wikimedqa = MultipleChoice("text",choices=regen('option\_[0-7]'),labels='label',
+wikimedqa = MultipleChoice("text",choices=regen(r"option_[0-7]"),labels='label',
     dataset_name="sileod/wikimedqa",
     config_name=["medwiki"])
 
@@ -1191,8 +1115,6 @@ cnli = Classification("premise","hypothesis","label",
 perturbed_boolq = Classification("question",labels="hard_label",
     dataset_name='tasksource/boolq-natural-perturbations')
 
-#mega_acceptability = Classification("sentence",labels="average",
-#    dataset_name='tasksource/mega-acceptability-v2')
 
 graded_acceptability = Classification("text",labels="normalized_score",
     dataset_name="tasksource/acceptability-prediction")
@@ -1310,37 +1232,10 @@ sen_making__2 = MultipleChoice(lambda x: [x['sentence0'],x['sentence1']][x['fals
 winowhy = Classification('sentence', lambda x: f'In "{x["wnli_sent1"]}", {x["wnli_sent2"]}',
     labels=name('label',['False','True']), dataset_name="tasksource/winowhy")
 
-#for CFG in "cognitive-bias", "fake-news", "gender-bias", "hate-speech", "linguistic-bias", "political-bias", "racial-bias", "text-level-bias":
-#    print(f"mbib__{CFG.replace('-','_')} = Classification('text',labels=name('label',['not {CFG}','{CFG}']), dataset_name='mediabiasgroup/mbib-base', config_name='{CFG}')")
-
-"""
-mbib_cognitive_bias	= Classification('text',labels=name('label',['not cognitive-bias','cognitive-bias']), dataset_name='mediabiasgroup/mbib-base', config_name='cognitive-bias')
-mbib_fake_news	= Classification('text',labels=name('label',['not fake-news','fake-news']), dataset_name='mediabiasgroup/mbib-base', config_name='fake-news')
-mbib_gender_bias	= Classification('text',labels=name('label',['not gender-bias','gender-bias']), dataset_name='mediabiasgroup/mbib-base', config_name='gender-bias')
-mbib_hate_speech	= Classification('text',labels=name('label',['not hate-speech','hate-speech']), dataset_name='mediabiasgroup/mbib-base', config_name='hate-speech')
-mbib_linguistic_bias	= Classification('text',labels=name('label',['not linguistic-bias','linguistic-bias']), dataset_name='mediabiasgroup/mbib-base', config_name='linguistic-bias')
-mbib_political_bias	= Classification('text',labels=name('label',['not political-bias','political-bias']), dataset_name='mediabiasgroup/mbib-base', config_name='political-bias')
-mbib_racial_bias	= Classification('text',labels=name('label',['not racial-bias','racial-bias']), dataset_name='mediabiasgroup/mbib-base', config_name='racial-bias')
-mbib_text_level_bias	= Classification('text',labels=name('label',['not text-level-bias','text-level-bias']), dataset_name='mediabiasgroup/mbib-base', config_name='text-level-bias')
-"""
 
 robustLR = Classification("context","statement","label", dataset_name="tasksource/robustLR")
 
-def _cast_cluttr_labels(dataset):
-    labels = sorted({label for rows in dataset.values() for label in rows["target_text"]})
-    return DatasetDict({
-        split: rows.cast_column("target_text", ClassLabel(names=labels))
-        for split, rows in dataset.items()
-    })
-
-cluttr = Classification(
-    "story", "query", "target_text", dataset_name="json",
-    task_id="v1/gen_train234_test2to10",
-    load_dataset_kwargs={"data_files": {
-        "train": "hf://datasets/kendrivp/CLUTRR_v1_extracted/gen_train234_test2to10/CLUTRR_v1_gen_train234_test2to10_train.json",
-        "validation": "hf://datasets/kendrivp/CLUTRR_v1_extracted/gen_train234_test2to10/CLUTRR_v1_gen_train234_test2to10_validation.json",
-        "test": "hf://datasets/kendrivp/CLUTRR_v1_extracted/gen_train234_test2to10/CLUTRR_v1_gen_train234_test2to10_test.json",
-    }}, pre_process=_cast_cluttr_labels)
+cluttr = Classification("story", "query", "label", dataset_name="tasksource/clutrr")
 
 logical_fallacy = Classification("source_article", labels="logical_fallacies", dataset_name="tasksource/logical-fallacy")
 
@@ -1359,21 +1254,9 @@ trofi = Classification(
         "test": "hf://datasets/tasksource/TroFi/data/test-00000-of-00001-a467035ce73d87fe.parquet",
     }}, splits=['train', None, 'test'])
 
-def _strip_sharc_extras(dataset):
-    columns = dataset["train"].column_names
-    extras = ["utterance_id", "tree_id", "source_url", "history", "evidence"]
-    if columns is None:
-        return dataset.remove_columns(extras)
-    return dataset.remove_columns([name for name in extras if name in columns])
-
-sharc_classification = Classification("snippet", lambda x:f'{x["scenario"]}\n{x["question"]}',
-    labels=lambda x:x["answer"] if x['answer'] in  {"Yes","No","Irrelevant"} else "Clarification needed",
-    dataset_name='json', task_id='sharc_modified/mod',
-    load_dataset_kwargs={"data_files": {
-        "train": "https://raw.githubusercontent.com/nikhilweee/neural-conv-qa/master/datasets/mod_train.json",
-        "validation": "https://raw.githubusercontent.com/nikhilweee/neural-conv-qa/master/datasets/mod_dev.json",
-    }, "streaming": True},
-    pre_process=_strip_sharc_extras)
+sharc_classification = Classification("snippet",
+    lambda x: "\n".join(part for part in (x["scenario"], x["question"], x["history"]) if part),
+    labels="label", dataset_name="tasksource/sharc")
 
 conceptrules_v2 = Classification("context", "text", "label", dataset_name="tasksource/conceptrules_v2")
 
@@ -1404,7 +1287,6 @@ lsat = MultipleChoice(cat(['passage','question']), choices_list='references',lab
 
 apt = Classification('text_a','text_b',name('labels',['not_paraphrase','paraphrase']),dataset_name='tasksource/apt')
 
-#xsum_factuality = Classification("summary",labels="is_factual")
 
 financial_sentiment = Classification("text",labels=name('label',['Bearish','Bullish','Neutral']),
     dataset_name="zeroshot/twitter-financial-news-sentiment")
@@ -1583,8 +1465,10 @@ brainteasers = MultipleChoice("question",
     labels="label",
     dataset_name="tasksource/brainteasers",config_name=['WP','SP'])
 
-#GATED !
-#toxigen = Classification("text",labels="toxicity_human", dataset_name="skg/toxigen-data")
+# toxicity_human is a 1-5 mean rating; the ambiguous middle is dropped
+toxigen = Classification("text", labels=lambda x: ["benign", "toxic"][x["toxicity_human"] >= 4],
+    pre_process=lambda ds: ds.filter(lambda x: not 2 < x["toxicity_human"] < 4),
+    dataset_name="skg/toxigen-data", config_name="annotated")
 
 def _support_shift_name(shift):
     if shift == 0:
@@ -1598,23 +1482,6 @@ persuasiveness = Classification(
     dataset_name="Anthropic/persuasion",
     label_values={shift: _support_shift_name(shift) for shift in range(-2, 6)})
 
-#ste_wic = Classification(cat("text_1","text_2"),
-#    lambda x:f"{x['target']} means the same thing in these texts",
-#    "gold_label_binary",
-#    dataset_name="cardiffnlp/super_tweeteval", config_name="tempo_wic",splits=['train','validation',None])
-
-#ste_nerd = Classification("text",
-#    lambda x:f"definition of {x['target']} here is 'x{['definition']}'",
-#    "gold_label_binary",
-#    dataset_name="cardiffnlp/super_tweeteval", config_name="tweet_nerd",splits=['train','validation',None])
- 
-#ste_sim = Classification("text_1","text_2",lambda x:x['gold_score']/5,
-#    dataset_name="cardiffnlp/super_tweeteval",config_name="tweet_similarity",splits=['train','validation',None])
-
-#ste_intimacy = Classification("text_1",labels=lambda x:x['gold_score']/5,
-#    dataset_name="cardiffnlp/super_tweeteval",config_name="tweet_intimacy")
-
-#ccdv/patent-classification|abstract text label
 
 ambigNQ = Classification("question",labels=lambda x:{True:"ambiguous", False:"not ambiguous"}.get(x["ambig"]),
     dataset_name="erbacher/AmbigNQ-clarifying-question")
@@ -1623,11 +1490,11 @@ siga_nli = Classification("premise","statement","label",dataset_name="tasksource
 
 unigram_fol = Classification("premise","hypothesis","label",dataset_name='unigram/FOL-nli')
 
-#gs_goal = MultipleChoice("sent2",regen("ending[0-3]"),"label",
-#        dataset_name="tasksource/goal-step-wikihow",config_name="goal")
+gs_goal = MultipleChoice(lambda x: f"Step: {x['sent2']}\nGoal:", regen("ending[0-3]"), "label",
+        dataset_name="tasksource/goal-step-wikihow", config_name="goal")
 
-#gs_step = MultipleChoice("sent2",regen("ending[0-3]"),"label",
-#        dataset_name="tasksource/goal-step-wikihow",config_name="step")
+gs_step = MultipleChoice(lambda x: f"Goal: {x['sent2']}\nStep:", regen("ending[0-3]"), "label",
+        dataset_name="tasksource/goal-step-wikihow", config_name="step")
 
 gs_order = MultipleChoice("sent2",regen("ending[0-1]"),"label",
         dataset_name="tasksource/goal-step-wikihow",config_name="order")
@@ -1646,7 +1513,6 @@ nlsat = Classification('sentence',labels='label',dataset_name="tasksource/natura
 idioms_nli = Classification('premise','hypothesis','label',dataset_name="tasksource/idioms-nli")
 
 lifeycle_entailment = Classification("premise","hypothesis","label",dataset_name='tasksource/lifecycle-entailment')
-
 
 
 # modern classification / relation extraction datasets
@@ -1785,28 +1651,44 @@ pku_saferlhf__safety = MultipleChoice(
     "prompt", choices=["response_0", "response_1"], labels="safer_response_id",
     dataset_name="PKU-Alignment/PKU-SafeRLHF")
 
-helpsteer__helpfulness = Classification("prompt", "response", "helpfulness", dataset_name="nvidia/HelpSteer")
-helpsteer__correctness = Classification("prompt", "response", "correctness", dataset_name="nvidia/HelpSteer")
-helpsteer__coherence = Classification("prompt", "response", "coherence", dataset_name="nvidia/HelpSteer")
-helpsteer__complexity = Classification("prompt", "response", "complexity", dataset_name="nvidia/HelpSteer")
-helpsteer__verbosity = Classification("prompt", "response", "verbosity", dataset_name="nvidia/HelpSteer")
+_HELPSTEER_SCALES = dict(helpfulness=("not helpful", "extremely helpful"),
+    correctness=("mostly incorrect", "fully correct and complete"), coherence=("incoherent", "perfectly clear"),
+    complexity=("basic competency", "deep domain expertise"), verbosity=("very terse", "very verbose"))
 
-helpsteer_2__helpfulness = Classification("prompt","response","helpfulness",dataset_name="nvidia/HelpSteer2")
-helpsteer_2__correctness = Classification("prompt", "response", "correctness", dataset_name="nvidia/HelpSteer2")
-helpsteer_2__coherence = Classification("prompt", "response", "coherence", dataset_name="nvidia/HelpSteer2")
-helpsteer_2__complexity = Classification("prompt", "response", "complexity", dataset_name="nvidia/HelpSteer2")
-helpsteer_2__verbosity = Classification("prompt", "response", "verbosity", dataset_name="nvidia/HelpSteer2")
+def _helpsteer(attribute, dataset_name):
+    low, high = _HELPSTEER_SCALES[attribute]
+    return Classification("prompt", "response", name(attribute, [f"0: {low}", "1", "2", "3", f"4: {high}"]),
+        dataset_name=dataset_name)
+
+helpsteer__helpfulness = _helpsteer("helpfulness", "nvidia/HelpSteer")
+helpsteer__correctness = _helpsteer("correctness", "nvidia/HelpSteer")
+helpsteer__coherence = _helpsteer("coherence", "nvidia/HelpSteer")
+helpsteer__complexity = _helpsteer("complexity", "nvidia/HelpSteer")
+helpsteer__verbosity = _helpsteer("verbosity", "nvidia/HelpSteer")
+
+helpsteer_2__helpfulness = _helpsteer("helpfulness", "nvidia/HelpSteer2")
+helpsteer_2__correctness = _helpsteer("correctness", "nvidia/HelpSteer2")
+helpsteer_2__coherence = _helpsteer("coherence", "nvidia/HelpSteer2")
+helpsteer_2__complexity = _helpsteer("complexity", "nvidia/HelpSteer2")
+helpsteer_2__verbosity = _helpsteer("verbosity", "nvidia/HelpSteer2")
+
+def render_dialogue(turns):
+    return "\n\n".join(f"{turn['role'].capitalize()}: {turn['content']}" for turn in turns)
+
+helpsteer_3 = MultipleChoice(lambda x: f"{render_dialogue(x['context'])}\n\nBetter next assistant reply:",
+    choices=["response1", "response2"], labels=lambda x: int(x["overall_preference"] > 0),
+    pre_process=lambda ds: ds.filter(lambda x: x["overall_preference"] != 0),  # 0 is a tie
+    dataset_name="nvidia/HelpSteer3", config_name="preference")
 
 msci_nli = Classification('sentence1','sentence2','label',dataset_name='sadat2307/MSciNLI')
 
-#lex_glue___ecthr_a = Classification(sentence1="text", labels="labels",dataset_name="coastalcph/lex_glue",config_name="ecthr_a") # too long
-#lex_glue___ecthr_b = Classification(sentence1="text", labels="labels") # too long
 
 ultrafeedback = MultipleChoice("question", choices=['response_j','response_k'],labels=constant(0), dataset_name="pushpdeep/UltraFeedback-paired")
 
 essay_scoring = Classification("full_text",labels="score",dataset_name='tasksource/AES2-essay-scoring')
 
-#argument_feedback = Classification("discourse_text",labels="discourse_effectiveness", dataset_name="tasksource/argument-feedback")
+argument_feedback = Classification(lambda x: f"{x['discourse_type']}: {x['discourse_text']}",
+    labels="discourse_effectiveness", dataset_name="tasksource/argument-feedback")
 
 eg = lambda x: Classification("full_text", labels=lambda y:int(y[x]), dataset_name="tasksource/english-grading")
 grading__cohesion = eg('cohesion')
@@ -1854,8 +1736,160 @@ issue_similarity = Classification(lambda x: _html_text(x["text1"]), lambda x: _h
     dataset_name="WhereIsAI/github-issue-similarity",
     label_values={0: "dissimilar issues", 1: "similar issues"})
 
+
+######################## Discarded tasks ########################
+# Kept for reference with the reason. Tasksource is for training: evaluation
+# benchmarks, duplicates and unsound label sources stay out.
+
+# [test-only diagnostic set, labels masked]
+#glue___ax = Classification(sentence1="premise", sentence2="hypothesis", labels="label", splits=["test", None, None]) # fully masked
+
+# [duplicate of glue/rte]
+#super_glue___rte = Classification(sentence1="premise", sentence2="hypothesis", labels="label") # in glue
+
+# [same pairs as sick/entailment_AB]
+#sick__entailment_BA = Classification('sentence_A','sentence_B','entailment_BA')
+
+# [generated labels not sound enough]
+# gpt3_nli = Classification("text_a","text_b","label",dataset_name="pietrolesci/gpt3_nli") # not sound enough
+
+# [overlaps FEVER-based NLI tasks]
+#enfever_nli = Classification("evidence","claim","label", dataset_name="ctu-aic/enfever_nli")
+
+# [diagnostic benchmark]
+#glue__diagnostics = Classification("premise","hypothesis","label",
+#    dataset_name="pietrolesci/glue_diagnostics",splits=["test",None,None])
+
+# [silver labels; paws/labeled_final is used]
+#paws___unlabeled_final = Classification("sentence1", "sentence2", "label")
+
+# [duplicate of glue/qqp]
+#quora = Classification(get.questions.text[0], get.questions.text[1], 'is_duplicate') # in glue
+
+# [not loadable]
+#tner___tweebank_ner    = TokenClassification(tokens="tokens", labels="tags")
+
+# [covered by math_qa]
+#aqua_rat___tokenized = MultipleChoice("question",choices_list="options",labels=lambda x:"ABCDE".index(x['correct'])) in math_qa
+
+# [claim-only FEVER; the verdict needs evidence]
+#fever___v1_0 = Classification(sentence1="claim", labels="label", splits=["train", "paper_dev", "paper_test"], dataset_name="fever", config_name="v1.0")
+#fever___v2_0 = Classification(sentence1="claim", labels="label", splits=[None, "validation", None], dataset_name="fever", config_name="v2.0")
+
+# [duplicate of glue/mnli]
+# multi_nli = Classification(sentence1="premise", sentence2="hypothesis", labels="label", splits=["train", "validation_matched", None]) #glue
+
+# [covered by hyperpartisan_news]
+#hyperpartisan_news_detection___byarticle = Classification(sentence1="text", labels="hyperpartisan", splits=["train", None, None]) # files too heavy
+#hyperpartisan_news_detection___bypublisher = Classification(sentence1="text", labels="hyperpartisan", splits=["train","validation", None]) # files too heavy
+
+# [covered by go_emotions/simplified]
+#go_emotions___raw = Classification(sentence1="text", splits=["train", None, None])
+
+# [duplicate of super_glue/boolq]
+#boolq = Classification(sentence1="question", splits=["train", "validation", None]) # in superglue
+
+# [too long]
+#ecthr_cases___alleged_violation_prediction = Classification(labels="labels", dataset_name="ecthr_cases", config_name="alleged-violation-prediction")
+#ecthr_cases___violation_prediction = Classification(labels="labels", dataset_name="ecthr_cases", config_name="violation-prediction")
+#   too long
+
+# [adversarial evaluation benchmark, validation only]
+#adv_glue___adv_sst2 = Classification(sentence1="sentence", labels="label", splits=["validation", None, None])
+#adv_glue___adv_qqp = Classification(sentence1="question1", sentence2="question2", labels="label", splits=["validation", None, None])
+#adv_glue___adv_mnli = Classification(sentence1="premise", sentence2="hypothesis", labels="label", splits=["validation", None, None])
+#adv_glue___adv_mnli_mismatched = Classification(sentence1="premise", sentence2="hypothesis", labels="label", splits=["validation", None, None])
+#adv_glue___adv_qnli = Classification(sentence1="question", labels="label", splits=["validation", None, None])
+#adv_glue___adv_rte = Classification(sentence1="sentence1", sentence2="sentence2", labels="label", splits=["validation", None, None])
+
+# [missing files]
+#species_800 = TokenClassification(tokens="tokens", labels="ner_tags", config_name=["species_800"]) missing files
+
+# [horoscope is not predictable from text]
+#blog_authorship_corpus__horoscope = Classification(sentence1="text",labels="horoscope")
+
+# [in bigbench, too heavy (100GB)]
+#code_x_glue_cc_clone_detection_big_clone_bench = Classification("func1", "func2", "label") # in bigbench + too heavy (100g)
+
+# [constant label, not a real task]
+#code_x_glue_cc_code_refinement = MultipleChoice(
+#    constant(""), choices=["buggy","fixed"], labels=constant(0),
+#    config_name="medium")
+
+# [source discontinued; see argument_feedback]
+#effective_feedback_student_writing = Classification("discourse_text", 
+#labels="discourse_effectiveness",dataset_name="YaHi/EffectiveFeedbackStudentWriting")
+# discontinued /!\
+
+# [every option is a valid answer; gold is only the most popular]
+#proto_qa = MultipleChoice(
+#    "question",
+#    choices_list=lambda x:x['answer-clusters']['answers'],
+#    labels=lambda x: x['answer-clusters']['count'].index(max(x['answer-clusters']['count'])),
+#    config_name='proto_qa'
+#)
+
+# [HC3 human answers are PTB-tokenized (a trivial shortcut); script-only loader]
+# def _preprocess_chatgpt_detection(ex):
+#     import random
+#     label=random.random()<0.5
+#     ex['label']=int(label)
+#     ex['answer']=[str(ex['human_answers'][0]),str(ex['chatgpt_answers'][0])][label]
+#     return ex
+#chatgpt_detection = Classification("question","answer","label",
+#    dataset_name = 'Hello-SimpleAI/HC3', config_name="all",
+#    pre_process=lambda dataset:dataset.map(_preprocess_chatgpt_detection))
+
+# [duplicate of equate]
+#equate = Classification("sentence1", "sentence2", "gold_label",dataset_name="tasksource/equate")
+
+# [unclear label semantics]
+#attempto_nli = Classification("premise","hypothesis",
+#    lambda x:f'race-{x["race_label"]}',
+#    dataset_name="sileod/attempto-nli")
+
+# [regression target; acceptability is covered by other tasks]
+#mega_acceptability = Classification("sentence",labels="average",
+#    dataset_name='tasksource/mega-acceptability-v2')
+
+# [MBIB is an evaluation benchmark]
+#for CFG in "cognitive-bias", "fake-news", "gender-bias", "hate-speech", "linguistic-bias", "political-bias", "racial-bias", "text-level-bias":
+#    print(f"mbib__{CFG.replace('-','_')} = Classification('text',labels=name('label',['not {CFG}','{CFG}']), dataset_name='mediabiasgroup/mbib-base', config_name='{CFG}')")
+# mbib_cognitive_bias	= Classification('text',labels=name('label',['not cognitive-bias','cognitive-bias']), dataset_name='mediabiasgroup/mbib-base', config_name='cognitive-bias')
+# mbib_fake_news	= Classification('text',labels=name('label',['not fake-news','fake-news']), dataset_name='mediabiasgroup/mbib-base', config_name='fake-news')
+# mbib_gender_bias	= Classification('text',labels=name('label',['not gender-bias','gender-bias']), dataset_name='mediabiasgroup/mbib-base', config_name='gender-bias')
+# mbib_hate_speech	= Classification('text',labels=name('label',['not hate-speech','hate-speech']), dataset_name='mediabiasgroup/mbib-base', config_name='hate-speech')
+# mbib_linguistic_bias	= Classification('text',labels=name('label',['not linguistic-bias','linguistic-bias']), dataset_name='mediabiasgroup/mbib-base', config_name='linguistic-bias')
+# mbib_political_bias	= Classification('text',labels=name('label',['not political-bias','political-bias']), dataset_name='mediabiasgroup/mbib-base', config_name='political-bias')
+# mbib_racial_bias	= Classification('text',labels=name('label',['not racial-bias','racial-bias']), dataset_name='mediabiasgroup/mbib-base', config_name='racial-bias')
+# mbib_text_level_bias	= Classification('text',labels=name('label',['not text-level-bias','text-level-bias']), dataset_name='mediabiasgroup/mbib-base', config_name='text-level-bias')
+
+# [summary-only, the source document is missing; script-only loader]
+#xsum_factuality = Classification("summary",labels="is_factual")
+
+# [SuperTweetEval is an evaluation benchmark]
+#ste_wic = Classification(cat("text_1","text_2"),
+#    lambda x:f"{x['target']} means the same thing in these texts",
+#    "gold_label_binary",
+#    dataset_name="cardiffnlp/super_tweeteval", config_name="tempo_wic",splits=['train','validation',None])
+#ste_nerd = Classification("text",
+#    lambda x:f"definition of {x['target']} here is 'x{['definition']}'",
+#    "gold_label_binary",
+#    dataset_name="cardiffnlp/super_tweeteval", config_name="tweet_nerd",splits=['train','validation',None])
+#ste_sim = Classification("text_1","text_2",lambda x:x['gold_score']/5,
+#    dataset_name="cardiffnlp/super_tweeteval",config_name="tweet_similarity",splits=['train','validation',None])
+#ste_intimacy = Classification("text_1",labels=lambda x:x['gold_score']/5,
+#    dataset_name="cardiffnlp/super_tweeteval",config_name="tweet_intimacy")
+
+# [not implemented]
+#ccdv/patent-classification|abstract text label
+
+# [too long]
+#lex_glue___ecthr_a = Classification(sentence1="text", labels="labels",dataset_name="coastalcph/lex_glue",config_name="ecthr_a") # too long
+#lex_glue___ecthr_b = Classification(sentence1="text", labels="labels") # too long
+
+# [merges of NLI tasks already included]
 #nli_l2 = Classification("sentence1","sentence2","labels",
 #    dataset_name="tasksource/merged-2l-nli")
-
 #nli_l3 =  Classification("sentence1","sentence2","labels",
 #    dataset_name="tasksource/merged-3l-nli")

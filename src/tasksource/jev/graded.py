@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from datasets import DatasetDict, load_dataset
 
 from ..preprocess import fix_splits, sample_dataset
+from ..tasks import render_dialogue
 
 SOURCE_PREFIX = "graded/"
 
@@ -62,6 +63,7 @@ class Family:
     questions: dict
     config: str = None
     keep: object = None  # row filter applied before splitting
+    prepare: object = None  # row map adding the state columns
 
 
 HELPSTEER = dict(
@@ -89,6 +91,13 @@ SIMILARITY = "How similar in meaning are the sentences, from 0 (unrelated) to 1 
 FAMILIES = {
     "helpsteer": Family("nvidia/HelpSteer", {"Prompt": "prompt", "Response": "response"}, HELPSTEER),
     "helpsteer2": Family("nvidia/HelpSteer2", {"Prompt": "prompt", "Response": "response"}, HELPSTEER),
+    "helpsteer3": Family("nvidia/HelpSteer3", {"Conversation": "dialogue", "Response 1": "response1",
+                                               "Response 2": "response2"}, dict(
+        preference=score("overall_preference", "Which response is the better next assistant reply, and by how much?",
+                         ["-3: Response 1 is much better", "-2: Response 1 is better", "-1: Response 1 is slightly better",
+                          "0: About the same", "1: Response 2 is slightly better", "2: Response 2 is better",
+                          "3: Response 2 is much better"], low=-3)),
+        config="preference", prepare=lambda x: {"dialogue": render_dialogue(x["context"])}),
     "oasst2": Family("tasksource/oasst2_dense_flat", {"Prompt": "parent_text", "Response": "text"}, {
         **{c: noul(c, f"Mean reviewer rating of the response's {c}, from 0 (lowest) to 1 (highest).")
            for c in OASST_RATINGS},
@@ -149,6 +158,8 @@ def load_family(name, max_rows=None, max_rows_eval=None):
     dataset = DatasetDict(load_dataset(family.dataset, family.config))
     if family.keep:
         dataset = dataset.filter(family.keep)
+    if family.prepare:
+        dataset = dataset.map(family.prepare)
     dataset = sample_dataset(fix_splits(dataset), max_rows, max_rows_eval)
     return {split: [row for i, example in enumerate(rows)
                     for row in jev_rows(example, family, SOURCE_PREFIX + name,

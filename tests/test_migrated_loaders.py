@@ -158,14 +158,14 @@ class MigratedLoaderHelperTest(unittest.TestCase):
             "trec": "tasksource/trec",
             "liar": "tasksource/liar",
             "math_qa": "tasksource/math_qa",
-            "cluttr": "json",
+            "cluttr": "tasksource/clutrr",
             "docred": "json",
             "dream": "json",
             "hate_speech18": "tasksource/hate_speech18",
             "ethos": "SetFit/ethos_binary",
             "fewrel": "tasksource/few_rel",
             "propsegment": "json",
-            "sharc_classification": "json",
+            "sharc_classification": "tasksource/sharc",
             "scicite": "tasksource/scicite",
             "relbert_lexical_relation_classification": "json",
             "social_i_qa": "tasksource/social_i_qa",
@@ -177,7 +177,7 @@ class MigratedLoaderHelperTest(unittest.TestCase):
             "prost": "json",
             "discosense": "json",
             "hope_edi": "csv",
-            "numer_sense": "csv",
+            "numer_sense": "tasksource/numer_sense",
             "valueeval_stance": "csv",
             "webgpt_comparisons": "heegyu/webgpt_comparisons_ko",
             "rumoureval_2019": "csv",
@@ -238,7 +238,7 @@ class MigratedLoaderHelperTest(unittest.TestCase):
             set(list_tasks(multilingual=True).id),
         )
         self.assertEqual(en_tasks.hope_edi.dataset_name, "csv")
-        self.assertEqual(en_tasks.numer_sense.dataset_name, "csv")
+        self.assertEqual(en_tasks.numer_sense.dataset_name, "tasksource/numer_sense")
         self.assertEqual(en_tasks.arg_me.dataset_name, "json")
         self.assertEqual(ml_tasks.sentiment.dataset_name, "csv")
         self.assertEqual(en_tasks.emo.dataset_name,
