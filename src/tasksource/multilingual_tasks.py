@@ -87,11 +87,11 @@ x_fact = Classification(
 
 xgluenc = Classification('text', labels='label_text',
     dataset_name="SetFit/xglue_nc", task_id="xglue/nc")
-xglue___qadsm = Classification('query','ad_description','relevance_label',
+xglue___qadsm = Classification('query','ad_description','relevance_label', question="Is the ad relevant to the query?",
     dataset_name="tasksource/xglue", config_name="qadsm")
-xglue___qam = Classification('question','answer','label',
+xglue___qam = Classification('question','answer','label', question="Does the passage answer the query?",
     dataset_name="tasksource/xglue", config_name="qam")
-xglue___wpr = Classification('query','web_page_snippet','relavance_label',
+xglue___wpr = Classification('query','web_page_snippet','relavance_label', question="How relevant is the web page to the query?",
     dataset_name="tasksource/xglue", config_name="wpr") # relavance_label : sic
 
 xlwic = Classification(
@@ -216,7 +216,7 @@ mms_sentiment = Classification("text", labels="label", dataset_name="parquet", t
 mapa_coarse = TokenClassification("tokens","coarse_grained",dataset_name='joelito/mapa', task_id="mapa/coarse_grained")
 mapa_fine = TokenClassification("tokens","fine_grained",dataset_name='joelito/mapa', task_id="mapa/fine_grained")
 
-aces_ranking = MultipleChoice("source",choices=['good-translation','incorrect-translation'],labels=constant(0), dataset_name='nikitam/ACES', config_name='ACES', task_id='ACES/ranking')
+aces_ranking = MultipleChoice("source",choices=['good-translation','incorrect-translation'],labels=constant(0), question="Which is the correct translation?", dataset_name='nikitam/ACES', config_name='ACES', task_id='ACES/ranking')
 def _aces_phenomena_labels(dataset):
     # The catalog samples before fixing string labels; build the ontology from
     # the full source so rare phenomena in dev/test are not silently invalid.
@@ -267,7 +267,8 @@ clue___tnews = Classification("sentence", labels="label", dataset_name="clue/clu
 klue___nli = Classification("premise", "hypothesis", "label", dataset_name="klue/klue", config_name="nli",
     splits=["train", "validation", None])
 klue___ynat = Classification("title", labels="label", dataset_name="klue/klue", config_name="ynat",
-    splits=["train", "validation", None])
+    splits=["train", "validation", None], label_values=dict(enumerate(  # the KLUE paper's English topic names
+        ["IT/science", "economy", "society", "life and culture", "world", "sports", "politics"])))
 klue___sts = Classification("sentence1", "sentence2", labels=lambda x: x["labels"]["binary-label"],
     dataset_name="klue/klue", config_name="sts", splits=["train", "validation", None],
     label_values={0: "not paraphrases", 1: "paraphrases"})
