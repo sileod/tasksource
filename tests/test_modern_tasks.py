@@ -58,3 +58,17 @@ class ModernTaskPreprocessingTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TaskQuestionTest(unittest.TestCase):
+    def test_question_is_metadata_until_prompted(self):
+        from datasets import Dataset, DatasetDict
+        from tasksource import Classification
+        from tasksource.preprocess import add_question
+        task = Classification("text", labels="label", question="Is this query well-formed?")
+        source = DatasetDict(train=Dataset.from_dict(
+            {"text": ["a b", "c d"] * 20, "label": ["yes", "no"] * 20, "question": ["x", "y"] * 20}))
+        raw = task(source)
+        self.assertEqual(raw["train"].column_names, ["sentence1", "labels"])
+        prompted = add_question(raw, task.question)
+        self.assertEqual(prompted["train"][0]["sentence2"], "Is this query well-formed?")

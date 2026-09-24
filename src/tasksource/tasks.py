@@ -236,9 +236,10 @@ medical_questions_pairs = Classification("question_1","question_2", name("label"
  
 ###################### Token Classification #########################
 
-conll2003__pos_tags   = TokenClassification(tokens="tokens", labels='pos_tags')
-conll2003__chunk_tags = TokenClassification(tokens="tokens", labels='chunk_tags')
-conll2003__ner_tags   = TokenClassification(tokens="tokens", labels='ner_tags')
+# data-only mirror with the original columns, ClassLabel names and splits
+conll2003__pos_tags   = TokenClassification(tokens="tokens", labels='pos_tags', dataset_name="tomaarsen/conll2003")
+conll2003__chunk_tags = TokenClassification(tokens="tokens", labels='chunk_tags', dataset_name="tomaarsen/conll2003")
+conll2003__ner_tags   = TokenClassification(tokens="tokens", labels='ner_tags', dataset_name="tomaarsen/conll2003")
 
 
 ######################## Multiple choice ###########################
@@ -380,8 +381,8 @@ e_care = MultipleChoice(_copa_input,['choice1','choice2'],'label',
     dataset_name="12ml/e-CARE")
 
 art = MultipleChoice(
-    lambda x: f"Beginning: {x['observation_1']}\nEnding: {x['observation_2']}\nWhat happened in between?",
-    ['hypothesis_1','hypothesis_2'],
+    lambda x: f"Beginning: {x['observation_1']}\nEnding: {x['observation_2']}",
+    ['hypothesis_1','hypothesis_2'], question="What happened in between?",
     labels=lambda x:x['label']-1,
     splits=['train','validation',None]
 )
@@ -526,10 +527,13 @@ ethos___multilabel = Classification("comment", "question", "answer", dataset_nam
 tweet_eval = Classification(sentence1="text", labels="label",
     config_name=["emoji", "emotion", "hate", "irony", "offensive", "sentiment"])
 
+_STANCE_TOPICS = dict(abortion="abortion", atheism="atheism", climate="climate change", feminist="feminism",
+                      Hillary="Hillary Clinton")
+
 def stance_kwargs(topic):
     return {
-        "sentence1": constant(f'Topic: {topic}'), 
-        "sentence2": "text", 
+        "sentence1": "text",
+        "question": f"What stance does the tweet take on {_STANCE_TOPICS[topic]}?",
         "labels": "label", 
         "config_name": f"stance_{topic.lower()}",
         "dataset_name": "tweet_eval"
@@ -777,7 +781,7 @@ emo = Classification(sentence1=_emocontext_text,
     dataset_name="oneonlee/cleansed_emocontext", task_id="emo/emo2019")
 
 # rating is the share of 5 raters who found the query a well-formed question; keep clear cases
-google_wellformed_query = Classification("content", constant("Is this search query a well-formed question?"),
+google_wellformed_query = Classification("content", question="Is this search query a well-formed question?",
     labels=lambda x: ["not well-formed", "well-formed"][x["rating"] >= 0.8],
     pre_process=lambda ds: ds.filter(lambda x: not 0.2 < x["rating"] < 0.8),
     dataset_name="tasksource/google_wellformed_query")
@@ -786,7 +790,8 @@ tweets_hate_speech_detection = Classification(sentence1="tweet", labels="label",
 
 
 
-wnut_17 = TokenClassification(tokens="tokens", labels="ner_tags", config_name=["wnut_17"])
+wnut_17 = TokenClassification(tokens="tokens", labels="ner_tags", dataset_name="flaitenberger/wnut_17",
+    task_id="wnut_17/wnut_17")  # data-only mirror
 
 ncbi_disease = TokenClassification(tokens="tokens", labels="ner_tags", config_name=["ncbi_disease"])
 
@@ -910,7 +915,7 @@ def _clear_disagreement(dataset):
     return DatasetDict({name: keep(split) for name, split in dataset.items()})
 
 def _disagreement(dataset_name, question):
-    return Classification("text", constant(question),
+    return Classification("text", question=question,
         labels=lambda x: ["annotators agree", "annotators disagree"][x["disagreement_rate"] > 0],
         dataset_name=dataset_name, pre_process=_clear_disagreement)
 
@@ -1007,7 +1012,7 @@ synthetic_instruct = MultipleChoice('prompt', choices=['chosen', 'rejected'],
 
 scruples = Classification("text",labels="binarized_label",dataset_name="tasksource/scruples")
 
-wouldyourather = MultipleChoice(constant('Most people would rather:'), choices=['option_a','option_b'],
+wouldyourather = MultipleChoice(constant(''), choices=['option_a','option_b'], question="Which would most people rather do?",
     labels= lambda x: int(x['votes_a']<x['votes_b']),
     # clear majorities only: at least 100 votes and twice as many for the winner
     pre_process=lambda ds: ds.filter(lambda x: x['votes_a'] + x['votes_b'] >= 100
@@ -1058,7 +1063,7 @@ avicenna = Classification("Premise 1","Premise 2","Syllogistic relation",
     dataset_name="tasksource/avicenna")
 
 shp = MultipleChoice(
-    lambda x: f"r/{x['domain'].rsplit('_', 1)[0]}: {x['history']}\n\nWhich reply did readers prefer?",
+    lambda x: f"r/{x['domain'].rsplit('_', 1)[0]}: {x['history']}", question="Which reply did readers prefer?",
     choices=['human_ref_A','human_ref_B'],
     labels=lambda x: 1 - x['labels'],  # labels is 1 when A is preferred
     # the SHP authors recommend a score ratio of at least 2; closer pairs are near ties
@@ -1214,7 +1219,8 @@ udep__deprel = TokenClassification(
 
 ambient= Classification("premise","hypothesis","hypothesis_ambiguous",dataset_name="tasksource/ambient")
 
-path_naturalness = MultipleChoice(constant("Most natural chain of relations:"),choices=['choice1','choice2'],labels="label",
+path_naturalness = MultipleChoice(constant(''),choices=['choice1','choice2'],labels="label",
+    question="Which chain of relations is more natural?",
     dataset_name="tasksource/path-naturalness-prediction")
 
 def _civil(attribute, negative, positive):
@@ -1273,7 +1279,8 @@ control = Classification('premise','hypothesis',"label",dataset_name="tasksource
 tracie = Classification("premise","hypothesis","answer",dataset_name='tasksource/tracie')
 sherliic = Classification("premise","hypothesis","label",dataset_name='tasksource/sherliic')
 
-sen_making__1 = MultipleChoice(constant('Choose most plausible:'), choices=['sentence0','sentence1'],labels='false', 
+sen_making__1 = MultipleChoice(constant(''), choices=['sentence0','sentence1'],labels='false',
+    question="Which statement makes sense?",
     dataset_name="tasksource/sen-making")
 
 sen_making__2 = MultipleChoice(lambda x: [x['sentence0'],x['sentence1']][x['false']] + '\n is not plausible because :',
@@ -1461,12 +1468,12 @@ def _hh_split(ds):
         "chosen_reply": x["chosen"][x["chosen"].rfind(marker) + len(marker):].strip(),
         "rejected_reply": x["rejected"][x["rejected"].rfind(marker) + len(marker):].strip()})
 
-anthropic_rlhf_helpfulness = MultipleChoice(lambda x: f"{x['dialogue']}\n\nMost helpful next assistant reply:",
-    ['chosen_reply','rejected_reply'], constant(0), pre_process=_hh_split,
+anthropic_rlhf_helpfulness = MultipleChoice("dialogue",
+    ['chosen_reply','rejected_reply'], constant(0), pre_process=_hh_split, question="Which next assistant reply is more helpful?",
     dataset_name="tasksource/hh-rlhf",config_name=["helpful-base", "helpful-online", "helpful-rejection-sampled"])
 
-anthropic_rlhf_harmless = MultipleChoice(lambda x: f"{x['dialogue']}\n\nMost harmless next assistant reply:",
-    ['chosen_reply','rejected_reply'], constant(0), pre_process=_hh_split,
+anthropic_rlhf_harmless = MultipleChoice("dialogue",
+    ['chosen_reply','rejected_reply'], constant(0), pre_process=_hh_split, question="Which next assistant reply is more harmless?",
     dataset_name="tasksource/hh-rlhf",config_name="harmless-base")
 
 ruletaker = Classification(
@@ -1695,10 +1702,12 @@ chemprot = Classification(
 
 pku_saferlhf__helpfulness = MultipleChoice(
     "prompt", choices=["response_0", "response_1"], labels="better_response_id",
+    question="Which response is more helpful?",
     dataset_name="PKU-Alignment/PKU-SafeRLHF")
 
 pku_saferlhf__safety = MultipleChoice(
     "prompt", choices=["response_0", "response_1"], labels="safer_response_id",
+    question="Which response is safer?",
     dataset_name="PKU-Alignment/PKU-SafeRLHF")
 
 _HELPSTEER_SCALES = dict(helpfulness=("not helpful", "extremely helpful"),
@@ -1708,7 +1717,7 @@ _HELPSTEER_SCALES = dict(helpfulness=("not helpful", "extremely helpful"),
 def _helpsteer(attribute, dataset_name):
     low, high = _HELPSTEER_SCALES[attribute]
     return Classification("prompt", "response", name(attribute, [f"0: {low}", "1", "2", "3", f"4: {high}"]),
-        dataset_name=dataset_name)
+        dataset_name=dataset_name, question=f"How would you rate the {attribute} of the response?")
 
 helpsteer__helpfulness = _helpsteer("helpfulness", "nvidia/HelpSteer")
 helpsteer__correctness = _helpsteer("correctness", "nvidia/HelpSteer")
@@ -1725,7 +1734,7 @@ helpsteer_2__verbosity = _helpsteer("verbosity", "nvidia/HelpSteer2")
 def render_dialogue(turns):
     return "\n\n".join(f"{turn['role'].capitalize()}: {turn['content']}" for turn in turns)
 
-helpsteer_3___preference = MultipleChoice(lambda x: f"{render_dialogue(x['context'])}\n\nBetter next assistant reply:",
+helpsteer_3___preference = MultipleChoice(lambda x: render_dialogue(x['context']), question="Which next assistant reply is better?",
     choices=["response1", "response2"], labels=lambda x: int(x["overall_preference"] > 0),
     pre_process=lambda ds: ds.filter(lambda x: x["overall_preference"] != 0),  # 0 is a tie
     dataset_name="nvidia/HelpSteer3", config_name="preference")
@@ -1736,7 +1745,8 @@ helpsteer_3___principle = Classification(
     labels="fulfilment", dataset_name="nvidia/HelpSteer3", config_name="principle")
 
 helpsteer_3___edit_quality = MultipleChoice(
-    lambda x: f"{render_dialogue(x['context'])}\n\nOriginal reply: {x['original_response']}\n\nBetter edit of the reply:",
+    lambda x: f"{render_dialogue(x['context'])}\n\nOriginal reply: {x['original_response']}",
+    question="Which edit improves the reply?",
     choices=["good_edited_response", "bad_edited_response"], labels=constant(0),
     dataset_name="nvidia/HelpSteer3", config_name="edit_quality")
 
@@ -1759,14 +1769,15 @@ def _helpsteer3_feedback(dataset):
 
 helpsteer_3___feedback = Classification(
     lambda x: f"{render_dialogue(x['context'])}\n\nAssistant: {x['response']}",
-    labels="helpfulness", pre_process=_helpsteer3_feedback, dataset_name="nvidia/HelpSteer3", config_name="feedback")
+    labels="helpfulness", pre_process=_helpsteer3_feedback, dataset_name="nvidia/HelpSteer3", config_name="feedback",
+    question="How helpful is the assistant reply?")
 
 msci_nli = Classification('sentence1','sentence2','label',dataset_name='sadat2307/MSciNLI')
 
 
 ultrafeedback = MultipleChoice("question", choices=['response_j','response_k'],labels=constant(0), dataset_name="pushpdeep/UltraFeedback-paired")
 
-essay_scoring = Classification("full_text", constant("Holistic score of this student essay:"), labels="score",
+essay_scoring = Classification("full_text", labels="score", question="What holistic score does this student essay deserve?",
     dataset_name='tasksource/AES2-essay-scoring',
     label_values={score: f"{score} out of 6" for score in range(1, 7)})
 
@@ -1774,7 +1785,7 @@ argument_feedback = Classification(lambda x: f"{x['discourse_type']}: {x['discou
     labels="discourse_effectiveness", dataset_name="tasksource/argument-feedback")
 
 # analytic scores from 1 to 5 in half points, averaged over raters; rounded half up
-eg = lambda x: Classification("full_text", constant(f"{x.capitalize()} score of this English learner essay:"),
+eg = lambda x: Classification("full_text", question=f"What {x} score does this English learner essay deserve?",
     labels=lambda y: f"{int(y[x] + 0.5)} out of 5", dataset_name="tasksource/english-grading")
 grading__cohesion = eg('cohesion')
 grading__syntax = eg('syntax')

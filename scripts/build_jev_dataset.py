@@ -23,8 +23,6 @@ from huggingface_hub import HfApi
 import numpy as np
 import pandas as pd
 from tasksource import list_tasks, load_task
-from tasksource import tasks as english_tasks
-from tasksource.access import load_preprocessing
 from tasksource.preprocess import sample_dataset
 from tasksource.jev.augmentations import augment_jev_internal, stable_fraction
 from tasksource.jev.prompt_augmentations import (
@@ -34,7 +32,6 @@ from tasksource.jev import graded, procedural
 from tasksource.jev.derived import VARIANT as PACKED_VARIANT, add_packed_classification, packed_items
 from tasksource.jev.length import LengthBudget
 from tasksource.jev.options import gold_position_violations
-from tasksource.jev.recast import recast_jev
 
 
 SUPPORTED_TYPES = {"Classification", "MultipleChoice", "TokenClassification"}
@@ -42,26 +39,13 @@ PUBLISH_EXCLUDED_PREFIXES = ("bigbench/", "mmlu/", "blimp/")
 JEV_TOKEN_TASKS = {
     "conll2003/ner_tags", "wnut_17/wnut_17",
 }
-TOKEN_SOURCE_MIRRORS = {
-    # Data-only copies; each retains the original columns, ClassLabel names,
-    # and train/validation/test boundaries used by the Tasksource annotation.
-    "conll2003/ner_tags": ("tomaarsen/conll2003", None),
-    "wnut_17/wnut_17": ("flaitenberger/wnut_17", None),
-}
 
 
 def load_jev_task(row, max_rows, max_rows_eval):
-    """Use audited data-only mirrors for otherwise script-bound token tasks."""
-    mirror = TOKEN_SOURCE_MIRRORS.get(row.source_id)
-    if mirror is None:
-        return load_task(
-            row.id, recast="jev", multilingual=row.multilingual,
-            max_rows=max_rows, max_rows_eval=max_rows_eval,
-        )
-    preprocessing = load_preprocessing(english_tasks, id=row.id)
-    source = load_dataset(*mirror)
-    standardized = preprocessing(source, max_rows, max_rows_eval)
-    return recast_jev(standardized, task=row.source_id)
+    return load_task(
+        row.id, recast="jev", multilingual=row.multilingual,
+        max_rows=max_rows, max_rows_eval=max_rows_eval,
+    )
 
 
 TRAINING_FEATURES = Features({

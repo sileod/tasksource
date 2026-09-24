@@ -109,14 +109,15 @@ def _token_state(tokens, target_index):
     )
 
 
-def recast_jev(dataset, task=None):
+def recast_jev(dataset, task=None, question=None):
     """Recast a standardized Tasksource dataset as runtime-defined choices.
 
     The output is model- and wire-format-independent. ``criteria`` contains
     the runtime choices, ``label`` their zero-based index, and ``answer``
     the matching criterion. Multiple-choice criteria are permuted
     deterministically per source row so the gold slot carries no signal;
-    augmentation is otherwise deliberately separate.
+    augmentation is otherwise deliberately separate. The annotation's
+    ``question``, when set, replaces the generic choice instruction.
     """
     if not isinstance(dataset, DatasetDict):
         raise TypeError("recast_jev expects a datasets.DatasetDict")
@@ -143,7 +144,7 @@ def recast_jev(dataset, task=None):
             label = int(example["labels"])
             return {
                 "state": state,
-                "instructions": JEV_CLASSIFICATION_INSTRUCTIONS,
+                "instructions": question or JEV_CLASSIFICATION_INSTRUCTIONS,
                 "criteria": criteria,
                 "label": label,
                 "answer": criteria[label],
@@ -167,7 +168,7 @@ def recast_jev(dataset, task=None):
             )
             return {
                 "state": clean_text(example["inputs"]),
-                "instructions": JEV_MULTIPLE_CHOICE_INSTRUCTIONS,
+                "instructions": question or JEV_MULTIPLE_CHOICE_INSTRUCTIONS,
                 "criteria": criteria,
                 "label": label,
                 "answer": criteria[label],

@@ -16,9 +16,12 @@ def render_options(options):
     options = [f'"{x}"' for x in options]
     return f"{', '.join(options[:-1])} or {options[-1]}"
 
-def render_classification(text,options,answer):
-    example = 'text_A→text_B' if text.startswith('text_A:') else 'the following'
-    inputs = f'With no explanation, label {example} with either {render_options(options)}.\n{text}'
+def render_classification(text,options,answer,question=None):
+    if question:
+        inputs = f'{question} With no explanation, answer with either {render_options(options)}.\n{text}'
+    else:
+        example = 'text_A→text_B' if text.startswith('text_A:') else 'the following'
+        inputs = f'With no explanation, label {example} with either {render_options(options)}.\n{text}'
     targets = f"{answer}."
     return dict_of(inputs,targets)
 
@@ -75,7 +78,7 @@ def recast_dataset_classification_to_mc(dataset,sep="[SEP]",N=4):
     return DatasetDict({k: recast_split(v) for k,v in dataset.items()})
 
 
-def recast_instruct(dataset):
+def recast_instruct(dataset, question=None):
     features = dataset['train'].features
     labels = features['labels']
 
@@ -88,6 +91,8 @@ def recast_instruct(dataset):
 
     def recast_MultipleChoice(x):
         x=shuffle_choices(x)
+        if question:
+            x['inputs'] = f"{x['inputs']}\n{question}" if x['inputs'] else question
         choices = sorted([k for k in x if 'choice' in k])
         if all([x[c] in x['inputs'] for c in choices]):
             return {"inputs":x['inputs'], 'targets': x[f"choice{x['labels']}"].strip()+"."}
@@ -109,11 +114,13 @@ def recast_instruct(dataset):
             
         answer=labels.int2str(x['labels']).strip()
         options= negative_sample_options(answer, labels._int2str)
-        return render_classification(text, options, answer)
+        return render_classification(text, options, answer, question)
         
-    dataset = dataset.map(eval(f"recast_{task_type}"))
+    recast = eval(f"recast_{task_type}")
+    # same repair of mojibake and escaped HTML as the Jev recast
+    dataset = dataset.map(lambda x: {k: clean_text(v) for k, v in recast(x).items()})
     dataset = dataset.remove_columns([k for k in features if k not in ['inputs','targets']])
     return dataset
 
 
-from .jev.recast import recast_jev, render_typed_decision, render_typed_decision_group
+from .jev.recast import clean_text, recast_jev, render_typed_decision, render_typed_decision_group

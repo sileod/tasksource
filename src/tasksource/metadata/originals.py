@@ -45,6 +45,8 @@ ORIGINALS = {
     "LabHC/moral_stories": ["demelin/moral_stories"],
     "MoE-UNC/wikihop": ["QAngaroo/wiki_hop"],
     "Samsoup/cosmos_qa": ["allenai/cosmos_qa"],
+    "tomaarsen/conll2003": ["eriktks/conll2003"],
+    "flaitenberger/wnut_17": ["leondz/wnut_17"],
     "baber/piqa": ["ybisk/piqa"],
     "fireworks-ai/logiqa": ["lucasmccabe/logiqa"],
     "ghbacct/financial-phrasebank-all-agree-classification": ["takala/financial_phrasebank"],

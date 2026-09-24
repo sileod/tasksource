@@ -5,7 +5,9 @@ import hashlib
 from datasets import Dataset, concatenate_datasets
 
 from . import graded, procedural
-from .prompt_augmentations import instruction_variants, paired_state_variants
+from .prompt_augmentations import (
+    CLASSIFICATION_INSTRUCTION, MULTIPLE_CHOICE_INSTRUCTION, instruction_variants, paired_state_variants,
+)
 
 
 def stable_fraction(identifier, salt):
@@ -92,7 +94,9 @@ def augment_jev_internal(
             })
 
         prompt_id = row["id"] + ":choice-instruction-paraphrase"
+        # a task's own question carries meaning the generic paraphrases would drop
         if (prompt_id not in existing_ids
+                and row["question"] in (CLASSIFICATION_INSTRUCTION, MULTIPLE_CHOICE_INSTRUCTION)
                 and stable_fraction(row["id"], "prompt") < prompt_rate):
             variants = instruction_variants(row["question"], options)
             index = int(stable_fraction(row["id"], "prompt-variant") * len(variants))

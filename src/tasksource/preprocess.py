@@ -63,7 +63,7 @@ class Preprocessing(DotWiz):
         
         # field annotated with a string
         substitutions = {v:k for k,v in self.to_dict().items()
-            if (k and k not in {'splits','dataset_name','config_name','task_id','load_dataset_kwargs'}
+            if (k and k not in {'splits','dataset_name','config_name','task_id','load_dataset_kwargs','question'}
             and type(v)==str and k!=v)}
 
         dataset=dataset.remove_columns([c for c in substitutions.values() if c in dataset['train'].features and c not in substitutions])
@@ -72,12 +72,12 @@ class Preprocessing(DotWiz):
         # field annotated with a function                                
         for k in self.to_dict().keys():
             v=getattr(self, k)
-            if callable(v) and k not in {"post_process","pre_process","load"}:
+            if callable(v) and k not in {"post_process","pre_process","load","question"}:
                 dataset=dataset.map(self.__map_to_target,
                                     fn_kwargs={'fn':v,'target':k})
 
-        dataset=dataset.remove_columns(
-            get_column_names(dataset)-set(self.to_dict().keys()))
+        dataset=dataset.remove_columns(  # question is metadata, never a column
+            get_column_names(dataset)-(set(self.to_dict().keys())-{'question'}))
         dataset = fix_labels(dataset)
         if self.label_values:
             dataset = cast_explicit_label_values(dataset, self.label_values)
@@ -253,6 +253,12 @@ class SharedFields:
     label_values:dict = field(default_factory=dict)
     pre_process: callable = fc.identity
     post_process: callable = fc.identity
+    # The task's question when the inputs alone do not say what to predict
+    # ("Is this search query a well-formed question?"). It is metadata, not a
+    # column: raw loading leaves the inputs untouched, load_task(prompted=True)
+    # appends it, and the instruct and Jev recasts use it as their instruction.
+    # Questions that vary per row belong in sentence2 or the MC inputs instead.
+    question: str = None
     #language:str="en"
     
 
@@ -274,6 +280,22 @@ regen = lambda x: list(exrex.generate(x))
 
 def name(label_name, classes):
     return lambda x:classes[x[label_name]]
+
+def add_question(dataset, question):
+    """Append a task question to the inputs (``load_task(prompted=True)``)."""
+    if not question:
+        return dataset
+    features = dataset["train"].features
+    if "inputs" in features:  # MultipleChoice
+        field = "inputs"
+    elif "sentence1" in features:  # Classification: the question pairs with the text
+        field = "sentence2"
+    else:  # TokenClassification labels each token; there is no text field to extend
+        return dataset
+    def prompt(x):
+        text = x.get(field)
+        return {field: f"{text}\n\n{question}" if text else question}
+    return dataset.map(prompt)
 
 def fix_splits(dataset):
 

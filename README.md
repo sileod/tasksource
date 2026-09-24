@@ -15,6 +15,8 @@ for id in df[df.task_type=="MultipleChoice"].id:
     dataset = load_task(id) # all yielded datasets can be used interchangeably
 ```
 
+Inputs are kept raw by default. When the inputs alone do not say what to predict, an annotation carries a `question` ("Is this search query a well-formed question?"), exposed as `dataset.question`; `load_task(id, prompted=True)` appends it to the inputs, and the instruct and typed-decision recasts use it as their instruction.
+
 Browse the 500+ curated tasks in tasks.md (tasks kept out on purpose, such as evaluation benchmarks, are in [parked.py](https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py) with the reason) (200+ MultipleChoice tasks, 200+ Classification tasks), and feel free to request a new task. Datasets are downloaded to `$HF_DATASETS_CACHE` (like any Hugging Face dataset), so ensure you have more than 100GB of space available.
 
 You can now also use:

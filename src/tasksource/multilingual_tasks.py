@@ -289,7 +289,7 @@ indic_glue__headlines = Classification("text", labels="label_text", dataset_name
     pre_process=_used_label_names)
 indic_glue___md__discourse_mode = Classification("sentence", labels="discourse_mode",
     dataset_name="ai4bharat/indic_glue", config_name="md.hi")
-indic_glue__section_title = MultipleChoice(lambda x: f"{x['sectionText']}\n\nSection title:",
+indic_glue__section_title = MultipleChoice("sectionText", question="Which title fits this section?",
     choices=["titleA", "titleB", "titleC", "titleD"],
     labels=lambda x: ["titleA", "titleB", "titleC", "titleD"].index(x["correctTitle"]),  # names the gold column
     dataset_name="parquet", task_id="indic_glue/wstp", load_dataset_kwargs=_indic_glue_files(

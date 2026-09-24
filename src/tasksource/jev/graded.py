@@ -130,10 +130,10 @@ FAMILIES = {
                                                "from 0 (unacceptable) to 1 (fully acceptable)?"))),
 }
 
-# tasksource task ids (substrings) that these families replace in the Jev build
-COVERED_TASKS = ("HelpSteer/", "HelpSteer2/", "HelpSteer3/preference", "oasst2_dense_flat", "civil_comments/",
-                 "english-grading/", "AES2-essay-scoring", "app_reviews", "joci", "glue/stsb", "sts-companion",
-                 "sick/relatedness", "chaos-mnli-ambiguity", "acceptability-prediction")
+# tasksource task ids (substrings) that these families replace in the Jev build. Regression tasks
+# (stsb, sick relatedness, oasst2 ...) are not listed: recast.improper_labels already excludes them.
+COVERED_TASKS = ("HelpSteer/", "HelpSteer2/", "HelpSteer3/preference", "civil_comments/",
+                 "english-grading/", "AES2-essay-scoring", "app_reviews", "joci")
 
 
 def jev_rows(example, family, source, split, index):

@@ -1,4 +1,4 @@
-from .preprocess import Preprocessing, MultipleChoiceFields
+from .preprocess import Preprocessing, MultipleChoiceFields, add_question
 from .jev.options import JEV_MAX_MC_OPTIONS
 import re
 import pandas as pd
@@ -138,7 +138,13 @@ def load_preprocessing(tasks=tasks, **kwargs):
 
 def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preprocessing_name=None,
          max_rows=None, max_rows_eval=None, multilingual=False, instruct=False,
-         recast=None, seed=0, **load_dataset_kwargs):
+         recast=None, prompted=False, seed=0, **load_dataset_kwargs):
+    """Load a standardized task.
+
+    ``prompted=True`` appends the annotation's ``question`` to the inputs;
+    otherwise the instruct and Jev recasts use it as their instruction. The
+    question is also available as ``dataset.question``.
+    """
     query = dict_of(id, dataset_name, config_name, task_name,preprocessing_name)
     query = {k:v for k,v in query.items() if v}
     _tasks = (lmtasks if multilingual else tasks)
@@ -177,17 +183,21 @@ def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preproc
         # Jev permutes criteria itself and needs every source option.
         options = dict(gold_first=False, max_options=JEV_MAX_MC_OPTIONS)
     dataset= preprocessing(dataset,max_rows, max_rows_eval, **options)
+    question = getattr(preprocessing, "question", None)
+    if prompted:
+        dataset = add_question(dataset, question)
     dataset.task_type = preprocessing.__class__.__name__
+    dataset.question = question
     if instruct and recast not in (None, "instruct"):
         raise ValueError("Use either instruct=True or recast=..., not both")
     recast = "instruct" if instruct else recast
     if recast == "instruct":
-        dataset = recast_module.recast_instruct(dataset)
+        dataset = recast_module.recast_instruct(dataset, question=None if prompted else question)
     elif recast == "jev":
         source_id = id or preprocessing_name or preprocessing.dataset_name
         if not (id or preprocessing_name) and preprocessing.config_name:
             source_id = f"{source_id}/{preprocessing.config_name}"
-        dataset = recast_module.recast_jev(dataset, task=source_id)
+        dataset = recast_module.recast_jev(dataset, task=source_id, question=None if prompted else question)
     elif recast is not None:
         raise ValueError(f"Unknown recast format: {recast!r}")
     return dataset

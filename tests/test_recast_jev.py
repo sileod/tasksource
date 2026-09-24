@@ -78,7 +78,7 @@ class RecastJevTest(unittest.TestCase):
     def test_internal_jev_augmentations_are_typed_and_idempotent(self):
         direct = Dataset.from_list([to_training_row({
             "state": "text_A: Example A\ntext_B: Example B",
-            "instructions": "Choose.",
+            "instructions": "Choose the criterion that best describes the state.",
             "criteria": ["negative", "positive"],
             "label": 1,
         }, index=0, task_id="demo", split="train")])
@@ -104,6 +104,14 @@ class RecastJevTest(unittest.TestCase):
         self.assertEqual(
             len(augment_jev_internal(augmented, 1.0, 1.0, 1.0, 1.0, 1.0)), 6
         )
+
+    def test_task_questions_are_not_paraphrased(self):
+        direct = Dataset.from_list([to_training_row({
+            "state": "30g butter to cups?", "instructions": "Is this search query a well-formed question?",
+            "criteria": ["not well-formed", "well-formed"], "label": 1,
+        }, index=0, task_id="demo", split="train")])
+        augmented = augment_jev_internal(direct, 0.0, 0.0, 0.0, 1.0, 0.0)
+        self.assertEqual(augmented["question"], ["Is this search query a well-formed question?"])
 
     def test_pretty_order_prefix_then_shuffled_tail(self):
         dataset = Dataset.from_dict({
