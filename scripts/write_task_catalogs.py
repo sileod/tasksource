@@ -41,12 +41,12 @@ def write(path, multilingual):
         f"{'multilingual_tasks' if multilingual else 'tasks'}.py), and tasks kept out on purpose are in "
         "[parked.py](src/tasksource/parked.py).",
         "",
-        "| id | type | dataset | question |",
-        "|---|---|---|:-:|",
+        "| # | id | type | dataset | question |",
+        "|--:|---|---|---|:-:|",
     ]
-    for row in tasks.itertuples():
+    for index, row in enumerate(tasks.itertuples(), 1):
         lines.append("| " + " | ".join([
-            f"[{cell(row.id)}]({module}#L{lines_of[row.preprocessing_name]})", row.task_type,
+            str(index), f"[{cell(row.id)}]({module}#L{lines_of[row.preprocessing_name]})", row.task_type,
             dataset_link(row.dataset_name), "✓" if getattr(row.mapping, "question", None) else "",
         ]) + " |")
     path.write_text("\n".join(lines) + "\n")
