@@ -250,15 +250,6 @@ conll2003__ner_tags   = TokenClassification(tokens="tokens", labels='ner_tags', 
 ######################## Multiple choice ###########################
 
 
-model_written_evals = MultipleChoice('question', choices_list=lambda x: [x['answer_matching_behavior'].strip(), x['answer_not_matching_behavior'].strip()], labels=constant(0),  
-    dataset_name="Anthropic/model-written-evals")
-
-truthful_qa___multiple_choice = MultipleChoice(
-    "question",
-    choices_list=get.mc1_targets.choices,
-    labels=constant(0)
-)
-
 fig_qa = MultipleChoice(
     "startphrase",
     choices=["ending1","ending2"],

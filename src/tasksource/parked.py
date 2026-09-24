@@ -211,6 +211,16 @@ quote_repetition = MultipleChoice('prompt',choices_list='classes',labels="answer
 redefine_math = MultipleChoice('prompt',choices_list='classes',labels="answer_index",
     dataset_name="inverse-scaling/redefine-math")
 
+# model-written-evals and TruthfulQA are evaluation suites
+model_written_evals = MultipleChoice('question', choices_list=lambda x: [x['answer_matching_behavior'].strip(), x['answer_not_matching_behavior'].strip()], labels=constant(0),  
+    dataset_name="Anthropic/model-written-evals")
+
+truthful_qa___multiple_choice = MultipleChoice(
+    "question",
+    choices_list=get.mc1_targets.choices,
+    labels=constant(0)
+)
+
 KINDS = {
     "evaluation": "evaluation benchmark: useful for evaluation, kept out of training",
     "duplicate": "duplicates or is covered by a listed task",
@@ -279,6 +289,8 @@ PARKED = {
     'nli_l3': ('duplicate', 'merges of NLI tasks already included'),
     'ecthr_cases___alleged_violation_prediction': ('impractical', 'too long'),
     'ecthr_cases___violation_prediction': ('impractical', 'too long'),
+    'model_written_evals': ('evaluation', "persona evaluations; the gold 'matching behavior' is often the undesired one (power-seeking, sycophancy)"),
+    'truthful_qa___multiple_choice': ('evaluation', 'TruthfulQA is an evaluation benchmark; validation split only'),
     'neqa': ('evaluation', 'Inverse Scaling Prize evaluation probe; few-shot prompt baked into the inputs'),
     'quote_repetition': ('evaluation', 'Inverse Scaling Prize evaluation probe; few-shot prompt baked into the inputs'),
     'redefine_math': ('evaluation', 'Inverse Scaling Prize evaluation probe; "Q: ... A:" prompt baked into the inputs'),
