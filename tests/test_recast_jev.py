@@ -121,6 +121,14 @@ class RecastJevTest(unittest.TestCase):
                          'Is "Paris" the correct answer to the question?')
         self.assertEqual(verification_question("What stance does the tweet take on feminism?", "against"),
                          'What stance does the tweet take on feminism? Is "against" the correct answer?')
+        self.assertEqual(verification_question("Choose the criterion that best labels the target token.",
+                                               "inside a person entity"),
+                         'Is "inside a person entity" the correct label for the target token?')
+
+    def test_clean_text_repairs_entities_that_lost_their_ampersand(self):
+        from tasksource.jev.recast import clean_text
+        self.assertEqual(clean_text("Royal  amp; Sun, the UK #39;s insurer"), "Royal & Sun, the UK's insurer")
+        self.assertEqual(clean_text("a 4 amp fuse"), "a 4 amp fuse")
 
     def test_pretty_order_prefix_then_shuffled_tail(self):
         dataset = Dataset.from_dict({

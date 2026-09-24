@@ -6,7 +6,8 @@ from datasets import Dataset, concatenate_datasets
 
 from . import graded, procedural
 from .prompt_augmentations import (
-    CLASSIFICATION_INSTRUCTION, MULTIPLE_CHOICE_INSTRUCTION, instruction_variants, paired_state_variants,
+    CLASSIFICATION_INSTRUCTION, MULTIPLE_CHOICE_INSTRUCTION, TOKEN_INSTRUCTION, instruction_variants,
+    paired_state_variants,
 )
 
 
@@ -22,6 +23,8 @@ def verification_question(question, option):
         return f'Is "{option}" the correct label for this example?'
     if question == MULTIPLE_CHOICE_INSTRUCTION:
         return f'Is "{option}" the correct answer to the question?'
+    if question == TOKEN_INSTRUCTION:
+        return f'Is "{option}" the correct label for the target token?'
     return f'{question} Is "{option}" the correct answer?'
 
 
