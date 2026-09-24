@@ -19,6 +19,8 @@ from huggingface_hub import HfApi
 
 from tasksource.jev.procedural import REPO_ID, TASKS
 
+MAX_CLASS_NAMES = 100
+
 
 def generate_split(task, split, rows, levels, exclude, max_attempts=50):
     module, seen, out = TASKS[task], set(exclude), []
@@ -45,7 +47,8 @@ def generate_split(task, split, rows, levels, exclude, max_attempts=50):
 
 
 def label_features(rows):
-    """One flat column per question: a ClassLabel, or a float for graded Noul answers."""
+    """One flat column per question: a ClassLabel, a float for graded Noul answers,
+    or the chosen option's text when a choice has no small fixed vocabulary."""
     specs, values = {}, {}
     for row in rows:
         answers = json.loads(row["answers"])
@@ -68,8 +71,12 @@ def label_features(rows):
         else:
             widest = max((list(s["criteria"]) for s in qspecs), key=len)
             names = list(dict.fromkeys(widest + [c for s in qspecs for c in s["criteria"]]))
-            features[qid] = ClassLabel(names=names)
-            readers[qid] = lambda a, names=names: names.index(a["choice"])
+            if len(names) > MAX_CLASS_NAMES:  # open answers such as amounts or times
+                features[qid] = Value("string")
+                readers[qid] = lambda a: a["choice"]
+            else:
+                features[qid] = ClassLabel(names=names)
+                readers[qid] = lambda a, names=names: names.index(a["choice"])
     return features, readers
 
 
@@ -85,7 +92,9 @@ def build_task(task, sizes, levels):
     for rows in splits.values():
         for row in rows:
             answers = json.loads(row["answers"])
-            row.update({qid: read(answers[qid]) for qid, read in readers.items()})
+            # States may ask a subset of their task's questions; the rest are null.
+            row.update({qid: read(answers[qid]) if qid in answers else None
+                        for qid, read in readers.items()})
     return DatasetDict({
         split: Dataset.from_list(rows, features=features) for split, rows in splits.items()
     })
@@ -96,8 +105,9 @@ def summarize(task, dataset):
     train = dataset["train"]
     for column, feature in train.features.items():
         if isinstance(feature, ClassLabel):
-            counts = Counter(train[column])
-            summary[column] = {feature.int2str(k)[:24]: round(v / len(train), 3)
+            counts = Counter(k for k in train[column] if k is not None)
+            asked = sum(counts.values())
+            summary[column] = {feature.int2str(k)[:24]: round(v / asked, 3)
                                for k, v in sorted(counts.items())}
     print(json.dumps(summary, ensure_ascii=False), flush=True)
     return summary

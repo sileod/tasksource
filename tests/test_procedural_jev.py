@@ -164,6 +164,79 @@ class ProceduralJevTest(unittest.TestCase):
             self.assertEqual(a["count_matching"]["score"], sum(
                 p["city"] == d["city"] and p["start_year"] >= d["since"] for p in d["people"]))
 
+    def test_arithmetic_gold_follows_state(self):
+        def value(answer):
+            return answer.get("choice", answer.get("noul", answer.get("score")))
+
+        sizes, ranks = Counter(), Counter()
+        for problem in self.samples("arithmetic", 600):
+            d, got = problem.data, {q: value(a) for q, a in problem.answers.items()}
+            sizes[len(got)] += 1
+            if d["scenario"] == "order":
+                cost = [l["unit_price"] * l["quantity"] for l in d["lines"]]
+                total = sum(cost)
+                due = total - d["discount"] if total >= d["threshold"] else total + d["shipping"]
+                expected = {
+                    "amount_due": due,
+                    "largest_line": d["lines"][cost.index(max(cost))]["item"],
+                    "lines_above": sum(c > d["line_cut"] for c in cost),
+                    "random_line_bulk": round(sum(l["quantity"] >= d["units"] for l in d["lines"]) / len(cost), 6),
+                    "within_budget": float(due <= d["budget"]),
+                    "budget_use": 2 if due > d["budget"] else 0 if 2 * due <= d["budget"] else 1,
+                }
+                self.assertEqual(cost.count(max(cost)), 1)
+            elif d["scenario"] == "ledger":
+                balance, balances = d["start"], []
+                for t in d["transactions"]:
+                    balance += t["amount"] if t["type"] == "deposit" else -t["amount"]
+                    balances.append(balance)
+                n, deposits, change = len(balances), sum(t["type"] == "deposit" for t in d["transactions"]), balance - d["start"]
+                expected = {
+                    "final_balance": balance,
+                    "went_negative": float(min(balances) < 0),
+                    "lowest_day": f"day {d['transactions'][balances.index(min(balances))]['day']}",
+                    "withdrawal_count": n - deposits,
+                    "random_is_deposit": round(deposits / n, 6),
+                    "net_change": 0 if change < -50 else 2 if change > 50 else 1,
+                }
+            else:
+                clock, starts = d["start"], []
+                for t in d["tasks"]:
+                    starts.append(clock)
+                    clock += t["minutes"] + d["gap"]
+                finish, minutes = clock - d["gap"], [t["minutes"] for t in d["tasks"]]
+                expected = {
+                    "finish_time": f"{finish // 60:02d}:{finish % 60:02d}",
+                    "done_by_deadline": float(finish <= d["deadline"]),
+                    "longest_task": d["tasks"][minutes.index(max(minutes))]["task"],
+                    "starts_before_noon": sum(s < 720 for s in starts),
+                    "random_is_long": round(sum(m > d["long"] for m in minutes) / len(minutes), 6),
+                }
+            for qid, answer in got.items():
+                want = expected[qid]
+                if qid in ("amount_due", "final_balance"):  # formatted with a currency symbol
+                    self.assertEqual(answer.lstrip("$€£"), str(want), qid)
+                else:
+                    self.assertEqual(answer, want, qid)
+                spec = problem.questions[qid]
+                if qid in ("amount_due", "final_balance", "finish_time"):
+                    self.assertEqual(len(spec["criteria"]), 5)
+                    ranks[sorted(spec["criteria"], key=lambda o: (len(o), o)).index(answer)] += 1
+        self.assertEqual(set(sizes), {2, 3, 4, 5})
+        self.assertGreater(min(ranks.values()), max(ranks.values()) / 2)  # gold rank is not a tell
+
+    def test_partial_question_sets_build_with_null_labels(self):
+        dataset = build_task("arithmetic", {"train": 300, "validation": 30, "test": 30}, [0, 2, 4])
+        features = dataset["train"].features
+        self.assertEqual(features["amount_due"].dtype, "string")  # open numeric vocabulary
+        self.assertEqual(features["random_is_deposit"].dtype, "float32")  # graded probability
+        for row in dataset["test"]:
+            asked = json.loads(row["questions"])
+            for qid in features:
+                if qid in ("id", "level", "state", "questions", "answers"):
+                    continue
+                self.assertEqual(row[qid] is None, qid not in asked, qid)
+
     def test_rendered_tasks_vary_wording_and_build(self):
         for task in ("needle_retrieval", "record_aggregation", "table_lookup"):
             problems = self.samples(task, 100)

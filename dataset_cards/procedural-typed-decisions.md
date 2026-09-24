@@ -13,6 +13,14 @@ tags:
 - synthetic
 - multi-question
 configs:
+- config_name: arithmetic
+  data_files:
+  - split: train
+    path: arithmetic/train-*.parquet
+  - split: validation
+    path: arithmetic/validation-*.parquet
+  - split: test
+    path: arithmetic/test-*.parquet
 - config_name: entity_belief_tracking
   data_files:
   - split: train
@@ -98,8 +106,8 @@ configs:
 # procedural-typed-decisions
 
 Procedurally generated decision problems. Each row is one structured state
-(JSON, or a table, CSV, key=value lines, or prose for the retrieval and
-aggregation configs) with **several typed questions over that same state**, following the
+(JSON, or a table, CSV, key=value lines, or prose for the arithmetic,
+retrieval, and aggregation configs) with **several typed questions over that same state**, following the
 Jev / System One request shape: `choice` (pick one criterion), `noul` (a
 number in [0, 1]; a probability or a yes/no), and `score` (an ordered rubric).
 Every answer is computed exactly from the state by rules that the state
@@ -112,6 +120,7 @@ is not produced by or affiliated with TypeSafe or OpenJev.
 
 | config | questions |
 |---|---|
+| `arithmetic` | An order with a discount/shipping rule, an account ledger, or a schedule; each state asks 2–5 of: `amount_due` / `final_balance` / `finish_time` (choice among the result and typical slips), `within_budget`, `went_negative`, `done_by_deadline` (noul), `random_line_bulk`, `random_is_deposit`, `random_is_long` (noul, exact probability k/n), `budget_use`, `net_change` (score, descriptive levels), `lines_above`, `withdrawal_count`, `starts_before_noon` (score), `largest_line`, `lowest_day`, `longest_task` (choice) |
 | `entity_belief_tracking` | `world_location` (choice), `agent_belief_location` (choice), `belief_matches_world` (noul) |
 | `event_state_reconstruction` | `current_owner` (choice), `is_open` (noul), `current_severity` (score) |
 | `evidence_sufficiency` | `claim_supported` (noul), `has_conflict` (noul), `strongest_support_origin` (choice) |
@@ -132,15 +141,16 @@ is not produced by or affiliated with TypeSafe or OpenJev.
 | `state` | The state: a JSON string, or rendered text for the retrieval and aggregation configs. |
 | `questions` | JSON object of named System One questions (`type`, `instructions`, `criteria`). |
 | `answers` | JSON object of reference answers, in the System One `answers` shape. |
-| one column per question | Flat label, for browsing and filtering: a `ClassLabel` for choice, score, and yes/no noul questions; a float for graded noul (`incident_real`). |
+| one column per question | Flat label, for browsing and filtering: a `ClassLabel` for choice, score, and yes/no noul questions; a float for graded noul (`incident_real`, `random_*`); the option text for open numeric choices (`amount_due`, `final_balance`, `finish_time`). Null when the state does not ask that question (`arithmetic` only). |
 
 States are unique within a split, and validation/test states never occur in
 train.
 
 ## Use
 
-As a multi-question Jev request, send `{"state": json.loads(row["state"]),
-"questions": json.loads(row["questions"])}` and compare with `row["answers"]`.
+As a multi-question Jev request, send `{"state": row["state"], "questions":
+json.loads(row["questions"])}` (parsing the state first when it is JSON) and
+compare with `row["answers"]`.
 The same rows are included, grouped by state, in
 [`tasksource/tasksource-jev-typed-decisions`](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions).
 
