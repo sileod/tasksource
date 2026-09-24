@@ -126,6 +126,18 @@ class ProceduralJevTest(unittest.TestCase):
         groups = Counter(source_row_group(i) for i in ids)
         self.assertEqual(set(groups.values()), {3})
 
+    def test_share_cap_balances_formats(self):
+        row = {"kind": "choice", "options": ["a", "b"], "target": [1.0, 0.0], "state": "s", "question": "q",
+               "variant": "direct", "split": "train"}
+        rows = [{**row, "id": f"{kind}-{i % 5}:train:{i}", "source": f"{kind}/{i % 5}"}
+                for kind, n in [("cls", 1000), ("mc", 1000), ("tok", 5)] for i in range(n)]
+        formats = {f"mc/{i}": "MultipleChoice" for i in range(5)} | {f"tok/{i}": "TokenClassification" for i in range(5)}
+        capped = share_cap(Dataset.from_list(rows, features=TRAINING_FEATURES), 100, formats=formats)
+        counts = Counter(source.split("/")[0] for source in capped["source"])
+        self.assertEqual(len(capped), 100)
+        self.assertEqual(counts["tok"], 3)  # 0.03 of the rows the non-reserved formats share
+        self.assertTrue(35 <= counts["mc"] <= 39, counts)
+
     def test_needle_retrieval_gold_follows_records(self):
         for problem in self.samples("needle_retrieval", 300):
             d, a = problem.data, problem.answers

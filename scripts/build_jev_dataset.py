@@ -433,23 +433,64 @@ def diverse_cap(dataset, max_rows):
     return dataset.select(sorted(selected))
 
 
-def share_cap(dataset, max_rows, procedural_share):
-    """Reserve a fixed share of the cap for procedural sources.
+# Target share of each format in a capped split. Graded and procedural shares are
+# reserved; the other formats share the rest, and one short of rows passes its
+# unused share to them in proportion to theirs.
+FORMAT_SHARES = {"Classification": 0.47, "MultipleChoice": 0.30, "TokenClassification": 0.03,
+                 "graded": 0.10, "procedural": 0.10}
+RESERVED_FORMATS = ("graded", "procedural")
 
-    Under the per-source quota, seven generators would get under 2% of the
-    rows although they are the only source of Score, graded Noul, and
-    multi-question states. A fixed share also stays put as sources come and go.
+
+def row_format(source, formats=None):
+    if source.startswith(procedural.SOURCE_PREFIX):
+        return "procedural"
+    if source.startswith(graded.SOURCE_PREFIX):
+        return "graded"
+    return (formats or {}).get(source, "Classification")
+
+
+def format_budgets(sizes, max_rows, shares):
+    """Row budget per format: reserved shares first, then the rest by share."""
+    budgets = {name: min(sizes[name], int(max_rows * shares[name])) for name in RESERVED_FORMATS if name in sizes}
+    remaining = max_rows - sum(budgets.values())
+    active = {name for name in sizes if name not in budgets}
+    while active:
+        total = sum(shares[name] for name in active)
+        short = [name for name in active if sizes[name] <= remaining * shares[name] / total]
+        if not short:
+            for name in active:
+                budgets[name] = int(remaining * shares[name] / total)
+            break
+        for name in short:
+            budgets[name] = sizes[name]
+            remaining -= sizes[name]
+            active.remove(name)
+    return budgets
+
+
+def share_cap(dataset, max_rows, procedural_share=FORMAT_SHARES["procedural"], formats=None):
+    """Cap a split with a fixed share per format, then by family within each format.
+
+    ``formats`` maps a source task to its task type (Classification,
+    MultipleChoice, TokenClassification); graded and procedural sources are
+    recognized by prefix. Without fixed shares, classification would take most
+    rows, and the seven procedural generators, the only source of several
+    decision shapes, would get under 2%.
     """
-    sources = dataset.select_columns(["source"])[:]["source"]
-    generated = [i for i, source in enumerate(sources) if source.startswith(procedural.SOURCE_PREFIX)]
-    if max_rows is None or not generated or len(generated) == len(dataset):
+    if max_rows is None or len(dataset) <= max_rows:
         return diverse_cap(dataset, max_rows)
-    generated_rows = min(len(generated), int(max_rows * procedural_share))
-    other = sorted(set(range(len(dataset))) - set(generated))
-    return concatenate_datasets([
-        diverse_cap(dataset.select(other), max_rows - generated_rows),
-        diverse_cap(dataset.select(generated), generated_rows),
-    ])
+    sources = dataset.select_columns(["source"])[:]["source"]
+    groups = {}
+    for index, source in enumerate(sources):
+        groups.setdefault(row_format(source, formats), []).append(index)
+    shares = {**FORMAT_SHARES, "procedural": procedural_share}
+    budgets = format_budgets({name: len(rows) for name, rows in groups.items()}, max_rows, shares)
+    # group-preserving caps can fall a few rows short; the format with the most
+    # spare rows goes last and takes up the difference
+    last = max(groups, key=lambda name: len(groups[name]) - budgets[name])
+    parts = [diverse_cap(dataset.select(groups[name]), budgets[name]) for name in sorted(groups) if name != last]
+    parts.append(diverse_cap(dataset.select(groups[last]), max_rows - sum(map(len, parts))))
+    return concatenate_datasets(parts)
 
 
 def source_row_group(identifier):
@@ -556,6 +597,7 @@ def publish_dataset(
         for split, split_dataset in dataset.items()
     })
     overlap_dropped = {}
+    formats = {task: record.get("task_type") for task, record in latest_records(output / "build-report.jsonl").items()}
     if publish_rows:
         caps = {"train": publish_rows, "validation": eval_rows, "test": eval_rows}
         train_keys = None
@@ -567,7 +609,7 @@ def publish_dataset(
                     dataset[split], train_keys
                 )
             available = len(dataset[split])
-            dataset[split] = share_cap(dataset[split], cap, procedural_share)
+            dataset[split] = share_cap(dataset[split], cap, procedural_share, formats)
             if available >= cap and len(dataset[split]) != cap:
                 raise ValueError(
                     f"Group-preserving cap produced {len(dataset[split])} "
@@ -609,12 +651,16 @@ def publish_dataset(
         if set(metadata["split"]) != {normalized_split(split)}:
             raise ValueError(f"Mixed source split annotations in {split}")
         source_counts = Counter(metadata["source"])
+        format_counts = Counter()
+        for source, count in source_counts.items():
+            format_counts[row_format(source, formats)] += count
         family_counts = Counter()
         for source, count in source_counts.items():
             family_counts[source_family(source)] += count
         release_audit["splits"][split] = {
             "rows": len(rows),
             "sources": dict(sorted(source_counts.items())),
+            "formats": dict(format_counts.most_common()),
             "families": dict(sorted(family_counts.items())),
             "kinds": dict(sorted(Counter(metadata["kind"]).items())),
             "variants": dict(sorted(Counter(metadata["variant"]).items())),

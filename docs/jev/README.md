@@ -19,7 +19,9 @@ The builder reads the current English and multilingual Tasksource catalogs
 plus the native graded and procedural Jev sources. Publish
 [`procedural-typed-decisions`](../../dataset_cards/procedural-typed-decisions.md) first if it should
 be included; the default public cap reserves up to 10% for those sources
-(`--procedural-share`). The builder excludes BIG-bench, MMLU, and BLiMP and
+(`--procedural-share`); graded sources get 10%, and the remaining rows go 47:30:3 to
+classification, multiple choice and token tasks (`FORMAT_SHARES` in the builder), with
+family weights from `src/tasksource/metadata/weights.py` inside each format. The builder excludes BIG-bench, MMLU, and BLiMP and
 only enables token tasks whose labels and source rows have been checked.
 Per-task defaults are 30,000 train
 and 3,000 evaluation source rows (half as many source sequences for token
