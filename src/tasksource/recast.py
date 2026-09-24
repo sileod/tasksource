@@ -6,11 +6,10 @@ import string
 # Tasks whose labels do not work as named classes: regression scores, multi-label
 # lists, or opaque label sets. Tasks covered by graded Jev families are listed in
 # jev/graded.py (COVERED_TASKS) instead.
-improper_labels = ['lexical_relation_classification/ROOT09', "pragmeval/squinky", "pragmeval/emobank", 'pragmeval/persuasiveness']
-improper_labels += ['glue/stsb', 'sick/relatedness', 'sts-companion', 'stsb_multi_mt', 'acceptability-prediction',
+improper_labels = ['glue/stsb', 'sick/relatedness', 'sts-companion', 'stsb_multi_mt', 'acceptability-prediction',
                     'chaos-mnli-ambiguity', 'oasst1_dense_flat', 'oasst2_dense_flat']  # regression
-improper_labels += ['lex_glue/eurlex', 'lex_glue/unfair_tos', 'go_emotions/simplified']  # multi-label
-improper_labels += ['auditor_review/demo-org--auditor_review', 'MLMA_hate_speech', 'icl-symbol-tuning-instruct', 'zero-shot-label-nli']
+improper_labels += ['lex_glue/eurlex']  # multi-label over 100 concepts
+improper_labels += ['icl-symbol-tuning-instruct', 'zero-shot-label-nli']  # already recasts
 
 def render_options(options):
     options = [f'"{x}"' for x in options]

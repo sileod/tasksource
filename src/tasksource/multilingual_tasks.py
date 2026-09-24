@@ -71,8 +71,9 @@ offenseval_tr = Classification(**_offenseval_mapping('tasksource/offenseval_2020
 
 offenseval_dravidian = Classification("text",labels="label",config_name=['kannada','malayalam','tamil'])
 
-mlma_hate = Classification("tweet", labels=lambda x:x["sentiment"].split('_'),
-    dataset_name="nedjmaou/MLMA_hate_speech")
+# sentiment joins every label the annotators gave ("hateful_normal"); keep single-label tweets
+mlma_hate = Classification("tweet", labels="sentiment", dataset_name="nedjmaou/MLMA_hate_speech",
+    pre_process=lambda ds: ds.filter(lambda x: "_" not in x["sentiment"]))
 
 def _x_fact_labels(dataset):
     # Use the full source train ontology before bounded sampling; "other" is

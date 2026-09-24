@@ -9,6 +9,14 @@ import re
 # the Hub's automatic parquet export of script-only datasets (same splits and features)
 PARQUET = "refs/convert/parquet"
 
+def _single_label(dataset, column, empty=None):
+    """Keep rows of a multi-label column with exactly one label (or none, named ``empty``)."""
+    names = dataset["train"].features[column].feature.names + ([empty] if empty else [])
+    keep = (lambda labels: len(labels) <= 1) if empty else (lambda labels: len(labels) == 1)
+    dataset = dataset.filter(lambda x: keep(x[column]))
+    return dataset.map(lambda x: {column: x[column][0] if x[column] else len(names) - 1},
+                       features=Features({**dataset["train"].features, column: ClassLabel(names=names)}))
+
 # Integer encodings documented by the corresponding source dataset cards.
 NLI_LABEL_VALUES = {0: "entailment", 1: "neutral", 2: "contradiction"}
 ENTAILMENT_LABEL_VALUES = {0: "not-entailed", 1: "entailed"}
@@ -586,7 +594,10 @@ lex_glue___scotus = Classification(sentence1="text", labels="label", label_value
     "criminal procedure", "civil rights", "first amendment", "due process", "privacy", "attorneys", "unions",
     "economic activity", "judicial power", "federalism", "interstate relations", "federal taxation", "miscellaneous"])))
 lex_glue___ledgar = Classification(sentence1="text", labels="label")
-lex_glue___unfair_tos = Classification(sentence1="text", labels="labels")
+# single-label rows only; an unlabeled clause is fair (the large majority)
+lex_glue___unfair_tos = Classification(sentence1="text", labels="labels",
+    pre_process=lambda ds: _single_label(ds, "labels", empty="fair clause"),
+    question="Which kind of unfair term, if any, does this terms-of-service clause contain?")
 lex_glue___case_hold = MultipleChoice("context", choices_list='endings', labels="label")
 
 language_identification = Classification("text",labels="labels", dataset_name="papluca/language-identification")
@@ -663,7 +674,8 @@ hyperpartisan_news = Classification(
 scierc = Classification("text",labels="label",dataset_name="zapsdcn/sciie")
 citation_intent = Classification("text",labels="label",dataset_name="zapsdcn/citation_intent")
 
-go_emotions___simplified = Classification(sentence1="text", labels="labels")
+go_emotions___simplified = Classification(sentence1="text", labels="labels",
+    pre_process=lambda ds: _single_label(ds, "labels"))  # 84% of comments have one emotion
 
 
 scicite = Classification(sentence1="string", labels="label",dataset_name="tasksource/scicite")
@@ -1787,23 +1799,14 @@ msci_nli = Classification('sentence1','sentence2','label',dataset_name='sadat230
 
 ultrafeedback = MultipleChoice("question", choices=['response_j','response_k'],labels=constant(0), question="Which response is better?", dataset_name="pushpdeep/UltraFeedback-paired")
 
-def _without_math_test(dataset):
-    # PRM800K's train split holds ~2k MATH test problems (its own test split is MATH-500); train only on
-    # problems from MATH train, like any benchmark whose train split is fine but test split is not
-    from datasets import load_dataset
-    normalize = lambda text: " ".join(text.split())
-    test = {normalize(problem) for config in get_dataset_config_names("EleutherAI/hendrycks_math")
-            for problem in load_dataset("EleutherAI/hendrycks_math", config, split="test")["problem"]}
-    return dataset.filter(lambda x: normalize(x["prompt"]) not in test)
-
 # PRM800K math solutions: chosen solutions are human-validated and correct, rejected ones flawed and wrong;
 # the step config compares next steps after a prefix that reached a verified answer
 prm800k_dpo___solution = MultipleChoice("prompt", choices=["chosen", "rejected"], labels=constant(0),
     question="Which solution is correct?", dataset_name="tasksource/prm800k_dpo", config_name="solution",
-    pre_process=_without_math_test, splits=["train", None, None])  # the source test split is MATH-500
+    splits=["train", None, None])  # the source splits follow MATH; its test split is a benchmark
 prm800k_dpo___step = MultipleChoice("prompt", choices=["chosen", "rejected"], labels=constant(0),
     question="Which next step is correct?", dataset_name="tasksource/prm800k_dpo", config_name="step",
-    splits=["train", None, None])  # the source test split is MATH-500; train has no MATH test problems
+    splits=["train", None, None])  # the source splits follow MATH; its test split is a benchmark
 
 essay_scoring = Classification("full_text", labels="score", question="What holistic score does this student essay deserve?",
     dataset_name='tasksource/AES2-essay-scoring',
