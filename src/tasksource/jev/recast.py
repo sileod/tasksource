@@ -1,4 +1,4 @@
-"""Canonical Tasksource-to-Jev recasts and System One request rendering."""
+"""Canonical Tasksource-to-Jev recasts and typed-decision (System One) request rendering."""
 
 import html
 import re
@@ -239,7 +239,7 @@ def recast_jev(dataset, task=None):
     return converted
 
 
-def render_systemone(example, question_id="decision", model=None):
+def render_typed_decision(example, question_id="decision", model=None):
     """Render one canonical Jev row as a System One choice request."""
     criteria = list(example["criteria"])
     if len(criteria) != len(set(criteria)):
@@ -258,7 +258,7 @@ def render_systemone(example, question_id="decision", model=None):
     return dict(request)
 
 
-def render_systemone_group(examples, model=None):
+def render_typed_decision_group(examples, model=None):
     """Render related decisions over one source state as a multi-question request."""
     examples = list(examples)
     if not examples:
@@ -290,3 +290,8 @@ def render_systemone_group(examples, model=None):
         }
     request["questions"] = questions
     return dict(request)
+
+
+# Former names, kept for existing callers.
+render_systemone = render_typed_decision
+render_systemone_group = render_typed_decision_group

@@ -7,7 +7,7 @@ from datasets import Dataset
 
 from tasksource.jev.augmentations import augment_jev_internal
 from tasksource.jev.procedural import TASKS, jev_rows
-from tasksource.jev.recast import render_systemone_group
+from tasksource.jev.recast import render_typed_decision_group
 from scripts.build_jev_dataset import TRAINING_FEATURES, share_cap, source_row_group
 from scripts.build_procedural_jev import build_task
 
@@ -99,7 +99,7 @@ class ProceduralJevTest(unittest.TestCase):
         Dataset.from_list(rows, features=TRAINING_FEATURES)
         self.assertEqual({row["kind"] for row in rows}, {"choice", "noul", "score"})
         self.assertEqual(len({source_row_group(row["id"]) for row in rows}), 1)
-        request = render_systemone_group([
+        request = render_typed_decision_group([
             {**row, "criteria": row["options"], "instructions": row["question"],
              "question_id": row["id"].split(":", 3)[3]}
             for row in rows if row["kind"] == "choice"

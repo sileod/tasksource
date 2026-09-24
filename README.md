@@ -42,8 +42,9 @@ We also recast all classification tasks as natural language inference, to improv
 ### tasksource-jev-typed-decisions
 
 Tasksource classification, multiple-choice, and vetted token tasks can be recast as
-runtime-defined decisions. The canonical representation keeps the state,
-instructions, criteria, integer label, and textual answer separate:
+runtime-defined typed decisions (the Jev / System One request format: `choice`,
+`score`, and `noul` questions over a state). The canonical representation keeps
+the state, instructions, criteria, integer label, and textual answer separate:
 
 [🤗 tasksource/tasksource-jev-typed-decisions](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions)
 
@@ -51,10 +52,10 @@ The [Jev build runbook](docs/jev/README.md) covers smoke tests, resumable builds
 validation, and publication.
 
 ```python
-from tasksource import load_task, render_systemone
+from tasksource import load_task, render_typed_decision
 
 dataset = load_task("glue/rte", recast="jev")
-request = render_systemone(dataset["train"][0], model="openjev")
+request = render_typed_decision(dataset["train"][0], model="openjev")
 
 ```
 
@@ -67,7 +68,7 @@ order. The published 1M corpus adds explicit, deterministic, low-frequency
 subrecasts for label verification (`noul`), criterion-order invariance, and
 manually vetted instruction variation. Every row records its source, normalized
 `train`/`dev`/`test` split, and variant. BIG-bench, MMLU, and BLiMP are excluded.
-The flat rows carry `group_id` and `question_id`; `render_systemone_group`
+The flat rows carry `group_id` and `question_id`; `render_typed_decision_group`
 combines related canonical decisions into one multi-question request.
 Publication keeps each source-row group together under the 500k cap and uses
 reviewed question and paired-field wording to reduce repeated boilerplate.

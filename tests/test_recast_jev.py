@@ -3,7 +3,7 @@ from collections import Counter
 
 from datasets import ClassLabel, Dataset, DatasetDict, Features, Sequence, Value
 
-from tasksource.recast import recast_jev, render_systemone, render_systemone_group
+from tasksource.recast import recast_jev, render_typed_decision, render_typed_decision_group
 from tasksource.jev.token_labels import normalize_token_label
 from tasksource.jev.prompt_augmentations import (
     published_pair_style, published_question_style,
@@ -47,7 +47,7 @@ class RecastJevTest(unittest.TestCase):
             "choice1": ["one"], "labels": [0]
         })})
         row = recast_jev(source)["train"][0]
-        request = render_systemone(row, model="openjev")
+        request = render_typed_decision(row, model="openjev")
         self.assertEqual(row["answer"], "zero")
         self.assertEqual(
             list(request["questions"]["decision"]["criteria"]),
@@ -278,7 +278,7 @@ class RecastJevTest(unittest.TestCase):
         self.assertEqual(first[0]["state"].count("[TARGET:"), 1)
         self.assertEqual(first[0]["source_row"], first[1]["source_row"])
         self.assertNotEqual(first[0]["question_id"], first[1]["question_id"])
-        grouped = render_systemone_group(first)
+        grouped = render_typed_decision_group(first)
         self.assertEqual(len(grouped["questions"]), 2)
         self.assertEqual(grouped["state"], "Sentence: Obama met Obama")
         self.assertTrue(all("position" in q["instructions"] for q in grouped["questions"].values()))
