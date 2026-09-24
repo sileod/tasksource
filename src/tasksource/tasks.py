@@ -1115,13 +1115,6 @@ mutual = MultipleChoice("article",choices_list="options",
     labels=lambda x: "ABCD".index(x['answers']),
     dataset_name="tasksource/mutual",splits=["train",None,None])
 
-neqa = MultipleChoice('prompt',choices_list='classes',labels="answer_index",
-    dataset_name="inverse-scaling/NeQA")
-quote_repetition = MultipleChoice('prompt',choices_list='classes',labels="answer_index",
-    dataset_name="inverse-scaling/quote-repetition")
-redefine_math = MultipleChoice('prompt',choices_list='classes',labels="answer_index",
-    dataset_name="inverse-scaling/redefine-math")
-
 puzzte = Classification("puzzle_text","question","answer",
     dataset_name="tasksource/puzzte",
     # "non-entailment" overlaps the specific contradiction/unknown labels
