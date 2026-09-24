@@ -10,6 +10,7 @@ import hashlib
 import importlib.metadata
 import json
 import math
+import re
 import shutil
 import subprocess
 import sys
@@ -30,6 +31,9 @@ from tasksource.jev.prompt_augmentations import (
     published_pair_style, published_question_style,
 )
 from tasksource.jev import graded, procedural
+from tasksource.jev.derived import VARIANT as PACKED_VARIANT, add_packed_classification, packed_items
+from tasksource.jev.length import LengthBudget
+from tasksource.jev.options import gold_position_violations
 from tasksource.jev.recast import recast_jev
 
 
@@ -215,11 +219,97 @@ def to_training_row(example, index, task_id, split):
     }
 
 
-def pretty_order(dataset, first_rows=1_000):
-    """Round-robin sources in a display prefix without shuffling the remainder."""
+def write_pack_audit(output, split, task_id, records):
+    """Member IDs of each packed group, kept out of the lightweight schema."""
+    if not records:
+        return
+    path = output / "pack-audit" / f"{split}-{slug(task_id)}.jsonl"
+    path.parent.mkdir(exist_ok=True)
+    path.write_text("".join(
+        json.dumps(record, ensure_ascii=False) + "\n" for record in records
+    ), encoding="utf-8")
+
+
+def check_gold_positions(rows, split, multiple_choice_sources):
+    """Reject multiple-choice sources whose gold answers favor one slot."""
+    sources, targets = [], []
+    columns = rows.select_columns(["source", "kind", "variant", "target"])
+    for batch in columns.iter(batch_size=10_000):
+        for source, kind, variant, target in zip(
+            batch["source"], batch["kind"], batch["variant"], batch["target"]
+        ):
+            if source in multiple_choice_sources and kind == "choice" and variant == "direct":
+                sources.append(source)
+                targets.append(target)
+    violations = gold_position_violations(sources, targets)
+    if violations:
+        raise ValueError(
+            f"Gold answers concentrated in one option slot in {split} "
+            f"(source: share, slot, rows): {violations}"
+        )
+
+
+# Shorter matches are generic utterances ("okay", "Quick!") that recur
+# naturally across splits, not contamination.
+MIN_OVERLAP_CHARS = 40
+
+
+def _normalized(text):
+    return re.sub(r"\W+", " ", str(text)).casefold().strip()
+
+
+def content_keys(rows):
+    """Keys for train-overlap checks: (state, options) for direct rows, and
+    each item text for packed rows, whose members may be capped away."""
+    decisions, texts = set(), set()
+    columns = rows.select_columns(["state", "options", "variant"])
+    for batch in columns.iter(batch_size=10_000):
+        for state, options, variant in zip(batch["state"], batch["options"], batch["variant"]):
+            if variant == "direct":
+                decisions.add((_normalized(state), tuple(sorted(map(_normalized, options)))))
+                texts.add(_normalized(state))
+            elif variant == PACKED_VARIANT:
+                texts.update(map(_normalized, packed_items(state)))
+    return decisions, texts
+
+
+def drop_train_overlap(rows, train_keys):
+    """Drop eval source-row groups and packs whose content is in train."""
+    decisions, texts = train_keys
+    leaked = set()
+    columns = rows.select_columns(["id", "state", "options", "variant"])
+    for batch in columns.iter(batch_size=10_000):
+        for identifier, state, options, variant in zip(
+            batch["id"], batch["state"], batch["options"], batch["variant"]
+        ):
+            if variant == "direct":
+                key = (_normalized(state), tuple(sorted(map(_normalized, options))))
+                content = len(key[0]) + max(map(len, key[1]), default=0)
+                hit = content >= MIN_OVERLAP_CHARS and key in decisions
+            elif variant == PACKED_VARIANT:
+                hit = any(
+                    len(item) >= MIN_OVERLAP_CHARS and item in texts
+                    for item in map(_normalized, packed_items(state))
+                )
+            else:
+                continue
+            if hit:
+                leaked.add(source_row_group(identifier))
+    ids = rows.select_columns(["id"])[:]["id"]
+    keep = [i for i, identifier in enumerate(ids) if source_row_group(identifier) not in leaked]
+    return rows.select(keep), len(rows) - len(keep)
+
+
+def pretty_order(dataset, first_rows=1_000, seed=0):
+    """Round-robin sources in a display prefix, then shuffle the remainder.
+
+    The prefix shows variety in the Hub viewer. Without the shuffle, capped
+    splits keep build order and put all procedural rows last.
+    """
     first_rows = min(first_rows, len(dataset))
+    shuffle = np.random.default_rng(seed).permutation
     if first_rows < 2 or "source" not in dataset.column_names:
-        return dataset
+        return dataset.select(shuffle(len(dataset)))
     # ``dataset["source"]`` is a lazy Column in recent datasets releases.
     # Repeated scalar indexing inside the loops below repeatedly rebuilds an
     # Arrow column and makes publication effectively quadratic.  Format the
@@ -232,7 +322,7 @@ def pretty_order(dataset, first_rows=1_000):
     variants = display.get("variant")
     names = sorted(set(sources))
     if len(names) < 2:
-        return dataset
+        return dataset.select(shuffle(len(dataset)))
     per_source = (first_rows + len(names) - 1) // len(names)
     buckets = {name: [] for name in names}
     first_by_variant = {name: {} for name in names} if variants else None
@@ -266,7 +356,7 @@ def pretty_order(dataset, first_rows=1_000):
             break
     selected = np.zeros(len(dataset), dtype=bool)
     selected[prefix] = True
-    order = np.concatenate((np.asarray(prefix), np.flatnonzero(~selected)))
+    order = np.concatenate((np.asarray(prefix), shuffle(np.flatnonzero(~selected))))
     return dataset.select(order)
 
 
@@ -445,8 +535,11 @@ def validate_decisions(rows, split):
                     and math.isfinite(target[0]) and 0 <= target[0] <= 1
                 )
             else:
+                texts = [str(option).strip() for option in options if option is not None]
                 valid = (
                     kind in {"choice", "score"} and len(options) >= 2
+                    and len(texts) == len(options) and all(texts)
+                    and len(set(texts)) == len(texts)
                     and len(options) == len(target)
                     and all(math.isfinite(value) and value >= 0 for value in target)
                     and math.isclose(sum(target), 1.0, abs_tol=1e-5)
@@ -458,7 +551,7 @@ def validate_decisions(rows, split):
 
 
 def publish_dataset(
-    output, repo_id, pretty_rows=1_000, publish_rows=1_000_000,
+    output, repo_id, pretty_rows=1_000, publish_rows=1_000_000, eval_rows=15_000,
     allowed_sources=None, procedural_share=0.1,
 ):
     data_files = {}
@@ -473,10 +566,17 @@ def publish_dataset(
         )
         for split, split_dataset in dataset.items()
     })
+    overlap_dropped = {}
     if publish_rows:
-        weights = {"train": 0.90, "validation": 0.05, "test": 0.05}
-        for split in dataset:
-            cap = int(publish_rows * weights.get(split, 0))
+        caps = {"train": publish_rows, "validation": eval_rows, "test": eval_rows}
+        train_keys = None
+        # Train first: eval rows whose content is in the published train go.
+        for split in sorted(dataset, key=lambda name: name != "train"):
+            cap = caps.get(split, 0)
+            if split != "train" and train_keys is not None:
+                dataset[split], overlap_dropped[split] = drop_train_overlap(
+                    dataset[split], train_keys
+                )
             available = len(dataset[split])
             dataset[split] = share_cap(dataset[split], cap, procedural_share)
             if available >= cap and len(dataset[split]) != cap:
@@ -490,15 +590,26 @@ def publish_dataset(
                     f"One-million-row release requires {cap} {split} rows, "
                     f"but only {len(dataset[split])} were selected"
                 )
+            if split == "train":
+                train_keys = content_keys(dataset[split])
     dataset = DatasetDict({
         split: diversify_published_prompts(add_question_groups(split_dataset))
         for split, split_dataset in dataset.items()
     })
     if "train" in dataset:
         dataset["train"] = pretty_order(dataset["train"], pretty_rows)
-    release_audit = {"repo_id": repo_id, "requested_rows": publish_rows, "splits": {}}
+    release_audit = {
+        "repo_id": repo_id, "requested_rows": publish_rows,
+        "requested_eval_rows": eval_rows,
+        "eval_rows_dropped_for_train_overlap": overlap_dropped, "splits": {},
+    }
+    multiple_choice_sources = {
+        task for task, record in latest_records(output / "build-report.jsonl").items()
+        if record.get("task_type") == "MultipleChoice"
+    }
     for split, rows in dataset.items():
         validate_decisions(rows, split)
+        check_gold_positions(rows, split, multiple_choice_sources)
         metadata = rows.select_columns(["id", "source", "split", "kind", "variant"])[:]
         if len(set(metadata["id"])) != len(rows):
             raise ValueError(f"Duplicate Jev decision IDs in {split}")
@@ -659,6 +770,7 @@ def build(args):
     report_path = output / "build-report.jsonl"
     completed = read_completed(report_path, data_dir)
     tasks = select_tasks(args)
+    packing_budget = LengthBudget(args.pack_max_tokens, args.pack_tokenizer)
     print(f"Selected {len(tasks)} tasks; {len(completed)} already complete", flush=True)
     manifest_path = output / "build-manifest.json"
     if not manifest_path.exists():
@@ -699,6 +811,13 @@ def build(args):
                     fn_kwargs={"task_id": task_id, "split": split},
                     remove_columns=split_dataset.column_names,
                 )
+                pack_audit = []
+                split_dataset = add_packed_classification(
+                    split_dataset, row.task_type, rate=args.pack_rate,
+                    budget=packing_budget, max_items=args.pack_max_items,
+                    audit=pack_audit,
+                )
+                write_pack_audit(output, split, task_id, pack_audit)
                 split_dataset = augment_jev_internal(
                     split_dataset, args.noul_rate, args.score_rate,
                     args.permutation_rate, args.prompt_rate,
@@ -771,6 +890,7 @@ def build(args):
     if args.upload:
         publish_dataset(
             output, args.repo_id, args.pretty_rows, args.publish_rows,
+            eval_rows=args.eval_rows,
             allowed_sources=set(tasks.source_id),
             procedural_share=args.procedural_share,
         )
@@ -809,6 +929,19 @@ def parse_args():
         "--paired-format-rate", type=float, default=0.05,
         help="Fraction of paired-text rows receiving neutral field-label variation.",
     )
+    parser.add_argument(
+        "--pack-rate", type=float, default=0.10,
+        help="Max fraction of each classification task/split packed into exact multi-question states.",
+    )
+    parser.add_argument(
+        "--pack-max-tokens", type=int, default=4096,
+        help="Length budget for a complete packed request (state, questions, criteria).",
+    )
+    parser.add_argument(
+        "--pack-tokenizer",
+        help="Hugging Face tokenizer for exact budgets; default is a conservative UTF-8 byte bound.",
+    )
+    parser.add_argument("--pack-max-items", type=int, default=4)
     parser.add_argument("--finalize", action="store_true")
     parser.add_argument(
         "--finalize-only", action="store_true",
@@ -826,7 +959,11 @@ def parse_args():
     )
     parser.add_argument(
         "--publish-rows", type=int, default=1_000_000,
-        help="Maximum published rows across a 90/5/5 train/dev/test allocation; 0 disables.",
+        help="Published train rows; 0 disables all capping.",
+    )
+    parser.add_argument(
+        "--eval-rows", type=int, default=15_000,
+        help="Published rows in each of validation and test.",
     )
     parser.add_argument(
         "--pretty-rows", type=int, default=1_000,

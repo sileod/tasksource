@@ -163,17 +163,55 @@ class MultipleChoiceFields(Preprocessing):
         if not self.choices_list:
             delattr(self,'choices_list')
     
-    def __call__(self,dataset, *args, **kwargs):
+    def __call__(self,dataset, *args, gold_first=True, max_options=MAX_MC_OPTIONS, **kwargs):
+        """``gold_first=False`` keeps source option order and, with
+        ``max_options=None``, every option (padding short rows with None)."""
         dataset = super().__call__(dataset, *args, **kwargs)
         if self.choices_list:
             dataset = dataset.filter(lambda x: 1<len(x['choices_list']))
-            n_options = min([len(x) for k in dataset for x in dataset[k]['choices_list']])
-            n_options = min(MAX_MC_OPTIONS,n_options)
-            dataset = dataset.map(self.flatten_choice_list, fn_kwargs={'n_options':n_options})
-
-        else:
+            lengths = [len(x) for k in dataset for x in dataset[k]['choices_list']]
+            if gold_first:
+                n_options = min(MAX_MC_OPTIONS,min(lengths))
+                dataset = dataset.map(self.flatten_choice_list, fn_kwargs={'n_options':n_options})
+            else:
+                n_options = max(lengths) if max_options is None else min(max_options, max(lengths))
+                dataset = dataset.map(self.ordered_choice_list, fn_kwargs={'n_options':n_options})
+        elif gold_first:
             dataset = dataset.map(self.sample_choices, fn_kwargs={'n_options':MAX_MC_OPTIONS})
+        elif max_options is not None:
+            dataset = dataset.map(self.ordered_sample_choices, fn_kwargs={'n_options':max_options})
         return dataset
+
+    @staticmethod
+    def _ordered_subset(choices, label, n_options):
+        """Keep the gold answer and the first negatives, in source order."""
+        if len(choices) <= n_options:
+            return list(choices), label
+        if not 0 <= label < len(choices):
+            return list(choices[:n_options]), label
+        negatives = [i for i in range(len(choices)) if i != label][:n_options-1]
+        kept = sorted([label, *negatives])
+        return [choices[i] for i in kept], kept.index(label)
+
+    @staticmethod
+    def ordered_choice_list(x, n_options=None):
+        choices, x['labels'] = MultipleChoiceFields._ordered_subset(
+            x['choices_list'], x['labels'], n_options)
+        for i in range(n_options):
+            x[f'choice{i}'] = choices[i] if i < len(choices) else None
+        del x['choices_list']
+        return x
+
+    @staticmethod
+    def ordered_sample_choices(x, n_options=None):
+        names = [c for c in x if 'choice' in c]
+        choices, x['labels'] = MultipleChoiceFields._ordered_subset(
+            [x[c] for c in names], x['labels'], n_options)
+        for c in names:
+            del x[c]
+        for i,o in enumerate(choices):
+            x[f'choice{i}']=o
+        return x
 
     @staticmethod
     def flatten_choice_list(x, n_options=None):

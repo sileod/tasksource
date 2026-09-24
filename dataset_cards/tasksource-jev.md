@@ -57,13 +57,20 @@ print(row["state"], row["question"], row["options"], row["target"])
 
 Most classification targets are one-hot because the source annotations are
 hard labels. Sources with vote distributions or ratings retain softer or
-ordinal targets where justified. Low-frequency, deterministic variants cover
-label verification, criterion order, instruction wording, and paired-text
-field wording. The first 1,000 training rows are interleaved to show task
-variety in the Dataset Viewer; no rows are added by that display order.
+ordinal targets where justified. Multiple-choice options keep every source
+answer, in a per-row deterministic order so the gold position carries no
+signal. Low-frequency, deterministic variants cover label verification,
+criterion order, instruction wording, and paired-text field wording. Up to 10%
+of each classification task's examples are also packed, two to four at a time,
+into `packed_derived` states whose questions (an item's label, agreement,
+existence, counts) follow exactly from the gold labels. The first 1,000
+training rows are interleaved to show task variety in the Dataset Viewer; the
+rest is shuffled.
 
-The release has 900,000 train, 50,000 validation (`dev` in the `split` field),
-and 50,000 test decisions. Publication balances dataset families while
+The release has 1,000,000 train, 15,000 validation (`dev` in the `split` field),
+and 15,000 test decisions. Validation and test rows whose text and options also
+occur in train (e.g. through overlapping source datasets) are removed.
+Publication balances dataset families while
 sampling their configurations and keeping related questions together. The
 full [source mix](release-audit.json), [failed source list](failed-tasks.json),
 and [build manifest](build-manifest.json) are published alongside the data.

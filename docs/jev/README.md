@@ -75,11 +75,15 @@ compares this build with a prior failure list; `build-manifest.json` records
 the selected sources, parameters, code revision, dirty-file list, and package
 versions.
 Check the `state`, readable `options`, `target`, original split, and any
-multiple questions sharing `group_id`. The release cap is 1,000,000 rows,
-allocated 90/5/5 to train/dev/test. It balances dataset families, samples
+multiple questions sharing `group_id`. The release caps train at 1,000,000 rows
+and dev/test at 15,000 rows each (`--eval-rows`). It balances dataset families, samples
 their configs, and keeps complete source-row groups;
-the first 1,000 train rows are ordered for source and prompt variety without
-changing membership.
+the first 1,000 train rows are ordered for source and prompt variety, and the
+rest of train is shuffled deterministically. Dev/test source-row groups and packs
+whose normalized content (state plus options; each item of a packed state) also
+occurs in the published train split are dropped before the eval caps apply;
+`release-audit.json` records how many. Publication rejects decisions with
+missing, blank, or duplicate options.
 
 Authenticate with the Hugging Face Hub, then publish the checked checkpoint:
 

@@ -22,6 +22,8 @@ glue___qqp = Classification(sentence1="question1", sentence2="question2", labels
 glue___stsb = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
 
 super_glue___boolq = Classification(sentence1="question", labels="label")
+boolq_passage = Classification("passage", "question", labels="label", # reading-comprehension variant
+    dataset_name="super_glue", config_name="boolq", task_id="super_glue/boolq_passage")
 super_glue___cb = Classification(sentence1="premise", sentence2="hypothesis", labels="label")
 super_glue___multirc = Classification(
     cat(["paragraph", "question"]),
@@ -358,7 +360,7 @@ sciq = MultipleChoice(
     labels=constant(0))
 
 social_i_qa = MultipleChoice(
-    'question',
+    cat(['context','question']),
     ['answerA','answerB','answerC'],
     'label',
     dataset_name="tasksource/social_i_qa")
@@ -382,12 +384,16 @@ hellaswag = MultipleChoice('ctx_a',
     choices_list=lambda x: [f'{x["ctx_b"]}{e}' for e in x["endings"]],
     labels='label', splits=['train','validation',None])
 
-super_glue___copa = MultipleChoice('premise',['choice1','choice2'],'label')
+def _copa_input(x):
+    ask = "What was the cause of this?" if x["question"] == "cause" else "What happened as a result?"
+    return f"{x['premise']} {ask}"
 
-balanced_copa = MultipleChoice('premise',['choice1','choice2'],'label',
+super_glue___copa = MultipleChoice(_copa_input,['choice1','choice2'],'label')
+
+balanced_copa = MultipleChoice(_copa_input,['choice1','choice2'],'label',
     dataset_name="pkavumba/balanced-copa")
 
-e_care = MultipleChoice('premise',['choice1','choice2'],'label',
+e_care = MultipleChoice(_copa_input,['choice1','choice2'],'label',
     dataset_name="12ml/e-CARE")
 
 art = MultipleChoice(cat(['hypothesis_1','hypothesis_2']),
@@ -503,7 +509,7 @@ hope_edi = Classification(
 
 rumoureval_2019 = Classification(
     sentence1="source_text",
-    sentence2=lambda x: str(x["reply_text"]),
+    sentence2="reply_text",
     labels="label", dataset_name="csv",
     task_id="rumoureval_2019/RumourEval2019",
     load_dataset_kwargs={"data_files": {
@@ -511,7 +517,8 @@ rumoureval_2019 = Classification(
         "validation": "hf://datasets/strombergnlp/rumoureval_2019/rumoureval2019_val.csv",
         "test": "hf://datasets/strombergnlp/rumoureval_2019/rumoureval2019_test.csv",
     }},
-    post_process=lambda ds: ds.filter(lambda x: x['labels'] is not None)
+    # filter before fix_labels, otherwise None becomes a class name
+    pre_process=lambda ds: ds.filter(lambda x: x['label'] is not None and x['reply_text'] is not None)
 )
 
 ethos = Classification(sentence1="text", labels=name("label", ["no hate speech", "hate speech"]),
@@ -1007,7 +1014,10 @@ def _webgpt_question_text(row):
 webgpt_comparisons = MultipleChoice(
     _webgpt_question_text, choices=['answer_0','answer_1'],
     labels=lambda x:int(float(x['score_1']) > 0),
-    dataset_name="heegyu/webgpt_comparisons_ko", task_id="webgpt_comparisons")
+    dataset_name="heegyu/webgpt_comparisons_ko", task_id="webgpt_comparisons",
+    # score_1 == 0 is a tie (27% of rows), which the label would read as answer_0 winning
+    pre_process=lambda ds: ds.filter(lambda x: float(x['score_1']) != 0
+        and str(x['answer_0']).strip() and str(x['answer_1']).strip()))
 
 synthetic_instruct = MultipleChoice('prompt', choices=['chosen', 'rejected'],
     labels=constant(0), dataset_name="Dahoas/synthetic-instruct-gptj-pairwise")
@@ -1076,7 +1086,12 @@ wikimedqa = MultipleChoice("text",choices=regen('option\_[0-7]'),labels='label',
     dataset_name="sileod/wikimedqa",
     config_name=["medwiki"])
 
-cicero = MultipleChoice(lambda x: " ".join(x['Dialogue']),
+def _cicero_input(x):
+    dialogue = "\n".join(x['Dialogue'])
+    question = x['Question'].replace("target", "the target utterance")
+    return f"{dialogue}\n\nTarget utterance: {x['Target']}\n{question}"
+
+cicero = MultipleChoice(_cicero_input,
     choices_list="Choices", labels=lambda x:x['Human Written Answer'][0],
     dataset_name="declare-lab/cicero")
 
@@ -1399,7 +1414,11 @@ hatemoji = Classification('text',labels=name("label_gold", ['not-hate-speech','h
 
 regset = Classification("context",labels="answer",dataset_name='tasksource/regset')
 
-esci = Classification('query','product_text','esci_label',
+def _esci_product(x): # product_text writes missing fields as 'None' lines
+    fields = ['product_title','product_brand','product_color','product_description','product_bullet_point']
+    return "\n".join(str(x[f]) for f in fields if x[f] not in (None, "", "None"))
+
+esci = Classification('query',_esci_product,'esci_label',
     dataset_name="tasksource/esci",
     pre_process=lambda ds:ds.filter(lambda x:x['product_locale']=='us'))
 
