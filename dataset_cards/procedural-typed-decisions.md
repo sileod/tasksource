@@ -1,5 +1,5 @@
 ---
-pretty_name: procedural-jev
+pretty_name: procedural-typed-decisions
 language:
 - en
 license: apache-2.0
@@ -95,7 +95,7 @@ configs:
     path: table_lookup/test-*.parquet
 ---
 
-# procedural-jev
+# procedural-typed-decisions
 
 Procedurally generated decision problems. Each row is one structured state
 (JSON, or a table, CSV, key=value lines, or prose for the retrieval and
@@ -150,7 +150,7 @@ Generation is deterministic (row `i` of a split is seeded by `task:split:i`).
 From a [tasksource](https://github.com/sileod/tasksource) checkout:
 
 ```bash
-PYTHONPATH=.:src python scripts/build_procedural_jev.py --output build/procedural-jev --upload
+PYTHONPATH=.:src python scripts/build_procedural_jev.py --output build/procedural-typed-decisions --upload
 ```
 
 Generators live in `src/tasksource/jev/procedural/`.

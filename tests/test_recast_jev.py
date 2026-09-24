@@ -108,7 +108,7 @@ class RecastJevTest(unittest.TestCase):
 
     def test_pretty_order_spreads_trailing_sources(self):
         dataset = Dataset.from_dict({
-            "source": ["tasks"] * 900 + ["procedural-jev/x"] * 100,
+            "source": ["tasks"] * 900 + ["procedural-typed-decisions/x"] * 100,
             "value": list(range(1000)),
         })
         ordered = pretty_order(dataset, first_rows=10)
@@ -116,7 +116,7 @@ class RecastJevTest(unittest.TestCase):
         self.assertEqual(sorted(ordered["value"]), list(range(1000)))
         halves = [ordered["source"][10:505], ordered["source"][505:]]
         for half in halves:
-            self.assertGreater(half.count("procedural-jev/x"), 25)
+            self.assertGreater(half.count("procedural-typed-decisions/x"), 25)
 
     def test_pretty_order_exposes_prompt_variants(self):
         dataset = Dataset.from_dict({
@@ -194,8 +194,8 @@ class RecastJevTest(unittest.TestCase):
         self.assertEqual(counts["family/b"], 10)
         self.assertEqual(source_family("multilingual/xcsr/fr"), "multilingual/xcsr")
         self.assertEqual(source_family("graded/helpsteer"), "graded/helpsteer")
-        self.assertEqual(source_family("procedural-jev/policy_applicability"),
-                         "procedural-jev/policy_applicability")
+        self.assertEqual(source_family("procedural-typed-decisions/policy_applicability"),
+                         "procedural-typed-decisions/policy_applicability")
 
     def test_completed_tasks_require_their_parquet_shards(self):
         import json

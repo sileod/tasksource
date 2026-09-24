@@ -2,7 +2,7 @@
 
 Each module exposes ``generate(rng, level)`` returning a ``Problem`` whose
 answers are derived from the state by the rules the state itself states.
-``scripts/build_procedural_jev.py`` publishes them as ``tasksource/procedural-jev``,
+``scripts/build_procedural_jev.py`` publishes them as ``tasksource/procedural-typed-decisions``,
 one config per task.
 """
 
@@ -23,8 +23,8 @@ TASKS = {
     )
 }
 
-REPO_ID = "tasksource/procedural-jev"
-SOURCE_PREFIX = "procedural-jev/"
+REPO_ID = "tasksource/procedural-typed-decisions"
+SOURCE_PREFIX = "procedural-typed-decisions/"
 
 
 def jev_rows(example, source, split, index):

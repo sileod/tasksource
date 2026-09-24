@@ -95,7 +95,7 @@ class ProceduralJevTest(unittest.TestCase):
             answers["changed_dimension"]["choice"],
         )
 
-        rows = jev_rows(example, "procedural-jev/state_perturbation", "train", 0)
+        rows = jev_rows(example, "procedural-typed-decisions/state_perturbation", "train", 0)
         Dataset.from_list(rows, features=TRAINING_FEATURES)
         self.assertEqual({row["kind"] for row in rows}, {"choice", "noul", "score"})
         self.assertEqual(len({source_row_group(row["id"]) for row in rows}), 1)
@@ -109,18 +109,18 @@ class ProceduralJevTest(unittest.TestCase):
     def test_augmentation_leaves_procedural_rows_alone(self):
         dataset = build_task("policy_applicability", {"train": 20, "validation": 2, "test": 2}, [0])
         rows = [row for i, example in enumerate(dataset["train"])
-                for row in jev_rows(example, "procedural-jev/policy_applicability", "train", i)]
+                for row in jev_rows(example, "procedural-typed-decisions/policy_applicability", "train", i)]
         shard = Dataset.from_list(rows, features=TRAINING_FEATURES)
         self.assertEqual(len(augment_jev_internal(shard, 1.0, 1.0, 1.0, 1.0, 1.0)), len(shard))
 
     def test_share_cap_reserves_procedural_rows_whole_groups(self):
         dataset = build_task("state_perturbation", {"train": 40, "validation": 1, "test": 1}, [0])
         procedural = [row for i, example in enumerate(dataset["train"])
-                      for row in jev_rows(example, "procedural-jev/state_perturbation", "train", i)]
+                      for row in jev_rows(example, "procedural-typed-decisions/state_perturbation", "train", i)]
         other = [{**procedural[0], "id": f"src-{i % 4}:train:{i}", "source": f"src/{i % 4}",
                   "kind": "choice", "options": ["a", "b"], "target": [1.0, 0.0]} for i in range(400)]
         capped = share_cap(Dataset.from_list(other + procedural, features=TRAINING_FEATURES), 100, 0.3)
-        ids = [row["id"] for row in capped if row["source"].startswith("procedural-jev/")]
+        ids = [row["id"] for row in capped if row["source"].startswith("procedural-typed-decisions/")]
         self.assertEqual(len(capped), 100)
         self.assertEqual(len(ids), 30)
         groups = Counter(source_row_group(i) for i in ids)

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate and optionally publish tasksource/procedural-jev, one config per task.
+"""Generate and optionally publish tasksource/procedural-typed-decisions, one config per task.
 
 Every row is one generated state with several typed Jev questions over it
 (`questions`, `answers` as JSON), plus one flat label column per question so
@@ -106,8 +106,8 @@ def summarize(task, dataset):
 def parse_args():
     root = Path(__file__).resolve().parents[1]
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, default=root / "build" / "procedural-jev")
-    parser.add_argument("--card", type=Path, default=root / "dataset_cards" / "procedural-jev.md")
+    parser.add_argument("--output", type=Path, default=root / "build" / "procedural-typed-decisions")
+    parser.add_argument("--card", type=Path, default=root / "dataset_cards" / "procedural-typed-decisions.md")
     parser.add_argument("--tasks", nargs="*", default=sorted(TASKS))
     parser.add_argument("--train", type=int, default=20_000)
     parser.add_argument("--eval", type=int, default=1_000, help="Rows in each of validation and test.")
@@ -135,7 +135,7 @@ def main(args):
         # last so named configs remain loadable after push_to_hub updates metadata.
         api.upload_file(path_or_fileobj=str(args.card), path_in_repo="README.md",
                         repo_id=args.repo_id, repo_type="dataset",
-                        commit_message="Document procedural-jev configurations")
+                        commit_message="Document procedural-typed-decisions configurations")
 
 
 if __name__ == "__main__":

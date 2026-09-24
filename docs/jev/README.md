@@ -17,7 +17,7 @@ versions, not a complete lockfile.
 
 The builder reads the current English and multilingual Tasksource catalogs
 plus the native graded and procedural Jev sources. Publish
-[`procedural-jev`](../../dataset_cards/procedural-jev.md) first if it should
+[`procedural-typed-decisions`](../../dataset_cards/procedural-typed-decisions.md) first if it should
 be included; the default public cap reserves up to 10% for those sources
 (`--procedural-share`). The builder excludes BIG-bench, MMLU, and BLiMP and
 only enables token tasks whose labels and source rows have been checked.
@@ -114,6 +114,6 @@ publication step without refetching upstream sources.
 The separate procedural corpus is built by
 [`scripts/build_procedural_jev.py`](../../scripts/build_procedural_jev.py);
 its schema and provenance are documented in the
-[`procedural-jev` card](../../dataset_cards/procedural-jev.md). The synthetic
+[`procedural-typed-decisions` card](../../dataset_cards/procedural-typed-decisions.md). The synthetic
 generation pipeline is a package entry point:
 `python -m tasksource.jev.synthetic.run --config <config.yaml>`.

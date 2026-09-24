@@ -363,7 +363,7 @@ def pretty_order(dataset, first_rows=1_000, seed=0):
 def source_family(source):
     """Balance dataset families, not each configuration as an independent task."""
     parts = source.split("/")
-    if parts[0] in {"multilingual", "graded", "procedural-jev"} and len(parts) > 1:
+    if parts[0] in {"multilingual", "graded", procedural.SOURCE_PREFIX.rstrip("/")} and len(parts) > 1:
         return "/".join(parts[:2])
     return parts[0]
 
@@ -971,7 +971,7 @@ def parse_args():
     )
     parser.add_argument(
         "--procedural-share", type=float, default=0.1,
-        help="Fraction of each capped split reserved for procedural-jev sources.",
+        help="Fraction of each capped split reserved for procedural-typed-decisions sources.",
     )
     return parser.parse_args()
 
