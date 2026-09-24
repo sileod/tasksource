@@ -20,32 +20,37 @@ size_categories:
 
 # tasksource-jev-typed-decisions
 
-One million decisions from **500+ Tasksource tasks across 300+ dataset families**,
-in a single format for models that receive their answer criteria at runtime.
-The value is breadth with traceable supervision: most rows inherit labels,
-ratings, or annotator votes from existing datasets, not labels invented by a
-teacher model. The `source` field identifies the originating task; existing
-train/dev/test boundaries are retained where the source provides them.
-The [Tasksource repository](https://github.com/sileod/tasksource) and
-[task catalog](https://github.com/sileod/tasksource/blob/main/tasks.md) document
-the source preprocessings.
+**One million human-labeled decisions from 500+ tasks, in one format for models
+that read their answer criteria at runtime.**
 
-The coverage is deliberately wide: GLUE and SuperGLUE inference and language
-understanding; SNLI and XNLI; HellaSwag, PIQA, and ScienceQA; AG News,
-Banking77, and real support-ticket classification; CoNLL-2003 and WNUT-17
-entity tagging; MasakhaNEWS and other multilingual tasks; and graded sources
-such as HelpSteer and ChaosNLI. These are different decision problems with
-different criteria, made usable through one schema. A small, tagged procedural
-component adds controlled multi-question states.
+Most instruction data teaches a model to *write*. This dataset teaches it to
+*decide*: given a state and a question, pick among the options it is handed,
+rate on a scale it is handed, or give a calibrated probability. The options
+change from row to row, so a model has to read them rather than memorize a label set.
 
-## Format
+## Why use it
 
-Each Parquet row has a `state`, a `question`, runtime `options`, and a `target`.
-`kind` is `choice`, `noul` (one truth probability), or `score` (ordered levels).
-For `choice` and `score`, `target` is a distribution aligned with `options`;
-for `noul`, `options` is empty. `id`, `group_id`, and `question_id` let related
-decisions share a source example without requiring nested rows. `variant`
-marks deterministic subrecasts; `source` and `split` preserve provenance.
+- **Real supervision.** Labels, ratings, and annotator votes come from
+  established datasets, not a teacher model. Every row names its `source`.
+- **Breadth.** Over 300 dataset families: NLI and reasoning, QA and
+  commonsense, sentiment, intent and topic, toxicity and safety, preference
+  pairs, fact checking, entity tagging, and dozens of languages. GLUE,
+  SuperGLUE, HellaSwag, PIQA, ScienceQA, Banking77, CoNLL-2003, MasakhaNEWS,
+  HelpSteer, ChaosNLI, and many more, with no task allowed to dominate.
+- **Three decision types in one schema.** `choice` (pick one option), `score`
+  (an ordered scale), and `noul` (the probability that a statement is true).
+  Soft targets are kept wherever the source has votes or ratings.
+- **Built so position, repeated eval data, and question choice give nothing away.**
+  - Multiple-choice options are shuffled per row, so the answer's position carries no signal.
+  - Validation and test rows whose content appears in train are removed.
+  - Derived questions are chosen without looking at their answers.
+  - Annotations were reviewed task by task. Inverted, unanswerable, and garbled labels were fixed or dropped.
+- **Multi-question states.** Related decisions share a `group_id` and can be
+  asked together. Packed states test reasoning over several items at once, and
+  [procedural-typed-decisions](https://huggingface.co/datasets/tasksource/procedural-typed-decisions)
+  adds exact counting, arithmetic, retrieval, and state tracking.
+
+## Quick start
 
 ```python
 from datasets import load_dataset
@@ -55,39 +60,50 @@ row = ds["train"][0]
 print(row["state"], row["question"], row["options"], row["target"])
 ```
 
-Most classification targets are one-hot because the source annotations are
-hard labels. Sources with vote distributions or ratings retain softer or
-ordinal targets where justified. Multiple-choice options keep every source
-answer, in a per-row deterministic order so the gold position carries no
-signal (a final "all/none of the above" reads "all/none of the other options";
-options that cite other options by letter keep their order). Low-frequency, deterministic variants cover label verification,
-criterion order, instruction wording, and paired-text field wording. Up to 10%
-of each classification task's examples are also packed, two to four at a time,
-into `packed_derived` states whose questions (an item's label, agreement,
-existence, counts) follow exactly from the gold labels and are chosen without
-looking at the answers. The first 1,000
-training rows are interleaved to show task variety in the Dataset Viewer; the
-rest is shuffled.
+```json
+{"state": "My body cast a shadow over the grass. What was the cause of this?",
+ "question": "Choose the criterion that best answers the question.",
+ "kind": "choice", "options": ["The sun was rising.", "The grass was cut."],
+ "target": [1.0, 0.0], "source": "super_glue/copa"}
+```
 
-The release has 1,000,000 train, 15,000 validation (`dev` in the `split` field),
-and 15,000 test decisions. Validation and test rows whose text and options also
-occur in train (e.g. through overlapping source datasets) are removed.
-Publication balances dataset families while
-sampling their configurations and keeping related questions together. The
-full [source mix](release-audit.json), [failed source list](failed-tasks.json),
-and [build manifest](build-manifest.json) are published alongside the data.
-BIG-bench, MMLU, and BLiMP are not included.
+## Format
+
+| field | meaning |
+|---|---|
+| `state` | The text to decide about |
+| `question` | What to decide |
+| `kind` | `choice`, `score`, or `noul` |
+| `options` | Runtime criteria; empty for `noul` |
+| `target` | Distribution over `options`, or `[p]` for `noul` |
+| `id`, `group_id`, `question_id` | Link decisions over the same source example |
+| `source`, `split`, `variant` | Originating task, original split, and recast variant |
+
+Splits: 1,000,000 train, 15,000 validation (`dev` in `split`), and 15,000 test,
+following each source's own train/dev/test splits where it has them.
+
+## How it is built
+
+- **Canonical recasts.** Each Tasksource task is converted deterministically.
+  - Criteria are the source's own label names and answer options.
+  - Multiple-choice rows keep every option in a per-row order.
+  - A final "all/none of the above" reads "all/none of the other options".
+  - Options that cite other options by letter or number keep their order.
+- **Variants.** Low-frequency, deterministic variants cover label verification as `noul`, criterion order, and instruction wording.
+- **Packing.** Up to 10% of each classification task's examples are packed, two to four at a time, into `packed_derived` states. Their questions (an item's label, agreement, existence, counts) follow exactly from the gold labels.
+- **Mixing.** Dataset families are balanced and related questions are kept together.
+  - The first 1,000 train rows are interleaved to show variety in the Dataset Viewer; the rest is shuffled.
+  - BIG-bench, MMLU, and BLiMP are left out so they stay clean for evaluation.
+- **Audit trail.** The [source mix](release-audit.json), [failed source list](failed-tasks.json), and [build manifest](build-manifest.json) ship with the data.
+- **Reproducible.** The [build runbook](https://github.com/sileod/tasksource/blob/main/docs/jev/README.md) rebuilds the release from [Tasksource](https://github.com/sileod/tasksource)'s [task catalog](https://github.com/sileod/tasksource/blob/main/tasks.md).
+
+## License and scope
 
 Tasksource harmonizes datasets from many publishers; their original licenses
-and usage terms still apply. The aggregate is marked `license: other` because
-there is no single license for every source. The
-[build runbook](https://github.com/sileod/tasksource/blob/main/docs/jev/README.md)
-describes the resumable pipeline. This recast is independent of TypeSafe and
-OpenJev.
+and terms still apply, hence `license: other`. This recast is independent of
+TypeSafe and OpenJev.
 
 ## Citation
-
-Please cite the Tasksource collection and preprocessing framework:
 
 ```bibtex
 @inproceedings{sileo-2024-tasksource,
