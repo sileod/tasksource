@@ -31,10 +31,10 @@ POSITIONAL_OPTION = re.compile(
 )
 # Options that refer to other options by letter, number, or roman numeral:
 # "A and B", "I and III only", "statements 1, 2 and 4", "options (a) or (c)".
-_REFERENCE = r"(?:\(?[A-H]\)|[A-H]|\([a-h]\)|[IVX]{1,4}|\(?[1-9]\)?)"
+_REFERENCE = r"(?:\(?[A-H]\)|[A-H]|[IVX]{1,4}|\(?[1-9]\)?)"
 REFERENTIAL_OPTION = re.compile(
     rf"^\W*(?:(?:both|neither|either|only|all|none|except|but|not|of|the|statements?|options?|choices?|answers?)\s+)*"
-    rf"{_REFERENCE}(?:\s*(?:,\s*(?:and|or)?|&|and|or|nor|/)\s*(?:both\s+|only\s+)?{_REFERENCE})+(?:\s+(?:only|both|are correct|are true))?\W*$"
+    rf"{_REFERENCE}(?:\s*(?:,(?:\s*(?:and|or)\b)?|&|and|or|nor|/)\s*(?:both\s+|only\s+)?{_REFERENCE})+(?:\s+(?:only|both|are correct|are true))?\W*$"
     rf"|^\W*(?:{_REFERENCE}\s+only|only\s+{_REFERENCE})\W*$"
     rf"|\b(?:options?|choices?|answers?|statements?)\s+{_REFERENCE}(?:\W|$)",
     re.IGNORECASE,

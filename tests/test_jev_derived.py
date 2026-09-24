@@ -75,6 +75,8 @@ class MultipleChoicePermutationTest(unittest.TestCase):
             self.assertEqual(permute_choices(fixed, 0, "x"), (fixed, 0), fixed)
         for free in (["Vitamin A and B12", "iron", "zinc"], ["Plan B", "Plan C", "none of them"]):
             self.assertIsNotNone(choice_permutation(free, "x"), free)
+        long_list = ",\n    ".join("63294342545525455533") + ",\n\nAre you seeking an essay?"
+        self.assertIsNotNone(choice_permutation([long_list, "no"], "x"))  # no catastrophic backtracking
 
     def test_gold_position_validation(self):
         sources = ["biased"] * 200 + ["fine"] * 200
