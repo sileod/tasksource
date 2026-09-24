@@ -1,6 +1,7 @@
 from .preprocess import cat, get, regen, name, constant, Classification, TokenClassification, MultipleChoice
 from .metadata import bigbench_discriminative_english, blimp_hard, imppres_presupposition, imppres_implicature, udep_en_configs
 from datasets import get_dataset_config_names, Sequence, ClassLabel, Dataset, DatasetDict, Features, Value
+import html
 import random
 import re
 
@@ -621,7 +622,10 @@ app_reviews = Classification("review", labels="star", splits=["train", None, Non
 # multi_nli = Classification(sentence1="premise", sentence2="hypothesis", labels="label", splits=["train", "validation_matched", None]) #glue
 
 hate_speech18 = Classification(sentence1="text", labels="label", splits=["train", None, None],
-    dataset_name="tasksource/hate_speech18")
+    dataset_name="tasksource/hate_speech18",
+    # idk/skip are skipped items; relation is hate only in context of neighbouring sentences
+    pre_process=lambda ds: ds.filter(lambda x: x["label"] in (0, 1)),
+    post_process=lambda ds: ds.cast_column("labels", ClassLabel(names=["noHate", "hate"])))
 
 sms_spam = Classification(sentence1="sms", labels="label", splits=["train", None, None])
 
@@ -748,7 +752,7 @@ ethics___commonsense = Classification(
         "test": "hf://datasets/hendrycks/ethics/data/commonsense/test_hard.csv",
     }})
 ethics___deontology = Classification(
-    sentence1="scenario", labels=_ethics_binary_label,
+    sentence1="scenario", sentence2="excuse", labels=name("label", ["unreasonable", "reasonable"]),
     dataset_name="csv", task_id="ethics/deontology",
     load_dataset_kwargs={"data_files": {
         "train": "hf://datasets/hendrycks/ethics/data/deontology/train.csv",
@@ -756,7 +760,7 @@ ethics___deontology = Classification(
         "test": "hf://datasets/hendrycks/ethics/data/deontology/test_hard.csv",
     }})
 ethics___justice = Classification(
-    sentence1="scenario", labels=_ethics_binary_label,
+    sentence1="scenario", labels=name("label", ["unreasonable", "reasonable"]),
     dataset_name="csv", task_id="ethics/justice",
     load_dataset_kwargs={"data_files": {
         "train": "hf://datasets/hendrycks/ethics/data/justice/train.csv",
@@ -765,7 +769,7 @@ ethics___justice = Classification(
     }})
 ethics___virtue = Classification(
     sentence1=_ethics_virtue_first, sentence2=_ethics_virtue_second,
-    labels=_ethics_binary_label,
+    labels=name("label", ["trait not shown", "trait shown"]),
     dataset_name="csv", task_id="ethics/virtue",
     load_dataset_kwargs={"data_files": {
         "train": "hf://datasets/hendrycks/ethics/data/virtue/train.csv",
@@ -774,7 +778,7 @@ ethics___virtue = Classification(
     }})
 
 def _emocontext_text(x):
-    return " ".join(str(x[field]) for field in ("turn1", "turn2", "turn3"))
+    return " ".join(x[field] for field in ("turn1", "turn2", "turn3") if x[field] is not None)
 
 emo = Classification(sentence1=_emocontext_text,
     labels=name("label", ["others", "happy", "sad", "angry"]),
@@ -874,9 +878,9 @@ circa = Classification(
 #promptCoherence = Classification("text",labels="label",dataset_name="Ericwang/promptCoherence")
 
 phrase_similarity = Classification(
-    sentence1=cat(["phrase1","sentence1"], " : "),
-    sentence2=cat(["phrase2","sentence2"], " : "),
-    labels='label',
+    sentence1=lambda x: f"Phrase: {x['phrase1']}\n{x['sentence1']}",
+    sentence2=lambda x: f"Phrase: {x['phrase2']}\n{x['sentence2']}",
+    labels=name('label', ['different meaning', 'same meaning']),
     dataset_name="Deehan1866/processed_phrase_similarity",
     task_id="phrase_similarity"
 )
@@ -1125,7 +1129,9 @@ redefine_math = MultipleChoice('prompt',choices_list='classes',labels="answer_in
     dataset_name="inverse-scaling/redefine-math")
 
 puzzte = Classification("puzzle_text","question","answer",
-    dataset_name="tasksource/puzzte")
+    dataset_name="tasksource/puzzte",
+    # "non-entailment" overlaps the specific contradiction/unknown labels
+    pre_process=lambda ds: ds.filter(lambda x: x["answer"] != "non-entailment"))
 
 implicatures = MultipleChoice(cat(['context','response'],"\n"),
     choices=['correct_implicature','incorrect_implicature'],
@@ -1442,14 +1448,18 @@ def _preprocess_chatbot_arena(ds):
     ds=ds.filter(lambda x:x['language']=="English")
 
     def _unroll(x):
+        # single-turn: the prompt is the state and the replies are the options
+        single = x['turn'] == 1
         f=lambda x:"\n".join([f"{turn['role']}:\n{turn['content']}" for turn in x])
-        x['conversation_a'] = f(x['conversation_a'])
-        x['conversation_b'] = f(x['conversation_b'])
+        x['prompt'] = (f"{x['conversation_a'][0]['content']}\n\nReply the user preferred:" if single
+            else "Conversation whose assistant the user preferred:")
+        x['conversation_a'] = x['conversation_a'][1]['content'] if single else f(x['conversation_a'])
+        x['conversation_b'] = x['conversation_b'][1]['content'] if single else f(x['conversation_b'])
         return x
     ds=ds.map(_unroll)
     return ds
 
-chatbot_arena = MultipleChoice(constant("Conversation whose assistant the user preferred:"),
+chatbot_arena = MultipleChoice("prompt",
     choices=["conversation_a","conversation_b"],
     labels=lambda x: ["model_a","model_b"].index(x["winner"]),
     dataset_name="lmsys/chatbot_arena_conversations",
@@ -1511,10 +1521,20 @@ nlgraph = Classification('question',labels=_nlgraph_binarize,
 oasst_rlhf = MultipleChoice("prompt",choices=['chosen','rejected'],labels=constant(0),
     dataset_name="tasksource/oasst2_pairwise_rlhf_reward")
 
-anthropic_rlhf_helpfulness = MultipleChoice(constant('Most helpful assistant answer:'), ['chosen','rejected'], constant(0),
+def _hh_split(ds):
+    # chosen/rejected repeat the whole dialogue; keep it once and compare the final replies
+    marker = "\n\nAssistant:"
+    ds = ds.filter(lambda x: x["chosen"][:x["chosen"].rfind(marker)] == x["rejected"][:x["rejected"].rfind(marker)])
+    return ds.map(lambda x: {"dialogue": x["chosen"][:x["chosen"].rfind(marker)].strip(),
+        "chosen_reply": x["chosen"][x["chosen"].rfind(marker) + len(marker):].strip(),
+        "rejected_reply": x["rejected"][x["rejected"].rfind(marker) + len(marker):].strip()})
+
+anthropic_rlhf_helpfulness = MultipleChoice(lambda x: f"{x['dialogue']}\n\nMost helpful next assistant reply:",
+    ['chosen_reply','rejected_reply'], constant(0), pre_process=_hh_split,
     dataset_name="tasksource/hh-rlhf",config_name=["helpful-base", "helpful-online", "helpful-rejection-sampled"])
 
-anthropic_rlhf_harmless = MultipleChoice(constant('Most harmless assistant answer:'), ['chosen','rejected'], constant(0),
+anthropic_rlhf_harmless = MultipleChoice(lambda x: f"{x['dialogue']}\n\nMost harmless next assistant reply:",
+    ['chosen_reply','rejected_reply'], constant(0), pre_process=_hh_split,
     dataset_name="tasksource/hh-rlhf",config_name="harmless-base")
 
 ruletaker = Classification(
@@ -1815,7 +1835,7 @@ seahorse = Classification('article',cat(["summary", "question"]),'answer',
 mip = Classification("prompt",labels="y",
     dataset_name="sileod/missing-item-prediction",config_name="contrastive")
 
-jigsaw_toxicity = Classification('comment_text',labels=name("toxic",["notthate","hate"]),
+jigsaw_toxicity = Classification('comment_text',labels=name("toxic",["not toxic","toxic"]),
     dataset_name="tasksource/jigsaw_toxicity")
 
 pol_nli = Classification("premise","hypothesis",labels=name('entailment',['entailment','not_entailment']),
@@ -1825,7 +1845,12 @@ synthetic_retrieval_nli = Classification('premise','hypothesis','label',dataset_
     config_name=["binary","count","position"],
     pre_process=lambda ds:ds.filter(lambda x:x['n']<=2048))
 
-issue_similarity = Classification("text1","text2","label",
+def _html_text(html_text):
+    text = re.sub(r"<br\s*/?>|</(?:p|h\d|li|pre|div)>", "\n", html_text)
+    text = html.unescape(re.sub(r"<[^>]+>", "", text))
+    return re.sub(r"\n\s*\n+", "\n", text).strip()
+
+issue_similarity = Classification(lambda x: _html_text(x["text1"]), lambda x: _html_text(x["text2"]), "label",
     dataset_name="WhereIsAI/github-issue-similarity",
     label_values={0: "dissimilar issues", 1: "similar issues"})
 

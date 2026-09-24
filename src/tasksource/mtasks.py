@@ -98,8 +98,8 @@ xglue___wpr = Classification('query','web_page_snippet','relavance_label',
     dataset_name="tasksource/xglue", config_name="wpr") # relavance_label : sic
 
 xlwic = Classification(
-    sentence1=cat(["target_word","context_1"], " : "),
-    sentence2=cat(["target_word","context_2"], " : "),
+    sentence1=lambda x: f"Word: {x['target_word']}\n{x['context_1']}",
+    sentence2="context_2",
     labels='label',dataset_name="tasksource/xlwic",config_name=['xlwic_de_de','xlwic_it_it','xlwic_fr_fr','xlwic_en_ko'])
 
 #[ "spam", "fails_task", "lang_mismatch", "pii", "not_appropriate", "hate_speech", "sexual_content", "quality", "toxicity", "humor", "helpfulness", "creativity", "violence" ]

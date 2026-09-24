@@ -16,44 +16,63 @@ from .augmentations import stable_fraction
 # No explicit option cap for Jev: every source option is kept.
 JEV_MAX_MC_OPTIONS = None
 
-# Options whose meaning depends on their slot stay where they are.
-PINNED_OPTION = re.compile(
-    r"^\W*(?:all|none|neither|both) of (?:the )?"
-    r"(?:above|these|those|the above|following|the following|options|choices|answers)\W*$",
+# A final "all/none of the above" means all/none of the other options, which
+# reads the same in any slot once reworded.
+TRAILING_ALL_NONE = re.compile(
+    r"^(\W*)(all|none) of (?:the )?(?:above|these|those|the above|following|the following)"
+    r"(?: (?:choices|options|answers))?(\W*)$",
     re.IGNORECASE,
 )
-# Options that refer to other options by letter or number make the whole row
-# order-dependent, e.g. "A and B" or "only options 1 and 3".
-REFERENTIAL_OPTION = re.compile(
-    r"^\W*(?:\(?[A-Ea-e1-5]\)?\s*(?:,|and|or|&)\s*)+\(?[A-Ea-e1-5]\)?\W*$"
-    r"|\b(?:options?|choices?|answers?)\s+\(?[A-E1-5]\)?(?:\W|$)",
+# Any other option about its neighbours ("both of the above", a non-final
+# "none of the above") depends on slot order.
+POSITIONAL_OPTION = re.compile(
+    r"\b(?:all|none|neither|both|either|any|each) of (?:the )?(?:above|below|these|those|following|preceding)\b",
+    re.IGNORECASE,
 )
+# Options that refer to other options by letter, number, or roman numeral:
+# "A and B", "I and III only", "statements 1, 2 and 4", "options (a) or (c)".
+_REFERENCE = r"(?:\(?[A-H]\)|[A-H]|\([a-h]\)|[IVX]{1,4}|\(?[1-9]\)?)"
+REFERENTIAL_OPTION = re.compile(
+    rf"^\W*(?:(?:both|neither|either|only|all|none|except|but|not|of|the|statements?|options?|choices?|answers?)\s+)*"
+    rf"{_REFERENCE}(?:\s*(?:,\s*(?:and|or)?|&|and|or|nor|/)\s*(?:both\s+|only\s+)?{_REFERENCE})+(?:\s+(?:only|both|are correct|are true))?\W*$"
+    rf"|^\W*(?:{_REFERENCE}\s+only|only\s+{_REFERENCE})\W*$"
+    rf"|\b(?:options?|choices?|answers?|statements?)\s+{_REFERENCE}(?:\W|$)",
+    re.IGNORECASE,
+)
+
+
+def normalize_all_none(criteria):
+    """Reword a final "all/none of the above" so it no longer depends on its slot."""
+    texts = [str(option) for option in criteria]
+    match = TRAILING_ALL_NONE.match(texts[-1]) if texts else None
+    if not match:
+        return list(criteria)
+    lead, word, tail = match.groups()
+    word = word.capitalize() if word[0].isupper() else word.lower()
+    return list(criteria[:-1]) + [f"{lead}{word} of the other options{tail}"]
 
 
 def choice_permutation(criteria, identifier):
     """Return a new slot order, or ``None`` when options must keep their order."""
     texts = [str(option) for option in criteria]
-    if any(REFERENTIAL_OPTION.search(text) for text in texts):
+    if any(POSITIONAL_OPTION.search(t) or REFERENTIAL_OPTION.search(t) for t in texts):
         return None
-    movable = [index for index, text in enumerate(texts) if not PINNED_OPTION.match(text)]
-    shuffled = sorted(
-        movable, key=lambda index: stable_fraction(identifier, f"mc-option-{index}")
-    )
-    order = list(range(len(texts)))
-    for slot, index in zip(movable, shuffled):
-        order[slot] = index
-    return order
+    return sorted(range(len(texts)), key=lambda index: stable_fraction(identifier, f"mc-option-{index}"))
 
 
 def permute_choices(criteria, label, identifier):
-    """Permute criteria and remap the label; unlabeled rows are unchanged."""
+    """Permute criteria and remap the label; unlabeled rows are unchanged.
+
+    Rows whose options refer to each other by position keep the source order.
+    """
     criteria = list(criteria)
     if not 0 <= label < len(criteria):
         return criteria, label
-    order = choice_permutation(criteria, identifier)
+    reworded = normalize_all_none(criteria)
+    order = choice_permutation(reworded, identifier)
     if order is None:
         return criteria, label
-    return [criteria[index] for index in order], order.index(label)
+    return [reworded[index] for index in order], order.index(label)
 
 
 def gold_position_violations(sources, targets, min_rows=100, max_share=0.8):

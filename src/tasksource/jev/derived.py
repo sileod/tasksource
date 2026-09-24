@@ -104,15 +104,13 @@ class InSubset(Operator):
     name, kind, family = "in", "noul", "relation"
 
     def params(self, labels, n_labels, seed):
+        """One subset per item, drawn without looking at the item's label."""
         result = []
-        for i, gold in enumerate(labels):
+        for i in range(len(labels)):
             key = f"{seed}:{LETTERS[i]}"
             size = 1 + int(stable_fraction(key, "subset-size") * (n_labels - 1))
-            others = sorted((l for l in range(n_labels) if l != gold),
-                            key=lambda l: stable_fraction(f"{key}:{l}", "subset"))
-            for subset in ([gold, *others[:size - 1]], others[:size]):
-                if 0 < len(subset) < n_labels:
-                    result.append((LETTERS[i], ".".join(map(str, sorted(subset)))))
+            subset = sorted(range(n_labels), key=lambda l: stable_fraction(f"{key}:{l}", "subset"))[:size]
+            result.append((LETTERS[i], ".".join(map(str, sorted(subset)))))
         return result
 
     def target(self, labels, params, n_labels):
@@ -140,18 +138,17 @@ class Exists(Operator):
                 f"Possible labels: {_quoted(names)}.")
 
 
-class ForAll(Operator):
-    name, kind, family = "forall", "noul", "aggregate"
+class AllSame(Operator):
+    name, kind, family = "all", "noul", "aggregate"
 
     def params(self, labels, n_labels, seed):
-        return [(label,) for label in range(n_labels)]
+        return [("same",)]
 
     def target(self, labels, params, n_labels):
-        return [float(all(label == params[0] for label in labels))]
+        return [float(len(set(labels)) == 1)]
 
     def question(self, params, names):
-        return (f'Do all items have the label "{names[params[0]]}"? '
-                f"Possible labels: {_quoted(names)}.")
+        return f"Do all items have the same label? Possible labels: {_quoted(names)}."
 
 
 class Count(Operator):
@@ -193,7 +190,7 @@ class MostCommon(Operator):
         return "Which label is shared by the most items?"
 
 
-OPERATORS = (Label(), SameLabel(), InSubset(), Exists(), ForAll(), Count(), MostCommon())
+OPERATORS = (Label(), SameLabel(), InSubset(), Exists(), AllSame(), Count(), MostCommon())
 
 
 def render_state(item_states):
@@ -204,26 +201,14 @@ def render_state(item_states):
 
 
 def _select_questions(candidates, seed, max_questions):
-    """One question per family, then fill, keeping Noul answers mixed."""
+    """One question per family, then fill; ranked by hash only, never by answer."""
     ranked = sorted(candidates, key=lambda row: stable_fraction(row["question_id"], seed))
     chosen = []
     for family in ("local", "relation", "aggregate", "numeric"):
-        nouls = [row["target"][0] for row in chosen if row["kind"] == "noul"]
         pool = [row for row in ranked if row["_family"] == family]
-        # Prefer the Noul answer not yet seen so the set is not all-yes/all-no.
-        pool.sort(key=lambda row: row["kind"] == "noul" and row["target"][0] in nouls)
         if pool and len(chosen) < max_questions:
             chosen.append(pool[0])
-    for row in ranked:
-        if len(chosen) >= max_questions:
-            break
-        if row in chosen:
-            continue
-        nouls = Counter(r["target"][0] for r in chosen if r["kind"] == "noul")
-        if row["kind"] == "noul" and nouls and row["target"][0] == nouls.most_common(1)[0][0] \
-                and len(nouls) == 1:
-            continue
-        chosen.append(row)
+    chosen += [row for row in ranked if row not in chosen][:max_questions - len(chosen)]
     return chosen
 
 
@@ -251,9 +236,7 @@ def _build_pack(members, rows, names, prefix, budget, max_questions):
                 "_family": operator.family,
             })
     questions = _select_questions(candidates, f"pack-questions:{pack_id}", max_questions)
-    nouls = {row["target"][0] for row in questions if row["kind"] == "noul"}
-    noul_count = sum(row["kind"] == "noul" for row in questions)
-    if len(questions) < MIN_QUESTIONS or (noul_count >= 2 and len(nouls) == 1):
+    if len(questions) < MIN_QUESTIONS:
         return None
     if not budget.fits(state, questions):
         return None
@@ -275,8 +258,9 @@ def _plan(pack_index, pools, n_labels, max_items, seed):
     """Choose a label pattern first, then members fill it.
 
     Binary tasks cycle through every size/count pattern (00, 01, 11, 001, ...).
-    Multiclass packs mix two or three distinct labels. The first two labels
-    differ whenever the pattern allows, so greedy truncation stays mixed.
+    Multiclass packs cycle through one, two, and three distinct labels, so
+    "all the same" questions have both answers. The first two labels differ
+    whenever the pattern allows, so greedy truncation stays mixed.
     """
     available = {label for label, pool in pools.items() if pool}
     if n_labels == 2:
@@ -293,7 +277,7 @@ def _plan(pack_index, pools, n_labels, max_items, seed):
         return None
     span = max_items - MIN_ITEMS + 1
     size = MIN_ITEMS + pack_index % span
-    distinct = min(2 + (pack_index // span) % 2, size, len(available))
+    distinct = min(1 + (pack_index // span) % 3, size, len(available))
     chosen = sorted(available, key=lambda l: stable_fraction(f"{seed}:{pack_index}:{l}", "pack-labels"))
     chosen = chosen[:distinct]
     plan, room = list(chosen), {l: len(pools[l]) - 1 for l in chosen}
@@ -417,8 +401,8 @@ def derive_target(question_id, labels, names):
         return "noul", [], [1.0 if labels[letter(args[0])] in subset else 0.0]
     if head == "exists":
         return "noul", [], [1.0 if int(args[0]) in labels else 0.0]
-    if head == "forall":
-        return "noul", [], [1.0 if set(labels) == {int(args[0])} else 0.0]
+    if head == "all":
+        return "noul", [], [1.0 if len(set(labels)) == 1 else 0.0]
     if head == "count":
         hits = len([l for l in labels if l == int(args[0])])
         return "score", [str(c) for c in range(size + 1)], [float(c == hits) for c in range(size + 1)]

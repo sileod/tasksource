@@ -8,10 +8,10 @@ from tasksource.recast import recast_jev
 from tasksource.jev.augmentations import augment_jev_internal
 from tasksource.jev.derived import (
     VARIANT, add_packed_classification, derive_target, render_state,
-    verify_packed_rows, MostCommon, OPERATORS,
+    verify_packed_rows, InSubset, MostCommon, OPERATORS, _select_questions,
 )
 from tasksource.jev.length import LengthBudget, render_request
-from tasksource.jev.options import gold_position_violations, permute_choices
+from tasksource.jev.options import choice_permutation, gold_position_violations, permute_choices
 from scripts.build_jev_dataset import (
     TRAINING_FEATURES, add_question_groups, diverse_cap, drop_train_overlap,
     content_keys, to_training_row, validate_decisions,
@@ -63,12 +63,18 @@ class MultipleChoicePermutationTest(unittest.TestCase):
 
     def test_positional_options(self):
         criteria = ["red", "blue", "green", "All of the above"]
+        slots = set()
         for i in range(20):
             permuted, label = permute_choices(criteria, 3, f"row{i}")
-            self.assertEqual(permuted[3], "All of the above")
-            self.assertEqual(label, 3)
-        referential = ["red", "blue", "A and B"]
-        self.assertEqual(permute_choices(referential, 2, "x"), (referential, 2))
+            self.assertEqual(permuted[label], "All of the other options")
+            slots.add(label)
+        self.assertGreater(len(slots), 1)  # reworded, so it moves freely
+        for fixed in (["red", "All of the above", "green"], ["red", "blue", "Both of the above"],
+                      ["red", "blue", "A and B"], ["I only", "II only", "I and III only"],
+                      ["x", "y", "statements 1, 2 and 4"], ["x", "y", "A, B, and C"]):
+            self.assertEqual(permute_choices(fixed, 0, "x"), (fixed, 0), fixed)
+        for free in (["Vitamin A and B12", "iron", "zinc"], ["Plan B", "Plan C", "none of them"]):
+            self.assertIsNotNone(choice_permutation(free, "x"), free)
 
     def test_gold_position_validation(self):
         sources = ["biased"] * 200 + ["fine"] * 200
@@ -133,7 +139,19 @@ class PackedClassificationTest(unittest.TestCase):
         names = ("a", "b", "c", "d", "e")
         _, _, audit = packed(classification_rows(400, names=names, label=lambda i: i % 5), rate=0.10)
         for record in audit:
-            self.assertIn(len({m["label"] for m in record["members"]}), (2, 3))
+            self.assertIn(len({m["label"] for m in record["members"]}), (1, 2, 3))
+        sizes = Counter(len({m["label"] for m in r["members"]}) for r in audit)
+        self.assertTrue({1, 2, 3} <= set(sizes), sizes)  # so "all the same" has both answers
+
+    def test_question_choice_ignores_answers(self):
+        # the same label layout seen through different targets asks the same questions
+        a = _select_questions([{"question_id": q, "kind": "noul", "target": [1.0], "_family": f}
+                               for q, f in (("same-A-B", "relation"), ("exists-0", "aggregate"), ("in-A-1", "relation"))], "s", 2)
+        b = _select_questions([{"question_id": q, "kind": "noul", "target": [0.0], "_family": f}
+                               for q, f in (("same-A-B", "relation"), ("exists-0", "aggregate"), ("in-A-1", "relation"))], "s", 2)
+        self.assertEqual([r["question_id"] for r in a], [r["question_id"] for r in b])
+        for labels in ([0, 1], [1, 0], [2, 2]):
+            self.assertEqual(InSubset().params(labels, 3, "pack"), InSubset().params([0, 0], 3, "pack"))
 
     def test_targets_recompute_independently(self):
         dataset = classification_rows(300, names=("x", "y", "z"), label=lambda i: i % 3)
@@ -179,7 +197,7 @@ class PackedClassificationTest(unittest.TestCase):
     def test_item_order_does_not_change_aggregates(self):
         names = ["a", "b", "c"]
         labels = [0, 2, 2, 1]
-        for question_id in ("exists-2", "forall-2", "count-2", "most-common", "exists-1"):
+        for question_id in ("exists-2", "all-same", "count-2", "most-common", "exists-1"):
             expected = derive_target(question_id, labels, names)
             for operator in OPERATORS:
                 if question_id.startswith(operator.name):

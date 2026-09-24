@@ -92,12 +92,10 @@ class cat(Preprocessing):
     separator:str=' '
         
     def __call__(self, example=None):
-        y=[np.char.array(example[f]) + sep 
-                for f,sep in zip(self.fields[::-1],itertools.repeat(self.separator))]
-        y=list(sum(*y))
-        if len(y)==1:
-            y=y[0]
-        return y
+        values = [example[f] for f in self.fields]
+        if all(isinstance(v, (list, tuple)) for v in values):  # batched
+            return [self.separator.join(str(v) for v in row if v is not None).strip() for row in zip(*values)]
+        return self.separator.join(str(v) for v in values if v is not None).strip()
 
 
 def pretty(f):

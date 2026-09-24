@@ -20,7 +20,7 @@ JEV_CLASSIFICATION_INSTRUCTIONS = "Choose the criterion that best describes the 
 JEV_MULTIPLE_CHOICE_INSTRUCTIONS = "Choose the criterion that best answers the question."
 
 
-_LINE_BREAK = re.compile(r"<br\s*/?>", re.IGNORECASE)
+_LINE_BREAK = re.compile(r"</?br\s*/?>", re.IGNORECASE)
 _ENTITY = re.compile(r"&(?:amp|lt|gt|quot|apos|#39|#x27);")
 
 
@@ -33,6 +33,10 @@ def clean_text(text):
     for _ in range(2):  # tweets are sometimes escaped twice (&amp;amp;)
         text = _ENTITY.sub(lambda m: html.unescape(m.group(0)), text)
     return text
+
+
+def _strip(text):
+    return text.strip() if isinstance(text, str) else text
 
 
 def _choice_columns(features):
@@ -158,7 +162,7 @@ def recast_jev(dataset, task=None):
             if 0 <= label < len(choices):
                 label = present.index(choices[label])
             criteria, label = permute_choices(
-                [clean_text(example[name]) for name in present], label,
+                [_strip(clean_text(example[name])) for name in present], label,
                 f"{task or ''}:{split}:{index}",
             )
             return {
