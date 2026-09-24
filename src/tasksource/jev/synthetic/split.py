@@ -38,12 +38,10 @@ def held_out_pairs(bundles: list[dict], ood_fraction: float, salt: str) -> set[t
 
 
 def _family_split(bundle: dict, split_cfg) -> str:
-    position = stable_hash(family_id(bundle), split_cfg.seed_salt) % 100
-    train_cut = int(split_cfg.train * 100)
-    val_cut = train_cut + int(split_cfg.validation * 100)
-    if position < train_cut:
+    position = stable_hash(family_id(bundle), split_cfg.seed_salt) / 16 ** 8  # uniform in [0, 1)
+    if position < split_cfg.train:
         return "train"
-    if position < val_cut:
+    if position < split_cfg.train + split_cfg.validation:
         return "validation"
     return "test"
 

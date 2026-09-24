@@ -15,7 +15,7 @@ Two explicit modes (see AnnotatorConfig):
   variable named in ``api_key_env`` and is never written to disk.
 
 Real annotations are cached by
-``hash(model + version + canonical(state + questions))`` so reruns
+``hash(endpoint + model + version + canonical(state + questions))`` so reruns
 reuse paid responses instead of re-calling. All questions over one
 state travel in a single request.
 
@@ -76,8 +76,10 @@ def canonical_bundle_payload(bundle: dict) -> str:
 
 
 def jev_cache_key(bundle: dict, annotator_cfg) -> str:
+    # the endpoint is part of the key: one model name can be served by different providers
+    endpoint = f"{annotator_cfg.name}@{annotator_cfg.base_url.rstrip('/')}{annotator_cfg.api_path}"
     return hashlib.sha256(
-        f"{annotator_cfg.model}\n{annotator_cfg.version}\n"
+        f"{endpoint}\n{annotator_cfg.model}\n{annotator_cfg.version}\n"
         f"{canonical_bundle_payload(bundle)}".encode("utf-8")).hexdigest()
 
 
@@ -122,10 +124,20 @@ def _jev_post(url: str, api_key: str, payload: dict, max_retries: int = 4) -> di
     raise last_error  # type: ignore[misc]
 
 
+def _probability(value) -> float:
+    """A finite float in [0, 1], or None."""
+    try:
+        value = float(value)
+    except (TypeError, ValueError):
+        return None
+    return value if math.isfinite(value) and 0 <= value <= 1 else None
+
+
 def _check_distribution(ordered: list[float], entry: dict) -> list[float]:
-    if not ordered or abs(sum(ordered) - 1.0) > 0.02:
+    values = [_probability(v) for v in ordered]
+    if not values or None in values or not math.isclose(sum(values), 1, abs_tol=0.02):
         raise RuntimeError(f"Jev probabilities do not form a distribution: {entry}")
-    return [float(v) for v in ordered]
+    return values
 
 
 def _jev_probabilities(question: dict, answers: dict) -> tuple[list[float], dict]:
@@ -138,7 +150,10 @@ def _jev_probabilities(question: dict, answers: dict) -> tuple[list[float], dict
     if fmt == "noul":
         if "noul" not in entry:
             raise RuntimeError(f"Jev noul answer missing 'noul': {entry}")
-        return [float(entry["noul"])], entry
+        noul = _probability(entry["noul"])
+        if noul is None:
+            raise RuntimeError(f"Jev noul answer is not a probability in [0, 1]: {entry}")
+        return [noul], entry
     options = list(question.get("options", []))
     probs = entry.get("probabilities")
     if fmt == "choice":

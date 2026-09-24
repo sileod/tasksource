@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import math
 import yaml
 
 
@@ -83,6 +84,10 @@ class SplitConfig:
     test: float = 0.075
     ood_fraction: float = 0.05
     seed_salt: str = "jev-synthetic-split-v1"
+
+    def __post_init__(self):
+        if not math.isclose(self.train + self.validation + self.test, 1, abs_tol=1e-6):
+            raise ValueError(f"split fractions must sum to 1: {self.train}/{self.validation}/{self.test}")
 
 
 @dataclass

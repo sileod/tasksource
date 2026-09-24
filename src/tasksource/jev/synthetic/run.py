@@ -186,7 +186,10 @@ def stage_export(cfg, run_dir: Path) -> dict:
         annotations = {q["question_id"]: a for q, a in
                        zip(bundle.get("questions", []), bundle.get("annotations", []))}
         for flat in bundle_to_flat_rows(bundle):
+            # a missing annotation must fail: flat_to_training_row would fill in a uniform target
             target = annotations.get(flat["question_id"], {}).get("probabilities")
+            if target is None:
+                raise ValueError(f"no annotation for question {flat['question_id']} of state {flat['state_id']}")
             flat_rows.append({**flat_to_training_row(flat, target, "synthetic/jev",
                                                      bundle.get("split", "train")),
                               "state_id": flat["state_id"], "question_id": flat["question_id"],
@@ -197,15 +200,12 @@ def stage_export(cfg, run_dir: Path) -> dict:
     # HF dataset dir with bundled + flat configs.
     hf_dir = run_dir / "hf_dataset"
     hf_dir.mkdir(parents=True, exist_ok=True)
-    try:
-        from datasets import Dataset
-        for split_name in ("train", "validation", "test", "ood"):
-            part = flat_frame[flat_frame["split"] == split_name] if len(flat_frame) else flat_frame
-            if len(part):
-                Dataset.from_pandas(part, preserve_index=False).to_parquet(
-                    hf_dir / f"flat-{split_name}.parquet")
-    except Exception:
-        pass
+    from datasets import Dataset
+    for split_name in ("train", "validation", "test", "ood"):
+        part = flat_frame[flat_frame["split"] == split_name] if len(flat_frame) else flat_frame
+        if len(part):
+            Dataset.from_pandas(part, preserve_index=False).to_parquet(
+                hf_dir / f"flat-{split_name}.parquet")
     (hf_dir / "README.md").write_text(
         "# jev-synthetic-decisions\n\nConfigs: `bundled` (one row per state, "
         "`final.parquet`) and `flat` (one row per decision, `flat.parquet`).\n",
