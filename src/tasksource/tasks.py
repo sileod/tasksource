@@ -29,13 +29,13 @@ super_glue___cb = Classification(sentence1="premise", sentence2="hypothesis", la
 super_glue___multirc = Classification(
     cat(["paragraph", "question"]),
     'answer',
-    labels='label'
+    labels=name('label', ['incorrect answer', 'correct answer'])
 )
 #super_glue___rte = Classification(sentence1="premise", sentence2="hypothesis", labels="label") # in glue
 super_glue___wic = Classification(
-    sentence1=cat(["word","sentence1"], " : "),
-    sentence2=cat(["word","sentence2"], " : "),
-    labels='label'
+    sentence1=lambda x: f"Word: {x['word']}\n{x['sentence1']}",
+    sentence2="sentence2",
+    labels=name('label', ['different meaning', 'same meaning'])
 )
 super_glue___axg = Classification(sentence1="premise", sentence2="hypothesis", labels="label", splits=["test", None, None])
 
@@ -546,7 +546,7 @@ tweet_eval = Classification(sentence1="text", labels="label",
 
 def stance_kwargs(topic):
     return {
-        "sentence1": constant(f'Topic: {topic}. \n Opinion:\n'), 
+        "sentence1": constant(f'Topic: {topic}'), 
         "sentence2": "text", 
         "labels": "label", 
         "config_name": f"stance_{topic.lower()}",
@@ -575,8 +575,15 @@ pragmeval_2 = Classification("sentence1","sentence2",labels="label",
 
 silicone = Classification("Utterance",labels="Label",
     dataset_name="tasksource/silicone",
-    config_name=['dyda_da', 'dyda_e', 'iemocap', 'maptask', 'meld_e', 'meld_s', 'oasis', 'sem'] # +['swda', 'mrda'] # in pragmeval
+    config_name=['dyda_da', 'dyda_e', 'maptask', 'meld_e', 'meld_s', 'oasis', 'sem'] # +['swda', 'mrda'] # in pragmeval
 )
+
+_IEMOCAP = dict(ang='anger', dis='disgust', exc='excitement', fea='fear', fru='frustration', hap='happiness',
+    neu='neutral', oth='other', sad='sadness', sur='surprise')
+silicone___iemocap = Classification("Utterance", labels=lambda x: _IEMOCAP[x['Emotion']],
+    dataset_name="tasksource/silicone",
+    # xxx marks utterances without annotator agreement (24% of train)
+    pre_process=lambda ds: ds.filter(lambda x: x['Emotion'] in _IEMOCAP))
 
 lex_glue___eurlex = Classification(sentence1="text", labels="labels") 
 lex_glue___scotus = Classification(sentence1="text", labels="label")
