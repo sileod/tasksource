@@ -59,11 +59,13 @@ Most classification targets are one-hot because the source annotations are
 hard labels. Sources with vote distributions or ratings retain softer or
 ordinal targets where justified. Multiple-choice options keep every source
 answer, in a per-row deterministic order so the gold position carries no
-signal. Low-frequency, deterministic variants cover label verification,
+signal (a final "all/none of the above" reads "all/none of the other options";
+options that cite other options by letter keep their order). Low-frequency, deterministic variants cover label verification,
 criterion order, instruction wording, and paired-text field wording. Up to 10%
 of each classification task's examples are also packed, two to four at a time,
 into `packed_derived` states whose questions (an item's label, agreement,
-existence, counts) follow exactly from the gold labels. The first 1,000
+existence, counts) follow exactly from the gold labels and are chosen without
+looking at the answers. The first 1,000
 training rows are interleaved to show task variety in the Dataset Viewer; the
 rest is shuffled.
 

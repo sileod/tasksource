@@ -58,9 +58,12 @@ request = render_systemone(dataset["train"][0], model="openjev")
 
 ```
 
-The canonical conversion is deterministic and does not paraphrase criteria.
-Multiple-choice criteria keep every source option and are permuted per row,
-seeded by task, split, and row index, so the gold slot carries no signal. The published 500k corpus adds explicit, deterministic, low-frequency
+The canonical conversion is deterministic and does not paraphrase criteria,
+except that a final "all/none of the above" becomes "all/none of the other
+options". Multiple-choice criteria keep every source option and are permuted per
+row, seeded by task, split, and row index, so the gold slot carries no signal;
+rows whose options refer to other options by position or letter keep their
+order. The published 1M corpus adds explicit, deterministic, low-frequency
 subrecasts for label verification (`noul`), criterion-order invariance, and
 manually vetted instruction variation. Every row records its source, normalized
 `train`/`dev`/`test` split, and variant. BIG-bench, MMLU, and BLiMP are excluded.
