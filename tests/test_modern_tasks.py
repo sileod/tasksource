@@ -2,11 +2,11 @@ import unittest
 
 from datasets import Dataset, DatasetDict
 
-from tasksource.mtasks import _helpsteer3_context
 from tasksource.tasks import (
     _chemprot_relations,
     _docred_relations,
     _fewrel_relation_match,
+    render_dialogue,
 )
 
 
@@ -53,7 +53,7 @@ class ModernTaskPreprocessingTest(unittest.TestCase):
 
     def test_helpsteer_context_preserves_roles(self):
         context = {"context": [{"role": "user", "content": "Hello"}, {"role": "assistant", "content": "Hi"}]}
-        self.assertEqual(_helpsteer3_context(context), "user: Hello\nassistant: Hi")
+        self.assertEqual(render_dialogue(context["context"]), "User: Hello\n\nAssistant: Hi")
 
 
 if __name__ == "__main__":

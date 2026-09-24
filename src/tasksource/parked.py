@@ -184,7 +184,6 @@ ecthr_cases___violation_prediction = Classification(labels="labels", dataset_nam
 effective_feedback_student_writing = Classification("discourse_text",
     labels="discourse_effectiveness", dataset_name="YaHi/EffectiveFeedbackStudentWriting")
 
-# not implemented: ccdv/patent-classification (abstract text -> label)
 
 # labels are model confidence scores, nearly all above 0.99
 has_part = Classification("arg1","arg2", labels="score", splits=["train", None, None])
@@ -193,15 +192,23 @@ has_part = Classification("arg1","arg2", labels="score", splits=["train", None, 
 recast___recast_kg_relations = Classification(sentence1="context", sentence2="hypothesis", labels="label",
     dataset_name="tasksource/recast", config_name="recast_kg_relations")
 
+# dependency relation labels depend on the head word, which the task does not show
+from .multilingual_tasks import _udep_cast_label_sequence, all as _all_configs  # noqa: E402
+udep__deprel_multilingual = TokenClassification('tokens', 'deprel',
+    pre_process=lambda ds: _udep_cast_label_sequence(ds, 'deprel'),
+    **_all_configs('universal-dependencies/universal_dependencies'))
+
 KINDS = {
     "evaluation": "evaluation benchmark: useful for evaluation, kept out of training",
     "duplicate": "duplicates or is covered by a listed task",
     "unsound": "labels or inputs do not support the task as annotated",
     "impractical": "inputs too long or data too heavy",
     "unavailable": "source no longer loads",
+    "todo": "worth adding, not annotated yet",
 }
 
 PARKED = {
+    'udep__deprel_multilingual': ('unsound', 'all-language variant of udep__deprel; relation labels depend on the head word, which the task does not show'),
     'has_part': ('unsound', 'labels are model confidence scores, nearly all above 0.99'),
     'recast___recast_kg_relations': ('unsound', 'label semantics (1-6) are undocumented'),
     'mmlu': ('evaluation', 'MMLU is an evaluation benchmark; no train split'),
@@ -260,6 +267,15 @@ PARKED = {
     'effective_feedback_student_writing': ('unavailable', 'source discontinued; see argument_feedback in tasks.py'),
 }
 REASONS = {key: reason for key, (_, reason) in PARKED.items()}
+
+# Candidates considered but never annotated.
+NOT_ANNOTATED = {
+    "ccdv/patent-classification": ("todo", "abstract to patent section; not annotated yet"),
+    "clue/clue cmnli": ("duplicate", "machine-translated MNLI; XNLI covers Chinese"),
+    "demelin/wino_x": ("evaluation", "machine translation evaluation set; script-only loader"),
+    "dbarbedillo/SMS_Spam_Multilingual_Collection_Dataset": ("unsound", "machine-translated; many translations degenerate"),
+    "ylacombe/xsum_factuality": ("unavailable", "no longer on the Hub"),
+}
 
 
 def by_kind(kind):

@@ -81,7 +81,7 @@ class MigratedLoaderHelperTest(unittest.TestCase):
             cast_explicit_label_values(source, {0: "no", 1: "yes"})
 
     def test_aces_ontology_is_fixed_before_sampling(self):
-        from tasksource.mtasks import _aces_phenomena_labels
+        from tasksource.multilingual_tasks import _aces_phenomena_labels
 
         source = DatasetDict({
             "train": Dataset.from_dict({"phenomena": ["addition", "deletion"]}),
@@ -93,7 +93,7 @@ class MigratedLoaderHelperTest(unittest.TestCase):
         self.assertEqual(mapped["validation"][0]["phenomena"], 1)
 
     def test_x_fact_ontology_covers_rare_dev_label(self):
-        from tasksource.mtasks import _x_fact_labels
+        from tasksource.multilingual_tasks import _x_fact_labels
 
         source = DatasetDict({
             "train": Dataset.from_dict({"label": ["false", "other"]}),
@@ -137,7 +137,7 @@ class MigratedLoaderHelperTest(unittest.TestCase):
 
     def test_migrated_tasks_use_data_only_sources(self):
         from tasksource import tasks as en_tasks
-        from tasksource import mtasks as ml_tasks
+        from tasksource import multilingual_tasks as ml_tasks
 
         expected = {
             "piqa": "baber/piqa",
@@ -212,7 +212,7 @@ class MigratedLoaderHelperTest(unittest.TestCase):
 
     def test_migrated_namespaces_and_raw_loader_ids(self):
         from tasksource import tasks as en_tasks
-        from tasksource import mtasks as ml_tasks
+        from tasksource import multilingual_tasks as ml_tasks
         from tasksource import list_tasks
 
         for var in [
@@ -240,13 +240,13 @@ class MigratedLoaderHelperTest(unittest.TestCase):
         self.assertEqual(en_tasks.hope_edi.dataset_name, "csv")
         self.assertEqual(en_tasks.numer_sense.dataset_name, "tasksource/numer_sense")
         self.assertEqual(en_tasks.arg_me.dataset_name, "json")
-        self.assertEqual(ml_tasks.sentiment.dataset_name, "csv")
+        self.assertEqual(ml_tasks.sentiment.dataset_name, "tasksource/multilingual-sentiments")
         self.assertEqual(en_tasks.emo.dataset_name,
                          "oneonlee/cleansed_emocontext")
         self.assertEqual(ml_tasks.xglue___qam.dataset_name, "tasksource/xglue")
         self.assertEqual(ml_tasks.xlwic.dataset_name, "tasksource/xlwic")
         self.assertEqual(ml_tasks.miam.dataset_name, "csv")
-        self.assertEqual(ml_tasks.mms_sentiment.dataset_name, "csv")
+        self.assertEqual(ml_tasks.mms_sentiment.dataset_name, "parquet")
         self.assertEqual(ml_tasks.mms_sentiment.task_id, "mms")
         self.assertEqual(ml_tasks.x_fact.dataset_name, "tasksource/x-fact")
         self.assertEqual(ml_tasks.emotion.dataset_name, "tasksource/universal-joy")

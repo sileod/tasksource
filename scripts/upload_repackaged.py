@@ -27,6 +27,7 @@ NUMERSENSE_URL = "https://raw.githubusercontent.com/INK-USC/NumerSense/main/data
 WELLFORMED_URL = "https://raw.githubusercontent.com/google-research-datasets/query-wellformedness/master/{}.tsv"
 HUMICROEDIT_URL = "https://cs.rochester.edu/u/nhossain/semeval-2020-task-7-dataset.zip"
 ETHOS_URL = "https://raw.githubusercontent.com/intelligence-csd-auth-gr/Ethos-Hate-Speech-Dataset/master/ethos/ethos_data/Ethos_Dataset_Multi_Label.csv"
+MULTILINGUAL_SENTIMENTS_URL = "https://raw.githubusercontent.com/tyqiangz/multilingual-sentiment-datasets/main/data/all/{}.csv"
 CLUTRR_URL = "hf://datasets/kendrivp/CLUTRR_v1_extracted/gen_train234_test2to10/CLUTRR_v1_gen_train234_test2to10_{}.json"
 
 
@@ -132,9 +133,51 @@ def ethos():
     return DatasetDict(train=Dataset.from_pandas(rows, preserve_index=False))
 
 
+def multilingual_sentiments():
+    """Multilingual sentiments (tyqiangz): 3-way sentiment in 12 languages, merged from public corpora (`source`)."""
+    splits = {}
+    for source, split in [("train", "train"), ("valid", "validation"), ("test", "test")]:
+        rows = load_dataset("csv", data_files=MULTILINGUAL_SENTIMENTS_URL.format(source))["train"]
+        splits[split] = rows.cast_column("label", ClassLabel(names=["negative", "neutral", "positive"]))
+    return DatasetDict(splits)
+
+
+def mms():
+    """MMS (Brand24): 79 sentiment datasets in 27 languages, one config per language.
+
+    Labels are the source's -1/0/1 shifted to negative/neutral/positive; `original_dataset`, `domain` and the
+    cleanlab self-confidence are kept. MMS ships a single split, so rows are split 90/5/5 by a hash of the text.
+    The bundled datasets keep their own licenses; check each `original_dataset` before use.
+    """
+    import pandas as pd
+    from huggingface_hub import hf_hub_download, list_repo_files
+    template = open(hf_hub_download("Brand24/mms", "_template.py", repo_type="dataset")).read()
+    domains = dict(re.findall(r"'(\w+)': \"(\w+)_DOMAIN\"", template))
+    files = sorted(f for f in list_repo_files("Brand24/mms", repo_type="dataset") if f.startswith("data/") and f.endswith(".tsv"))
+    frames = {}
+    for path in files:
+        language, name = path.split("/")[1], path.split("/")[2][:-4]
+        rows = pd.read_csv(hf_hub_download("Brand24/mms", path, repo_type="dataset"), sep="\t",
+                           names=["label", "text", "cleanlab_self_confidence"])
+        rows = rows[rows.label.isin([-1, 0, 1]) & rows.text.notna()]
+        rows = rows.assign(label=rows.label + 1, original_dataset=name, domain=domains[name].lower(), language=language)
+        frames.setdefault(language, []).append(rows)
+    configs = {}
+    for language, parts in frames.items():
+        rows = pd.concat(parts, ignore_index=True)
+        split = rows.text.map(lambda text: _split_of(str(text), validation=0.05, test=0.05))
+        configs[language] = DatasetDict({
+            name: Dataset.from_pandas(rows[split == name], preserve_index=False)
+            .cast_column("label", ClassLabel(names=["negative", "neutral", "positive"]))
+            for name in ("train", "validation", "test")})
+    return configs
+
+
 BUILDERS = {"sharc": ("tasksource/sharc", sharc), "numer_sense": ("tasksource/numer_sense", numer_sense),
             "clutrr": ("tasksource/clutrr", clutrr), "wellformed": ("tasksource/google_wellformed_query", wellformed),
-            "humicroedit": ("tasksource/humicroedit", humicroedit, "subtask-1"), "ethos": ("tasksource/ethos", ethos, "multilabel")}
+            "humicroedit": ("tasksource/humicroedit", humicroedit, "subtask-1"), "ethos": ("tasksource/ethos", ethos, "multilabel"),
+            "multilingual_sentiments": ("tasksource/multilingual-sentiments", multilingual_sentiments),
+            "mms": ("tasksource/mms", mms, "per-language")}
 
 
 def push_card(repo, build):
@@ -157,8 +200,12 @@ if __name__ == "__main__":
         assert repo in ORIGINALS, f"add {repo} to tasksource/metadata/originals.py"
         if not args.card_only:
             dataset = build()
-            print(repo, dataset, dataset["train"][0], sep="\n")
+            # a builder returns one DatasetDict, or {config: DatasetDict} for per-config repos
+            configs = dataset if config == ["per-language"] else {config[0] if config else "default": dataset}
+            for config_name, splits in configs.items():
+                print(repo, config_name, splits, splits["train"][0], sep="\n")
+                if not args.dry_run:
+                    splits.push_to_hub(repo, config_name=config_name)
             if args.dry_run:
                 continue
-            dataset.push_to_hub(repo, config_name=config[0] if config else "default")
         push_card(repo, build)

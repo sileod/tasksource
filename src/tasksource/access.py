@@ -16,12 +16,12 @@ import random
 
 class lazy_mtasks:
     def __getattr__(self, name):
-        from . import mtasks
-        return getattr(mtasks, name)
+        from . import multilingual_tasks
+        return getattr(multilingual_tasks, name)
 
     def __dir__(self):
-        from . import mtasks
-        return dir(mtasks)
+        from . import multilingual_tasks
+        return dir(multilingual_tasks)
 lmtasks=lazy_mtasks()
 
 def parse_var_name(s):
@@ -46,7 +46,7 @@ def pretty_name(x):
 @cache
 def list_tasks(tasks_path=f'{os.path.dirname(__file__)}/tasks.py',multilingual=False,instruct=False, excluded=[]):
     if multilingual:
-        tasks_path=tasks_path.replace('/tasks.py','/mtasks.py')
+        tasks_path=tasks_path.replace('/tasks.py','/multilingual_tasks.py')
     task_order = open(tasks_path).readlines()
     task_order = [x.split('=')[0].rstrip() for x in task_order if '=' in x]
     task_order = [x for x in task_order if x.isidentifier()]
@@ -103,10 +103,12 @@ def hub_datasets(task_ids=None, multilingual=None):
         df = df[df.id.isin(task_ids)]
     repos = set()
     for row in df.itertuples():
+        loaded = set(re.findall(r"hf://datasets/([\w.-]+/[\w.-]+)", str(row.mapping.load_dataset_kwargs)))
         if row.dataset_name not in RAW_BUILDERS:
-            repos.add(row.dataset_name)
-        repos.update(re.findall(r"hf://datasets/([\w.-]+/[\w.-]+)", str(row.mapping.load_dataset_kwargs)))
-        repos.update(ORIGINALS.get(row.dataset_name, []) + ORIGINALS.get(row.id, []))
+            loaded.add(row.dataset_name)
+        repos.update(loaded)
+        for key in loaded | {row.id}:
+            repos.update(ORIGINALS.get(key, []))
     return sorted(repos)
 
 def dict_to_query(d=dict(), **kwargs):
