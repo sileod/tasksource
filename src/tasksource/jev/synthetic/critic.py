@@ -26,13 +26,14 @@ def load_critic_prompt(version: str) -> str:
     return (PROMPTS_DIR / f"{version}.txt").read_text(encoding="utf-8")
 
 
-def critic_cache_key(model: str, temperature: float, prompt: str, bundle: dict) -> str:
+def critic_cache_key(model: str, temperature: float, prompt: str, bundle: dict, endpoint: str = "") -> str:
+    """``endpoint`` names the provider (``name@base_url``): one model name can be served by several."""
     canonical = json.dumps(
         {"state_id": bundle.get("state_id"), "state": bundle.get("state"),
          "questions": bundle.get("questions")},
         sort_keys=True, ensure_ascii=False)
     return hashlib.sha256(
-        f"{model}\n{temperature}\n{prompt_hash(prompt)}\n{canonical}".encode("utf-8")
+        f"{endpoint}\n{model}\n{temperature}\n{prompt_hash(prompt)}\n{canonical}".encode("utf-8")
     ).hexdigest()
 
 
@@ -62,8 +63,8 @@ class RequestPacer:
 
 async def _critique_one(sem, client, model: str, temperature: float,
                         template: str, bundle: dict, raw_dir: Path,
-                        pacer: RequestPacer | None = None) -> dict:
-    key = critic_cache_key(model, temperature, template, bundle)
+                        pacer: RequestPacer | None = None, endpoint: str = "") -> dict:
+    key = critic_cache_key(model, temperature, template, bundle, endpoint)
     cached = raw_dir / f"{key}.json"
     if cached.exists():
         record = json.loads(cached.read_text(encoding="utf-8"))
@@ -115,7 +116,7 @@ async def critique_bundles_async(cfg, bundles: list[dict], raw_dir: Path) -> lis
         pacer = RequestPacer(cfg.critic.requests_per_minute) if client is not None else None
         out = await asyncio.gather(*[_critique_one(sem, client, cfg.critic.model,
                                                    cfg.critic.temperature, template, b, raw_dir,
-                                                   pacer)
+                                                   pacer, f"{provider.name}@{provider.base_url.rstrip('/')}")
                                      for b in bundles])
     finally:
         if client is not None:

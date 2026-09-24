@@ -44,8 +44,10 @@ class Preprocessing(DotWiz):
         return self(datasets.load_dataset(
             self.dataset_name, self.config_name, **self.load_dataset_kwargs))
 
-    def __call__(self,dataset, max_rows=None, max_rows_eval=None,seed=0):
-        dataset = self.pre_process(dataset)
+    def __call__(self,dataset, max_rows=None, max_rows_eval=None,seed=0, pre_processed=False):
+        """``pre_processed=True`` skips ``pre_process`` (already applied, e.g. before streaming sampling)."""
+        if not pre_processed:
+            dataset = self.pre_process(dataset)
 
         # manage splits
         for k,v in zip(self.default_splits, self.splits):
@@ -307,10 +309,12 @@ def fix_splits(dataset):
     if 'auxiliary_train' in dataset:
         del dataset['auxiliary_train']
     
-    if 'test' in dataset: # manage obfuscated labels
-        if 'labels' in dataset['test'].features:
-            if len(set(fc.flatten(dataset['test'].to_dict()['labels'])))==1:
-                del dataset['test']
+    if 'test' in dataset and 'labels' in dataset['test'].features: # manage obfuscated labels
+        test_labels = set(fc.flatten(dataset['test']['labels']))
+        # one placeholder value (-1, None, or a value train never uses); a real single-class test set is kept
+        train_labels = set(fc.flatten(dataset['train']['labels'])) if 'train' in dataset and 'labels' in dataset['train'].features else set()
+        if len(test_labels)==1 and (test_labels & {-1, None} or not test_labels & train_labels):
+            del dataset['test']
 
     if 'validation' in dataset and 'train' not in dataset:
         train_validation = dataset['validation'].train_test_split(0.5, seed=0)

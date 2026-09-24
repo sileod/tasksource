@@ -3,7 +3,10 @@ on:
   release:
     types: [published]
 jobs:
+  tests:
+    uses: ./.github/workflows/tests.yml
   pypi:
+    needs: tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
