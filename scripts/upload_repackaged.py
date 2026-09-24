@@ -28,6 +28,7 @@ WELLFORMED_URL = "https://raw.githubusercontent.com/google-research-datasets/que
 HUMICROEDIT_URL = "https://cs.rochester.edu/u/nhossain/semeval-2020-task-7-dataset.zip"
 ETHOS_URL = "https://raw.githubusercontent.com/intelligence-csd-auth-gr/Ethos-Hate-Speech-Dataset/master/ethos/ethos_data/Ethos_Dataset_Multi_Label.csv"
 MULTILINGUAL_SENTIMENTS_URL = "https://raw.githubusercontent.com/tyqiangz/multilingual-sentiment-datasets/main/data/all/{}.csv"
+CHAOS_MNLI_URL = "hf://datasets/tasksource/chaos-mnli-ambiguity/chaos_mnli.jsonl"
 CLUTRR_URL = "hf://datasets/kendrivp/CLUTRR_v1_extracted/gen_train234_test2to10/CLUTRR_v1_gen_train234_test2to10_{}.json"
 
 
@@ -173,18 +174,54 @@ def mms():
     return configs
 
 
+def _gini(shares):
+    # Gini coefficient: mean absolute difference between shares over twice their mean
+    return sum(abs(a - b) for a in shares for b in shares) / (2 * len(shares) * sum(shares))
+
+
+def chaos_mnli_ambiguity():
+    """ChaosNLI, MNLI portion: 1,599 MNLI pairs relabeled by 100 annotators each (Nie et al., 2020).
+
+    `label_dist` and `label_count` follow the entailment/neutral/contradiction order, and `gini` is the Gini
+    coefficient of `label_dist` (0 = annotators evenly split, 1 = unanimous). Built from the jsonl first uploaded
+    here, which flattens the ChaosNLI release (https://github.com/easonnie/ChaosNLI) and adds `gini`; the
+    variable-key `label_counter` (a duplicate of `label_count`) is dropped so the rows have a fixed schema.
+
+    ```
+    @inproceedings{nie2020chaosnli,
+        title = {What Can We Learn from Collective Human Opinions on Natural Language Inference Data?},
+        author = {Nie, Yixin and Zhou, Xiang and Bansal, Mohit},
+        booktitle = {Proceedings of EMNLP},
+        year = {2020}
+    }
+    @inproceedings{xzhou2022distnli,
+        title = {Distributed NLI: Learning to Predict Human Opinion Distributions for Language Reasoning},
+        author = {Zhou, Xiang and Nie, Yixin and Bansal, Mohit},
+        booktitle = {Findings of the Association for Computational Linguistics: ACL 2022},
+        year = {2022}
+    }
+    ```
+    """
+    rows = load_dataset("json", data_files=CHAOS_MNLI_URL, features=None)["train"].remove_columns("label_counter")
+    for row in rows:
+        assert abs(_gini(row["label_dist"]) - row["gini"]) < 1e-6, row["uid"]
+    return DatasetDict(train=rows)
+
+
 BUILDERS = {"sharc": ("tasksource/sharc", sharc), "numer_sense": ("tasksource/numer_sense", numer_sense),
             "clutrr": ("tasksource/clutrr", clutrr), "wellformed": ("tasksource/google_wellformed_query", wellformed),
             "humicroedit": ("tasksource/humicroedit", humicroedit, "subtask-1"), "ethos": ("tasksource/ethos", ethos, "multilabel"),
             "multilingual_sentiments": ("tasksource/multilingual-sentiments", multilingual_sentiments),
-            "mms": ("tasksource/mms", mms, "per-language")}
+            "mms": ("tasksource/mms", mms, "per-language"),
+            "chaos_mnli_ambiguity": ("tasksource/chaos-mnli-ambiguity", chaos_mnli_ambiguity)}
 
 
 def push_card(repo, build):
     card = DatasetCard.load(repo)
     card.data.source_datasets = ORIGINALS[repo]
     sources = ", ".join(f"[{name}](https://huggingface.co/datasets/{name})" for name in ORIGINALS[repo])
-    card.text = (f"\n# {repo.split('/')[1]}\n\n{inspect.cleandoc(build.__doc__)}\n\nOriginal data: {sources}. "
+    sources = f"Original data: {sources}. " if sources else ""  # an empty entry: the original is not on the Hub
+    card.text = (f"\n# {repo.split('/')[1]}\n\n{inspect.cleandoc(build.__doc__)}\n\n{sources}"
                  "Repackaged as parquet for [tasksource](https://github.com/sileod/tasksource) by "
                  "[scripts/upload_repackaged.py](https://github.com/sileod/tasksource/blob/main/scripts/upload_repackaged.py).\n")
     card.push_to_hub(repo)

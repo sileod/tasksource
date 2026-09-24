@@ -13,6 +13,7 @@ by scripts/upload_repackaged.py) or a task switches to a mirror.
 ORIGINALS = {
     # re-uploaded under tasksource/
     "tasksource/blog_authorship_corpus": ["barilan/blog_authorship_corpus"],
+    "tasksource/chaos-mnli-ambiguity": [],  # ChaosNLI is only on GitHub/Dropbox
     "tasksource/clutrr": ["CLUTRR/v1"],
     "tasksource/contract-nli": ["kiddothe2b/contract-nli"],
     "tasksource/corr2cause": ["causal-nlp/corr2cause"],
