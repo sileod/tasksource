@@ -83,7 +83,7 @@ def list_tasks(tasks_path=f'{os.path.dirname(__file__)}/tasks.py',multilingual=F
     del df['rank']
     if instruct:
         df=df[df.id.map(lambda x: not any(a in x for a in recast_module.improper_labels))]
-    df=df[df.id.map(lambda x: not any(x in a for a in excluded))]
+    df=df[df.id.map(lambda x: not any(a in x for a in excluded))]  # excluded holds substrings of task ids
     return df
 
 #task_df =list_tasks()
@@ -102,7 +102,8 @@ def hub_datasets(task_ids=None, multilingual=None):
     df = pd.concat(frames)
     if task_ids is not None:
         missing = set(task_ids) - set(df.id)
-        assert not missing, f"unknown tasks: {sorted(missing)}"
+        if missing:
+            raise KeyError(f"unknown tasks: {sorted(missing)}")
         df = df[df.id.isin(task_ids)]
     repos = set()
     for row in df.itertuples():
@@ -171,12 +172,14 @@ def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preproc
     dataset = load_dataset(
         preprocessing.dataset_name, source_config, **source_kwargs
     )
+    pre_processed = False
     if isinstance(dataset, IterableDatasetDict):
         # Keep bounded streaming sources (e.g. multilingual sentiment pools)
         # bounded before materializing them. Apply source filtering first, then
         # deterministically shuffle a finite buffer and take the same limits
         # used by ordinary Tasksource sampling.
         dataset = preprocessing.pre_process(dataset)
+        pre_processed = True
         materialized = {}
         for split, rows in dataset.items():
             limit = max_rows if split == "train" else max_rows_eval
@@ -188,7 +191,7 @@ def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preproc
     if recast == "jev" and isinstance(preprocessing, MultipleChoiceFields):
         # Jev permutes criteria itself and needs every source option.
         options = dict(gold_first=False, max_options=JEV_MAX_MC_OPTIONS)
-    dataset= preprocessing(dataset,max_rows, max_rows_eval, **options)
+    dataset= preprocessing(dataset,max_rows, max_rows_eval, seed=seed, pre_processed=pre_processed, **options)
     question = getattr(preprocessing, "question", None)
     if prompted:
         dataset = add_question(dataset, question)
@@ -198,7 +201,7 @@ def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preproc
         raise ValueError("Use either instruct=True or recast=..., not both")
     recast = "instruct" if instruct else recast
     if recast == "instruct":
-        dataset = recast_module.recast_instruct(dataset, question=None if prompted else question)
+        dataset = recast_module.recast_instruct(dataset, question=None if prompted else question, seed=seed)
     elif recast == "jev":
         source_id = id or preprocessing_name or preprocessing.dataset_name
         if not (id or preprocessing_name) and preprocessing.config_name:
