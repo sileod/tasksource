@@ -74,8 +74,6 @@ offenseval_dravidian = Classification("text",labels="label",config_name=['kannad
 mlma_hate = Classification("tweet", labels=lambda x:x["sentiment"].split('_'),
     dataset_name="nedjmaou/MLMA_hate_speech")
 
-qam = Classification("question","answer","label", dataset_name="tasksource/xglue",config_name="qam")
-
 def _x_fact_labels(dataset):
     # Use the full source train ontology before bounded sampling; "other" is
     # rare enough to disappear from small train samples while remaining in dev.
@@ -213,8 +211,8 @@ mms_sentiment = Classification("text", labels="label", dataset_name="parquet", t
                                         for split in ("train", "validation", "test")}},
     pre_process=_mms_sources)
 
-mapa_fine = TokenClassification("tokens","coarse_grained",dataset_name='joelito/mapa')
-mapa_corase = TokenClassification("tokens","fine_grained",dataset_name='joelito/mapa')
+mapa_coarse = TokenClassification("tokens","coarse_grained",dataset_name='joelito/mapa', task_id="mapa/coarse_grained")
+mapa_fine = TokenClassification("tokens","fine_grained",dataset_name='joelito/mapa', task_id="mapa/fine_grained")
 
 aces_ranking = MultipleChoice("source",choices=['good-translation','incorrect-translation'],labels=constant(0), dataset_name='nikitam/ACES', config_name='ACES', task_id='ACES/ranking')
 def _aces_phenomena_labels(dataset):
