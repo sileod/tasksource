@@ -101,10 +101,13 @@ xlwic = Classification(
     labels='label',dataset_name="tasksource/xlwic",config_name=['xlwic_de_de','xlwic_it_it','xlwic_fr_fr','xlwic_en_ko'])
 
 oasst1__quality = Classification("parent_text","text",labels="quality", dataset_name="tasksource/oasst1_dense_flat",
+    question="How good is the reply, from 0 (low quality) to 1 (high quality)?",
     pre_process = lambda ds:ds.remove_columns('labels'))
 oasst1__toxicity = Classification("parent_text","text",labels="toxicity", dataset_name="tasksource/oasst1_dense_flat",
+    question="How toxic is the reply, from 0 (not toxic) to 1 (very toxic)?",
     pre_process = lambda ds:ds.remove_columns('labels'))
 oasst1__helpfulness = Classification("parent_text","text",labels="helpfulness", dataset_name="tasksource/oasst1_dense_flat",
+    question="How helpful is the reply, from 0 (unhelpful) to 1 (helpful)?",
     pre_process = lambda ds:ds.remove_columns('labels'))
 
 
@@ -116,10 +119,12 @@ exams = MultipleChoice(get.question.stem, choices_list=get.question.choices.text
     dataset_name="exams", config_name='multilingual',
     pre_process=lambda ds:ds.filter(lambda x:  x['answerKey'] in "ABCDE"))
 
-xcsr = MultipleChoice(lambda x: x['question']['stem'].strip() or 'Most plausible:', # X-CODAH stems are empty
-    choices_list=get.question.choices.text,
-    labels=lambda x:'ABCDE'.index(x['answerKey']),
-    **all('INK-USC/xcsr'))
+_xcsr = all('INK-USC/xcsr')
+_xcsr_fields = dict(choices_list=get.question.choices.text, labels=lambda x:'ABCDE'.index(x['answerKey']), dataset_name=_xcsr['dataset_name'])
+xcsr = MultipleChoice(get.question.stem, **_xcsr_fields,
+    config_name=[c for c in _xcsr['config_name'] or [] if c.startswith('X-CSQA')])
+xcsr_codah = MultipleChoice(constant(''), question="Which sentence is most plausible?", **_xcsr_fields,  # X-CODAH stems are empty
+    config_name=[c for c in _xcsr['config_name'] or [] if c.startswith('X-CODAH')])
 
 xcopa = MultipleChoice(_copa_input,choices=['choice1','choice2'],labels="label",
     **all('cambridgeltl/xcopa'))
@@ -157,7 +162,7 @@ udep__pos = TokenClassification(
 def udep_post_process(ds):
     return _udep_cast_label_sequence(ds, 'labels')
 
-oasst_rlhf = MultipleChoice("prompt",choices=['chosen','rejected'],labels=constant(0),
+oasst_rlhf = MultipleChoice("prompt",choices=['chosen','rejected'],labels=constant(0), question="Which reply is better?",
     dataset_name="tasksource/oasst1_pairwise_rlhf_reward")
 
 # the tweet sources duplicate tweet_sentiment_multilingual and amazon_reviews_multi is its own task

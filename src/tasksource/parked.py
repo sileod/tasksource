@@ -203,6 +203,14 @@ udep__deprel_multilingual = TokenClassification('tokens', 'deprel',
 xglue__ner = TokenClassification("words", "ner", dataset_name="microsoft/xglue", config_name="ner")
 xglue__pos = TokenClassification("words", "pos", dataset_name="microsoft/xglue", config_name="pos")
 
+# Inverse Scaling Prize sets are evaluation probes with few-shot prompts baked in
+neqa = MultipleChoice('prompt',choices_list='classes',labels="answer_index",
+    dataset_name="inverse-scaling/NeQA")
+quote_repetition = MultipleChoice('prompt',choices_list='classes',labels="answer_index",
+    dataset_name="inverse-scaling/quote-repetition")
+redefine_math = MultipleChoice('prompt',choices_list='classes',labels="answer_index",
+    dataset_name="inverse-scaling/redefine-math")
+
 KINDS = {
     "evaluation": "evaluation benchmark: useful for evaluation, kept out of training",
     "duplicate": "duplicates or is covered by a listed task",
@@ -271,6 +279,9 @@ PARKED = {
     'nli_l3': ('duplicate', 'merges of NLI tasks already included'),
     'ecthr_cases___alleged_violation_prediction': ('impractical', 'too long'),
     'ecthr_cases___violation_prediction': ('impractical', 'too long'),
+    'neqa': ('evaluation', 'Inverse Scaling Prize evaluation probe; few-shot prompt baked into the inputs'),
+    'quote_repetition': ('evaluation', 'Inverse Scaling Prize evaluation probe; few-shot prompt baked into the inputs'),
+    'redefine_math': ('evaluation', 'Inverse Scaling Prize evaluation probe; "Q: ... A:" prompt baked into the inputs'),
     'effective_feedback_student_writing': ('unavailable', 'source discontinued; see argument_feedback in tasks.py'),
 }
 REASONS = {key: reason for key, (_, reason) in PARKED.items()}

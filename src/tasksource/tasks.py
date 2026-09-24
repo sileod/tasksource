@@ -24,7 +24,8 @@ glue___wnli = Classification(sentence1="sentence1", sentence2="sentence2", label
 
 glue___mrpc = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
 glue___qqp = Classification(sentence1="question1", sentence2="question2", labels="label")
-glue___stsb = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
+glue___stsb = Classification(sentence1="sentence1", sentence2="sentence2", labels="label",
+    question="How similar are the two sentences, from 0 (unrelated) to 5 (equivalent)?")
 
 super_glue___boolq = Classification(sentence1="question", labels="label")
 boolq_passage = Classification("passage", "question", labels="label", # reading-comprehension variant
@@ -55,7 +56,8 @@ babi_nli = Classification("premise", "hypothesis", "label",
 
 
 sick__label         = Classification('sentence_A','sentence_B','label', dataset_name="tasksource/sick")
-sick__relatedness   = Classification('sentence_A','sentence_B','relatedness_score', dataset_name="tasksource/sick")
+sick__relatedness   = Classification('sentence_A','sentence_B','relatedness_score', dataset_name="tasksource/sick",
+    question="How related are the two sentences, from 1 (unrelated) to 5 (very related)?")
 sick__entailment_AB = Classification('sentence_A','sentence_B','entailment_AB', dataset_name="tasksource/sick")
 
 def remove_neg_1(dataset):
@@ -346,8 +348,8 @@ social_i_qa = MultipleChoice(
     'label',
     dataset_name="tasksource/social_i_qa")
 
-wiki_hop___original = MultipleChoice(
-    'query',
+wiki_hop___original = MultipleChoice(  # query is "relation subject"
+    lambda x: (lambda r, s: f"What is the {r.replace('_', ' ')} of {s}?")(*x['query'].split(' ', 1)),
     choices_list='candidates',
     labels=lambda x:x['choices_list'].index(x["answer"]),
     dataset_name="MoE-UNC/wikihop", config_name="default",
@@ -553,14 +555,27 @@ discovery = Classification("sentence1", "sentence2", labels="label", config_name
 
 pragmeval_1 = Classification("sentence",labels="label",
     dataset_name="pragmeval",
-    config_name= ["emobank-arousal", "emobank-dominance", "emobank-valence", "squinky-formality", "squinky-implicature", 
-    "squinky-informativeness","switchboard","mrda","verifiability"])
+    config_name= ["switchboard","mrda","verifiability"])
 
 pragmeval_2 = Classification("sentence1","sentence2",labels="label",
     dataset_name="pragmeval",
-    config_name= ["emergent", "gum", "pdtb", "persuasiveness-claimtype", 
-    "persuasiveness-eloquence", "persuasiveness-premisetype", "persuasiveness-relevance", "persuasiveness-specificity", 
-    "persuasiveness-strength", "sarcasm","stac"])
+    config_name= ["emergent", "gum", "pdtb", "persuasiveness-claimtype", "persuasiveness-premisetype", "sarcasm","stac"])
+
+# low/high scales over the same inputs: the label names the scale
+def _pragmeval_scale(config, scale, *inputs):
+    return Classification(*inputs, labels="label", dataset_name="pragmeval", config_name=config, task_id=f"pragmeval/{config}",
+        label_values={0: f"low {scale}", 1: f"high {scale}"})
+
+pragmeval__emobank_arousal = _pragmeval_scale("emobank-arousal", "emotional arousal", "sentence")
+pragmeval__emobank_dominance = _pragmeval_scale("emobank-dominance", "dominance (sense of control)", "sentence")
+pragmeval__emobank_valence = _pragmeval_scale("emobank-valence", "valence (pleasantness)", "sentence")
+pragmeval__squinky_formality = _pragmeval_scale("squinky-formality", "formality", "sentence")
+pragmeval__squinky_implicature = _pragmeval_scale("squinky-implicature", "implicature (implied beyond what is said)", "sentence")
+pragmeval__squinky_informativeness = _pragmeval_scale("squinky-informativeness", "informativeness", "sentence")
+pragmeval__persuasiveness_eloquence = _pragmeval_scale("persuasiveness-eloquence", "eloquence", "sentence1", "sentence2")
+pragmeval__persuasiveness_relevance = _pragmeval_scale("persuasiveness-relevance", "relevance", "sentence1", "sentence2")
+pragmeval__persuasiveness_specificity = _pragmeval_scale("persuasiveness-specificity", "specificity", "sentence1", "sentence2")
+pragmeval__persuasiveness_strength = _pragmeval_scale("persuasiveness-strength", "argument strength", "sentence1", "sentence2")
 
 silicone = Classification("Utterance",labels="Label",
     dataset_name="tasksource/silicone",
@@ -593,7 +608,9 @@ rotten_tomatoes = Classification(sentence1="text", labels="label")
 
 ag_news = Classification(sentence1="text", labels="label", splits=["train", None, "test"])
 
-yelp_review_full = Classification(sentence1="text", labels="label", splits=["train", None, "test"], config_name=["yelp_review_full"])
+yelp_review_full = Classification(sentence1=lambda x: x["text"].replace("\\n", "\n"), labels="label",  # newlines are escaped in the source
+    label_values={stars - 1: f"{stars} star{'s' if stars != 1 else ''}" for stars in range(1, 6)},
+    splits=["train", None, "test"], config_name=["yelp_review_full"])
 
 financial_phrasebank = Classification(sentence1="text", labels="label", splits=["train", None, None],
     dataset_name="ghbacct/financial-phrasebank-all-agree-classification",
@@ -625,10 +642,12 @@ humicroedit___subtask_1 = Classification(lambda x: f"Original: {x['headline']}",
     labels=lambda x: int(x["meanGrade"] + 0.5),
     label_values={0: "not funny", 1: "slightly funny", 2: "moderately funny", 3: "funny"},
     dataset_name="tasksource/humicroedit", config_name="subtask-1")
-humicroedit___subtask_2 = Classification(
-    sentence1=cat(['original1','edit1'],' : '),
-    sentence2=cat(['original2','edit2'],' : '),
-    labels="label", dataset_name="tasksource/humicroedit", config_name="subtask-2")
+def _humicroedit(i):  # the headline with its <word/> replaced by the edit
+    return lambda x: re.sub(r"<[^>]*/>", x[f"edit{i}"], x[f"original{i}"])
+humicroedit___subtask_2 = Classification(_humicroedit(1), _humicroedit(2),
+    labels="label", question="Which edited headline is funnier?",
+    label_values={0: "equally funny", 1: "first headline", 2: "second headline"},
+    dataset_name="tasksource/humicroedit", config_name="subtask-2")
 
 snips_built_in_intents = Classification(sentence1="text", labels="label", splits=["train", None, None])
 
@@ -661,7 +680,14 @@ scicite = Classification(sentence1="string", labels="label",dataset_name="taskso
 liar = Classification(sentence1="statement", labels="label",
     dataset_name="tasksource/liar")
 
-relbert_lexical_relation_classification = Classification(sentence1="head", sentence2="tail", labels="relation",
+# the source relation codes, spelled out (EVALution names are already readable)
+LEXICAL_RELATIONS = {"attri": "attribute", "coord": "co-hyponym", "COORD": "co-hyponym", "sibl": "co-hyponym",
+    "hyper": "hypernym", "HYPER": "hypernym", "hypo": "hyponym", "mero": "meronym",
+    "random": "unrelated", "RANDOM": "unrelated", "false": "unrelated"}
+LEXICAL_RELATION_QUESTION = "How is the second word related to the first?"
+
+relbert_lexical_relation_classification = Classification(sentence1="head", sentence2="tail",
+ labels=lambda x: LEXICAL_RELATIONS.get(x["relation"], x["relation"]), question=LEXICAL_RELATION_QUESTION,
  dataset_name="json",
  config_name=["BLESS","EVALution","K&H+N","ROOT09"],
  task_id="lexical_relation_classification/{config_name}",
@@ -687,7 +713,7 @@ def _cogalexv_relations(dataset):
         "relation", ClassLabel(names=list(COGALEXV_RELATIONS.values())))
 
 relbert_cogalexv = Classification(
- sentence1="head", sentence2="tail", labels="relation", dataset_name="json",
+ sentence1="head", sentence2="tail", labels="relation", dataset_name="json", question=LEXICAL_RELATION_QUESTION,
  task_id="lexical_relation_classification/CogALexV",
  load_dataset_kwargs={"data_files": {
      "train": "hf://datasets/relbert/lexical_relation_classification/dataset/CogALexV/train.jsonl",
@@ -838,8 +864,8 @@ commonsense_qa = MultipleChoice(
     splits=["train","validation",None]
 )
 mc_taco = Classification(
-    lambda x: f'{x["sentence"]} {x["question"]} {x["answer"]}',
-    labels="label",
+    lambda x: f'{x["sentence"]}\n{x["question"]}', "answer",
+    labels="label", question="Is this answer plausible?",
     splits=[ "validation",None,"test"],
     dataset_name="marcov/mc_taco_promptsource", task_id="mc_taco"
 )
@@ -946,7 +972,7 @@ logiqa = MultipleChoice(
 )
 
 
-wiki_qa = Classification("question","answer", name("label",['False','True']))
+wiki_qa = Classification("question","answer", name("label",['False','True']), question="Does this sentence answer the question?")
 
 cycic_classification = Classification("question",labels=name("correct_answer",['False','True']),
     dataset_name = "tasksource/cycic_classification")
@@ -1008,16 +1034,16 @@ def _webgpt_question_text(row):
 
 webgpt_comparisons = MultipleChoice(
     _webgpt_question_text, choices=['answer_0','answer_1'],
-    labels=lambda x:int(float(x['score_1']) > 0),
+    labels=lambda x:int(float(x['score_1']) > 0), question="Which answer did the human rater prefer?",
     dataset_name="heegyu/webgpt_comparisons_ko", task_id="webgpt_comparisons",
     # score_1 == 0 is a tie (27% of rows), which the label would read as answer_0 winning
     pre_process=lambda ds: ds.filter(lambda x: float(x['score_1']) != 0
         and str(x['answer_0']).strip() and str(x['answer_1']).strip()))
 
 synthetic_instruct = MultipleChoice('prompt', choices=['chosen', 'rejected'],
-    labels=constant(0), dataset_name="Dahoas/synthetic-instruct-gptj-pairwise")
+    labels=constant(0), question="Which response is better?", dataset_name="Dahoas/synthetic-instruct-gptj-pairwise")
 
-scruples = Classification("text",labels="binarized_label",dataset_name="tasksource/scruples")
+scruples = Classification("text",labels="binarized_label", question="Was the author in the right or in the wrong?",dataset_name="tasksource/scruples")
 
 wouldyourather = MultipleChoice(constant(''), choices=['option_a','option_b'], question="Which would most people rather do?",
     labels= lambda x: int(x['votes_a']<x['votes_b']),
@@ -1053,7 +1079,7 @@ strategy_qa = Classification('question',labels='answer',
 
 summarize_from_feedback = MultipleChoice(get.info.post,
     choices_list=lambda x: [x['summaries'][0]['text'],x['summaries'][1]['text']],
-    labels="choice",
+    labels="choice", question="Which summary did the human rater prefer?",
     dataset_name="vwxyzjn/summarize_from_feedback_oai_preprocessing",
     task_id="summarize_from_feedback/comparisons",
     pre_process = lambda ds:ds.filter(lambda x: type(get.info.post(x))==str)
@@ -1066,7 +1092,7 @@ folio = Classification("premises","conclusion",
 tomi_nli = Classification("premise","hypothesis","label",
     dataset_name="tasksource/tomi-nli")
 
-avicenna = Classification("Premise 1","Premise 2","Syllogistic relation",
+avicenna = Classification("Premise 1","Premise 2","Syllogistic relation", question="Do the two premises form a syllogism?",
     dataset_name="tasksource/avicenna")
 
 shp = MultipleChoice(
@@ -1100,13 +1126,6 @@ mutual = MultipleChoice("article",choices_list="options",
     labels=lambda x: "ABCD".index(x['answers']),
     dataset_name="tasksource/mutual",splits=["train",None,None])
 
-neqa = MultipleChoice('prompt',choices_list='classes',labels="answer_index",
-    dataset_name="inverse-scaling/NeQA")
-quote_repetition = MultipleChoice('prompt',choices_list='classes',labels="answer_index",
-    dataset_name="inverse-scaling/quote-repetition")
-redefine_math = MultipleChoice('prompt',choices_list='classes',labels="answer_index",
-    dataset_name="inverse-scaling/redefine-math")
-
 puzzte = Classification("puzzle_text","question","answer",
     dataset_name="tasksource/puzzte",
     # "non-entailment" overlaps the specific contradiction/unknown labels
@@ -1124,7 +1143,7 @@ race = MultipleChoice(cat(['question','article'],'\n'), choices_list='options',
 race_c = MultipleChoice(cat(['question','article'],'\n'),choices_list='option',labels='label',
     dataset_name='tasksource/race-c')
 
-spartqa_yn=Classification("story","question","answer",
+spartqa_yn=Classification("story","question",lambda x: {"DK": "don't know"}.get(x["answer"], x["answer"]),
     dataset_name="tasksource/spartqa-yn")
 
 spartqa_mc=MultipleChoice(cat(["story","question"]),choices_list="candidate_answers",labels="answer",
@@ -1172,6 +1191,7 @@ perturbed_boolq = Classification("question",labels="hard_label",
 
 
 graded_acceptability = Classification("text",labels="normalized_score",
+    question="How acceptable is this sentence, from 0 (unacceptable) to 1 (acceptable)?",
     dataset_name="tasksource/acceptability-prediction")
 
 equate = Classification("sentence1","sentence2","gold_label",
@@ -1180,7 +1200,7 @@ equate = Classification("sentence1","sentence2","gold_label",
 science_qa = MultipleChoice("question",choices_list="choices",labels="answer",
     dataset_name="tasksource/ScienceQA_text_only")
 
-ekar=MultipleChoice("question",choices_list=get.choices.text,
+ekar=MultipleChoice("question",choices_list=get.choices.text, question="Which pair is related in the same way?",
     labels=lambda x:"ABCD".index(x['answerKey']),
 dataset_name="Jiangjie/ekar_english")
 
@@ -1200,9 +1220,12 @@ logiqa_2 = Classification("premise","hypothesis","label",dataset_name="tasksourc
 _oasst = dict(dataset_name="tasksource/oasst2_dense_flat",
     pre_process = lambda ds:ds.filter(lambda x:x['lang']=='en'))
 
-oasst1__quality = Classification("parent_text","text",labels="quality",**_oasst)
-oasst1__toxicity = Classification("parent_text","text",labels="toxicity",**_oasst)
-oasst1__helpfulness = Classification("parent_text","text",labels="helpfulness",**_oasst)
+oasst1__quality = Classification("parent_text","text",labels="quality",**_oasst,
+    question="How good is the reply, from 0 (low quality) to 1 (high quality)?")
+oasst1__toxicity = Classification("parent_text","text",labels="toxicity",**_oasst,
+    question="How toxic is the reply, from 0 (not toxic) to 1 (very toxic)?")
+oasst1__helpfulness = Classification("parent_text","text",labels="helpfulness",**_oasst,
+    question="How helpful is the reply, from 0 (unhelpful) to 1 (helpful)?")
 
 mindgames = Classification("premise","hypothesis","label",dataset_name="sileod/mindgames")
 
@@ -1224,7 +1247,8 @@ udep__deprel = TokenClassification(
     dataset_name="universal-dependencies/universal_dependencies",
     pre_process=_udep_deprel_pre_process)
 
-ambient= Classification("premise","hypothesis","hypothesis_ambiguous",dataset_name="tasksource/ambient")
+ambient= Classification("premise","hypothesis","hypothesis_ambiguous",dataset_name="tasksource/ambient",
+    question="Is the hypothesis ambiguous?")
 
 path_naturalness = MultipleChoice(constant(''),choices=['choice1','choice2'],labels="label",
     question="Which chain of relations is more natural?",
@@ -1276,8 +1300,8 @@ sen_making__1 = MultipleChoice(constant(''), choices=['sentence0','sentence1'],l
     question="Which statement makes sense?",
     dataset_name="tasksource/sen-making")
 
-sen_making__2 = MultipleChoice(lambda x: [x['sentence0'],x['sentence1']][x['false']] + '\n is not plausible because :',
-    choices=['A','B','C'],labels=lambda x: 'ABC'.index(x['reason']), dataset_name="tasksource/sen-making")
+sen_making__2 = MultipleChoice(lambda x: [x['sentence0'],x['sentence1']][x['false']],
+    question="Why is this statement implausible?", choices=['A','B','C'],labels=lambda x: 'ABC'.index(x['reason']), dataset_name="tasksource/sen-making")
 
 winowhy = Classification('sentence', lambda x: f'In "{x["wnli_sent1"]}", {x["wnli_sent2"]}',
     labels=name('label',['False','True']), dataset_name="tasksource/winowhy")
@@ -1452,7 +1476,7 @@ nlgraph = Classification('question',labels=_nlgraph_binarize,
     pre_process=lambda ds:ds.filter(lambda x:x['task'] in "connectivity cycle hamilton"),
     dataset_name="tasksource/nlgraph")
 
-oasst_rlhf = MultipleChoice("prompt",choices=['chosen','rejected'],labels=constant(0),
+oasst_rlhf = MultipleChoice("prompt",choices=['chosen','rejected'],labels=constant(0), question="Which reply is better?",
     dataset_name="tasksource/oasst2_pairwise_rlhf_reward")
 
 def _hh_split(ds):
@@ -1472,12 +1496,11 @@ anthropic_rlhf_harmless = MultipleChoice("dialogue",
     dataset_name="tasksource/hh-rlhf",config_name="harmless-base")
 
 ruletaker = Classification(
-    lambda x: 'What is not explicitly stated as true is considered false. \n' +x["context"], #closed world assumption
-    "question","label",dataset_name="tasksource/ruletaker")
+    "context", "question", question="Does the statement follow from the context? What is not explicitly stated as true is considered false.",
+    labels="label", dataset_name="tasksource/ruletaker")
 
 para_rules = Classification(
-    lambda x: 'What is not explicitly stated as true is considered false. \n' +x["context"], #closed world assumption
-    "question", labels=name("label",["False","True"]),
+    "context", "question", question="Is the statement true? What is not explicitly stated as true is considered false.", labels=name("label",["False","True"]),
     dataset_name="qbao775/PARARULE-Plus")
 
 proofwriter_deduction = Classification("theory","question","answer",
@@ -1771,7 +1794,7 @@ helpsteer_3___feedback = Classification(
 msci_nli = Classification('sentence1','sentence2','label',dataset_name='sadat2307/MSciNLI')
 
 
-ultrafeedback = MultipleChoice("question", choices=['response_j','response_k'],labels=constant(0), dataset_name="pushpdeep/UltraFeedback-paired")
+ultrafeedback = MultipleChoice("question", choices=['response_j','response_k'],labels=constant(0), question="Which response is better?", dataset_name="pushpdeep/UltraFeedback-paired")
 
 def _without_math_test(dataset):
     # PRM800K's train split holds ~2k MATH test problems (its own test split is MATH-500); train only on
@@ -1818,7 +1841,7 @@ hover = Classification("evidence","claim","label",
 hover__nli = Classification("evidence","claim",name("label",["entailment","neutral","contradiction"]),
     dataset_name="Dzeniks/hover-3way")
 
-tasksource_dpo = MultipleChoice("prompt",choices=['chosen','rejected'],labels=constant(0),
+tasksource_dpo = MultipleChoice("prompt",choices=['chosen','rejected'],labels=constant(0), question="Which response is better?",
     dataset_name="tasksource/tasksource_dpo_pairs")
 
 seahorse = Classification('article',cat(["summary", "question"]),'answer',
