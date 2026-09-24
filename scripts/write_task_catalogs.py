@@ -11,6 +11,8 @@ from pathlib import Path
 from tasksource import list_tasks
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
 def cell(text):
     return " ".join(str(text or "").split()).replace("|", "\\|")
 
