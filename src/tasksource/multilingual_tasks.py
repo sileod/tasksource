@@ -25,7 +25,7 @@ xnli = Classification("premise", "hypothesis", "label",
 americas_nli = Classification("premise","hypothesis","label",config_name="all_languages")
 
 stsb_multi_mt = Classification("sentence1", "sentence2",
-    lambda x: float(x["similarity_score"]/5),
+    lambda x: float(x["similarity_score"]/5), question="How similar are the two sentences, from 0 (unrelated) to 1 (equivalent)?",
     **all('PhilipMay/stsb_multi_mt'))
 
 pawsx = Classification("sentence1","sentence2",name('label',['not_paraphrase','paraphrase']), **all('google-research-datasets/paws-x'))
@@ -59,7 +59,7 @@ xstance = Classification(_xstance_question, "comment", "stance_label",
 
 def _offenseval_mapping(dataset_name, config_name, task_id):
     return dict(
-        sentence1=lambda x: str(x["text"]),
+        sentence1=lambda x: str(x["text"]).replace("<LF>", "\n"),  # the Arabic set encodes newlines as <LF>
         labels=name("subtask_a", ['not offensive', 'offensive']),
         pre_process=lambda ds: ds.filter(lambda x: x['subtask_a'] in [0, 1]),
         dataset_name=dataset_name, config_name=config_name, task_id=task_id)
@@ -128,7 +128,8 @@ xcopa = MultipleChoice(_copa_input,choices=['choice1','choice2'],labels="label",
     **all('cambridgeltl/xcopa'))
 
 xstory = MultipleChoice(lambda x: "\n".join([x[f'input_sentence_{i}'] for i in range(1,5)]),
-    choices=["sentence_quiz1","sentence_quiz2"],labels=constant(0), **all("juletxara/xstory_cloze"))
+    choices=["sentence_quiz1","sentence_quiz2"],labels=lambda x: x["answer_right_ending"] - 1,
+    question="Which ending continues the story?", **all("juletxara/xstory_cloze"))
 
 
 
