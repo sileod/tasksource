@@ -724,6 +724,10 @@ def migrate_legacy_shards(
         temporary.replace(path)
 
 
+def covered_by_graded(task):
+    return task not in NATIVE_SOURCES and any(covered in task for covered in graded.COVERED_TASKS)
+
+
 def select_tasks(args):
     frame = list_tasks(instruct=True)
     frame["multilingual"] = False
@@ -741,6 +745,8 @@ def select_tasks(args):
     frame = frame[
         ~frame.source_id.str.startswith(PUBLISH_EXCLUDED_PREFIXES, na=False)
     ]
+    # graded families already cover these tasks with described score levels
+    frame = frame[~frame.id.map(covered_by_graded)]
     frame = frame[
         (frame.task_type != "TokenClassification")
         | frame.source_id.isin(JEV_TOKEN_TASKS)

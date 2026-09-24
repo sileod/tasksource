@@ -3,13 +3,14 @@ from datasets import DatasetDict, Dataset
 from sorcery import dict_of
 import string
 
-improper_labels =['recast/recast_kg_relations','linguisticprobing',"lex_glue/scotus",'lexical_relation_classification/ROOT09',"pragmeval/squinky","pragmeval/emobank",'pragmeval/persuasiveness']
-improper_labels += ['glue/stsb', 'sick/relatedness', 'joci', 'amazon_counterfactual/en', 'toxic_conversations', 'ethos/multilabel', 'lex_glue/eurlex', 'lex_glue/unfair_tos', 'app_reviews', 'humicroedit/subtask-1', 'stackoverflow-questions', 'go_emotions/simplified', 'google_wellformed_query', 'has_part', 'blog_authorship_corpus/age', 'promptCoherence', 'Sarcasm_News_Headline', 'auditor_review/demo-org--auditor_review', 'sts-companion', 'acceptability-prediction', 'chaos-mnli-ambiguity', 'headline_cause/en_simple', 'oasst1_dense_flat', 'civil_comments']
-
-improper_labels += ['stsb_multi_mt','MLMA_hate_speech','icl-symbol-tuning-instruct','zero-shot-label-nli']
-
-# HelpSteer ratings and preferences are graded Jev families instead
-improper_labels += ['essay-scoring','english-grading','HelpSteer/','HelpSteer2/','HelpSteer3/preference','oasst2']
+# Tasks whose labels do not work as named classes: regression scores, multi-label
+# lists, or opaque label sets. Tasks covered by graded Jev families are listed in
+# jev/graded.py (COVERED_TASKS) instead.
+improper_labels = ['lexical_relation_classification/ROOT09', "pragmeval/squinky", "pragmeval/emobank", 'pragmeval/persuasiveness']
+improper_labels += ['glue/stsb', 'sick/relatedness', 'sts-companion', 'stsb_multi_mt', 'acceptability-prediction',
+                    'chaos-mnli-ambiguity', 'oasst1_dense_flat', 'oasst2_dense_flat']  # regression
+improper_labels += ['lex_glue/eurlex', 'lex_glue/unfair_tos', 'go_emotions/simplified']  # multi-label
+improper_labels += ['auditor_review/demo-org--auditor_review', 'MLMA_hate_speech', 'icl-symbol-tuning-instruct', 'zero-shot-label-nli']
 
 def render_options(options):
     options = [f'"{x}"' for x in options]

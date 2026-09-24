@@ -1,23 +1,32 @@
-"""Repackage raw-file datasets as parquet under tasksource/ on the Hub.
+"""Repackage hard-to-load datasets as parquet under tasksource/ on the Hub.
 
-These sources only exist as GitHub files or inconsistent JSON, which makes
-them slow and brittle to load. Each function returns a clean DatasetDict.
+These sources only exist as GitHub files, loading scripts or inconsistent
+JSON, which makes them slow and brittle to load. Each function returns a clean
+DatasetDict; its docstring becomes the Hub card, which also lists the original
+datasets from tasksource/metadata/originals.py (add the entry there first).
 
-    python scripts/upload_repackaged.py sharc numer_sense clutrr [--dry-run]
+    python scripts/upload_repackaged.py sharc numer_sense clutrr wellformed [--dry-run] [--card-only]
 """
 
 import argparse
 import ast
+import inspect
 import json
 import re
 import urllib.request
 
 from datasets import ClassLabel, Dataset, DatasetDict, load_dataset
 
+from huggingface_hub import DatasetCard
+
 from tasksource.jev.augmentations import stable_fraction
+from tasksource.metadata.originals import ORIGINALS
 
 SHARC_URL = "https://raw.githubusercontent.com/nikhilweee/neural-conv-qa/master/datasets/mod_{}.json"
 NUMERSENSE_URL = "https://raw.githubusercontent.com/INK-USC/NumerSense/main/data/train.masked.tsv"
+WELLFORMED_URL = "https://raw.githubusercontent.com/google-research-datasets/query-wellformedness/master/{}.tsv"
+HUMICROEDIT_URL = "https://cs.rochester.edu/u/nhossain/semeval-2020-task-7-dataset.zip"
+ETHOS_URL = "https://raw.githubusercontent.com/intelligence-csd-auth-gr/Ethos-Hate-Speech-Dataset/master/ethos/ethos_data/Ethos_Dataset_Multi_Label.csv"
 CLUTRR_URL = "hf://datasets/kendrivp/CLUTRR_v1_extracted/gen_train234_test2to10/CLUTRR_v1_gen_train234_test2to10_{}.json"
 
 
@@ -80,17 +89,76 @@ def clutrr():
     return dataset.cast_column("label", ClassLabel(names=names))
 
 
+def wellformed():
+    """Google query wellformedness: the share of 5 raters who judged a search query a well-formed question.
+
+    The trailing " ?" the source adds to every query is attached as "?"; the queries are otherwise untouched.
+    """
+    splits = {}
+    for source, split in [("train", "train"), ("dev", "validation"), ("test", "test")]:
+        raw = load_dataset("csv", data_files=WELLFORMED_URL.format(source), delimiter="\t",
+                           column_names=["content", "rating"], quoting=3)["train"]
+        splits[split] = raw.map(lambda x: {"content": re.sub(r"\s+\?$", "?", x["content"])})
+    return DatasetDict(splits)
+
+
+def humicroedit():
+    """Humicroedit (SemEval-2020 task 7): news headlines edited to be funny.
+
+    subtask-1 grades one edited headline (meanGrade averages five 0-3 funniness grades); `headline` and
+    `edited` render the original headline and its edit from the `<word/>` markup. subtask-2 compares two
+    edits of the same headline (label 1 or 2 is the funnier one, 0 a tie).
+    """
+    import io, zipfile
+    import pandas as pd
+    with urllib.request.urlopen(HUMICROEDIT_URL) as response:
+        archive = zipfile.ZipFile(io.BytesIO(response.read()))
+    splits = {}
+    for source, split in [("train", "train"), ("dev", "validation"), ("test", "test")]:
+        rows = pd.read_csv(archive.open(f"semeval-2020-task-7-dataset/subtask-1/{source}.csv"), dtype={"grades": str})
+        rows["headline"] = rows.original.str.replace(r"<([^/>]+)/>", r"\1", regex=True)
+        rows["edited"] = [re.sub(r"<[^/>]+/>", edit, original) for original, edit in zip(rows.original, rows.edit)]
+        splits[split] = Dataset.from_pandas(rows, preserve_index=False)
+    return DatasetDict(splits)
+
+
+def ethos():
+    """ETHOS multi-label: hateful comments with the share of raters who saw each aspect (violence, target, grounds).
+
+    Only the source's single split is provided.
+    """
+    import pandas as pd
+    rows = pd.read_csv(ETHOS_URL, sep=";")
+    return DatasetDict(train=Dataset.from_pandas(rows, preserve_index=False))
+
+
 BUILDERS = {"sharc": ("tasksource/sharc", sharc), "numer_sense": ("tasksource/numer_sense", numer_sense),
-            "clutrr": ("tasksource/clutrr", clutrr)}
+            "clutrr": ("tasksource/clutrr", clutrr), "wellformed": ("tasksource/google_wellformed_query", wellformed),
+            "humicroedit": ("tasksource/humicroedit", humicroedit, "subtask-1"), "ethos": ("tasksource/ethos", ethos, "multilabel")}
+
+
+def push_card(repo, build):
+    card = DatasetCard.load(repo)
+    card.data.source_datasets = ORIGINALS[repo]
+    sources = ", ".join(f"[{name}](https://huggingface.co/datasets/{name})" for name in ORIGINALS[repo])
+    card.text = (f"\n# {repo.split('/')[1]}\n\n{inspect.cleandoc(build.__doc__)}\n\nOriginal data: {sources}. "
+                 "Repackaged as parquet for [tasksource](https://github.com/sileod/tasksource) by "
+                 "[scripts/upload_repackaged.py](https://github.com/sileod/tasksource/blob/main/scripts/upload_repackaged.py).\n")
+    card.push_to_hub(repo)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("names", nargs="+", choices=BUILDERS)
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--card-only", action="store_true")
     args = parser.parse_args()
     for name in args.names:
-        repo, build = BUILDERS[name]
-        dataset = build()
-        print(repo, dataset, dataset["train"][0], sep="\n")
-        if not args.dry_run:
-            dataset.push_to_hub(repo)
+        repo, build, *config = BUILDERS[name]
+        assert repo in ORIGINALS, f"add {repo} to tasksource/metadata/originals.py"
+        if not args.card_only:
+            dataset = build()
+            print(repo, dataset, dataset["train"][0], sep="\n")
+            if args.dry_run:
+                continue
+            dataset.push_to_hub(repo, config_name=config[0] if config else "default")
+        push_card(repo, build)

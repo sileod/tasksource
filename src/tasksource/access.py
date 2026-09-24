@@ -4,6 +4,7 @@ import re
 import pandas as pd
 from . import tasks, recast as recast_module
 from .metadata import dataset_rank
+from .metadata.originals import ORIGINALS
 from datasets import load_dataset, Dataset, DatasetDict, IterableDatasetDict
 import funcy as fc
 import os
@@ -84,6 +85,29 @@ def list_tasks(tasks_path=f'{os.path.dirname(__file__)}/tasks.py',multilingual=F
 
 #task_df =list_tasks()
 #mtask_df =list_tasks(multilingual=True)
+
+RAW_BUILDERS = {"csv", "json", "parquet", "text"}
+
+def hub_datasets(task_ids=None, multilingual=None):
+    """Hub dataset ids behind tasks, for the ``datasets:`` field of a model card.
+
+    Lists the repo each task loads from, repos read through hf:// data files,
+    and the originals of tasksource copies and mirrors (metadata/originals.py).
+    ``task_ids`` defaults to every task; ``multilingual=None`` searches both lists.
+    """
+    frames = [list_tasks(multilingual=m) for m in ([False, True] if multilingual is None else [multilingual])]
+    df = pd.concat(frames)
+    if task_ids is not None:
+        missing = set(task_ids) - set(df.id)
+        assert not missing, f"unknown tasks: {sorted(missing)}"
+        df = df[df.id.isin(task_ids)]
+    repos = set()
+    for row in df.itertuples():
+        if row.dataset_name not in RAW_BUILDERS:
+            repos.add(row.dataset_name)
+        repos.update(re.findall(r"hf://datasets/([\w.-]+/[\w.-]+)", str(row.mapping.load_dataset_kwargs)))
+        repos.update(ORIGINALS.get(row.dataset_name, []) + ORIGINALS.get(row.id, []))
+    return sorted(repos)
 
 def dict_to_query(d=dict(), **kwargs):
     d={**d,**kwargs}

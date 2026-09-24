@@ -1,13 +1,15 @@
 """Parked tasks: annotations kept out of the task list, each with its reason.
 
 Tasksource is for training, so evaluation benchmarks, duplicates and unsound
-or unloadable sources are parked here instead of being deleted. Parked tasks
-are not listed by ``list_tasks`` but still load directly:
+or unloadable sources are parked here instead of being deleted. Each entry in
+PARKED has a kind (see KINDS) and a reason. Parked tasks are not listed by
+``list_tasks`` but still load directly:
 
     from tasksource import parked
     dataset = parked.glue___ax.load()
+    benchmarks = parked.by_kind("evaluation")  # {name: task}
 
-To revive one, move it back to tasks.py and drop its REASONS entry.
+To revive one, move it back to tasks.py and drop its PARKED entry.
 """
 from datasets import get_dataset_config_names
 
@@ -184,62 +186,86 @@ effective_feedback_student_writing = Classification("discourse_text",
 
 # not implemented: ccdv/patent-classification (abstract text -> label)
 
-REASONS = {
-    'mmlu': 'MMLU is an evaluation benchmark; no train split',
-    'blimp_hard': 'BLiMP is an evaluation benchmark (test-only minimal pairs)',
-    'bigbench': 'BIG-bench is an evaluation suite',
-    'glue___ax': 'test-only diagnostic set, labels masked',
-    'super_glue___rte': 'duplicate of glue/rte',
-    'sick__entailment_BA': 'same pairs as sick/entailment_AB',
-    'gpt3_nli': 'generated labels not sound enough',
-    'enfever_nli': 'overlaps FEVER-based NLI tasks',
-    'glue__diagnostics': 'diagnostic benchmark',
-    'paws___unlabeled_final': 'silver labels; paws/labeled_final is used',
-    'quora': 'duplicate of glue/qqp',
-    'tner___tweebank_ner': 'not loadable',
-    'aqua_rat___tokenized': 'covered by math_qa',
-    'fever___v1_0': 'claim-only FEVER; the verdict needs evidence',
-    'fever___v2_0': 'claim-only FEVER; the verdict needs evidence',
-    'multi_nli': 'duplicate of glue/mnli',
-    'hyperpartisan_news_detection___byarticle': 'covered by hyperpartisan_news',
-    'hyperpartisan_news_detection___bypublisher': 'covered by hyperpartisan_news',
-    'go_emotions___raw': 'covered by go_emotions/simplified',
-    'boolq': 'duplicate of super_glue/boolq',
-    'adv_glue___adv_sst2': 'adversarial evaluation benchmark, validation only',
-    'adv_glue___adv_qqp': 'adversarial evaluation benchmark, validation only',
-    'adv_glue___adv_mnli': 'adversarial evaluation benchmark, validation only',
-    'adv_glue___adv_mnli_mismatched': 'adversarial evaluation benchmark, validation only',
-    'adv_glue___adv_qnli': 'adversarial evaluation benchmark, validation only',
-    'adv_glue___adv_rte': 'adversarial evaluation benchmark, validation only',
-    'species_800': 'missing files',
-    'blog_authorship_corpus__horoscope': 'horoscope is not predictable from text',
-    'code_x_glue_cc_clone_detection_big_clone_bench': 'in bigbench, too heavy (100GB)',
-    'code_x_glue_cc_code_refinement': 'constant label, not a real task',
-    'proto_qa': 'every option is a valid answer; gold is only the most popular',
-    'chatgpt_detection': 'HC3 human answers are PTB-tokenized (a trivial shortcut); script-only loader',
-    'attempto_nli': 'unclear label semantics',
-    'mega_acceptability': 'regression target; acceptability is covered by other tasks',
-    'mbib_cognitive_bias': 'MBIB is an evaluation benchmark',
-    'mbib_fake_news': 'MBIB is an evaluation benchmark',
-    'mbib_gender_bias': 'MBIB is an evaluation benchmark',
-    'mbib_hate_speech': 'MBIB is an evaluation benchmark',
-    'mbib_linguistic_bias': 'MBIB is an evaluation benchmark',
-    'mbib_political_bias': 'MBIB is an evaluation benchmark',
-    'mbib_racial_bias': 'MBIB is an evaluation benchmark',
-    'mbib_text_level_bias': 'MBIB is an evaluation benchmark',
-    'xsum_factuality': 'summary-only, the source document is missing; script-only loader',
-    'ste_wic': 'SuperTweetEval is an evaluation benchmark',
-    'ste_nerd': 'SuperTweetEval is an evaluation benchmark',
-    'ste_sim': 'SuperTweetEval is an evaluation benchmark',
-    'ste_intimacy': 'SuperTweetEval is an evaluation benchmark',
-    'lex_glue___ecthr_a': 'too long',
-    'lex_glue___ecthr_b': 'too long',
-    'nli_l2': 'merges of NLI tasks already included',
-    'nli_l3': 'merges of NLI tasks already included',
-    'ecthr_cases___alleged_violation_prediction': 'too long',
-    'ecthr_cases___violation_prediction': 'too long',
-    'effective_feedback_student_writing': 'source discontinued; see argument_feedback in tasks.py',
+# labels are model confidence scores, nearly all above 0.99
+has_part = Classification("arg1","arg2", labels="score", splits=["train", None, None])
+
+# label semantics (1-6) are undocumented
+recast___recast_kg_relations = Classification(sentence1="context", sentence2="hypothesis", labels="label",
+    dataset_name="tasksource/recast", config_name="recast_kg_relations")
+
+KINDS = {
+    "evaluation": "evaluation benchmark: useful for evaluation, kept out of training",
+    "duplicate": "duplicates or is covered by a listed task",
+    "unsound": "labels or inputs do not support the task as annotated",
+    "impractical": "inputs too long or data too heavy",
+    "unavailable": "source no longer loads",
 }
+
+PARKED = {
+    'has_part': ('unsound', 'labels are model confidence scores, nearly all above 0.99'),
+    'recast___recast_kg_relations': ('unsound', 'label semantics (1-6) are undocumented'),
+    'mmlu': ('evaluation', 'MMLU is an evaluation benchmark; no train split'),
+    'blimp_hard': ('evaluation', 'BLiMP is an evaluation benchmark (test-only minimal pairs)'),
+    'bigbench': ('evaluation', 'BIG-bench is an evaluation suite'),
+    'glue___ax': ('evaluation', 'test-only diagnostic set, labels masked'),
+    'super_glue___rte': ('duplicate', 'duplicate of glue/rte'),
+    'sick__entailment_BA': ('duplicate', 'same pairs as sick/entailment_AB'),
+    'gpt3_nli': ('unsound', 'generated labels not sound enough'),
+    'enfever_nli': ('duplicate', 'overlaps FEVER-based NLI tasks'),
+    'glue__diagnostics': ('evaluation', 'diagnostic benchmark'),
+    'paws___unlabeled_final': ('unsound', 'silver labels; paws/labeled_final is used'),
+    'quora': ('duplicate', 'duplicate of glue/qqp'),
+    'tner___tweebank_ner': ('unavailable', 'not loadable'),
+    'aqua_rat___tokenized': ('duplicate', 'covered by math_qa'),
+    'fever___v1_0': ('unsound', 'claim-only FEVER; the verdict needs evidence'),
+    'fever___v2_0': ('unsound', 'claim-only FEVER; the verdict needs evidence'),
+    'multi_nli': ('duplicate', 'duplicate of glue/mnli'),
+    'hyperpartisan_news_detection___byarticle': ('duplicate', 'covered by hyperpartisan_news'),
+    'hyperpartisan_news_detection___bypublisher': ('duplicate', 'covered by hyperpartisan_news'),
+    'go_emotions___raw': ('duplicate', 'covered by go_emotions/simplified'),
+    'boolq': ('duplicate', 'duplicate of super_glue/boolq'),
+    'adv_glue___adv_sst2': ('evaluation', 'adversarial evaluation benchmark, validation only'),
+    'adv_glue___adv_qqp': ('evaluation', 'adversarial evaluation benchmark, validation only'),
+    'adv_glue___adv_mnli': ('evaluation', 'adversarial evaluation benchmark, validation only'),
+    'adv_glue___adv_mnli_mismatched': ('evaluation', 'adversarial evaluation benchmark, validation only'),
+    'adv_glue___adv_qnli': ('evaluation', 'adversarial evaluation benchmark, validation only'),
+    'adv_glue___adv_rte': ('evaluation', 'adversarial evaluation benchmark, validation only'),
+    'species_800': ('unavailable', 'missing files'),
+    'blog_authorship_corpus__horoscope': ('unsound', 'horoscope is not predictable from text'),
+    'code_x_glue_cc_clone_detection_big_clone_bench': ('impractical', 'in bigbench, too heavy (100GB)'),
+    'code_x_glue_cc_code_refinement': ('unsound', 'constant label, not a real task'),
+    'proto_qa': ('unsound', 'every option is a valid answer; gold is only the most popular'),
+    'chatgpt_detection': ('unsound', 'HC3 human answers are PTB-tokenized (a trivial shortcut); script-only loader'),
+    'attempto_nli': ('unsound', 'unclear label semantics'),
+    'mega_acceptability': ('duplicate', 'regression target; acceptability is covered by other tasks'),
+    'mbib_cognitive_bias': ('evaluation', 'MBIB is an evaluation benchmark'),
+    'mbib_fake_news': ('evaluation', 'MBIB is an evaluation benchmark'),
+    'mbib_gender_bias': ('evaluation', 'MBIB is an evaluation benchmark'),
+    'mbib_hate_speech': ('evaluation', 'MBIB is an evaluation benchmark'),
+    'mbib_linguistic_bias': ('evaluation', 'MBIB is an evaluation benchmark'),
+    'mbib_political_bias': ('evaluation', 'MBIB is an evaluation benchmark'),
+    'mbib_racial_bias': ('evaluation', 'MBIB is an evaluation benchmark'),
+    'mbib_text_level_bias': ('evaluation', 'MBIB is an evaluation benchmark'),
+    'xsum_factuality': ('unsound', 'summary-only, the source document is missing; script-only loader'),
+    'ste_wic': ('evaluation', 'SuperTweetEval is an evaluation benchmark'),
+    'ste_nerd': ('evaluation', 'SuperTweetEval is an evaluation benchmark'),
+    'ste_sim': ('evaluation', 'SuperTweetEval is an evaluation benchmark'),
+    'ste_intimacy': ('evaluation', 'SuperTweetEval is an evaluation benchmark'),
+    'lex_glue___ecthr_a': ('impractical', 'too long'),
+    'lex_glue___ecthr_b': ('impractical', 'too long'),
+    'nli_l2': ('duplicate', 'merges of NLI tasks already included'),
+    'nli_l3': ('duplicate', 'merges of NLI tasks already included'),
+    'ecthr_cases___alleged_violation_prediction': ('impractical', 'too long'),
+    'ecthr_cases___violation_prediction': ('impractical', 'too long'),
+    'effective_feedback_student_writing': ('unavailable', 'source discontinued; see argument_feedback in tasks.py'),
+}
+REASONS = {key: reason for key, (_, reason) in PARKED.items()}
+
+
+def by_kind(kind):
+    """Parked tasks of one kind, e.g. ``by_kind("evaluation")`` for evaluation benchmarks."""
+    assert kind in KINDS, f"kind must be one of {list(KINDS)}"
+    return {key: globals()[key] for key, (task_kind, _) in PARKED.items() if task_kind == kind}
 
 # Unset names default from the variable name, as in list_tasks.
 for _key, _task in list(globals().items()):

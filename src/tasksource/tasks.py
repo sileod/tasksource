@@ -117,7 +117,7 @@ hans = Classification(sentence1="sentence1", sentence2="sentence2", labels="labe
 wanli = Classification('premise','hypothesis','gold', dataset_name="alisawuffles/WANLI")
 
 recast_nli = Classification(sentence1="context", sentence2="hypothesis", labels="label", dataset_name="tasksource/recast",
-    config_name=['recast_kg_relations', 'recast_puns', 'recast_factuality', 'recast_verbnet',
+    config_name=['recast_puns', 'recast_factuality', 'recast_verbnet',
     'recast_verbcorner', 'recast_ner', 'recast_sentiment', 'recast_megaveridicality'])
 
 
@@ -442,7 +442,7 @@ utilitarianism = Classification(
     label_values={0: "false", 1: "true"})
 
 amazon_counterfactual = Classification(
-    "text", labels="label",
+    "text", labels="label_text",
     dataset_name="mteb/amazon_counterfactual",
     config_name="en")
 
@@ -451,7 +451,7 @@ insincere_questions = Classification(
     dataset_name="SetFit/insincere-questions")
 
 toxic_conversations = Classification(
-    "text", labels="label",
+    "text", labels="label_text",
     dataset_name="SetFit/toxic_conversations")
 
 turingbench = Classification("Generation",labels="label",
@@ -500,13 +500,28 @@ ethos = Classification(sentence1="text", labels=name("label", ["no hate speech",
     splits=["train", None, None], dataset_name="SetFit/ethos_binary",
     task_id="ethos/binary",
     pre_process=lambda ds: _concat_splits_to_train(ds, ("train", "test")))
-ethos___multilabel = Classification(
-    'text',
-    labels=lambda x: [x[c] for c in
-    ['violence', 'gender', 'race', 'national_origin', 'disability', 'religion', 'sexual_orientation','directed_vs_generalized']
-    ],
-    splits=["train", None, None]
-)
+_ETHOS_ASPECTS = {
+    "violence": "Does this comment incite violence?",
+    "directed_vs_generalized": "Is this comment directed at a specific person rather than a group?",
+    "gender": "Does this comment attack people for their gender?",
+    "race": "Does this comment attack people for their race?",
+    "national_origin": "Does this comment attack people for their national origin?",
+    "disability": "Does this comment attack people for a disability?",
+    "religion": "Does this comment attack people for their religion?",
+    "sexual_orientation": "Does this comment attack people for their sexual orientation?",
+}
+
+def _ethos_aspects(dataset):
+    # one yes/no question per hateful comment and aspect; aspects are rater shares, keep clear cases
+    def rows(split):
+        for x in split:
+            for aspect, question in _ETHOS_ASPECTS.items():
+                if not 0.2 < x[aspect] < 0.5:
+                    yield dict(comment=x["comment"], question=question, answer=["no", "yes"][x[aspect] >= 0.5])
+    return DatasetDict({name: Dataset.from_generator(rows, gen_kwargs=dict(split=split)) for name, split in dataset.items()})
+
+ethos___multilabel = Classification("comment", "question", "answer", dataset_name="tasksource/ethos",
+    config_name="multilabel", pre_process=_ethos_aspects)
 
 tweet_eval = Classification(sentence1="text", labels="label",
     config_name=["emoji", "emotion", "hate", "irony", "offensive", "sentiment"])
@@ -553,7 +568,10 @@ silicone___iemocap = Classification("Utterance", labels=lambda x: _IEMOCAP[x['Em
     pre_process=lambda ds: ds.filter(lambda x: x['Emotion'] in _IEMOCAP))
 
 lex_glue___eurlex = Classification(sentence1="text", labels="labels") 
-lex_glue___scotus = Classification(sentence1="text", labels="label")
+# Supreme Court Database issue areas 1-13 (14, private action, is absent)
+lex_glue___scotus = Classification(sentence1="text", labels="label", label_values=dict(enumerate([
+    "criminal procedure", "civil rights", "first amendment", "due process", "privacy", "attorneys", "unions",
+    "economic activity", "judicial power", "federalism", "interstate relations", "federal taxation", "miscellaneous"])))
 lex_glue___ledgar = Classification(sentence1="text", labels="label")
 lex_glue___unfair_tos = Classification(sentence1="text", labels="labels")
 lex_glue___case_hold = MultipleChoice("context", choices_list='endings', labels="label")
@@ -583,7 +601,8 @@ dbpedia_14 = Classification(sentence1="content", labels="label", splits=["train"
 
 amazon_polarity = Classification(sentence1="content", labels="label", splits=["train", None, "test"], config_name=["amazon_polarity"])
 
-app_reviews = Classification("review", labels="star", splits=["train", None, None])
+app_reviews = Classification("review", labels="star", splits=["train", None, None],
+    label_values={star: f"{star} star" + "s" * (star > 1) for star in range(1, 6)})
 
 
 hate_speech18 = Classification(sentence1="text", labels="label", splits=["train", None, None],
@@ -594,7 +613,11 @@ hate_speech18 = Classification(sentence1="text", labels="label", splits=["train"
 
 sms_spam = Classification(sentence1="sms", labels="label", splits=["train", None, None])
 
-humicroedit___subtask_1 = Classification("original", "edit", labels="meanGrade", dataset_name="humicroedit", config_name="subtask-1")
+# meanGrade averages five 0-3 funniness grades
+humicroedit___subtask_1 = Classification(lambda x: f"Original: {x['headline']}", lambda x: f"Edited: {x['edited']}",
+    labels=lambda x: int(x["meanGrade"] + 0.5),
+    label_values={0: "not funny", 1: "slightly funny", 2: "moderately funny", 3: "funny"},
+    dataset_name="tasksource/humicroedit", config_name="subtask-1")
 humicroedit___subtask_2 = Classification(
     sentence1=cat(['original1','edit1'],' : '),
     sentence2=cat(['original2','edit2'],' : '),
@@ -609,8 +632,10 @@ hate_speech_offensive = Classification(sentence1="tweet", labels="class", splits
 yahoo_answers_topics = Classification(
     "question_title","question_content",labels="topic")
 
+# popularity bands from the dataset's BigQuery thresholds on score, favorites and views
 stackoverflow_questions=Classification("title","body",labels="label",
-    dataset_name="pacovaldez/stackoverflow-questions")
+    dataset_name="pacovaldez/stackoverflow-questions", label_values={
+        0: "very popular question", 1: "popular question", 2: "somewhat popular question", 3: "unpopular question"})
 
 
 hyperpartisan_news = Classification(
@@ -663,17 +688,26 @@ relbert_cogalexv = Classification(
  }}, pre_process=_cogalexv_relations)
 
 
-linguisticprobing = Classification("sentence", labels="label", dataset_name="tasksource/linguisticprobing", 
-    config_name=['subj_number',
-                'obj_number',
-                'past_present',
-                'sentence_length',
-                'top_constituents',
-                'tree_depth',
-                'coordination_inversion',
-                'odd_man_out',
-                'bigram_shift']#+['word_content'] #too many labels 
-)
+def _probing(config, readable):
+    # SentEval probing labels are codes (NN, PAST, O/I...); spell them out
+    def pre_process(dataset):
+        names = dataset["train"].features["label"].names
+        return dataset.cast_column("label", ClassLabel(names=[readable(name) for name in names]))
+    return Classification("sentence", labels="label", dataset_name="tasksource/linguisticprobing",
+        config_name=config, pre_process=pre_process)
+
+_SENTENCE_LENGTH = ["5-8 words", "9-12 words", "13-16 words", "17-20 words", "21-25 words", "26-28 words"]
+linguisticprobing___subj_number = _probing("subj_number", {"NN": "singular subject", "NNS": "plural subject"}.get)
+linguisticprobing___obj_number = _probing("obj_number", {"NN": "singular object", "NNS": "plural object"}.get)
+linguisticprobing___past_present = _probing("past_present", {"PAST": "past tense", "PRES": "present tense"}.get)
+linguisticprobing___sentence_length = _probing("sentence_length", lambda code: _SENTENCE_LENGTH[int(code)])
+linguisticprobing___top_constituents = _probing("top_constituents",
+    lambda code: "other constituents" if code == "OTHER" else "constituents " + code.replace("_", " "))
+linguisticprobing___tree_depth = _probing("tree_depth", lambda code: code.replace("depth_", "parse tree depth "))
+linguisticprobing___coordination_inversion = _probing("coordination_inversion",
+    {"O": "original clause order", "I": "inverted clause order"}.get)
+linguisticprobing___odd_man_out = _probing("odd_man_out", {"O": "original sentence", "C": "one word replaced"}.get)
+linguisticprobing___bigram_shift = _probing("bigram_shift", {"O": "original word order", "I": "two adjacent words swapped"}.get)
 
 crowdflower = Classification("text", labels="label",
  splits=["train", None, None], dataset_name="tasksource/crowdflower",
@@ -742,12 +776,15 @@ emo = Classification(sentence1=_emocontext_text,
     splits=["train", None, "test"],
     dataset_name="oneonlee/cleansed_emocontext", task_id="emo/emo2019")
 
-google_wellformed_query = Classification(sentence1="content", labels="rating")
+# rating is the share of 5 raters who found the query a well-formed question; keep clear cases
+google_wellformed_query = Classification("content", constant("Is this search query a well-formed question?"),
+    labels=lambda x: ["not well-formed", "well-formed"][x["rating"] >= 0.8],
+    pre_process=lambda ds: ds.filter(lambda x: not 0.2 < x["rating"] < 0.8),
+    dataset_name="tasksource/google_wellformed_query")
 
 tweets_hate_speech_detection = Classification(sentence1="tweet", labels="label", splits=["train", None, None])
 
 
-has_part = Classification("arg1","arg2", labels="score", splits=["train", None, None])
 
 wnut_17 = TokenClassification(tokens="tokens", labels="ner_tags", config_name=["wnut_17"])
 
@@ -762,7 +799,9 @@ SpeedOfMagic_ontonotes_english = TokenClassification(tokens="tokens", labels="ne
 
 blog_authorship_corpus__gender    = Classification(sentence1="text",labels="gender",
     dataset_name="tasksource/blog_authorship_corpus")
-blog_authorship_corpus__age       = Classification(sentence1="text",labels="age")
+blog_authorship_corpus__age       = Classification(sentence1="text",
+    labels=lambda x: "13-17" if x["age"] <= 17 else "23-27" if x["age"] <= 27 else "33-48",  # the corpus age groups
+    dataset_name="tasksource/blog_authorship_corpus")
 blog_authorship_corpus__job       = Classification(sentence1="text",labels="topic",
     dataset_name="tasksource/blog_authorship_corpus",
     pre_process=lambda ds: _cast_blog_topics(ds))
@@ -849,7 +888,7 @@ dynasent___r2 = Classification(
     config_name="r2", task_id="dynasent/dynabench.dynasent.{config_name}.all/{config_name}",
     pre_process=_dynasent_ternary)
 
-sarcasm_news = Classification("headline", labels="is_sarcastic",
+sarcasm_news = Classification("headline", labels=name("is_sarcastic", ["not sarcastic", "sarcastic"]),
     dataset_name="raquiba/Sarcasm_News_Headline")
 
 sem_eval_2010_task_8 = Classification("sentence",labels="relation")
@@ -1139,8 +1178,10 @@ implicit_hate = Classification("post",labels="class",
 nli_unambiguity = Classification("premise","hypothesis","gini",
     dataset_name="tasksource/chaos-mnli-ambiguity")
 
-headline_cause = Classification('left_title','right_title','label',
-    dataset_name='IlyaGusev/headline_cause',config_name='en_simple')
+headline_cause = Classification('left_title', 'right_title', 'label', dataset_name='json', task_id='headline_cause/en_simple',
+    load_dataset_kwargs={"data_files": {split: f"hf://datasets/IlyaGusev/headline_cause/en/simple/{name}.jsonl"
+                                        for split, name in [("train", "train"), ("validation", "val"), ("test", "test")]}},
+    label_values={0: "no causal link", 1: "first headline caused the second", 2: "second headline caused the first"})
 
 logiqa_2 = Classification("premise","hypothesis","label",dataset_name="tasksource/logiqa-2.0-nli")
 
@@ -1176,13 +1217,18 @@ ambient= Classification("premise","hypothesis","hypothesis_ambiguous",dataset_na
 path_naturalness = MultipleChoice(constant("Most natural chain of relations:"),choices=['choice1','choice2'],labels="label",
     dataset_name="tasksource/path-naturalness-prediction")
 
-civil_comments__toxicity = Classification("text",labels="toxicity")
-civil_comments__severe_toxicity = Classification("text",labels="severe_toxicity")
-civil_comments__obscene = Classification("text",labels="obscene")
-civil_comments__threat = Classification("text",labels="threat")
-civil_comments__insult = Classification("text",labels="insult")
-civil_comments__identity_attack = Classification("text",labels="identity_attack")
-civil_comments__sexual_explicit = Classification("text",labels="sexual_explicit")
+def _civil(attribute, negative, positive):
+    # attributes are the share of raters who flagged the comment; keep clear cases
+    return Classification("text", labels=lambda x: [negative, positive][x[attribute] >= 0.5],
+        pre_process=lambda ds: ds.filter(lambda x: not 0.1 <= x[attribute] < 0.5), dataset_name="google/civil_comments")
+
+civil_comments__toxicity = _civil("toxicity", "not toxic", "toxic")
+civil_comments__severe_toxicity = _civil("severe_toxicity", "not severely toxic", "severely toxic")
+civil_comments__obscene = _civil("obscene", "not obscene", "obscene")
+civil_comments__threat = _civil("threat", "no threat", "threat")
+civil_comments__insult = _civil("insult", "not insulting", "insulting")
+civil_comments__identity_attack = _civil("identity_attack", "no identity attack", "identity attack")
+civil_comments__sexual_explicit = _civil("sexual_explicit", "not sexually explicit", "sexually explicit")
 
 cloth = MultipleChoice("sentence", choices_list=lambda x:[x["answer"]]+x["distractors"],labels=constant(0), dataset_name="AndyChiang/cloth")
 dgen  = MultipleChoice("sentence", choices_list=lambda x:[x["answer"]]+x["distractors"],labels=constant(0), dataset_name="AndyChiang/dgen")
@@ -1720,12 +1766,16 @@ msci_nli = Classification('sentence1','sentence2','label',dataset_name='sadat230
 
 ultrafeedback = MultipleChoice("question", choices=['response_j','response_k'],labels=constant(0), dataset_name="pushpdeep/UltraFeedback-paired")
 
-essay_scoring = Classification("full_text",labels="score",dataset_name='tasksource/AES2-essay-scoring')
+essay_scoring = Classification("full_text", constant("Holistic score of this student essay:"), labels="score",
+    dataset_name='tasksource/AES2-essay-scoring',
+    label_values={score: f"{score} out of 6" for score in range(1, 7)})
 
 argument_feedback = Classification(lambda x: f"{x['discourse_type']}: {x['discourse_text']}",
     labels="discourse_effectiveness", dataset_name="tasksource/argument-feedback")
 
-eg = lambda x: Classification("full_text", labels=lambda y:int(y[x]), dataset_name="tasksource/english-grading")
+# analytic scores from 1 to 5 in half points, averaged over raters; rounded half up
+eg = lambda x: Classification("full_text", constant(f"{x.capitalize()} score of this English learner essay:"),
+    labels=lambda y: f"{int(y[x] + 0.5)} out of 5", dataset_name="tasksource/english-grading")
 grading__cohesion = eg('cohesion')
 grading__syntax = eg('syntax')
 grading__vocabulary = eg('vocabulary')
