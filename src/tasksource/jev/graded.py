@@ -64,6 +64,7 @@ class Family:
     config: str = None
     keep: object = None  # row filter applied before splitting
     prepare: object = None  # row map adding the state columns
+    dedupe: str = None  # column whose repeats are dropped (one row per annotator upstream)
 
 
 HELPSTEER = dict(
@@ -87,6 +88,13 @@ OASST_FLAGS = dict(spam="spam", fails_task="failing the task", not_appropriate="
 ESSAY = ["cohesion", "syntax", "vocabulary", "phraseology", "grammar", "conventions"]
 PAIR = {"Sentence 1": "sentence1", "Sentence 2": "sentence2"}
 SIMILARITY = "How similar in meaning are the sentences, from 0 (unrelated) to 1 (equivalent)?"
+AITA = dict(AUTHOR="the author is in the wrong", OTHER="the other party is in the wrong",
+            EVERYBODY="everyone is in the wrong", NOBODY="no one is in the wrong", INFO="more information is needed")
+HATE_VOTES = ["hate_speech_count", "offensive_language_count", "neither_count"]
+# RuyuanWan disagreement sets: what the annotators judged
+DISAGREEMENT = dict(Dynasent="the sentiment of the text", Politeness="the politeness of the text",
+                    SBIC="whether the text is offensive", SChem="whether the rule of thumb is acceptable",
+                    Dilemmas="which of the two actions is less ethical")
 
 FAMILIES = {
     "helpsteer": Family("nvidia/HelpSteer", {"Prompt": "prompt", "Response": "response"}, HELPSTEER),
@@ -126,6 +134,17 @@ FAMILIES = {
     "chaos_mnli": Family("tasksource/chaos-mnli-ambiguity", {"Premise": "premise", "Hypothesis": "hypothesis"}, dict(
         relation=choice("label_count", "How would annotators label the relation of the hypothesis to the premise?",
                         ["entailment", "neutral", "contradiction"]))),
+    "hate_speech_offensive": Family("tdavidson/hate_speech_offensive", {"Tweet": "tweet"}, dict(
+        votes=choice("votes", "How would annotators classify the tweet?",
+                     ["hate speech", "offensive but not hate speech", "neither"])),
+        prepare=lambda x: {"votes": [x[c] for c in HATE_VOTES]}),
+    "scruples": Family("tasksource/scruples", {"Title": "title", "Post": "text"}, dict(
+        verdict=choice("votes", "How would Reddit readers judge who is in the wrong in this story?", list(AITA.values()))),
+        prepare=lambda x: {"votes": [x["label_scores"][k] for k in AITA]}),
+    **{f"{name.lower()}_disagreement": Family(f"RuyuanWan/{name}_Disagreement", {"Text": "text"}, dict(
+        disagreement=noul("disagreement_rate", f"How much would annotators disagree about {topic}, "
+                                               "from 0 (all agree) to 1 (maximal disagreement)?")),
+        dedupe="text") for name, topic in DISAGREEMENT.items()},
     "acceptability": Family("tasksource/acceptability-prediction", {"Sentence": "text"}, dict(
         acceptability=noul("normalized_score", "How acceptable do native speakers find the sentence, "
                                                "from 0 (unacceptable) to 1 (fully acceptable)?"))),
@@ -134,7 +153,8 @@ FAMILIES = {
 # tasksource task ids (substrings) that these families replace in the Jev build. Regression tasks
 # (stsb, sick relatedness, oasst2 ...) are not listed: recast.improper_labels already excludes them.
 COVERED_TASKS = ("HelpSteer/", "HelpSteer2/", "HelpSteer3/preference", "civil_comments/",
-                 "english-grading/", "AES2-essay-scoring", "app_reviews", "joci")
+                 "english-grading/", "AES2-essay-scoring", "app_reviews", "joci",
+                 "hate_speech_offensive", "scruples", "_Disagreement")
 
 
 def jev_rows(example, family, source, split, index):
@@ -162,6 +182,9 @@ def load_family(name, max_rows=None, max_rows_eval=None):
     """Grouped Jev rows per split, split and sampled like any Tasksource source."""
     family = FAMILIES[name]
     dataset = DatasetDict(load_dataset(family.dataset, family.config))
+    if family.dedupe:
+        dataset = DatasetDict({split: rows.select(
+            rows.to_pandas().drop_duplicates(family.dedupe).index.tolist()) for split, rows in dataset.items()})
     if family.keep:
         dataset = dataset.filter(family.keep)
     if family.prepare:
