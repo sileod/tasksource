@@ -3,7 +3,7 @@
     PYTHONPATH=src python scripts/write_task_catalogs.py
 
 A quick glance at every task: its id (linked to the annotation), type, source
-dataset, and whether it has a question.
+dataset, and whether it has a question; then the soft-label annotations.
 """
 
 import re
@@ -49,6 +49,23 @@ def write(path, multilingual):
             str(index), f"[{cell(row.id)}]({module}#L{lines_of[row.preprocessing_name]})", row.task_type,
             dataset_link(row.dataset_name), "✓" if getattr(row.mapping, "question", None) else "",
         ]) + " |")
+    soft = list_tasks(multilingual=multilingual, soft=True)
+    soft = soft[soft.soft_labels]
+    if len(soft):
+        lines += [
+            "", "## Soft labels", "",
+            "Annotations whose label is a distribution (annotator votes, rater shares, survey counts), "
+            "loaded with `load_task(id, soft=True)`. Those with a hard view are also listed above, by "
+            "their majority label; the others have soft labels only.",
+            "",
+            "| id | kind | hard view | dataset |",
+            "|---|---|---|---|",
+        ]
+        for row in soft.itertuples():
+            lines.append("| " + " | ".join([
+                f"[{cell(row.id)}]({module}#L{lines_of[row.preprocessing_name]})", row.mapping.kind,
+                row.mapping.hard_type or "", dataset_link(row.dataset_name),
+            ]) + " |")
     path.write_text("\n".join(lines) + "\n")
     print(f"{path.name}: {len(tasks)} tasks")
 

@@ -1,10 +1,9 @@
-from .preprocess import cat, get, regen, name, constant, Classification, TokenClassification, MultipleChoice
+from .preprocess import cat, get, regen, name, constant, Classification, TokenClassification, MultipleChoice, SoftLabeling
 from .metadata import udep_en_configs
 from .metadata.configs import BABI_NLI
 from datasets import Sequence, ClassLabel, Dataset, DatasetDict, Features, Value, concatenate_datasets
 import hashlib
 import html
-from collections import Counter
 import random
 import re
 
@@ -780,10 +779,11 @@ emo = Classification(sentence1=_emocontext_text,
     splits=["train", None, "test"],
     dataset_name="oneonlee/cleansed_emocontext", task_id="emo/emo2019")
 
-# rating is the share of 5 raters who found the query a well-formed question; keep clear cases
-google_wellformed_query = Classification("content", question="Is this search query a well-formed question?",
-    labels=lambda x: ["not well-formed", "well-formed"][x["rating"] >= 0.8],
-    pre_process=lambda ds: ds.filter(lambda x: not 0.2 < x["rating"] < 0.8),
+# rating is the share of 5 raters who found the query a well-formed question; the hard view keeps clear cases
+google_wellformed_query = SoftLabeling("content", labels="rating", kind="noul",
+    options=["not well-formed", "well-formed"], hard=0.8,
+    question="Is this search query a well-formed question?",
+    soft_question="What fraction of raters would judge this search query to be a well-formed question?",
     dataset_name="tasksource/google_wellformed_query")
 
 tweets_hate_speech_detection = Classification(sentence1="tweet", labels="label", splits=["train", None, None])
@@ -1020,11 +1020,12 @@ synthetic_instruct = MultipleChoice('prompt', choices=['chosen', 'rejected'],
 
 scruples = Classification("text",labels="binarized_label", question="Was the author in the right or in the wrong?",dataset_name="tasksource/scruples")
 
-wouldyourather = MultipleChoice(constant(''), choices=['option_a','option_b'], question="Which would most people rather do?",
-    labels= lambda x: int(x['votes_a']<x['votes_b']),
-    # clear majorities only: at least 100 votes and twice as many for the winner
-    pre_process=lambda ds: ds.filter(lambda x: x['votes_a'] + x['votes_b'] >= 100
-                                     and max(x['votes_a'], x['votes_b']) >= 2 * min(x['votes_a'], x['votes_b'])),
+# poll vote shares; at least 100 votes, and the hard view keeps two-to-one majorities
+wouldyourather = SoftLabeling(constant(''), labels=lambda x: [x['votes_a'], x['votes_b']],
+    options=lambda x: [x['option_a'], x['option_b']], hard=2/3,
+    question="Which would most people rather do?",
+    soft_question="A poll asked people which they would rather do. Which option would a randomly chosen respondent pick?",
+    pre_process=lambda ds: ds.filter(lambda x: x['votes_a'] + x['votes_b'] >= 100),
     dataset_name="tasksource/wouldyourather")
 
 
@@ -1889,6 +1890,21 @@ helpsteer_3___preference = MultipleChoice(lambda x: render_dialogue(x['context']
     pre_process=lambda ds: ds.filter(lambda x: x["overall_preference"] != 0),  # 0 is a tie
     dataset_name="nvidia/HelpSteer3", config_name="preference")
 
+HELPSTEER3_PREFERENCE = ["-3: Response 1 is much better", "-2: Response 1 is better", "-1: Response 1 is slightly better",
+                         "0: About the same", "1: Response 2 is slightly better", "2: Response 2 is better",
+                         "3: Response 2 is much better"]
+
+def render_helpsteer3_pair(x):
+    return (f"Conversation:\n{render_dialogue(x['context'])}\n\n"
+            f"Response 1:\n{x['response1']}\n\nResponse 2:\n{x['response2']}")
+
+# each annotator's preference, not only the aggregate
+helpsteer_3___individual_preferences = SoftLabeling(render_helpsteer3_pair, kind="score",
+    labels=lambda x: [[p["score"] for p in x["individual_preference"]].count(level) for level in range(-3, 4)],
+    options=HELPSTEER3_PREFERENCE, replaces=("HelpSteer3/preference",),
+    question="Which response is the better next assistant reply, and by how much?",
+    dataset_name="nvidia/HelpSteer3", config_name="preference", task_id="HelpSteer3/individual_preferences")
+
 helpsteer_3___principle = Classification(
     lambda x: f"{render_dialogue(x['context'])}\n\nAssistant: {x['response']}",
     lambda x: f"Does the assistant reply satisfy this principle: {x['principle']}?",
@@ -1904,23 +1920,23 @@ HELPFULNESS = ["not helpful", "slightly helpful", "partially helpful", "mostly h
 _HELPFULNESS = re.compile(r"^\W*The response is (not|slightly|partially|mostly|perfectly) helpful", re.I)
 
 def _helpsteer3_feedback(dataset):
-    # each annotator critique opens with a helpfulness level; keep the majority level
+    # each annotator critique opens with a helpfulness level; count the levels of each response
     def rows(split):
         for x in split:
             for i in ("1", "2"):
-                levels = [m.group(1).lower() for m in map(_HELPFULNESS.match, x[f"feedback{i}"]) if m]
-                level, votes = Counter(levels).most_common(1)[0] if levels else (None, 0)
-                if votes >= 2:
+                levels = [f"{m.group(1).lower()} helpful" for m in map(_HELPFULNESS.match, x[f"feedback{i}"]) if m]
+                if len(levels) >= 2:
                     yield dict(context=x["context"], response=x[f"response{i}"],
-                               helpfulness=HELPFULNESS.index(f"{level} helpful"))
+                               helpfulness=[levels.count(level) for level in HELPFULNESS])
     return DatasetDict({name: Dataset.from_generator(rows, gen_kwargs=dict(split=split))
-                        .cast_column("helpfulness", ClassLabel(names=HELPFULNESS))
                         for name, split in dataset.items()})
 
-helpsteer_3___feedback = Classification(
+# annotators' helpfulness levels; the hard view keeps the majority level (two of three)
+helpsteer_3___feedback = SoftLabeling(
     lambda x: f"{render_dialogue(x['context'])}\n\nAssistant: {x['response']}",
-    labels="helpfulness", pre_process=_helpsteer3_feedback, dataset_name="nvidia/HelpSteer3", config_name="feedback",
-    question="How helpful is the assistant reply?", ordinal=True)
+    labels="helpfulness", kind="score", options=HELPFULNESS, hard=0.6, ordinal=True,
+    pre_process=_helpsteer3_feedback, dataset_name="nvidia/HelpSteer3", config_name="feedback",
+    question="How helpful is the assistant reply?")
 
 msci_nli = Classification('sentence1','sentence2','label',dataset_name='sadat2307/MSciNLI')
 
@@ -1992,3 +2008,17 @@ def _html_text(html_text):
 issue_similarity = Classification(lambda x: _html_text(x["text1"]), lambda x: _html_text(x["text2"]), "label",
     dataset_name="WhereIsAI/github-issue-similarity",
     label_values={0: "dissimilar issues", 1: "similar issues"})
+
+# Family Feud survey counts over answer clusters (the most frequent eight); no single right answer, so soft
+# labels only. Train only: the validation questions are ProtoQA's evaluation set.
+def _protoqa_top(x, n=8):
+    clusters = x["answer-clusters"]
+    return sorted(zip(clusters["count"], (a[0] for a in clusters["answers"])), key=lambda c: -c[0])[:n]
+
+proto_qa = SoftLabeling(lambda x: x["normalized-question"].strip().capitalize(),
+    labels=lambda x: [count for count, _ in _protoqa_top(x)], options=lambda x: [a for _, a in _protoqa_top(x)],
+    question="People were surveyed with this question. Considering only respondents who gave one of these "
+             "answers, which answer would a randomly chosen one have given?",
+    pre_process=lambda ds: ds.filter(lambda x: len(x["answer-clusters"]["count"]) >= 2
+                                     and sum(x["answer-clusters"]["count"]) >= 20),
+    splits=["train", None, None], dataset_name="community-datasets/proto_qa", config_name="proto_qa")

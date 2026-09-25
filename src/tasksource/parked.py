@@ -109,14 +109,6 @@ code_x_glue_cc_code_refinement = MultipleChoice(
     constant(""), choices=["buggy","fixed"], labels=constant(0),
     config_name="medium")
 
-# every option is a valid answer; gold is only the most popular
-proto_qa = MultipleChoice(
-    "question",
-    choices_list=lambda x:x['answer-clusters']['answers'],
-    labels=lambda x: x['answer-clusters']['count'].index(max(x['answer-clusters']['count'])),
-    config_name='proto_qa'
-)
-
 # HC3 human answers are PTB-tokenized (a trivial shortcut); script-only loader
 def _preprocess_chatgpt_detection(ex):
      import random
@@ -314,7 +306,6 @@ PARKED = {
     'blog_authorship_corpus__horoscope': ('unsound', 'horoscope is not predictable from text'),
     'code_x_glue_cc_clone_detection_big_clone_bench': ('impractical', 'in bigbench, too heavy (100GB)'),
     'code_x_glue_cc_code_refinement': ('unsound', 'constant label, not a real task'),
-    'proto_qa': ('unsound', 'every option is a valid answer; gold is only the most popular'),
     'chatgpt_detection': ('unsound', 'HC3 human answers are PTB-tokenized (a trivial shortcut); script-only loader'),
     'attempto_nli': ('unsound', 'unclear label semantics'),
     'mega_acceptability': ('duplicate', 'regression target; acceptability is covered by other tasks'),

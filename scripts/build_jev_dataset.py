@@ -37,7 +37,7 @@ from tasksource.jev.length import LengthBudget
 from tasksource.jev.options import gold_position_violations
 
 
-SUPPORTED_TYPES = {"Classification", "MultipleChoice", "TokenClassification"}
+SUPPORTED_TYPES = {"Classification", "MultipleChoice", "TokenClassification", "SoftLabeling"}
 PUBLISH_EXCLUDED_PREFIXES = ("bigbench/", "mmlu/", "blimp/")
 JEV_TOKEN_TASKS = {
     "conll2003/ner_tags", "wnut_17/wnut_17",
@@ -234,11 +234,14 @@ def append_report(path, record):
 def to_training_row(example, index, task_id, split):
     """Convert the lossless internal recast to the common Jev training schema."""
     options = list(example["criteria"])
-    label = int(example["label"])
-    if not 0 <= label < len(options):
-        raise ValueError(f"{task_id}:{split}:{index}: label {label} outside {len(options)} options")
-    target = [0.0] * len(options)
-    target[label] = 1.0
+    if "target" in example:  # soft labels: the distribution itself
+        target = list(example["target"])
+    else:
+        label = int(example["label"])
+        if not 0 <= label < len(options):
+            raise ValueError(f"{task_id}:{split}:{index}: label {label} outside {len(options)} options")
+        target = [0.0] * len(options)
+        target[label] = 1.0
     source_row = example.get("source_row", index)
     question_id = example.get("question_id", "decision")
     group_id = f"{slug(task_id)}:{split}:{source_row}"
@@ -507,7 +510,8 @@ def row_format(source, formats=None):
         return "procedural"
     if source.startswith(graded.SOURCE_PREFIX):
         return "graded"
-    return (formats or {}).get(source, "Classification")
+    task_type = (formats or {}).get(source, "Classification")
+    return "graded" if task_type == "SoftLabeling" else task_type
 
 
 def format_budgets(sizes, max_rows, shares):
@@ -880,11 +884,11 @@ def covered_by_graded(task):
 
 
 def select_tasks(args):
-    frame = list_tasks(instruct=True)
+    frame = list_tasks(instruct=True, soft=True)
     frame["multilingual"] = False
     frame["source_id"] = frame.id
     if not args.english_only:
-        multilingual = list_tasks(multilingual=True, instruct=True)
+        multilingual = list_tasks(multilingual=True, instruct=True, soft=True)
         multilingual["multilingual"] = True
         multilingual["source_id"] = "multilingual/" + multilingual.id
         frame = pd.concat([frame, multilingual], ignore_index=True)

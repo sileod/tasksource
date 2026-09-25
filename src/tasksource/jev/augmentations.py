@@ -47,8 +47,8 @@ def augment_jev_internal(
     augmented = []
     existing_ids = set(dataset["id"])
     for row in dataset:
-        # Natively authored questions keep their wording and typed kinds.
-        if (row["variant"] != "direct" or row["kind"] != "choice"
+        # Natively authored questions keep their wording and typed kinds; soft targets are not verifiable.
+        if (row["variant"] != "direct" or row["kind"] != "choice" or max(row["target"]) < 1.0
                 or row["source"].startswith((procedural.SOURCE_PREFIX, graded.SOURCE_PREFIX))):
             continue
         options = row["options"]

@@ -19,10 +19,7 @@ Inputs are kept raw by default. When the inputs alone do not say what to predict
 
 Browse the 500+ curated tasks in tasks.md (tasks kept out on purpose, such as evaluation benchmarks, are in [parked.py](https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py) with the reason) (200+ MultipleChoice tasks, 200+ Classification tasks), and feel free to request a new task. Datasets are downloaded to `$HF_DATASETS_CACHE` (like any Hugging Face dataset), so ensure you have more than 100GB of space available.
 
-You can now also use:
-```python
-load_dataset("tasksource/data", "glue/rte",max_rows=30_000)
-```
+Some annotations are distributions rather than single labels: annotator votes, rater shares, survey counts. These `SoftLabeling` annotations load as probabilities with `load_task(id, soft=True)` (`labels` over `options`); most also have a hard view, their majority label on rows with clear agreement, which is what `load_task(id)` and the default `list_tasks()` give. `list_tasks(soft=True)` lists the soft views, including annotations that only make sense as distributions (e.g. ProtoQA survey answers). They are listed at the end of tasks.md.
 
 ### Pretrained models:
 

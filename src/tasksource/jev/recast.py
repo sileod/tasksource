@@ -8,7 +8,7 @@ import ftfy
 from datasets import ClassLabel, DatasetDict, List, Sequence
 
 from .augmentations import stable_fraction
-from .options import permute_choices
+from .options import choice_permutation, normalize_all_none, permute_choices
 from .ordinal import asks_score, scale_order
 from .questions import default_question
 from .prompt_augmentations import TOKEN_INSTRUCTION
@@ -126,7 +126,38 @@ def _token_state(tokens, target_index):
     )
 
 
-def recast_jev(dataset, task=None, question=None, ordinal=False):
+def _recast_soft(dataset, task, question, kind, row_options):
+    """SoftLabeling rows keep their distribution as ``target``; per-row choice
+    options are permuted like multiple-choice criteria, fixed ones keep their order."""
+    if kind not in ("noul", "score", "choice"):
+        raise ValueError(f"soft labels need a kind (noul, score or choice), got {kind!r}")
+    paired = "sentence2" in dataset["train"].features
+
+    def convert(example, index, split):
+        raw = _keeps_raw_text(task, split, index)
+        state = clean_text(example["sentence1"], raw)
+        if paired:
+            state = f"text_A: {state}\ntext_B: {clean_text(example['sentence2'], raw)}"
+        criteria, target = [_strip(clean_text(o, raw)) for o in example["options"]], list(example["labels"])
+        identifier = f"{task or ''}:{split}:{index}"
+        if row_options:
+            reworded = normalize_all_none(criteria)
+            order = choice_permutation(reworded, identifier)
+            if order is not None:
+                criteria, target = [reworded[i] for i in order], [target[i] for i in order]
+        return {"state": state, "instructions": question or JEV_CLASSIFICATION_INSTRUCTIONS,
+                "criteria": criteria, "target": target, "task": task or "", "kind": kind}
+
+    converted = DatasetDict({
+        split: rows.map(convert, with_indices=True, fn_kwargs={"split": split})
+        .filter(lambda row: row["kind"] == "noul" or _valid_criteria(row["criteria"]))
+        for split, rows in dataset.items()
+    })
+    keep = {"state", "instructions", "criteria", "target", "task", "kind"}
+    return converted.remove_columns([c for c in converted["train"].column_names if c not in keep])
+
+
+def recast_jev(dataset, task=None, question=None, ordinal=False, kind=None, row_options=False):
     """Recast a standardized Tasksource dataset as runtime-defined choices.
 
     The output is model- and wire-format-independent. ``criteria`` contains
@@ -136,7 +167,9 @@ def recast_jev(dataset, task=None, question=None, ordinal=False):
     augmentation is otherwise deliberately separate. The annotation's
     ``question``, when set, replaces the generic choice instruction.
     Ordinal label sets (``ordinal=True`` or a known scale) are put in scale
-    order and about half their rows get ``kind="score"``.
+    order and about half their rows get ``kind="score"``. Soft labels
+    (SoftLabeling, whose ``kind`` is passed) keep their distribution as ``target``;
+    ``row_options`` marks options that vary per row, which are permuted.
     """
     if not isinstance(dataset, DatasetDict):
         raise TypeError("recast_jev expects a datasets.DatasetDict")
@@ -144,6 +177,8 @@ def recast_jev(dataset, task=None, question=None, ordinal=False):
         raise ValueError("recast_jev expects a train split")
 
     features = dataset["train"].features
+    if kind is not None:
+        return _recast_soft(dataset, task, question, kind, row_options)
     task_type = _jev_task_type(features)
     labels = features.get("labels")
 

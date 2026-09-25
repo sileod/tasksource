@@ -1,6 +1,7 @@
 from collections.abc import Iterable
 from dotwiz import DotWiz
 from dataclasses import dataclass, field
+import dataclasses
 from typing import Union
 import itertools
 import re
@@ -287,6 +288,157 @@ class TokenClassification(SharedFields, TokenClassificationFields): pass
 
 @dataclass
 class Seq2SeqLM(SharedFields, Seq2SeqLMFields): pass
+
+
+SOFT_KINDS = ("noul", "score", "choice")
+_TOLERANCE = 1e-9  # shares like 2/3 or 1 - 0.8 must pass their own threshold
+
+
+def soft_target(value, kind, n_options=None, low=0, high=1, step=1):
+    """A raw label as a probability distribution, or None when missing or out of range.
+
+    ``value`` is vote counts (a list, normalized), a fraction or mean rating
+    (``noul``: rescaled from ``[low, high]`` to one probability), or a level
+    (``score``/``choice``: one-hot at ``(value - low) / step``)."""
+    if value is None or (isinstance(value, float) and np.isnan(value)):
+        return None
+    if isinstance(value, (list, tuple)):
+        total = sum(value)
+        return [v / total for v in value] if total else None
+    if kind == "noul":
+        return [(value - low) / (high - low)] if low <= value <= high else None
+    index = round((value - low) / step)
+    return [float(i == index) for i in range(n_options)] if 0 <= index < n_options else None
+
+
+@dataclass
+class SoftLabelingFields(Preprocessing):
+    sentence1:str='sentence1'
+    sentence2:str='sentence2'
+    labels:str='labels'
+    options:str='options'
+
+@dataclass
+class SoftLabelingView(SharedFields, SoftLabelingFields):
+    """The soft view of a SoftLabeling annotation, as loaded: ``labels`` is a distribution over ``options``."""
+
+
+@dataclass
+class SoftLabelingSpec(Preprocessing):
+    sentence1:object='sentence1'
+    sentence2:object=None
+    labels:object='labels'
+    kind:str='choice'
+    options:object=None
+    low:float=0
+    high:float=1
+    step:float=1
+    hard:float=None
+    soft_question:str=None
+    replaces:tuple=()
+
+
+@dataclass
+class SoftLabeling(SharedFields, SoftLabelingSpec):
+    """An annotation whose label is a distribution: annotator votes, rater shares, survey counts.
+
+    Loaded with ``soft=True``, rows have ``sentence1``/``sentence2``, ``labels``
+    (probabilities) and ``options`` (their names; empty for ``noul``). ``kind`` says
+    what the distribution is over:
+
+    - ``noul``: one probability, e.g. the share of raters who said yes;
+    - ``score``: ordered levels (``options``), e.g. votes over a rating scale;
+    - ``choice``: named options, fixed (a list) or per row (a column or function).
+
+    With ``hard`` (the least agreement kept, above 0.5), the annotation also has a
+    hard view, loaded by default: the majority label, on rows where at least that
+    share agrees. ``noul`` then needs ``options=[no, yes]``; per-row options give a
+    MultipleChoice task and fixed ones a Classification. Without ``hard`` the
+    labels are only meaningful as distributions, and ``list_tasks`` lists the task
+    only with ``soft=True``. ``soft_question`` asks for the distribution when the
+    hard ``question`` asks for the majority. ``replaces`` names hard task ids that
+    the soft view supersedes (``list_tasks(soft=True)`` leaves them out).
+    """
+
+    def __post_init__(self):
+        super().__post_init__()
+        if self.kind not in SOFT_KINDS:
+            raise ValueError(f"kind must be one of {SOFT_KINDS}, got {self.kind!r}")
+        if self.hard is not None and not 0.5 < self.hard <= 1:
+            raise ValueError("hard is the least majority share kept, in (0.5, 1]")
+        if self.hard is not None and self.kind == "noul" and len(self.options or ()) != 2:
+            raise ValueError("a noul hard view needs options=[no, yes]")
+        if self.kind != "choice" and not isinstance(self.options, (list, tuple, type(None))):
+            raise ValueError("only choice options may vary per row")
+
+    @property
+    def per_row_options(self):
+        return self.kind == "choice" and not isinstance(self.options, (list, tuple))
+
+    @property
+    def hard_type(self):
+        """The task type of the hard view, or None for soft labels only."""
+        if self.hard is None:
+            return None
+        return "MultipleChoice" if self.per_row_options else "Classification"
+
+    @staticmethod
+    def _read(field, x):
+        return x[field] if isinstance(field, str) else field(x)
+
+    def _soft(self, x):
+        if self.kind == "noul":
+            options = []
+        else:
+            options = [str(o) for o in (self._read(self.options, x) if self.per_row_options else self.options)]
+        target = soft_target(self._read(self.labels, x), self.kind, len(options), self.low, self.high, self.step)
+        if target is not None and self.kind != "noul" and len(target) != len(options):
+            target = None
+        return {"_soft": target or [], "_options": options}
+
+    def _prepare(self, dataset):
+        """The annotation's pre_process, then each row's distribution; rows without one are dropped."""
+        dataset = self.pre_process(dataset)
+        def add(rows):
+            if not hasattr(rows, "features") or rows.features is None:  # streaming
+                return rows.map(self._soft).filter(lambda x: len(x["_soft"]) > 0)
+            features = rows.features.copy()
+            features["_soft"] = datasets.List(datasets.Value("float64"))
+            features["_options"] = datasets.List(datasets.Value("string"))
+            return rows.map(self._soft, features=features).filter(lambda x: len(x["_soft"]) > 0)
+        return type(dataset)({split: add(rows) for split, rows in dataset.items()})
+
+    def _agrees(self, x):
+        target = x["_soft"]
+        top = max(target[0], 1 - target[0]) if self.kind == "noul" else max(target)
+        return top >= self.hard - _TOLERANCE
+
+    def view(self, soft=True):
+        """The loadable task: SoftLabelingView, or the hard Classification/MultipleChoice."""
+        shared = {f.name: getattr(self, f.name) for f in dataclasses.fields(SharedFields)}
+        shared["pre_process"] = self._prepare
+        if soft:
+            shared["question"] = self.soft_question or self.question
+            return SoftLabelingView(sentence1=self.sentence1, sentence2=self.sentence2 or "sentence2",
+                                    labels="_soft", options="_options", **shared)
+        if self.hard is None:
+            raise ValueError("this annotation has soft labels only; load it with soft=True")
+        shared["pre_process"] = lambda dataset: self._prepare(dataset).filter(self._agrees)
+        if self.kind == "noul":
+            label = lambda x: int(x["_soft"][0] >= self.hard - _TOLERANCE)
+        else:
+            label = lambda x: int(np.argmax(x["_soft"]))
+        if self.per_row_options:
+            return MultipleChoice(inputs=self.sentence1, choices_list="_options", labels=label, **shared)
+        shared["label_values"] = dict(enumerate(self.options))
+        return Classification(sentence1=self.sentence1, sentence2=self.sentence2 or "sentence2",
+                              labels=label, **shared)
+
+    def load(self, soft=False):
+        return self.view(soft).load()
+
+    def __call__(self, dataset, *args, soft=False, **kwargs):
+        return self.view(soft)(dataset, *args, **kwargs)
 
 get=dotgetter()
 constant = pretty(fc.constantly)
