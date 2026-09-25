@@ -1782,9 +1782,17 @@ _HELPSTEER_SCALES = dict(helpfulness=("not helpful", "extremely helpful"),
     correctness=("mostly incorrect", "fully correct and complete"), coherence=("incoherent", "perfectly clear"),
     complexity=("basic competency", "deep domain expertise"), verbosity=("very terse", "very verbose"))
 
+def render_helpsteer_prompt(prompt):
+    """HelpSteer2 multi-turn prompts separate turns with ``<extra_id_1>User``/``Assistant`` lines."""
+    parts = re.split(r"\n?<extra_id_1>(User|Assistant)\n", prompt)
+    if len(parts) == 1:
+        return prompt
+    turns = [("user", parts[0])] + list(zip(parts[1::2], parts[2::2]))
+    return render_dialogue([{"role": role, "content": content.strip()} for role, content in turns])
+
 def _helpsteer(attribute, dataset_name):
     low, high = _HELPSTEER_SCALES[attribute]
-    return Classification("prompt", "response", name(attribute, [f"0: {low}", "1", "2", "3", f"4: {high}"]),
+    return Classification(lambda x: render_helpsteer_prompt(x["prompt"]), "response", name(attribute, [f"0: {low}", "1", "2", "3", f"4: {high}"]),
         dataset_name=dataset_name, question=f"How would you rate the {attribute} of the response?")
 
 helpsteer__helpfulness = _helpsteer("helpfulness", "nvidia/HelpSteer")

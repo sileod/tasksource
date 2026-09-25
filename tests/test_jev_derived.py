@@ -73,7 +73,10 @@ class MultipleChoicePermutationTest(unittest.TestCase):
                       ["red", "blue", "A and B"], ["I only", "II only", "I and III only"],
                       ["x", "y", "statements 1, 2 and 4"], ["x", "y", "A, B, and C"]):
             self.assertEqual(permute_choices(fixed, 0, "x"), (fixed, 0), fixed)
-        for free in (["Vitamin A and B12", "iron", "zinc"], ["Plan B", "Plan C", "none of them"]):
+        for free in (["Vitamin A and B12", "iron", "zinc"], ["Plan B", "Plan C", "none of them"],
+                     # long free-text options (PRM800K solutions, chat replies) are not references
+                     ["So x = 5.\n\n# Answer\n\n5", "So x = 4.\n\n# Answer\n\n4"],
+                     ["See option (a) in the settings menu, then restart the app. " * 3, "Reinstall it."]):
             self.assertIsNotNone(choice_permutation(free, "x"), free)
         long_list = ",\n    ".join("63294342545525455533") + ",\n\nAre you seeking an essay?"
         self.assertIsNotNone(choice_permutation([long_list, "no"], "x"))  # no catastrophic backtracking

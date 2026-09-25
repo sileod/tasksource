@@ -52,10 +52,22 @@ def normalize_all_none(criteria):
     return list(criteria[:-1]) + [f"{lead}{word} of the other options{tail}"]
 
 
+# Options that point at other options are short, one-line answers; a long free-text
+# option (a solution ending in "# Answer\n\n5", a chat reply) mentioning "answer 5"
+# or "option (a)" is not about its neighbours.
+MAX_REFERRING_OPTION_CHARS = 120
+
+
+def refers_to_other_options(text):
+    if "\n" in text or len(text) > MAX_REFERRING_OPTION_CHARS:
+        return False
+    return bool(POSITIONAL_OPTION.search(text) or REFERENTIAL_OPTION.search(text))
+
+
 def choice_permutation(criteria, identifier):
     """Return a new slot order, or ``None`` when options must keep their order."""
     texts = [str(option) for option in criteria]
-    if any(POSITIONAL_OPTION.search(t) or REFERENTIAL_OPTION.search(t) for t in texts):
+    if any(refers_to_other_options(t) for t in texts):
         return None
     return sorted(range(len(texts)), key=lambda index: stable_fraction(identifier, f"mc-option-{index}"))
 

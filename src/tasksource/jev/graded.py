@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from datasets import DatasetDict, load_dataset
 
 from ..preprocess import fix_splits, sample_dataset
-from ..tasks import render_dialogue
+from ..tasks import render_dialogue, render_helpsteer_prompt
 
 SOURCE_PREFIX = "graded/"
 
@@ -90,7 +90,8 @@ SIMILARITY = "How similar in meaning are the sentences, from 0 (unrelated) to 1 
 
 FAMILIES = {
     "helpsteer": Family("nvidia/HelpSteer", {"Prompt": "prompt", "Response": "response"}, HELPSTEER),
-    "helpsteer2": Family("nvidia/HelpSteer2", {"Prompt": "prompt", "Response": "response"}, HELPSTEER),
+    "helpsteer2": Family("nvidia/HelpSteer2", {"Prompt": "prompt", "Response": "response"}, HELPSTEER,
+                         prepare=lambda x: {"prompt": render_helpsteer_prompt(x["prompt"])}),
     "helpsteer3": Family("nvidia/HelpSteer3", {"Conversation": "dialogue", "Response 1": "response1",
                                                "Response 2": "response2"}, dict(
         preference=score("overall_preference", "Which response is the better next assistant reply, and by how much?",

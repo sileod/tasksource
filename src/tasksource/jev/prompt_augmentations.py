@@ -6,6 +6,7 @@ the decision request; they must never add facts, uncertainty, or label meaning.
 
 CLASSIFICATION_INSTRUCTION = "Choose the criterion that best describes the state."
 MULTIPLE_CHOICE_INSTRUCTION = "Choose the criterion that best answers the question."
+TOKEN_INSTRUCTION = "Choose the criterion that best labels the target token."
 
 GENERIC_CLASSIFICATION = (
     "Select the label that best applies to the state.",

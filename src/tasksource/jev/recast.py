@@ -9,6 +9,7 @@ from datasets import ClassLabel, DatasetDict, List, Sequence
 
 from .augmentations import stable_fraction
 from .options import permute_choices
+from .prompt_augmentations import TOKEN_INSTRUCTION
 from .token_labels import (
     MAX_JEV_TOKENS_PER_SEQUENCE,
     normalize_token_label,
@@ -22,6 +23,8 @@ JEV_MULTIPLE_CHOICE_INSTRUCTIONS = "Choose the criterion that best answers the q
 
 _LINE_BREAK = re.compile(r"</?br\s*/?>", re.IGNORECASE)
 _ENTITY = re.compile(r"&(?:amp|lt|gt|quot|apos|#39|#x27);")
+# entities whose "&" became a space upstream (AG News: "UK #39;s", "Royal  amp; Sun")
+_SPACED_ENTITY = re.compile(r" (amp|lt|gt|quot|#\d{2,4});")
 
 
 def clean_text(text):
@@ -32,7 +35,7 @@ def clean_text(text):
     text = _LINE_BREAK.sub("\n", ftfy.fix_encoding(text))
     for _ in range(2):  # tweets are sometimes escaped twice (&amp;amp;)
         text = _ENTITY.sub(lambda m: html.unescape(m.group(0)), text)
-    return text
+    return _SPACED_ENTITY.sub(lambda m: html.unescape(f"&{m.group(1)};"), text)
 
 
 def _strip(text):
@@ -210,9 +213,7 @@ def recast_jev(dataset, task=None, question=None):
                 ):
                     label = int(token_labels[token_index])
                     output["state"].append(_token_state(tokens, token_index))
-                    output["instructions"].append(
-                        "Choose the criterion that best labels the target token."
-                    )
+                    output["instructions"].append(TOKEN_INSTRUCTION)
                     output["criteria"].append(criteria)
                     output["label"].append(label)
                     output["answer"].append(criteria[label])
