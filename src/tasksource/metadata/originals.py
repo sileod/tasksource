@@ -11,6 +11,8 @@ by scripts/upload_repackaged.py) or a task switches to a mirror.
 """
 
 ORIGINALS = {
+    # third-party mirrors
+    "bogdanminko/wildguardmix-cleaned": ["allenai/wildguardmix"],
     # re-uploaded under tasksource/
     "tasksource/blog_authorship_corpus": ["barilan/blog_authorship_corpus"],
     "tasksource/chaos-mnli-ambiguity": [],  # ChaosNLI is only on GitHub/Dropbox

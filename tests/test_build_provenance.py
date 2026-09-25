@@ -96,5 +96,30 @@ class CatalogApiTest(unittest.TestCase):
         self.assertEqual(load_preprocessing(id="glue/rte").config_name, "rte")
 
 
+class SafetySplitTest(unittest.TestCase):
+    def test_grouped_split_keeps_prompts_on_one_side(self):
+        from datasets import Dataset, DatasetDict
+        from tasksource.tasks import _wildguardmix
+        rows = Dataset.from_dict({"prompt": [f"p{i // 2}" for i in range(4000)], "response": ["r"] * 4000,
+                                  "prompt_harm_label": ["harmful"] * 4000})
+        split = _wildguardmix(DatasetDict(train=rows))
+        prompts = {name: set(part["prompt"]) for name, part in split.items()}
+        self.assertFalse(prompts["train"] & (prompts["validation"] | prompts["test"]))
+        self.assertTrue(all(len(part) for part in split.values()))
+        one = _wildguardmix(DatasetDict(train=rows), one_row_per_prompt=True)
+        self.assertEqual(sum(map(len, one.values())), 2000)
+
+    def test_beavertails_votes(self):
+        from datasets import Dataset, DatasetDict
+        from tasksource.tasks import _beavertails_majority
+        from tasksource.jev.graded import _beavertails_votes
+        rows = Dataset.from_dict({"prompt": ["p"] * 3 + ["q"] * 3, "response": ["r"] * 3 + ["s"] * 3,
+                                  "category": [{}] * 6, "is_safe": [True, True, False, False, False, True]})
+        majority = _beavertails_majority(DatasetDict({"330k_train": rows}))["330k_train"]
+        self.assertEqual(sorted(zip(majority["prompt"], majority["is_safe"])), [("p", True), ("q", False)])
+        votes = _beavertails_votes(DatasetDict({"330k_train": rows, "330k_test": rows}))["train"]
+        self.assertEqual(sorted(zip(votes["prompt"], votes["unsafe_share"])), [("p", 1 / 3), ("q", 2 / 3)])
+
+
 if __name__ == "__main__":
     unittest.main()

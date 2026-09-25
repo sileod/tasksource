@@ -10,7 +10,7 @@ import ast
 import math
 from dataclasses import dataclass
 
-from datasets import DatasetDict, load_dataset
+from datasets import Dataset, DatasetDict, load_dataset
 
 from ..preprocess import fix_splits, sample_dataset
 from ..tasks import render_dialogue, render_helpsteer_prompt
@@ -67,6 +67,7 @@ class Family:
     prepare: object = None  # row map adding the state columns
     dedupe: str = None  # column whose repeats are dropped (one row per annotator upstream)
     load_kwargs: dict = None  # e.g. the Hub parquet export of a script-only dataset
+    pre_process: object = None  # DatasetDict -> DatasetDict, e.g. one row per item from per-annotator rows
 
 
 HELPSTEER = dict(
@@ -134,6 +135,15 @@ def _dynasent_votes(example):
     return {"votes": [len(annotators.get(label, [])) for label in DYNASENT]}
 
 
+def _beavertails_votes(dataset):
+    """One row per (prompt, response) with the share of its three annotators who judged it unsafe."""
+    def votes(rows):
+        frame = rows.to_pandas()
+        frame["unsafe_share"] = frame.groupby(["prompt", "response"]).is_safe.transform(lambda safe: (~safe).sum() / len(safe))
+        return Dataset.from_pandas(frame.drop_duplicates(["prompt", "response"]), preserve_index=False)
+    return DatasetDict(train=votes(dataset["330k_train"]), test=votes(dataset["330k_test"]))
+
+
 def _share_of_yes(example):
     return {"share": example["soft_label"][1]}
 
@@ -198,6 +208,9 @@ FAMILIES = {
         disagreement=noul("disagreement_rate", f"How much would annotators disagree about {topic}, "
                                                "from 0 (all agree) to 1 (maximal disagreement)?")),
         dedupe="text") for name, topic in DISAGREEMENT.items()},
+    "beavertails": Family("PKU-Alignment/BeaverTails", {"Prompt": "prompt", "Response": "response"}, dict(
+        unsafe=noul("unsafe_share", "What fraction of annotators judged the assistant response unsafe?")),
+        pre_process=_beavertails_votes),
     "unli": Family("Zhengping/UNLI", PREMISE, dict(
         probability=noul("label", "How likely is the hypothesis to be true, given the premise?"))),
     **{f"dynasent_{r}": Family("dynabench/dynasent", {"Sentence": "sentence"}, dict(
@@ -270,6 +283,8 @@ def load_family(name, max_rows=None, max_rows_eval=None, revision=None):
     family = FAMILIES[name]
     kwargs = {**(family.load_kwargs or {}), **({"revision": revision} if revision else {})}
     dataset = DatasetDict(load_dataset(family.dataset, family.config, **kwargs))
+    if family.pre_process:
+        dataset = family.pre_process(dataset)
     if family.dedupe:
         dataset = DatasetDict({split: rows.select(
             rows.to_pandas().drop_duplicates(family.dedupe).index.tolist()) for split, rows in dataset.items()})

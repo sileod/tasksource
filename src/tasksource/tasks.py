@@ -1,6 +1,7 @@
 from .preprocess import cat, get, regen, name, constant, Classification, TokenClassification, MultipleChoice
 from .metadata import udep_en_configs
-from datasets import get_dataset_config_names, Sequence, ClassLabel, Dataset, DatasetDict, Features, Value
+from datasets import get_dataset_config_names, Sequence, ClassLabel, Dataset, DatasetDict, Features, Value, concatenate_datasets
+import hashlib
 import html
 from collections import Counter
 import random
@@ -1623,25 +1624,58 @@ shell_risk = Classification(
     dataset_name="kontext-security/ShellRisk-Bench",
     question="Is this shell command risky?")
 
+def split_by_group(dataset, key, validation=0.05, test=0.05):
+    """Re-split every row by a stable hash of ``key(row)``, so a group (e.g. all rows
+    sharing a prompt) never straddles train and evaluation."""
+    def split_of(row):
+        fraction = int(hashlib.sha256(key(row).encode("utf-8")).hexdigest()[:8], 16) / 16 ** 8
+        return "test" if fraction < test else "validation" if fraction < test + validation else "train"
+    rows = concatenate_datasets(list(dataset.values()))
+    splits = rows.map(lambda row: {"_split": split_of(row)})["_split"]
+    return DatasetDict({name: rows.select([i for i, s in enumerate(splits) if s == name])
+                        for name in ("train", "validation", "test")})
+
+# The mirror has one train split with two responses per prompt: split by prompt, so no
+# evaluation prompt is seen in training (a random split put 90% of them there).
+def _wildguardmix(dataset, one_row_per_prompt=False):
+    dataset = split_by_group(dataset, lambda row: row["prompt"])
+    if one_row_per_prompt:  # prompt labels never conflict across a prompt's rows
+        dataset = DatasetDict({split: rows.select(rows.to_pandas().drop_duplicates("prompt").index.tolist())
+                               for split, rows in dataset.items()})
+    return dataset
+
 wildguardmix__prompt_harm = Classification(
     "prompt", labels="prompt_harm_label",
     dataset_name="bogdanminko/wildguardmix-cleaned",
+    pre_process=lambda ds: _wildguardmix(ds, one_row_per_prompt=True),
     question="Is this user prompt harmful?")
 
 wildguardmix__response_harm = Classification(
     "prompt", "response", labels="response_harm_label",
-    dataset_name="bogdanminko/wildguardmix-cleaned",
+    dataset_name="bogdanminko/wildguardmix-cleaned", pre_process=_wildguardmix,
     question="Is the assistant response harmful?")
 
 wildguardmix__response_refusal = Classification(
     "prompt", "response", labels="response_refusal_label",
-    dataset_name="bogdanminko/wildguardmix-cleaned",
+    dataset_name="bogdanminko/wildguardmix-cleaned", pre_process=_wildguardmix,
     question="Does the assistant response refuse the request?")
+
+# BeaverTails annotates each (prompt, response) three times, one row per annotation;
+# keep one row per pair with the majority judgment (the vote share is graded/beavertails).
+def _beavertails_majority(dataset):
+    def majority(rows):
+        frame = rows.to_pandas()
+        frame["safe_votes"] = frame.groupby(["prompt", "response"]).is_safe.transform("mean")
+        frame = frame.drop_duplicates(["prompt", "response"])
+        frame["is_safe"] = frame.safe_votes > 0.5  # three votes: never a tie
+        return Dataset.from_pandas(frame.drop(columns="safe_votes"), preserve_index=False)
+    return DatasetDict({split: majority(rows) for split, rows in dataset.items()})
 
 beavertails_safety = Classification(
     "prompt", "response", labels=name("is_safe", ["unsafe", "safe"]),
     dataset_name="PKU-Alignment/BeaverTails",
     splits=["330k_train", None, "330k_test"],
+    pre_process=_beavertails_majority,
     question="Is the assistant response safe?")
 
 
