@@ -118,3 +118,24 @@ class SafetySplitTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ResumeAtomicityTest(unittest.TestCase):
+    def test_latest_failure_voids_an_earlier_success(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            data_dir, report = Path(tmp), Path(tmp) / "build-report.jsonl"
+            (data_dir / f"train-{slug('t')}.parquet").touch()
+            records = [{"task": "t", "status": "ok", "rows": {"train": 1}, "fingerprint": "f"},
+                       {"task": "t", "status": "error"}]
+            report.write_text("".join(json.dumps(r) + "\n" for r in records))
+            self.assertEqual(read_completed(report, data_dir, "f"), (set(), set()))
+
+
+class PinTest(unittest.TestCase):
+    def test_hf_urls_point_at_pinned_commits(self):
+        from tasksource.access import pin_hf_urls
+        files = {"train": ["hf://datasets/a/b/x.parquet", "hf://datasets/a/b@refs%2Fconvert%2Fparquet/y/*.parquet"],
+                 "test": "hf://datasets/c/d/z.jsonl"}
+        pinned = pin_hf_urls(files, {"a/b": "abc123"})
+        self.assertEqual(pinned["train"], ["hf://datasets/a/b@abc123/x.parquet", "hf://datasets/a/b@abc123/y/*.parquet"])
+        self.assertEqual(pinned["test"], "hf://datasets/c/d/z.jsonl")  # no pin: unchanged

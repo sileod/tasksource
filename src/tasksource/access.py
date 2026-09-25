@@ -155,6 +155,19 @@ def _format_loader_kwargs(value, **context):
         return {k: _format_loader_kwargs(v, **context) for k, v in value.items()}
     return value
 
+_HF_URL = re.compile(r"hf://datasets/([\w.-]+/[\w.-]+)(?:@[^/\s'\"]+)?/")
+
+def pin_hf_urls(value, pins):
+    """Point ``hf://datasets/owner/repo[@ref]/...`` data-file URLs at the commits in ``pins`` ({repo: sha})."""
+    if isinstance(value, str):
+        return _HF_URL.sub(lambda m: f"hf://datasets/{m.group(1)}@{pins[m.group(1)]}/"
+                           if pins.get(m.group(1)) else m.group(0), value)
+    if isinstance(value, (list, tuple)):
+        return type(value)(pin_hf_urls(v, pins) for v in value)
+    if isinstance(value, dict):
+        return {k: pin_hf_urls(v, pins) for k, v in value.items()}
+    return value
+
 def load_preprocessing(tasks=tasks, **kwargs):
     df = list_tasks(multilingual=tasks==lmtasks)
     matches = df[np.logical_and.reduce([df[k] == v for k, v in kwargs.items()] + [np.ones(len(df), bool)])]
@@ -172,8 +185,11 @@ def load_preprocessing(tasks=tasks, **kwargs):
 
 def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preprocessing_name=None,
          max_rows=None, max_rows_eval=None, multilingual=False, instruct=False,
-         recast=None, prompted=False, seed=0, **load_dataset_kwargs):
+         recast=None, prompted=False, seed=0, data_file_pins=None, **load_dataset_kwargs):
     """Load a standardized task.
+
+    ``data_file_pins`` ({repo: commit}) pins the task's ``hf://`` data files, as
+    ``revision`` pins its Hub dataset.
 
     ``prompted=True`` appends the annotation's ``question`` to the inputs;
     otherwise the instruct and Jev recasts use it as their instruction. The
@@ -194,6 +210,7 @@ def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preproc
         copy.deepcopy(preprocessing.load_dataset_kwargs),
         config_name=preprocessing.config_name or "",
     )
+    source_kwargs = pin_hf_urls(source_kwargs, data_file_pins or {})
     source_kwargs.update(load_dataset_kwargs)
     source_config = preprocessing.config_name
     if preprocessing.dataset_name in {"csv", "json", "text", "parquet"}:

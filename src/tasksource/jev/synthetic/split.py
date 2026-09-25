@@ -5,9 +5,9 @@ questions — all questions/variants of a state stay together).
 
 The OOD split is a genuine domain x skill compositional holdout: a
 deterministic band of (domain, skill) pairs is held out, and EVERY
-bundle containing a held-out pair goes to ``ood``. Held-out pairs
-therefore never appear in train — verified by ``verify_splits`` and
-reported in ``split_report.json``.
+family with a bundle containing a held-out pair goes to ``ood``, so
+held-out pairs never appear in train and no family straddles splits;
+both are verified by ``verify_splits`` and reported in ``split_report.json``.
 """
 
 from __future__ import annotations
@@ -46,15 +46,21 @@ def _family_split(bundle: dict, split_cfg) -> str:
     return "test"
 
 
-def assign_split(bundle: dict, split_cfg, held_out: set[tuple[str, str]] | None = None) -> str:
-    if held_out and bundle_pairs(bundle) & held_out:
+def ood_families(bundles: list[dict], held_out: set[tuple[str, str]]) -> set[str]:
+    """Families with at least one bundle touching a held-out pair: all of them go to ood."""
+    return {family_id(bundle) for bundle in bundles if bundle_pairs(bundle) & held_out}
+
+
+def assign_split(bundle: dict, split_cfg, ood: set[str] | None = None) -> str:
+    if ood and family_id(bundle) in ood:
         return "ood"
     return _family_split(bundle, split_cfg)
 
 
 def assign_splits(bundles: list[dict], split_cfg) -> list[dict]:
     held_out = held_out_pairs(bundles, split_cfg.ood_fraction, split_cfg.seed_salt)
-    return [{**bundle, "split": assign_split(bundle, split_cfg, held_out)} for bundle in bundles]
+    ood = ood_families(bundles, held_out)
+    return [{**bundle, "split": assign_split(bundle, split_cfg, ood)} for bundle in bundles]
 
 
 def verify_splits(bundles: list[dict], ood_fraction: float, salt: str) -> dict:
@@ -62,6 +68,12 @@ def verify_splits(bundles: list[dict], ood_fraction: float, salt: str) -> dict:
     held_out = held_out_pairs(
         [{k: b.get(k) for k in ("domain", "questions")} for b in bundles],
         ood_fraction, salt)
+    family_splits: dict[str, set[str]] = {}
+    for bundle in bundles:
+        family_splits.setdefault(family_id(bundle), set()).add(bundle.get("split", "?"))
+    straddling = sorted(family for family, splits in family_splits.items() if len(splits) > 1)
+    if straddling:
+        raise ValueError(f"Families split across splits: {straddling[:10]}")
     train_pairs: set[tuple[str, str]] = set()
     ood_pairs: set[tuple[str, str]] = set()
     counts: dict[str, int] = {}

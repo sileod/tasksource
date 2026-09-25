@@ -324,12 +324,27 @@ class SplitTest(unittest.TestCase):
         self.assertGreater(report["n_held_out_pairs"], 0)
         self.assertGreater(report["split_counts"].get("ood", 0), 0)
         held = set(report["held_out_pairs"])
+        held_families = {split_mod.family_id(b) for b in assigned
+                         if {f"{d}::{s}" for d, s in split_mod.bundle_pairs(b)} & held}
         for bundle in assigned:
             pairs = {f"{d}::{s}" for d, s in split_mod.bundle_pairs(bundle)}
-            if bundle["split"] == "ood":
-                self.assertTrue(pairs & held)
+            if bundle["split"] == "ood":  # the whole family of a held-out pair goes to ood
+                self.assertIn(split_mod.family_id(bundle), held_families)
             if bundle["split"] == "train":
                 self.assertFalse(pairs & held)
+
+    def test_ood_takes_whole_families(self):
+        cfg = _cfg()
+        family = {"domain": "d", "scenario_type": "t", "style": "s"}
+        skills = [f"skill{i}" for i in range(200)]
+        bundles = [{**family, "state_id": f"s{i}", "questions": [{"skill": skill}]} for i, skill in enumerate(skills)]
+        held = split_mod.held_out_pairs(bundles, cfg.split.ood_fraction, cfg.split.seed_salt)
+        self.assertTrue(held)  # some of this family's (domain, skill) pairs are held out
+        assigned = split_mod.assign_splits(bundles, cfg.split)
+        self.assertEqual({b["split"] for b in assigned}, {"ood"})
+        with self.assertRaises(ValueError):
+            split_mod.verify_splits([{**bundles[0], "split": "train"}, {**bundles[1], "split": "ood"}],
+                                    cfg.split.ood_fraction, cfg.split.seed_salt)
 
 
 class SelectTest(unittest.TestCase):

@@ -276,12 +276,15 @@ def jev_rows(example, family, source, split, index):
     return rows
 
 
-def load_family(name, max_rows=None, max_rows_eval=None, revision=None):
+def load_family(name, max_rows=None, max_rows_eval=None, revision=None, data_file_pins=None):
     """Grouped Jev rows per split, split and sampled like any Tasksource source.
 
-    ``revision`` pins the source commit, overriding the family's requested ref."""
+    ``revision`` pins the source commit, overriding the family's requested ref;
+    ``data_file_pins`` ({repo: commit}) pins ``hf://`` data files."""
+    from ..access import pin_hf_urls
     family = FAMILIES[name]
-    kwargs = {**(family.load_kwargs or {}), **({"revision": revision} if revision else {})}
+    kwargs = {**pin_hf_urls(family.load_kwargs or {}, data_file_pins or {}),
+              **({"revision": revision} if revision else {})}
     dataset = DatasetDict(load_dataset(family.dataset, family.config, **kwargs))
     if family.pre_process:
         dataset = family.pre_process(dataset)

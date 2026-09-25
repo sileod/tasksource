@@ -44,11 +44,12 @@ JEV_TOKEN_TASKS = {
 }
 
 
-def load_jev_task(row, max_rows, max_rows_eval, revision=None):
-    """``revision`` pins the task's Hub dataset to the commit recorded in the build report."""
+def load_jev_task(row, max_rows, max_rows_eval, revision=None, data_file_pins=None):
+    """``revision`` and ``data_file_pins`` pin the task's Hub dataset and ``hf://``
+    data files to the commits recorded in the build report."""
     return load_task(
         row.id, recast="jev", multilingual=row.multilingual,
-        max_rows=max_rows, max_rows_eval=max_rows_eval,
+        max_rows=max_rows, max_rows_eval=max_rows_eval, data_file_pins=data_file_pins,
         **({"revision": revision} if revision else {}),
     )
 
@@ -66,10 +67,11 @@ NATIVE_SOURCES = (
 )
 
 
-def load_native_task(source_id, max_rows, max_rows_eval, revision=None):
+def load_native_task(source_id, max_rows, max_rows_eval, revision=None, data_file_pins=None):
     """Sources authored as typed Jev questions, grouped by state (no recast)."""
     if source_id.startswith(graded.SOURCE_PREFIX):
-        rows = graded.load_family(source_id[len(graded.SOURCE_PREFIX):], max_rows, max_rows_eval, revision)
+        rows = graded.load_family(source_id[len(graded.SOURCE_PREFIX):], max_rows, max_rows_eval,
+                                  revision, data_file_pins)
     else:
         dataset = load_dataset(procedural.REPO_ID, source_id[len(procedural.SOURCE_PREFIX):], revision=revision)
         dataset = sample_dataset(dataset, max_rows, max_rows_eval)
@@ -124,22 +126,19 @@ def read_completed(report_path, data_dir=None, fingerprint=None):
     """Tasks whose latest successful shards exist; with ``fingerprint``, return
     ``(completed, stale)``: ``stale`` tasks have shards from another fingerprint."""
     completed, stale = set(), set()
-    if report_path.exists():
-        for line in report_path.read_text().splitlines():
-            record = json.loads(line)
-            if record["status"] != "ok":
-                continue
-            task = record["task"]
-            splits = record.get("rows", {})
-            if data_dir is None or (
-                splits and all(
-                    (data_dir / f"{split}-{slug(task)}.parquet").exists()
-                    for split in splits
-                )
-            ):
-                current = fingerprint is None or record.get("fingerprint") == fingerprint
-                (completed if current else stale).add(task)
-                (stale if current else completed).discard(task)
+    # only a task's latest record counts: a later failed rebuild voids an earlier success
+    for task, record in latest_records(report_path).items():
+        if record["status"] != "ok":
+            continue
+        splits = record.get("rows", {})
+        if data_dir is None or (
+            splits and all(
+                (data_dir / f"{split}-{slug(task)}.parquet").exists()
+                for split in splits
+            )
+        ):
+            current = fingerprint is None or record.get("fingerprint") == fingerprint
+            (completed if current else stale).add(task)
     return completed if fingerprint is None else (completed, stale)
 
 
@@ -956,6 +955,7 @@ def build(args):
             continue
         started = time.time()
         print(f"[{position}/{len(tasks)}] build {task_id}", flush=True)
+        partial = {}  # every split goes to a partial file, renamed only once all splits succeed
         try:
             max_rows = args.max_rows
             max_rows_eval = args.max_rows_eval
@@ -966,15 +966,16 @@ def build(args):
             provenance = source_provenance(task_id)
             pins = resolve_revisions(provenance)
             loaded = pins.get(provenance.get("dataset"))
+            file_pins = {repo: pins.get(repo) for repo in provenance.get("data_files_from", []) if pins.get(repo)}
             if row.task_type == "NativeJev":
-                dataset = load_native_task(task_id, max_rows, max_rows_eval, loaded)
+                dataset = load_native_task(task_id, max_rows, max_rows_eval, loaded, file_pins)
             else:
-                dataset = load_jev_task(row, max_rows, max_rows_eval, loaded)
+                dataset = load_jev_task(row, max_rows, max_rows_eval, loaded, file_pins)
             split_rows = {}
             for split, split_dataset in dataset.items():
                 if row.task_type == "NativeJev":
-                    path = data_dir / f"{split}-{slug(task_id)}.parquet"
-                    split_dataset.to_parquet(path)
+                    partial[split] = data_dir / f".{split}-{slug(task_id)}.parquet.partial"
+                    split_dataset.to_parquet(partial[split])
                     split_rows[split] = len(split_dataset)
                     continue
                 split_dataset = split_dataset.map(
@@ -995,9 +996,15 @@ def build(args):
                     args.permutation_rate, args.prompt_rate,
                     args.paired_format_rate,
                 )
-                path = data_dir / f"{split}-{slug(task_id)}.parquet"
-                split_dataset.to_parquet(path)
+                partial[split] = data_dir / f".{split}-{slug(task_id)}.parquet.partial"
+                split_dataset.to_parquet(partial[split])
                 split_rows[split] = len(split_dataset)
+            for split in ("train", "validation", "test"):
+                final = data_dir / f"{split}-{slug(task_id)}.parquet"
+                if split in partial:
+                    partial.pop(split).replace(final)
+                else:
+                    final.unlink(missing_ok=True)  # a split an earlier build had and this one lacks
             record = {
                 "task": task_id,
                 "task_type": row.task_type,
@@ -1010,6 +1017,8 @@ def build(args):
             }
             completed.add(task_id)
         except Exception as error:
+            for path in partial.values():
+                path.unlink(missing_ok=True)
             record = {
                 "task": task_id,
                 "task_type": row.task_type,
