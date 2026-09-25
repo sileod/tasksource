@@ -85,7 +85,9 @@ xglue___qadsm = Classification('query','ad_description','relevance_label', quest
     dataset_name="tasksource/xglue", config_name="qadsm")
 xglue___qam = Classification('question','answer','label', question="Does the passage answer the query?",
     dataset_name="tasksource/xglue", config_name="qam")
-xglue___wpr = Classification('query','web_page_snippet','relavance_label', question="How relevant is the web page to the query?",
+xglue___wpr = Classification(
+    "query", "web_page_snippet", "relavance_label",
+    question="How relevant is the web page to the query?", ordinal=True,
     dataset_name="tasksource/xglue", config_name="wpr") # relavance_label : sic
 
 xlwic = Classification(
