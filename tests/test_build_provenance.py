@@ -12,9 +12,6 @@ from tasksource.jev.recast import render_typed_decision, render_typed_decision_g
 from tasksource.tasks import _intent_grasp_keep
 from scripts.build_jev_dataset import build_fingerprint, read_completed, slug, source_provenance
 
-STATE = {"git_commit": "abc", "uncommitted_sha256": "0"}
-
-
 def _args(**overrides):
     values = dict(max_rows=1000, max_rows_eval=100, noul_rate=0.05, score_rate=0.0, permutation_rate=0.05,
                   prompt_rate=0.05, paired_format_rate=0.05, pack_rate=0.1, pack_max_tokens=4096,
@@ -23,13 +20,11 @@ def _args(**overrides):
 
 
 class ResumeTest(unittest.TestCase):
-    def test_fingerprint_tracks_code_and_shard_settings_only(self):
-        base = build_fingerprint(_args(), STATE)
-        self.assertNotEqual(base, build_fingerprint(_args(max_rows=30000), STATE))
-        self.assertNotEqual(base, build_fingerprint(_args(), {**STATE, "git_commit": "def"}))
-        self.assertNotEqual(base, build_fingerprint(_args(), {**STATE, "uncommitted_sha256": "1"}))
+    def test_fingerprint_tracks_shard_settings_only(self):
+        base = build_fingerprint(_args())
+        self.assertNotEqual(base, build_fingerprint(_args(max_rows=30000)))
         # where the output goes or whether it uploads does not change shard contents
-        self.assertEqual(base, build_fingerprint(_args(output=Path("b"), upload=True), STATE))
+        self.assertEqual(base, build_fingerprint(_args(output=Path("b"), upload=True)))
 
     def test_shards_from_another_fingerprint_are_stale(self):
         with tempfile.TemporaryDirectory() as tmp:

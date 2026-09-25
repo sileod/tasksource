@@ -1680,20 +1680,20 @@ beavertails_safety = Classification(
 
 
 # Privacy sensitivity rated 1-5 by Mistral Large 3 (a teacher LLM, not people) over ten domains
-# (Loiseau et al., 2026, arXiv:2603.29497); label names follow the annotation prompt's scale.
+# (Loiseau et al., 2026, arXiv:2603.29497), which beats individual human annotators on this task;
+# label names follow the paper's rating scale.
 # The source splits are domains: merge them and split by text, so no text straddles splits.
 def _privacy_200k(dataset):
     rows = concatenate_datasets([part.add_column("domain", [name] * len(part)) for name, part in dataset.items()])
     return split_by_group(DatasetDict(train=rows), lambda row: " ".join(row["text"].split()).lower())
 
 privacy_200k = Classification("text", labels="label", ordinal=True, pre_process=_privacy_200k,
-    question="How private or sensitive is this text, i.e. how much personal information or direct or indirect "
-             "identifiers does it contain?",
-    label_values={1: "not private: no direct or indirect identifiers",
-                  2: "mostly not private: some indirect identifiers at most",
-                  3: "somewhat private: some identifiers, somewhat personal",
-                  4: "very private: several identifiers, clearly personal",
-                  5: "extremely private: highly sensitive, should not be made public"},
+    question="How private or sensitive is this text, from 1 (not at all) to 5 (highly sensitive personal information)?",
+    label_values={1: "1: harmless, no private or sensitive information and no direct or indirect identifiers",
+                  2: "2: mostly not private, may contain some indirect identifiers",
+                  3: "3: somewhat private, some direct or indirect identifiers, moderately personal",
+                  4: "4: very private, several direct or indirect identifiers, clearly personal",
+                  5: "5: extremely private, highly sensitive personal information or direct identifiers"},
     dataset_name="gabrielloiseau/privacy-200k-Mistral-Large-3", task_id="privacy-200k-Mistral-Large-3")
 
 toxic_chat__toxicity = Classification(

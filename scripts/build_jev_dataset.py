@@ -92,8 +92,9 @@ def slug(task_id):
     return f"{readable}-{digest}"
 
 
-# Arguments that change what a task's shards contain; with the code state they form the
-# build fingerprint, so a resumed build never mixes shards from different settings or code.
+# Arguments that change what a task's shards contain: the build fingerprint, so a resumed build
+# never mixes shards built with different settings. The code state is recorded per shard
+# (report "code") but not enforced: any commit would otherwise invalidate every shard.
 SHARD_PARAMETERS = ("max_rows", "max_rows_eval", "noul_rate", "score_rate", "permutation_rate", "prompt_rate",
                     "paired_format_rate", "pack_rate", "pack_max_tokens", "pack_tokenizer", "pack_max_items")
 
@@ -113,9 +114,9 @@ def code_state():
     return {"git_commit": _git("rev-parse", "HEAD").decode().strip(), "uncommitted_sha256": digest.hexdigest()}
 
 
-def build_fingerprint(args, state=None):
+def build_fingerprint(args):
     shard_args = {name: getattr(args, name, None) for name in SHARD_PARAMETERS}
-    payload = json.dumps({**(state or code_state()), **shard_args}, sort_keys=True, default=str)
+    payload = json.dumps(shard_args, sort_keys=True, default=str)
     return hashlib.sha256(payload.encode()).hexdigest()[:16]
 
 
@@ -931,7 +932,7 @@ def build(args):
     stale &= set(tasks.source_id)
     if stale and not (args.finalize_only or args.reuse_incompatible_shards):
         raise SystemExit(
-            f"{len(stale)} task shards in {output} come from other code or settings (build fingerprint "
+            f"{len(stale)} task shards in {output} were built with other settings (build fingerprint "
             f"{fingerprint} differs), e.g. {sorted(stale)[:3]}. Use a fresh --output, or pass "
             "--reuse-incompatible-shards to keep them (build-manifest.json records their fingerprints).")
     if args.reuse_incompatible_shards:
@@ -1003,6 +1004,7 @@ def build(args):
                 "status": "ok",
                 "rows": split_rows,
                 "fingerprint": fingerprint,
+                "code": code_state(),
                 "revisions": pins,
                 "seconds": round(time.time() - started, 3),
             }
