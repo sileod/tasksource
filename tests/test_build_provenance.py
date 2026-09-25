@@ -13,7 +13,7 @@ from tasksource.jev.recast import render_typed_decision, render_typed_decision_g
 from tasksource.multilingual_tasks import xglue___wpr
 from tasksource.tasks import _intent_grasp_keep
 from scripts.build_jev_dataset import (
-    build_fingerprint, filter_request_lengths, read_completed, slug, source_provenance,
+    build_fingerprint, filter_request_lengths, read_completed, slug, source_license, source_provenance,
 )
 
 def _args(**overrides):
@@ -115,6 +115,25 @@ class RequestLengthBudgetTest(unittest.TestCase):
         filtered, dropped = filter_request_lengths(
             rows, max_bytes=10_000, budget=LengthBudget(128, Tokenizer(), overhead=0))
         self.assertEqual((len(filtered), dropped), (0, 1))
+
+
+class LicenseTest(unittest.TestCase):
+    def test_most_restrictive_license_wins(self):
+        info = {"dataset": "a/copy", "originals": ["b/original"]}
+        self.assertEqual(source_license("x", info, {"a/copy": ["mit"], "b/original": ["cc-by-nc-4.0"]})["license_use"],
+                         "non-commercial")
+        self.assertEqual(source_license("x", info, {"a/copy": ["mit"]})["license_use"], "commercial")
+        for unclassified in (["other"], ["cc"], ["cc-by-nd-4.0"], []):
+            self.assertEqual(source_license("x", info, {"a/copy": unclassified})["license_use"], "unspecified")
+
+    def test_dpi_annotations(self):
+        # DPI records the SILICONE corpora as non-commercial although the Hub card says CC BY-SA
+        meld = source_license("silicone/meld_e", {"dataset": "eusip/silicone"}, {"eusip/silicone": ["cc-by-sa-4.0"]})
+        self.assertEqual((meld["license_use"], meld["license"]), ("non-commercial", "cc-by-sa-4.0, CC BY-NC-SA 4.0 (DPI)"))
+        # an annotation of the whole dataset covers its configs
+        self.assertEqual(source_license("hh-rlhf/helpful-base", {"dataset": "tasksource/hh-rlhf"}, {})["license_use"],
+                         "commercial")
+        self.assertEqual(source_license("x", {}, {}), {"license": "unspecified", "license_use": "unspecified"})
 
 
 class CatalogApiTest(unittest.TestCase):

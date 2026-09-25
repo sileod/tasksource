@@ -83,6 +83,7 @@ print(row["state"], row["question"], row["options"], row["target"])
 | `target` | Distribution over `options`, or `[p]` for `noul` |
 | `id`, `group_id`, `question_id` | Link decisions over the same source example |
 | `source`, `split`, `variant` | Originating task, original split, and recast variant |
+| `license`, `license_use` | The source's license(s), and `commercial`, `non-commercial` or `unspecified` (see below) |
 
 Splits: 2,500,000 train, 15,000 validation (`dev` in `split`), and 15,000 test,
 following each source's own train/dev/test splits where it has them.
@@ -102,14 +103,33 @@ following each source's own train/dev/test splits where it has them.
 - **Mixing.** Formats get fixed shares of the train rows (47% classification, 30% multiple choice, 3% token labeling, 10% graded (soft-label sources), 10% procedural). Within a format, dataset families get equal shares, scaled by [hand-set weights](https://github.com/sileod/tasksource/blob/main/src/tasksource/metadata/weights.py) (more for adversarial NLI, long documents and preference pairs; less for templated probes). Related questions are kept together.
   - The first 1,000 train rows are interleaved to show variety in the Dataset Viewer; the rest is shuffled.
   - Evaluation benchmarks (BIG-bench, MMLU, BLiMP, MATH test, ...) are left out so they stay clean for evaluation.
-- **Sources.** [sources.yaml](sources.yaml) lists every source with its rows, the Hub dataset and revision it was loaded from, and the original dataset behind each tasksource copy.
+- **Sources.** [sources.yaml](sources.yaml) lists every source with its rows, the Hub dataset and revision it was loaded from, the original dataset behind each tasksource copy, and its licenses.
 - **Audit trail.** The [source mix](release-audit.json), [failed source list](failed-tasks.json), and [build manifest](build-manifest.json) ship with the data.
 - **Reproducible.** The [build runbook](https://github.com/sileod/tasksource/blob/main/docs/jev/README.md) rebuilds the release from [Tasksource](https://github.com/sileod/tasksource)'s [task catalog](https://github.com/sileod/tasksource/blob/main/tasks.md).
 
 ## License and scope
 
 Tasksource harmonizes datasets from many publishers; their original licenses
-and terms still apply, hence `license: other`. This recast is independent of
+and terms still apply, hence `license: other`.
+
+Each row carries its source's license, to help filter:
+
+```python
+ds = ds.filter(lambda use: use == "commercial", input_columns="license_use")
+```
+
+- `license` lists the `license` of the Hub dataset card the source was loaded from,
+  and of the original dataset behind a tasksource copy. It also lists licenses recorded
+  by the [Data Provenance Initiative](https://www.dataprovenance.org/), marked `(DPI)`.
+- `license_use` takes the most restrictive of those: `non-commercial` if any is
+  non-commercial or academic-only, `commercial` if one allows commercial use (share-alike
+  and copyleft included), and `unspecified` otherwise. That covers missing licenses and
+  `other`, bare `cc`, and no-derivatives licenses.
+- [sources.yaml](sources.yaml) records each card and DPI license per source.
+
+This is a best-effort aid, not legal advice. Licenses on cards can be wrong or
+incomplete, and a source's terms may differ from its card's. Check the
+original terms before relying on them. This recast is independent of
 TypeSafe and OpenJev.
 
 ## Citation

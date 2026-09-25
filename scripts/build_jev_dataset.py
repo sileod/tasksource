@@ -16,16 +16,19 @@ import subprocess
 import sys
 import time
 from collections import Counter, deque
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from datasets import Dataset, DatasetDict, Features, List, Value, concatenate_datasets, load_dataset
 from huggingface_hub import HfApi
+from huggingface_hub.errors import GatedRepoError, RepositoryNotFoundError
 import numpy as np
 import pandas as pd
 import yaml
 from tasksource import list_tasks, load_task, task_provenance
 from tasksource.preprocess import sample_dataset
 from tasksource.metadata.weights import task_weight
+from tasksource.metadata.dpi_licenses import LICENSE_USE as DPI_USE, REPO_LICENSES as DPI_REPOS, TASK_LICENSES as DPI_TASKS
 from tasksource.jev.augmentations import augment_jev_internal, stable_fraction
 from tasksource.jev.prompt_augmentations import (
     published_pair_style, published_question_style,
@@ -716,6 +719,9 @@ def publish_dataset(
     })
     if "train" in dataset:
         dataset["train"] = pretty_order(dataset["train"], pretty_rows)
+    licenses = source_licenses(sorted({source for rows in dataset.values()
+                                       for source in set(rows.select_columns(["source"])[:]["source"])}))
+    dataset = DatasetDict({split: add_license_columns(rows, licenses) for split, rows in dataset.items()})
     release_audit = {
         "repo_id": repo_id, "requested_rows": publish_rows,
         "requested_eval_rows": eval_rows,
@@ -751,6 +757,7 @@ def publish_dataset(
             "families": dict(sorted(family_counts.items())),
             "kinds": dict(sorted(Counter(metadata["kind"]).items())),
             "variants": dict(sorted(Counter(metadata["variant"]).items())),
+            "license_use": dict(sorted(Counter(licenses[source]["license_use"] for source in metadata["source"]).items())),
         }
         print(f"Publish {split}: {len(rows)} rows, {len(set(metadata['source']))} sources", flush=True)
         if split == "train":
@@ -779,7 +786,7 @@ def publish_dataset(
         json.dumps(release_audit, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
-    write_sources_yaml(output / "sources.yaml", release_audit, latest_records(output / "build-report.jsonl"))
+    write_sources_yaml(output / "sources.yaml", release_audit, latest_records(output / "build-report.jsonl"), licenses)
     api = HfApi()
     api.upload_file(
         path_or_fileobj=str(output / "README.md"),
@@ -819,7 +826,87 @@ def source_provenance(source):
     return task_provenance(source)
 
 
-def write_sources_yaml(path, release_audit, records=None):
+# Hub card license ids (lowercase) whose terms allow commercial use; share-alike and
+# copyleft included. Anything else (cc, other, no-derivatives, custom) stays unclassified.
+PERMISSIVE_LICENSE = re.compile(
+    r"^(apache|mit|bsd|cc0|cc-by-\d|cc-by-sa-\d|odc-by|odbl|pddl|afl|gpl|lgpl|agpl|artistic|cdla|ecl|epl|mpl"
+    r"|isc|unlicense|wtfpl|bigscience|openrail|creativeml-openrail|llama2|llama3)")
+NON_COMMERCIAL_LICENSE = re.compile(r"(^|-)nc(-|$)|academic|research")
+DPI_LICENSE_USE = {"All": "commercial", "NC": "non-commercial", "Acad": "non-commercial"}
+
+
+def card_license_use(license):
+    if NON_COMMERCIAL_LICENSE.search(license):
+        return "non-commercial"
+    return "commercial" if PERMISSIVE_LICENSE.match(license) else None
+
+
+def dpi_license_use(license):
+    # "No License" means all rights reserved, whatever DPI's class says
+    return None if license == "No License" else DPI_LICENSE_USE.get(DPI_USE.get(license))
+
+
+def fetch_card_licenses(repos):
+    """The ``license`` of each Hub dataset card, as a list (``unknown`` dropped)."""
+    api = HfApi()
+
+    def read(repo):
+        for attempt in range(3):
+            try:
+                card = api.dataset_info(repo).card_data
+                break
+            except (GatedRepoError, RepositoryNotFoundError):  # no readable card
+                return repo, []
+            except Exception:
+                if attempt == 2:
+                    raise
+                time.sleep(5)
+        value = (card or {}).get("license") if card else None
+        values = value if isinstance(value, list) else [value]
+        return repo, [str(v).lower() for v in values if v and str(v).lower() != "unknown"]
+
+    with ThreadPoolExecutor(16) as pool:
+        return dict(pool.map(read, sorted(repos)))
+
+
+def source_license(source, info, cards):
+    """License of one source from the cards of the repos it loads (and their originals) and
+    Data Provenance Initiative annotations. ``license_use`` takes the most restrictive
+    classified license: non-commercial, else commercial, else unspecified."""
+    repos = [r for r in [info.get("dataset"), *info.get("data_files_from", []), *info.get("originals", [])] if r]
+    card = {repo: cards[repo] for repo in repos if cards.get(repo)}
+    task = source.removeprefix("multilingual/")
+    # DPI annotated older tasksource ids; a whole-dataset id also covers its configs
+    dpi = sorted(set(DPI_TASKS.get(task, DPI_TASKS.get(task.split("/")[0], []))).union(
+        *[DPI_REPOS.get(repo.lower(), []) for repo in repos]))
+    uses = {card_license_use(license) for licenses in card.values() for license in licenses}
+    uses |= {dpi_license_use(license) for license in dpi}
+    use = "non-commercial" if "non-commercial" in uses else "commercial" if "commercial" in uses else "unspecified"
+    names = sorted({license for licenses in card.values() for license in licenses}) + [f"{name} (DPI)" for name in dpi]
+    return {"license": ", ".join(names) or "unspecified", "license_use": use,
+            **({"card_licenses": card} if card else {}), **({"dpi_licenses": dpi} if dpi else {})}
+
+
+def source_licenses(sources):
+    provenance = {}
+    for source in sources:
+        try:
+            provenance[source] = source_provenance(source)
+        except KeyError:
+            provenance[source] = {}
+    cards = fetch_card_licenses({repo for info in provenance.values() for repo in
+                                 [info.get("dataset"), *info.get("data_files_from", []), *info.get("originals", [])]
+                                 if repo})
+    return {source: source_license(source, info, cards) for source, info in provenance.items()}
+
+
+def add_license_columns(rows, licenses):
+    sources = rows.select_columns(["source"])[:]["source"]
+    rows = rows.add_column("license", [licenses[source]["license"] for source in sources])
+    return rows.add_column("license_use", [licenses[source]["license_use"] for source in sources])
+
+
+def write_sources_yaml(path, release_audit, records=None, licenses=None):
     """Every source in the release with its rows, Hub dataset, revision and originals.
 
     Revisions are the commits each task was loaded from, recorded in the build report
@@ -840,6 +927,7 @@ def write_sources_yaml(path, release_audit, records=None):
             info["revisions"] = {repo: sha for repo, sha in recorded.items() if sha}
         elif info.get("dataset") or info.get("data_files_from"):  # URL-only sources have no Hub revision
             info["revisions_unrecorded"] = True
+        info.update((licenses or {}).get(source, {}))
         sources[source] = info
     try:
         commit = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True,
