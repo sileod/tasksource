@@ -61,7 +61,7 @@ def generate(rng, level=0):
     questions = {
         "access_allowed": {"type": "noul", "instructions": "Does the governing policy allow the requested action?"},
         "governing_policy": {"type": "choice", "instructions": "Which matching policy has the highest priority?", "criteria": {x: x for x in options}},
-        "review_risk": {"type": "score", "instructions": "Under state.review_rule, how risky is this policy outcome for automated execution?", "criteria": RISK},
+        "review_risk": {"type": "score", "instructions": "Following the review rule, how risky is this policy outcome for automated execution?", "criteria": RISK},
     }
     answers = {
         "access_allowed": noul_answer(allowed),

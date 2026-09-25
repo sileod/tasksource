@@ -64,7 +64,7 @@ def generate(rng, level=0):
         },
         "risk_direction": {
             "type": "score",
-            "instructions": "Using state.risk_rule, how did operational risk change from before to after?",
+            "instructions": "Following the risk rule, how did operational risk change from before to after?",
             "criteria": RISK,
         },
     }

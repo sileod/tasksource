@@ -40,7 +40,7 @@ def generate(rng, level=0):
         "evidence": evidence,
     }
     questions = {
-        "claim_supported": {"type": "noul", "instructions": "Under state.rule, is the claim sufficiently supported?"},
+        "claim_supported": {"type": "noul", "instructions": "Following the stated sufficiency rule, is the claim sufficiently supported?"},
         "has_conflict": {"type": "noul", "instructions": "Is there at least one valid supporting origin and at least one valid contradictory origin?"},
         "strongest_support_origin": {
             "type": "choice",

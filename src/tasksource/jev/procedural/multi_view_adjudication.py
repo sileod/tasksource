@@ -16,6 +16,19 @@ IMPACT = [
 BILLING_FLAGS = ["duplicate_charge", "invoice_mismatch", "refund_missing"]
 
 
+FEATURES = ["checkout", "login", "search", "reports", "exports", "notifications", "sync", "billing_page"]
+
+
+def _impact(workflow):
+    """Level 2 when a core feature is down without a documented workaround; level 1 when any
+    feature is down or slow; otherwise 0 (restored features no longer count)."""
+    status = {entry["feature"]: entry["status"] for entry in workflow["affected_features"]}
+    if any(status[f] == "down" and f in workflow["core_features"] and f not in workflow["workarounds"]
+           for f in status):
+        return 2
+    return int(any(s in ("down", "slow") for s in status.values()))
+
+
 def generate(rng, level=0):
     n_events = sround(4 + 1.2 * level, rng)
     n_distractors = sround(2 + 0.8 * level, rng)
@@ -64,31 +77,17 @@ def generate(rng, level=0):
         deadline_hours = rng.choice([None, 48, 72, 168])
         executive_escalation = False
 
-    if impact == 0:
+    # the level joins three lists: which features are affected and how, which are core, and
+    # which have a workaround; drawn freely, then kept when they give the chosen level
+    while True:
+        affected = rng.sample(FEATURES, rng.randint(1, 4))
         workflow = {
-            "core_blocked": False,
-            "degraded": False,
-            "workaround_available": rng.choice([True, False]),
+            "affected_features": [{"feature": f, "status": rng.choice(["down", "slow", "restored"])} for f in affected],
+            "core_features": sorted(rng.sample(FEATURES, 3)),
+            "workarounds": sorted(rng.sample(FEATURES, rng.randint(0, 3))),
         }
-    elif impact == 1:
-        if rng.random() < 0.5:
-            workflow = {
-                "core_blocked": False,
-                "degraded": True,
-                "workaround_available": rng.choice([True, False]),
-            }
-        else:
-            workflow = {
-                "core_blocked": True,
-                "degraded": True,
-                "workaround_available": True,
-            }
-    else:
-        workflow = {
-            "core_blocked": True,
-            "degraded": True,
-            "workaround_available": False,
-        }
+        if _impact(workflow) == impact:
+            break
 
     events = [
         {
@@ -107,10 +106,7 @@ def generate(rng, level=0):
         for i in range(max(0, n_distractors))
     ]
     state = {
-        "ticket": {
-            "message": "The user reports an operational issue requiring adjudication from the joined records.",
-            "channel": rng.choice(["email", "chat", "api"]),
-        },
+        "ticket": {"channel": rng.choice(["email", "chat", "api"])},
         "billing": billing,
         "account": account,
         "telemetry": telemetry,
@@ -131,8 +127,8 @@ def generate(rng, level=0):
                 "Urgent iff timeline.executive_escalation is true or timeline.deadline_hours is not null and <= 24."
             ),
             "workflow_impact": (
-                "Use level 2 when workflow.core_blocked is true and no workaround is available; level 1 when "
-                "workflow.degraded is true or core work is blocked but a workaround is available; otherwise level 0."
+                "Level 2 when a core feature is down and has no documented workaround; otherwise level 1 when any "
+                "affected feature is down or slow; otherwise level 0. Restored features are no longer affected."
             ),
             "scope": "recent_events and unrelated_records are distractors and do not override the joined current views.",
         },
@@ -140,16 +136,16 @@ def generate(rng, level=0):
     questions = {
         "intent": {
             "type": "choice",
-            "instructions": "Under state.adjudication_rules.intent, what is the primary operational issue?",
+            "instructions": "Following the intent rule, what is the primary operational issue?",
             "criteria": INTENTS,
         },
         "is_urgent": {
             "type": "noul",
-            "instructions": "Under state.adjudication_rules.urgency, is this request urgent?",
+            "instructions": "Following the urgency rule, is this request urgent?",
         },
         "workflow_impact": {
             "type": "score",
-            "instructions": "Under state.adjudication_rules.workflow_impact, how much does the issue block the user's work?",
+            "instructions": "Following the workflow impact rule, how much does the issue block the user's work?",
             "criteria": IMPACT,
         },
     }

@@ -11,7 +11,7 @@ import json
 from . import (
     arithmetic, entity_belief_tracking, event_state_reconstruction, evidence_sufficiency,
     multi_view_adjudication, needle_retrieval, partial_observation_calibration,
-    policy_applicability, record_aggregation, state_perturbation, table_lookup,
+    policy_applicability, policy_under_uncertainty, record_aggregation, state_perturbation, table_lookup,
 )
 
 TASKS = {
@@ -19,7 +19,7 @@ TASKS = {
     for module in (
         arithmetic, entity_belief_tracking, event_state_reconstruction, evidence_sufficiency,
         multi_view_adjudication, needle_retrieval, partial_observation_calibration,
-        policy_applicability, record_aggregation, state_perturbation, table_lookup,
+        policy_applicability, policy_under_uncertainty, record_aggregation, state_perturbation, table_lookup,
     )
 }
 

@@ -28,13 +28,11 @@ def generate(rng, level=0):
         "initial_locations": initial,
         "events": events,
         "belief_rule": "A move always changes the true location. An agent updates that object's believed location only when listed as a witness; otherwise the agent keeps its previous belief.",
-        "query_agent": target_agent,
-        "query_object": target_obj,
     }
     questions = {
-        "world_location": {"type": "choice", "instructions": "Where is query_object actually located after all events?", "criteria": {x: x for x in LOCATIONS}},
-        "agent_belief_location": {"type": "choice", "instructions": "Where does query_agent believe query_object is after all events?", "criteria": {x: x for x in LOCATIONS}},
-        "belief_matches_world": {"type": "noul", "instructions": "Does query_agent's final belief about query_object match the true final location?"},
+        "world_location": {"type": "choice", "instructions": f"Where is {target_obj} actually located after all events?", "criteria": {x: x for x in LOCATIONS}},
+        "agent_belief_location": {"type": "choice", "instructions": f"Where does {target_agent} believe {target_obj} is after all events?", "criteria": {x: x for x in LOCATIONS}},
+        "belief_matches_world": {"type": "noul", "instructions": f"After all events, does {target_agent} believe {target_obj} is where it actually is?"},
     }
     actual = world[target_obj]
     believed = beliefs[target_agent][target_obj]

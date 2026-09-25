@@ -1,12 +1,16 @@
 import json
 import random
+import re
 import unittest
 from collections import Counter
+from fractions import Fraction
+from itertools import product
 
 from datasets import Dataset
 
 from tasksource.jev.augmentations import augment_jev_internal
 from tasksource.jev.procedural import TASKS, jev_rows
+from tasksource.jev.procedural.policy_applicability import SENSITIVITY
 from tasksource.jev.recast import render_typed_decision_group
 from scripts.build_jev_dataset import TRAINING_FEATURES, share_cap, source_row_group
 from scripts.build_procedural_jev import build_task
@@ -24,9 +28,11 @@ def _intent(state):
 
 
 def _impact(workflow):
-    if workflow["core_blocked"] and not workflow["workaround_available"]:
+    down = {e["feature"] for e in workflow["affected_features"] if e["status"] == "down"}
+    slow = {e["feature"] for e in workflow["affected_features"] if e["status"] == "slow"}
+    if down & set(workflow["core_features"]) - set(workflow["workarounds"]):
         return 2
-    return int(workflow["degraded"] or workflow["core_blocked"])
+    return int(bool(down | slow))
 
 
 def _risk(record, rule):
@@ -36,6 +42,35 @@ def _risk(record, rule):
         + (rule["amount_threshold_points"] if record["amount"] >= rule["amount_threshold"] else 0)
         + (rule["unassigned_owner_points"] if record["owner"] == "unassigned" else 0)
     )
+
+
+def _uncertain_policy_answers(state):
+    """Brute force from the rendered state: every (role, report outcomes) world, weighted and conditioned."""
+    history = dict((plural[:-1], int(n)) for n, plural in re.findall(r"(\d+) by (\w+)", state["role_evidence"]["history"]))
+    reports = [(r["says"], Fraction(*map(int, re.findall(r"\d+", r["reliability"]))))
+               for r in state["role_evidence"]["reports"]]
+    roles = list(history)
+    joint = {}
+    for role in roles:
+        for outcomes in product(roles, repeat=len(reports)):
+            weight = Fraction(history[role], sum(history.values()))
+            for said, (_, reliability) in zip(outcomes, reports):
+                weight *= reliability if said == role else (1 - reliability) / (len(roles) - 1)
+            if list(outcomes) == [said for said, _ in reports]:
+                joint[role] = joint.get(role, 0) + weight
+    total = sum(joint.values())
+    allowed, governing = Fraction(0), {}
+    for role, weight in joint.items():
+        request = state["request"]
+        subject = {**request["subject"], "role": role}
+        matching = [p for p in state["policies"] if role in p["roles"] and subject["team"] in p["teams"]
+                    and subject["clearance"] >= p["min_clearance"] and request["action"] in p["actions"]
+                    and SENSITIVITY.index(request["resource"]["sensitivity"]) <= p["max_sensitivity"]]
+        top = max(matching, key=lambda p: p["priority"]) if matching else None
+        key = top["id"] if top else "none (default deny)"
+        governing[key] = governing.get(key, 0) + weight / total
+        allowed += weight / total if top and top["effect"] == "allow" else 0
+    return {role: weight / total for role, weight in joint.items()}, governing, allowed
 
 
 class ProceduralJevTest(unittest.TestCase):
@@ -160,6 +195,27 @@ class ProceduralJevTest(unittest.TestCase):
             top = max(i["quantity"] for i in pool)
             leaders = [i["item"] for i in pool if i["quantity"] == top]
             self.assertEqual(leaders, [a["largest_quantity"]["choice"]])
+
+    def test_uncertain_policy_gold_is_the_exact_posterior(self):
+        errors = {"prior": [], "report": []}
+        for problem in self.samples("policy_under_uncertainty", 300):
+            roles, governing, allowed = _uncertain_policy_answers(problem.state)
+            answers = problem.answers
+            self.assertAlmostEqual(answers["access_allowed"]["noul"], float(allowed), places=5)
+            for question, exact in (("requester_role", roles), ("governing_policy", governing)):
+                for option, p in answers[question]["probabilities"].items():
+                    self.assertAlmostEqual(p, float(exact.get(option, 0)), places=9)
+            # plugging a single role in, the most common one or the first report's, is clearly worse
+            history = problem.data["prior"]
+            for name, role in (("prior", max(history, key=history.get)), ("report", problem.data["reports"][0][1])):
+                plugged = _uncertain_policy_answers({**problem.state, "role_evidence": {
+                    "history": f"1 by {role}s", "reports": []}})[2]
+                errors[name].append(abs(float(plugged) - float(allowed)))
+        self.assertGreater(sum(errors["prior"]) / 300, 0.1)
+        self.assertGreater(sum(errors["report"]) / 300, 0.05)
+        sharp = sum(problem.answers["access_allowed"]["noul"] in (0.0, 1.0)
+                    for problem in self.samples("policy_under_uncertainty", 300))
+        self.assertTrue(40 < sharp < 150)  # the role is irrelevant in some problems, not most
 
     def test_table_lookup_gold_follows_tables(self):
         for problem in self.samples("table_lookup", 300):
