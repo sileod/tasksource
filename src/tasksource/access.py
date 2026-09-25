@@ -204,6 +204,8 @@ def load_preprocessing(tasks=tasks, **kwargs):
     for c in 'dataset_name','config_name':
         if not isinstance(getattr(preprocessing,c), str):
              setattr(preprocessing,c,getattr(y,c))
+    if isinstance(preprocessing.question, dict):
+        preprocessing.question = preprocessing.question.get(preprocessing.config_name)
     preprocessing.dataset_name = CANONICAL.get(preprocessing.dataset_name, preprocessing.dataset_name)
     return preprocessing
 
