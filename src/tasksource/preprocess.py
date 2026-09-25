@@ -42,6 +42,10 @@ class Preprocessing(DotWiz):
         x[target]=fn(x)
         return x
         
+    def on_sampled(self, dataset):
+        """Work deferred until rows are split and sampled (the soft view's distributions)."""
+        return dataset
+
     def load(self):
         return self(datasets.load_dataset(
             self.dataset_name, self.config_name, **self.load_dataset_kwargs))
@@ -64,6 +68,7 @@ class Preprocessing(DotWiz):
             if k not in self.default_splits:
                 del dataset[k]
         dataset = sample_dataset(dataset, max_rows, max_rows_eval,seed=seed)
+        dataset = self.on_sampled(dataset)
         
         # field annotated with a string
         substitutions = {v:k for k,v in self.to_dict().items()
@@ -428,10 +433,9 @@ class SoftLabeling(SharedFields, SoftLabelingSpec):
         return {"_soft": target or [], "_options": options, "_count": -1 if count is None else count}
 
     def _prepare(self, dataset, min_annotators=None, drop_unlabeled=True):
-        """The annotation's pre_process, then each row's distribution. Rows voted on by fewer
-        than ``min_annotators`` are dropped; unlabeled rows too, unless ``drop_unlabeled=False``
-        (the soft view drops them after splitting, so sibling annotations of one source split alike)."""
-        dataset = self.pre_process(dataset)
+        """Each row's distribution. Rows voted on by fewer than ``min_annotators`` are dropped;
+        unlabeled rows too, unless ``drop_unlabeled=False`` (the soft view drops them after
+        splitting, so sibling annotations of one source split alike)."""
         few = lambda x: bool(min_annotators) and self.aggregation == "votes" and 0 <= x["_count"] < min_annotators
         keep = lambda x: not few(x) and (len(x["_soft"]) > 0 or not drop_unlabeled)
         def add(rows):
@@ -458,17 +462,23 @@ class SoftLabeling(SharedFields, SoftLabelingSpec):
         shared = {f.name: getattr(self, f.name) for f in dataclasses.fields(SharedFields)}
         if soft:
             shared["question"] = self.soft_question or self.question
-            shared["pre_process"] = lambda dataset: self._prepare(dataset, min_annotators, drop_unlabeled=False)
             post_process = self.post_process
             shared["post_process"] = lambda dataset: post_process(dataset.filter(lambda x: len(x["labels"]) > 0))
-            return SoftLabelingView(sentence1=self.sentence1, sentence2=self.sentence2 or "sentence2",
-                                    labels="_soft", options="_options", **shared)
+            spec = self
+
+            class View(SoftLabelingView):
+                def on_sampled(self, dataset):  # distributions of the sampled rows only
+                    return spec._prepare(dataset, min_annotators, drop_unlabeled=False)
+
+            return View(sentence1=self.sentence1, sentence2=self.sentence2 or "sentence2",
+                        labels="_soft", options="_options", **shared)
         if self.regression:
             return Classification(sentence1=self.sentence1, sentence2=self.sentence2 or "sentence2",
                                   labels=self.labels, **shared)
         if self.hard is None:
             raise ValueError("this annotation has soft labels only; load it with soft=True")
-        shared["pre_process"] = lambda dataset: self._prepare(dataset).filter(self._agrees)
+        pre_process = self.pre_process
+        shared["pre_process"] = lambda dataset: self._prepare(pre_process(dataset)).filter(self._agrees)
         if self.kind == "noul":
             label = lambda x: int(x["_soft"][0] >= self.hard - _TOLERANCE)
         else:
