@@ -398,13 +398,17 @@ def pretty_order(dataset, first_rows=1_000, seed=0):
         if variants:
             first_by_variant[source].setdefault(variants[index], index)
     if variants:
+        # a source's first preview row rotates among the main variants, its second among
+        # the derived ones, so every variant shows even with two rows per source
         primary = ("direct", "instruction_paraphrase", "paired_text_format")
+        secondary = ("packed_derived", "label_verification", "criteria_permutation")
         for name in names:
-            offset = min(int(stable_fraction(name, "preview-variant") * 3), 2)
-            priority = (
-                *primary[offset:], *primary[:offset],
-                "criteria_permutation", "label_verification",
-            )
+            first = min(int(stable_fraction(name, "preview-variant") * 3), 2)
+            second = min(int(stable_fraction(name, "preview-derived") * 3), 2)
+            available = first_by_variant[name]
+            lead = [v for v in (*primary[first:], *primary[:first]) if v in available][:1]
+            derived = [v for v in (*secondary[second:], *secondary[:second]) if v in available][:1]
+            priority = (*lead, *derived, *primary, *secondary)
             chosen = [
                 first_by_variant[name][variant]
                 for variant in priority if variant in first_by_variant[name]

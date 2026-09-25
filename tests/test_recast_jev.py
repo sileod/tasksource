@@ -164,6 +164,13 @@ class RecastJevTest(unittest.TestCase):
         prefix = set(ordered["value"][:4])
         self.assertEqual(sorted(ordered["value"][4:]), [i for i in range(6) if i not in prefix])
 
+    def test_pretty_order_shows_derived_variants_with_two_rows_per_source(self):
+        variants = ["direct", "instruction_paraphrase", "packed_derived", "label_verification"]
+        names = [f"s{i}" for i in range(30)]
+        dataset = Dataset.from_dict({"source": [n for n in names for _ in variants], "variant": variants * len(names)})
+        shown = set(pretty_order(dataset, first_rows=60)["variant"][:60])
+        self.assertTrue({"packed_derived", "label_verification"} <= shown)
+
     def test_paired_public_style_keeps_related_questions_consistent(self):
         state = "text_A: Rain fell.\ntext_B: The ground is wet."
         styled, question = published_pair_style(
