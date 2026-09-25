@@ -138,9 +138,10 @@ def task_provenance(task_id, multilingual=False):
     files = sorted(refs)
     dataset = None if row.dataset_name in RAW_BUILDERS else row.dataset_name
     originals = sorted({o for key in {dataset, row.id, *files} if key for o in ORIGINALS.get(key, [])} - {dataset})
+    urls = sorted({u for u in re.findall(r"https?://[^\s'\"]+", str(kwargs))})  # non-Hub files: no revision to pin
     info = {"dataset": dataset, "config": row.config_name or None, "revision": kwargs.get("revision"),
             "data_files_from": files, "data_file_revisions": {repo: ref for repo, ref in refs.items() if ref},
-            "originals": originals}
+            "source_urls": urls, "originals": originals}
     return {k: v for k, v in info.items() if v}
 
 def _format_loader_kwargs(value, **context):

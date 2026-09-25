@@ -818,7 +818,7 @@ def write_sources_yaml(path, release_audit, records=None):
         recorded = (records.get(source) or {}).get("revisions")
         if recorded:
             info["revisions"] = {repo: sha for repo, sha in recorded.items() if sha}
-        else:
+        elif info.get("dataset") or info.get("data_files_from"):  # URL-only sources have no Hub revision
             info["revisions_unrecorded"] = True
         sources[source] = info
     try:
