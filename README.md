@@ -21,6 +21,8 @@ Browse the 500+ curated tasks in tasks.md (tasks kept out on purpose, such as ev
 
 Some annotations are distributions rather than single labels: annotator votes, rater shares, survey counts. These `SoftLabeling` annotations load as probabilities with `load_task(id, soft=True)` (`labels` over `options`); most also have a hard view, their majority label on rows with clear agreement, which is what `load_task(id)` and the default `list_tasks()` give. `list_tasks(soft=True)` lists the soft views, including annotations that only make sense as distributions (e.g. ProtoQA survey answers). Each records whether it summarizes annotator votes or mean ratings, and how many annotators judged an item: vote shares from three annotators are coarse (0, 1/3, 2/3, 1), and `min_annotators=5` leaves them out. They are listed at the end of tasks.md.
 
+Licenses are available on demand. `list_tasks(license_use="commercial")` keeps tasks whose sources allow commercial use (also `non-commercial`, `unspecified`, or a list), and `task_licenses()` gives each task's licenses and where they come from. They are read from the Hub cards of the datasets a task loads and of their originals, plus [Data Provenance Initiative](https://www.dataprovenance.org/) annotations, both snapshotted in the package (`task_licenses(fresh=True)` reads the current cards). `license_use` takes the most restrictive license found; `other`, bare `cc` and missing licenses are `unspecified`. This is a best-effort filter, not legal advice.
+
 ### Pretrained models:
 
 Text encoder pretrained on tasksource reached state-of-the-art results: [🤗/deberta-v3-base-tasksource-nli](https://hf.co/sileod/deberta-v3-base-tasksource-nli)

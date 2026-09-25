@@ -8,6 +8,7 @@ from . import tasks, recast as recast_module
 from .metadata import dataset_rank
 from .metadata.originals import ORIGINALS
 from .metadata.canonical import CANONICAL
+from .licenses import LICENSE_USES, fetch_card_licenses, source_license
 from datasets import load_dataset, Dataset, DatasetDict, IterableDatasetDict
 import funcy as fc
 import os
@@ -47,7 +48,7 @@ def pretty_name(x):
     return f"{dn}/{cn}/{tn}".replace('//','/').rstrip('/')
 
 def list_tasks(tasks_path=f'{os.path.dirname(__file__)}/tasks.py', multilingual=False, instruct=False, excluded=(),
-               soft=False, min_annotators=None):
+               soft=False, min_annotators=None, license_use=None):
     """The task catalog as a DataFrame; ``excluded`` holds substrings of task ids to leave out.
 
     ``soft=False`` lists tasks with hard labels, SoftLabeling annotations by their
@@ -58,8 +59,20 @@ def list_tasks(tasks_path=f'{os.path.dirname(__file__)}/tasks.py', multilingual=
     ``min_annotators``, vote shares recorded from fewer annotators count as hard:
     listed by their hard view if they have one, and replacing nothing.
 
+    ``license_use`` (commercial, non-commercial, unspecified, or several) keeps only
+    tasks with that use and adds ``license`` and ``license_use`` columns; see
+    ``task_licenses``.
+
     Each call returns a fresh copy, so callers may edit it without affecting later calls."""
-    return _list_tasks(tasks_path, multilingual, instruct, tuple(excluded), soft, min_annotators).copy()
+    df = _list_tasks(tasks_path, multilingual, instruct, tuple(excluded), soft, min_annotators)
+    if license_use is not None:
+        uses = {license_use} if isinstance(license_use, str) else set(license_use)
+        if uses - set(LICENSE_USES):
+            raise ValueError(f"license_use must be among {LICENSE_USES}")
+        licenses = _task_licenses(df, multilingual)
+        df = df.assign(license=[x["license"] for x in licenses], license_use=[x["license_use"] for x in licenses])
+        df = df[df.license_use.isin(uses)]
+    return df.copy()
 
 @cache
 def _list_tasks(tasks_path, multilingual, instruct, excluded, soft=False, min_annotators=None):
@@ -118,6 +131,41 @@ def _list_tasks(tasks_path, multilingual, instruct, excluded, soft=False, min_an
 
 RAW_BUILDERS = {"csv", "json", "parquet", "text"}
 
+def _task_repos(mapping, dataset_name, task_id):
+    """Repos a task loads (its dataset, hf:// data files) and the originals behind them."""
+    loaded = set(re.findall(r"hf://datasets/([\w.-]+/[\w.-]+)", str(mapping.load_dataset_kwargs)))
+    if dataset_name not in RAW_BUILDERS:
+        loaded.add(dataset_name)
+    return sorted(loaded | {o for key in loaded | {task_id} for o in ORIGINALS.get(key, [])})
+
+def _task_licenses(df, multilingual, cards=None):
+    return [source_license(("multilingual/" if multilingual else "") + i, _task_repos(m, d, i), cards)
+            for i, m, d in zip(df.id, df.mapping, df.dataset_name)]
+
+def task_licenses(task_ids=None, multilingual=False, fresh=False):
+    """License of each task: ``license``, ``license_use`` and the sources they come from.
+
+    ``license`` lists the license of the Hub card of each repo the task loads (and of the
+    original behind a tasksource copy) and the licenses recorded by the Data Provenance
+    Initiative, marked ``(DPI)``. ``license_use`` is ``non-commercial`` if any is
+    non-commercial or academic-only, else ``commercial`` if one allows commercial use,
+    else ``unspecified``. Cards come from a checked-in snapshot; ``fresh=True`` reads
+    the current cards from the Hub. A best-effort filter, not legal advice."""
+    df = _every_task(multilingual=multilingual)
+    if task_ids is not None:
+        missing = set(task_ids) - set(df.id)
+        if missing:
+            raise KeyError(f"unknown tasks: {sorted(missing)}")
+        df = df[df.id.isin(task_ids)]
+    cards = fetch_card_licenses({r for row in df.itertuples() for r in _task_repos(row.mapping, row.dataset_name, row.id)}) \
+        if fresh else None
+    licenses = _task_licenses(df, multilingual, cards)
+    return pd.DataFrame({"id": list(df.id), "dataset_name": list(df.dataset_name),
+                         "license": [x["license"] for x in licenses],
+                         "license_use": [x["license_use"] for x in licenses],
+                         "card_licenses": [x.get("card_licenses", {}) for x in licenses],
+                         "dpi_licenses": [x.get("dpi_licenses", []) for x in licenses]})
+
 def _every_task(multilingual=False):
     """Hard and soft views together: every task id, each once."""
     return pd.concat([list_tasks(multilingual=multilingual, soft=s) for s in (True, False)]).drop_duplicates("id")
@@ -136,15 +184,7 @@ def hub_datasets(task_ids=None, multilingual=None):
         if missing:
             raise KeyError(f"unknown tasks: {sorted(missing)}")
         df = df[df.id.isin(task_ids)]
-    repos = set()
-    for row in df.itertuples():
-        loaded = set(re.findall(r"hf://datasets/([\w.-]+/[\w.-]+)", str(row.mapping.load_dataset_kwargs)))
-        if row.dataset_name not in RAW_BUILDERS:
-            loaded.add(row.dataset_name)
-        repos.update(loaded)
-        for key in loaded | {row.id}:
-            repos.update(ORIGINALS.get(key, []))
-    return sorted(repos)
+    return sorted({repo for row in df.itertuples() for repo in _task_repos(row.mapping, row.dataset_name, row.id)})
 
 def task_provenance(task_id, multilingual=False):
     """Where one task's data comes from: the loading repo and config, repos read
