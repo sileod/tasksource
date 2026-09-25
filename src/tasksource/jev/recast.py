@@ -27,15 +27,27 @@ _ENTITY = re.compile(r"&(?:amp|lt|gt|quot|apos|#39|#x27);")
 _SPACED_ENTITY = re.compile(r" (amp|lt|gt|quot|#\d{2,4});")
 
 
-def clean_text(text):
+# Share of Jev rows that keep realistic source noise (escaped entities,
+# mojibake, <br>) for robustness; chosen by a stable hash of the row.
+RAW_TEXT_RATE = 0.05
+
+
+def clean_text(text, raw=False):
     """Undo encoding damage left in source text: mojibake (``â€™``, ``Ã³``),
-    HTML escaping in tweets, and ``<br>`` breaks in WikiHow contexts. Other markup stays."""
+    HTML escaping in tweets, and ``<br>`` breaks in WikiHow contexts. Other markup stays.
+    ``raw=True`` keeps that realistic noise and only restores entities whose "&" was lost."""
     if not isinstance(text, str):
         return text
+    if raw:
+        return _SPACED_ENTITY.sub(lambda m: f"&{m.group(1)};", text)  # the space was the "&"
     text = _LINE_BREAK.sub("\n", ftfy.fix_encoding(text))
     for _ in range(2):  # tweets are sometimes escaped twice (&amp;amp;)
         text = _ENTITY.sub(lambda m: html.unescape(m.group(0)), text)
     return _SPACED_ENTITY.sub(lambda m: html.unescape(f"&{m.group(1)};"), text)
+
+
+def _keeps_raw_text(task, split, index):
+    return stable_fraction(f"{task or ''}:{split}:{index}", "raw-text") < RAW_TEXT_RATE
 
 
 def _strip(text):
@@ -140,10 +152,11 @@ def recast_jev(dataset, task=None, question=None):
                 f"Classification label names must be present and unique: {criteria}"
             )
 
-        def convert(example):
-            state = clean_text(example["sentence1"])
+        def convert(example, index, split):
+            raw = _keeps_raw_text(task, split, index)
+            state = clean_text(example["sentence1"], raw)
             if "sentence2" in example:
-                state = f"text_A: {state}\ntext_B: {clean_text(example['sentence2'])}"
+                state = f"text_A: {state}\ntext_B: {clean_text(example['sentence2'], raw)}"
             label = int(example["labels"])
             return {
                 "state": state,
@@ -165,12 +178,13 @@ def recast_jev(dataset, task=None, question=None):
                 present = choices  # missing gold: keep None so the row is filtered
             if 0 <= label < len(choices):
                 label = present.index(choices[label])
+            raw = _keeps_raw_text(task, split, index)
             criteria, label = permute_choices(
-                [_strip(clean_text(example[name])) for name in present], label,
+                [_strip(clean_text(example[name], raw)) for name in present], label,
                 f"{task or ''}:{split}:{index}",
             )
             return {
-                "state": clean_text(example["inputs"]),
+                "state": clean_text(example["inputs"], raw),
                 "instructions": question or JEV_MULTIPLE_CHOICE_INSTRUCTIONS,
                 "criteria": criteria,
                 "label": label,
@@ -235,7 +249,11 @@ def recast_jev(dataset, task=None, question=None):
 
     if task_type == "Classification":
         # rows without a gold class (-1 = hidden label) would index the last criterion
-        converted = dataset.filter(lambda row: 0 <= row["labels"] < len(criteria)).map(convert)
+        converted = DatasetDict({
+            split: rows.filter(lambda row: 0 <= row["labels"] < len(criteria))
+            .map(convert, with_indices=True, fn_kwargs={"split": split})
+            for split, rows in dataset.items()
+        })
     keep = {"state", "instructions", "criteria", "label", "answer", "task"}
     remove = [name for name in converted["train"].column_names if name not in keep]
     if remove:

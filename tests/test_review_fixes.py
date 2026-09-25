@@ -217,3 +217,17 @@ class SyntheticConfigTest(unittest.TestCase):
         per_family = {split_mod.family_id(b) for b in selected}
         self.assertEqual(len(selected), 12)
         self.assertEqual(len(per_family), 3)
+
+
+class RawTextTest(unittest.TestCase):
+    def test_raw_keeps_realistic_noise_and_restores_lost_ampersands(self):
+        from tasksource.jev.recast import clean_text
+        self.assertEqual(clean_text("Tom&#39;s <br> UK #39;s", raw=True), "Tom&#39;s <br> UK&#39;s")
+        self.assertEqual(clean_text("Tom&#39;s UK #39;s"), "Tom's UK's")
+
+    def test_small_share_of_rows_stay_raw(self):
+        from tasksource.jev.recast import recast_jev
+        rows = Dataset.from_dict({"sentence1": ["it&#39;s"] * 2000, "labels": [0, 1] * 1000})
+        data = DatasetDict(train=rows.cast_column("labels", ClassLabel(names=["no", "yes"])))
+        states = recast_jev(data, task="demo")["train"]["state"]
+        self.assertAlmostEqual(states.count("it&#39;s") / len(states), 0.05, delta=0.02)
