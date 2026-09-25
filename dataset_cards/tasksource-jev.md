@@ -21,13 +21,8 @@ size_categories:
 
 # tasksource-jev-typed-decisions
 
-**Two million human-labeled decisions from 600+ tasks, in one format for models
-that read their answer criteria at runtime.**
-
-Most instruction data teaches a model to *write*. This dataset teaches it to
-*decide*: given a state and a question, pick among the options it is handed,
-rate on a scale it is handed, or give a calibrated probability. The options
-change from row to row, so a model has to read them rather than memorize a label set.
+**2.5 million decisions from 670 sources, in one format for models that read
+their answer criteria at runtime.**
 
 ## Why use it
 
