@@ -427,7 +427,8 @@ toxic_conversations = Classification(
     "text", labels="label_text",
     dataset_name="SetFit/toxic_conversations")
 
-turingbench = Classification("Generation",labels="label",
+turingbench = Classification("Generation", labels="label",
+    question="Who or what generated this text?",
     dataset_name="csv", task_id="TuringBench",
     load_dataset_kwargs={"data_files": {
         "train": "hf://datasets/jana4/turingbench-humanized/TuringBench/AA/train.csv",
@@ -735,7 +736,18 @@ crowdflower = Classification("text", labels="label",
             'political-media-audience',
             'political-media-bias',
             'political-media-message',
-            'text_emotion']
+            'text_emotion'],
+ question={
+     "sentiment_nuclear_power": "What is the tweet's sentiment toward nuclear energy, or is it unrelated?",
+     "tweet_global_warming": "Does the tweet indicate that the author believes global warming is occurring?",
+     "airline-sentiment": "What sentiment does the tweet express about the airline?",
+     "corporate-messaging": "What type of corporate social-media message is this?",
+     "economic-news": "Is this article relevant to the U.S. economy?",
+     "political-media-audience": "Is this political message aimed at a constituency or a national audience?",
+     "political-media-bias": "Is this political message partisan or neutral?",
+     "political-media-message": "What type of political message is this?",
+     "text_emotion": "What emotion does the text express?",
+ },
 )
 
 def _ethics_binary_label(x):
@@ -1260,20 +1272,29 @@ civil_comments__sexual_explicit = _civil("sexual_explicit", "not sexually explic
 cloth = MultipleChoice("sentence", choices_list=lambda x:[x["answer"]]+x["distractors"],labels=constant(0), dataset_name="AndyChiang/cloth")
 dgen  = MultipleChoice("sentence", choices_list=lambda x:[x["answer"]]+x["distractors"],labels=constant(0), dataset_name="AndyChiang/dgen")
 
-i2d2 = Classification("sentence1",labels=name('label',['False','True']), dataset_name="tasksource/I2D2")
+i2d2 = Classification(
+    "sentence1", labels=name("label", ["False", "True"]),
+    question="Is this a plausible commonsense statement?",
+    dataset_name="tasksource/I2D2")
 
 arg_me = Classification(
-    'argument', 'conclusion', 'stance', dataset_name="webis/args_me", task_id="args_me",
+    "argument", "conclusion", "stance",
+    question="What stance does the argument take toward the conclusion?",
+    dataset_name="webis/args_me", task_id="args_me",
     load_dataset_kwargs=dict(revision=PARQUET, data_dir="corpus"))  # one argument per row
 valueeval_stance = Classification(
-    "Premise", "Conclusion", "Stance", dataset_name="csv",
-    task_id="Touche23-ValueEval",
+    "Premise", "Conclusion", "Stance",
+    question="Does the premise argue in favor of or against the conclusion?",
+    dataset_name="csv", task_id="Touche23-ValueEval",
     load_dataset_kwargs={"data_files": {
         "train": "https://zenodo.org/records/7879430/files/arguments-training.tsv",
         "validation": "https://zenodo.org/records/7879430/files/arguments-validation.tsv",
         "test": "https://zenodo.org/records/7879430/files/arguments-test.tsv",
     }, "delimiter": "\t"})
-starcon = Classification('argument','topic','label',dataset_name="tasksource/starcon")
+starcon = Classification(
+    "argument", "topic", "label",
+    question="What stance does the argument take toward the topic?",
+    dataset_name="tasksource/starcon")
 
 banking77 = Classification("text",labels="label",dataset_name="legacy-datasets/banking77")
 
@@ -1306,12 +1327,17 @@ parade = Classification("Definition1","Definition2", labels=name('Binary labels'
 
 cladder = Classification("given_info", "question", "answer",dataset_name="tasksource/cladder")
 
-subjectivity = Classification("Sentence",labels=lambda x: {"OBJ": "objective", "SUBJ": "subjective"}[x["Label"]],dataset_name="tasksource/subjectivity")
+subjectivity = Classification(
+    "Sentence", labels=lambda x: {"OBJ": "objective", "SUBJ": "subjective"}[x["Label"]],
+    question="Is the sentence objective or subjective?",
+    dataset_name="tasksource/subjectivity")
 
-moh   = Classification("context","expression","label", dataset_name="tasksource/MOH")
-vuac  = Classification("context","expression","label", dataset_name="tasksource/VUAC")
+_metaphor_question = "Is the target expression used literally or metaphorically?"
+moh = Classification("context", "expression", "label", question=_metaphor_question, dataset_name="tasksource/MOH")
+vuac = Classification("context", "expression", "label", question=_metaphor_question, dataset_name="tasksource/VUAC")
 trofi = Classification(
-    "context", "expression", "label", dataset_name="parquet", task_id="TroFi",
+    "context", "expression", "label", question=_metaphor_question,
+    dataset_name="parquet", task_id="TroFi",
     load_dataset_kwargs={"data_files": {
         "train": "hf://datasets/tasksource/TroFi/data/train-00000-of-00001-67b67b8474db644d.parquet",
         "test": "hf://datasets/tasksource/TroFi/data/test-00000-of-00001-a467035ce73d87fe.parquet",
@@ -1546,7 +1572,9 @@ persuasiveness = Classification(
     label_values={shift: _support_shift_name(shift) for shift in range(-2, 6)})
 
 
-ambigNQ = Classification("question",labels=lambda x:{True:"ambiguous", False:"not ambiguous"}.get(x["ambig"]),
+ambigNQ = Classification(
+    "question", labels=lambda x: {True: "ambiguous", False: "not ambiguous"}.get(x["ambig"]),
+    question="Is the question ambiguous?",
     dataset_name="erbacher/AmbigNQ-clarifying-question")
 
 siga_nli = Classification("premise","statement","label",dataset_name="tasksource/SIGA-nli")

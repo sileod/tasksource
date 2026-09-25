@@ -8,14 +8,19 @@ from pathlib import Path
 
 from tasksource import list_tasks, task_provenance
 from tasksource.access import load_preprocessing
+from tasksource.jev.length import LengthBudget
 from tasksource.jev.recast import render_typed_decision, render_typed_decision_group
+from tasksource.multilingual_tasks import xglue___wpr
 from tasksource.tasks import _intent_grasp_keep
-from scripts.build_jev_dataset import build_fingerprint, read_completed, slug, source_provenance
+from scripts.build_jev_dataset import (
+    build_fingerprint, filter_request_lengths, read_completed, slug, source_provenance,
+)
 
 def _args(**overrides):
     values = dict(max_rows=1000, max_rows_eval=100, noul_rate=0.05, score_rate=0.0, permutation_rate=0.05,
                   prompt_rate=0.05, paired_format_rate=0.05, pack_rate=0.1, pack_max_tokens=4096,
-                  pack_tokenizer=None, pack_max_items=4, output=Path("a"), upload=False)
+                  pack_tokenizer=None, pack_max_items=4, max_request_bytes=131072,
+                  max_request_tokens=32768, request_tokenizer=None, output=Path("a"), upload=False)
     return argparse.Namespace(**{**values, **overrides})
 
 
@@ -23,6 +28,8 @@ class ResumeTest(unittest.TestCase):
     def test_fingerprint_tracks_shard_settings_only(self):
         base = build_fingerprint(_args())
         self.assertNotEqual(base, build_fingerprint(_args(max_rows=30000)))
+        self.assertNotEqual(base, build_fingerprint(_args(max_request_bytes=65536)))
+        self.assertNotEqual(base, build_fingerprint(_args(max_request_tokens=16384)))
         # where the output goes or whether it uploads does not change shard contents
         self.assertEqual(base, build_fingerprint(_args(output=Path("b"), upload=True)))
 
@@ -68,6 +75,48 @@ class TypedRendererTest(unittest.TestCase):
         self.assertEqual({qid: q["type"] for qid, q in request["questions"].items()}, {"a": "score", "b": "choice"})
 
 
+class RequestLengthBudgetTest(unittest.TestCase):
+    def test_filters_complete_rendered_requests(self):
+        from datasets import Dataset
+
+        row = {
+            "id": "x", "kind": "choice", "options": ["yes", "no"], "target": [1.0, 0.0],
+            "state": "short", "question": "Is this valid?", "source": "source",
+            "variant": "direct", "split": "train",
+        }
+        rows = Dataset.from_list([row, {**row, "id": "long", "state": "x" * 2000}])
+        filtered, dropped = filter_request_lengths(rows, max_bytes=512)
+        self.assertEqual((len(filtered), dropped, filtered[0]["id"]), (1, 1, "x"))
+
+    def test_zero_budget_disables_filter(self):
+        from datasets import Dataset
+
+        rows = Dataset.from_list([{
+            "id": "x", "kind": "choice", "options": ["yes", "no"], "target": [1.0, 0.0],
+            "state": "x" * 2000, "question": "Q?", "source": "source",
+            "variant": "direct", "split": "train",
+        }])
+        filtered, dropped = filter_request_lengths(rows, max_bytes=0)
+        self.assertEqual((len(filtered), dropped), (1, 0))
+
+    def test_optional_exact_token_budget(self):
+        from datasets import Dataset
+
+        class Tokenizer:
+            def encode(self, text, add_special_tokens=False):
+                return list(text)
+
+        row = {
+            "id": "x", "kind": "choice", "options": ["yes", "no"], "target": [1.0, 0.0],
+            "state": "x" * 300, "question": "Q?", "source": "source",
+            "variant": "direct", "split": "train",
+        }
+        rows = Dataset.from_list([row])
+        filtered, dropped = filter_request_lengths(
+            rows, max_bytes=10_000, budget=LengthBudget(128, Tokenizer(), overhead=0))
+        self.assertEqual((len(filtered), dropped), (0, 1))
+
+
 class CatalogApiTest(unittest.TestCase):
     def test_intent_grasp_answer_bounds(self):
         row = lambda index: {"answer_index": [index], "options": ["a", "b", "c"],
@@ -82,6 +131,17 @@ class CatalogApiTest(unittest.TestCase):
         edited["extra"] = 1
         self.assertEqual(len(list_tasks()), full)
         self.assertNotIn("extra", list_tasks().columns)
+
+    def test_config_specific_questions_and_ordinal_metadata(self):
+        self.assertEqual(
+            load_preprocessing(id="crowdflower/economic-news").question,
+            "Is this article relevant to the U.S. economy?",
+        )
+        self.assertEqual(
+            load_preprocessing(id="crowdflower/tweet_global_warming").question,
+            "Does the tweet indicate that the author believes global warming is occurring?",
+        )
+        self.assertTrue(xglue___wpr.ordinal)
 
     def test_lookup_errors(self):
         with self.assertRaises(KeyError):

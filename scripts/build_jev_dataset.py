@@ -32,7 +32,7 @@ from tasksource.jev.prompt_augmentations import (
 )
 from tasksource.jev import procedural
 from tasksource.jev.derived import VARIANT as PACKED_VARIANT, add_packed_classification, packed_items
-from tasksource.jev.length import LengthBudget
+from tasksource.jev.length import LengthBudget, render_request
 from tasksource.jev.options import gold_position_violations
 
 
@@ -88,6 +88,28 @@ def normalized_split(split):
     return "dev" if split == "validation" else split
 
 
+def filter_request_lengths(rows, max_bytes=131_072, budget=None):
+    """Drop rows whose complete rendered request exceeds byte or exact-token budgets."""
+    if not max_bytes and budget is None:
+        return rows, 0
+
+    def fits(row):
+        question = {
+            "question_id": row.get("question_id", "decision"),
+            "kind": row["kind"],
+            "question": row["question"],
+            "options": row["options"],
+        }
+        questions = [question]
+        if max_bytes and len(render_request(row["state"], questions).encode("utf-8")) > max_bytes:
+            return False
+        return budget is None or budget.fits(row["state"], questions)
+
+    before = len(rows)
+    rows = rows.filter(fits)
+    return rows, before - len(rows)
+
+
 def slug(task_id):
     digest = hashlib.sha1(task_id.encode("utf-8")).hexdigest()[:10]
     readable = "".join(c if c.isalnum() else "-" for c in task_id).strip("-")[:70]
@@ -98,7 +120,8 @@ def slug(task_id):
 # never mixes shards built with different settings. The code state is recorded per shard
 # (report "code") but not enforced: any commit would otherwise invalidate every shard.
 SHARD_PARAMETERS = ("max_rows", "max_rows_eval", "noul_rate", "score_rate", "permutation_rate", "prompt_rate",
-                    "paired_format_rate", "pack_rate", "pack_max_tokens", "pack_tokenizer", "pack_max_items")
+                    "paired_format_rate", "pack_rate", "pack_max_tokens", "pack_tokenizer", "pack_max_items",
+                    "max_request_bytes", "max_request_tokens", "request_tokenizer")
 
 
 def _git(*arguments):
@@ -928,6 +951,10 @@ def build(args):
     if args.reuse_incompatible_shards:
         completed |= stale
     packing_budget = LengthBudget(args.pack_max_tokens, args.pack_tokenizer)
+    request_budget = (
+        LengthBudget(args.max_request_tokens, args.request_tokenizer)
+        if args.request_tokenizer and args.max_request_tokens else None
+    )
     print(f"Selected {len(tasks)} tasks; {len(completed)} already complete", flush=True)
     manifest_path = output / "build-manifest.json"
     manifest = build_manifest(args, tasks)
@@ -963,31 +990,32 @@ def build(args):
             else:
                 dataset = load_jev_task(row, max_rows, max_rows_eval, loaded, file_pins)
             split_rows = {}
+            request_length_dropped = {}
             for split, split_dataset in dataset.items():
-                if row.task_type == "NativeJev":
-                    partial[split] = data_dir / f".{split}-{slug(task_id)}.parquet.partial"
-                    split_dataset.to_parquet(partial[split])
-                    split_rows[split] = len(split_dataset)
-                    continue
-                split_dataset = split_dataset.map(
-                    to_training_row,
-                    with_indices=True,
-                    fn_kwargs={"task_id": task_id, "split": split},
-                    remove_columns=split_dataset.column_names,
-                )
-                pack_audit = []
-                split_dataset = add_packed_classification(
-                    split_dataset, row.task_type, rate=args.pack_rate,
-                    budget=packing_budget, max_items=args.pack_max_items,
-                    audit=pack_audit,
-                )
-                write_pack_audit(output, split, task_id, pack_audit)
-                if row.task_type != "SoftLabeling":  # a distribution's questions are asked as authored
-                    split_dataset = augment_jev_internal(
-                        split_dataset, args.noul_rate, args.score_rate,
-                        args.permutation_rate, args.prompt_rate,
-                        args.paired_format_rate,
+                if row.task_type != "NativeJev":
+                    split_dataset = split_dataset.map(
+                        to_training_row,
+                        with_indices=True,
+                        fn_kwargs={"task_id": task_id, "split": split},
+                        remove_columns=split_dataset.column_names,
                     )
+                    pack_audit = []
+                    split_dataset = add_packed_classification(
+                        split_dataset, row.task_type, rate=args.pack_rate,
+                        budget=packing_budget, max_items=args.pack_max_items,
+                        audit=pack_audit,
+                    )
+                    write_pack_audit(output, split, task_id, pack_audit)
+                    if row.task_type != "SoftLabeling":  # a distribution's questions are asked as authored
+                        split_dataset = augment_jev_internal(
+                            split_dataset, args.noul_rate, args.score_rate,
+                            args.permutation_rate, args.prompt_rate,
+                            args.paired_format_rate,
+                        )
+                split_dataset, dropped = filter_request_lengths(
+                    split_dataset, args.max_request_bytes, request_budget)
+                if dropped:
+                    request_length_dropped[split] = dropped
                 partial[split] = data_dir / f".{split}-{slug(task_id)}.parquet.partial"
                 split_dataset.to_parquet(partial[split])
                 split_rows[split] = len(split_dataset)
@@ -1002,6 +1030,7 @@ def build(args):
                 "task_type": row.task_type,
                 "status": "ok",
                 "rows": split_rows,
+                "request_length_dropped": request_length_dropped,
                 "fingerprint": fingerprint,
                 "code": code_state(),
                 "revisions": pins,
@@ -1128,6 +1157,18 @@ def parse_args():
         help="Hugging Face tokenizer for exact budgets; default is a conservative UTF-8 byte bound.",
     )
     parser.add_argument("--pack-max-items", type=int, default=4)
+    parser.add_argument(
+        "--max-request-bytes", type=int, default=131_072,
+        help="Maximum UTF-8 size of a complete rendered request. Set 0 to disable.",
+    )
+    parser.add_argument(
+        "--max-request-tokens", type=int, default=32_768,
+        help="Exact token cap when --request-tokenizer is supplied. Set 0 to disable.",
+    )
+    parser.add_argument(
+        "--request-tokenizer",
+        help="Hugging Face tokenizer used for the optional exact token cap.",
+    )
     parser.add_argument("--finalize", action="store_true")
     parser.add_argument(
         "--finalize-only", action="store_true",
