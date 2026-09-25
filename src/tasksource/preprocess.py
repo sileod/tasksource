@@ -265,6 +265,7 @@ class SharedFields:
     # appends it, and the instruct and Jev recasts use it as their instruction.
     # Questions that vary per row belong in sentence2 or the MC inputs instead.
     question: str = None
+    ordinal: bool = False  # labels are an ordered scale, listed in order (Jev asks part as score)
     #language:str="en"
     
 

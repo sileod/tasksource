@@ -206,7 +206,8 @@ def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preproc
         source_id = id or preprocessing_name or preprocessing.dataset_name
         if not (id or preprocessing_name) and preprocessing.config_name:
             source_id = f"{source_id}/{preprocessing.config_name}"
-        dataset = recast_module.recast_jev(dataset, task=source_id, question=None if prompted else question)
+        dataset = recast_module.recast_jev(dataset, task=source_id, question=None if prompted else question,
+                                           ordinal=getattr(preprocessing, "ordinal", False))
     elif recast is not None:
         raise ValueError(f"Unknown recast format: {recast!r}")
     return dataset

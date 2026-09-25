@@ -9,6 +9,8 @@ from datasets import ClassLabel, DatasetDict, List, Sequence
 
 from .augmentations import stable_fraction
 from .options import permute_choices
+from .ordinal import asks_score, scale_order
+from .questions import default_question
 from .prompt_augmentations import TOKEN_INSTRUCTION
 from .token_labels import (
     MAX_JEV_TOKENS_PER_SEQUENCE,
@@ -124,7 +126,7 @@ def _token_state(tokens, target_index):
     )
 
 
-def recast_jev(dataset, task=None, question=None):
+def recast_jev(dataset, task=None, question=None, ordinal=False):
     """Recast a standardized Tasksource dataset as runtime-defined choices.
 
     The output is model- and wire-format-independent. ``criteria`` contains
@@ -133,6 +135,8 @@ def recast_jev(dataset, task=None, question=None):
     deterministically per source row so the gold slot carries no signal;
     augmentation is otherwise deliberately separate. The annotation's
     ``question``, when set, replaces the generic choice instruction.
+    Ordinal label sets (``ordinal=True`` or a known scale) are put in scale
+    order and about half their rows get ``kind="score"``.
     """
     if not isinstance(dataset, DatasetDict):
         raise TypeError("recast_jev expects a datasets.DatasetDict")
@@ -151,20 +155,26 @@ def recast_jev(dataset, task=None, question=None):
             raise ValueError(
                 f"Classification label names must be present and unique: {criteria}"
             )
+        order = scale_order(criteria, tagged=ordinal)
+        position = {source: slot for slot, source in enumerate(order or range(len(criteria)))}
+        criteria = [criteria[i] for i in (order or range(len(criteria)))]
+        instructions = question or default_question(criteria, "sentence2" in features) or JEV_CLASSIFICATION_INSTRUCTIONS
 
         def convert(example, index, split):
             raw = _keeps_raw_text(task, split, index)
             state = clean_text(example["sentence1"], raw)
             if "sentence2" in example:
                 state = f"text_A: {state}\ntext_B: {clean_text(example['sentence2'], raw)}"
-            label = int(example["labels"])
+            label = position[int(example["labels"])]
+            identifier = f"{task or ''}:{split}:{index}"
             return {
                 "state": state,
-                "instructions": question or JEV_CLASSIFICATION_INSTRUCTIONS,
+                "instructions": instructions,
                 "criteria": criteria,
                 "label": label,
                 "answer": criteria[label],
                 "task": task or "",
+                "kind": "score" if order and asks_score(identifier) else "choice",
             }
 
     elif task_type == "MultipleChoice":
@@ -254,7 +264,7 @@ def recast_jev(dataset, task=None, question=None):
             .map(convert, with_indices=True, fn_kwargs={"split": split})
             for split, rows in dataset.items()
         })
-    keep = {"state", "instructions", "criteria", "label", "answer", "task"}
+    keep = {"state", "instructions", "criteria", "label", "answer", "task", "kind"}
     remove = [name for name in converted["train"].column_names if name not in keep]
     if remove:
         converted = converted.remove_columns(remove)

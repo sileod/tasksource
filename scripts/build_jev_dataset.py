@@ -195,7 +195,7 @@ def to_training_row(example, index, task_id, split):
     row_id = group_id if question_id == "decision" else f"{group_id}:{question_id}"
     return {
         "id": row_id,
-        "kind": "choice",
+        "kind": example.get("kind") or "choice",  # ordinal tasks: part score
         "options": options,
         "target": target,
         "state": example["state"],

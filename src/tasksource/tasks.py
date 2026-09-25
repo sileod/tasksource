@@ -579,7 +579,8 @@ ag_news = Classification(sentence1="text", labels="label", splits=["train", None
 
 yelp_review_full = Classification(sentence1=lambda x: x["text"].replace("\\n", "\n"), labels="label",  # newlines are escaped in the source
     label_values={stars - 1: f"{stars} star{'s' if stars != 1 else ''}" for stars in range(1, 6)},
-    splits=["train", None, "test"], config_name=["yelp_review_full"])
+    splits=["train", None, "test"], config_name=["yelp_review_full"],
+    question="How many stars did the reviewer give?")
 
 financial_phrasebank = Classification(sentence1="text", labels="label", splits=["train", None, None],
     dataset_name="ghbacct/financial-phrasebank-all-agree-classification",
@@ -608,7 +609,7 @@ sms_spam = Classification(sentence1="sms", labels="label", splits=["train", None
 
 # meanGrade averages five 0-3 funniness grades
 humicroedit___subtask_1 = Classification(lambda x: f"Original: {x['headline']}", lambda x: f"Edited: {x['edited']}",
-    labels=lambda x: int(x["meanGrade"] + 0.5),
+    labels=lambda x: int(x["meanGrade"] + 0.5), ordinal=True, question="How funny is the edited headline?",
     label_values={0: "not funny", 1: "slightly funny", 2: "moderately funny", 3: "funny"},
     dataset_name="tasksource/humicroedit", config_name="subtask-1")
 def _humicroedit(i):  # the headline with its <word/> replaced by the edit
@@ -628,7 +629,8 @@ yahoo_answers_topics = Classification(
     "question_title","question_content",labels="topic")
 
 # popularity bands from the dataset's BigQuery thresholds on score, favorites and views
-stackoverflow_questions=Classification("title","body",labels="label",
+stackoverflow_questions=Classification("title","body",labels="label", ordinal=True,
+    question="How popular is this Stack Overflow question?",
     dataset_name="pacovaldez/stackoverflow-questions", label_values={
         0: "very popular question", 1: "popular question", 2: "somewhat popular question", 3: "unpopular question"})
 
@@ -647,7 +649,9 @@ go_emotions___simplified = Classification(sentence1="text", labels="labels",
 
 scicite = Classification(sentence1="string", labels="label",dataset_name="tasksource/scicite")
 
-liar = Classification(sentence1="statement", labels="label",
+liar = Classification(sentence1="statement", labels="label", ordinal=True,
+    question="How true is the statement, according to PolitiFact?",
+    label_values={5: "pants on fire", 0: "false", 4: "barely true", 1: "half true", 2: "mostly true", 3: "true"},
     dataset_name="tasksource/liar")
 
 # the source relation codes, spelled out (EVALution names are already readable)
@@ -1846,7 +1850,7 @@ def _helpsteer3_feedback(dataset):
 helpsteer_3___feedback = Classification(
     lambda x: f"{render_dialogue(x['context'])}\n\nAssistant: {x['response']}",
     labels="helpfulness", pre_process=_helpsteer3_feedback, dataset_name="nvidia/HelpSteer3", config_name="feedback",
-    question="How helpful is the assistant reply?")
+    question="How helpful is the assistant reply?", ordinal=True)
 
 msci_nli = Classification('sentence1','sentence2','label',dataset_name='sadat2307/MSciNLI')
 

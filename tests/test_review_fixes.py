@@ -231,3 +231,25 @@ class RawTextTest(unittest.TestCase):
         data = DatasetDict(train=rows.cast_column("labels", ClassLabel(names=["no", "yes"])))
         states = recast_jev(data, task="demo")["train"]["state"]
         self.assertAlmostEqual(states.count("it&#39;s") / len(states), 0.05, delta=0.02)
+
+
+class OrdinalTest(unittest.TestCase):
+    def _data(self, names, n=400):
+        rows = Dataset.from_dict({"sentence1": [f"t{i}" for i in range(n)], "labels": [i % len(names) for i in range(n)]})
+        return DatasetDict(train=rows.cast_column("labels", ClassLabel(names=names)))
+
+    def test_known_scale_is_reordered_and_partly_score(self):
+        from tasksource.jev.recast import recast_jev
+        rows = recast_jev(self._data(["neutral", "positive", "negative"]), task="demo")["train"]
+        self.assertEqual(rows[0]["criteria"], ["negative", "neutral", "positive"])
+        self.assertEqual(rows[0]["answer"], "neutral")  # label 0 was "neutral" before reordering
+        self.assertAlmostEqual(rows["kind"].count("score") / len(rows), 0.5, delta=0.1)
+        self.assertEqual(rows[0]["instructions"], "What sentiment does the text express?")
+
+    def test_tag_keeps_listed_order_and_untagged_stays_choice(self):
+        from tasksource.jev.recast import recast_jev
+        names = ["low", "medium", "high"]
+        self.assertEqual(set(recast_jev(self._data(names), task="demo")["train"]["kind"]), {"choice"})
+        tagged = recast_jev(self._data(names), task="demo", ordinal=True)["train"]
+        self.assertEqual(tagged[0]["criteria"], names)
+        self.assertIn("score", tagged["kind"])
