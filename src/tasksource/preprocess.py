@@ -302,9 +302,10 @@ _TOLERANCE = 1e-9  # shares like 2/3 or 1 - 0.8 must pass their own threshold
 def soft_target(value, kind, n_options=None, low=0, high=1, step=1):
     """A raw label as a probability distribution, or None when missing or out of range.
 
-    ``value`` is vote counts (a list, normalized), a fraction or mean rating
-    (``noul``: rescaled from ``[low, high]`` to one probability), or a level
-    (``score``/``choice``: one-hot at ``(value - low) / step``)."""
+    ``value`` is vote counts (a list, normalized), a fraction (``noul``: rescaled
+    from ``[low, high]`` to one probability), a level (``choice``: one-hot at
+    ``(value - low) / step``), or a level or mean rating (``score``: split between
+    the two nearest levels so that the expected level is ``value``)."""
     if value is None or (isinstance(value, float) and np.isnan(value)):
         return None
     if isinstance(value, (list, tuple)):
@@ -312,7 +313,21 @@ def soft_target(value, kind, n_options=None, low=0, high=1, step=1):
         return [v / total for v in value] if total else None
     if kind == "noul":
         return [(value - low) / (high - low)] if low <= value <= high else None
-    index = round((value - low) / step)
+    position = (value - low) / step
+    if kind == "score":
+        if not -_TOLERANCE <= position <= n_options - 1 + _TOLERANCE:
+            return None
+        position = min(max(position, 0), n_options - 1)
+        below = min(int(np.floor(position + _TOLERANCE)), n_options - 1)
+        above_share = max(position - below, 0.0)
+        target = [0.0] * n_options
+        target[below] = 1 - above_share
+        if above_share > _TOLERANCE:
+            target[below + 1] = above_share
+        else:
+            target[below] = 1.0
+        return target
+    index = round(position)
     return [float(i == index) for i in range(n_options)] if 0 <= index < n_options else None
 
 
@@ -391,8 +406,8 @@ class SoftLabeling(SharedFields, SoftLabelingSpec):
             raise ValueError("only choice options may vary per row")
         if self.aggregation not in ("votes", "mean"):
             raise ValueError("aggregation is 'votes' or 'mean'")
-        if self.regression and (self.hard is not None or self.kind != "noul"):
-            raise ValueError("a regression view is for noul mean ratings without a hard view")
+        if self.regression and (self.hard is not None or self.kind == "choice"):
+            raise ValueError("a regression view is for noul or score mean ratings without a hard view")
 
     @property
     def per_row_options(self):

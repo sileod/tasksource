@@ -25,6 +25,15 @@ class SoftTargetTest(unittest.TestCase):
         self.assertIsNone(soft_target([0, 0], "choice", 2))
         self.assertIsNone(soft_target(float("nan"), "noul"))
 
+    def test_score_mean_splits_between_nearest_levels(self):
+        target = soft_target(3.4, "score", 5, low=1)
+        self.assertEqual([round(x, 6) for x in target], [0, 0, 0.6, 0.4, 0])
+        self.assertAlmostEqual(sum(i * p for i, p in enumerate(target, start=1)), 3.4)  # the mean is kept
+        self.assertEqual(soft_target(5, "score", 5, low=1), [0, 0, 0, 0, 1.0])
+        self.assertEqual(soft_target(0.5, "score", 5, step=0.25), [0, 0, 1.0, 0, 0])
+        self.assertIsNone(soft_target(5.2, "score", 5, low=1))
+        self.assertEqual(soft_target(1.6, "choice", 3), [0, 0, 1.0])  # choice levels stay one-hot
+
 
 class ViewTest(unittest.TestCase):
     RATINGS = _rows(text=["a", "b", "c", "d"], rating=[0.0, 0.2, 0.6, 1.0])

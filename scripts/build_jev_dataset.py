@@ -44,6 +44,11 @@ JEV_TOKEN_TASKS = {
 }
 
 
+# Emotion and sentiment of isolated dialogue utterances whose labels depend on the conversation
+# and delivery ("ok ." as happiness): the target cannot be read from the state.
+JEV_EXCLUDED_SOURCES = {"silicone/iemocap", "silicone/meld_e", "silicone/meld_s", "silicone/dyda_e"}
+
+
 # Vote shares from fewer annotators than this are coarse (one of three is 0.33): such
 # soft annotations enter Jev by their hard majority view, if they have one.
 MIN_ANNOTATORS = 5
@@ -954,6 +959,7 @@ def select_tasks(args):
     frame = frame[
         ~frame.source_id.str.startswith(PUBLISH_EXCLUDED_PREFIXES, na=False)
     ]
+    frame = frame[~frame.source_id.isin(JEV_EXCLUDED_SOURCES)]
     frame = frame[
         (frame.task_type != "TokenClassification")
         | frame.source_id.isin(JEV_TOKEN_TASKS)

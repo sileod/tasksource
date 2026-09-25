@@ -34,11 +34,15 @@ glue___wnli = Classification(sentence1="sentence1", sentence2="sentence2", label
 
 glue___mrpc = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
 glue___qqp = Classification(sentence1="question1", sentence2="question2", labels="label")
-# a regression task (the mean of raters' 0-5 similarity ratings); soft, a probability-like score
-glue___stsb = SoftLabeling(sentence1="sentence1", sentence2="sentence2", labels="label", kind="noul", high=5,
-    aggregation="mean", regression=True,
+# the STS annotation guidelines' 0-5 similarity levels
+STS_LEVELS = ["completely dissimilar", "not equivalent, but on the same topic", "not equivalent, but share some details",
+              "roughly equivalent, but some important information differs", "mostly equivalent, but some unimportant details differ",
+              "completely equivalent"]
+# a regression task (the mean of raters' 0-5 similarity ratings); soft, split between the two nearest levels
+glue___stsb = SoftLabeling(sentence1="sentence1", sentence2="sentence2", labels="label", kind="score", high=5,
+    options=STS_LEVELS, aggregation="mean", regression=True,
     question="How similar are the two sentences, from 0 (unrelated) to 5 (equivalent)?",
-    soft_question="How similar in meaning are the sentences, from 0 (unrelated) to 1 (equivalent)?")
+    soft_question="How similar in meaning are the two sentences?")
 
 super_glue___boolq = Classification(sentence1="question", labels="label")
 boolq_passage = Classification("passage", "question", labels="label", # reading-comprehension variant
@@ -70,9 +74,10 @@ babi_nli = Classification("premise", "hypothesis", "label",
 sick__label         = Classification('sentence_A','sentence_B','label', dataset_name="tasksource/sick")
 # the mean of ten raters' 1-5 relatedness ratings
 sick__relatedness   = SoftLabeling('sentence_A','sentence_B','relatedness_score', dataset_name="tasksource/sick",
-    kind="noul", low=1, high=5, aggregation="mean", annotators=10, regression=True,
+    kind="score", low=1, high=5, aggregation="mean", annotators=10, regression=True,
+    options=["1 (completely unrelated)", "2", "3", "4", "5 (very related)"],
     question="How related are the two sentences, from 1 (unrelated) to 5 (very related)?",
-    soft_question="How related in meaning are the sentences, from 0 (unrelated) to 1 (closely related)?")
+    soft_question="How related in meaning are the two sentences?")
 
 
 def remove_neg_1(dataset):
@@ -976,8 +981,8 @@ cycic_mc = MultipleChoice("question", choices=regen(r"answer_option[0-4]"), labe
     dataset_name = "tasksource/cycic_multiplechoice")
 
 
-sts_companion = SoftLabeling("sentence1","sentence2","label", kind="noul", high=5, aggregation="mean",
-    regression=True, dataset_name="tasksource/sts-companion", soft_question="How similar in meaning are the sentences, from 0 (unrelated) to 1 (equivalent)?")
+sts_companion = SoftLabeling("sentence1","sentence2","label", kind="score", high=5, options=STS_LEVELS, aggregation="mean",
+    regression=True, dataset_name="tasksource/sts-companion", soft_question="How similar in meaning are the two sentences?")
 
 commonsense_qa_2 = Classification("question",labels="answer",
     dataset_name="tasksource/commonsense_qa_2.0")
@@ -1193,6 +1198,26 @@ graded_acceptability = SoftLabeling("text",labels="normalized_score", kind="noul
     question="How acceptable is this sentence, from 0 (unacceptable) to 1 (acceptable)?",
     soft_question="How acceptable do native speakers find the sentence, from 0 (unacceptable) to 1 (fully acceptable)?",
     dataset_name="tasksource/acceptability-prediction")
+
+# each rater's rating, by the scale the sentence was rated on (MOP4: 1-4; MOP2: 1 or 4); the 100-point slider is left out
+def _acceptability_votes(scale):
+    def pre_process(dataset):
+        return dataset.filter(lambda x: x["MOP"] == scale)
+    return pre_process
+
+def _rating_counts(levels):
+    return lambda x: [[int(r) for r in x["rating_list"].split(",")].count(level) for level in levels]
+
+graded_acceptability__votes = SoftLabeling("text", labels=_rating_counts([1, 2, 3, 4]), kind="score",
+    options=["1 (unacceptable)", "2", "3", "4 (acceptable)"], annotators=15, pre_process=_acceptability_votes("MOP4"),
+    soft_question="How acceptable do native speakers find the sentence?",
+    replaces=["acceptability-prediction"], dataset_name="tasksource/acceptability-prediction",
+    task_id="acceptability-prediction/rating_votes")
+graded_acceptability__binary = SoftLabeling("text", labels=lambda x: _rating_counts([4])(x)[0] / len(x["rating_list"].split(",")),
+    kind="noul", annotators=15, pre_process=_acceptability_votes("MOP2"),
+    soft_question="Would a native speaker judge the sentence acceptable?",
+    replaces=["acceptability-prediction"], dataset_name="tasksource/acceptability-prediction",
+    task_id="acceptability-prediction/binary_votes")
 
 equate = Classification("sentence1","sentence2","gold_label",
     dataset_name='tasksource/equate')
@@ -2095,22 +2120,6 @@ scruples_votes = SoftLabeling(lambda x: f"{x['title']}\n\n{x['text']}", labels=l
     question="How would Reddit readers judge who is in the wrong in this story?",
     dataset_name="tasksource/scruples", task_id="scruples/verdict_votes")
 
-def _one_row_per_text(dataset):  # SBIC repeats texts once per annotator
-    return DatasetDict({name: Dataset.from_pandas(split.to_pandas().drop_duplicates("text"), preserve_index=False)
-                        for name, split in dataset.items()})
-
-def _disagreement_rate(dataset_name, topic):
-    return SoftLabeling("text", labels="disagreement_rate", kind="noul", annotators=3,
-        question=f"How much would annotators disagree about {topic}, from 0 (all agree) to 1 (maximal disagreement)?",
-        pre_process=_one_row_per_text, dataset_name=dataset_name,
-        task_id=f"{dataset_name.split('/')[-1]}/disagreement_rate")
-
-dynasent_disagreement_rate = _disagreement_rate("RuyuanWan/Dynasent_Disagreement", "the sentiment of the text")
-politeness_disagreement_rate = _disagreement_rate("RuyuanWan/Politeness_Disagreement", "the politeness of the text")
-sbic_disagreement_rate = _disagreement_rate("RuyuanWan/SBIC_Disagreement", "whether the text is offensive")
-schem_disagreement_rate = _disagreement_rate("RuyuanWan/SChem_Disagreement", "whether the rule of thumb is acceptable")
-dilemmas_disagreement_rate = _disagreement_rate("RuyuanWan/Dilemmas_Disagreement", "which of the two actions is less ethical")
-
 # BeaverTails: three annotators per (prompt, response), one row each
 def _beavertails_votes(dataset):
     """One row per (prompt, response) with the share of its three annotators who judged it unsafe."""
@@ -2222,21 +2231,24 @@ civil_comments__sexual_explicit_share = _civil_share("sexual_explicit", "sexuall
 # OpenAssistant reviews of English assistant replies (three reviewers per reply): mean ratings and flag shares
 _oasst2_replies = lambda ds: ds.filter(lambda x: x["lang"] == "en" and x["role"] == "assistant")
 
-def _oasst2(attribute, question, aggregation):
-    return SoftLabeling("parent_text", "text", labels=attribute, kind="noul", annotators=3, aggregation=aggregation,
+def _oasst2(attribute, question, aggregation, **kwargs):
+    return SoftLabeling("parent_text", "text", labels=attribute, annotators=3, aggregation=aggregation,
         question=question, pre_process=_oasst2_replies, dataset_name="tasksource/oasst2_dense_flat",
-        task_id=f"oasst2/{attribute}")
+        task_id=f"oasst2/{attribute}", **kwargs)
 
-_rating = lambda attribute: _oasst2(attribute, f"Mean reviewer rating of the response's {attribute}, "
-                                               "from 0 (lowest) to 1 (highest).", "mean")
-_flag = lambda attribute, label: _oasst2(attribute, f"What fraction of reviewers flagged the response as {label}?", "votes")
+# reviewers rate on five-point scales stored as 0, 0.25, ..., 1; a mean splits between the two nearest levels
+def _rating(attribute, low, high):
+    return _oasst2(attribute, f"How would reviewers rate the response's {attribute}?", "mean", kind="score", step=0.25,
+                   options=[f"1 ({low})", "2", "3", "4", f"5 ({high})"])
+_flag = lambda attribute, label: _oasst2(attribute, f"What fraction of reviewers flagged the response as {label}?", "votes",
+                                         kind="noul")
 
-oasst2__quality = _rating("quality")
-oasst2__helpfulness = _rating("helpfulness")
-oasst2__creativity = _rating("creativity")
-oasst2__humor = _rating("humor")
-oasst2__toxicity = _rating("toxicity")
-oasst2__violence = _rating("violence")
+oasst2__quality = _rating("quality", "low quality", "high quality")
+oasst2__helpfulness = _rating("helpfulness", "unhelpful", "helpful")
+oasst2__creativity = _rating("creativity", "ordinary", "creative")
+oasst2__humor = _rating("humor", "serious", "funny")
+oasst2__toxicity = _rating("toxicity", "polite", "rude")
+oasst2__violence = _rating("violence", "harmless", "violent")
 oasst2__spam = _flag("spam", "spam")
 oasst2__fails_task = _flag("fails_task", "failing the task")
 oasst2__not_appropriate = _flag("not_appropriate", "inappropriate")

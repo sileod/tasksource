@@ -33,7 +33,12 @@ size_categories:
   SuperGLUE, HellaSwag, PIQA, ScienceQA, Banking77, CoNLL-2003, MasakhaNEWS,
   HelpSteer, ChaosNLI, and many more, with no task allowed to dominate.
 - **Three decision types in one schema.** `choice` (pick one option), `score`
-  (an ordered scale), and `noul` (the probability that a statement is true).
+  (an ordered scale), and `noul` (the probability that the answer to a yes/no
+  question is yes). `noul` holds only probabilities: entailment likelihoods, and the
+  share of annotators who answered yes. Mean ratings and similarity are `score`
+  distributions whose expected level is the mean (3.4 on 1–5 puts 0.6 on 3 and 0.4
+  on 4). Ordinal label sets appear as both `choice` and `score`, split
+  deterministically per row, so a model learns both requests for the same scale.
   Soft targets are kept wherever the source has mean ratings or votes from at
   least five annotators per item (vote shares from fewer are too noisy): STS,
   ChaosNLI, civil_comments, Measuring Hate Speech, WouldYouRather, ProtoQA,
