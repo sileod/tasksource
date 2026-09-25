@@ -263,6 +263,6 @@ class ProvenanceTest(unittest.TestCase):
 
     def test_native_sources(self):
         from scripts.build_jev_dataset import source_provenance
-        self.assertEqual(source_provenance("graded/unli")["dataset"], "Zhengping/UNLI")
+        self.assertEqual(source_provenance("UNLI")["dataset"], "Zhengping/UNLI")
         from tasksource.jev import procedural
         self.assertIn("generated", source_provenance(procedural.SOURCE_PREFIX + next(iter(procedural.TASKS))))

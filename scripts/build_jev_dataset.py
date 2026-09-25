@@ -24,14 +24,13 @@ import numpy as np
 import pandas as pd
 import yaml
 from tasksource import list_tasks, load_task, task_provenance
-from tasksource.metadata.originals import ORIGINALS
 from tasksource.preprocess import sample_dataset
 from tasksource.metadata.weights import task_weight
 from tasksource.jev.augmentations import augment_jev_internal, stable_fraction
 from tasksource.jev.prompt_augmentations import (
     published_pair_style, published_question_style,
 )
-from tasksource.jev import graded, procedural
+from tasksource.jev import procedural
 from tasksource.jev.derived import VARIANT as PACKED_VARIANT, add_packed_classification, packed_items
 from tasksource.jev.length import LengthBudget
 from tasksource.jev.options import gold_position_violations
@@ -44,11 +43,17 @@ JEV_TOKEN_TASKS = {
 }
 
 
+# Vote shares from fewer annotators than this are coarse (one of three is 0.33): such
+# soft annotations enter Jev by their hard majority view, if they have one.
+MIN_ANNOTATORS = 5
+
+
 def load_jev_task(row, max_rows, max_rows_eval, revision=None, data_file_pins=None):
     """``revision`` and ``data_file_pins`` pin the task's Hub dataset and ``hf://``
     data files to the commits recorded in the build report."""
     return load_task(
         row.id, recast="jev", multilingual=row.multilingual,
+        soft=row.task_type == "SoftLabeling", min_annotators=MIN_ANNOTATORS,
         max_rows=max_rows, max_rows_eval=max_rows_eval, data_file_pins=data_file_pins,
         **({"revision": revision} if revision else {}),
     )
@@ -63,21 +68,16 @@ TRAINING_FEATURES = Features({
 
 NATIVE_SOURCES = (
     [procedural.SOURCE_PREFIX + name for name in sorted(procedural.TASKS)]
-    + [graded.SOURCE_PREFIX + name for name in graded.FAMILIES]
 )
 
 
 def load_native_task(source_id, max_rows, max_rows_eval, revision=None, data_file_pins=None):
-    """Sources authored as typed Jev questions, grouped by state (no recast)."""
-    if source_id.startswith(graded.SOURCE_PREFIX):
-        rows = graded.load_family(source_id[len(graded.SOURCE_PREFIX):], max_rows, max_rows_eval,
-                                  revision, data_file_pins)
-    else:
-        dataset = load_dataset(procedural.REPO_ID, source_id[len(procedural.SOURCE_PREFIX):], revision=revision)
-        dataset = sample_dataset(dataset, max_rows, max_rows_eval)
-        rows = {split: [row for index, example in enumerate(examples)
-                        for row in procedural.jev_rows(example, source_id, normalized_split(split), index)]
-                for split, examples in dataset.items()}
+    """Procedural sources, authored as typed Jev questions grouped by state (no recast)."""
+    dataset = load_dataset(procedural.REPO_ID, source_id[len(procedural.SOURCE_PREFIX):], revision=revision)
+    dataset = sample_dataset(dataset, max_rows, max_rows_eval)
+    rows = {split: [row for index, example in enumerate(examples)
+                    for row in procedural.jev_rows(example, source_id, normalized_split(split), index)]
+            for split, examples in dataset.items()}
     return DatasetDict({
         split: Dataset.from_list(split_rows, features=TRAINING_FEATURES)
         for split, split_rows in rows.items() if split_rows  # e.g. hidden test labels
@@ -244,7 +244,8 @@ def to_training_row(example, index, task_id, split):
         target[label] = 1.0
     source_row = example.get("source_row", index)
     question_id = example.get("question_id", "decision")
-    group_id = f"{slug(task_id)}:{split}:{source_row}"
+    # soft annotations of one dataset share a group, so one input's questions stay together
+    group_id = f"{slug(example.get('group') or task_id)}:{split}:{source_row}"
     row_id = group_id if question_id == "decision" else f"{group_id}:{question_id}"
     return {
         "id": row_id,
@@ -403,7 +404,7 @@ def pretty_order(dataset, first_rows=1_000, seed=0):
 def source_family(source):
     """Balance dataset families, not each configuration as an independent task."""
     parts = source.split("/")
-    if parts[0] in {"multilingual", "graded", procedural.SOURCE_PREFIX.rstrip("/")} and len(parts) > 1:
+    if parts[0] in {"multilingual", procedural.SOURCE_PREFIX.rstrip("/")} and len(parts) > 1:
         return "/".join(parts[:2])
     return parts[0]
 
@@ -508,10 +509,8 @@ RESERVED_FORMATS = ("graded", "procedural")
 def row_format(source, formats=None):
     if source.startswith(procedural.SOURCE_PREFIX):
         return "procedural"
-    if source.startswith(graded.SOURCE_PREFIX):
-        return "graded"
     task_type = (formats or {}).get(source, "Classification")
-    return "graded" if task_type == "SoftLabeling" else task_type
+    return "graded" if task_type == "SoftLabeling" else task_type  # soft labels: the graded share
 
 
 def format_budgets(sizes, max_rows, shares):
@@ -537,8 +536,8 @@ def share_cap(dataset, max_rows, procedural_share=FORMAT_SHARES["procedural"], f
     """Cap a split with a fixed share per format, then by family within each format.
 
     ``formats`` maps a source task to its task type (Classification,
-    MultipleChoice, TokenClassification); graded and procedural sources are
-    recognized by prefix. Without fixed shares, classification would take most
+    MultipleChoice, TokenClassification, SoftLabeling: the graded share);
+    procedural sources are recognized by prefix. Without fixed shares, classification would take most
     rows, and the seven procedural generators, the only source of several
     decision shapes, would get under 2%.
     """
@@ -792,12 +791,6 @@ def source_provenance(source):
     if source.startswith(procedural.SOURCE_PREFIX):
         return {"dataset": procedural.REPO_ID, "config": source[len(procedural.SOURCE_PREFIX):],
                 "generated": "procedural (tasksource.jev.procedural)"}
-    if source.startswith(graded.SOURCE_PREFIX):
-        family = graded.FAMILIES[source[len(graded.SOURCE_PREFIX):]]
-        info = {"dataset": family.dataset, "config": family.config,
-                "revision": (family.load_kwargs or {}).get("revision"),
-                "originals": sorted(set(ORIGINALS.get(family.dataset, [])) - {family.dataset})}
-        return {k: v for k, v in info.items() if v}
     if source.startswith("multilingual/"):
         return task_provenance(source[len("multilingual/"):], multilingual=True)
     return task_provenance(source)
@@ -879,16 +872,12 @@ def migrate_legacy_shards(
         temporary.replace(path)
 
 
-def covered_by_graded(task):
-    return task not in NATIVE_SOURCES and any(covered in task for covered in graded.COVERED_TASKS)
-
-
 def select_tasks(args):
-    frame = list_tasks(instruct=True, soft=True)
+    frame = list_tasks(instruct=True, soft=True, min_annotators=MIN_ANNOTATORS)
     frame["multilingual"] = False
     frame["source_id"] = frame.id
     if not args.english_only:
-        multilingual = list_tasks(multilingual=True, instruct=True, soft=True)
+        multilingual = list_tasks(multilingual=True, instruct=True, soft=True, min_annotators=MIN_ANNOTATORS)
         multilingual["multilingual"] = True
         multilingual["source_id"] = "multilingual/" + multilingual.id
         frame = pd.concat([frame, multilingual], ignore_index=True)
@@ -900,8 +889,6 @@ def select_tasks(args):
     frame = frame[
         ~frame.source_id.str.startswith(PUBLISH_EXCLUDED_PREFIXES, na=False)
     ]
-    # graded families already cover these tasks with described score levels
-    frame = frame[~frame.id.map(covered_by_graded)]
     frame = frame[
         (frame.task_type != "TokenClassification")
         | frame.source_id.isin(JEV_TOKEN_TASKS)
@@ -995,11 +982,12 @@ def build(args):
                     audit=pack_audit,
                 )
                 write_pack_audit(output, split, task_id, pack_audit)
-                split_dataset = augment_jev_internal(
-                    split_dataset, args.noul_rate, args.score_rate,
-                    args.permutation_rate, args.prompt_rate,
-                    args.paired_format_rate,
-                )
+                if row.task_type != "SoftLabeling":  # a distribution's questions are asked as authored
+                    split_dataset = augment_jev_internal(
+                        split_dataset, args.noul_rate, args.score_rate,
+                        args.permutation_rate, args.prompt_rate,
+                        args.paired_format_rate,
+                    )
                 partial[split] = data_dir / f".{split}-{slug(task_id)}.parquet.partial"
                 split_dataset.to_parquet(partial[split])
                 split_rows[split] = len(split_dataset)

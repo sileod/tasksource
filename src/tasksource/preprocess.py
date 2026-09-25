@@ -336,6 +336,10 @@ class SoftLabelingSpec(Preprocessing):
     hard:float=None
     soft_question:str=None
     replaces:tuple=()
+    annotators:int=None
+    aggregation:str='votes'
+    count:object=None
+    regression:bool=False
 
 
 @dataclass
@@ -358,6 +362,16 @@ class SoftLabeling(SharedFields, SoftLabelingSpec):
     only with ``soft=True``. ``soft_question`` asks for the distribution when the
     hard ``question`` asks for the majority. ``replaces`` names hard task ids that
     the soft view supersedes (``list_tasks(soft=True)`` leaves them out).
+
+    ``aggregation`` says what the distribution summarizes: ``votes`` (the share
+    of annotators choosing each option) or ``mean`` (the mean of graded ratings,
+    e.g. similarity or probability judgements). ``annotators`` records how many
+    annotators judged a typical item. Vote shares from a few annotators are
+    coarse (one of three is 0.33), so ``min_annotators`` (in ``load_task`` and
+    ``list_tasks``) keeps soft vote targets only from enough annotators: per row
+    when ``count`` (a column or function) or vote counts give it, else by the
+    recorded ``annotators``. ``regression=True`` keeps the raw value as the
+    default (regression) view of a mean rating that has no majority label.
     """
 
     def __post_init__(self):
@@ -370,6 +384,10 @@ class SoftLabeling(SharedFields, SoftLabelingSpec):
             raise ValueError("a noul hard view needs options=[no, yes]")
         if self.kind != "choice" and not isinstance(self.options, (list, tuple, type(None))):
             raise ValueError("only choice options may vary per row")
+        if self.aggregation not in ("votes", "mean"):
+            raise ValueError("aggregation is 'votes' or 'mean'")
+        if self.regression and (self.hard is not None or self.kind != "noul"):
+            raise ValueError("a regression view is for noul mean ratings without a hard view")
 
     @property
     def per_row_options(self):
@@ -377,10 +395,16 @@ class SoftLabeling(SharedFields, SoftLabelingSpec):
 
     @property
     def hard_type(self):
-        """The task type of the hard view, or None for soft labels only."""
+        """The task type of the default (hard or regression) view, or None for soft labels only."""
+        if self.regression:
+            return "Classification"
         if self.hard is None:
             return None
         return "MultipleChoice" if self.per_row_options else "Classification"
+
+    def enough_annotators(self, min_annotators):
+        """Whether the recorded annotator count supports soft targets (mean ratings always do)."""
+        return not min_annotators or self.aggregation == "mean" or (self.annotators or 0) >= min_annotators
 
     @staticmethod
     def _read(field, x):
@@ -391,21 +415,36 @@ class SoftLabeling(SharedFields, SoftLabelingSpec):
             options = []
         else:
             options = [str(o) for o in (self._read(self.options, x) if self.per_row_options else self.options)]
-        target = soft_target(self._read(self.labels, x), self.kind, len(options), self.low, self.high, self.step)
+        value = self._read(self.labels, x)
+        target = soft_target(value, self.kind, len(options), self.low, self.high, self.step)
         if target is not None and self.kind != "noul" and len(target) != len(options):
             target = None
-        return {"_soft": target or [], "_options": options}
+        if self.count is not None:
+            count = self._read(self.count, x)
+        elif isinstance(value, (list, tuple)):
+            count = sum(value)
+        else:
+            count = self.annotators
+        return {"_soft": target or [], "_options": options, "_count": -1 if count is None else count}
 
-    def _prepare(self, dataset):
-        """The annotation's pre_process, then each row's distribution; rows without one are dropped."""
+    def _prepare(self, dataset, min_annotators=None, drop_unlabeled=True):
+        """The annotation's pre_process, then each row's distribution. Rows voted on by fewer
+        than ``min_annotators`` are dropped; unlabeled rows too, unless ``drop_unlabeled=False``
+        (the soft view drops them after splitting, so sibling annotations of one source split alike)."""
         dataset = self.pre_process(dataset)
+        few = lambda x: bool(min_annotators) and self.aggregation == "votes" and 0 <= x["_count"] < min_annotators
+        keep = lambda x: not few(x) and (len(x["_soft"]) > 0 or not drop_unlabeled)
         def add(rows):
             if not hasattr(rows, "features") or rows.features is None:  # streaming
-                return rows.map(self._soft).filter(lambda x: len(x["_soft"]) > 0)
+                return rows.map(self._soft).filter(keep)
             features = rows.features.copy()
             features["_soft"] = datasets.List(datasets.Value("float64"))
             features["_options"] = datasets.List(datasets.Value("string"))
-            return rows.map(self._soft, features=features).filter(lambda x: len(x["_soft"]) > 0)
+            features["_count"] = datasets.Value("float64")
+            def batch(columns):
+                soft = [self._soft(dict(zip(columns, values))) for values in zip(*columns.values())]
+                return {**columns, **{k: [row[k] for row in soft] for k in ("_soft", "_options", "_count")}}
+            return rows.map(batch, batched=True, features=features).filter(keep)
         return type(dataset)({split: add(rows) for split, rows in dataset.items()})
 
     def _agrees(self, x):
@@ -413,14 +452,20 @@ class SoftLabeling(SharedFields, SoftLabelingSpec):
         top = max(target[0], 1 - target[0]) if self.kind == "noul" else max(target)
         return top >= self.hard - _TOLERANCE
 
-    def view(self, soft=True):
-        """The loadable task: SoftLabelingView, or the hard Classification/MultipleChoice."""
+    def view(self, soft=True, min_annotators=None):
+        """The loadable task: SoftLabelingView, or the hard Classification/MultipleChoice
+        (the regression Classification for ``regression=True``)."""
         shared = {f.name: getattr(self, f.name) for f in dataclasses.fields(SharedFields)}
-        shared["pre_process"] = self._prepare
         if soft:
             shared["question"] = self.soft_question or self.question
+            shared["pre_process"] = lambda dataset: self._prepare(dataset, min_annotators, drop_unlabeled=False)
+            post_process = self.post_process
+            shared["post_process"] = lambda dataset: post_process(dataset.filter(lambda x: len(x["labels"]) > 0))
             return SoftLabelingView(sentence1=self.sentence1, sentence2=self.sentence2 or "sentence2",
                                     labels="_soft", options="_options", **shared)
+        if self.regression:
+            return Classification(sentence1=self.sentence1, sentence2=self.sentence2 or "sentence2",
+                                  labels=self.labels, **shared)
         if self.hard is None:
             raise ValueError("this annotation has soft labels only; load it with soft=True")
         shared["pre_process"] = lambda dataset: self._prepare(dataset).filter(self._agrees)
@@ -434,11 +479,11 @@ class SoftLabeling(SharedFields, SoftLabelingSpec):
         return Classification(sentence1=self.sentence1, sentence2=self.sentence2 or "sentence2",
                               labels=label, **shared)
 
-    def load(self, soft=False):
-        return self.view(soft).load()
+    def load(self, soft=False, min_annotators=None):
+        return self.view(soft, min_annotators).load()
 
-    def __call__(self, dataset, *args, soft=False, **kwargs):
-        return self.view(soft)(dataset, *args, **kwargs)
+    def __call__(self, dataset, *args, soft=False, min_annotators=None, **kwargs):
+        return self.view(soft, min_annotators)(dataset, *args, **kwargs)
 
 get=dotgetter()
 constant = pretty(fc.constantly)

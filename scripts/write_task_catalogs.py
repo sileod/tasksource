@@ -56,15 +56,19 @@ def write(path, multilingual):
             "", "## Soft labels", "",
             "Annotations whose label is a distribution (annotator votes, rater shares, survey counts), "
             "loaded with `load_task(id, soft=True)`. Those with a hard view are also listed above, by "
-            "their majority label; the others have soft labels only.",
+            "their majority label; the others have soft labels only. `votes` are shares of annotators, "
+            "`mean` a mean rating; annotators is the typical count per item (vote shares from fewer than "
+            "five are coarse, and the Jev build leaves them out).",
             "",
-            "| id | kind | hard view | dataset |",
-            "|---|---|---|---|",
+            "| id | kind | aggregation | annotators | default view | dataset |",
+            "|---|---|---|--:|---|---|",
         ]
         for row in soft.itertuples():
             lines.append("| " + " | ".join([
                 f"[{cell(row.id)}]({module}#L{lines_of[row.preprocessing_name]})", row.mapping.kind,
-                row.mapping.hard_type or "", dataset_link(row.dataset_name),
+                row.mapping.aggregation, str(row.mapping.annotators or ""),
+                ("regression" if row.mapping.regression else row.mapping.hard_type) or "",
+                dataset_link(row.dataset_name),
             ]) + " |")
     path.write_text("\n".join(lines) + "\n")
     print(f"{path.name}: {len(tasks)} tasks")

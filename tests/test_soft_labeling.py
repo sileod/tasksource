@@ -50,6 +50,19 @@ class ViewTest(unittest.TestCase):
         self.assertEqual(soft["options"][0], ["x", "y"])
         self.assertEqual(soft["labels"][0], [0.25, 0.75])
 
+    def test_min_annotators_filters_vote_rows(self):
+        votes = _rows(text=["a", "b"], v=[[1, 2], [4, 6]])
+        task = SoftLabeling("text", labels="v", options=["x", "y"], annotators=5)
+        self.assertEqual(task(votes, soft=True, min_annotators=5)["train"]["sentence1"], ["b"])
+        rated = SoftLabeling("text", labels="v", options=["x", "y"], aggregation="mean")
+        self.assertEqual(len(rated(votes, soft=True, min_annotators=5)["train"]), 2)
+
+    def test_regression_view_keeps_raw_value(self):
+        task = SoftLabeling("text", labels="rating", kind="noul", high=5, aggregation="mean", regression=True)
+        rows = _rows(text=["a", "b"], rating=[1.0, 4.0])
+        self.assertEqual(task(rows)["train"]["labels"], [1.0, 4.0])
+        self.assertEqual(task(rows, soft=True)["train"]["labels"], [[0.2], [0.8]])
+
     def test_soft_only(self):
         task = SoftLabeling("text", labels="rating", kind="noul")
         self.assertIsNone(task.hard_type)
@@ -66,17 +79,39 @@ class CatalogTest(unittest.TestCase):
         hard, soft = list_tasks(), list_tasks(soft=True)
         self.assertNotIn("proto_qa/proto_qa", set(hard.id))  # soft labels only
         self.assertIn("proto_qa/proto_qa", set(soft.id))
-        self.assertIn("HelpSteer3/preference", set(hard.id))
-        self.assertNotIn("HelpSteer3/preference", set(soft.id))  # replaced by the individual preferences
+        self.assertIn("hate_speech_offensive", set(hard.id))
+        self.assertNotIn("hate_speech_offensive", set(soft.id))  # replaced by its vote shares
+        enough = list_tasks(soft=True, min_annotators=5)
+        # three annotators: the votes are left out and replace nothing; mean ratings are kept
+        self.assertNotIn("hate_speech_offensive/votes", set(enough.id))
+        self.assertIn("hate_speech_offensive", set(enough.id))
+        self.assertIn("civil_comments/toxicity_share", set(enough.id))
+        self.assertNotIn("civil_comments/toxicity", set(enough.id))
+        self.assertIn("UNLI", set(enough.id))
+        feedback = enough[enough.id == "HelpSteer3/feedback"].iloc[0]
+        self.assertEqual(feedback.task_type, "Classification")  # by its hard view
+        stsb = hard[hard.id == "glue/stsb"].iloc[0]
+        self.assertEqual(stsb.task_type, "Classification")  # the regression view, as before
         row = hard[hard.id == "google_wellformed_query"].iloc[0]
         self.assertEqual((row.task_type, row.soft_labels), ("Classification", True))
         self.assertEqual(soft[soft.id == "google_wellformed_query"].iloc[0].task_type, "SoftLabeling")
 
 
 class JevTest(unittest.TestCase):
+    def test_sibling_annotations_share_a_group_key(self):
+        rows = _rows(sentence1=["same text"], options=[[]], labels=[[0.4]])
+        a = recast_jev(rows, task="d/a", kind="noul", group="d")["train"][0]
+        b = recast_jev(rows, task="d/b", kind="noul", group="d")["train"][0]
+        self.assertEqual((a["group"], a["source_row"], a["state"]), (b["group"], b["source_row"], b["state"]))
+        self.assertNotEqual(a["question_id"], b["question_id"])
+
+    def test_rows_with_the_same_text_and_other_options_are_kept(self):
+        rows = _rows(sentence1=["", ""], options=[["a", "b"], ["c", "d"]], labels=[[0.3, 0.7], [0.6, 0.4]])
+        self.assertEqual(len(recast_jev(rows, task="t", kind="choice", row_options=True)["train"]), 2)
+
     def test_per_row_options_are_permuted_with_their_target(self):
         options = [[f"answer {i}-{j}" for j in range(4)] for i in range(40)]
-        rows = _rows(sentence1=["q"] * 40, options=options, labels=[[0.7, 0.2, 0.1, 0.0]] * 40)
+        rows = _rows(sentence1=[f"q{i}" for i in range(40)], options=options, labels=[[0.7, 0.2, 0.1, 0.0]] * 40)
         jev = recast_jev(rows, task="t", question="Q?", kind="choice", row_options=True)["train"]
         slots = set()
         for row, source in zip(jev, options):

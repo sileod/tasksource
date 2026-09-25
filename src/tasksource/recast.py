@@ -4,8 +4,7 @@ from sorcery import dict_of
 import string
 
 # Tasks whose labels do not work as named classes: regression scores, multi-label
-# lists, or opaque label sets. Tasks covered by graded Jev families are listed in
-# jev/graded.py (COVERED_TASKS) instead.
+# lists, or opaque label sets. Their soft views (SoftLabeling) are fine.
 improper_labels = ['glue/stsb', 'sick/relatedness', 'sts-companion', 'stsb_multi_mt', 'acceptability-prediction',
                     'chaos-mnli-ambiguity', 'oasst1_dense_flat', 'oasst2_dense_flat']  # regression
 improper_labels += ['lex_glue/eurlex']  # multi-label over 100 concepts

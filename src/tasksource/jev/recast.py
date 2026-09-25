@@ -1,5 +1,6 @@
 """Canonical Tasksource-to-Jev recasts and typed-decision (System One) request rendering."""
 
+import hashlib
 import html
 import re
 from collections import OrderedDict
@@ -46,6 +47,10 @@ def clean_text(text, raw=False):
     for _ in range(2):  # tweets are sometimes escaped twice (&amp;amp;)
         text = _ENTITY.sub(lambda m: html.unescape(m.group(0)), text)
     return _SPACED_ENTITY.sub(lambda m: html.unescape(f"&{m.group(1)};"), text)
+
+
+def _question_id(task):
+    return re.sub(r"[^0-9A-Za-z_.-]+", "-", task or "decision")
 
 
 def _keeps_raw_text(task, split, index):
@@ -126,38 +131,50 @@ def _token_state(tokens, target_index):
     )
 
 
-def _recast_soft(dataset, task, question, kind, row_options):
+def _recast_soft(dataset, task, question, kind, row_options, group):
     """SoftLabeling rows keep their distribution as ``target``; per-row choice
-    options are permuted like multiple-choice criteria, fixed ones keep their order."""
+    options are permuted like multiple-choice criteria, fixed ones keep their order.
+
+    Rows are keyed by their inputs (``source_row``: text, and per-row options) within ``group``, the
+    source dataset: sibling annotations of one dataset (one per rated attribute)
+    give one input the same key, so a build keeps them together. Repeated
+    inputs within one task keep their first row."""
     if kind not in ("noul", "score", "choice"):
         raise ValueError(f"soft labels need a kind (noul, score or choice), got {kind!r}")
     paired = "sentence2" in dataset["train"].features
 
     def convert(example, index, split):
-        raw = _keeps_raw_text(task, split, index)
+        inputs = [example["sentence1"], example.get("sentence2"), *(example["options"] if row_options else [])]
+        key = hashlib.sha256("\x1f".join(map(str, inputs)).encode()).hexdigest()[:16]
+        raw = _keeps_raw_text(group, split, key)
         state = clean_text(example["sentence1"], raw)
         if paired:
             state = f"text_A: {state}\ntext_B: {clean_text(example['sentence2'], raw)}"
         criteria, target = [_strip(clean_text(o, raw)) for o in example["options"]], list(example["labels"])
-        identifier = f"{task or ''}:{split}:{index}"
+        identifier = f"{task or ''}:{split}:{key}"
         if row_options:
             reworded = normalize_all_none(criteria)
             order = choice_permutation(reworded, identifier)
             if order is not None:
                 criteria, target = [reworded[i] for i in order], [target[i] for i in order]
         return {"state": state, "instructions": question or JEV_CLASSIFICATION_INSTRUCTIONS,
-                "criteria": criteria, "target": target, "task": task or "", "kind": kind}
+                "criteria": criteria, "target": target, "task": task or "", "kind": kind,
+                "group": group or task or "", "source_row": key, "question_id": _question_id(task)}
+
+    def first_of_each_input(rows):
+        first = rows.select_columns(["source_row"]).to_pandas().drop_duplicates("source_row").index
+        return rows if len(first) == len(rows) else rows.select(first.tolist())
 
     converted = DatasetDict({
-        split: rows.map(convert, with_indices=True, fn_kwargs={"split": split})
-        .filter(lambda row: row["kind"] == "noul" or _valid_criteria(row["criteria"]))
-        for split, rows in dataset.items()
+        split: first_of_each_input(rows.map(convert, with_indices=True, fn_kwargs={"split": split})
+        .filter(lambda row: row["kind"] == "noul" or _valid_criteria(row["criteria"])))
+        for split, rows in dataset.items() if len(rows)  # e.g. hidden test labels
     })
-    keep = {"state", "instructions", "criteria", "target", "task", "kind"}
+    keep = {"state", "instructions", "criteria", "target", "task", "kind", "group", "source_row", "question_id"}
     return converted.remove_columns([c for c in converted["train"].column_names if c not in keep])
 
 
-def recast_jev(dataset, task=None, question=None, ordinal=False, kind=None, row_options=False):
+def recast_jev(dataset, task=None, question=None, ordinal=False, kind=None, row_options=False, group=None):
     """Recast a standardized Tasksource dataset as runtime-defined choices.
 
     The output is model- and wire-format-independent. ``criteria`` contains
@@ -169,7 +186,8 @@ def recast_jev(dataset, task=None, question=None, ordinal=False, kind=None, row_
     Ordinal label sets (``ordinal=True`` or a known scale) are put in scale
     order and about half their rows get ``kind="score"``. Soft labels
     (SoftLabeling, whose ``kind`` is passed) keep their distribution as ``target``;
-    ``row_options`` marks options that vary per row, which are permuted.
+    ``row_options`` marks options that vary per row, which are permuted;
+    ``group`` names the source dataset that sibling soft annotations share.
     """
     if not isinstance(dataset, DatasetDict):
         raise TypeError("recast_jev expects a datasets.DatasetDict")
@@ -178,7 +196,7 @@ def recast_jev(dataset, task=None, question=None, ordinal=False, kind=None, row_
 
     features = dataset["train"].features
     if kind is not None:
-        return _recast_soft(dataset, task, question, kind, row_options)
+        return _recast_soft(dataset, task, question, kind, row_options, group)
     task_type = _jev_task_type(features)
     labels = features.get("labels")
 

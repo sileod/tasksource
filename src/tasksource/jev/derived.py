@@ -21,7 +21,7 @@ from itertools import zip_longest
 
 from datasets import Dataset, concatenate_datasets
 
-from . import graded, procedural
+from . import procedural
 from .augmentations import stable_fraction
 from .prompt_augmentations import CLASSIFICATION_INSTRUCTION
 from .length import LengthBudget
@@ -368,7 +368,7 @@ def add_packed_classification(
     groups = {}
     for index, row in enumerate(rows):
         if (row["kind"] == "choice" and row["variant"] == "direct"
-                and not row["source"].startswith((procedural.SOURCE_PREFIX, graded.SOURCE_PREFIX))):
+                and not row["source"].startswith(procedural.SOURCE_PREFIX)):
             groups.setdefault((row["source"], row["split"]), []).append(index)
     derived, audits = [], []
     for key in sorted(groups):

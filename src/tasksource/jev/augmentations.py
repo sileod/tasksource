@@ -4,7 +4,7 @@ import hashlib
 
 from datasets import Dataset, concatenate_datasets
 
-from . import graded, procedural
+from . import procedural
 from .prompt_augmentations import (
     CLASSIFICATION_INSTRUCTION, MULTIPLE_CHOICE_INSTRUCTION, TOKEN_INSTRUCTION, instruction_variants,
     paired_state_variants,
@@ -49,7 +49,7 @@ def augment_jev_internal(
     for row in dataset:
         # Natively authored questions keep their wording and typed kinds; soft targets are not verifiable.
         if (row["variant"] != "direct" or row["kind"] != "choice" or max(row["target"]) < 1.0
-                or row["source"].startswith((procedural.SOURCE_PREFIX, graded.SOURCE_PREFIX))):
+                or row["source"].startswith(procedural.SOURCE_PREFIX)):
             continue
         options = row["options"]
         correct = max(range(len(row["target"])), key=row["target"].__getitem__)

@@ -243,7 +243,6 @@ class RecastJevTest(unittest.TestCase):
         self.assertEqual(counts["family/a"], 10)
         self.assertEqual(counts["family/b"], 10)
         self.assertEqual(source_family("multilingual/xcsr/fr"), "multilingual/xcsr")
-        self.assertEqual(source_family("graded/helpsteer"), "graded/helpsteer")
         self.assertEqual(source_family("procedural-typed-decisions/policy_applicability"),
                          "procedural-typed-decisions/policy_applicability")
 

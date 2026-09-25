@@ -2,6 +2,7 @@ from .preprocess import cat, get, regen, name, constant, Classification, TokenCl
 from .metadata import udep_en_configs
 from .metadata.configs import BABI_NLI
 from datasets import Sequence, ClassLabel, Dataset, DatasetDict, Features, Value, concatenate_datasets
+import ast
 import hashlib
 import html
 import random
@@ -33,8 +34,11 @@ glue___wnli = Classification(sentence1="sentence1", sentence2="sentence2", label
 
 glue___mrpc = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
 glue___qqp = Classification(sentence1="question1", sentence2="question2", labels="label")
-glue___stsb = Classification(sentence1="sentence1", sentence2="sentence2", labels="label",
-    question="How similar are the two sentences, from 0 (unrelated) to 5 (equivalent)?")
+# a regression task (the mean of raters' 0-5 similarity ratings); soft, a probability-like score
+glue___stsb = SoftLabeling(sentence1="sentence1", sentence2="sentence2", labels="label", kind="noul", high=5,
+    aggregation="mean", regression=True,
+    question="How similar are the two sentences, from 0 (unrelated) to 5 (equivalent)?",
+    soft_question="How similar in meaning are the sentences, from 0 (unrelated) to 1 (equivalent)?")
 
 super_glue___boolq = Classification(sentence1="question", labels="label")
 boolq_passage = Classification("passage", "question", labels="label", # reading-comprehension variant
@@ -64,8 +68,11 @@ babi_nli = Classification("premise", "hypothesis", "label",
 
 
 sick__label         = Classification('sentence_A','sentence_B','label', dataset_name="tasksource/sick")
-sick__relatedness   = Classification('sentence_A','sentence_B','relatedness_score', dataset_name="tasksource/sick",
-    question="How related are the two sentences, from 1 (unrelated) to 5 (very related)?")
+# the mean of ten raters' 1-5 relatedness ratings
+sick__relatedness   = SoftLabeling('sentence_A','sentence_B','relatedness_score', dataset_name="tasksource/sick",
+    kind="noul", low=1, high=5, aggregation="mean", annotators=10, regression=True,
+    question="How related are the two sentences, from 1 (unrelated) to 5 (very related)?",
+    soft_question="How related in meaning are the sentences, from 0 (unrelated) to 1 (closely related)?")
 
 
 def remove_neg_1(dataset):
@@ -175,8 +182,9 @@ recast_white__dpr = Classification("text","hypothesis","label",
     dataset_name="pietrolesci/recast_white",splits=['dpr',None,None],
     label_values=ENTAILMENT_LABEL_VALUES)
 
-joci = Classification("context","hypothesis",
-    labels=lambda x: [None, "impossible", "technically possible", "plausible", "likely", "very likely"][x["original_label"]],
+joci = Classification("context","hypothesis", labels="original_label", ordinal=True,
+    label_values={1: "impossible", 2: "technically possible", 3: "plausible", 4: "likely", 5: "very likely"},
+    question="How likely is the hypothesis, given the context?",
     pre_process=lambda ds:ds.filter(lambda x:x['original_label']!=0),
     dataset_name="pietrolesci/joci",splits=['full',None,None])
 
@@ -595,7 +603,8 @@ dbpedia_14 = Classification(sentence1="content", labels="label", splits=["train"
 
 amazon_polarity = Classification(sentence1="content", labels="label", splits=["train", None, "test"], config_name=["amazon_polarity"])
 
-app_reviews = Classification("review", labels="star", splits=["train", None, None],
+app_reviews = Classification("review", labels="star", splits=["train", None, None], ordinal=True,
+    question="How many stars did the reviewer give the app?",
     label_values={star: f"{star} star" + "s" * (star > 1) for star in range(1, 6)})
 
 
@@ -781,7 +790,7 @@ emo = Classification(sentence1=_emocontext_text,
 
 # rating is the share of 5 raters who found the query a well-formed question; the hard view keeps clear cases
 google_wellformed_query = SoftLabeling("content", labels="rating", kind="noul",
-    options=["not well-formed", "well-formed"], hard=0.8,
+    options=["not well-formed", "well-formed"], hard=0.8, annotators=5,
     question="Is this search query a well-formed question?",
     soft_question="What fraction of raters would judge this search query to be a well-formed question?",
     dataset_name="tasksource/google_wellformed_query")
@@ -955,8 +964,8 @@ cycic_mc = MultipleChoice("question", choices=regen(r"answer_option[0-4]"), labe
     dataset_name = "tasksource/cycic_multiplechoice")
 
 
-sts_companion = Classification("sentence1","sentence2","label",
-    dataset_name="tasksource/sts-companion")
+sts_companion = SoftLabeling("sentence1","sentence2","label", kind="noul", high=5, aggregation="mean",
+    regression=True, dataset_name="tasksource/sts-companion", soft_question="How similar in meaning are the sentences, from 0 (unrelated) to 1 (equivalent)?")
 
 commonsense_qa_2 = Classification("question",labels="answer",
     dataset_name="tasksource/commonsense_qa_2.0")
@@ -1022,7 +1031,7 @@ scruples = Classification("text",labels="binarized_label", question="Was the aut
 
 # poll vote shares; at least 100 votes, and the hard view keeps two-to-one majorities
 wouldyourather = SoftLabeling(constant(''), labels=lambda x: [x['votes_a'], x['votes_b']],
-    options=lambda x: [x['option_a'], x['option_b']], hard=2/3,
+    options=lambda x: [x['option_a'], x['option_b']], hard=2/3, annotators=1000,
     question="Which would most people rather do?",
     soft_question="A poll asked people which they would rather do. Which option would a randomly chosen respondent pick?",
     pre_process=lambda ds: ds.filter(lambda x: x['votes_a'] + x['votes_b'] >= 100),
@@ -1166,8 +1175,11 @@ perturbed_boolq = Classification("question",labels="hard_label",
     dataset_name='tasksource/boolq-natural-perturbations')
 
 
-graded_acceptability = Classification("text",labels="normalized_score",
+# the mean of 8 to 18 native speakers' ratings, rescaled to [0, 1]
+graded_acceptability = SoftLabeling("text",labels="normalized_score", kind="noul", aggregation="mean",
+    annotators=15, regression=True,
     question="How acceptable is this sentence, from 0 (unacceptable) to 1 (acceptable)?",
+    soft_question="How acceptable do native speakers find the sentence, from 0 (unacceptable) to 1 (fully acceptable)?",
     dataset_name="tasksource/acceptability-prediction")
 
 equate = Classification("sentence1","sentence2","gold_label",
@@ -1662,7 +1674,7 @@ wildguardmix__response_refusal = Classification(
     question="Does the assistant response refuse the request?")
 
 # BeaverTails annotates each (prompt, response) three times, one row per annotation;
-# keep one row per pair with the majority judgment (the vote share is graded/beavertails).
+# keep one row per pair with the majority judgment (the vote share is BeaverTails/unsafe_votes).
 def _beavertails_majority(dataset):
     def majority(rows):
         frame = rows.to_pandas()
@@ -1868,7 +1880,7 @@ def render_helpsteer_prompt(prompt):
 def _helpsteer(attribute, dataset_name):
     low, high = _HELPSTEER_SCALES[attribute]
     return Classification(lambda x: render_helpsteer_prompt(x["prompt"]), "response", name(attribute, [f"0: {low}", "1", "2", "3", f"4: {high}"]),
-        dataset_name=dataset_name, question=f"How would you rate the {attribute} of the response?")
+        dataset_name=dataset_name, question=f"How would you rate the {attribute} of the response?", ordinal=True)
 
 helpsteer__helpfulness = _helpsteer("helpfulness", "nvidia/HelpSteer")
 helpsteer__correctness = _helpsteer("correctness", "nvidia/HelpSteer")
@@ -1898,10 +1910,15 @@ def render_helpsteer3_pair(x):
     return (f"Conversation:\n{render_dialogue(x['context'])}\n\n"
             f"Response 1:\n{x['response1']}\n\nResponse 2:\n{x['response2']}")
 
+helpsteer_3___preference_strength = Classification(render_helpsteer3_pair, labels="overall_preference",
+    label_values=dict(zip(range(-3, 4), HELPSTEER3_PREFERENCE)), ordinal=True,
+    question="Which response is the better next assistant reply, and by how much?",
+    dataset_name="nvidia/HelpSteer3", config_name="preference", task_id="HelpSteer3/preference_strength")
+
 # each annotator's preference, not only the aggregate
 helpsteer_3___individual_preferences = SoftLabeling(render_helpsteer3_pair, kind="score",
     labels=lambda x: [[p["score"] for p in x["individual_preference"]].count(level) for level in range(-3, 4)],
-    options=HELPSTEER3_PREFERENCE, replaces=("HelpSteer3/preference",),
+    options=HELPSTEER3_PREFERENCE, annotators=3,
     question="Which response is the better next assistant reply, and by how much?",
     dataset_name="nvidia/HelpSteer3", config_name="preference", task_id="HelpSteer3/individual_preferences")
 
@@ -1934,7 +1951,7 @@ def _helpsteer3_feedback(dataset):
 # annotators' helpfulness levels; the hard view keeps the majority level (two of three)
 helpsteer_3___feedback = SoftLabeling(
     lambda x: f"{render_dialogue(x['context'])}\n\nAssistant: {x['response']}",
-    labels="helpfulness", kind="score", options=HELPFULNESS, hard=0.6, ordinal=True,
+    labels="helpfulness", kind="score", options=HELPFULNESS, hard=0.6, ordinal=True, annotators=3,
     pre_process=_helpsteer3_feedback, dataset_name="nvidia/HelpSteer3", config_name="feedback",
     question="How helpful is the assistant reply?")
 
@@ -1952,7 +1969,7 @@ prm800k_dpo___step = MultipleChoice("prompt", choices=["chosen", "rejected"], la
     question="Which next step is correct?", dataset_name="tasksource/prm800k_dpo", config_name="step",
     splits=["train", None, None])  # the source splits follow MATH; its test split is a benchmark
 
-essay_scoring = Classification("full_text", labels="score", question="What holistic score does this student essay deserve?",
+essay_scoring = Classification("full_text", labels="score", question="What holistic score does this student essay deserve?", ordinal=True,
     dataset_name='tasksource/AES2-essay-scoring',
     label_values={score: f"{score} out of 6" for score in range(1, 7)})
 
@@ -1961,7 +1978,7 @@ argument_feedback = Classification(lambda x: f"{x['discourse_type']}: {x['discou
     labels="discourse_effectiveness", dataset_name="tasksource/argument-feedback")
 
 # analytic scores from 1 to 5 in half points, averaged over raters; rounded half up
-eg = lambda x: Classification("full_text", question=f"What {x} score does this English learner essay deserve?",
+eg = lambda x: Classification("full_text", question=f"What {x} score does this English learner essay deserve?", ordinal=True,
     labels=lambda y: f"{int(y[x] + 0.5)} out of 5", dataset_name="tasksource/english-grading")
 grading__cohesion = eg('cohesion')
 grading__syntax = eg('syntax')
@@ -2017,8 +2034,185 @@ def _protoqa_top(x, n=8):
 
 proto_qa = SoftLabeling(lambda x: x["normalized-question"].strip().capitalize(),
     labels=lambda x: [count for count, _ in _protoqa_top(x)], options=lambda x: [a for _, a in _protoqa_top(x)],
+    annotators=100,
     question="People were surveyed with this question. Considering only respondents who gave one of these "
              "answers, which answer would a randomly chosen one have given?",
     pre_process=lambda ds: ds.filter(lambda x: len(x["answer-clusters"]["count"]) >= 2
                                      and sum(x["answer-clusters"]["count"]) >= 20),
     splits=["train", None, None], dataset_name="community-datasets/proto_qa", config_name="proto_qa")
+
+
+# Soft labels: annotator vote shares and mean ratings, recorded with how many annotators judged an
+# item (vote shares from fewer than five are coarse; the Jev build keeps them out). Sibling
+# annotations of one dataset, one per rated attribute, share their inputs.
+
+UNLI = SoftLabeling("premise", "hypothesis", labels="label", kind="noul", aggregation="mean", annotators=2,
+    question="How likely is the hypothesis to be true, given the premise?", dataset_name="Zhengping/UNLI",
+    task_id="UNLI")  # the mean of two probability judgements (three when they differ by 20 points)
+
+chaos_mnli = SoftLabeling("premise", "hypothesis", labels="label_count", options=["entailment", "neutral", "contradiction"],
+    annotators=100, question="How would annotators label the relation of the hypothesis to the premise?",
+    dataset_name="tasksource/chaos-mnli-ambiguity", task_id="chaos-mnli-ambiguity/votes")
+
+hate_speech_offensive_votes = SoftLabeling("tweet", labels=lambda x: [x["hate_speech_count"], x["offensive_language_count"],
+    x["neither_count"]], options=["hate speech", "offensive but not hate speech", "neither"], annotators=3,
+    question="How would annotators classify the tweet?", replaces=("hate_speech_offensive",),
+    dataset_name="tdavidson/hate_speech_offensive", task_id="hate_speech_offensive/votes")
+
+AITA = dict(AUTHOR="the author is in the wrong", OTHER="the other party is in the wrong",
+            EVERYBODY="everyone is in the wrong", NOBODY="no one is in the wrong", INFO="more information is needed")
+
+scruples_votes = SoftLabeling(lambda x: f"{x['title']}\n\n{x['text']}", labels=lambda x: [x["label_scores"][k] for k in AITA],
+    options=list(AITA.values()), annotators=8, replaces=("scruples",),
+    question="How would Reddit readers judge who is in the wrong in this story?",
+    dataset_name="tasksource/scruples", task_id="scruples/verdict_votes")
+
+def _one_row_per_text(dataset):  # SBIC repeats texts once per annotator
+    return DatasetDict({name: Dataset.from_pandas(split.to_pandas().drop_duplicates("text"), preserve_index=False)
+                        for name, split in dataset.items()})
+
+def _disagreement_rate(dataset_name, topic):
+    return SoftLabeling("text", labels="disagreement_rate", kind="noul", annotators=3,
+        question=f"How much would annotators disagree about {topic}, from 0 (all agree) to 1 (maximal disagreement)?",
+        pre_process=_one_row_per_text, dataset_name=dataset_name,
+        task_id=f"{dataset_name.split('/')[-1]}/disagreement_rate")
+
+dynasent_disagreement_rate = _disagreement_rate("RuyuanWan/Dynasent_Disagreement", "the sentiment of the text")
+politeness_disagreement_rate = _disagreement_rate("RuyuanWan/Politeness_Disagreement", "the politeness of the text")
+sbic_disagreement_rate = _disagreement_rate("RuyuanWan/SBIC_Disagreement", "whether the text is offensive")
+schem_disagreement_rate = _disagreement_rate("RuyuanWan/SChem_Disagreement", "whether the rule of thumb is acceptable")
+dilemmas_disagreement_rate = _disagreement_rate("RuyuanWan/Dilemmas_Disagreement", "which of the two actions is less ethical")
+
+# BeaverTails: three annotators per (prompt, response), one row each
+def _beavertails_votes(dataset):
+    """One row per (prompt, response) with the share of its three annotators who judged it unsafe."""
+    def votes(rows):
+        frame = rows.to_pandas()
+        frame["unsafe_share"] = frame.groupby(["prompt", "response"]).is_safe.transform(lambda safe: (~safe).sum() / len(safe))
+        return Dataset.from_pandas(frame.drop_duplicates(["prompt", "response"]), preserve_index=False)
+    return DatasetDict(train=votes(dataset["330k_train"]), test=votes(dataset["330k_test"]))
+
+beavertails_votes = SoftLabeling("prompt", "response", labels="unsafe_share", kind="noul", annotators=3,
+    question="What fraction of annotators judged the assistant response unsafe?", pre_process=_beavertails_votes,
+    dataset_name="PKU-Alignment/BeaverTails", task_id="BeaverTails/unsafe_votes")
+
+DYNASENT = ["positive", "negative", "neutral", "mixed"]
+
+def _dynasent_votes(x):
+    annotators = x["label_distribution"]  # label -> annotator ids, a dict or its repr
+    annotators = ast.literal_eval(annotators) if isinstance(annotators, str) else annotators
+    return [len(annotators.get(label, [])) for label in DYNASENT]
+
+dynasent_votes__r1 = SoftLabeling("sentence", labels=_dynasent_votes, options=DYNASENT, annotators=5,
+    question="How would annotators label the sentiment of the sentence?", dataset_name="dynabench/dynasent",
+    replaces=("dynasent/dynabench.dynasent.r1.all/r1",), task_id="dynasent/r1_votes",
+    load_dataset_kwargs=dict(revision=PARQUET, data_dir="dynabench.dynasent.r1.all"))
+dynasent_votes__r2 = SoftLabeling("sentence", labels=_dynasent_votes, options=DYNASENT, annotators=5,
+    question="How would annotators label the sentiment of the sentence?", dataset_name="dynabench/dynasent",
+    replaces=("dynasent/dynabench.dynasent.r2.all/r2",), task_id="dynasent/r2_votes",
+    load_dataset_kwargs=dict(revision=PARQUET, data_dir="dynabench.dynasent.r2.all"))
+
+hatexplain = SoftLabeling(lambda x: " ".join(x["post_tokens"]), labels=lambda x: [x["annotators"]["label"].count(label)
+    for label in range(3)], options=["hate speech", "normal", "offensive"], annotators=3,
+    question="How would annotators classify the post?", dataset_name="Hate-speech-CNERG/hatexplain",
+    load_dataset_kwargs=dict(revision=PARQUET, data_dir="plain_text"), task_id="hatexplain/votes")
+
+# Measuring Hate Speech survey items (Sachdeva et al., 2022, table 1); vote counts in code order, where a
+# higher code is more hateful (checked against the dataset's hate_speech_score)
+TARGETED = "the group(s) it targets"
+AGREEMENT = ["strongly disagree", "disagree", "neither disagree nor agree", "agree", "strongly agree"]
+
+def _mhs(item, question, levels, kind="score"):
+    return SoftLabeling("text", labels=item, kind=kind, options=levels, annotators=3, count="annotators",
+        question=question, dataset_name="tasksource/measuring-hate-speech-votes",
+        task_id=f"measuring-hate-speech/{item}")
+
+mhs__sentiment = _mhs("sentiment", "How would you describe the sentiment of this comment?",
+    ["strongly positive", "somewhat positive", "neutral", "somewhat negative", "strongly negative"])
+mhs__respect = _mhs("respect", f"Is this comment respectful towards {TARGETED}?",
+    ["strongly respectful", "respectful", "neutral", "disrespectful", "strongly disrespectful"])
+mhs__insult = _mhs("insult", f"Do you agree that this comment is insulting towards {TARGETED}?", AGREEMENT)
+mhs__humiliate = _mhs("humiliate", f"Do you agree that this comment is humiliating towards {TARGETED}?", AGREEMENT)
+mhs__status = _mhs("status", f"This comment states that {TARGETED} is:",
+    ["strongly superior", "superior", "neither superior nor inferior", "inferior", "strongly inferior"])
+mhs__dehumanize = _mhs("dehumanize", f"Do you agree that this comment dehumanizes {TARGETED} (e.g., by comparing "
+    "them to an animal)?", AGREEMENT)
+mhs__violence = _mhs("violence", f"Do you agree that this comment calls for using violence against {TARGETED}?", AGREEMENT)
+mhs__genocide = _mhs("genocide", "Do you agree that this comment calls for the deliberate killing of a large group "
+    f"of people from {TARGETED}?", AGREEMENT)
+mhs__attack_defend = _mhs("attack_defend", f"Is this comment attacking or defending {TARGETED}?",
+    ["strongly defending", "defending", "neither defending nor attacking", "attacking", "strongly attacking"])
+mhs__hatespeech = _mhs("hatespeech", "Does this comment contain hate speech, defined as bias-motivated, hostile and "
+    "malicious language targeted at a person or group because of their actual or perceived innate characteristics?",
+    ["no", "unclear", "yes"], kind="choice")
+
+# LeWiDi 2023 (Learning with Disagreements): soft labels with the per-item annotator count
+def _lewidi(config, sentence1, question, sentence2=None, annotators=5, **kwargs):
+    kwargs = {"labels": lambda x: x["soft_label"][1], "kind": "noul", "task_id": f"lewidi/{config}", **kwargs}
+    return SoftLabeling(sentence1, sentence2, annotators=annotators, count=lambda x: int(x["annotations"]),
+        question=question, dataset_name="tasksource/lewidi", config_name=config, **kwargs)
+
+def _conversation(x):
+    turns = [("Agent", "prev_agent"), ("User", "prev_user"), ("Agent", "agent"), ("User", "user")]
+    # the source writes "_" for turns before the conversation started
+    return "\n".join(f"{who}: {x[column]}" for who, column in turns if x[column].strip() not in ("", "_"))
+
+lewidi___md_agreement = _lewidi("md_agreement", "text", "What fraction of annotators find the tweet offensive?")
+lewidi___hs_brexit = _lewidi("hs_brexit", "text", "What fraction of annotators consider the tweet hate speech?",
+    annotators=6)
+lewidi___armis = _lewidi("armis", "text", "What fraction of annotators consider the tweet misogynistic or sexist?",
+    annotators=3)
+lewidi___conv_abuse = _lewidi("conv_abuse", _conversation,
+    "What fraction of annotators consider the user's last message abusive?", annotators=3)
+lewidi___mp = _lewidi("mp", "post", "What fraction of annotators consider the reply ironic?", sentence2="reply")
+lewidi___csc = _lewidi("csc", "context", "How sarcastic is the response, given the context?", sentence2="response",
+    annotators=4, labels="soft_label", kind="score", options=["1: not sarcastic", "2", "3", "4", "5", "6: very sarcastic"])
+
+def _varierrnli(relation):
+    return _lewidi("varierrnli", "context", f'What fraction of annotators accept "{relation}" as a label for the '
+        "statement, given the context?", sentence2="statement", annotators=4, labels=relation,
+        task_id=f"lewidi/varierrnli/{relation}")
+
+lewidi___varierrnli__entailment = _varierrnli("entailment")
+lewidi___varierrnli__neutral = _varierrnli("neutral")
+lewidi___varierrnli__contradiction = _varierrnli("contradiction")
+
+# Civil Comments: the share of raters (four to ten or more, from the shares' denominators) flagging each attribute
+def _civil_share(attribute, label):
+    return SoftLabeling("text", labels=attribute, kind="noul", annotators=6,
+        question=f"What fraction of annotators rated the comment as {label}?", replaces=(f"civil_comments/{attribute}",),
+        dataset_name="google/civil_comments", task_id=f"civil_comments/{attribute}_share")
+
+civil_comments__toxicity_share = _civil_share("toxicity", "toxic")
+civil_comments__severe_toxicity_share = _civil_share("severe_toxicity", "severely toxic")
+civil_comments__obscene_share = _civil_share("obscene", "obscene")
+civil_comments__threat_share = _civil_share("threat", "threatening")
+civil_comments__insult_share = _civil_share("insult", "insulting")
+civil_comments__identity_attack_share = _civil_share("identity_attack", "an identity attack")
+civil_comments__sexual_explicit_share = _civil_share("sexual_explicit", "sexually explicit")
+
+# OpenAssistant reviews of English assistant replies (three reviewers per reply): mean ratings and flag shares
+_oasst2_replies = lambda ds: ds.filter(lambda x: x["lang"] == "en" and x["role"] == "assistant")
+
+def _oasst2(attribute, question, aggregation):
+    return SoftLabeling("parent_text", "text", labels=attribute, kind="noul", annotators=3, aggregation=aggregation,
+        question=question, pre_process=_oasst2_replies, dataset_name="tasksource/oasst2_dense_flat",
+        task_id=f"oasst2/{attribute}")
+
+_rating = lambda attribute: _oasst2(attribute, f"Mean reviewer rating of the response's {attribute}, "
+                                               "from 0 (lowest) to 1 (highest).", "mean")
+_flag = lambda attribute, label: _oasst2(attribute, f"What fraction of reviewers flagged the response as {label}?", "votes")
+
+oasst2__quality = _rating("quality")
+oasst2__helpfulness = _rating("helpfulness")
+oasst2__creativity = _rating("creativity")
+oasst2__humor = _rating("humor")
+oasst2__toxicity = _rating("toxicity")
+oasst2__violence = _rating("violence")
+oasst2__spam = _flag("spam", "spam")
+oasst2__fails_task = _flag("fails_task", "failing the task")
+oasst2__not_appropriate = _flag("not_appropriate", "inappropriate")
+oasst2__hate_speech = _flag("hate_speech", "hate speech")
+oasst2__sexual_content = _flag("sexual_content", "sexual content")
+oasst2__pii = _flag("pii", "revealing personal information")
+oasst2__lang_mismatch = _flag("lang_mismatch", "in the wrong language")

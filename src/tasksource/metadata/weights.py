@@ -10,7 +10,7 @@ wins; keep the list short.
 import re
 
 WEIGHTS = {
-    r"graded/unli": 8,  # 55k human probabilities: the best calibration source
+    r"^UNLI$": 8,  # 55k human probability judgements: the best calibration source
     r"(linguisticprobing|robust_nli|gen_debiased_nli)": 0.1,
     r"universal_dependencies": 0.2,
     r"(label_nli|dpo|dataset_train_nli)": 5,

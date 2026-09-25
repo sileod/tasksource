@@ -47,20 +47,22 @@ def pretty_name(x):
     return f"{dn}/{cn}/{tn}".replace('//','/').rstrip('/')
 
 def list_tasks(tasks_path=f'{os.path.dirname(__file__)}/tasks.py', multilingual=False, instruct=False, excluded=(),
-               soft=False):
+               soft=False, min_annotators=None):
     """The task catalog as a DataFrame; ``excluded`` holds substrings of task ids to leave out.
 
     ``soft=False`` lists tasks with hard labels, SoftLabeling annotations by their
     hard view (``task_type`` Classification or MultipleChoice). ``soft=True`` prefers
     soft labels: SoftLabeling annotations are listed as such, including those with
     soft labels only, and the hard tasks they replace are left out. The
-    ``soft_labels`` column says whether a task has a soft view.
+    ``soft_labels`` column says whether a task has a soft view. With
+    ``min_annotators``, vote shares recorded from fewer annotators count as hard:
+    listed by their hard view if they have one, and replacing nothing.
 
     Each call returns a fresh copy, so callers may edit it without affecting later calls."""
-    return _list_tasks(tasks_path, multilingual, instruct, tuple(excluded), soft).copy()
+    return _list_tasks(tasks_path, multilingual, instruct, tuple(excluded), soft, min_annotators).copy()
 
 @cache
-def _list_tasks(tasks_path, multilingual, instruct, excluded, soft=False):
+def _list_tasks(tasks_path, multilingual, instruct, excluded, soft=False, min_annotators=None):
     if multilingual:
         tasks_path=tasks_path.replace('/tasks.py','/multilingual_tasks.py')
     task_order = open(tasks_path).readlines()
@@ -78,7 +80,8 @@ def _list_tasks(tasks_path, multilingual, instruct, excluded, soft=False):
         if isinstance(value,Preprocessing):
             task_type = value.__class__.__name__
             if isinstance(value, SoftLabeling):
-                task_type = "SoftLabeling" if soft else value.hard_type
+                use_soft = soft and value.enough_annotators(min_annotators)
+                task_type = "SoftLabeling" if use_soft else value.hard_type
                 if task_type is None:  # soft labels only
                     continue
             dataset_name, config_name, task_name = parse_var_name(key)
@@ -103,10 +106,10 @@ def _list_tasks(tasks_path, multilingual, instruct, excluded, soft=False):
     df['dataset_name'] = df.dataset_name.map(lambda n: CANONICAL.get(n, n))  # after the ids, which keep the short names
     del df['rank']
     if soft:  # a soft view supersedes the hard tasks it names
-        replaced = {r for m in df.mapping if isinstance(m, SoftLabeling) for r in m.replaces}
+        replaced = {r for m, t in zip(df.mapping, df.task_type) if t == "SoftLabeling" for r in m.replaces}
         df = df[~df.id.isin(replaced)]
-    if instruct:
-        df=df[df.id.map(lambda x: not any(a in x for a in recast_module.improper_labels))]
+    if instruct:  # improper labels (regression targets ...) are fine as soft labels
+        df=df[(df.task_type == "SoftLabeling") | df.id.map(lambda x: not any(a in x for a in recast_module.improper_labels))]
     df=df[df.id.map(lambda x: not any(a in x for a in excluded))]  # excluded holds substrings of task ids
     return df
 
@@ -115,6 +118,10 @@ def _list_tasks(tasks_path, multilingual, instruct, excluded, soft=False):
 
 RAW_BUILDERS = {"csv", "json", "parquet", "text"}
 
+def _every_task(multilingual=False):
+    """Hard and soft views together: every task id, each once."""
+    return pd.concat([list_tasks(multilingual=multilingual, soft=s) for s in (True, False)]).drop_duplicates("id")
+
 def hub_datasets(task_ids=None, multilingual=None):
     """Hub dataset ids behind tasks, for the ``datasets:`` field of a model card.
 
@@ -122,7 +129,7 @@ def hub_datasets(task_ids=None, multilingual=None):
     and the originals of tasksource copies and mirrors (metadata/originals.py).
     ``task_ids`` defaults to every task; ``multilingual=None`` searches both lists.
     """
-    frames = [list_tasks(multilingual=m, soft=True) for m in ([False, True] if multilingual is None else [multilingual])]
+    frames = [_every_task(multilingual=m) for m in ([False, True] if multilingual is None else [multilingual])]
     df = pd.concat(frames)
     if task_ids is not None:
         missing = set(task_ids) - set(df.id)
@@ -142,7 +149,7 @@ def hub_datasets(task_ids=None, multilingual=None):
 def task_provenance(task_id, multilingual=False):
     """Where one task's data comes from: the loading repo and config, repos read
     through hf:// data files, and the originals of tasksource copies and mirrors."""
-    df = list_tasks(multilingual=multilingual, soft=True)
+    df = _every_task(multilingual=multilingual)
     row = df[df.id == task_id]
     if row.empty:
         raise KeyError(f"unknown task: {task_id}")
@@ -186,7 +193,7 @@ def pin_hf_urls(value, pins):
     return value
 
 def load_preprocessing(tasks=tasks, **kwargs):
-    df = pd.concat([list_tasks(multilingual=tasks==lmtasks, soft=s) for s in (True, False)]).drop_duplicates("id")
+    df = _every_task(multilingual=tasks==lmtasks)
     matches = df[np.logical_and.reduce([df[k] == v for k, v in kwargs.items()] + [np.ones(len(df), bool)])]
     if matches.empty:
         raise KeyError(f"unknown task: {kwargs}")
@@ -202,14 +209,16 @@ def load_preprocessing(tasks=tasks, **kwargs):
 
 def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preprocessing_name=None,
          max_rows=None, max_rows_eval=None, multilingual=False, instruct=False,
-         recast=None, prompted=False, seed=0, data_file_pins=None, soft=None, **load_dataset_kwargs):
+         recast=None, prompted=False, seed=0, data_file_pins=None, soft=None, min_annotators=None,
+         **load_dataset_kwargs):
     """Load a standardized task.
 
     ``data_file_pins`` ({repo: commit}) pins the task's ``hf://`` data files, as
     ``revision`` pins its Hub dataset.
 
     ``soft`` picks the view of a SoftLabeling annotation: its distributions
-    (``soft=True``, the default for the Jev recast) or its majority labels.
+    (``soft=True``, the default for the Jev recast) or its majority labels;
+    ``min_annotators`` drops soft vote targets from fewer annotators.
 
     ``prompted=True`` appends the annotation's ``question`` to the inputs;
     otherwise the instruct and Jev recasts use it as their instruction. The
@@ -224,7 +233,7 @@ def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preproc
     soft_labels = isinstance(preprocessing, SoftLabeling) and (recast == "jev" if soft is None else soft)
     if isinstance(preprocessing, SoftLabeling):
         kind, row_options = preprocessing.kind, preprocessing.per_row_options
-        preprocessing = preprocessing.view(soft_labels)
+        preprocessing = preprocessing.view(soft_labels, min_annotators)
     elif soft:
         raise ValueError(f"{id or query} has no soft labels")
 
@@ -283,7 +292,9 @@ def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preproc
         dataset = recast_module.recast_jev(dataset, task=source_id, question=None if prompted else question,
                                            ordinal=getattr(preprocessing, "ordinal", False),
                                            kind=kind if soft_labels else None,
-                                           row_options=soft_labels and row_options)
+                                           row_options=soft_labels and row_options,
+                                           group="/".join(filter(None, [preprocessing.dataset_name,
+                                                                        preprocessing.config_name])))
     elif recast is not None:
         raise ValueError(f"Unknown recast format: {recast!r}")
     return dataset

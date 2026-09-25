@@ -44,7 +44,7 @@ class ProvenanceTest(unittest.TestCase):
         self.assertEqual(task_provenance("dream")["revision"], "refs/convert/parquet")
         conll = task_provenance("conll2002/es", multilingual=True)
         self.assertEqual(conll["data_file_revisions"], {"eriktks/conll2002": "refs/convert/parquet"})
-        self.assertEqual(source_provenance("graded/hatexplain")["revision"], "refs/convert/parquet")
+        self.assertEqual(source_provenance("hatexplain/votes")["revision"], "refs/convert/parquet")
         self.assertNotIn("revision", task_provenance("glue/mnli"))
 
 
@@ -107,7 +107,7 @@ class SafetySplitTest(unittest.TestCase):
     def test_beavertails_votes(self):
         from datasets import Dataset, DatasetDict
         from tasksource.tasks import _beavertails_majority
-        from tasksource.jev.graded import _beavertails_votes
+        from tasksource.tasks import _beavertails_votes
         rows = Dataset.from_dict({"prompt": ["p"] * 3 + ["q"] * 3, "response": ["r"] * 3 + ["s"] * 3,
                                   "category": [{}] * 6, "is_safe": [True, True, False, False, False, True]})
         majority = _beavertails_majority(DatasetDict({"330k_train": rows}))["330k_train"]
