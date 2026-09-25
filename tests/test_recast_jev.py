@@ -171,6 +171,16 @@ class RecastJevTest(unittest.TestCase):
         shown = set(pretty_order(dataset, first_rows=60)["variant"][:60])
         self.assertTrue({"packed_derived", "label_verification"} <= shown)
 
+    def test_pretty_order_keeps_question_groups_adjacent(self):
+        groups = [f"g{i // 3}" for i in range(300)]
+        dataset = Dataset.from_dict({"source": [f"s{i % 7}" for i in range(0, 300, 3) for _ in range(3)],
+                                     "group_id": groups, "value": list(range(300))})
+        ordered = pretty_order(dataset, first_rows=20)
+        self.assertEqual(sorted(ordered["value"]), list(range(300)))
+        runs = [g for i, g in enumerate(ordered["group_id"]) if i == 0 or g != ordered["group_id"][i - 1]]
+        self.assertEqual(len(runs), 100)  # each group appears once, as one run
+        self.assertNotEqual(runs, sorted(runs, key=lambda g: int(g[1:])))  # groups are shuffled
+
     def test_paired_public_style_keeps_related_questions_consistent(self):
         state = "text_A: Rain fell.\ntext_B: The ground is wet."
         styled, question = published_pair_style(

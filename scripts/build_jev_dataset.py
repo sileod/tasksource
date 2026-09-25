@@ -366,15 +366,28 @@ def drop_train_overlap(rows, train_keys):
 
 
 def pretty_order(dataset, first_rows=1_000, seed=0):
-    """Round-robin sources in a display prefix, then shuffle the remainder.
+    """Round-robin sources in a display prefix, then shuffle the remainder by question group.
 
     The prefix shows variety in the Hub viewer. Without the shuffle, capped
-    splits keep build order and put all procedural rows last.
+    splits keep build order and put all procedural rows last. The questions of
+    a group (``group_id``) stay adjacent, in the prefix too.
     """
     first_rows = min(first_rows, len(dataset))
     shuffle = np.random.default_rng(seed).permutation
+    if "group_id" in dataset.column_names:
+        codes = pd.factorize(np.asarray(dataset.select_columns(["group_id"])[:]["group_id"], dtype=object))[0]
+    else:
+        codes = np.arange(len(dataset))
+
+    def grouped(lead=()):
+        """Rows ordered by group: the groups of ``lead`` rows first, in that order, then the rest shuffled."""
+        rank = shuffle(codes.max() + 1 if len(codes) else 0).astype(np.int64)
+        lead_groups = list(dict.fromkeys(codes[row] for row in lead))
+        rank[lead_groups] = np.arange(len(lead_groups)) - len(lead_groups)
+        return dataset.select(np.lexsort((np.arange(len(codes)), rank[codes])))
+
     if first_rows < 2 or "source" not in dataset.column_names:
-        return dataset.select(shuffle(len(dataset)))
+        return grouped()
     # ``dataset["source"]`` is a lazy Column in recent datasets releases.
     # Repeated scalar indexing inside the loops below repeatedly rebuilds an
     # Arrow column and makes publication effectively quadratic.  Format the
@@ -387,7 +400,7 @@ def pretty_order(dataset, first_rows=1_000, seed=0):
     variants = display.get("variant")
     names = sorted(set(sources))
     if len(names) < 2:
-        return dataset.select(shuffle(len(dataset)))
+        return grouped()
     per_source = (first_rows + len(names) - 1) // len(names)
     buckets = {name: [] for name in names}
     first_by_variant = {name: {} for name in names} if variants else None
@@ -414,19 +427,20 @@ def pretty_order(dataset, first_rows=1_000, seed=0):
                 for variant in priority if variant in first_by_variant[name]
             ]
             buckets[name] = list(dict.fromkeys((*chosen, *buckets[name])))[:per_source]
-    prefix = []
+    group_sizes = np.bincount(codes)
+    prefix, shown, seen = [], 0, set()
     for offset in range(per_source):
         for name in names:
-            if offset < len(buckets[name]):
-                prefix.append(buckets[name][offset])
-                if len(prefix) == first_rows:
+            if offset < len(buckets[name]) and codes[buckets[name][offset]] not in seen:
+                row = buckets[name][offset]
+                prefix.append(row)
+                seen.add(codes[row])
+                shown += group_sizes[codes[row]]  # a row brings its whole group
+                if shown >= first_rows:
                     break
-        if len(prefix) == first_rows:
+        if shown >= first_rows:
             break
-    selected = np.zeros(len(dataset), dtype=bool)
-    selected[prefix] = True
-    order = np.concatenate((np.asarray(prefix), shuffle(np.flatnonzero(~selected))))
-    return dataset.select(order)
+    return grouped(prefix)
 
 
 def source_family(source):
