@@ -84,7 +84,7 @@ print(row["state"], row["question"], row["options"], row["target"])
 | `id`, `group_id`, `question_id` | Link decisions over the same source example |
 | `source`, `split`, `variant` | Originating task, original split, and recast variant |
 
-Splits: 2,000,000 train, 15,000 validation (`dev` in `split`), and 15,000 test,
+Splits: 2,500,000 train, 15,000 validation (`dev` in `split`), and 15,000 test,
 following each source's own train/dev/test splits where it has them.
 
 ## How it is built
