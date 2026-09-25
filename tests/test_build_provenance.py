@@ -19,8 +19,8 @@ from scripts.build_jev_dataset import (
 def _args(**overrides):
     values = dict(max_rows=1000, max_rows_eval=100, noul_rate=0.05, score_rate=0.0, permutation_rate=0.05,
                   prompt_rate=0.05, paired_format_rate=0.05, pack_rate=0.1, pack_max_tokens=4096,
-                  pack_tokenizer=None, pack_max_items=4, max_request_tokens=32768,
-                  request_tokenizer=None, output=Path("a"), upload=False)
+                  pack_tokenizer=None, pack_max_items=4, max_request_bytes=131072,
+                  max_request_tokens=32768, request_tokenizer=None, output=Path("a"), upload=False)
     return argparse.Namespace(**{**values, **overrides})
 
 
@@ -28,6 +28,7 @@ class ResumeTest(unittest.TestCase):
     def test_fingerprint_tracks_shard_settings_only(self):
         base = build_fingerprint(_args())
         self.assertNotEqual(base, build_fingerprint(_args(max_rows=30000)))
+        self.assertNotEqual(base, build_fingerprint(_args(max_request_bytes=65536)))
         self.assertNotEqual(base, build_fingerprint(_args(max_request_tokens=16384)))
         # where the output goes or whether it uploads does not change shard contents
         self.assertEqual(base, build_fingerprint(_args(output=Path("b"), upload=True)))
@@ -84,7 +85,7 @@ class RequestLengthBudgetTest(unittest.TestCase):
             "variant": "direct", "split": "train",
         }
         rows = Dataset.from_list([row, {**row, "id": "long", "state": "x" * 2000}])
-        filtered, dropped = filter_request_lengths(rows, LengthBudget(512, overhead=0))
+        filtered, dropped = filter_request_lengths(rows, max_bytes=512)
         self.assertEqual((len(filtered), dropped, filtered[0]["id"]), (1, 1, "x"))
 
     def test_zero_budget_disables_filter(self):
@@ -95,8 +96,25 @@ class RequestLengthBudgetTest(unittest.TestCase):
             "state": "x" * 2000, "question": "Q?", "source": "source",
             "variant": "direct", "split": "train",
         }])
-        filtered, dropped = filter_request_lengths(rows, LengthBudget(0))
+        filtered, dropped = filter_request_lengths(rows, max_bytes=0)
         self.assertEqual((len(filtered), dropped), (1, 0))
+
+    def test_optional_exact_token_budget(self):
+        from datasets import Dataset
+
+        class Tokenizer:
+            def encode(self, text, add_special_tokens=False):
+                return list(text)
+
+        row = {
+            "id": "x", "kind": "choice", "options": ["yes", "no"], "target": [1.0, 0.0],
+            "state": "x" * 300, "question": "Q?", "source": "source",
+            "variant": "direct", "split": "train",
+        }
+        rows = Dataset.from_list([row])
+        filtered, dropped = filter_request_lengths(
+            rows, max_bytes=10_000, budget=LengthBudget(128, Tokenizer(), overhead=0))
+        self.assertEqual((len(filtered), dropped), (0, 1))
 
 
 class CatalogApiTest(unittest.TestCase):
