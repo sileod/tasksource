@@ -21,8 +21,7 @@ size_categories:
 
 # tasksource-jev-typed-decisions
 
-**2.5 million decisions from 670 sources, in one format for models that read
-their answer criteria at runtime.**
+**2.5 million typed decisions (choices, ratings and probabilities) from 670 sources.**
 
 ## Why use it
 
