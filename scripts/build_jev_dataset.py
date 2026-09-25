@@ -185,6 +185,8 @@ def to_training_row(example, index, task_id, split):
     """Convert the lossless internal recast to the common Jev training schema."""
     options = list(example["criteria"])
     label = int(example["label"])
+    if not 0 <= label < len(options):
+        raise ValueError(f"{task_id}:{split}:{index}: label {label} outside {len(options)} options")
     target = [0.0] * len(options)
     target[label] = 1.0
     source_row = example.get("source_row", index)

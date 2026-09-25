@@ -177,10 +177,11 @@ def sample_formats(rng: random.Random, n: int, format_weights: dict,
 
     if n == 1:
         return [draw()]
-    if n >= 3 and rng.random() < p_all_if_ge3:
-        # Construct all-three coverage directly: replacing a random
+    covered = [f for f, w in zip(formats, weights) if w > 0]  # only configured formats
+    if n >= max(3, len(covered)) and rng.random() < p_all_if_ge3:
+        # Construct full coverage directly: replacing a random
         # position could evict the only instance of another format.
-        sampled = ["choice", "noul", "score"] + [draw() for _ in range(n - 3)]
+        sampled = covered + [draw() for _ in range(n - len(covered))]
         rng.shuffle(sampled)
         return sampled
     if rng.random() >= p_mixed:
@@ -188,7 +189,7 @@ def sample_formats(rng: random.Random, n: int, format_weights: dict,
     # Mixed: at least 2 distinct formats (n>=2).
     sampled = [draw() for _ in range(n)]
     if len(set(sampled)) < 2:
-        others = [f for f in formats if f != sampled[0]] or formats
+        others = [f for f in covered if f != sampled[0]] or covered
         sampled[rng.randrange(n)] = rng.choice(others)
     rng.shuffle(sampled)
     return sampled

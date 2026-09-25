@@ -14,6 +14,9 @@ also reports requested-vs-observed ambiguity as a quality diagnostic.
 from __future__ import annotations
 
 import hashlib
+from collections import Counter
+
+from .split import family_id
 
 
 def ambiguity_bucket(max_prob: float) -> str:
@@ -50,9 +53,25 @@ def select_bundles(bundles: list[dict], selection_cfg, n_target: int | None = No
     if drift and plan:
         biggest = max(plan, key=plan.get)
         plan[biggest] += drift
+    cap = getattr(selection_cfg, "max_per_family", 0)  # 0 = no cap
+    per_family: Counter = Counter()
+
+    def admit(bundle) -> bool:
+        family = family_id(bundle)
+        if cap and per_family[family] >= cap:
+            return False
+        per_family[family] += 1
+        return True
+
     selected: list[dict] = []
     for bucket_name, count in plan.items():
-        selected.extend(buckets.get(bucket_name, [])[:max(0, count)])
+        taken = 0
+        for bundle in buckets.get(bucket_name, []):
+            if taken >= count:
+                break
+            if admit(bundle):
+                selected.append(bundle)
+                taken += 1
     # Backfill from any bucket if a bucket is short.
     if len(selected) < total:
         have = {b["state_id"] for b in selected}
@@ -60,7 +79,7 @@ def select_bundles(bundles: list[dict], selection_cfg, n_target: int | None = No
             for bundle in bucket_bundles:
                 if len(selected) >= total:
                     break
-                if bundle["state_id"] not in have:
+                if bundle["state_id"] not in have and admit(bundle):
                     selected.append(bundle)
                     have.add(bundle["state_id"])
     selected.sort(key=lambda b: b["state_id"])

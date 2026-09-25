@@ -350,6 +350,8 @@ PARKED = {
     'imppres__prag': ('evaluation', 'IMPPRES is a diagnostic set for NLI pragmatics, not training data'),
     'imppres__log': ('evaluation', 'IMPPRES is a diagnostic set for NLI pragmatics, not training data'),
     'effective_feedback_student_writing': ('unavailable', 'source discontinued; see argument_feedback in tasks.py'),
+    'prompt_injection_threat_matrix': ('unavailable', 'gated or removed: the Hub reports the dataset missing'),
+    'prompt_injection_geekyrakshit': ('duplicate', 'aggregate of deepset/prompt-injections and xTRam1 (listed); 90% of its test rows are in its own train'),
 }
 REASONS = {key: reason for key, (_, reason) in PARKED.items()}
 
@@ -359,8 +361,6 @@ NOT_ANNOTATED = {
     "clue/clue cmnli": ("duplicate", "machine-translated MNLI; XNLI covers Chinese"),
     "demelin/wino_x": ("evaluation", "machine translation evaluation set; script-only loader"),
     "dbarbedillo/SMS_Spam_Multilingual_Collection_Dataset": ("unsound", "machine-translated; many translations degenerate"),
-    "prompt_injection_threat_matrix": ("unavailable", "gated or removed: the Hub reports the dataset missing"),
-    "prompt_injection_geekyrakshit": ("duplicate", "aggregate of deepset/prompt-injections and xTRam1 (listed); 90% of its test rows are in its own train"),
     "ylacombe/xsum_factuality": ("unavailable", "no longer on the Hub"),
 }
 

@@ -40,10 +40,11 @@ def render_multiple_choice(prompt, options, labels):
     return dict_of(inputs, targets) 
 
 def negative_sample_options(y, labels,N=4, rng=random):
+    """The gold label and N-1 sampled negatives, in ontology order so the gold slot carries no signal."""
     if len(labels)<N:
-        return labels
-    else:
-        return [y]+rng.sample([x for x in labels if x!=y], N-1)
+        return list(labels)
+    chosen = {y, *rng.sample([x for x in labels if x!=y], N-1)}
+    return [x for x in labels if x in chosen]
 
 def shuffle_choices(x, rng=random):
     choices = sorted([k for k in x if 'choice' in k])
@@ -65,7 +66,8 @@ def recast_dataset_classification_to_mc(dataset,sep="[SEP]",N=4):
             df['inputs'] +=sep + df.sentence2
 
         N=min(N, len(labels.names))
-        df['choices']=df.apply(lambda x:negative_sample_options(labels.int2str(x['labels']), labels.names,N),axis=1)     
+        df['choices']=df.apply(lambda x:negative_sample_options(labels.int2str(x['labels']), labels.names,N,
+            rng=random.Random(x.name)),axis=1)  # per-row RNG: reproducible     
         df['labels']=df.apply(lambda x:x['choices'].index(labels.int2str(x['labels'])),axis=1)
 
         for i in range(N):
@@ -103,7 +105,7 @@ def recast_instruct(dataset, question=None, seed=0):
     def recast_TokenClassification(x, rng):
         distractors = list(labels.feature.names)
         x_labels = [labels.feature.int2str(y) for y in x['labels']]
-        labels_set= list({labels.feature.int2str(y) for y in x['labels']})
+        labels_set= list(dict.fromkeys(x_labels))  # first-seen order, independent of PYTHONHASHSEED
         options=list(dict.fromkeys(labels_set+distractors))[:max(len(labels_set),10)]
         return render_token_classification(x['tokens'],options,x_labels)
 

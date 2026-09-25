@@ -34,6 +34,12 @@ class SamplerConfig:
     probability_mixed_formats: float = 0.85
     probability_all_formats_if_n_ge_3: float = 0.70
 
+    def __post_init__(self):
+        from .schemas import FORMATS
+        unknown = set(self.question_formats) - set(FORMATS)
+        if unknown or not self.question_formats:
+            raise ValueError(f"question_formats keys must be among {FORMATS}: {sorted(self.question_formats)}")
+
 
 @dataclass
 class CriticConfig:

@@ -143,3 +143,77 @@ class ApiTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class GoldPositionTest(unittest.TestCase):
+    """Sampled options must not put the gold label first."""
+
+    def test_instruct_options_do_not_lead_with_gold(self):
+        rows = recast_instruct(_classification(200), seed=0)["train"]
+        firsts = {x["inputs"].split('"')[1] == x["targets"].rstrip(".") for x in rows}
+        self.assertEqual(firsts, {True, False})
+
+    def test_classification_to_mc_labels_vary(self):
+        from tasksource.recast import recast_dataset_classification_to_mc
+        labels = recast_dataset_classification_to_mc(_classification(200))["train"]["labels"]
+        self.assertGreater(len(set(labels)), 1)
+
+
+class InvalidLabelTest(unittest.TestCase):
+    """-1 (hidden label) must never become the last class."""
+
+    def test_classification_rows_without_gold_dropped(self):
+        from tasksource.jev.recast import recast_jev
+        rows = Dataset.from_dict({"sentence1": ["a", "b", "c"], "labels": [0, -1, 1]})
+        data = DatasetDict(train=rows.cast_column("labels", ClassLabel(names=["no", "yes"])))
+        self.assertEqual(recast_jev(data)["train"]["answer"], ["no", "yes"])
+
+    def test_multiple_choice_rows_without_gold_dropped(self):
+        from tasksource.jev.recast import recast_jev
+        data = DatasetDict(train=Dataset.from_dict({
+            "inputs": ["q1", "q2"], "choice0": ["x", "x"], "choice1": ["y", "y"], "labels": [-1, 1]}))
+        self.assertEqual(recast_jev(data)["train"]["answer"], ["y"])
+
+    def test_training_row_rejects_out_of_range_label(self):
+        from scripts.build_jev_dataset import to_training_row
+        example = {"criteria": ["a", "b"], "label": -1, "state": "s", "instructions": "q"}
+        with self.assertRaises(ValueError):
+            to_training_row(example, 0, "demo", "train")
+
+
+class TokenOptionOrderTest(unittest.TestCase):
+    def test_options_independent_of_hash_seed(self):
+        import subprocess, sys
+        code = ("from datasets import *; from tasksource.recast import recast_instruct\n"
+                "names=[f'label{i}' for i in range(30)]\n"
+                "d=Dataset.from_dict({'tokens':[['w']*30],'labels':[list(range(30))]})"
+                ".cast_column('labels',Sequence(ClassLabel(names=names)))\n"
+                "print(recast_instruct(DatasetDict(train=d))['train'][0]['inputs'].split(chr(10))[0])")
+        src = str(Path(__file__).resolve().parents[1] / "src")
+        outputs = {subprocess.run([sys.executable, "-c", code], capture_output=True, text=True, check=True,
+                                  env={**__import__("os").environ, "PYTHONHASHSEED": seed, "PYTHONPATH": src}).stdout
+                   for seed in ("1", "2", "3")}
+        self.assertEqual(len(outputs), 1)
+
+
+class SyntheticConfigTest(unittest.TestCase):
+    def test_single_format_config_is_respected(self):
+        from tasksource.jev.synthetic.config import SamplerConfig
+        cfg = SamplerConfig(question_formats={"choice": 1.0})
+        formats = {q["format"] for s in specs_mod.sample_specs(cfg, 300) for q in s["questions"]}
+        self.assertEqual(formats, {"choice"})
+
+    def test_unknown_format_rejected(self):
+        from tasksource.jev.synthetic.config import SamplerConfig
+        with self.assertRaises(ValueError):
+            SamplerConfig(question_formats={"choice": 0.5, "essay": 0.5})
+
+    def test_max_per_family_caps_selection(self):
+        from tasksource.jev.synthetic import select as select_mod
+        from tasksource.jev.synthetic.config import SelectionConfig
+        bundles = [{"state_id": f"s{i}", "domain": f"d{i % 3}", "scenario_type": "t", "style": "x",
+                    "annotation_stats": [{"max_prob": 0.95}]} for i in range(30)]
+        selected = select_mod.select_bundles(bundles, SelectionConfig(max_per_family=4))["selected"]
+        per_family = {split_mod.family_id(b) for b in selected}
+        self.assertEqual(len(selected), 12)
+        self.assertEqual(len(per_family), 3)

@@ -176,7 +176,8 @@ def recast_jev(dataset, task=None, question=None):
             }
 
         converted = DatasetDict({
-            split: rows.map(convert, with_indices=True, fn_kwargs={"split": split})
+            split: rows.filter(lambda row: 0 <= row["labels"] < len(choices))  # no gold: -1 would index the last option
+            .map(convert, with_indices=True, fn_kwargs={"split": split})
             .filter(lambda row: _valid_criteria(row["criteria"]))
             for split, rows in dataset.items()
         })
@@ -232,7 +233,8 @@ def recast_jev(dataset, task=None, question=None):
         )
 
     if task_type == "Classification":
-        converted = dataset.map(convert)
+        # rows without a gold class (-1 = hidden label) would index the last criterion
+        converted = dataset.filter(lambda row: 0 <= row["labels"] < len(criteria)).map(convert)
     keep = {"state", "instructions", "criteria", "label", "answer", "task"}
     remove = [name for name in converted["train"].column_names if name not in keep]
     if remove:
