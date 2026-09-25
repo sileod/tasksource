@@ -1,6 +1,7 @@
 ---
 pretty_name: tasksource-jev-typed-decisions
 language:
+- en
 - multilingual
 license: other
 task_categories:
@@ -20,7 +21,7 @@ size_categories:
 
 # tasksource-jev-typed-decisions
 
-**One million human-labeled decisions from 500+ tasks, in one format for models
+**Two million human-labeled decisions from 600+ tasks, in one format for models
 that read their answer criteria at runtime.**
 
 Most instruction data teaches a model to *write*. This dataset teaches it to
@@ -79,7 +80,7 @@ print(row["state"], row["question"], row["options"], row["target"])
 | `id`, `group_id`, `question_id` | Link decisions over the same source example |
 | `source`, `split`, `variant` | Originating task, original split, and recast variant |
 
-Splits: 1,000,000 train, 15,000 validation (`dev` in `split`), and 15,000 test,
+Splits: 2,000,000 train, 15,000 validation (`dev` in `split`), and 15,000 test,
 following each source's own train/dev/test splits where it has them.
 
 ## How it is built
