@@ -6,6 +6,7 @@ Each family names a dataset, the fields that form the state, and one typed
 question per label column; sibling annotations of one input share a state.
 """
 
+import ast
 import math
 from dataclasses import dataclass
 
@@ -65,6 +66,7 @@ class Family:
     keep: object = None  # row filter applied before splitting
     prepare: object = None  # row map adding the state columns
     dedupe: str = None  # column whose repeats are dropped (one row per annotator upstream)
+    load_kwargs: dict = None  # e.g. the Hub parquet export of a script-only dataset
 
 
 HELPSTEER = dict(
@@ -95,6 +97,57 @@ HATE_VOTES = ["hate_speech_count", "offensive_language_count", "neither_count"]
 DISAGREEMENT = dict(Dynasent="the sentiment of the text", Politeness="the politeness of the text",
                     SBIC="whether the text is offensive", SChem="whether the rule of thumb is acceptable",
                     Dilemmas="which of the two actions is less ethical")
+
+PARQUET_EXPORT = "refs/convert/parquet"
+PREMISE = {"Premise": "premise", "Hypothesis": "hypothesis"}
+AGREEMENT = ["strongly disagree", "disagree", "neither disagree nor agree", "agree", "strongly agree"]
+TARGETED = "the group(s) it targets"
+# Measuring Hate Speech survey items (Sachdeva et al., 2022, table 1); vote counts in code order, where a
+# higher code is more hateful (checked against the dataset's hate_speech_score)
+MHS = dict(
+    sentiment=("How would you describe the sentiment of this comment?",
+               ["strongly positive", "somewhat positive", "neutral", "somewhat negative", "strongly negative"]),
+    respect=(f"Is this comment respectful towards {TARGETED}?",
+             ["strongly respectful", "respectful", "neutral", "disrespectful", "strongly disrespectful"]),
+    insult=(f"Do you agree that this comment is insulting towards {TARGETED}?", AGREEMENT),
+    humiliate=(f"Do you agree that this comment is humiliating towards {TARGETED}?", AGREEMENT),
+    status=(f"This comment states that {TARGETED} is:",
+            ["strongly superior", "superior", "neither superior nor inferior", "inferior", "strongly inferior"]),
+    dehumanize=(f"Do you agree that this comment dehumanizes {TARGETED} (e.g., by comparing them to an animal)?",
+                AGREEMENT),
+    violence=(f"Do you agree that this comment calls for using violence against {TARGETED}?", AGREEMENT),
+    genocide=(f"Do you agree that this comment calls for the deliberate killing of a large group of people "
+              f"from {TARGETED}?", AGREEMENT),
+    attack_defend=(f"Is this comment attacking or defending {TARGETED}?",
+                   ["strongly defending", "defending", "neither defending nor attacking", "attacking",
+                    "strongly attacking"]),
+)
+HATE_SPEECH_DEFINITION = ("Does this comment contain hate speech, defined as bias-motivated, hostile and malicious "
+                          "language targeted at a person or group because of their actual or perceived innate "
+                          "characteristics?")
+DYNASENT = ["positive", "negative", "neutral", "mixed"]
+
+
+def _dynasent_votes(example):
+    annotators = example["label_distribution"]  # label -> annotator ids, a dict or its repr
+    annotators = ast.literal_eval(annotators) if isinstance(annotators, str) else annotators
+    return {"votes": [len(annotators.get(label, [])) for label in DYNASENT]}
+
+
+def _share_of_yes(example):
+    return {"share": example["soft_label"][1]}
+
+
+def _conv_abuse(example):
+    turns = [("Agent", "prev_agent"), ("User", "prev_user"), ("Agent", "agent"), ("User", "user")]
+    # the source writes "_" for turns before the conversation started
+    return {**_share_of_yes(example), "conversation": "\n".join(
+        f"{who}: {example[column]}" for who, column in turns if example[column].strip() not in ("", "_"))}
+
+
+def _lewidi_noul(config, state, question, prepare=_share_of_yes):
+    return Family("tasksource/lewidi", state, dict(label=noul("share", question)), config=config, prepare=prepare)
+
 
 FAMILIES = {
     "helpsteer": Family("nvidia/HelpSteer", {"Prompt": "prompt", "Response": "response"}, HELPSTEER),
@@ -145,6 +198,38 @@ FAMILIES = {
         disagreement=noul("disagreement_rate", f"How much would annotators disagree about {topic}, "
                                                "from 0 (all agree) to 1 (maximal disagreement)?")),
         dedupe="text") for name, topic in DISAGREEMENT.items()},
+    "unli": Family("Zhengping/UNLI", PREMISE, dict(
+        probability=noul("label", "How likely is the hypothesis to be true, given the premise?"))),
+    **{f"dynasent_{r}": Family("dynabench/dynasent", {"Sentence": "sentence"}, dict(
+        sentiment=choice("votes", "How would annotators label the sentiment of the sentence?", DYNASENT)),
+        prepare=_dynasent_votes, load_kwargs=dict(revision=PARQUET_EXPORT, data_dir=f"dynabench.dynasent.{r}.all"))
+       for r in ("r1", "r2")},
+    "hatexplain": Family("Hate-speech-CNERG/hatexplain", {"Post": "post"}, dict(
+        label=choice("votes", "How would annotators classify the post?", ["hate speech", "normal", "offensive"])),
+        prepare=lambda x: {"post": " ".join(x["post_tokens"]),
+                           "votes": [x["annotators"]["label"].count(label) for label in range(3)]},
+        load_kwargs=dict(revision=PARQUET_EXPORT, data_dir="plain_text")),
+    "measuring_hate_speech": Family("tasksource/measuring-hate-speech-votes", {"Comment": "text"}, {
+        **{item: score(item, question, levels) for item, (question, levels) in MHS.items()},
+        "hatespeech": choice("hatespeech", HATE_SPEECH_DEFINITION, ["no", "unclear", "yes"])}),
+    "lewidi_md_agreement": _lewidi_noul("md_agreement", {"Tweet": "text"},
+                                        "What fraction of annotators find the tweet offensive?"),
+    "lewidi_hs_brexit": _lewidi_noul("hs_brexit", {"Tweet": "text"},
+                                     "What fraction of annotators consider the tweet hate speech?"),
+    "lewidi_armis": _lewidi_noul("armis", {"Tweet": "text"},
+                                 "What fraction of annotators consider the tweet misogynistic or sexist?"),
+    "lewidi_conv_abuse": _lewidi_noul("conv_abuse", {"Conversation": "conversation"},
+                                      "What fraction of annotators consider the user's last message abusive?",
+                                      prepare=_conv_abuse),
+    "lewidi_mp": _lewidi_noul("mp", {"Post": "post", "Reply": "reply"},
+                              "What fraction of annotators consider the reply ironic?"),
+    "lewidi_csc": Family("tasksource/lewidi", {"Context": "context", "Response": "response"}, dict(
+        sarcasm=score("soft_label", "How sarcastic is the response, given the context?",
+                      ["1: not sarcastic", "2", "3", "4", "5", "6: very sarcastic"])), config="csc"),
+    "lewidi_varierrnli": Family("tasksource/lewidi", {"Context": "context", "Statement": "statement"}, {
+        relation: noul(relation, f'What fraction of annotators accept "{relation}" as a label for the '
+                                 f"statement, given the context?")
+        for relation in ("entailment", "neutral", "contradiction")}, config="varierrnli"),
     "acceptability": Family("tasksource/acceptability-prediction", {"Sentence": "text"}, dict(
         acceptability=noul("normalized_score", "How acceptable do native speakers find the sentence, "
                                                "from 0 (unacceptable) to 1 (fully acceptable)?"))),
@@ -181,7 +266,7 @@ def jev_rows(example, family, source, split, index):
 def load_family(name, max_rows=None, max_rows_eval=None):
     """Grouped Jev rows per split, split and sampled like any Tasksource source."""
     family = FAMILIES[name]
-    dataset = DatasetDict(load_dataset(family.dataset, family.config))
+    dataset = DatasetDict(load_dataset(family.dataset, family.config, **(family.load_kwargs or {})))
     if family.dedupe:
         dataset = DatasetDict({split: rows.select(
             rows.to_pandas().drop_duplicates(family.dedupe).index.tolist()) for split, rows in dataset.items()})

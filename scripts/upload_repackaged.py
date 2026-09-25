@@ -28,6 +28,7 @@ WELLFORMED_URL = "https://raw.githubusercontent.com/google-research-datasets/que
 HUMICROEDIT_URL = "https://cs.rochester.edu/u/nhossain/semeval-2020-task-7-dataset.zip"
 ETHOS_URL = "https://raw.githubusercontent.com/intelligence-csd-auth-gr/Ethos-Hate-Speech-Dataset/master/ethos/ethos_data/Ethos_Dataset_Multi_Label.csv"
 MULTILINGUAL_SENTIMENTS_URL = "https://raw.githubusercontent.com/tyqiangz/multilingual-sentiment-datasets/main/data/all/{}.csv"
+LEWIDI_URL = "https://raw.githubusercontent.com/Le-Wi-Di/le-wi-di.github.io/546eaab420adab3c658813ae3fc7ae9f73cf8f05/{}"
 CHAOS_MNLI_URL = "hf://datasets/tasksource/chaos-mnli-ambiguity/chaos_mnli.jsonl"
 CLUTRR_URL = "hf://datasets/kendrivp/CLUTRR_v1_extracted/gen_train234_test2to10/CLUTRR_v1_gen_train234_test2to10_{}.json"
 
@@ -208,17 +209,117 @@ def chaos_mnli_ambiguity():
     return DatasetDict(train=rows)
 
 
+MHS_ITEMS = dict(sentiment=5, respect=5, insult=5, humiliate=5, status=5, dehumanize=5,
+                 violence=5, genocide=5, attack_defend=5, hatespeech=3)
+
+
+def measuring_hate_speech_votes():
+    """Measuring Hate Speech (Kennedy et al., 2020; Sachdeva et al., 2022), one row per comment with vote counts.
+
+    The source has one row per (comment, annotator). Each survey item becomes a list of vote counts over its
+    ordinal codes, in code order: 0-4 for the nine Likert items, where a higher code is more hateful
+    (sentiment: strongly positive to strongly negative; respect: strongly respectful to strongly disrespectful;
+    insult, humiliate, dehumanize, violence, genocide: strongly disagree to strongly agree; status: strongly
+    superior to strongly inferior; attack_defend: strongly defending to strongly attacking), and 0-2 for
+    hatespeech (no, unclear, yes). Survey wording: Sachdeva et al. (2022), appendix table 1. Comments with fewer
+    than three annotators are dropped; rows are split 90/5/5 by a hash of the comment id. License: CC BY 4.0,
+    as the original.
+    """
+    import pandas as pd
+    rows = load_dataset("ucberkeley-dlab/measuring-hate-speech", split="train").to_pandas()
+    for item in MHS_ITEMS:
+        rows[item] = pd.to_numeric(rows[item]).astype(int)
+    grouped = rows.groupby("comment_id")
+    comments = grouped.agg(text=("text", "first"), platform=("platform", "first"),
+                           annotators=("annotator_id", "size"), hate_speech_score=("hate_speech_score", "first"))
+    for item, levels in MHS_ITEMS.items():
+        comments[item] = grouped[item].agg(lambda codes, n=levels: [int((codes == level).sum()) for level in range(n)])
+    comments = comments[comments.annotators >= 3].reset_index()
+    comments["hate_speech_score"] = pd.to_numeric(comments.hate_speech_score)
+    split = comments.comment_id.map(lambda key: _split_of(str(key), validation=0.05, test=0.05))
+    return DatasetDict({name: Dataset.from_pandas(comments[split == name], preserve_index=False)
+                        for name in ("train", "validation", "test")})
+
+
+# Learning with Disagreements: (edition folder, file prefix, text fields, label order)
+LEWIDI = {
+    "md_agreement": ("LeWiDi_2-2023/MD-Agreement_dataset", "MD-Agreement", ["text"], ["0", "1"]),
+    "hs_brexit": ("LeWiDi_2-2023/HS-Brexit_dataset", "HS-Brexit", ["text"], ["0", "1"]),
+    "armis": ("LeWiDi_2-2023/ArMIS_dataset", "ArMIS", ["text"], ["0", "1"]),
+    "conv_abuse": ("LeWiDi_2-2023/ConvAbuse_dataset", "ConvAbuse", ["prev_agent", "prev_user", "agent", "user"], ["0", "1"]),
+    "csc": ("LeWiDi_3-2025/CSC", "CSC", ["context", "response"], ["1", "2", "3", "4", "5", "6"]),
+    "mp": ("LeWiDi_3-2025/MP", "MP", ["post", "reply"], ["0", "1"]),
+    "varierrnli": ("LeWiDi_3-2025/VariErrNLI", "VariErrNLI", ["context", "statement"], None),
+}
+
+
+def _lewidi_text(text):
+    if isinstance(text, dict):
+        return text
+    try:  # ConvAbuse stores its dialogue as a JSON string
+        parsed = json.loads(text)
+        return parsed if isinstance(parsed, dict) else {"text": text}
+    except (TypeError, ValueError):
+        return {"text": text}
+
+
+def lewidi():
+    """Learning with Disagreements (LeWiDi, SemEval-2023 Task 11 and its 2025 edition): soft labels from every annotator.
+
+    One config per dataset: md_agreement (offensiveness, 5 annotators), hs_brexit (hate speech, 6), armis
+    (Arabic misogyny and sexism, 3), conv_abuse (abuse in user turns of chatbot dialogues, 3 or more), csc
+    (sarcasm rated 1-6), mp (MultiPICo irony, multilingual) and varierrnli (NLI where each annotator may accept
+    several labels). ``soft_label`` lists the share of annotators per label in ``labels`` order; varierrnli
+    instead gives, per NLI label, the share of annotators who accepted it. Text fields are unpacked from the
+    harmonized JSON. The Paraphrase set (an 11-level scale over 500 items) is left out. The original datasets'
+    licenses and terms apply unchanged; see the LeWiDi repository (https://github.com/Le-Wi-Di/le-wi-di.github.io)
+    and each dataset's paper.
+    """
+    configs = {}
+    for name, (folder, prefix, fields, labels) in LEWIDI.items():
+        splits = {}
+        for source, split in [("train", "train"), ("dev", "validation"), ("test", "test")]:
+            with urllib.request.urlopen(LEWIDI_URL.format(f"{folder}/{prefix}_{source}.json")) as response:
+                items = json.load(response)
+            rows = []
+            for item_id, item in items.items():
+                text = _lewidi_text(item["text"])
+                row = {"id": str(item_id), **{field: str(text[field]) for field in fields},
+                       "lang": item.get("lang", ""), "annotations": item.get("number of annotations")}
+                soft = item["soft_label"]
+                if labels is None:
+                    for relation in ("entailment", "neutral", "contradiction"):
+                        row[relation] = float(soft[relation]["1"])
+                else:
+                    # MP writes its labels as "0.0"/"1.0" in train
+                    soft = {str(int(float(key))): value for key, value in soft.items()}
+                    shares = [float(soft[label]) for label in labels]
+                    row["soft_label"] = [share / sum(shares) for share in shares]  # CSC test shares are rounded
+                rows.append(row)
+            splits[split] = Dataset.from_list(rows)
+        configs[name] = DatasetDict(splits)
+    return configs
+
+
 BUILDERS = {"sharc": ("tasksource/sharc", sharc), "numer_sense": ("tasksource/numer_sense", numer_sense),
             "clutrr": ("tasksource/clutrr", clutrr), "wellformed": ("tasksource/google_wellformed_query", wellformed),
             "humicroedit": ("tasksource/humicroedit", humicroedit, "subtask-1"), "ethos": ("tasksource/ethos", ethos, "multilabel"),
             "multilingual_sentiments": ("tasksource/multilingual-sentiments", multilingual_sentiments),
             "mms": ("tasksource/mms", mms, "per-language"),
-            "chaos_mnli_ambiguity": ("tasksource/chaos-mnli-ambiguity", chaos_mnli_ambiguity)}
+            "chaos_mnli_ambiguity": ("tasksource/chaos-mnli-ambiguity", chaos_mnli_ambiguity),
+            "measuring_hate_speech_votes": ("tasksource/measuring-hate-speech-votes", measuring_hate_speech_votes),
+            "lewidi": ("tasksource/lewidi", lewidi, "per-config")}
+
+
+# license metadata for repackaged sets, as the originals state it
+LICENSES = {"tasksource/measuring-hate-speech-votes": "cc-by-4.0", "tasksource/lewidi": "other"}
 
 
 def push_card(repo, build):
     card = DatasetCard.load(repo)
     card.data.source_datasets = ORIGINALS[repo]
+    if repo in LICENSES:
+        card.data.license = LICENSES[repo]
     sources = ", ".join(f"[{name}](https://huggingface.co/datasets/{name})" for name in ORIGINALS[repo])
     sources = f"Original data: {sources}. " if sources else ""  # an empty entry: the original is not on the Hub
     card.text = (f"\n# {repo.split('/')[1]}\n\n{inspect.cleandoc(build.__doc__)}\n\n{sources}"
@@ -238,7 +339,7 @@ if __name__ == "__main__":
         if not args.card_only:
             dataset = build()
             # a builder returns one DatasetDict, or {config: DatasetDict} for per-config repos
-            configs = dataset if config == ["per-language"] else {config[0] if config else "default": dataset}
+            configs = dataset if config in (["per-language"], ["per-config"]) else {config[0] if config else "default": dataset}
             for config_name, splits in configs.items():
                 print(repo, config_name, splits, splits["train"][0], sep="\n")
                 if not args.dry_run:
