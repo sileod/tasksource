@@ -97,6 +97,7 @@ following each source's own train/dev/test splits where it has them.
 - **Mixing.** Formats get fixed shares of the train rows (47% classification, 30% multiple choice, 3% token labeling, 10% graded, 10% procedural). Within a format, dataset families get equal shares, scaled by [hand-set weights](https://github.com/sileod/tasksource/blob/main/src/tasksource/metadata/weights.py) (more for adversarial NLI, long documents and preference pairs; less for templated probes). Related questions are kept together.
   - The first 1,000 train rows are interleaved to show variety in the Dataset Viewer; the rest is shuffled.
   - Evaluation benchmarks (BIG-bench, MMLU, BLiMP, MATH test, ...) are left out so they stay clean for evaluation.
+- **Sources.** [sources.yaml](sources.yaml) lists every source with its rows, the Hub dataset and revision it was loaded from, and the original dataset behind each tasksource copy.
 - **Audit trail.** The [source mix](release-audit.json), [failed source list](failed-tasks.json), and [build manifest](build-manifest.json) ship with the data.
 - **Reproducible.** The [build runbook](https://github.com/sileod/tasksource/blob/main/docs/jev/README.md) rebuilds the release from [Tasksource](https://github.com/sileod/tasksource)'s [task catalog](https://github.com/sileod/tasksource/blob/main/tasks.md).
 

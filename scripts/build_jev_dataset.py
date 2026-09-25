@@ -22,7 +22,9 @@ from datasets import Dataset, DatasetDict, Features, List, Value, concatenate_da
 from huggingface_hub import HfApi
 import numpy as np
 import pandas as pd
-from tasksource import list_tasks, load_task
+import yaml
+from tasksource import list_tasks, load_task, task_provenance
+from tasksource.metadata.originals import ORIGINALS
 from tasksource.preprocess import sample_dataset
 from tasksource.metadata.weights import task_weight
 from tasksource.jev.augmentations import augment_jev_internal, stable_fraction
@@ -703,6 +705,7 @@ def publish_dataset(
         json.dumps(release_audit, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
+    write_sources_yaml(output / "sources.yaml", release_audit)
     api = HfApi()
     api.upload_file(
         path_or_fileobj=str(output / "README.md"),
@@ -719,7 +722,7 @@ def publish_dataset(
     for name in (
         "build-report.jsonl", "build-summary.json", "build-manifest.json",
         "failed-tasks.json", "outdated-datasets.json", "fixed-source-audit.json",
-        "release-audit.json", "token-source-status.md",
+        "release-audit.json", "token-source-status.md", "sources.yaml",
     ):
         path = output / name
         if path.exists():
@@ -730,6 +733,60 @@ def publish_dataset(
                 repo_type="dataset",
                 commit_message=f"Add {name}",
             )
+
+
+def source_provenance(source):
+    """Hub provenance of one published source (see tasksource.task_provenance)."""
+    if source.startswith(procedural.SOURCE_PREFIX):
+        return {"generated": "procedural (tasksource.jev.procedural)"}
+    if source.startswith(graded.SOURCE_PREFIX):
+        family = graded.FAMILIES[source[len(graded.SOURCE_PREFIX):]]
+        info = {"dataset": family.dataset, "config": family.config,
+                "originals": sorted(set(ORIGINALS.get(family.dataset, [])) - {family.dataset})}
+        return {k: v for k, v in info.items() if v}
+    if source.startswith("multilingual/"):
+        return task_provenance(source[len("multilingual/"):], multilingual=True)
+    return task_provenance(source)
+
+
+def write_sources_yaml(path, release_audit):
+    """Every source in the release with its rows, Hub dataset, revision and originals."""
+    api, revisions = HfApi(), {}
+
+    def revision(repo):
+        if repo not in revisions:
+            try:
+                revisions[repo] = api.dataset_info(repo).sha
+            except Exception:  # gated, renamed or offline: provenance without a pin
+                revisions[repo] = None
+        return revisions[repo]
+
+    splits = release_audit["splits"]
+    sources = {}
+    for source in sorted({s for split in splits.values() for s in split["sources"]}):
+        info = {"rows": {name: split["sources"][source] for name, split in splits.items() if source in split["sources"]}}
+        try:
+            info.update(source_provenance(source))
+        except KeyError as error:
+            info["provenance_error"] = str(error)
+        for repo in [info.get("dataset"), *info.get("data_files_from", [])]:
+            if repo and revision(repo):
+                info.setdefault("revisions", {})[repo] = revision(repo)
+        sources[source] = info
+    try:
+        commit = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True,
+                                cwd=Path(__file__).resolve().parent).stdout.strip() or None
+    except OSError:
+        commit = None
+    document = {
+        "repo_id": release_audit["repo_id"],
+        "tasksource_commit": commit,
+        "datasets": sorted({repo for info in sources.values()
+                            for repo in [info.get("dataset"), *info.get("data_files_from", []), *info.get("originals", [])]
+                            if repo}),
+        "sources": sources,
+    }
+    path.write_text(yaml.safe_dump(document, sort_keys=False, allow_unicode=True, width=120), encoding="utf-8")
 
 
 def migrate_legacy_shards(

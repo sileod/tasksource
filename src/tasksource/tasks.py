@@ -1660,6 +1660,23 @@ clinc_oos = Classification(
     "text", labels="intent",
     dataset_name="clinc/clinc_oos", config_name="plus")
 
+# 49 intent corpora with the intents written out as options. Its train reuses source
+# test rows: drop them, and the corpora tasksource already has; multi-answer rows (13%) too.
+_INTENT_GRASP_LISTED = {"banking77", "clinc", "trec", "snips", "sci_cite", "mtop", "moral_stories"}
+
+def _intent_grasp(dataset):
+    def keep(x, split):
+        meta = x["metadata"]
+        return (len(x["answer_index"]) == 1 and x["answer_index"][0] < len(x["options"])
+                and meta["original_task"] not in _INTENT_GRASP_LISTED
+                and (split == "test" or meta["original_split"] != "test"))
+    return DatasetDict({split: rows.filter(keep, fn_kwargs={"split": split}) for split, rows in dataset.items()})
+
+intent_grasp = MultipleChoice(lambda x: f"{x['context']}\n\n{x['question']}",
+    choices_list="options", labels=lambda x: x["answer_index"][0],
+    dataset_name="yuweiyin/IntentGrasp", config_name="all", splits=["train", None, "test"],
+    pre_process=_intent_grasp)
+
 def _records(x):
     if not isinstance(x, dict):
         return x

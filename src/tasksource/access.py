@@ -115,6 +115,20 @@ def hub_datasets(task_ids=None, multilingual=None):
             repos.update(ORIGINALS.get(key, []))
     return sorted(repos)
 
+def task_provenance(task_id, multilingual=False):
+    """Where one task's data comes from: the loading repo and config, repos read
+    through hf:// data files, and the originals of tasksource copies and mirrors."""
+    df = list_tasks(multilingual=multilingual)
+    row = df[df.id == task_id]
+    if row.empty:
+        raise KeyError(f"unknown task: {task_id}")
+    row = next(row.itertuples())
+    files = sorted(set(re.findall(r"hf://datasets/([\w.-]+/[\w.-]+)", str(row.mapping.load_dataset_kwargs))))
+    dataset = None if row.dataset_name in RAW_BUILDERS else row.dataset_name
+    originals = sorted({o for key in {dataset, row.id, *files} if key for o in ORIGINALS.get(key, [])} - {dataset})
+    info = {"dataset": dataset, "config": row.config_name or None, "data_files_from": files, "originals": originals}
+    return {k: v for k, v in info.items() if v}
+
 def dict_to_query(d=dict(), **kwargs):
     d={**d,**kwargs}
     return '&'.join([f'`{k}`=="{v}"' for k,v in d.items()])

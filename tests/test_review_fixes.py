@@ -253,3 +253,16 @@ class OrdinalTest(unittest.TestCase):
         tagged = recast_jev(self._data(names), task="demo", ordinal=True)["train"]
         self.assertEqual(tagged[0]["criteria"], names)
         self.assertIn("score", tagged["kind"])
+
+
+class ProvenanceTest(unittest.TestCase):
+    def test_copies_name_their_originals(self):
+        from tasksource import task_provenance
+        self.assertEqual(task_provenance("liar"), {"dataset": "tasksource/liar", "originals": ["ucsbai/liar"]})
+        self.assertEqual(task_provenance("glue/mnli"), {"dataset": "nyu-mll/glue", "config": "mnli"})
+
+    def test_native_sources(self):
+        from scripts.build_jev_dataset import source_provenance
+        self.assertEqual(source_provenance("graded/unli")["dataset"], "Zhengping/UNLI")
+        from tasksource.jev import procedural
+        self.assertIn("generated", source_provenance(procedural.SOURCE_PREFIX + next(iter(procedural.TASKS))))
