@@ -40,7 +40,10 @@ change from row to row, so a model has to read them rather than memorize a label
   HelpSteer, ChaosNLI, and many more, with no task allowed to dominate.
 - **Three decision types in one schema.** `choice` (pick one option), `score`
   (an ordered scale), and `noul` (the probability that a statement is true).
-  Soft targets are kept wherever the source has votes or ratings.
+  Soft targets are kept wherever the source has mean ratings or votes from at
+  least five annotators per item (vote shares from fewer are too noisy): STS,
+  ChaosNLI, civil_comments, Measuring Hate Speech, WouldYouRather, ProtoQA,
+  LeWiDi and more. They make up the graded share.
 - **Built so position, repeated eval data, and question choice give nothing away.**
   - Multiple-choice options are shuffled per row, so the answer's position carries no signal.
   - Validation and test rows whose content appears in train are removed.
@@ -49,7 +52,8 @@ change from row to row, so a model has to read them rather than memorize a label
 - **Multi-question states.** Related decisions share a `group_id` and can be
   asked together. Packed states test reasoning over several items at once, and
   [procedural-typed-decisions](https://huggingface.co/datasets/tasksource/procedural-typed-decisions)
-  adds exact counting, arithmetic, retrieval, and state tracking.
+  adds exact counting, arithmetic, retrieval, state tracking, and exact
+  posteriors when a policy applies to a requester whose role is uncertain.
 
 ## Quick start
 
@@ -95,7 +99,7 @@ following each source's own train/dev/test splits where it has them.
     Label-verification and packed questions carry it too.
 - **Variants.** Low-frequency, deterministic variants cover label verification as `noul`, criterion order, and instruction wording.
 - **Packing.** Up to 10% of each classification task's examples are packed, two to four at a time, into `packed_derived` states. Their questions (an item's label, agreement, existence, counts) follow exactly from the gold labels.
-- **Mixing.** Formats get fixed shares of the train rows (47% classification, 30% multiple choice, 3% token labeling, 10% graded, 10% procedural). Within a format, dataset families get equal shares, scaled by [hand-set weights](https://github.com/sileod/tasksource/blob/main/src/tasksource/metadata/weights.py) (more for adversarial NLI, long documents and preference pairs; less for templated probes). Related questions are kept together.
+- **Mixing.** Formats get fixed shares of the train rows (47% classification, 30% multiple choice, 3% token labeling, 10% graded (soft-label sources), 10% procedural). Within a format, dataset families get equal shares, scaled by [hand-set weights](https://github.com/sileod/tasksource/blob/main/src/tasksource/metadata/weights.py) (more for adversarial NLI, long documents and preference pairs; less for templated probes). Related questions are kept together.
   - The first 1,000 train rows are interleaved to show variety in the Dataset Viewer; the rest is shuffled.
   - Evaluation benchmarks (BIG-bench, MMLU, BLiMP, MATH test, ...) are left out so they stay clean for evaluation.
 - **Sources.** [sources.yaml](sources.yaml) lists every source with its rows, the Hub dataset and revision it was loaded from, and the original dataset behind each tasksource copy.
