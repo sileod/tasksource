@@ -32,7 +32,7 @@ from tasksource.jev.prompt_augmentations import (
 )
 from tasksource.jev import procedural
 from tasksource.jev.derived import VARIANT as PACKED_VARIANT, add_packed_classification, packed_items
-from tasksource.jev.length import LengthBudget
+from tasksource.jev.length import LengthBudget, render_request
 from tasksource.jev.options import gold_position_violations
 
 
@@ -88,9 +88,9 @@ def normalized_split(split):
     return "dev" if split == "validation" else split
 
 
-def filter_request_lengths(rows, budget):
-    """Drop rows whose complete rendered request exceeds the training context budget."""
-    if not budget.max_tokens:
+def filter_request_lengths(rows, max_bytes=131_072, budget=None):
+    """Drop rows whose complete rendered request exceeds byte or exact-token budgets."""
+    if not max_bytes and budget is None:
         return rows, 0
 
     def fits(row):
@@ -100,7 +100,10 @@ def filter_request_lengths(rows, budget):
             "question": row["question"],
             "options": row["options"],
         }
-        return budget.fits(row["state"], [question])
+        questions = [question]
+        if max_bytes and len(render_request(row["state"], questions).encode("utf-8")) > max_bytes:
+            return False
+        return budget is None or budget.fits(row["state"], questions)
 
     before = len(rows)
     rows = rows.filter(fits)
@@ -118,7 +121,7 @@ def slug(task_id):
 # (report "code") but not enforced: any commit would otherwise invalidate every shard.
 SHARD_PARAMETERS = ("max_rows", "max_rows_eval", "noul_rate", "score_rate", "permutation_rate", "prompt_rate",
                     "paired_format_rate", "pack_rate", "pack_max_tokens", "pack_tokenizer", "pack_max_items",
-                    "max_request_tokens", "request_tokenizer")
+                    "max_request_bytes", "max_request_tokens", "request_tokenizer")
 
 
 def _git(*arguments):
@@ -948,7 +951,10 @@ def build(args):
     if args.reuse_incompatible_shards:
         completed |= stale
     packing_budget = LengthBudget(args.pack_max_tokens, args.pack_tokenizer)
-    request_budget = LengthBudget(args.max_request_tokens, args.request_tokenizer)
+    request_budget = (
+        LengthBudget(args.max_request_tokens, args.request_tokenizer)
+        if args.request_tokenizer and args.max_request_tokens else None
+    )
     print(f"Selected {len(tasks)} tasks; {len(completed)} already complete", flush=True)
     manifest_path = output / "build-manifest.json"
     manifest = build_manifest(args, tasks)
@@ -1006,7 +1012,8 @@ def build(args):
                             args.permutation_rate, args.prompt_rate,
                             args.paired_format_rate,
                         )
-                split_dataset, dropped = filter_request_lengths(split_dataset, request_budget)
+                split_dataset, dropped = filter_request_lengths(
+                    split_dataset, args.max_request_bytes, request_budget)
                 if dropped:
                     request_length_dropped[split] = dropped
                 partial[split] = data_dir / f".{split}-{slug(task_id)}.parquet.partial"
@@ -1151,12 +1158,16 @@ def parse_args():
     )
     parser.add_argument("--pack-max-items", type=int, default=4)
     parser.add_argument(
+        "--max-request-bytes", type=int, default=131_072,
+        help="Maximum UTF-8 size of a complete rendered request. Set 0 to disable.",
+    )
+    parser.add_argument(
         "--max-request-tokens", type=int, default=32_768,
-        help="Maximum complete rendered request length; without --request-tokenizer, UTF-8 bytes are a conservative token upper bound. Set 0 to disable.",
+        help="Exact token cap when --request-tokenizer is supplied. Set 0 to disable.",
     )
     parser.add_argument(
         "--request-tokenizer",
-        help="Hugging Face tokenizer for exact complete-request length filtering.",
+        help="Hugging Face tokenizer used for the optional exact token cap.",
     )
     parser.add_argument("--finalize", action="store_true")
     parser.add_argument(
