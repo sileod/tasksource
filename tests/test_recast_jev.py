@@ -170,6 +170,11 @@ class RecastJevTest(unittest.TestCase):
         dataset = Dataset.from_dict({"source": [n for n in names for _ in variants], "variant": variants * len(names)})
         shown = set(pretty_order(dataset, first_rows=60)["variant"][:60])
         self.assertTrue({"packed_derived", "label_verification"} <= shown)
+        # packed questions come in groups of four, which fill the preview quickly
+        rows = [(n, v, f"{n}-{v}-{k}") for n in names for v in variants for k in range(4 if v == "packed_derived" else 1)]
+        grouped = Dataset.from_dict({"source": [r[0] for r in rows], "variant": [r[1] for r in rows],
+                                     "group_id": [r[2].rsplit("-", 1)[0] if r[1] == "packed_derived" else r[2] for r in rows]})
+        self.assertIn("packed_derived", set(pretty_order(grouped, first_rows=40)["variant"][:40]))
 
     def test_pretty_order_keeps_question_groups_adjacent(self):
         groups = [f"g{i // 3}" for i in range(300)]

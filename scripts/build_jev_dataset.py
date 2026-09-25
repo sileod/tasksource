@@ -434,6 +434,9 @@ def pretty_order(dataset, first_rows=1_000, seed=0):
             buckets[name] = list(dict.fromkeys((*chosen, *buckets[name])))[:per_source]
     group_sizes = np.bincount(codes)
     prefix, shown, seen = [], 0, set()
+    # whole groups fill the prefix before a second pass, so alternate sources lead with their derived row
+    for name in names[1::2] if variants else ():
+        buckets[name][:2] = buckets[name][:2][::-1]
     for offset in range(per_source):
         for name in names:
             if offset < len(buckets[name]) and codes[buckets[name][offset]] not in seen:
