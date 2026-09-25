@@ -77,6 +77,14 @@ configs:
     path: policy_applicability/validation-*.parquet
   - split: test
     path: policy_applicability/test-*.parquet
+- config_name: policy_under_uncertainty
+  data_files:
+  - split: train
+    path: policy_under_uncertainty/train-*.parquet
+  - split: validation
+    path: policy_under_uncertainty/validation-*.parquet
+  - split: test
+    path: policy_under_uncertainty/test-*.parquet
 - config_name: record_aggregation
   data_files:
   - split: train
@@ -128,6 +136,7 @@ is not produced by or affiliated with TypeSafe or OpenJev.
 | `needle_retrieval` | `value_of_id` (choice), `id_has_value` (noul), `id_listed` (noul); up to ~300 records whose ids differ from the target by one or two digits |
 | `partial_observation_calibration` | `incident_real` (noul, exact Bayesian posterior) |
 | `policy_applicability` | `access_allowed` (noul), `governing_policy` (choice), `review_risk` (score) |
+| `policy_under_uncertainty` | `access_allowed` (noul), `governing_policy` (choice), `requester_role` (choice); exact posteriors over a role known through history counts and reports of stated reliability |
 | `record_aggregation` | `count_in_category` (score), `largest_quantity` (choice), `any_out_of_stock` (noul), `total_above` (noul) |
 | `state_perturbation` | `material_change` (noul), `changed_dimension` (choice), `risk_direction` (score) |
 | `table_lookup` | `find_person` (choice, two-condition filter), `manager_of` (choice, join), `started_before` (noul), `count_matching` (score) |
