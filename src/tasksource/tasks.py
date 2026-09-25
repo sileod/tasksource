@@ -738,7 +738,7 @@ crowdflower = Classification("text", labels="label",
             'political-media-message',
             'text_emotion'],
  question={
-     "sentiment_nuclear_power": "What sentiment or stance does the tweet express about nuclear energy?",
+     "sentiment_nuclear_power": "What is the tweet's sentiment toward nuclear energy, or is it unrelated?",
      "tweet_global_warming": "Does the tweet indicate that the author believes global warming is occurring?",
      "airline-sentiment": "What sentiment does the tweet express about the airline?",
      "corporate-messaging": "What type of corporate social-media message is this?",
