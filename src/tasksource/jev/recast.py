@@ -271,22 +271,34 @@ def recast_jev(dataset, task=None, question=None, ordinal=False):
     return converted
 
 
-def render_typed_decision(example, question_id="decision", model=None):
-    """Render one canonical Jev row as a System One choice request."""
+MAX_SCORE_LEVELS = 10
+
+
+def _typed_question(example, instructions):
+    """One System One question from a canonical row; ``kind`` defaults to ``choice``."""
+    kind = example.get("kind") or "choice"
+    if kind == "noul":
+        return {"type": "noul", "instructions": instructions}
     criteria = list(example["criteria"])
     if len(criteria) != len(set(criteria)):
-        raise ValueError("System One choice criterion names must be unique")
+        raise ValueError("System One criterion names must be unique")
+    if kind == "choice":
+        return {"type": "choice", "instructions": instructions,
+                "criteria": {criterion: None for criterion in criteria}}
+    if kind == "score":  # ordered levels
+        if not 2 <= len(criteria) <= MAX_SCORE_LEVELS:
+            raise ValueError(f"System One score questions take 2 to {MAX_SCORE_LEVELS} levels, got {len(criteria)}")
+        return {"type": "score", "instructions": instructions, "criteria": criteria}
+    raise ValueError(f"Unsupported System One question kind: {kind}")
+
+
+def render_typed_decision(example, question_id="decision", model=None):
+    """Render one canonical Jev row as a System One request with its question kind."""
     request = OrderedDict()
     if model is not None:
         request["model"] = model
     request["state"] = example["state"]
-    request["questions"] = {
-        question_id: {
-            "type": "choice",
-            "instructions": example["instructions"],
-            "criteria": {criterion: None for criterion in criteria},
-        }
-    }
+    request["questions"] = {question_id: _typed_question(example, example["instructions"])}
     return dict(request)
 
 
@@ -307,19 +319,13 @@ def render_typed_decision_group(examples, model=None):
         question_id = example.get("question_id", "decision")
         if question_id in questions:
             raise ValueError(f"Duplicate question id: {question_id}")
-        criteria = list(example["criteria"])
-        if len(criteria) != len(set(criteria)):
-            raise ValueError("System One choice criterion names must be unique")
         instructions = example["instructions"]
         if "target_index" in example:
             instructions += (
                 f" Target token at position {example['target_index']}: "
                 f"{example['target_token']}"
             )
-        questions[question_id] = {
-            "type": "choice", "instructions": instructions,
-            "criteria": {criterion: None for criterion in criteria},
-        }
+        questions[question_id] = _typed_question(example, instructions)
     request["questions"] = questions
     return dict(request)
 

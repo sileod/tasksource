@@ -263,10 +263,13 @@ def jev_rows(example, family, source, split, index):
     return rows
 
 
-def load_family(name, max_rows=None, max_rows_eval=None):
-    """Grouped Jev rows per split, split and sampled like any Tasksource source."""
+def load_family(name, max_rows=None, max_rows_eval=None, revision=None):
+    """Grouped Jev rows per split, split and sampled like any Tasksource source.
+
+    ``revision`` pins the source commit, overriding the family's requested ref."""
     family = FAMILIES[name]
-    dataset = DatasetDict(load_dataset(family.dataset, family.config, **(family.load_kwargs or {})))
+    kwargs = {**(family.load_kwargs or {}), **({"revision": revision} if revision else {})}
+    dataset = DatasetDict(load_dataset(family.dataset, family.config, **kwargs))
     if family.dedupe:
         dataset = DatasetDict({split: rows.select(
             rows.to_pandas().drop_duplicates(family.dedupe).index.tolist()) for split, rows in dataset.items()})

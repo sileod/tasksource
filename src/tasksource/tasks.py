@@ -1664,13 +1664,15 @@ clinc_oos = Classification(
 # test rows: drop them, and the corpora tasksource already has; multi-answer rows (13%) too.
 _INTENT_GRASP_LISTED = {"banking77", "clinc", "trec", "snips", "sci_cite", "mtop", "moral_stories"}
 
+def _intent_grasp_keep(x, split):
+    meta = x["metadata"]
+    return (len(x["answer_index"]) == 1 and 0 <= x["answer_index"][0] < len(x["options"])
+            and meta["original_task"] not in _INTENT_GRASP_LISTED
+            and (split == "test" or meta["original_split"] != "test"))
+
 def _intent_grasp(dataset):
-    def keep(x, split):
-        meta = x["metadata"]
-        return (len(x["answer_index"]) == 1 and x["answer_index"][0] < len(x["options"])
-                and meta["original_task"] not in _INTENT_GRASP_LISTED
-                and (split == "test" or meta["original_split"] != "test"))
-    return DatasetDict({split: rows.filter(keep, fn_kwargs={"split": split}) for split, rows in dataset.items()})
+    return DatasetDict({split: rows.filter(_intent_grasp_keep, fn_kwargs={"split": split})
+                        for split, rows in dataset.items()})
 
 intent_grasp = MultipleChoice(lambda x: f"{x['context']}\n\n{x['question']}",
     choices_list="options", labels=lambda x: x["answer_index"][0],

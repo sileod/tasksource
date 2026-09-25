@@ -44,10 +44,12 @@ JEV_TOKEN_TASKS = {
 }
 
 
-def load_jev_task(row, max_rows, max_rows_eval):
+def load_jev_task(row, max_rows, max_rows_eval, revision=None):
+    """``revision`` pins the task's Hub dataset to the commit recorded in the build report."""
     return load_task(
         row.id, recast="jev", multilingual=row.multilingual,
         max_rows=max_rows, max_rows_eval=max_rows_eval,
+        **({"revision": revision} if revision else {}),
     )
 
 
@@ -64,12 +66,12 @@ NATIVE_SOURCES = (
 )
 
 
-def load_native_task(source_id, max_rows, max_rows_eval):
+def load_native_task(source_id, max_rows, max_rows_eval, revision=None):
     """Sources authored as typed Jev questions, grouped by state (no recast)."""
     if source_id.startswith(graded.SOURCE_PREFIX):
-        rows = graded.load_family(source_id[len(graded.SOURCE_PREFIX):], max_rows, max_rows_eval)
+        rows = graded.load_family(source_id[len(graded.SOURCE_PREFIX):], max_rows, max_rows_eval, revision)
     else:
-        dataset = load_dataset(procedural.REPO_ID, source_id[len(procedural.SOURCE_PREFIX):])
+        dataset = load_dataset(procedural.REPO_ID, source_id[len(procedural.SOURCE_PREFIX):], revision=revision)
         dataset = sample_dataset(dataset, max_rows, max_rows_eval)
         rows = {split: [row for index, example in enumerate(examples)
                         for row in procedural.jev_rows(example, source_id, normalized_split(split), index)]
@@ -90,13 +92,42 @@ def slug(task_id):
     return f"{readable}-{digest}"
 
 
-def read_completed(report_path, data_dir=None):
-    completed = set()
-    if not report_path.exists():
-        return completed
-    for line in report_path.read_text().splitlines():
-        record = json.loads(line)
-        if record["status"] == "ok":
+# Arguments that change what a task's shards contain; with the code state they form the
+# build fingerprint, so a resumed build never mixes shards from different settings or code.
+SHARD_PARAMETERS = ("max_rows", "max_rows_eval", "noul_rate", "score_rate", "permutation_rate", "prompt_rate",
+                    "paired_format_rate", "pack_rate", "pack_max_tokens", "pack_tokenizer", "pack_max_items")
+
+
+def _git(*arguments):
+    root = Path(__file__).resolve().parents[1]
+    return subprocess.run(["git", *arguments], cwd=root, capture_output=True, check=False).stdout
+
+
+def code_state():
+    """Commit plus a hash of uncommitted changes under src/ and scripts/, untracked files included."""
+    root = Path(__file__).resolve().parents[1]
+    digest = hashlib.sha256(_git("diff", "--binary", "HEAD", "--", "src", "scripts"))
+    for name in sorted(_git("ls-files", "--others", "--exclude-standard", "--", "src", "scripts").decode().split()):
+        if not name.endswith((".pyc", ".pyo")):
+            digest.update(name.encode() + b"\0" + (root / name).read_bytes())
+    return {"git_commit": _git("rev-parse", "HEAD").decode().strip(), "uncommitted_sha256": digest.hexdigest()}
+
+
+def build_fingerprint(args, state=None):
+    shard_args = {name: getattr(args, name, None) for name in SHARD_PARAMETERS}
+    payload = json.dumps({**(state or code_state()), **shard_args}, sort_keys=True, default=str)
+    return hashlib.sha256(payload.encode()).hexdigest()[:16]
+
+
+def read_completed(report_path, data_dir=None, fingerprint=None):
+    """Tasks whose latest successful shards exist; with ``fingerprint``, return
+    ``(completed, stale)``: ``stale`` tasks have shards from another fingerprint."""
+    completed, stale = set(), set()
+    if report_path.exists():
+        for line in report_path.read_text().splitlines():
+            record = json.loads(line)
+            if record["status"] != "ok":
+                continue
             task = record["task"]
             splits = record.get("rows", {})
             if data_dir is None or (
@@ -105,8 +136,24 @@ def read_completed(report_path, data_dir=None):
                     for split in splits
                 )
             ):
-                completed.add(task)
-    return completed
+                current = fingerprint is None or record.get("fingerprint") == fingerprint
+                (completed if current else stale).add(task)
+                (stale if current else completed).discard(task)
+    return completed if fingerprint is None else (completed, stale)
+
+
+def resolve_revisions(provenance):
+    """Commit sha of each Hub repo a source loads, at the revision it requests."""
+    api, pins = HfApi(), {}
+    requested = {**({provenance["dataset"]: provenance.get("revision")} if provenance.get("dataset") else {}),
+                 **{repo: provenance.get("data_file_revisions", {}).get(repo)
+                    for repo in provenance.get("data_files_from", [])}}
+    for repo, revision in requested.items():
+        try:
+            pins[repo] = api.dataset_info(repo, revision=revision).sha
+        except Exception:  # gated or offline: loading will tell; the report records no pin
+            pins[repo] = None
+    return pins
 
 
 def build_manifest(args, tasks):
@@ -134,6 +181,7 @@ def build_manifest(args, tasks):
     return {
         "git_commit": git("rev-parse", "HEAD").decode().strip(),
         "git_diff_sha256": hashlib.sha256(diff).hexdigest(),
+        "fingerprint": build_fingerprint(args),
         "working_tree_changes": status,
         "python": sys.version.split()[0],
         "packages": versions,
@@ -705,7 +753,7 @@ def publish_dataset(
         json.dumps(release_audit, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
-    write_sources_yaml(output / "sources.yaml", release_audit)
+    write_sources_yaml(output / "sources.yaml", release_audit, latest_records(output / "build-report.jsonl"))
     api = HfApi()
     api.upload_file(
         path_or_fileobj=str(output / "README.md"),
@@ -738,10 +786,12 @@ def publish_dataset(
 def source_provenance(source):
     """Hub provenance of one published source (see tasksource.task_provenance)."""
     if source.startswith(procedural.SOURCE_PREFIX):
-        return {"generated": "procedural (tasksource.jev.procedural)"}
+        return {"dataset": procedural.REPO_ID, "config": source[len(procedural.SOURCE_PREFIX):],
+                "generated": "procedural (tasksource.jev.procedural)"}
     if source.startswith(graded.SOURCE_PREFIX):
         family = graded.FAMILIES[source[len(graded.SOURCE_PREFIX):]]
         info = {"dataset": family.dataset, "config": family.config,
+                "revision": (family.load_kwargs or {}).get("revision"),
                 "originals": sorted(set(ORIGINALS.get(family.dataset, [])) - {family.dataset})}
         return {k: v for k, v in info.items() if v}
     if source.startswith("multilingual/"):
@@ -749,17 +799,13 @@ def source_provenance(source):
     return task_provenance(source)
 
 
-def write_sources_yaml(path, release_audit):
-    """Every source in the release with its rows, Hub dataset, revision and originals."""
-    api, revisions = HfApi(), {}
+def write_sources_yaml(path, release_audit, records=None):
+    """Every source in the release with its rows, Hub dataset, revision and originals.
 
-    def revision(repo):
-        if repo not in revisions:
-            try:
-                revisions[repo] = api.dataset_info(repo).sha
-            except Exception:  # gated, renamed or offline: provenance without a pin
-                revisions[repo] = None
-        return revisions[repo]
+    Revisions are the commits each task was loaded from, recorded in the build report
+    (``records``, the latest report record per task); a task built before revisions were
+    recorded is marked ``revisions_unrecorded`` rather than given today's commit."""
+    records = records or {}
 
     splits = release_audit["splits"]
     sources = {}
@@ -769,9 +815,11 @@ def write_sources_yaml(path, release_audit):
             info.update(source_provenance(source))
         except KeyError as error:
             info["provenance_error"] = str(error)
-        for repo in [info.get("dataset"), *info.get("data_files_from", [])]:
-            if repo and revision(repo):
-                info.setdefault("revisions", {})[repo] = revision(repo)
+        recorded = (records.get(source) or {}).get("revisions")
+        if recorded:
+            info["revisions"] = {repo: sha for repo, sha in recorded.items() if sha}
+        else:
+            info["revisions_unrecorded"] = True
         sources[source] = info
     try:
         commit = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True,
@@ -877,16 +925,26 @@ def build(args):
             args.prompt_rate, args.paired_format_rate,
         )
     report_path = output / "build-report.jsonl"
-    completed = read_completed(report_path, data_dir)
+    fingerprint = build_fingerprint(args)
+    completed, stale = read_completed(report_path, data_dir, fingerprint)
     tasks = select_tasks(args)
+    stale &= set(tasks.source_id)
+    if stale and not (args.finalize_only or args.reuse_incompatible_shards):
+        raise SystemExit(
+            f"{len(stale)} task shards in {output} come from other code or settings (build fingerprint "
+            f"{fingerprint} differs), e.g. {sorted(stale)[:3]}. Use a fresh --output, or pass "
+            "--reuse-incompatible-shards to keep them (build-manifest.json records their fingerprints).")
+    if args.reuse_incompatible_shards:
+        completed |= stale
     packing_budget = LengthBudget(args.pack_max_tokens, args.pack_tokenizer)
     print(f"Selected {len(tasks)} tasks; {len(completed)} already complete", flush=True)
     manifest_path = output / "build-manifest.json"
-    if not manifest_path.exists():
-        manifest_path.write_text(
-            json.dumps(build_manifest(args, tasks), indent=2, ensure_ascii=False) + "\n",
-            encoding="utf-8",
-        )
+    manifest = build_manifest(args, tasks)
+    if manifest_path.exists():  # keep earlier runs' provenance next to this one's
+        previous = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest["previous_runs"] = previous.pop("previous_runs", []) + [
+            {key: previous.get(key) for key in ("git_commit", "git_diff_sha256", "fingerprint", "parameters")}]
+    manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
     for position, row in enumerate(
         () if args.finalize_only else tasks.itertuples(index=False), start=1
@@ -903,10 +961,14 @@ def build(args):
             if row.task_type == "TokenClassification":
                 max_rows = max(1, max_rows // 2)
                 max_rows_eval = max(1, max_rows_eval // 2)
+            # pin every Hub repo to the commit its requested revision points to now, and record it
+            provenance = source_provenance(task_id)
+            pins = resolve_revisions(provenance)
+            loaded = pins.get(provenance.get("dataset"))
             if row.task_type == "NativeJev":
-                dataset = load_native_task(task_id, max_rows, max_rows_eval)
+                dataset = load_native_task(task_id, max_rows, max_rows_eval, loaded)
             else:
-                dataset = load_jev_task(row, max_rows, max_rows_eval)
+                dataset = load_jev_task(row, max_rows, max_rows_eval, loaded)
             split_rows = {}
             for split, split_dataset in dataset.items():
                 if row.task_type == "NativeJev":
@@ -940,6 +1002,8 @@ def build(args):
                 "task_type": row.task_type,
                 "status": "ok",
                 "rows": split_rows,
+                "fingerprint": fingerprint,
+                "revisions": pins,
                 "seconds": round(time.time() - started, 3),
             }
             completed.add(task_id)
@@ -981,6 +1045,12 @@ def build(args):
             "outdated_datasets": len(outdated),
             "parquet_files": len(list(data_dir.glob("*.parquet"))),
             "excluded_source_families": list(PUBLISH_EXCLUDED_PREFIXES),
+            # the code/settings fingerprints the selected shards were built with; more than
+            # one means --reuse-incompatible-shards or --finalize-only kept older shards
+            "build_fingerprint": fingerprint,
+            "shard_fingerprints": dict(Counter(
+                latest[task].get("fingerprint") or "unrecorded" for task in sorted(selected & set(latest))
+                if latest[task]["status"] == "ok")),
         }
         (output / "build-summary.json").write_text(
             json.dumps(summary, indent=2) + "\n", encoding="utf-8"
@@ -1015,6 +1085,10 @@ def parse_args():
     parser.add_argument(
         "--english-only", action="store_true",
         help="Exclude the multilingual Tasksource catalog.",
+    )
+    parser.add_argument(
+        "--reuse-incompatible-shards", action="store_true",
+        help="Resume even when existing shards come from other code or shard settings.",
     )
     parser.add_argument("--max-rows", type=int, default=30_000)
     parser.add_argument("--max-rows-eval", type=int, default=3_000)

@@ -1,6 +1,8 @@
 from .preprocess import Preprocessing, MultipleChoiceFields, add_question
 from .jev.options import JEV_MAX_MC_OPTIONS
 import re
+from urllib.parse import unquote
+import numpy as np
 import pandas as pd
 from . import tasks, recast as recast_module
 from .metadata import dataset_rank
@@ -44,8 +46,14 @@ def pretty_name(x):
     tn = x.task_name if x.task_name else ""
     return f"{dn}/{cn}/{tn}".replace('//','/').rstrip('/')
 
+def list_tasks(tasks_path=f'{os.path.dirname(__file__)}/tasks.py', multilingual=False, instruct=False, excluded=()):
+    """The task catalog as a DataFrame; ``excluded`` holds substrings of task ids to leave out.
+
+    Each call returns a fresh copy, so callers may edit it without affecting later calls."""
+    return _list_tasks(tasks_path, multilingual, instruct, tuple(excluded)).copy()
+
 @cache
-def list_tasks(tasks_path=f'{os.path.dirname(__file__)}/tasks.py',multilingual=False,instruct=False, excluded=[]):
+def _list_tasks(tasks_path, multilingual, instruct, excluded):
     if multilingual:
         tasks_path=tasks_path.replace('/tasks.py','/multilingual_tasks.py')
     task_order = open(tasks_path).readlines()
@@ -123,15 +131,17 @@ def task_provenance(task_id, multilingual=False):
     if row.empty:
         raise KeyError(f"unknown task: {task_id}")
     row = next(row.itertuples())
-    files = sorted(set(re.findall(r"hf://datasets/([\w.-]+/[\w.-]+)", str(row.mapping.load_dataset_kwargs))))
+    kwargs = row.mapping.load_dataset_kwargs or {}
+    # hf:// data files may pin a ref: hf://datasets/owner/name@refs%2Fconvert%2Fparquet/...
+    refs = {repo: unquote(ref) or None for repo, ref in
+            re.findall(r"hf://datasets/([\w.-]+/[\w.-]+)(?:@([^/\s'\"]+))?", str(kwargs))}
+    files = sorted(refs)
     dataset = None if row.dataset_name in RAW_BUILDERS else row.dataset_name
     originals = sorted({o for key in {dataset, row.id, *files} if key for o in ORIGINALS.get(key, [])} - {dataset})
-    info = {"dataset": dataset, "config": row.config_name or None, "data_files_from": files, "originals": originals}
+    info = {"dataset": dataset, "config": row.config_name or None, "revision": kwargs.get("revision"),
+            "data_files_from": files, "data_file_revisions": {repo: ref for repo, ref in refs.items() if ref},
+            "originals": originals}
     return {k: v for k, v in info.items() if v}
-
-def dict_to_query(d=dict(), **kwargs):
-    d={**d,**kwargs}
-    return '&'.join([f'`{k}`=="{v}"' for k,v in d.items()])
 
 def _format_loader_kwargs(value, **context):
     """Resolve per-config placeholders in generic-builder data_files settings."""
@@ -146,8 +156,13 @@ def _format_loader_kwargs(value, **context):
     return value
 
 def load_preprocessing(tasks=tasks, **kwargs):
-    _tasks_df = list_tasks(multilingual=tasks==lmtasks)
-    y = _tasks_df.copy().query(dict_to_query(**kwargs)).iloc[0]
+    df = list_tasks(multilingual=tasks==lmtasks)
+    matches = df[np.logical_and.reduce([df[k] == v for k, v in kwargs.items()] + [np.ones(len(df), bool)])]
+    if matches.empty:
+        raise KeyError(f"unknown task: {kwargs}")
+    if len(matches) > 1:
+        raise ValueError(f"{kwargs} matches {len(matches)} tasks ({', '.join(matches.id[:5])}...); pass a task id")
+    y = matches.iloc[0]
     preprocessing= copy.copy(getattr(tasks, y.preprocessing_name))
     for c in 'dataset_name','config_name':
         if not isinstance(getattr(preprocessing,c), str):
