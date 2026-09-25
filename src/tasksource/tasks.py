@@ -1562,6 +1562,85 @@ lifeycle_entailment = Classification("premise","hypothesis","label",dataset_name
 
 # modern classification / relation extraction datasets
 
+# safety / prompt-injection classifier training datasets
+
+prompt_injection_xtram = Classification(
+    "text", labels="label",
+    dataset_name="xTRam1/safe-guard-prompt-injection",
+    question="Is this prompt a prompt-injection attempt?",
+    label_values={0: "benign", 1: "injection"})
+
+prompt_injection_deepset = Classification(
+    "text", labels="label",
+    dataset_name="deepset/prompt-injections",
+    question="Is this prompt a prompt-injection attempt?",
+    label_values={0: "benign", 1: "injection"})
+
+prompt_injection_slabs = Classification(
+    "text", labels="label",
+    dataset_name="S-Labs/prompt-injection-dataset",
+    question="Is this prompt a prompt-injection attempt?",
+    label_values={0: "benign", 1: "injection"})
+
+prompt_injection_neuralchemy = Classification(
+    "text", labels="label",
+    dataset_name="neuralchemy/Prompt-injection-dataset", config_name="full",
+    question="Is this prompt malicious or a prompt-injection attempt?",
+    label_values={0: "benign", 1: "malicious"})
+
+prompt_shield = Classification(
+    "prompt", labels="label",
+    dataset_name="hendzh/PromptShield",
+    question="Is this prompt a prompt-injection attempt?",
+    label_values={0: "benign", 1: "injection"})
+
+shell_safety = Classification(
+    lambda x: f"Session context: {x['session_context']}\nCommand: {x['command']}",
+    labels="label", dataset_name="tomngdev/shell-safety-v2",
+    question="What safety decision should be made before running this shell command?")
+
+agent_action_safety = Classification(
+    lambda x: "\n".join(
+        f"{field}: {x[field]}" for field in
+        ["original_goal", "user_message", "context", "constraints", "conversation", "action"]
+        if x.get(field) not in (None, "", [])
+    ),
+    labels=name("is_safe", ["unsafe", "safe"]),
+    dataset_name="json", task_id="agent_action_safety",
+    splits=["train", "validation", None],
+    load_dataset_kwargs={"data_files": {
+        "train": "hf://datasets/karanxa/agent-action-safety-dataset/train.jsonl",
+        "validation": "hf://datasets/karanxa/agent-action-safety-dataset/val.jsonl",
+    }},
+    question="Is this proposed agent action safe in the given context?")
+
+shell_risk = Classification(
+    "command", labels="label", label_values={0: "not risky", 1: "risky"},
+    dataset_name="kontext-security/ShellRisk-Bench",
+    question="Is this shell command risky?")
+
+wildguardmix__prompt_harm = Classification(
+    "prompt", labels="prompt_harm_label",
+    dataset_name="bogdanminko/wildguardmix-cleaned",
+    question="Is this user prompt harmful?")
+
+wildguardmix__response_harm = Classification(
+    "prompt", "response", labels="response_harm_label",
+    dataset_name="bogdanminko/wildguardmix-cleaned",
+    question="Is the assistant response harmful?")
+
+wildguardmix__response_refusal = Classification(
+    "prompt", "response", labels="response_refusal_label",
+    dataset_name="bogdanminko/wildguardmix-cleaned",
+    question="Does the assistant response refuse the request?")
+
+beavertails_safety = Classification(
+    "prompt", "response", labels=name("is_safe", ["unsafe", "safe"]),
+    dataset_name="PKU-Alignment/BeaverTails",
+    splits=["330k_train", None, "330k_test"],
+    question="Is the assistant response safe?")
+
+
 toxic_chat__toxicity = Classification(
     "user_input", labels=name("toxicity", ["not toxic", "toxic"]), question="Is this user prompt toxic?",
     dataset_name="lmsys/toxic-chat", config_name="toxicchat0124",

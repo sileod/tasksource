@@ -257,6 +257,19 @@ imppres__log = Classification("premise","hypothesis","gold_label_log",
     dataset_name="tasksource/imppres", config_name=imppres_implicature,
     post_process=lambda x: _imppres_post_process(x,'logical'))
 
+# prompt-injection aggregates
+prompt_injection_threat_matrix = Classification(
+    "text", labels="label",
+    dataset_name="neuralchemy/prompt-injection-Threat-Matrix", config_name="binary",
+    question="Is this prompt malicious or a prompt-injection attempt?",
+    label_values={0: "benign", 1: "malicious"})
+
+prompt_injection_geekyrakshit = Classification(
+    "prompt", labels="label",
+    dataset_name="geekyrakshit/prompt-injection-dataset",
+    question="Is this prompt a prompt-injection attempt?",
+    label_values={0: "benign", 1: "injection"})
+
 KINDS = {
     "evaluation": "evaluation benchmark: useful for evaluation, kept out of training",
     "duplicate": "duplicates or is covered by a listed task",
@@ -346,6 +359,8 @@ NOT_ANNOTATED = {
     "clue/clue cmnli": ("duplicate", "machine-translated MNLI; XNLI covers Chinese"),
     "demelin/wino_x": ("evaluation", "machine translation evaluation set; script-only loader"),
     "dbarbedillo/SMS_Spam_Multilingual_Collection_Dataset": ("unsound", "machine-translated; many translations degenerate"),
+    "prompt_injection_threat_matrix": ("unavailable", "gated or removed: the Hub reports the dataset missing"),
+    "prompt_injection_geekyrakshit": ("duplicate", "aggregate of deepset/prompt-injections and xTRam1 (listed); 90% of its test rows are in its own train"),
     "ylacombe/xsum_factuality": ("unavailable", "no longer on the Hub"),
 }
 
