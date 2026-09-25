@@ -3,6 +3,7 @@ from dotwiz import DotWiz
 from dataclasses import dataclass, field
 from typing import Union
 import itertools
+import re
 import funcy as fc
 import exrex 
 import magicattr 
@@ -218,14 +219,22 @@ class MultipleChoiceFields(Preprocessing):
         return x
 
     @staticmethod
+    def shuffled_with_gold(choices, label, n_options=None):
+        """Keep the gold option and the first negatives in source order, then permute them so the
+        gold slot carries no signal: deterministic, seeded by the options' text. Options that refer
+        to each other by position ("all of the above") keep the source order."""
+        from .jev.options import choice_permutation  # at call time: jev imports this module
+        kept_indices = sorted([label, *[i for i in range(len(choices)) if i != label][:(n_options or len(choices)) - 1]])
+        kept, gold = [choices[i] for i in kept_indices], kept_indices.index(label)
+        order = choice_permutation(kept, "\x1f".join(map(str, kept)))
+        if order is None:  # options refer to each other by position: keep the source order
+            return kept, gold
+        return [kept[i] for i in order], order.index(gold)
+
+    @staticmethod
     def flatten_choice_list(x, n_options=None):
-        n_neg = n_options-1 if n_options else None
-        choices = x['choices_list']
-        label=x['labels']
-        neg = choices[:label] + choices[label+1:]
-        pos = choices[label]
-        x['labels']=0
-        x['choices_list']=[pos]+neg[:n_neg]
+        x['choices_list'], x['labels'] = MultipleChoiceFields.shuffled_with_gold(
+            x['choices_list'], x['labels'], n_options)
         for i,o in enumerate(x['choices_list']):
             x[f'choice{i}']=o
         del x['choices_list']
@@ -233,15 +242,13 @@ class MultipleChoiceFields(Preprocessing):
 
     @staticmethod
     def sample_choices(x, n_options=None):
-        choices = [x[c] for c in x if 'choice' in c]
-        if not MAX_MC_OPTIONS or len(choices)<=n_options:
+        names = sorted((c for c in x if re.fullmatch(r'choice\d+', c)), key=lambda c: int(c[6:]))  # choice10 after choice2
+        choices = [x[c] for c in names]
+        # also when nothing is truncated: many annotations put the gold answer first (labels=constant(0))
+        if not 0 <= x['labels'] < len(choices):
             return x
-        n_neg = n_options-1 if n_options else None
-        label=x['labels']
-        neg = choices[:label] + choices[label+1:]
-        pos = choices[label]
-        x['labels']=0
-        choices_list=[pos]+neg[:n_neg]
+        choices_list, x['labels'] = MultipleChoiceFields.shuffled_with_gold(
+            choices, x['labels'], n_options if MAX_MC_OPTIONS else None)
         for c in list(x):
             if 'choice' in c:
                 del x[c]

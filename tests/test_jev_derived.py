@@ -95,7 +95,15 @@ class MultipleChoicePermutationTest(unittest.TestCase):
         })})
         preprocessing = MultipleChoice("q", choices_list="opts", labels="label")
         legacy = preprocessing(DatasetDict(source), gold_first=True)["train"]
-        self.assertEqual(set(legacy["labels"]), {0})
+        # truncated to the shortest row's option count, gold kept, then shuffled: gold is no longer always first
+        for row in legacy:
+            self.assertEqual(row[f"choice{row['labels']}"], {"a": "y", "b": "q"}[row["inputs"]])
+        # over many distinct option sets, the gold slot is spread out
+        many = DatasetDict({"train": Dataset.from_dict({
+            "q": [f"q{i}" for i in range(400)], "opts": [[f"{i}-{c}" for c in "abcdef"] for i in range(400)],
+            "label": [i % 6 for i in range(400)]})})
+        slots = Counter(preprocessing(many, gold_first=True)["train"]["labels"])
+        self.assertTrue(all(count > 40 for count in slots.values()) and len(slots) == 4, slots)
         jev = preprocessing(DatasetDict(source), gold_first=False, max_options=None)["train"]
         jev = jev.sort("inputs")
         self.assertEqual(jev["labels"][0], 2)
