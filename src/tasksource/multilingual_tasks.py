@@ -1,14 +1,8 @@
 from .preprocess import cat, get,name, regen, constant, Classification, TokenClassification, MultipleChoice
 from .tasks import _copa_input, language_name
-from datasets import get_dataset_config_names, ClassLabel, Dataset, DatasetDict, concatenate_datasets, Sequence
-
-def all(dataset_name):
-    try:
-        config_name=get_dataset_config_names(dataset_name)
-    except Exception as e:
-        print(dataset_name,e)
-        config_name=None
-    return dict(dataset_name=dataset_name, config_name=config_name)
+from .metadata.configs import (MASAKHANEWS, PAWS_X, STSB_MULTI_MT, UNIVERSAL_DEPENDENCIES, XCOPA, XCSR_CODAH,
+                               XCSR_CSQA, XSTORY_CLOZE)
+from datasets import ClassLabel, Dataset, DatasetDict, concatenate_datasets, Sequence
 
 def concatenate_configs(dataset):
     return DatasetDict(train=concatenate_datasets(list(dataset.values())))
@@ -26,9 +20,9 @@ americas_nli = Classification("premise","hypothesis","label",config_name="all_la
 
 stsb_multi_mt = Classification("sentence1", "sentence2",
     lambda x: float(x["similarity_score"]/5), question="How similar are the two sentences, from 0 (unrelated) to 1 (equivalent)?",
-    **all('PhilipMay/stsb_multi_mt'))
+    dataset_name='PhilipMay/stsb_multi_mt', config_name=STSB_MULTI_MT)
 
-pawsx = Classification("sentence1","sentence2",name('label',['not_paraphrase','paraphrase']), **all('google-research-datasets/paws-x'))
+pawsx = Classification("sentence1","sentence2",name('label',['not_paraphrase','paraphrase']), dataset_name='google-research-datasets/paws-x', config_name=PAWS_X)
 
 MIAM_DIHANA_LABELS = [
     "Afirmacion", "Apertura", "Cierre", "Confirmacion", "Espera",
@@ -120,19 +114,17 @@ exams = MultipleChoice(get.question.stem, choices_list=get.question.choices.text
     dataset_name="exams", config_name='multilingual',
     pre_process=lambda ds:ds.filter(lambda x:  x['answerKey'] in "ABCDE"))
 
-_xcsr = all('INK-USC/xcsr')
-_xcsr_fields = dict(choices_list=get.question.choices.text, labels=lambda x:'ABCDE'.index(x['answerKey']), dataset_name=_xcsr['dataset_name'])
-xcsr = MultipleChoice(get.question.stem, **_xcsr_fields,
-    config_name=[c for c in _xcsr['config_name'] or [] if c.startswith('X-CSQA')])
+_xcsr_fields = dict(choices_list=get.question.choices.text, labels=lambda x:'ABCDE'.index(x['answerKey']), dataset_name='INK-USC/xcsr')
+xcsr = MultipleChoice(get.question.stem, **_xcsr_fields, config_name=XCSR_CSQA)
 xcsr_codah = MultipleChoice(constant(''), question="Which sentence is most plausible?", **_xcsr_fields,  # X-CODAH stems are empty
-    config_name=[c for c in _xcsr['config_name'] or [] if c.startswith('X-CODAH')])
+    config_name=XCSR_CODAH)
 
 xcopa = MultipleChoice(_copa_input,choices=['choice1','choice2'],labels="label",
-    **all('cambridgeltl/xcopa'))
+    dataset_name='cambridgeltl/xcopa', config_name=XCOPA)
 
 xstory = MultipleChoice(lambda x: "\n".join([x[f'input_sentence_{i}'] for i in range(1,5)]),
     choices=["sentence_quiz1","sentence_quiz2"],labels=lambda x: x["answer_right_ending"] - 1,
-    question="Which ending continues the story?", **all("juletxara/xstory_cloze"))
+    question="Which ending continues the story?", dataset_name="juletxara/xstory_cloze", config_name=XSTORY_CLOZE)
 
 
 
@@ -159,7 +151,7 @@ def _udep_cast_label_sequence(dataset, column):
 udep__pos = TokenClassification(
     'tokens', 'upos',
     pre_process=lambda ds: _udep_cast_label_sequence(ds, 'upos'),
-    **all('universal-dependencies/universal_dependencies'))
+    dataset_name='universal-dependencies/universal_dependencies', config_name=UNIVERSAL_DEPENDENCIES)
 
 def udep_post_process(ds):
     return _udep_cast_label_sequence(ds, 'labels')
@@ -227,7 +219,7 @@ amazon_intent = Classification("text",labels="label",
 
 masakhanews = Classification(
     "headline", labels="category",
-    **all("masakhane/masakhanews"))
+    dataset_name="masakhane/masakhanews", config_name=MASAKHANEWS)
 
 nusax_sentiment = Classification(
     "text", labels=name("label", ["negative", "neutral", "positive"]),

@@ -11,16 +11,15 @@ PARKED has a kind (see KINDS) and a reason. Parked tasks are not listed by
 
 To revive one, move it back to tasks.py and drop its PARKED entry.
 """
-from datasets import get_dataset_config_names
-
 from .access import parse_var_name
 from .metadata import bigbench_discriminative_english, blimp_hard as blimp_hard_configs
+from .metadata.configs import MMLU, UNIVERSAL_DEPENDENCIES
 from .preprocess import Preprocessing, cat, constant, get, regen, name, Classification, TokenClassification, MultipleChoice
 
 # MMLU is an evaluation benchmark; no train split
 mmlu = MultipleChoice('question',labels='answer',choices_list='choices',splits=['validation','dev','test'],
     dataset_name="tasksource/mmlu",
-    config_name=get_dataset_config_names("tasksource/mmlu")
+    config_name=MMLU
 )
 
 # BLiMP is an evaluation benchmark (test-only minimal pairs)
@@ -193,10 +192,10 @@ recast___recast_kg_relations = Classification(sentence1="context", sentence2="hy
     dataset_name="tasksource/recast", config_name="recast_kg_relations")
 
 # dependency relation labels depend on the head word, which the task does not show
-from .multilingual_tasks import _udep_cast_label_sequence, all as _all_configs  # noqa: E402
+from .multilingual_tasks import _udep_cast_label_sequence  # noqa: E402
 udep__deprel_multilingual = TokenClassification('tokens', 'deprel',
     pre_process=lambda ds: _udep_cast_label_sequence(ds, 'deprel'),
-    **_all_configs('universal-dependencies/universal_dependencies'))
+    dataset_name='universal-dependencies/universal_dependencies', config_name=UNIVERSAL_DEPENDENCIES)
 
 # xglue's NER and POS configs repackage CoNLL-2002/2003 and Universal Dependencies (tasks listed
 # elsewhere) and exist only behind a loading script

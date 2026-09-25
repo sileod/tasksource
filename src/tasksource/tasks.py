@@ -1,6 +1,7 @@
 from .preprocess import cat, get, regen, name, constant, Classification, TokenClassification, MultipleChoice
 from .metadata import udep_en_configs
-from datasets import get_dataset_config_names, Sequence, ClassLabel, Dataset, DatasetDict, Features, Value, concatenate_datasets
+from .metadata.configs import BABI_NLI
+from datasets import Sequence, ClassLabel, Dataset, DatasetDict, Features, Value, concatenate_datasets
 import hashlib
 import html
 from collections import Counter
@@ -60,8 +61,7 @@ anli__a3 = Classification('premise','hypothesis','label', splits=['train_r3','de
 
 babi_nli = Classification("premise", "hypothesis", "label",
     dataset_name="tasksource/babi_nli",
-    config_name=sorted(set(get_dataset_config_names("tasksource/babi_nli"))-{"agents-motivations"})
-) # agents-motivations task is not as clear-cut as the others
+    config_name=BABI_NLI)  # agents-motivations is left out: not as clear-cut as the others
 
 
 sick__label         = Classification('sentence_A','sentence_B','label', dataset_name="tasksource/sick")
