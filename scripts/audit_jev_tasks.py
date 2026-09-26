@@ -146,20 +146,24 @@ def adjudication_prompt(row):
     kind, question, options = row["kind"], row["question"], list(row["options"])
     if kind == "noul":
         options = ["no", "yes"]
-    listing = "\n".join(f"{LETTERS[i]}. {option}" for i, option in enumerate(options))
+    labels = option_labels(len(options))
+    listing = "\n".join(f"{label}. {option}" for label, option in zip(labels, options))
     scale = " The options are ordered levels, lowest first." if kind == "score" else ""
     return (f"Read the text and answer the question.{scale}\n\n<text>\n{row['state']}\n</text>\n\n"
             f"Question: {question}\n\nOptions:\n{listing}\n\n"
             "Reason step by step about the text, the question and each option, checking facts and implicit\n"
-            "assumptions. Then give the letter of the best option inside <answer></answer> tags.")
+            "assumptions. Then give the label of the best option inside <answer></answer> tags.")
+
+
+def option_labels(n_options):
+    """Letters, or numbers when there are more options than letters."""
+    return list(LETTERS[:n_options]) if n_options <= len(LETTERS) else [str(i + 1) for i in range(n_options)]
 
 
 def parse_letter(reply, n_options):
-    match = re.search(r"<answer>\s*\(?([A-Z])\b", str(reply))
-    if not match:
-        return None
-    index = LETTERS.index(match.group(1))
-    return index if index < n_options else None
+    match = re.search(r"<answer>\s*\(?([A-Z]|\d+)\b", str(reply))
+    labels = option_labels(n_options)
+    return labels.index(match.group(1)) if match and match.group(1) in labels else None
 
 
 def adjudicate(records, args):
