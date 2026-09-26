@@ -114,7 +114,9 @@ def preference_pairs(rows):
         rejected = random.Random(f"{x['task']}/{index}").choice(others) if others and x["targets"] in x["options"] else None
         return {"prompt": x["inputs"], "chosen": x["targets"], "rejected": rejected}
     pairs = rows.map(pair, with_indices=True, remove_columns=["inputs", "targets", "options"])
-    return pairs.filter(lambda rejected: rejected is not None, input_columns="rejected")
+    pairs = pairs.filter(lambda rejected: rejected is not None, input_columns="rejected")
+    columns = ["prompt", "chosen", "rejected", "task", "license", "license_use"]  # the Hub viewer shows this order
+    return pairs.select_columns([c for c in columns if c in pairs.column_names])
 
 
 def finalize(args):
