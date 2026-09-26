@@ -146,7 +146,9 @@ recast_nli = Classification(sentence1="context", sentence2="hypothesis", labels=
     'recast_verbcorner', 'recast_ner', 'recast_sentiment', 'recast_megaveridicality'])
 
 
-probability_words_nli = Classification(sentence1="context", sentence2="hypothesis", labels="label",
+# the Hub ClassLabel names are swapped: label 1 ("invalid") marks the valid hypothesis in every config
+probability_words_nli = Classification(sentence1="context", sentence2="hypothesis",
+    labels=lambda x: ["invalid", "valid"][x["label"]],
     question="Given the probabilities stated in text_A, is concluding text_B valid?",
     dataset_name="sileod/probability_words_nli", 
     config_name=["reasoning_1hop","reasoning_2hop","usnli"])
