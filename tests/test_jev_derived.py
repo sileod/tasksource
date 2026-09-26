@@ -322,6 +322,14 @@ class ReleaseQualityTest(unittest.TestCase):
         self.assertIn(VARIANT, kept["variant"])
         self.assertIn("label_verification", kept["variant"])
 
+    def test_long_state_overlaps_whatever_its_options(self):
+        state = "The movie was excellent from the first scene to the very last one."
+        row = lambda options, split: {"id": f"t:{split}:0", "kind": "choice", "options": options, "target": [1.0] + [0.0] * (len(options) - 1),
+                                      "state": state, "question": "Q?", "source": "t", "variant": "direct", "split": split}
+        train = Dataset.from_list([row(["negative", "positive"], "train")])
+        test = Dataset.from_list([row(["negative", "neutral", "positive"], "test")])
+        self.assertEqual(drop_train_overlap(test, content_keys(train))[1], 1)
+
     def test_source_annotation_fixes(self):
         self.assertEqual(
             _copa_input({"premise": "It rained.", "question": "effect"}),

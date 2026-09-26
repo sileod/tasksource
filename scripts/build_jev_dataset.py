@@ -23,7 +23,8 @@ from huggingface_hub import HfApi
 import numpy as np
 import pandas as pd
 import yaml
-from tasksource import list_tasks, load_task, task_provenance
+from tasksource import list_tasks, load_task, task_provenance, tasks
+from tasksource.access import lmtasks, load_preprocessing
 from tasksource.preprocess import sample_dataset
 from tasksource.metadata.weights import task_weight
 from tasksource.licenses import fetch_card_licenses, provenance_repos, source_license
@@ -328,15 +329,22 @@ def _normalized(text):
     return re.sub(r"\W+", " ", str(text)).casefold().strip()
 
 
+def _direct_key(state, options):
+    state = _normalized(state)
+    return (state, ()) if len(state) >= MIN_OVERLAP_CHARS else (state, tuple(sorted(map(_normalized, options))))
+
+
 def content_keys(rows):
-    """Keys for train-overlap checks: (state, options) for direct rows, and
-    each item text for packed rows, whose members may be capped away."""
+    """Keys for train-overlap checks: the state (with its options, when the state
+    alone is too short to identify content) for direct rows, and each item text for
+    packed rows, whose members may be capped away. A long state seen in train under
+    another task or option set counts as overlap."""
     decisions, texts = set(), set()
     columns = rows.select_columns(["state", "options", "variant"])
     for batch in columns.iter(batch_size=10_000):
         for state, options, variant in zip(batch["state"], batch["options"], batch["variant"]):
             if variant == "direct":
-                decisions.add((_normalized(state), tuple(sorted(map(_normalized, options)))))
+                decisions.add(_direct_key(state, options))
                 texts.add(_normalized(state))
             elif variant == PACKED_VARIANT:
                 texts.update(map(_normalized, packed_items(state)))
@@ -353,7 +361,7 @@ def drop_train_overlap(rows, train_keys):
             batch["id"], batch["state"], batch["options"], batch["variant"]
         ):
             if variant == "direct":
-                key = (_normalized(state), tuple(sorted(map(_normalized, options))))
+                key = _direct_key(state, options)
                 content = len(key[0]) + max(map(len, key[1]), default=0)
                 hit = content >= MIN_OVERLAP_CHARS and key in decisions
             elif variant == PACKED_VARIANT:
@@ -827,7 +835,7 @@ def publish_dataset(
     for name in (
         "build-report.jsonl", "build-summary.json", "build-manifest.json",
         "failed-tasks.json", "outdated-datasets.json", "fixed-source-audit.json",
-        "release-audit.json", "token-source-status.md", "sources.yaml",
+        "release-audit.json", "token-source-status.md", "sources.yaml", "AGENTS.md",
     ):
         path = output / name
         if path.exists():
@@ -868,6 +876,16 @@ def add_license_columns(rows, licenses):
     return rows.add_column("license_use", [licenses[source]["license_use"] for source in sources])
 
 
+def soft_label_info(source):
+    """How a soft-label source's targets were made: from votes or mean ratings, and by how many annotators."""
+    multilingual = source.startswith("multilingual/")
+    try:
+        spec = load_preprocessing(id=source.removeprefix("multilingual/"), tasks=lmtasks if multilingual else tasks)
+    except (KeyError, ValueError):
+        return {}
+    return {"aggregation": spec.aggregation, **({"annotators": spec.annotators} if spec.annotators else {})}
+
+
 def write_sources_yaml(path, release_audit, records=None, licenses=None):
     """Every source in the release with its rows, Hub dataset, revision and originals.
 
@@ -890,6 +908,8 @@ def write_sources_yaml(path, release_audit, records=None, licenses=None):
         elif info.get("dataset") or info.get("data_files_from"):  # URL-only sources have no Hub revision
             info["revisions_unrecorded"] = True
         info.update((licenses or {}).get(source, {}))
+        if (records.get(source) or {}).get("task_type") == "SoftLabeling":
+            info.update(soft_label_info(source))
         sources[source] = info
     try:
         commit = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True,
@@ -1105,6 +1125,7 @@ def build(args):
     if args.finalize:
         shutil.copyfile(args.card, output / "README.md")
         shutil.copyfile(args.card.parent / "jev-token-source-status.md", output / "token-source-status.md")
+        shutil.copyfile(args.card.parent / "jev-AGENTS.md", output / "AGENTS.md")
         selected = set(tasks.source_id)
         latest = latest_records(report_path)
         failures = [

@@ -5,6 +5,7 @@ language:
 - multilingual
 license: other
 task_categories:
+- zero-shot-classification
 - text-classification
 - question-answering
 - token-classification
@@ -55,6 +56,8 @@ size_categories:
   posteriors when a policy applies to a requester whose role is uncertain.
 
 ## Quick start
+
+Coding agent? Read [AGENTS.md](AGENTS.md): row semantics, rebuilding multi-question requests from `group_id`, filtering, and evaluation caveats.
 
 ```python
 from datasets import load_dataset
