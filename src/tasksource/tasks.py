@@ -147,6 +147,7 @@ recast_nli = Classification(sentence1="context", sentence2="hypothesis", labels=
 
 
 probability_words_nli = Classification(sentence1="context", sentence2="hypothesis", labels="label",
+    question="Given the probabilities stated in text_A, is concluding text_B valid?",
     dataset_name="sileod/probability_words_nli", 
     config_name=["reasoning_1hop","reasoning_2hop","usnli"])
 
@@ -234,12 +235,14 @@ add_one_rte = Classification("premise","hypothesis","label",
     dataset_name="pietrolesci/add_one_rte",splits=["train","dev","test"],
     label_values=ENTAILMENT_LABEL_VALUES)
 
-hlgd = Classification("headline_a", "headline_b", labels="label", dataset_name="tasksource/hlgd")
+hlgd = Classification("headline_a", "headline_b", labels="label", dataset_name="tasksource/hlgd",
+    question="Do the two headlines report the same news event?")
 
 paws___labeled_final   = Classification("sentence1", "sentence2", name('label',['not_paraphrase','paraphrase']))
 paws___labeled_swap    = Classification("sentence1", "sentence2", name('label',['not_paraphrase','paraphrase']), splits=["train", None, None])
 
-medical_questions_pairs = Classification("question_1","question_2", name("label",['not similar','similar']))
+medical_questions_pairs = Classification("question_1","question_2", name("label",['not similar','similar']),
+    question="Do the two medical questions ask the same thing?")
  
 ###################### Token Classification #########################
 
@@ -524,7 +527,8 @@ tweet_eval_feminist = Classification(**stance_kwargs("feminist"))
 tweet_eval_hillary  = Classification(**stance_kwargs("Hillary"))
 
 
-discovery = Classification("sentence1", "sentence2", labels="label", config_name=["discovery"])
+discovery = Classification("sentence1", "sentence2", labels="label", config_name=["discovery"],
+    question="Which discourse marker best links text_A to text_B?")
 
 pragmeval_1 = Classification("sentence",labels="label",
     dataset_name="pragmeval",
@@ -532,6 +536,10 @@ pragmeval_1 = Classification("sentence",labels="label",
 
 pragmeval_2 = Classification("sentence1","sentence2",labels="label",
     dataset_name="pragmeval",
+    question={"emergent": "What stance does article headline text_B take toward the claim in text_A?",
+              "pdtb": "Which discourse relation links text_B to text_A?",
+              "gum": "Which discourse relation links text_B to text_A?",
+              "stac": "Which dialogue act relation links text_B to text_A?"},
     config_name= ["emergent", "gum", "pdtb", "persuasiveness-claimtype", "persuasiveness-premisetype", "sarcasm","stac"])
 
 # low/high scales over the same inputs: the label names the scale
@@ -716,7 +724,16 @@ def _probing(config, readable):
         names = dataset["train"].features["label"].names
         return dataset.cast_column("label", ClassLabel(names=[readable(name) for name in names]))
     return Classification("sentence", labels="label", dataset_name="tasksource/linguisticprobing",
-        config_name=config, pre_process=pre_process)
+        config_name=config, pre_process=pre_process, question=_PROBING_QUESTIONS.get(config))
+
+_PROBING_QUESTIONS = {
+    "sentence_length": "How many words does the sentence have?",
+    "tree_depth": "What is the depth of the sentence's constituency parse tree?",
+    "top_constituents": "What is the sequence of top-level constituents in the sentence's parse tree?",
+    "coordination_inversion": "Were the two coordinated clauses of this sentence swapped?",
+    "odd_man_out": "Was one word of this sentence replaced by a random word of the same part of speech?",
+    "bigram_shift": "Were two adjacent words of this sentence swapped?",
+}
 
 _SENTENCE_LENGTH = ["5-8 words", "9-12 words", "13-16 words", "17-20 words", "21-25 words", "26-28 words"]
 linguisticprobing___subj_number = _probing("subj_number", {"NN": "singular subject", "NNS": "plural subject"}.get)
@@ -777,6 +794,7 @@ ethics___commonsense = Classification(
     }})
 ethics___deontology = Classification(
     sentence1="scenario", sentence2="excuse", labels=name("label", ["unreasonable", "reasonable"]),
+    question="Is text_B a reasonable excuse or exemption for the request or duty in text_A?",
     dataset_name="csv", task_id="ethics/deontology",
     load_dataset_kwargs={"data_files": {
         "train": "hf://datasets/hendrycks/ethics/data/deontology/train.csv",
@@ -871,7 +889,8 @@ mc_taco = Classification(
     dataset_name="marcov/mc_taco_promptsource", task_id="mc_taco"
 )
 
-ade_corpus_v2___Ade_corpus_v2_classification = Classification("text",labels="label")
+ade_corpus_v2___Ade_corpus_v2_classification = Classification("text",labels="label",
+    question="Does the sentence report an adverse effect of a drug?")
 
 discosense = MultipleChoice("context",choices=regen(r"option_[0-3]"),labels="label",
     dataset_name="json", task_id="discosense",
@@ -886,7 +905,8 @@ circa = Classification(
     labels="goldstandard2", post_process=remove_neg_1)
 
 code_x_glue_cc_defect_detection = Classification("func", labels=lambda x: ["no defect", "defect"][int(x["target"])],
-    dataset_name="google/code_x_glue_cc_defect_detection")
+    dataset_name="google/code_x_glue_cc_defect_detection",
+    question="Does this C function contain a defect, such as a vulnerability or a memory bug?")
 
 
 phrase_similarity = Classification(
@@ -1155,7 +1175,7 @@ temporal_nli = Classification("Premise","Hypothesis","Label",
     dataset_name="tasksource/temporal-nli")
 
 riddle_sense = MultipleChoice("question", choices_list=get.choices.text,
-    labels=lambda x : "ABCDE".index(x['answerKey']),
+    labels=lambda x : "ABCDE".index(x['answerKey']) if x['answerKey'] else -1,  # hidden test answers
     dataset_name="jeggers/riddle_sense",
     pre_process=lambda ds: ds.map(_parse_jeggers_riddle_choices))
 
@@ -1230,6 +1250,7 @@ ekar=MultipleChoice("question",choices_list=get.choices.text, question="Which pa
 dataset_name="Jiangjie/ekar_english")
 
 implicit_hate = Classification("post",labels="class",
+    question="Is the post explicitly hateful, implicitly hateful (coded or indirect), or not hateful?",
     dataset_name="tasksource/implicit-hate-stg1")
 
 nli_unambiguity = Classification("premise","hypothesis","gini",
@@ -1332,7 +1353,7 @@ tracie = Classification("premise","hypothesis","answer",dataset_name='tasksource
 sherliic = Classification("premise","hypothesis","label",dataset_name='tasksource/sherliic')
 
 sen_making__1 = MultipleChoice(constant(''), choices=['sentence0','sentence1'],labels='false',
-    question="Which statement makes sense?",
+    question="Which statement is against common sense?",
     dataset_name="tasksource/sen-making")
 
 sen_making__2 = MultipleChoice(lambda x: [x['sentence0'],x['sentence1']][x['false']],
@@ -1374,7 +1395,8 @@ sharc_classification = Classification("snippet",
 
 conceptrules_v2 = Classification("context", "text", "label", question="Is the statement true given the context?", dataset_name="tasksource/conceptrules_v2")
 
-scidtb = Classification("unit1_txt","unit2_txt","label", dataset_name="multilingual-discourse-hub/disrpt",config_name='eng.dep.scidtb.rels')
+scidtb = Classification("unit1_txt","unit2_txt","label", dataset_name="multilingual-discourse-hub/disrpt",config_name='eng.dep.scidtb.rels',
+    question="Which discourse relation links unit text_B to unit text_A?")
 
 chunking = TokenClassification("tokens","chunk_tags", dataset_name="eriktks/conll2000", task_id="conll2000",
     load_dataset_kwargs=dict(revision=PARQUET))
@@ -1466,9 +1488,11 @@ dnd_intent = Classification("examples",labels="label_names",
     dataset_name='neurae/dnd_style_intents')
 
 fld = Classification("context","hypothesis", "proof_label",
+    question="From the facts in text_A, is the hypothesis text_B proved, disproved, or neither?",
     dataset_name="hitachi-nlp/FLD.v2",config_name="default")
 
 flds = Classification("context","hypothesis", "proof_label",
+    question="From the facts in text_A, is the hypothesis text_B proved, disproved, or neither?",
     dataset_name="hitachi-nlp/FLD.v2",config_name="star")
 
 sdoh_nli = Classification("premise","hypothesis",labels=lambda x:{True:"entailment",False:"not_entailment"}[x['label']],
@@ -1545,13 +1569,15 @@ para_rules = Classification(
 proofwriter_deduction = Classification("theory","question","answer",
     dataset_name="tasksource/proofwriter") #open world assumption
 
-logical_entailment = Classification("A","B","label",dataset_name='tasksource/logical-entailment')
+logical_entailment = Classification("A","B","label",dataset_name='tasksource/logical-entailment',
+    question="Does propositional formula text_A logically entail formula text_B?")
 
 nope = Classification('premise','hypothesis',
     labels=lambda x:dict(E='entailment',N='neutral',C='contradiction').get(x['label'],x['label']),
     dataset_name='tasksource/nope')
 
-logicNLI = Classification('premise','hypothesis','label',dataset_name='tasksource/LogicNLI')
+logicNLI = Classification('premise','hypothesis','label',dataset_name='tasksource/LogicNLI',
+    question="Given the facts and rules in text_A, how does statement text_B follow?")
 
 contract_nli__seg = Classification("premise","hypothesis","label", dataset_name="tasksource/contract-nli",config_name="contractnli_a")
 
@@ -1622,7 +1648,8 @@ docnli = Classification("premise","hypothesis","label",dataset_name="tasksource/
 
 mctest_nli = Classification("premise","hypothesis","label",dataset_name="tasksource/mctest-nli")
 
-patent_phrase_similarity = Classification("anchor","target","label",dataset_name="tasksource/patent-phrase-similarity")
+patent_phrase_similarity = Classification("anchor","target","label",dataset_name="tasksource/patent-phrase-similarity",
+    question="In patent language, how is phrase text_B related to phrase text_A?")
 
 nlsat = Classification('sentence',labels='label',dataset_name="tasksource/natural-language-satisfiability")
 
@@ -1905,6 +1932,7 @@ def _chemprot_relations(dataset):
 
 chemprot = Classification(
     "text", "entity_pair", "relation",
+    question="Which ChemProt relation group (CPR) holds between the chemical and the protein in text_B?",
     dataset_name="bigbio/chemprot", config_name="chemprot_full_source",
     pre_process=_chemprot_relations)
 

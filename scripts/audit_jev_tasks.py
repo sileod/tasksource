@@ -35,7 +35,7 @@ SPLIT_PREFERENCE = ("test", "validation", "train")
 LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 
-def sample_rows(shards, per_task, seed, tasks=None):
+def sample_rows(shards, per_task, seed, tasks=None, splits=SPLIT_PREFERENCE):
     """Up to ``per_task`` direct decisions per source, from its most held-out split."""
     files = defaultdict(dict)
     for path in glob.glob(str(Path(shards) / "*.parquet")):
@@ -44,7 +44,7 @@ def sample_rows(shards, per_task, seed, tasks=None):
     rows = []
     for stem, splits in sorted(files.items()):
         picked = []
-        for split in SPLIT_PREFERENCE:
+        for split in splits:
             if split not in splits or len(picked) >= per_task:
                 continue
             table = pq.read_table(splits[split]).to_pandas()
@@ -249,6 +249,7 @@ def main():
     parser.add_argument("--tasks", nargs="*", help="restrict to these sources")
     parser.add_argument("--limit-tasks", type=int, help="first N sources only (a pilot)")
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--splits", nargs="+", default=list(SPLIT_PREFERENCE), help="splits to sample, in order")
     parser.add_argument("--jev-model", default="~typesafe/jev-latest")
     parser.add_argument("--jev-key-env", default="JEV_OPENROUTER_API_KEY")
     parser.add_argument("--budget-usd", type=float, default=5.0)
@@ -263,7 +264,7 @@ def main():
     args = parser.parse_args()
     args.out.mkdir(parents=True, exist_ok=True)
 
-    rows = sample_rows(args.shards, args.per_task, args.seed, args.tasks)
+    rows = sample_rows(args.shards, args.per_task, args.seed, args.tasks, args.splits)
     if args.tasks:
         rows = [r for r in rows if r["source"] in args.tasks]
     if args.limit_tasks:

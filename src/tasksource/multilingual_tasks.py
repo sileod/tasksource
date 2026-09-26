@@ -116,7 +116,8 @@ exams = MultipleChoice(get.question.stem, choices_list=get.question.choices.text
     dataset_name="exams", config_name='multilingual',
     pre_process=lambda ds:ds.filter(lambda x:  x['answerKey'] in "ABCDE"))
 
-_xcsr_fields = dict(choices_list=get.question.choices.text, labels=lambda x:'ABCDE'.index(x['answerKey']), dataset_name='INK-USC/xcsr')
+_xcsr_fields = dict(choices_list=get.question.choices.text, dataset_name='INK-USC/xcsr',
+    labels=lambda x: 'ABCDE'.index(x['answerKey']) if x['answerKey'] else -1)  # hidden test answers
 xcsr = MultipleChoice(get.question.stem, **_xcsr_fields, config_name=XCSR_CSQA)
 xcsr_codah = MultipleChoice(constant(''), question="Which sentence is most plausible?", **_xcsr_fields,  # X-CODAH stems are empty
     config_name=XCSR_CODAH)
@@ -134,6 +135,7 @@ xstory = MultipleChoice(lambda x: "\n".join([x[f'input_sentence_{i}'] for i in r
 # own task; keep corpora with at least 1,600 training pairs, minus the English ones tasksource already
 # has (scidtb, and STAC via pragmeval) and por.pdtb.crpc (no label column)
 disrpt = Classification("unit1_txt", "unit2_txt", "label", dataset_name="multilingual-discourse-hub/disrpt",
+    question="Which discourse relation links unit text_B to unit text_A?",
     config_name=["deu.rst.pcc.rels", "eus.rst.ert.rels", "fas.rst.prstc.rels", "fra.sdrt.annodis.rels",
                  "nld.rst.nldt.rels", "por.rst.cstn.rels", "rus.rst.rrt.rels", "spa.rst.rststb.rels",
                  "tha.pdtb.tdtb.rels", "zho.rst.gcdt.rels"])

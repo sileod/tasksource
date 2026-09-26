@@ -515,7 +515,8 @@ constant = pretty(fc.constantly)
 regen = lambda x: list(exrex.generate(x))
 
 def name(label_name, classes):
-    return lambda x:classes[x[label_name]]
+    # a negative label is a hidden answer (e.g. an obfuscated test split), not the last class
+    return lambda x: classes[x[label_name]] if x[label_name] is not None and x[label_name] >= 0 else None
 
 def add_question(dataset, question):
     """Append a task question to the inputs (``load_task(prompted=True)``)."""
@@ -549,6 +550,10 @@ def fix_splits(dataset):
         train_labels = set(fc.flatten(dataset['train']['labels'])) if 'train' in dataset and 'labels' in dataset['train'].features else set()
         if len(test_labels)==1 and (test_labels & {-1, None} or not test_labels & train_labels):
             del dataset['test']
+
+    for split in list(dataset):  # rows whose answer is hidden (a null label) cannot be trained or scored on
+        if isinstance(dataset[split].features.get('labels'), datasets.ClassLabel) and None in dataset[split].unique('labels'):
+            dataset[split] = dataset[split].filter(lambda label: label is not None, input_columns='labels')
 
     if 'validation' in dataset and 'train' not in dataset:
         train_validation = dataset['validation'].train_test_split(0.5, seed=0)
@@ -586,6 +591,7 @@ def fix_labels(dataset, label_key='labels'):
         features=dataset['train'].features.copy(); features[label_key]=datasets.Value('string')
         dataset=dataset.map(lambda x:{label_key:str(x[label_key])}, features=features)
     labels=set(fc.flatten(list(dataset[k][label_key]) for k in dataset))  # a label seen only in eval splits must not crash
+    labels.discard(None)  # a hidden label stays null, it is not a class
     if set(labels)=={'entailment','neutral','contradiction'}:
         order=lambda x:dict(fc.flip(enumerate(['entailment','neutral','contradiction']))).get(x,x)
     else:

@@ -134,3 +134,16 @@ class JevTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def test_hidden_labels_are_dropped_not_named():
+    from datasets import ClassLabel, Dataset, DatasetDict
+    from tasksource.preprocess import fix_splits, name
+
+    assert name("label", ["no", "yes"])({"label": -1}) is None
+    assert name("label", ["no", "yes"])({"label": 1}) == "yes"
+    labels = ClassLabel(names=["no", "yes"])
+    rows = lambda values: Dataset.from_dict({"labels": values}).cast_column("labels", labels)
+    fixed = fix_splits(DatasetDict(train=rows([0, 1, None]), validation=rows([0, 1] * 4), test=rows([None] * 4)))
+    assert None not in fixed["train"]["labels"] and len(fixed["train"]) == 2
+    assert len(fixed["test"]) == 4 and set(fixed["test"]["labels"]) == {0, 1}  # hidden test replaced by half of validation
