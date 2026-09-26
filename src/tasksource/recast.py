@@ -78,9 +78,11 @@ def recast_dataset_classification_to_mc(dataset,sep="[SEP]",N=4):
     return DatasetDict({k: recast_split(v) for k,v in dataset.items()})
 
 
-def recast_instruct(dataset, question=None, seed=0):
+def recast_instruct(dataset, question=None, seed=0, options=False):
     """Sampling and shuffling use one RNG per example, seeded by (seed, split, row index):
-    reproducible, and independent of the global ``random`` state."""
+    reproducible, and independent of the global ``random`` state. ``options=True`` keeps
+    an ``options`` column: every answer offered in the prompt, formatted like ``targets``
+    (empty for token classification), e.g. for preference pairs."""
     features = dataset['train'].features
     labels = features['labels']
 
@@ -97,16 +99,18 @@ def recast_instruct(dataset, question=None, seed=0):
             x['inputs'] = f"{x['inputs']}\n{question}" if x['inputs'] else question
         choices = sorted([k for k in x if 'choice' in k])
         if all([x[c] in x['inputs'] for c in choices]):
-            return {"inputs":x['inputs'], 'targets': x[f"choice{x['labels']}"].strip()+"."}
+            return {"inputs":x['inputs'], 'targets': x[f"choice{x['labels']}"].strip()+".",
+                    'options': [x[c].strip()+"." for c in choices]}
         else:
-            return render_multiple_choice(x['inputs'],[x[c] for c in choices],x['labels'])
+            rendered = render_multiple_choice(x['inputs'],[x[c] for c in choices],x['labels'])
+            return {**rendered, 'options': [f"{letter}." for letter in string.ascii_uppercase[:len(choices)]]}
 
     def recast_TokenClassification(x, rng):
         distractors = list(labels.feature.names)
         x_labels = [labels.feature.int2str(y) for y in x['labels']]
         labels_set= list(dict.fromkeys(x_labels))  # first-seen order, independent of PYTHONHASHSEED
         options=list(dict.fromkeys(labels_set+distractors))[:max(len(labels_set),10)]
-        return render_token_classification(x['tokens'],options,x_labels)
+        return {**render_token_classification(x['tokens'],options,x_labels), 'options': []}
 
     def recast_Classification(x, rng):
         if 'sentence2' in x:
@@ -116,14 +120,18 @@ def recast_instruct(dataset, question=None, seed=0):
             
         answer=labels.int2str(x['labels']).strip()
         options= negative_sample_options(answer, labels._int2str, rng=rng)
-        return render_classification(text, options, answer, question)
+        return {**render_classification(text, options, answer, question), 'options': [f"{o}." for o in options]}
         
     recast = eval(f"recast_{task_type}")
     # same repair of mojibake and escaped HTML as the Jev recast
-    dataset = DatasetDict({split: rows.map(
-        lambda x, i, split=split: {k: clean_text(v) for k, v in recast(x, random.Random(f"{seed}/{split}/{i}")).items()},
-        with_indices=True) for split, rows in dataset.items()})
-    dataset = dataset.remove_columns([k for k in features if k not in ['inputs','targets']])
+    def convert(x, i, split):
+        row = recast(x, random.Random(f"{seed}/{split}/{i}"))
+        return {"inputs": clean_text(row["inputs"]), "targets": clean_text(row["targets"]),
+                "options": [clean_text(o) for o in row["options"]]}
+    dataset = DatasetDict({split: rows.map(convert, with_indices=True, fn_kwargs={"split": split})
+                           for split, rows in dataset.items()})
+    kept = ['inputs', 'targets'] + (['options'] if options else [])
+    dataset = dataset.remove_columns([k for k in dataset['train'].column_names if k not in kept])
     return dataset
 
 
