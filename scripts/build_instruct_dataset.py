@@ -92,7 +92,7 @@ def build(args):
 
 def interleave(rows):
     """Round-robin tasks, so every stretch of the split mixes them."""
-    tasks = rows.select_columns(["task"])[:]["task"]
+    tasks = rows.data.column("task").to_pylist()
     queues = {}
     for index, task in enumerate(tasks):
         queues.setdefault(task, []).append(index)
@@ -104,7 +104,7 @@ def interleave(rows):
             else:
                 del queues[task]
         depth += 1
-    return rows.select(order)
+    return rows.select(order).flatten_indices()  # later column reads stay fast
 
 
 def preference_pairs(rows):
@@ -125,10 +125,10 @@ def finalize(args):
                      if task in selected and split in records[task]["rows"]] for split in SPLITS}
     instruct = DatasetDict({split: interleave(load_dataset("parquet", data_files=[str(f) for f in paths], split="train"))
                             for split, paths in files.items() if paths})
-    licenses = source_licenses(sorted(set(instruct["train"]["task"])
-                                      | {t for split in instruct.values() for t in set(split["task"])}))
+    tasks = {split: rows.data.column("task").to_pylist() for split, rows in instruct.items()}
+    licenses = source_licenses(sorted(set().union(*tasks.values())))
     def add_licenses(rows):
-        tasks = rows.select_columns(["task"])[:]["task"]
+        tasks = rows.data.column("task").to_pylist()
         rows = rows.add_column("license", [licenses[t]["license"] for t in tasks])
         return rows.add_column("license_use", [licenses[t]["license_use"] for t in tasks])
     instruct = DatasetDict({split: add_licenses(rows) for split, rows in instruct.items()})
@@ -136,7 +136,7 @@ def finalize(args):
     instruct = DatasetDict({split: rows.remove_columns("options") for split, rows in instruct.items()})
 
     sources = {}
-    for task in sorted(set(instruct["train"]["task"])):
+    for task in sorted(set().union(*tasks.values())):
         info = {"rows": {split: records[task]["rows"][split] for split in SPLITS if split in records[task]["rows"]}}
         info.update(source_provenance(task))
         info["revisions"] = records[task].get("revisions", {})
