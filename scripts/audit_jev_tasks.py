@@ -150,7 +150,8 @@ def adjudication_prompt(row):
     scale = " The options are ordered levels, lowest first." if kind == "score" else ""
     return (f"Read the text and answer the question.{scale}\n\n<text>\n{row['state']}\n</text>\n\n"
             f"Question: {question}\n\nOptions:\n{listing}\n\n"
-            "Think briefly, then give only the letter of the best option inside <answer></answer> tags.")
+            "Reason step by step about the text, the question and each option, checking facts and implicit\n"
+            "assumptions. Then give the letter of the best option inside <answer></answer> tags.")
 
 
 def parse_letter(reply, n_options):
@@ -224,6 +225,13 @@ def report(records, args):
              "adjudicator_sides_gold": int(frame.adjudicator_sides_gold.sum()),
              "adjudicator_sides_jev": int(frame.adjudicator_sides_jev.sum()),
              "adjudicator_other": int(frame.adjudicator_other.sum())}
+    # procedural gold is computed exactly: siding with Jev there is an adjudicator error
+    procedural = frame[frame.source.str.startswith("procedural-typed-decisions/")]
+    if procedural.adjudicated.sum():
+        total["adjudicator_error_rate_on_procedural"] = round(
+            float(procedural.adjudicator_sides_jev.sum() + procedural.adjudicator_other.sum())
+            / float(procedural.adjudicated.sum()), 4)
+        total["procedural_adjudicated"] = int(procedural.adjudicated.sum())
     (args.out / "summary.json").write_text(json.dumps(total, indent=2) + "\n")
     print(json.dumps(total), flush=True)
     return frame
