@@ -103,6 +103,11 @@ def annotate(bundles, config, args):
     cache_dir = args.out / "jev-cache"
     cache_dir.mkdir(parents=True, exist_ok=True)
     api_key = os.environ[config.api_key_env]
+    for path in cache_dir.glob("*.json"):  # entries cut short by an interrupted older run
+        try:
+            json.loads(path.read_text())
+        except ValueError:
+            path.unlink()
     spent = cached_cost(cache_dir)
     todo = [b for b in bundles if not (cache_dir / f"{jev_cache_key(b, config)}.json").exists()]
     print(f"Jev: {len(bundles) - len(todo)} cached, {len(todo)} to request, ${spent:.4f} spent", flush=True)

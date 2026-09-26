@@ -199,13 +199,16 @@ def annotate_bundle_jev(bundle: dict, annotator_cfg, api_key: str,
                 f"Jev response has no 'answers' map: {str(response)[:300]}")
         answers, returned_model = response["answers"], response.get("model", "")
         if cached_path is not None:
-            cached_path.write_text(json.dumps(
+            # write then rename, so an interrupted run never leaves a truncated cache entry
+            partial = cached_path.with_name(f"{cached_path.name}.{os.getpid()}.tmp")
+            partial.write_text(json.dumps(
                 {"cache_key": key, "state_id": bundle.get("state_id"),
                  "requested_model": annotator_cfg.model,
                  "returned_model": returned_model,
                  "usage": response.get("usage", {}),
                  "answers": answers},
                 ensure_ascii=False, indent=2), encoding="utf-8")
+            partial.replace(cached_path)
     annotations = []
     for question in bundle.get("questions", []):
         probs, entry = _jev_probabilities(question, answers)
