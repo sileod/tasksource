@@ -28,7 +28,8 @@ ENTAILMENT_LABEL_VALUES = {0: "not-entailed", 1: "entailed"}
 ###################### NLI/paraphrase ###############################
 
 glue___mnli = Classification(sentence1="premise", sentence2="hypothesis", labels="label", splits=["train", None, "validation_matched"])
-glue___qnli = Classification("question","sentence", labels="label")
+glue___qnli = Classification("question","sentence", labels="label",
+    question="Does sentence text_B contain the answer to question text_A?")  # a question cannot entail
 glue___rte = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
 glue___wnli = Classification(sentence1="sentence1", sentence2="sentence2", labels="label")
 
