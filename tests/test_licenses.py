@@ -43,3 +43,13 @@ class CatalogTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def test_task_weight_multiplies_hand_and_audit_weights():
+    from tasksource.metadata.weights import task_weight
+    from tasksource.metadata.audit_weights import AUDIT_WEIGHTS
+
+    assert task_weight("UNLI") == 8 * AUDIT_WEIGHTS.get("UNLI", 1)
+    assert task_weight("english-grading/syntax") == 0.5
+    assert task_weight("tomi-nli") == 1.5
+    assert task_weight("glue/rte") == 1

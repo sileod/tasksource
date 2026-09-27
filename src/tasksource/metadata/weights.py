@@ -9,6 +9,8 @@ wins; keep the list short.
 
 import re
 
+from .audit_weights import AUDIT_WEIGHTS
+
 WEIGHTS = {
     r"^UNLI$": 8,  # 55k human probability judgements: the best calibration source
     r"(linguisticprobing|robust_nli|gen_debiased_nli)": 0.1,
@@ -20,7 +22,6 @@ WEIGHTS = {
 
 
 def task_weight(task_id):
-    for pattern, weight in WEIGHTS.items():
-        if re.search(pattern, task_id):
-            return weight
-    return 1
+    """The hand-set weight above times the per-task Jev audit weight (audit_weights.py)."""
+    weight = next((w for pattern, w in WEIGHTS.items() if re.search(pattern, task_id)), 1)
+    return weight * AUDIT_WEIGHTS.get(task_id, 1)
