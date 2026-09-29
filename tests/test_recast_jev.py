@@ -230,6 +230,18 @@ class RecastJevTest(unittest.TestCase):
         self.assertGreater(counts["anli/a1"], 2 * counts["plain"])
         self.assertLess(counts["linguisticprobing/x"], counts["plain"])
 
+    def test_diverse_cap_nudges_toward_many_options_without_repeating(self):
+        options = {"yesno": ["yes", "no"], "wide": [str(i) for i in range(12)], "tiny": [str(i) for i in range(30)]}
+        sources = ["yesno"] * 200 + ["wide"] * 200 + ["tiny"] * 5
+        dataset = Dataset.from_dict({"source": sources, "id": [f"s:train:{i}" for i in range(len(sources))],
+                                     "options": [options[s] for s in sources]})
+        capped = diverse_cap(dataset, 150)
+        counts = Counter(capped["source"])
+        self.assertEqual(len(set(capped["id"])), len(capped))  # no row twice
+        self.assertEqual(counts["tiny"], 5)  # a small family is taken whole, not repeated
+        self.assertGreater(counts["wide"], counts["yesno"])
+        self.assertLess(counts["wide"], 1.4 * counts["yesno"])  # a nudge, not a swing
+
     def test_diverse_cap_caps_multilingual_share(self):
         sources = [f"multilingual/m{i % 8}" for i in range(400)] + [f"e{i % 2}" for i in range(400)]
         dataset = Dataset.from_dict({"source": sources, "id": [f"s:train:{i}" for i in range(800)]})
