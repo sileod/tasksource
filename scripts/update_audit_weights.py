@@ -13,7 +13,8 @@ hard a task is; the kind of gold says what a failure means:
 The adjudicator's (DeepSeek) agreement is not used: on real tasks it mostly shares
 Jev's errors (it sided with Jev on 60% of disagreements, but on 12% where gold is exact).
 
-    python scripts/update_audit_weights.py build/jev-task-audit build/jev-task-audit-fixed
+    python scripts/update_audit_weights.py build/jev-task-audit build/jev-task-audit-fixed \
+        --reaudit build/procedural-calibration
 """
 
 import argparse
@@ -25,7 +26,7 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[1]
 CLEAN = (r"^(tomi-nli|corr2cause|babi_nli/|puzzte|regset|SpaRTUN|spartqa|conceptrules|logiqa|help-nli|FLD|clutrr"
          r"|proofwriter|stepgame|nlgraph|lsat|LogicNLI|logical-entailment|probability_words_nli|sen-making|docred"
-         r"|TuringBench)")
+         r"|TuringBench|procedural-typed-decisions/)")
 SUBJECTIVE = (r"(_Disagreement$|^english-grading/|^AES2|^HelpSteer|^oasst2/|^hh-rlhf/|^SHP|^webgpt|^crowdflower/"
               r"|^argument-feedback|^liar$|^google_wellformed|^pragmeval/(squinky|persuasiveness|verifiability|emobank)"
               r"|^esci$|^humicroedit|^wouldyourather|^go_emotions|^tweet_eval/(emoji|stance|hate)|^emo/"
@@ -58,9 +59,13 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("audit", help="audit output directory (all tasks)")
     parser.add_argument("repaired", nargs="?", help="audit of tasks re-evaluated after repairs; these override")
+    parser.add_argument("--reaudit", nargs="*", default=[],
+                        help="later audits of unchanged-gold tasks (e.g. regenerated procedural configs); these override")
     parser.add_argument("--out", type=Path, default=ROOT / "src/tasksource/metadata/audit_weights.py")
     args = parser.parse_args()
     kappa = kappas(args.audit)
+    for audit in args.reaudit:
+        kappa.update(kappas(audit))
     repaired = set()
     if args.repaired:
         after = kappas(args.repaired)

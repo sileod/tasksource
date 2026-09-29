@@ -126,10 +126,12 @@ AUDIT_WEIGHTS = {
     "pragmeval/persuasiveness-strength": 0.5,  # hard-subjective, kappa 0.29
     "pragmeval/squinky-implicature": 0.5,  # hard-subjective, kappa 0.15
     "pragmeval/verifiability": 0.5,  # hard-subjective, kappa 0.25
-    "procedural-typed-decisions/evidence_sufficiency": 0.5,  # trivial, kappa 0.96
-    "procedural-typed-decisions/needle_retrieval": 0.5,  # trivial, kappa 1.00
-    "procedural-typed-decisions/state_perturbation": 0.5,  # trivial, kappa 0.96
-    "procedural-typed-decisions/table_lookup": 0.5,  # trivial, kappa 1.00
+    "procedural-typed-decisions/entity_belief_tracking": 0.5,  # trivial, kappa 0.94
+    "procedural-typed-decisions/evidence_sufficiency": 0.5,  # trivial, kappa 0.90
+    "procedural-typed-decisions/needle_retrieval": 0.5,  # trivial, kappa 0.98
+    "procedural-typed-decisions/policy_applicability": 1.5,  # hard-clean, kappa 0.33
+    "procedural-typed-decisions/state_perturbation": 0.5,  # trivial, kappa 0.95
+    "procedural-typed-decisions/table_lookup": 0.5,  # trivial, kappa 0.94
     "prost": 0.5,  # trivial, kappa 0.97
     "puzzte": 1.5,  # hard-clean, kappa 0.10
     "qasc": 0.5,  # trivial, kappa 0.92
