@@ -10,6 +10,7 @@ RATES = [
     (Fraction(2, 3), Fraction(1, 3)),
     (Fraction(9, 10), Fraction(2, 5)),
 ]
+N_SENSORS = [1, 2, 3, 4, 6]
 PRIORS = [Fraction(1, 5), Fraction(1, 3), Fraction(1, 2), Fraction(2, 3), Fraction(4, 5)]
 
 
@@ -18,7 +19,7 @@ def _text(x):
 
 
 def generate(rng, level=0):
-    n_sensors = sround(2 + 0.55 * level, rng)
+    n_sensors = N_SENSORS[level]
     prior = rng.choice(PRIORS)
     yes, no = prior, 1 - prior
     sensors = []

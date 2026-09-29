@@ -1,8 +1,12 @@
-"""Count, compare, and sum over an inventory; every answer is unique by construction."""
+"""Count, compare, and sum over an inventory; every answer is unique by construction.
+
+Levels grow the inventory; from level 2 a compound count adds a quantity filter,
+and from level 3 a stock filter as well.
+"""
 
 from ._common import COLORS, OBJECTS, STYLES, Problem, choice_answer, noul_answer, phrase, render_records, score_answer, sround
 
-SIZES = [5, 10, 18, 30, 45]
+SIZES = [5, 12, 24, 40, 60]
 CATEGORIES = ["tools", "kitchen", "garden", "office", "outdoor"]
 COUNTS = [str(i) for i in range(9)] + ["9 or more"]  # Jev scores have at most 10 levels
 
@@ -60,5 +64,17 @@ def generate(rng, level=0):
         "any_out_of_stock": noul_answer(any(not i["in_stock"] for i in members)),
         "total_above": noul_answer(total > threshold),
     }
-    data = {"items": items, "category": category, "scope_category": pool is members, "threshold": threshold}
+    if level >= 2:
+        cut = rng.randint(5, 15)
+        stock = level >= 3
+        hits = sum(i["category"] == category and i["quantity"] >= cut and (i["in_stock"] or not stock) for i in items)
+        questions["count_filtered"] = {"type": "score", "criteria": COUNTS, "instructions": phrase(rng, [
+            "How many {c} items{s} have a quantity of at least {q}?",
+            "Count the {c} items{s} whose quantity is {q} or more."],
+            c=category, q=cut, s=" that are in stock" if stock else "")}
+        answers["count_filtered"] = score_answer(min(hits, len(COUNTS) - 1), COUNTS)
+        data_extra = {"cut": cut, "stock": stock}
+    else:
+        data_extra = {}
+    data = {"items": items, "category": category, "scope_category": pool is members, "threshold": threshold, **data_extra}
     return Problem(render_records(items, rng.choice(STYLES)), questions, answers, data)

@@ -1,8 +1,14 @@
-"""Find one record among many whose ids differ from the target by one or two digits."""
+"""Find one record among many whose ids differ from the target by one or two digits.
+
+From level 2 the question names an original id that was reissued one to three
+times; the chain must be followed to the listed id, and near-miss ids have
+reissue chains of their own.
+"""
 
 from ._common import CITIES, STYLES, Problem, choice_answer, noul_answer, phrase, render_records, sround
 
 SIZES = [8, 20, 50, 120, 250]
+HOPS = [0, 0, 1, 2, 3]
 DOMAINS = [("locker", "city"), ("shipment", "destination"), ("badge", "office"), ("account", "branch")]
 
 
@@ -26,7 +32,7 @@ def generate(rng, level=0):
         keys.add(_near(target, rng))
     while len(keys) < n:
         keys.add(_near(target, rng) if rng.random() < 0.2 else f"{rng.randrange(10_000):04d}")
-    keys = sorted(keys, key=lambda _: rng.random())
+    keys = sorted(sorted(keys), key=lambda _: rng.random())  # sort first: set order depends on the hash seed
     records = [{"id": f"{noun[0].upper()}-{key}", field: rng.choice(CITIES)} for key in keys]
     index = keys.index(target)
     gold = records[index]
@@ -46,12 +52,40 @@ def generate(rng, level=0):
         while probe in listed:
             probe = f"{noun[0].upper()}-{_near(target, rng)}"
 
+    prefix = f"{noun[0].upper()}-"
+    used = set(keys) | {probe[len(prefix):]}  # the id_listed probe must not turn out to be a reissued id
+
+    def fresh(near_to):
+        while True:
+            candidate = _near(near_to, rng) if rng.random() < 0.7 else f"{rng.randrange(10_000):04d}"
+            if candidate not in used:
+                used.add(candidate)
+                return candidate
+
+    reissued = {}  # old id -> new id
+    chain = [target]
+    for _ in range(HOPS[level]):
+        chain.insert(0, fresh(chain[0]))
+        reissued[prefix + chain[0]] = prefix + chain[1]
+    for _ in range(2 * HOPS[level]):  # near-miss chains that end at other records
+        end = rng.choice([k for k in keys if k != target])
+        start = fresh(chain[0])
+        if rng.random() < 0.5:
+            middle = fresh(start)
+            reissued[prefix + start], reissued[prefix + middle] = prefix + middle, prefix + end
+        else:
+            reissued[prefix + start] = prefix + end
+
     style = rng.choice(STYLES + ("prose",))
     if style == "prose":
         state = " ".join(f"The {noun} {r['id']} has {field} {r[field]}." for r in records)
     else:
         state = render_records(records, style)
-    key = gold["id"]
+    if reissued:
+        moves = sorted(reissued.items(), key=lambda _: rng.random())
+        state += (f"\n\nReissued {noun} ids (a reissued id is no longer listed; look up its new id):\n"
+                  + "\n".join(f"{old} -> {new}" for old, new in moves))
+    key = prefix + chain[0]
     questions = {
         "value_of_id": {"type": "choice", "criteria": {c: c for c in options}, "instructions": phrase(rng, [
             "Which {field} is listed for {noun} {key}?", "What is the {field} of {noun} {key}?",
@@ -68,5 +102,5 @@ def generate(rng, level=0):
         "id_has_value": noul_answer(proposed == gold[field]),
         "id_listed": noul_answer(probe in listed),
     }
-    data = {"records": records, "field": field, "key": key, "proposed": proposed, "probe": probe}
+    data = {"records": records, "field": field, "key": key, "reissued": reissued, "proposed": proposed, "probe": probe}
     return Problem(state, questions, answers, data)

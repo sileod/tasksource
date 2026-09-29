@@ -80,10 +80,26 @@ def label_features(rows):
     return features, readers
 
 
-def build_task(task, sizes, levels):
+def pretty_order(rows, first_rows=1_000, seed=0):
+    """Levels round-robin in a display prefix (easiest first), then the remaining rows shuffled."""
+    buckets = {}
+    for row in rows:
+        buckets.setdefault(row["level"], []).append(row)
+    prefix, queues = [], [list(bucket) for _, bucket in sorted(buckets.items())]
+    while len(prefix) < min(first_rows, len(rows)):
+        for queue in queues:
+            if queue and len(prefix) < first_rows:
+                prefix.append(queue.pop(0))
+    rest = [row for queue in queues for row in queue]
+    random.Random(seed).shuffle(rest)
+    return prefix + rest
+
+
+def build_task(task, sizes, levels, pretty_rows=1_000):
     splits, seen = {}, set()
     for split, rows in sizes.items():
         splits[split], seen = generate_split(task, split, rows, levels, seen)
+    splits["train"] = pretty_order(splits["train"], pretty_rows)
     labels, readers = label_features(splits["train"])
     features = Features({
         "id": Value("string"), "level": Value("int32"), "state": Value("string"),
@@ -122,6 +138,8 @@ def parse_args():
     parser.add_argument("--train", type=int, default=20_000)
     parser.add_argument("--eval", type=int, default=1_000, help="Rows in each of validation and test.")
     parser.add_argument("--levels", type=int, nargs="*", default=[0, 1, 2, 3, 4])
+    parser.add_argument("--pretty-rows", type=int, default=1_000,
+                        help="Train rows shown first, cycling through levels; the rest is shuffled.")
     parser.add_argument("--upload", action="store_true")
     parser.add_argument("--repo-id", default=REPO_ID)
     return parser.parse_args()
@@ -131,7 +149,7 @@ def main(args):
     sizes = {"train": args.train, "validation": args.eval, "test": args.eval}
     built = {}
     for task in args.tasks:
-        built[task] = build_task(task, sizes, args.levels)
+        built[task] = build_task(task, sizes, args.levels, args.pretty_rows)
         built[task].save_to_disk(args.output / task)
     summaries = [summarize(task, dataset) for task, dataset in built.items()]
     (args.output / "build-summary.json").write_text(json.dumps(summaries, indent=2) + "\n")

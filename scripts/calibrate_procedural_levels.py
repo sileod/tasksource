@@ -23,7 +23,7 @@ from tasksource.jev.procedural import SOURCE_PREFIX, TASKS, jev_rows
 def write_shards(tasks, per_level, levels, out):
     shards = out / "shards"
     shards.mkdir(parents=True, exist_ok=True)
-    level_of = {}
+    level_of, graded = {}, {}
     for task in tasks:
         rows = []
         for level in levels:
@@ -34,9 +34,11 @@ def write_shards(tasks, per_level, levels, out):
                            "answers": json.dumps(problem.answers)}
                 for row in jev_rows(example, SOURCE_PREFIX + task, "validation", f"{level}-{i}"):
                     level_of[row["id"]] = level
+                    if row["kind"] == "noul" and row["target"][0] not in (0.0, 1.0):
+                        graded[row["id"]] = row["target"][0]
                     rows.append(row)
         pd.DataFrame(rows).to_parquet(shards / f"validation-{task}.parquet")
-    return shards, level_of
+    return shards, level_of, graded
 
 
 def kappa(group):
@@ -44,7 +46,7 @@ def kappa(group):
     return round((accuracy - chance) / (1 - chance), 2)
 
 
-def report(out, level_of):
+def report(out, level_of, graded):
     decisions = pd.read_json(out / "decisions.jsonl", lines=True)
     decisions = decisions[decisions.id.isin(level_of)]
     decisions["level"] = decisions.id.map(level_of)
@@ -56,6 +58,12 @@ def report(out, level_of):
     by_level["all"] = decisions.groupby("task")[["correct", "chance"]].apply(kappa)
     by_question = decisions.groupby(["task", "question", "level"])[["correct", "chance"]].apply(kappa).unstack()
     print(by_level.to_string(), "\n", by_question.to_string(), sep="\n")
+    # probability answers: kappa of the rounded answer says little, so also the mean absolute error
+    soft = decisions[decisions.id.isin(graded)].copy()
+    if len(soft):
+        soft["error"] = (soft.jev_probabilities.str[0] - soft.id.map(graded)).abs()
+        print("\nmean absolute error on graded probabilities (0 is exact):")
+        print(soft.groupby(["task", "question", "level"]).error.mean().round(3).unstack().to_string())
     return by_level
 
 
@@ -67,12 +75,12 @@ def main():
     parser.add_argument("--out", type=Path, default=Path("build/procedural-level-calibration"))
     parser.add_argument("--budget-usd", type=float, default=0.5, help="cumulative over --out's cache")
     args = parser.parse_args()
-    shards, level_of = write_shards(args.tasks, args.per_level, args.levels, args.out)
+    shards, level_of, graded = write_shards(args.tasks, args.per_level, args.levels, args.out)
     subprocess.run([sys.executable, str(Path(__file__).with_name("audit_jev_tasks.py")), "--shards", str(shards),
                     "--out", str(args.out), "--per-task", "100000", "--skip-adjudication",
                     "--budget-usd", str(args.budget_usd), "--tasks", *[SOURCE_PREFIX + t for t in args.tasks]],
                    check=True)
-    report(args.out, level_of)
+    report(args.out, level_of, graded)
 
 
 if __name__ == "__main__":
