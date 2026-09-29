@@ -4,7 +4,7 @@ from ._common import COLORS, OBJECTS, STYLES, Problem, choice_answer, noul_answe
 
 SIZES = [5, 10, 18, 30, 45]
 CATEGORIES = ["tools", "kitchen", "garden", "office", "outdoor"]
-COUNTS = [str(i) for i in range(21)]
+COUNTS = [str(i) for i in range(9)] + ["9 or more"]  # Jev scores have at most 10 levels
 
 
 def generate(rng, level=0):
@@ -55,7 +55,7 @@ def generate(rng, level=0):
             "Do the {c} items add up to more than {t} units?"], c=category, t=threshold)},
     }
     answers = {
-        "count_in_category": score_answer(count, COUNTS),
+        "count_in_category": score_answer(min(count, len(COUNTS) - 1), COUNTS),
         "largest_quantity": choice_answer(leader["item"], options),
         "any_out_of_stock": noul_answer(any(not i["in_stock"] for i in members)),
         "total_above": noul_answer(total > threshold),
