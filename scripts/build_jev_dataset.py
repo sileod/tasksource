@@ -494,7 +494,7 @@ MAX_MULTILINGUAL_SHARE = 0.2  # a ceiling on multilingual families' share of eac
 def cardinality_factor(n_options):
     """A gentle nudge of a family's share by its typical option count (yes/no counts as 2):
     binary stays the most common case, many-option questions get a little more room."""
-    return 0.9 if n_options <= 2 else 1.0 if n_options <= 5 else 1.1 if n_options <= 20 else 1.2
+    return 0.8 if n_options <= 2 else 1.0 if n_options <= 5 else 1.2 if n_options <= 20 else 1.4
 
 
 def family_cardinality(dataset, buckets):
