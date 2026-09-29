@@ -135,6 +135,25 @@ SEMANTIC_RUBRICS = [
     ["unacceptable", "poor", "adequate", "good", "excellent"],
 ]
 
+# Ordered words must describe the skill being rated. Unlisted skills use a
+# numeric scale, whose endpoints the generator must explain in the question.
+SEMANTIC_RUBRICS_BY_SKILL = {
+    "severity": [SEMANTIC_RUBRICS[0], SEMANTIC_RUBRICS[4]],
+    "triage_priority": [["routine", "low", "medium", "high", "critical"]],
+    "sentiment": [SEMANTIC_RUBRICS[1]],
+    "fraud_likelihood": [SEMANTIC_RUBRICS[5]],
+    "churn_risk": [SEMANTIC_RUBRICS[5]],
+    "needs_escalation": [SEMANTIC_RUBRICS[5]],
+    "urgency": [["not urgent", "low urgency", "moderate urgency",
+                 "high urgency", "immediate"]],
+    "compliance_risk": [SEMANTIC_RUBRICS[0]],
+    "data_sensitivity": [["public", "internal", "confidential", "restricted"]],
+    "customer_effort": [["none", "low", "moderate", "high", "very high"]],
+    "groundedness": [SEMANTIC_RUBRICS[6]],
+    "completeness": [SEMANTIC_RUBRICS[2]],
+    "resolution_confidence": [SEMANTIC_RUBRICS[5]],
+}
+
 
 def domain_skills(domain: str) -> list[str]:
     """Skill pool compatible with a domain (falls back to all skills)."""
@@ -164,6 +183,14 @@ def _weighted_choice(rng: random.Random, weights: dict) -> str:
 
 def sample_n_questions(rng: random.Random, dist: dict) -> int:
     return int(_weighted_choice(rng, {k: float(v) for k, v in dist.items()}))
+
+
+def _configured_choice(rng: random.Random, values: list, weights: dict | None):
+    if weights is None:
+        return rng.choice(values)
+    choices = [value for value in values if str(value) in weights or value in weights]
+    masses = [float(weights.get(value, weights.get(str(value), 0))) for value in choices]
+    return rng.choices(choices, weights=masses, k=1)[0]
 
 
 def sample_formats(rng: random.Random, n: int, format_weights: dict,
@@ -207,11 +234,12 @@ def sample_question_spec(rng: random.Random, fmt: str, skill: str) -> dict:
     # Score: Tasksource represents these as ORDERED CRITERIA with the
     # target aligned to them — a healthy mix of numeric scales and
     # named rubrics.
-    if rng.random() < 0.5:
+    rubrics = SEMANTIC_RUBRICS_BY_SKILL.get(skill, [])
+    if rng.random() < 0.5 or not rubrics:
         lo, hi = rng.choice(SCORE_RANGES)
         return {"format": "score", "skill": skill, "min": lo, "max": hi,
                 "criteria": numeric_criteria(lo, hi)}
-    rubric = list(rng.choice(SEMANTIC_RUBRICS))
+    rubric = list(rng.choice(rubrics))
     return {"format": "score", "skill": skill, "min": 0, "max": len(rubric) - 1,
             "criteria": rubric}
 
@@ -231,11 +259,14 @@ def sample_spec(index: int, rng: random.Random, sampler_cfg) -> dict:
         "domain": domain,
         "scenario_type": rng.choice(SCENARIO_TYPES),
         "style": rng.choice(domain_styles(domain)),
-        "difficulty": rng.choice(DIFFICULTIES),
-        "ambiguity": rng.choice(AMBIGUITY_LEVELS),
+        "difficulty": _configured_choice(rng, DIFFICULTIES,
+                                         sampler_cfg.difficulty_weights),
+        "ambiguity": _configured_choice(rng, AMBIGUITY_LEVELS,
+                                        sampler_cfg.ambiguity_weights),
         "state_length": rng.choice(["short", "medium", "long"]),
         "evidence": rng.choice(EVIDENCE_STRUCTURES),
-        "distractors": rng.choice([0, 1, 2, 3]),
+        "distractors": _configured_choice(rng, [0, 1, 2, 3],
+                                          sampler_cfg.distractor_weights),
         "certainty_hint": rng.choice(NOUL_CERTAINTY),
         "questions": [sample_question_spec(rng, fmt, skill)
                       for fmt, skill in zip(formats, skills)],

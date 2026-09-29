@@ -11,14 +11,23 @@ SPEC:
 Rules:
 - Generate ONE coherent state plus EXACTLY the requested number of questions, in order.
 - Every question must be answerable or meaningfully assessable from the SAME state.
+- If a decision depends on a policy, threshold, deadline, current time, or
+  authority, include that information explicitly in the state. Do not require
+  outside legal, medical, aviation, or other specialist rules to pick an answer.
 - Questions must test DISTINCT aspects of the state (not paraphrases).
 - For choice questions output EXACTLY n_options options (use the requested count).
+- Make exactly ONE choice option best supported by the state. Other options may
+  be plausible, but the state must contain evidence that rules them out. Avoid
+  pairs of options that are both valid next steps under the stated policy.
 - For score questions the spec gives ordered "criteria": reuse them VERBATIM,
   in order, as the "options" array, with matching "min" (first index) and
-  "max" (last index). Never rename, merge, or reorder criteria.
-- For noul questions output only the question text.
+  "max" (last index). Never rename, merge, or reorder criteria. State what the
+  scale measures and what its endpoints mean; match the question to the rubric.
+- For noul questions output only the question text. Ask about ONE yes/no
+  proposition, never "positive or negative" or another either/or choice.
 - Include requested irrelevant/distractor information naturally in the state.
 - Do NOT state or hint which option is correct; do not make one option lexically obvious.
 - Do NOT mention difficulty, ambiguity, skill names, evidence, distractors, or any metadata.
+- Do NOT mention Jev or a dataset in the state or questions.
 - Do NOT include phrases like "correct answer" or "the answer is".
 - Output STRICT JSON only, no markdown fences, with keys: {"state": str, "questions": [{"question": str, "options"?: [str], "min"?: int, "max"?: int}]}.

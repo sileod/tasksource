@@ -146,7 +146,8 @@ def parse_bundle(text: str, spec: dict) -> dict:
 
 
 async def _generate_one(sem: asyncio.Semaphore, client, cfg, prompt_template: str,
-                        p_hash: str, c_hash: str, spec: dict, raw_dir: Path) -> dict:
+                        p_hash: str, c_hash: str, spec: dict, raw_dir: Path,
+                        credential_slot: int = 0) -> dict:
     req_hash = providers.request_hash(c_hash, p_hash, spec)
     cached = raw_dir / f"{req_hash}.json"
     if cached.exists():
@@ -159,6 +160,7 @@ async def _generate_one(sem: asyncio.Semaphore, client, cfg, prompt_template: st
         record = {"request_hash": req_hash, "spec": spec, "prompt": prompt,
                   "provider": "mock", "requested_model": cfg.provider.model,
                   "returned_model": cfg.provider.model,
+                  "credential_slot": credential_slot,
                   "temperature": cfg.generation.temperature,
                   "prompt_version": cfg.generation.prompt_version, "bundle": bundle}
         cached.write_text(json.dumps(record, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -187,6 +189,7 @@ async def _generate_one(sem: asyncio.Semaphore, client, cfg, prompt_template: st
               "raw_response": result["raw"], "raw_text": result["text"],
               "provider": cfg.provider.name, "requested_model": cfg.provider.model,
               "returned_model": result["returned_model"],
+              "credential_slot": credential_slot,
               "temperature": cfg.generation.temperature,
               "prompt_version": cfg.generation.prompt_version, "bundle": bundle}
     cached.write_text(json.dumps(record, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -194,11 +197,11 @@ async def _generate_one(sem: asyncio.Semaphore, client, cfg, prompt_template: st
 
 
 async def _safe_generate_one(sem, client, cfg, prompt_template, p_hash, c_hash,
-                             spec, raw_dir) -> dict:
+                             spec, raw_dir, credential_slot: int = 0) -> dict:
     """Fault isolation: one bad spec must not kill a 1k run."""
     try:
         return await _generate_one(sem, client, cfg, prompt_template, p_hash,
-                                   c_hash, spec, raw_dir)
+                                   c_hash, spec, raw_dir, credential_slot)
     except Exception as exc:  # noqa: BLE001
         return {"spec": spec, "bundle": None, "request_hash": None,
                 "cached": False, "record": None, "error": str(exc)}
@@ -209,16 +212,26 @@ async def generate_bundles_async(cfg, specs: list[dict], raw_dir: Path) -> list[
     prompt_template = load_prompt(cfg.generation.prompt_version)
     p_hash = prompt_hash(prompt_template)
     c_hash = generation_cache_key(cfg)
-    client = None
+    clients = [None]
     if cfg.provider.name != "mock":
-        api_key = providers.require_api_key(cfg.provider)
-        client = providers.make_client(cfg.provider, api_key)
+        clients = [providers.make_client(cfg.provider, key)
+                   for key in providers.available_api_keys(cfg.provider)]
     sem = asyncio.Semaphore(max(1, cfg.generation.concurrency))
-    tasks = [_safe_generate_one(sem, client, cfg, prompt_template, p_hash, c_hash, spec, raw_dir)
-             for spec in specs]
-    results = []
-    for coro in asyncio.as_completed(tasks):
-        results.append(await coro)
+    tasks = [_safe_generate_one(sem, clients[i % len(clients)], cfg,
+                                prompt_template, p_hash, c_hash, spec, raw_dir,
+                                i % len(clients))
+             for i, spec in enumerate(specs)]
+    try:
+        results = []
+        for coro in asyncio.as_completed(tasks):
+            results.append(await coro)
+    finally:
+        for client in clients:
+            if client is not None:
+                try:
+                    await client.close()
+                except Exception:
+                    pass
     errors = [r for r in results if r.get("bundle") is None]
     if errors:
         (raw_dir / "errors.jsonl").write_text(
