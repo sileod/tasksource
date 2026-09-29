@@ -232,6 +232,30 @@ class ProceduralJevTest(unittest.TestCase):
             self.assertEqual(a["count_matching"]["score"], sum(
                 p["city"] == d["city"] and p["start_year"] >= d["since"] for p in d["people"]))
 
+    def test_taxonomy_routing_gold_follows_rules(self):
+        from tasksource.jev.procedural.taxonomy_routing import _holds, _text
+        first_hit = []
+        for problem in self.samples("taxonomy_routing", 300):
+            d, a = problem.data, problem.answers
+            meets = [name for name, rule in d["rules"].items() if all(_holds(c, d["ticket"]) for c in rule)]
+            self.assertEqual(meets, [a["route"]["choice"]])
+            self.assertEqual(a["belongs_to"]["noul"], float(d["probe"] == meets[0]))
+            self.assertEqual(a["conditions_met"]["score"], sum(_holds(c, d["ticket"]) for c in d["rules"][d["probe"]]))
+            for rule in d["rules"].values():  # every rendering keeps every rule
+                self.assertIn(" and ".join(map(_text, rule)), problem.state)
+            # routing on a rule's first condition alone is a shortcut that must not work
+            first_hit.append(next(n for n, r in d["rules"].items() if _holds(r[0], d["ticket"])) == meets[0])
+        self.assertLess(sum(first_hit) / 300, 0.5)
+
+    def test_long_option_lists_occur(self):
+        counts = Counter()
+        for task, qid in (("needle_retrieval", "value_of_id"), ("table_lookup", "find_person"),
+                          ("entity_belief_tracking", "world_location"), ("taxonomy_routing", "route")):
+            sizes = [len(p.questions[qid]["criteria"]) for p in self.samples(task, 300)]
+            counts[task] = sum(size >= 8 for size in sizes) / len(sizes)
+        self.assertTrue(all(share > 0.15 for share in counts.values()), counts)
+        self.assertGreater(counts["taxonomy_routing"], 0.9)
+
     def test_arithmetic_gold_follows_state(self):
         def value(answer):
             return answer.get("choice", answer.get("noul", answer.get("score")))
