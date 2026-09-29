@@ -42,12 +42,12 @@ def sample_rows(shards, per_task, seed, tasks=None, splits=SPLIT_PREFERENCE):
         split, stem = Path(path).stem.split("-", 1)
         files[stem][split] = path
     rows = []
-    for stem, splits in sorted(files.items()):
+    for stem, paths in sorted(files.items()):
         picked = []
         for split in splits:
-            if split not in splits or len(picked) >= per_task:
+            if split not in paths or len(picked) >= per_task:
                 continue
-            table = pq.read_table(splits[split]).to_pandas()
+            table = pq.read_table(paths[split]).to_pandas()
             table = table[table.variant == "direct"]
             if tasks and not table.source.isin(tasks).any():
                 break

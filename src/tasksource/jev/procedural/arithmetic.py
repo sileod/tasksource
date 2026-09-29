@@ -10,7 +10,7 @@ import json
 
 from ._common import OBJECTS, Problem, choice_answer, noul_answer, phrase, render_records, score_answer, sround
 
-COUNTS = [str(i) for i in range(11)]
+COUNTS = [str(i) for i in range(10)]  # Jev scores have at most 10 levels
 CURRENCIES = ["$", "€", "£"]
 TASK_NAMES = ["email triage", "code review", "standup", "design sync", "report writing",
               "client call", "inventory check", "backup check", "planning", "interviews"]
@@ -113,7 +113,7 @@ def _order(rng, level):
 
 
 def _ledger(rng, level):
-    n = min(10, sround(3 + 1.6 * level, rng))
+    n = min(len(COUNTS) - 1, sround(3 + 1.6 * level, rng))
     transactions = [{"day": day, "type": rng.choice(["deposit", "withdrawal"]),
                      "amount": 5 * rng.randint(1, 10 + 10 * level)}
                     for day in sorted(rng.sample(range(1, 29), n))]

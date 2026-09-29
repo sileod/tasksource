@@ -89,6 +89,8 @@ class ProceduralJevTest(unittest.TestCase):
                         self.assertIn(answer["choice"], spec["criteria"])
                     elif spec["type"] == "noul":
                         self.assertTrue(0.0 <= answer["noul"] <= 1.0)
+                    elif spec["type"] == "score":
+                        self.assertLessEqual(len(spec["criteria"]), 10, (task, qid))  # the Jev API limit
 
     def test_generation_is_deterministic(self):
         for task in TASKS:
@@ -187,7 +189,7 @@ class ProceduralJevTest(unittest.TestCase):
         for problem in self.samples("record_aggregation", 300):
             d, a = problem.data, problem.answers
             members = [i for i in d["items"] if i["category"] == d["category"]]
-            self.assertEqual(a["count_in_category"]["score"], len(members))
+            self.assertEqual(a["count_in_category"]["score"], min(len(members), 9))
             self.assertEqual(a["any_out_of_stock"]["noul"], float(any(not i["in_stock"] for i in members)))
             self.assertEqual(a["total_above"]["noul"],
                              float(sum(i["quantity"] for i in members) > d["threshold"]))

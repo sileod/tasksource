@@ -6,7 +6,7 @@ from ._common import CITIES, PEOPLE, Problem, choice_answer, noul_answer, phrase
 
 SIZES = [6, 10, 16, 24, 36]
 TEAMS = ["billing", "search", "mobile", "security", "data", "support"]
-COUNTS = [str(i) for i in range(13)]
+COUNTS = [str(i) for i in range(10)]  # Jev scores have at most 10 levels
 
 
 def generate(rng, level=0):
