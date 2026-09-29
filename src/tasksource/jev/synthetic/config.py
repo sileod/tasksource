@@ -71,6 +71,33 @@ class AnnotatorConfig:
 
 
 @dataclass
+class TeacherAuditConfig:
+    # Independent post-Jev sanity check. The auditor sees state/questions but
+    # never Jev's probabilities; comparison happens locally afterwards.
+    enabled: bool = False
+    # When absent, inherit the critic provider. For a genuinely independent
+    # check, explicitly choose a different provider/model from the generator.
+    provider: ProviderConfig | None = None
+    model: str = "deepseek-v4-flash-0731"
+    prompt_version: str = "teacher_audit_v1"
+    temperature: float = 0.0
+    requests_per_minute: int = 40
+    min_teacher_confidence: float = 0.85
+    min_auditor_confidence: float = 0.80
+    # False keeps flagged examples in the released artifact and records the
+    # disagreement. True makes the stage also emit/use audit_passed.jsonl.
+    drop_confident_disagreements: bool = False
+
+    def __post_init__(self):
+        for name, value in (
+            ("min_teacher_confidence", self.min_teacher_confidence),
+            ("min_auditor_confidence", self.min_auditor_confidence),
+        ):
+            if not 0 <= value <= 1:
+                raise ValueError(f"{name} must be in [0, 1], got {value}")
+
+
+@dataclass
 class SelectionConfig:
     # Buckets over observed Jev ambiguity (max_prob based, see select.py).
     buckets: dict = field(default_factory=lambda: {
@@ -81,6 +108,20 @@ class SelectionConfig:
         "near_uniform": 0.05,
     })
     max_per_family: int = 0  # 0 = no cap
+    # When downsampling, this share is selected by a teacher-independent hash
+    # before confidence-bucket balancing. This leaves an unbiased reservoir for
+    # diagnosing selection effects.
+    unfiltered_fraction: float = 0.20
+    seed_salt: str = "jev-synthetic-selection-v2"
+
+    def __post_init__(self):
+        if not 0 <= self.unfiltered_fraction <= 1:
+            raise ValueError(
+                f"unfiltered_fraction must be in [0, 1], got {self.unfiltered_fraction}")
+        if not self.buckets or any(float(weight) < 0 for weight in self.buckets.values()):
+            raise ValueError("selection buckets must be a non-empty map of non-negative weights")
+        if sum(float(weight) for weight in self.buckets.values()) <= 0:
+            raise ValueError("selection bucket weights must have positive total mass")
 
 
 @dataclass
@@ -105,6 +146,7 @@ class AppConfig:
     sampler: SamplerConfig = field(default_factory=SamplerConfig)
     critic: CriticConfig = field(default_factory=CriticConfig)
     annotator: AnnotatorConfig = field(default_factory=AnnotatorConfig)
+    teacher_audit: TeacherAuditConfig = field(default_factory=TeacherAuditConfig)
     selection: SelectionConfig = field(default_factory=SelectionConfig)
     split: SplitConfig = field(default_factory=SplitConfig)
 
@@ -112,10 +154,18 @@ class AppConfig:
         """Resolved critic provider (explicit, else the generator provider)."""
         return self.critic.provider if self.critic.provider is not None else self.provider
 
+    def teacher_audit_provider(self) -> ProviderConfig:
+        """Resolved teacher-audit provider (explicit, else the critic provider)."""
+        return (self.teacher_audit.provider
+                if self.teacher_audit.provider is not None else self.critic_provider())
+
     def to_dict(self) -> dict:
         critic = dict(self.critic.__dict__)
         critic["provider"] = (self.critic.provider.__dict__
                               if self.critic.provider is not None else None)
+        teacher_audit = dict(self.teacher_audit.__dict__)
+        teacher_audit["provider"] = (self.teacher_audit.provider.__dict__
+                                     if self.teacher_audit.provider is not None else None)
         return {
             "run_name": self.run_name,
             "output_dir": self.output_dir,
@@ -124,6 +174,7 @@ class AppConfig:
             "sampler": self.sampler.__dict__,
             "critic": critic,
             "annotator": self.annotator.__dict__,
+            "teacher_audit": teacher_audit,
             "selection": self.selection.__dict__,
             "split": self.split.__dict__,
         }
@@ -139,6 +190,17 @@ def _merge(base: dict, override: dict) -> dict:
     return out
 
 
+def _nested_provider(raw, fallback: ProviderConfig, model: str) -> ProviderConfig | None:
+    if isinstance(raw, dict):
+        return ProviderConfig(**raw)
+    if isinstance(raw, str):
+        # Legacy: bare name inherits the parent connection details.
+        return ProviderConfig(
+            name=raw, api_key_env=fallback.api_key_env,
+            base_url=fallback.base_url, model=model)
+    return None
+
+
 def load_config(path: str) -> AppConfig:
     """Load a config.yaml into a typed AppConfig."""
     with open(path, encoding="utf-8") as handle:
@@ -146,25 +208,28 @@ def load_config(path: str) -> AppConfig:
     defaults = AppConfig().to_dict()
     merged = _merge(defaults, raw)
     provider = ProviderConfig(**merged["provider"])
-    critic_raw = merged["critic"]
+
+    critic_raw = dict(merged["critic"])
     critic_provider_raw = critic_raw.pop("provider", None)
-    if isinstance(critic_provider_raw, dict):
-        critic_provider = ProviderConfig(**critic_provider_raw)
-    elif isinstance(critic_provider_raw, str):
-        # Legacy: bare name inherits the generator's connection details.
-        critic_provider = ProviderConfig(
-            name=critic_provider_raw, api_key_env=provider.api_key_env,
-            base_url=provider.base_url, model=critic_raw.get("model", provider.model))
-    else:
-        critic_provider = None  # inherit the generator provider at use site
+    critic_provider = _nested_provider(
+        critic_provider_raw, provider, critic_raw.get("model", provider.model))
+    critic = CriticConfig(provider=critic_provider, **critic_raw)
+
+    audit_raw = dict(merged["teacher_audit"])
+    audit_provider_raw = audit_raw.pop("provider", None)
+    audit_provider = _nested_provider(
+        audit_provider_raw, critic_provider or provider,
+        audit_raw.get("model", (critic_provider or provider).model))
+
     return AppConfig(
         run_name=merged["run_name"],
         output_dir=merged["output_dir"],
         provider=provider,
         generation=GenerationConfig(**merged["generation"]),
         sampler=SamplerConfig(**merged["sampler"]),
-        critic=CriticConfig(provider=critic_provider, **critic_raw),
+        critic=critic,
         annotator=AnnotatorConfig(**merged["annotator"]),
+        teacher_audit=TeacherAuditConfig(provider=audit_provider, **audit_raw),
         selection=SelectionConfig(**merged["selection"]),
         split=SplitConfig(**merged["split"]),
     )

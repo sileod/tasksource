@@ -11,9 +11,11 @@ from tasksource.jev.synthetic import annotate as annot_mod
 from tasksource.jev.synthetic import critic as critic_mod
 from tasksource.jev.synthetic import dedup as dedup_mod
 from tasksource.jev.synthetic import providers
+from tasksource.jev.synthetic import run as run_mod
 from tasksource.jev.synthetic import select as select_mod
 from tasksource.jev.synthetic import specs as specs_mod
 from tasksource.jev.synthetic import split as split_mod
+from tasksource.jev.synthetic import teacher_audit as teacher_audit_mod
 from tasksource.jev.synthetic import validate as validate_mod
 from tasksource.jev.synthetic.config import AppConfig, load_config
 from tasksource.jev.synthetic.generate import (
@@ -226,6 +228,84 @@ class CriticTest(unittest.TestCase):
         self.assertTrue(all(not p.startswith("state_") for p in files_after_first))
 
 
+class TeacherAuditTest(unittest.TestCase):
+    def test_selection_requires_current_audit_artifact(self):
+        cfg = _cfg()
+        cfg.teacher_audit.enabled = True
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = Path(tmp)
+            (run_dir / "annotated.jsonl").write_text("", encoding="utf-8")
+            with self.assertRaises(FileNotFoundError):
+                run_mod.stage_select(cfg, run_dir)
+
+    def test_invalid_auditor_answer_does_not_pass(self):
+        from tasksource.jev.synthetic.config import TeacherAuditConfig
+        bundle = {
+            "state_id": "s", "state": "A compact test state.",
+            "questions": [{"question_id": "q0", "format": "choice",
+                           "question": "Which?", "options": ["a", "b"]}],
+            "annotations": [{"probabilities": [0.9, 0.1]}],
+        }
+        audit = teacher_audit_mod.compare_with_teacher(
+            bundle, [{"question_id": "q0", "answer": "not an option",
+                      "confidence": 0.99, "issues": []}],
+            TeacherAuditConfig(enabled=True))
+        self.assertFalse(audit["complete"])
+        self.assertFalse(audit["pass"])
+        self.assertIsNone(audit["questions"][0]["agrees"])
+
+    def test_confident_teacher_disagreement_is_flagged(self):
+        from tasksource.jev.synthetic.config import TeacherAuditConfig
+        bundle = {
+            "state_id": "s",
+            "state": "A compact test state.",
+            "questions": [
+                {"question_id": "q0", "format": "noul", "question": "Is it true?"},
+                {"question_id": "q1", "format": "choice", "question": "Which?",
+                 "options": ["a", "b"]},
+                {"question_id": "q2", "format": "score", "question": "How much?",
+                 "options": ["low", "medium", "high"]},
+            ],
+            "annotations": [
+                {"probabilities": [0.95]},
+                {"probabilities": [0.9, 0.1]},
+                {"probabilities": [0.05, 0.9, 0.05]},
+            ],
+        }
+        independent = [
+            {"question_id": "q0", "answer": False, "confidence": 0.95, "issues": []},
+            {"question_id": "q1", "answer": "a", "confidence": 0.95, "issues": []},
+            {"question_id": "q2", "answer": 1, "confidence": 0.95, "issues": []},
+        ]
+        audit = teacher_audit_mod.compare_with_teacher(
+            bundle, independent,
+            TeacherAuditConfig(enabled=True, min_teacher_confidence=0.8,
+                               min_auditor_confidence=0.8))
+        self.assertFalse(audit["pass"])
+        self.assertEqual(audit["confident_disagreements"], 1)
+        self.assertTrue(audit["questions"][0]["confident_disagreement"])
+        self.assertTrue(audit["questions"][1]["agrees"])
+        self.assertTrue(audit["questions"][2]["agrees"])
+
+    def test_mock_teacher_audit_is_cached_and_offline(self):
+        from tasksource.jev.synthetic.config import ProviderConfig
+        cfg = _cfg()
+        cfg.teacher_audit.enabled = True
+        cfg.teacher_audit.provider = ProviderConfig(
+            name="mock", api_key_env="UNUSED", base_url="", model="mock-auditor")
+        cfg.teacher_audit.model = "mock-auditor"
+        specs = specs_mod.sample_specs(cfg.sampler, 3)
+        bundles = [annot_mod.annotate_bundle(mock_realization(spec), cfg.annotator)
+                   for spec in specs]
+        with tempfile.TemporaryDirectory() as tmp:
+            raw = Path(tmp)
+            first = teacher_audit_mod.audit_bundles(cfg, bundles, raw)
+            second = teacher_audit_mod.audit_bundles(cfg, bundles, raw)
+            self.assertEqual(first, second)
+            self.assertEqual(len(list(raw.glob("*.json"))), len(bundles))
+        self.assertTrue(all(b["teacher_audit"]["enabled"] for b in first))
+
+
 class CacheKeyTest(unittest.TestCase):
     def test_unrelated_settings_do_not_invalidate_generation(self):
         cfg = _cfg()
@@ -355,7 +435,35 @@ class SelectTest(unittest.TestCase):
         annotated = annot_mod.annotate_bundles(bundles, cfg.annotator)
         result = select_mod.select_bundles(annotated, cfg.selection)
         self.assertEqual(len(result["selected"]), len(annotated))
-        self.assertEqual(sum(result["diagnostics"]["plan"].values()), len(annotated))
+        diagnostics = result["diagnostics"]
+        self.assertEqual(
+            sum(diagnostics["plan"].values()) + diagnostics["unfiltered_selected"],
+            len(annotated))
+        self.assertTrue(all("selection_reason" in b for b in result["selected"]))
+        self.assertTrue(all("selection_bucket" in b for b in result["selected"]))
+
+    def test_unfiltered_reservoir_does_not_depend_on_teacher_confidence(self):
+        from tasksource.jev.synthetic.config import SelectionConfig
+        bundles = [
+            {"state_id": f"s{i}", "domain": f"d{i % 3}", "scenario_type": "t",
+             "style": "x", "ambiguity": "clear",
+             "questions": [{"skill": "classification"}],
+             "annotation_stats": [{"max_prob": 0.95 if i % 2 else 0.4}]}
+            for i in range(40)
+        ]
+        cfg = SelectionConfig(unfiltered_fraction=0.5, seed_salt="test-reservoir")
+        first = select_mod.select_bundles(bundles, cfg, n_target=12)["selected"]
+        flipped = [
+            {**b, "annotation_stats": [{"max_prob": 0.2 if i % 2 else 0.99}]}
+            for i, b in enumerate(bundles)
+        ]
+        second = select_mod.select_bundles(flipped, cfg, n_target=12)["selected"]
+        first_reservoir = {b["state_id"] for b in first
+                           if b["selection_reason"] == "unfiltered_reservoir"}
+        second_reservoir = {b["state_id"] for b in second
+                            if b["selection_reason"] == "unfiltered_reservoir"}
+        self.assertEqual(first_reservoir, second_reservoir)
+        self.assertEqual(len(first_reservoir), 6)
 
 
 class JevParsingTest(unittest.TestCase):
@@ -438,7 +546,8 @@ class ConfigTest(unittest.TestCase):
 
     def test_all_configs_load(self):
         base = self._config_dir()
-        for name in ("albert_deepseek_v4_flash.yaml", "openai_luna.yaml", "mock_pilot.yaml"):
+        for name in ("albert_deepseek_v4_flash.yaml", "openai_luna.yaml", "mock_pilot.yaml",
+                     "albert_deepseek_v4_flash_jev_audited.yaml"):
             cfg = load_config(str(base / name))
             self.assertTrue(cfg.provider.model)
             self.assertTrue(cfg.provider.api_key_env)
@@ -461,6 +570,17 @@ class ConfigTest(unittest.TestCase):
         other = copy.deepcopy(cfg)
         other.provider.name = "openai"
         self.assertEqual(other.critic_provider().name, "albert")
+
+
+    def test_audited_config_uses_independent_teacher_auditor(self):
+        base = self._config_dir()
+        cfg = load_config(str(base / "albert_deepseek_v4_flash_jev_audited.yaml"))
+        self.assertEqual(cfg.annotator.name, "jev")
+        self.assertTrue(cfg.teacher_audit.enabled)
+        self.assertEqual(cfg.provider.name, "albert")
+        self.assertEqual(cfg.teacher_audit_provider().name, "openrouter")
+        self.assertNotEqual(cfg.teacher_audit_provider().name, cfg.provider.name)
+        self.assertAlmostEqual(cfg.selection.unfiltered_fraction, 0.20)
 
 
 if __name__ == "__main__":

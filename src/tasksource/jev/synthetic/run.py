@@ -21,6 +21,7 @@ from . import critic as critic_mod
 from . import dedup as dedup_mod
 from . import manifest as manifest_mod
 from . import providers, select as select_mod
+from . import teacher_audit as teacher_audit_mod
 from . import specs as specs_mod
 from . import split as split_mod
 from . import validate as validate_mod
@@ -29,7 +30,7 @@ from .generate import PROMPTS_DIR, generate_bundles, generation_cache_key, promp
 from .schemas import bundle_to_flat_rows, flat_to_training_row
 
 STAGES = ("specs", "generate", "validate", "critic", "dedup",
-          "annotate", "select", "split", "export")
+          "annotate", "teacher_audit", "select", "split", "export")
 
 
 def run_dir_for(cfg) -> Path:
@@ -50,7 +51,7 @@ def _to_frame(bundles: list[dict]) -> pd.DataFrame:
     rows = []
     for bundle in bundles:
         row = dict(bundle)
-        for key in ("questions", "annotations", "annotation_stats"):
+        for key in ("questions", "annotations", "annotation_stats", "teacher_audit"):
             if key in row and row[key] is not None:
                 row[key] = json.dumps(row[key], ensure_ascii=False)
         rows.append(row)
@@ -60,7 +61,7 @@ def _to_frame(bundles: list[dict]) -> pd.DataFrame:
 def _from_frame(frame: pd.DataFrame) -> list[dict]:
     bundles = []
     for record in frame.to_dict(orient="records"):
-        for key in ("questions", "annotations", "annotation_stats"):
+        for key in ("questions", "annotations", "annotation_stats", "teacher_audit"):
             if key in record and isinstance(record[key], str):
                 try:
                     record[key] = json.loads(record[key])
@@ -90,7 +91,12 @@ def stage_generate(cfg, run_dir: Path) -> list[dict]:
     _to_frame(bundles).to_parquet(run_dir / "candidates.parquet", index=False)
     manifest_path = run_dir / "manifest.json"
     prompt_hashes = {}
-    for name in ("generate_v1", "critic_v1"):
+    prompt_versions = {
+        cfg.generation.prompt_version,
+        cfg.critic.prompt_version,
+        cfg.teacher_audit.prompt_version,
+    }
+    for name in sorted(prompt_versions):
         prompt_file = PROMPTS_DIR / f"{name}.txt"
         if prompt_file.exists():
             prompt_hashes[name] = prompt_hash(prompt_file.read_text(encoding="utf-8"))
@@ -100,7 +106,10 @@ def stage_generate(cfg, run_dir: Path) -> list[dict]:
                              "generate_cache_key": generation_cache_key(cfg),
                              "annotator": cfg.annotator.name,
                              "critic_provider": cfg.critic_provider().name,
-                             "critic_model": cfg.critic.model},
+                             "critic_model": cfg.critic.model,
+                             "teacher_audit_enabled": cfg.teacher_audit.enabled,
+                             "teacher_audit_provider": cfg.teacher_audit_provider().name,
+                             "teacher_audit_model": cfg.teacher_audit.model},
             prompt_hashes))
     # Keep spec lookup for validation.
     (run_dir / "_spec_by_id.json").write_text(json.dumps(spec_by_id), encoding="utf-8")
@@ -160,8 +169,62 @@ def stage_annotate(cfg, run_dir: Path) -> list[dict]:
     return annotated
 
 
+def stage_teacher_audit(cfg, run_dir: Path) -> list[dict]:
+    """Independently answer generated questions, then compare with Jev locally."""
+    bundles = _read_bundles(run_dir / "annotated.jsonl")
+    audited = teacher_audit_mod.audit_bundles(
+        cfg, bundles, run_dir / "raw" / "teacher_audit")
+    _write_bundles(run_dir / "audited.jsonl", audited)
+    _to_frame(audited).to_parquet(run_dir / "audited.parquet", index=False)
+
+    passing = [bundle for bundle in audited
+               if bundle.get("teacher_audit", {}).get("pass", True)]
+    audit_questions = [row for bundle in audited
+                       for row in bundle.get("teacher_audit", {}).get("questions", [])]
+    answered = [row for row in audit_questions if row.get("agrees") is not None]
+    report = {
+        "enabled": cfg.teacher_audit.enabled,
+        "states": len(audited),
+        "questions": len(audit_questions),
+        "answered_questions": len(answered),
+        "disagreements": sum(row.get("agrees") is False for row in answered),
+        "auditor_issue_questions": sum(bool(row.get("issues")) for row in audit_questions),
+        "complete": sum(bool(b.get("teacher_audit", {}).get("complete", False))
+                        for b in audited),
+        "passing": len(passing),
+        "confident_disagreements": sum(
+            int(b.get("teacher_audit", {}).get("confident_disagreements", 0))
+            for b in audited),
+        "drop_confident_disagreements": cfg.teacher_audit.drop_confident_disagreements,
+        "provider": cfg.teacher_audit_provider().name,
+        "model": cfg.teacher_audit.model,
+    }
+    (run_dir / "teacher_audit_report.json").write_text(
+        json.dumps(report, indent=2), encoding="utf-8")
+    if cfg.teacher_audit.drop_confident_disagreements:
+        _write_bundles(run_dir / "audit_passed.jsonl", passing)
+
+    manifest_path = run_dir / "manifest.json"
+    if manifest_path.exists():
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        audit_config = dict(cfg.teacher_audit.__dict__)
+        audit_config["provider"] = cfg.teacher_audit_provider().__dict__
+        manifest["teacher_audit"] = {**audit_config, "report": report}
+        manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    return passing if cfg.teacher_audit.drop_confident_disagreements else audited
+
+
 def stage_select(cfg, run_dir: Path, n_target: int | None = None) -> list[dict]:
-    annotated = _read_bundles(run_dir / "annotated.jsonl")
+    if cfg.teacher_audit.enabled:
+        source = (run_dir / "audit_passed.jsonl" if
+                  cfg.teacher_audit.drop_confident_disagreements else
+                  run_dir / "audited.jsonl")
+        if not source.exists():
+            raise FileNotFoundError(
+                f"Teacher audit artifact {source} is missing; run the teacher_audit stage")
+    else:
+        source = run_dir / "annotated.jsonl"
+    annotated = _read_bundles(source)
     result = select_mod.select_bundles(annotated, cfg.selection, n_target)
     _write_bundles(run_dir / "selected.jsonl", result["selected"])
     (run_dir / "selection_report.json").write_text(
@@ -183,18 +246,50 @@ def stage_export(cfg, run_dir: Path) -> dict:
     bundles = _read_bundles(run_dir / "final.jsonl")
     flat_rows: list[dict] = []
     for bundle in bundles:
-        annotations = {q["question_id"]: a for q, a in
-                       zip(bundle.get("questions", []), bundle.get("annotations", []))}
+        annotations = {
+            q["question_id"]: (a, stats)
+            for q, a, stats in zip(
+                bundle.get("questions", []),
+                bundle.get("annotations", []),
+                bundle.get("annotation_stats", []))
+        }
+        audit = bundle.get("teacher_audit", {})
+        audit_by_question = {
+            row.get("question_id"): row for row in audit.get("questions", [])
+        }
         for flat in bundle_to_flat_rows(bundle):
             # a missing annotation must fail: flat_to_training_row would fill in a uniform target
-            target = annotations.get(flat["question_id"], {}).get("probabilities")
+            annotation, stats = annotations.get(flat["question_id"], (None, None))
+            target = annotation.get("probabilities") if annotation else None
             if target is None:
                 raise ValueError(f"no annotation for question {flat['question_id']} of state {flat['state_id']}")
-            flat_rows.append({**flat_to_training_row(flat, target, "synthetic/jev",
-                                                     bundle.get("split", "train")),
-                              "state_id": flat["state_id"], "question_id": flat["question_id"],
-                              "bundle_size": flat["bundle_size"], "domain": flat["domain"],
-                              "skill": flat.get("skill", "")})
+            audit_row = audit_by_question.get(flat["question_id"], {})
+            target_origin = (
+                f"{annotation.get('annotator', 'unknown')}:"
+                f"{annotation.get('returned_model') or annotation.get('annotator_version', 'unknown')}"
+            )
+            flat_rows.append({
+                **flat_to_training_row(flat, target, "synthetic/jev",
+                                       bundle.get("split", "train")),
+                "state_id": flat["state_id"],
+                "question_id": flat["question_id"],
+                "bundle_size": flat["bundle_size"],
+                "domain": flat["domain"],
+                "skill": flat.get("skill", ""),
+                "target_origin": target_origin,
+                "annotator": annotation.get("annotator", ""),
+                "annotator_version": annotation.get("annotator_version", ""),
+                "annotator_model": annotation.get("returned_model", ""),
+                "teacher_max_prob": stats.get("max_prob") if stats else None,
+                "teacher_entropy": stats.get("entropy") if stats else None,
+                "selection_reason": bundle.get("selection_reason", ""),
+                "selection_bucket": bundle.get("selection_bucket", ""),
+                "teacher_audit_enabled": bool(audit.get("enabled", False)),
+                "teacher_audit_agrees": audit_row.get("agrees"),
+                "teacher_audit_confidence": audit_row.get("auditor_confidence"),
+                "teacher_audit_confident_disagreement": audit_row.get(
+                    "confident_disagreement"),
+            })
     flat_frame = pd.DataFrame(flat_rows)
     flat_frame.to_parquet(run_dir / "flat.parquet", index=False)
     # HF dataset dir with bundled + flat configs.
@@ -208,7 +303,9 @@ def stage_export(cfg, run_dir: Path) -> dict:
                 hf_dir / f"flat-{split_name}.parquet")
     (hf_dir / "README.md").write_text(
         "# jev-synthetic-decisions\n\nConfigs: `bundled` (one row per state, "
-        "`final.parquet`) and `flat` (one row per decision, `flat.parquet`).\n",
+        "`final.parquet`) and `flat` (one row per decision, `flat.parquet`). "
+        "Flat rows retain target origin, teacher uncertainty, selection arm, and "
+        "independent teacher-audit fields.\n",
         encoding="utf-8")
     shutil.copyfile(run_dir / "final.parquet", hf_dir / "bundled.parquet")
     shutil.copyfile(run_dir / "flat.parquet", hf_dir / "flat.parquet")
@@ -235,6 +332,8 @@ def run_stage(cfg, run_dir: Path, stage: str, **kwargs):
         return stage_dedup(cfg, run_dir)
     if stage == "annotate":
         return stage_annotate(cfg, run_dir)
+    if stage == "teacher_audit":
+        return stage_teacher_audit(cfg, run_dir)
     if stage == "select":
         return stage_select(cfg, run_dir, kwargs.get("n_target"))
     if stage == "split":
