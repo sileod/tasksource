@@ -165,6 +165,18 @@ class BundleTest(unittest.TestCase):
         self.assertTrue(any("likelihood levels for urgency" in error for error in errors))
         self.assertTrue(any("target model" in error for error in errors))
 
+    def test_natural_metadata_words_are_not_rejected(self):
+        bundle = {
+            "state_id": "s",
+            "state": "The analyst found evidence of difficulty completing the claim review.",
+            "questions": [{"question_id": "q0", "format": "noul",
+                           "question": "Is the claim review complete?"}],
+        }
+        self.assertEqual(validate_mod.validate_bundle(bundle), [])
+        bundle["state"] += " Difficulty: 4."
+        self.assertIn("state leaks sampler metadata field",
+                      validate_mod.validate_bundle(bundle))
+
     def test_flat_preserves_grouping(self):
         spec = specs_mod.sample_specs(_cfg().sampler, 5)[0]
         bundle = mock_realization(spec)

@@ -1,4 +1,4 @@
-"""Route a ticket to the one category, among 10 to 60, whose rule it satisfies.
+"""Route a ticket to the one category, among 4 to 60, whose rule it satisfies.
 
 Each state is a fresh routing guide: category names come from a bounded pool,
 but every row draws new rules (conjunctions of one to three conditions), many of
@@ -18,7 +18,7 @@ ISSUES = ["refund", "damage", "login", "delay", "invoice", "defect"]
 TIERS = ["free", "plus", "business"]
 REGIONS = ["north", "south", "east", "west"]
 CHANNELS = ["email", "chat", "phone"]
-SIZES = [10, 16, 24, 36, 50]
+SIZES = [6, 10, 18, 30, 45]
 AMOUNTS = [50, 100, 200, 500]
 AGES = [7, 14, 30, 60]
 MET_COUNTS = ["0", "1", "2", "3"]
@@ -82,7 +82,7 @@ def _near_rule(rng, ticket, gold):
 
 
 def generate(rng, level=0):
-    n = min(len(CATEGORIES), max(8, sround(SIZES[level] * rng.uniform(0.8, 1.25), rng)))
+    n = min(len(CATEGORIES), max(4, sround(SIZES[level] * rng.uniform(0.7, 1.35), rng)))
     names = rng.sample(CATEGORIES, n)
     ticket = _ticket(rng)
     gold = rng.choice(names)

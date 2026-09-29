@@ -6,8 +6,9 @@ import re
 
 from .schemas import validate_bundle_shape
 
-LEAK_TOKENS = ("difficulty", "ambiguity", "skill", "distractor",
-               "state_length", "evidence", "certainty")
+METADATA_LEAK = re.compile(
+    r"\b(?:difficulty|ambiguity|skill|distractors?|state_length|"
+    r"evidence_structure|certainty_hint)\s*[:=]", re.IGNORECASE)
 ANSWER_LEAK = re.compile(r"correct (answer|option|choice)|answer is\b", re.IGNORECASE)
 MODEL_LEAK = re.compile(r"\bjev\b", re.IGNORECASE)
 EITHER_OR_LABEL = re.compile(r"\b(?:positive\s+or\s+negative|negative\s+or\s+positive|yes\s+or\s+no|no\s+or\s+yes)\b", re.IGNORECASE)
@@ -37,11 +38,8 @@ def validate_bundle(bundle: dict, spec: dict | None = None) -> list[str]:
         errors.append("state too short")
     if len(state) > 8000:
         errors.append("state too long")
-    lowered = state.lower()
-    for token in LEAK_TOKENS:
-        if token in lowered:
-            errors.append(f"state leaks sampler metadata: {token}")
-            break
+    if METADATA_LEAK.search(state):
+        errors.append("state leaks sampler metadata field")
     if ANSWER_LEAK.search(state):
         errors.append("state leaks correct answer phrasing")
     if MODEL_LEAK.search(state):
