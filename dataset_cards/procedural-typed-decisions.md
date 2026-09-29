@@ -204,8 +204,15 @@ absolute error on the exact probability grows from 0.16 (level 0) to 0.29
 (level 4) on `incident_real`, and stays around 0.33 on the posterior
 `access_allowed` of `policy_under_uncertainty`. `policy_under_uncertainty` and
 `partial_observation_calibration` (exact posteriors) are hard from level 0 on;
-`table_lookup` and `multi_view_adjudication` remain the easiest at level 4. Rerun with
-`scripts/calibrate_procedural_levels.py`.
+`table_lookup` and `multi_view_adjudication` remain the easiest at level 4.
+
+A second model, `upstage/solar-decide` (10 states per level; it takes at most
+26 options, so the longest lists are left out), shows the same easy-to-hard
+slope on most configs, e.g. 0.95 → 0.53 on `event_state_reconstruction`,
+1.00 → 0.48 on `evidence_sufficiency`, 0.88 → 0.42 on `policy_applicability`;
+`arithmetic`, `table_lookup`, and `state_perturbation` stay easy for it (about
+0.8–0.9 at every level). Rerun with `scripts/calibrate_procedural_levels.py`
+(`--model` for another model of the OpenRouter decisions API).
 
 ## Use
 
