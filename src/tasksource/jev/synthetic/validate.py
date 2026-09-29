@@ -9,6 +9,8 @@ from .schemas import validate_bundle_shape
 LEAK_TOKENS = ("difficulty", "ambiguity", "skill", "distractor",
                "state_length", "evidence", "certainty")
 ANSWER_LEAK = re.compile(r"correct (answer|option|choice)|answer is\b", re.IGNORECASE)
+MODEL_LEAK = re.compile(r"\bjev\b", re.IGNORECASE)
+EITHER_OR_LABEL = re.compile(r"\b(?:positive\s+or\s+negative|negative\s+or\s+positive|yes\s+or\s+no|no\s+or\s+yes)\b", re.IGNORECASE)
 OPEN_QUESTION = re.compile(r"\b(?:what|which|who|where|when)\b", re.IGNORECASE)
 EVENT_PROBABILITY = re.compile(
     r"\b(?:likelihood|probability|chance|risk|confidence)\s+that\b|"
@@ -17,6 +19,8 @@ EVENT_PROBABILITY = re.compile(
 
 def valid_noul_question(text: str) -> bool:
     """A noul target is a probability for one proposition, not a free-form answer."""
+    if EITHER_OR_LABEL.search(text):
+        return False
     if EVENT_PROBABILITY.search(text):
         return True
     if OPEN_QUESTION.search(text) or re.search(r"\bhow\b", text, re.IGNORECASE):
@@ -40,15 +44,24 @@ def validate_bundle(bundle: dict, spec: dict | None = None) -> list[str]:
             break
     if ANSWER_LEAK.search(state):
         errors.append("state leaks correct answer phrasing")
+    if MODEL_LEAK.search(state):
+        errors.append("state mentions the target model")
     texts = [q.get("question", "") for q in bundle.get("questions", [])]
     for text in texts:
         if not text or len(text.strip()) < 10:
             errors.append("empty/truncated question")
         if ANSWER_LEAK.search(text):
             errors.append("question leaks correct answer phrasing")
+        if MODEL_LEAK.search(text):
+            errors.append("question mentions the target model")
     for q in bundle.get("questions", []):
         if q.get("format") == "noul" and not valid_noul_question(q.get("question", "")):
             errors.append(f"noul {q.get('question_id')} must ask about one yes/no proposition")
+        if (q.get("format") == "score"
+                and list(q.get("options", [])) ==
+                ["very unlikely", "unlikely", "possible", "likely", "very likely"]
+                and re.search(r"\burgen(?:t|cy)\b", q.get("question", ""), re.IGNORECASE)):
+            errors.append(f"score {q.get('question_id')} uses likelihood levels for urgency")
     if len(set(texts)) != len(texts):
         errors.append("duplicate question texts in bundle")
     options_seen = [tuple(q.get("options", [])) for q in bundle.get("questions", []) if q.get("format") == "choice"]

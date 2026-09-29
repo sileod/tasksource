@@ -29,7 +29,8 @@ def load_critic_prompt(version: str) -> str:
 def critic_cache_key(model: str, temperature: float, prompt: str, bundle: dict, endpoint: str = "") -> str:
     """``endpoint`` names the provider (``name@base_url``): one model name can be served by several."""
     canonical = json.dumps(
-        {"state_id": bundle.get("state_id"), "state": bundle.get("state"),
+        {"state_id": bundle.get("state_id"), "domain": bundle.get("domain"),
+         "state": bundle.get("state"),
          "questions": bundle.get("questions")},
         sort_keys=True, ensure_ascii=False)
     return hashlib.sha256(
@@ -76,7 +77,8 @@ async def _critique_one(sem, client, model: str, temperature: float,
              "provider": "mock", "model": model, "verdict": verdict},
             ensure_ascii=False, indent=2), encoding="utf-8")
         return {"state_id": bundle["state_id"], **verdict}
-    payload = {"state_id": bundle["state_id"], "state": bundle["state"],
+    payload = {"state_id": bundle["state_id"], "domain": bundle.get("domain"),
+               "state": bundle["state"],
                "questions": bundle["questions"]}
     prompt = template.replace("{{BUNDLE_JSON}}", json.dumps(payload, ensure_ascii=False, indent=2))
     async with sem:
@@ -108,22 +110,26 @@ async def critique_bundles_async(cfg, bundles: list[dict], raw_dir: Path) -> lis
         return [{"state_id": b["state_id"], "pass": True, "issues": [], "score": 1.0} for b in bundles]
     template = load_critic_prompt(cfg.critic.prompt_version)
     provider = cfg.critic_provider()
-    client = None
+    clients = [None]
     if provider.name != "mock":
-        client = providers.make_client(provider, providers.require_api_key(provider))
+        clients = [providers.make_client(provider, key)
+                   for key in providers.available_api_keys(provider)]
     try:
         sem = asyncio.Semaphore(max(1, cfg.generation.concurrency))
-        pacer = RequestPacer(cfg.critic.requests_per_minute) if client is not None else None
-        out = await asyncio.gather(*[_critique_one(sem, client, cfg.critic.model,
+        pacers = [RequestPacer(cfg.critic.requests_per_minute) if client is not None
+                  else None for client in clients]
+        out = await asyncio.gather(*[_critique_one(sem, clients[i % len(clients)], cfg.critic.model,
                                                    cfg.critic.temperature, template, b, raw_dir,
-                                                   pacer, f"{provider.name}@{provider.base_url.rstrip('/')}")
-                                     for b in bundles])
+                                                   pacers[i % len(clients)],
+                                                   f"{provider.name}@{provider.base_url.rstrip('/')}")
+                                     for i, b in enumerate(bundles)])
     finally:
-        if client is not None:
-            try:
-                await client.close()
-            except Exception:
-                pass
+        for client in clients:
+            if client is not None:
+                try:
+                    await client.close()
+                except Exception:
+                    pass
     return list(out)
 
 

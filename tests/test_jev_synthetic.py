@@ -96,6 +96,19 @@ class SamplerTest(unittest.TestCase):
                       and q["criteria"][0].lstrip("-").isdigit())
         self.assertGreater(numeric, 0)
         self.assertGreater(len(score_qs) - numeric, 0)  # semantic rubrics too
+        for q in score_qs:
+            if not q["criteria"][0].lstrip("-").isdigit():
+                self.assertIn(q["criteria"], specs_mod.SEMANTIC_RUBRICS_BY_SKILL[q["skill"]])
+
+    def test_audited_run_is_broad_with_smaller_score_share(self):
+        path = (Path(__file__).resolve().parents[1] / "src" / "tasksource" / "jev"
+                / "synthetic" / "configs" / "albert_deepseek_v4_flash_jev_audited.yaml")
+        specs = specs_mod.sample_specs(load_config(str(path)).sampler, 4000)
+        formats = Counter(q["format"] for spec in specs for q in spec["questions"])
+        self.assertTrue(0.12 < formats["score"] / sum(formats.values()) < 0.18)
+        self.assertEqual({spec["domain"] for spec in specs}, set(specs_mod.DOMAINS))
+        self.assertEqual({spec["difficulty"] for spec in specs}, set(specs_mod.DIFFICULTIES))
+        self.assertEqual({spec["ambiguity"] for spec in specs}, set(specs_mod.AMBIGUITY_LEVELS))
 
 
 class BundleTest(unittest.TestCase):
@@ -117,11 +130,30 @@ class BundleTest(unittest.TestCase):
             "Which team should own this ticket?",
             "According to the report, what is the timestamp on the monitor?",
             "List all of the action items assigned to the agent.",
+            "Is the customer's sentiment positive or negative?",
         ]
         for text in valid:
             self.assertTrue(validate_mod.valid_noul_question(text), text)
         for text in invalid:
             self.assertFalse(validate_mod.valid_noul_question(text), text)
+
+    def test_rejects_pilot_format_and_model_leaks(self):
+        bundle = {
+            "state_id": "s", "state": "The vendor delayed a shipment and the client called support.",
+            "questions": [
+                {"question_id": "q0", "format": "noul",
+                 "question": "Is the client's sentiment positive or negative?"},
+                {"question_id": "q1", "format": "score",
+                 "question": "How urgent is the shipment issue?",
+                 "options": ["very unlikely", "unlikely", "possible", "likely", "very likely"]},
+                {"question_id": "q2", "format": "noul",
+                 "question": "Should Jev approve the refund?"},
+            ],
+        }
+        errors = validate_mod.validate_bundle(bundle)
+        self.assertTrue(any("one yes/no proposition" in error for error in errors))
+        self.assertTrue(any("likelihood levels for urgency" in error for error in errors))
+        self.assertTrue(any("target model" in error for error in errors))
 
     def test_flat_preserves_grouping(self):
         spec = specs_mod.sample_specs(_cfg().sampler, 5)[0]
@@ -521,6 +553,17 @@ class JevParsingTest(unittest.TestCase):
 
 
 class PreflightTest(unittest.TestCase):
+    def test_optional_api_keys_are_distinct_and_need_not_be_set(self):
+        from unittest.mock import patch
+        from tasksource.jev.synthetic.config import ProviderConfig
+        provider = ProviderConfig(name="albert", api_key_env="TEST_PRIMARY",
+                                  optional_api_key_envs=["TEST_EXTRA", "TEST_DUPLICATE"])
+        with patch.dict("os.environ", {"TEST_PRIMARY": "key-one"}, clear=True):
+            self.assertEqual(providers.available_api_keys(provider), ["key-one"])
+        with patch.dict("os.environ", {"TEST_PRIMARY": "key-one", "TEST_EXTRA": "key-two",
+                                      "TEST_DUPLICATE": "key-one"}, clear=True):
+            self.assertEqual(providers.available_api_keys(provider), ["key-one", "key-two"])
+
     def test_missing_key_raises(self):
         import os
         from tasksource.jev.synthetic.config import ProviderConfig

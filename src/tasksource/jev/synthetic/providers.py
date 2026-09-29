@@ -34,6 +34,16 @@ def require_api_key(provider: ProviderConfig) -> str:
     return api_key
 
 
+def available_api_keys(provider: ProviderConfig) -> list[str]:
+    """Primary key plus distinct, present optional keys in configured order."""
+    keys = [require_api_key(provider)]
+    for name in provider.optional_api_key_envs:
+        value = os.getenv(name, "")
+        if value and value not in keys:
+            keys.append(value)
+    return keys
+
+
 def make_client(provider: ProviderConfig, api_key: str):
     """Build a generic OpenAI-compatible async client."""
     try:
@@ -51,24 +61,25 @@ async def preflight(provider: ProviderConfig) -> PreflightResult:
 
     Must run before sampling specs or writing artifacts (except the run dir).
     """
-    api_key = require_api_key(provider)
+    api_keys = available_api_keys(provider)
     if provider.name == "mock":
         return PreflightResult(provider="mock", model=provider.model,
                                returned_model=provider.model, base_url="mock://")
-    client = make_client(provider, api_key)
-    try:
-        models = await client.models.list()
-    finally:
+    for api_key in api_keys:
+        client = make_client(provider, api_key)
         try:
-            await client.close()
-        except Exception:
-            pass
-    available = [m.id for m in models.data]
-    if provider.model not in available:
-        raise RuntimeError(
-            f"Model {provider.model!r} not listed by {provider.name} "
-            f"(base_url={provider.base_url}). Available: {available[:20]}"
-        )
+            models = await client.models.list()
+            available = [m.id for m in models.data]
+            if provider.model not in available:
+                raise RuntimeError(
+                    f"Model {provider.model!r} not listed by {provider.name} "
+                    f"(base_url={provider.base_url}). Available: {available[:20]}"
+                )
+        finally:
+            try:
+                await client.close()
+            except Exception:
+                pass
     returned = provider.model
     return PreflightResult(provider=provider.name, model=provider.model,
                            returned_model=returned, base_url=provider.base_url)

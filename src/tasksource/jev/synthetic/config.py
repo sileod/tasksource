@@ -11,6 +11,9 @@ import yaml
 class ProviderConfig:
     name: str = "albert"
     api_key_env: str = "ALBERT_API_KEY"
+    # Extra environment variables are used only when set. Secrets never enter
+    # configs or manifests; requests rotate across distinct supplied keys.
+    optional_api_key_envs: list[str] = field(default_factory=list)
     base_url: str = "https://albert.api.etalab.gouv.fr/v1"
     model: str = "DeepSeek-V4-Flash"
 
@@ -33,12 +36,31 @@ class SamplerConfig:
     question_formats: dict = field(default_factory=lambda: {"choice": 0.40, "noul": 0.30, "score": 0.30})
     probability_mixed_formats: float = 0.85
     probability_all_formats_if_n_ge_3: float = 0.70
+    # None preserves the original uniform sampler for existing runs.
+    difficulty_weights: dict | None = None
+    ambiguity_weights: dict | None = None
+    distractor_weights: dict | None = None
 
     def __post_init__(self):
         from .schemas import FORMATS
         unknown = set(self.question_formats) - set(FORMATS)
         if unknown or not self.question_formats:
             raise ValueError(f"question_formats keys must be among {FORMATS}: {sorted(self.question_formats)}")
+        for name in ("difficulty_weights", "ambiguity_weights", "distractor_weights"):
+            weights = getattr(self, name)
+            if weights is not None and (not weights or any(float(v) < 0 for v in weights.values())
+                                       or sum(float(v) for v in weights.values()) <= 0):
+                raise ValueError(f"{name} must have non-negative weights with positive total mass")
+        from .specs import AMBIGUITY_LEVELS, DIFFICULTIES
+        allowed = {"difficulty_weights": DIFFICULTIES,
+                   "ambiguity_weights": AMBIGUITY_LEVELS,
+                   "distractor_weights": range(4)}
+        for name, values in allowed.items():
+            weights = getattr(self, name)
+            if weights is not None:
+                unknown = set(map(str, weights)) - set(map(str, values))
+                if unknown:
+                    raise ValueError(f"{name} has unknown values: {sorted(unknown)}")
 
 
 @dataclass
