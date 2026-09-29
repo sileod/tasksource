@@ -216,8 +216,16 @@ def report(records, args):
     # accuracy if the disagreements where the adjudicator sides with Jev were label errors
     frame["jev_accuracy_adjudicated"] = ((frame.jev_accuracy * frame.n + frame.adjudicator_sides_jev)
                                          / frame.n).round(4)
+    # an --out that already holds other tasks keeps them: this run replaces only the tasks it audited
+    kept = []
+    if (args.out / "per-task.csv").exists():
+        previous = pd.read_csv(args.out / "per-task.csv")
+        frame = pd.concat([previous[~previous.source.isin(per_task)], frame]).sort_values("source")
+        with (args.out / "decisions.jsonl").open() as handle:
+            kept = [line for line in handle if json.loads(line)["source"] not in per_task]
     frame.to_csv(args.out / "per-task.csv", index=False)
     with (args.out / "decisions.jsonl").open("w") as handle:
+        handle.writelines(kept)
         for r in records:
             handle.write(json.dumps({"id": r["row"]["id"], "source": r["row"]["source"], "kind": r["row"]["kind"],
                                      "gold": r["gold"], "jev": r["jev"], "jev_probabilities": r["probabilities"],
