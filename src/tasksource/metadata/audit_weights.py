@@ -14,7 +14,7 @@ AUDIT_WEIGHTS = {
     "HelpSteer/verbosity": 0.5,  # hard-subjective, kappa 0.25
     "HelpSteer2/complexity": 0.5,  # hard-subjective, kappa 0.10
     "HelpSteer2/correctness": 0.5,  # hard-subjective, kappa 0.21
-    "HelpSteer2/helpfulness": 0.5,  # hard-subjective, kappa 0.18
+    "HelpSteer2/helpfulness": 0.5,  # hard-subjective, kappa 0.17
     "HelpSteer2/verbosity": 0.5,  # hard-subjective, kappa -0.06
     "HelpSteer3/edit_quality": 0.5,  # hard-subjective, kappa 0.19
     "HelpSteer3/feedback": 0.5,  # hard-subjective, kappa 0.16
@@ -83,7 +83,7 @@ AUDIT_WEIGHTS = {
     "language-identification": 0.5,  # trivial, kappa 0.99
     "liar": 0.5,  # hard-subjective, kappa 0.06
     "logiqa-2.0-nli": 1.5,  # hard-clean, kappa 0.26
-    "lsat-rc": 0.5,  # trivial, kappa 0.92
+    "lsat-rc": 0.5,  # trivial, kappa 0.93
     "missing-item-prediction/contrastive": 0.5,  # trivial, kappa 0.97
     "multilingual/MLMA_hate_speech": 0.5,  # hard-subjective, kappa 0.28
     "multilingual/indic_glue/actsa-sc.te/sentiment": 0.5,  # hard-subjective, kappa -0.08
@@ -142,7 +142,7 @@ AUDIT_WEIGHTS = {
     "regset": 1.5,  # hard-clean, kappa 0.17
     "sciq": 0.5,  # trivial, kappa 0.96
     "sen-making/2": 0.5,  # trivial, kappa 0.97
-    "simple_pair": 0.5,  # trivial, kappa 0.92
+    "simple_pair": 0.5,  # trivial, kappa 0.93
     "snips_built_in_intents": 0.5,  # trivial, kappa 0.95
     "spartqa-mchoice": 1.5,  # hard-clean, kappa 0.33
     "spartqa-yn": 1.5,  # hard-clean, kappa 0.33
