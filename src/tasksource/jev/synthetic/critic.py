@@ -15,6 +15,7 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import json
+import re
 import time
 from pathlib import Path
 
@@ -44,6 +45,31 @@ def mock_critique(bundle: dict) -> dict:
     if len(set(texts)) != len(texts):
         issues.append("questions are paraphrases of each other")
     return {"pass": not issues, "issues": issues, "score": 1.0 if not issues else 0.0}
+
+
+def checked_verdict(response: dict, bundle: dict) -> dict:
+    """Require one grounded skill/answer check for every live critique."""
+    issues = [str(issue) for issue in response.get("issues", [])]
+    checks = response.get("checks")
+    questions = bundle.get("questions", [])
+    expected = {q["question_id"] for q in questions}
+    if not isinstance(checks, list) or len(checks) != len(questions) or {
+            check.get("question_id") for check in checks if isinstance(check, dict)
+    } != expected:
+        issues.append("missing or duplicate per-question critic checks")
+    else:
+        state = re.sub(r"\s+", " ", bundle.get("state", "")).casefold()
+        for check in checks:
+            qid = check["question_id"]
+            quote = check.get("evidence_quote")
+            if not isinstance(quote, str) or not quote.strip() or re.sub(
+                    r"\s+", " ", quote).strip().casefold() not in state:
+                issues.append(f"{qid}: evidence quote not found in state")
+            for field in ("skill_match", "supported", "unique_answer"):
+                if check.get(field) is not True:
+                    issues.append(f"{qid}: critic {field} check failed")
+    return {"pass": response.get("pass") is True and not issues,
+            "issues": issues, "score": float(response.get("score", 0.0))}
 
 
 class RequestPacer:
@@ -86,13 +112,10 @@ async def _critique_one(sem, client, model: str, temperature: float,
             await pacer.wait()
         result = await providers.chat_complete(
             client, model, [{"role": "user", "content": prompt}],
-            temperature=temperature, max_tokens=1000)
+            temperature=temperature, max_tokens=2000)
     try:
-        verdict = extract_json_object(result["text"])
-        verdict = {"pass": bool(verdict.get("pass", False)),
-                   "issues": list(verdict.get("issues", [])),
-                   "score": float(verdict.get("score", 0.0))}
-    except (ValueError, json.JSONDecodeError, TypeError):
+        verdict = checked_verdict(extract_json_object(result["text"]), bundle)
+    except (ValueError, json.JSONDecodeError, TypeError, KeyError):
         verdict = {"pass": False, "issues": ["unparseable critic response"], "score": 0.0}
     cached.write_text(json.dumps(
         {"cache_key": key, "state_id": bundle["state_id"],

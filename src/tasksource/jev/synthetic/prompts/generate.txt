@@ -15,10 +15,35 @@ Rules:
   authority, include that information explicitly in the state. Do not require
   outside legal, medical, aviation, or other specialist rules to pick an answer.
 - Questions must test DISTINCT aspects of the state (not paraphrases).
+- General text-analysis questions (topic, emotion, intent, claim support,
+  stance, document purpose, main point, implicit concern, intended audience,
+  argument role, stakeholder perspective, social implication, evidence
+  strength, or message tone) should arise naturally from the same kind of
+  state as other questions: a report, message, conversation, ticket, or
+  excerpt. These are reading and interpretation tasks, not arithmetic,
+  chronology, entity lookup, or literal span retrieval. Include textual cues
+  for one best answer, but allow realistic nuance. For argument role, identify
+  whether a passage functions as a claim, support, caveat, or request in the
+  context. For evidence strength, compare how well stated evidence supports a
+  specific claim; do not ask for a numerical confidence grade. Claim support
+  must ask how evidence bears on a specific claim, not restate a message's main
+  concern. Audience inference asks whom a message addresses or is designed for,
+  not who should handle a ticket; include an actual addressee or clear audience
+  cue rather than a generic incident ticket. For implicit concern, use the concerned
+  person's own words; do not invent a concern for someone absent from the
+  state. Social implication asks how wording or behavior may affect people,
+  not what a policy requires next. Include everyday common sense, social
+  context, and conversational subtext where they fit. Mix straightforward
+  reading with cases that require combining multiple cues.
+  Invent varied, context-appropriate options; do not copy labels or wording
+  from a named benchmark.
 - For choice questions output EXACTLY n_options options (use the requested count).
 - Make exactly ONE choice option best supported by the state. Other options may
   be plausible, but the state must contain evidence that rules them out. Avoid
   pairs of options that are both valid next steps under the stated policy.
+- Before output, solve each choice question from the state and check every
+  option. The best interpretation must have clear support; alternatives should
+  differ in meaning rather than be near-synonyms.
 - For score questions the spec gives ordered "criteria": reuse them VERBATIM,
   in order, as the "options" array, with matching "min" (first index) and
   "max" (last index). Never rename, merge, or reorder criteria. State what the

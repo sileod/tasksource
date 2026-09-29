@@ -109,6 +109,16 @@ class SamplerTest(unittest.TestCase):
         self.assertEqual({spec["domain"] for spec in specs}, set(specs_mod.DOMAINS))
         self.assertEqual({spec["difficulty"] for spec in specs}, set(specs_mod.DIFFICULTIES))
         self.assertEqual({spec["ambiguity"] for spec in specs}, set(specs_mod.AMBIGUITY_LEVELS))
+        general = set().union(*specs_mod.GENERAL_TEXT_SKILLS_BY_FORMAT.values())
+        general_rows = [(spec["domain"], q["skill"], q["format"])
+                        for spec in specs for q in spec["questions"]
+                        if q["skill"] in general]
+        self.assertTrue(0.08 < len(general_rows) / sum(formats.values()) < 0.16)
+        self.assertEqual({skill for _, skill, _ in general_rows}, general)
+        self.assertTrue(all(fmt in {"choice", "noul"} for _, _, fmt in general_rows))
+        for skill in general:
+            self.assertGreaterEqual(len({domain for domain, sampled, _ in general_rows
+                                         if sampled == skill}), 15)
 
 
 class BundleTest(unittest.TestCase):
@@ -154,6 +164,18 @@ class BundleTest(unittest.TestCase):
         self.assertTrue(any("one yes/no proposition" in error for error in errors))
         self.assertTrue(any("likelihood levels for urgency" in error for error in errors))
         self.assertTrue(any("target model" in error for error in errors))
+
+    def test_natural_metadata_words_are_not_rejected(self):
+        bundle = {
+            "state_id": "s",
+            "state": "The analyst found evidence of difficulty completing the claim review.",
+            "questions": [{"question_id": "q0", "format": "noul",
+                           "question": "Is the claim review complete?"}],
+        }
+        self.assertEqual(validate_mod.validate_bundle(bundle), [])
+        bundle["state"] += " Difficulty: 4."
+        self.assertIn("state leaks sampler metadata field",
+                      validate_mod.validate_bundle(bundle))
 
     def test_flat_preserves_grouping(self):
         spec = specs_mod.sample_specs(_cfg().sampler, 5)[0]
@@ -225,6 +247,22 @@ class AnnotatorGatingTest(unittest.TestCase):
 
 
 class CriticTest(unittest.TestCase):
+    def test_live_critic_requires_grounded_check_for_each_question(self):
+        bundle = {"state": "The customer says the package arrived damaged yesterday.",
+                  "questions": [{"question_id": "q0"}, {"question_id": "q1"}]}
+        check = lambda qid, quote: {"question_id": qid,
+                                    "evidence_quote": quote,
+                                    "skill_match": True, "supported": True,
+                                    "unique_answer": True}
+        response = {"pass": True, "issues": [], "score": 1.0,
+                    "checks": [check("q0", "package arrived damaged"),
+                               check("q1", "The customer says")]}
+        self.assertTrue(critic_mod.checked_verdict(response, bundle)["pass"])
+        response["checks"][1]["evidence_quote"] = "invented evidence"
+        self.assertFalse(critic_mod.checked_verdict(response, bundle)["pass"])
+        response["checks"] = response["checks"][:1]
+        self.assertFalse(critic_mod.checked_verdict(response, bundle)["pass"])
+
     def test_critic_uses_own_provider(self):
         cfg = _cfg()
         from tasksource.jev.synthetic.config import ProviderConfig
