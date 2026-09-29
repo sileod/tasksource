@@ -149,7 +149,7 @@ is not produced by or affiliated with TypeSafe or OpenJev.
 | `record_aggregation` | `count_in_category` (score), `largest_quantity` (choice), `any_out_of_stock` (noul), `total_above` (noul), from level 2 `count_filtered` (score, quantity and stock filters) |
 | `state_perturbation` | `material_change` (noul), `changed_dimension` (choice), `risk_direction` (score); 1 to 8 records with up to 4 simultaneous changes whose risk effects can offset, and look-alike non-material fields |
 | `table_lookup` | `find_person` (choice, two-condition filter, through the manager from level 2 and with a start-year condition from level 3; 6 to 40 options, capped by the table), `manager_of` (choice, join), `started_before` (noul), `count_matching` (score) |
-| `taxonomy_routing` | `route` (choice among the 4–60 categories of a routing guide drawn fresh per state; many rules share a condition with the right one), `belongs_to` (noul), `conditions_met` (score, 0–3) |
+| `taxonomy_routing` | `route` (choice among the 4–60 categories of a routing guide drawn fresh per state; many rules share a condition with the right one), `belongs_to` (noul), `conditions_met` (score, 0–4) |
 
 ## Schema
 
@@ -187,7 +187,7 @@ table gives Jev's chance-adjusted accuracy, kappa = (accuracy − chance) /
 | `record_aggregation` | 0.99 | 0.96 | 0.84 | 0.75 | 0.70 |
 | `state_perturbation` | 0.95 | 0.89 | 0.44 | 0.63 | 0.50 |
 | `table_lookup` | 1.00 | 0.98 | 0.97 | 0.90 | 0.87 |
-| `taxonomy_routing` | 1.00 | 0.98 | 0.93 | 0.79 | 0.61 |
+| `taxonomy_routing` | 1.00 | 0.98 | 0.92 | 0.78 | 0.64 |
 
 Probability answers are scored above by their rounding to yes/no; Jev's mean
 absolute error on the exact probability grows from 0.16 (level 0) to 0.29

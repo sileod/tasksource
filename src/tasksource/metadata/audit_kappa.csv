@@ -533,7 +533,7 @@ procedural-typed-decisions/policy_under_uncertainty,0.4252099833211822,False,pro
 procedural-typed-decisions/record_aggregation,0.8331887976330153,False,procedural-level-calibration
 procedural-typed-decisions/state_perturbation,0.6822033898305084,False,procedural-level-calibration
 procedural-typed-decisions/table_lookup,0.9426731397502425,False,procedural-level-calibration
-procedural-typed-decisions/taxonomy_routing,0.8571100693835039,False,procedural-level-calibration
+procedural-typed-decisions/taxonomy_routing,0.860329033056992,False,procedural-level-calibration
 prompt-injection-dataset,0.5700000000000001,False,jev-task-audit
 prompt-injections,0.6200000000000001,False,jev-task-audit
 proofwriter,0.5575,False,jev-task-audit

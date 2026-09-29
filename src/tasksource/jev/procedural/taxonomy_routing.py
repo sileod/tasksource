@@ -25,7 +25,7 @@ SIZES = [5, 10, 18, 30, 45]
 CONDITIONS = [(1, 1), (1, 2), (1, 3), (2, 3), (2, 4)]
 AMOUNTS = [50, 100, 200, 500]
 AGES = [7, 14, 30, 60]
-MET_COUNTS = ["0", "1", "2", "3"]
+MET_COUNTS = ["0", "1", "2", "3", "4"]  # rules have at most four conditions
 
 FIELDS = {"product": PRODUCTS, "issue": ISSUES, "tier": TIERS, "region": REGIONS, "channel": CHANNELS}
 
