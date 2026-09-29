@@ -306,6 +306,9 @@ class ProceduralJevTest(unittest.TestCase):
         self.assertEqual([r["level"] for r in ordered[:10]], [0, 1, 2, 3, 4] * 2)
         self.assertEqual(sorted(r["i"] for r in ordered), list(range(100)))
         self.assertNotEqual([r["level"] for r in ordered[20:]], sorted(r["level"] for r in ordered[20:]))
+        mixed = pretty_order([{"level": i % 5, "task": "ab"[i % 2]} for i in range(100)], 20,
+                             key=lambda r: (r["level"], r["task"]))
+        self.assertEqual([(r["level"], r["task"]) for r in mixed[:4]], [(0, "a"), (0, "b"), (1, "a"), (1, "b")])
 
     def test_taxonomy_routing_gold_follows_rules(self):
         from tasksource.jev.procedural.taxonomy_routing import _holds, _text

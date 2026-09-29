@@ -13,6 +13,15 @@ tags:
 - synthetic
 - multi-question
 configs:
+- config_name: all
+  default: true
+  data_files:
+  - split: train
+    path: all/train-*.parquet
+  - split: validation
+    path: all/validation-*.parquet
+  - split: test
+    path: all/test-*.parquet
 - config_name: arithmetic
   data_files:
   - split: train
@@ -137,6 +146,7 @@ is not produced by or affiliated with TypeSafe or OpenJev.
 
 | config | questions |
 |---|---|
+| `all` (default) | Every config below in one table, with a `task` column and the shared fields only (no flat label columns); the first 1,000 train rows cycle through levels and tasks, the rest is shuffled |
 | `arithmetic` | An order with a discount/shipping rule, an account ledger, or a schedule; each state asks 2–5 of: `amount_due` / `final_balance` / `finish_time` (choice among the result and typical slips), `within_budget`, `went_negative`, `done_by_deadline` (noul), `random_line_bulk`, `random_is_deposit`, `random_is_long` (noul, exact probability k/n), `budget_use`, `net_change` (score, descriptive levels), `lines_above`, `withdrawal_count`, `starts_before_noon` (score), `largest_line`, `lowest_day`, `longest_task` (choice) |
 | `entity_belief_tracking` | `world_location` (choice), `agent_belief_location` (choice), `belief_matches_world` (noul), from level 2 `nested_belief_location` (choice: where A thinks B believes an object is); 4 to 16 locations |
 | `event_state_reconstruction` | `current_owner` (choice), `is_open` (noul), `current_severity` (score); the log is shuffled from level 2 and has voided entries from level 3 |
@@ -163,8 +173,8 @@ is not produced by or affiliated with TypeSafe or OpenJev.
 | one column per question | Flat label, for browsing and filtering: a `ClassLabel` for choice, score, and yes/no noul questions; a float for graded noul (`incident_real`, `random_*`); the option text for open numeric choices (`amount_due`, `final_balance`, `finish_time`). Null when the state does not ask that question (`arithmetic`, and level-dependent questions). |
 
 States are unique within a split, and validation/test states never occur in
-train. The first 1,000 train rows cycle through the levels (easiest first) for
-browsing; the rest of the split is shuffled.
+train. In each config, the first 1,000 train rows cycle through the levels
+(easiest first) for browsing; the rest of the split is shuffled.
 
 ## Difficulty by level
 

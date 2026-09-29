@@ -14,7 +14,7 @@ import random
 from collections import Counter
 from pathlib import Path
 
-from datasets import ClassLabel, Dataset, DatasetDict, Features, Value
+from datasets import ClassLabel, Dataset, DatasetDict, Features, Value, concatenate_datasets, load_from_disk
 from huggingface_hub import HfApi
 
 from tasksource.jev.procedural import REPO_ID, TASKS
@@ -80,11 +80,11 @@ def label_features(rows):
     return features, readers
 
 
-def pretty_order(rows, first_rows=1_000, seed=0):
-    """Levels round-robin in a display prefix (easiest first), then the remaining rows shuffled."""
+def pretty_order(rows, first_rows=1_000, seed=0, key=lambda row: row["level"]):
+    """Buckets (levels by default) round-robin in a display prefix, easiest first, then the remaining rows shuffled."""
     buckets = {}
     for row in rows:
-        buckets.setdefault(row["level"], []).append(row)
+        buckets.setdefault(key(row), []).append(row)
     prefix, queues = [], [list(bucket) for _, bucket in sorted(buckets.items())]
     while len(prefix) < min(first_rows, len(rows)):
         for queue in queues:
@@ -114,6 +114,25 @@ def build_task(task, sizes, levels, pretty_rows=1_000):
     return DatasetDict({
         split: Dataset.from_list(rows, features=features) for split, rows in splits.items()
     })
+
+
+COMMON = ["id", "task", "level", "state", "questions", "answers"]
+
+
+def build_all(output, tasks, pretty_rows=1_000, seed=0):
+    """Every task in one config (the default): shared columns only, the train prefix cycling
+    through levels and tasks, everything else shuffled."""
+    parts = {task: load_from_disk(str(output / task)) for task in tasks}
+    splits = {}
+    for split in parts[tasks[0]]:
+        rows = [{"task": task, **{c: r[c] for c in COMMON if c != "task"}}
+                for task, dataset in parts.items() for r in dataset[split]]
+        if split == "train":
+            rows = pretty_order(rows, pretty_rows, seed, key=lambda r: (r["level"], r["task"]))
+        else:
+            random.Random(seed).shuffle(rows)
+        splits[split] = Dataset.from_list([{c: r[c] for c in COMMON} for r in rows])
+    return DatasetDict(splits)
 
 
 def summarize(task, dataset):
@@ -152,7 +171,9 @@ def main(args):
         built[task] = build_task(task, sizes, args.levels, args.pretty_rows)
         built[task].save_to_disk(args.output / task)
     summaries = [summarize(task, dataset) for task, dataset in built.items()]
-    (args.output / "build-summary.json").write_text(json.dumps(summaries, indent=2) + "\n")
+    if summaries:  # --tasks with no names rebuilds only the combined config from the saved tasks
+        (args.output / "build-summary.json").write_text(json.dumps(summaries, indent=2) + "\n")
+    built["all"] = build_all(args.output, sorted(TASKS), args.pretty_rows)
     if args.upload:
         api = HfApi()
         api.create_repo(args.repo_id, repo_type="dataset", exist_ok=True)

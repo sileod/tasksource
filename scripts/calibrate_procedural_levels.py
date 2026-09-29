@@ -3,7 +3,10 @@
 Generates ``--per-level`` fresh states per level (seeded by ``calibrate:task:level:i``,
 never a published row), asks Jev through scripts/audit_jev_tasks.py, and prints
 kappa = (accuracy - chance) / (1 - chance) per task x level and per question.
-Level 0 should be easy-ish for Jev and level 4 tough.
+Level 0 should be easy-ish for Jev and level 4 tough. ``--model`` asks another model on the
+same decisions endpoint instead, so levels are not tuned to Jev alone; ``--kinds`` restricts
+the questions asked (e.g. ``noul`` for models that only take yes/no). Kappa is a Bernoulli mean,
+so a few states per level are enough for a rough read.
 
     PYTHONPATH=.:src python scripts/calibrate_procedural_levels.py --tasks needle_retrieval --budget-usd 0.2
 """
@@ -20,7 +23,7 @@ import pandas as pd
 from tasksource.jev.procedural import SOURCE_PREFIX, TASKS, jev_rows
 
 
-def write_shards(tasks, per_level, levels, out):
+def write_shards(tasks, per_level, levels, out, kinds=None):
     shards = out / "shards"
     shards.mkdir(parents=True, exist_ok=True)
     level_of, graded = {}, {}
@@ -33,6 +36,8 @@ def write_shards(tasks, per_level, levels, out):
                 example = {"state": state, "questions": json.dumps(problem.questions),
                            "answers": json.dumps(problem.answers)}
                 for row in jev_rows(example, SOURCE_PREFIX + task, "validation", f"{level}-{i}"):
+                    if kinds and row["kind"] not in kinds:
+                        continue
                     level_of[row["id"]] = level
                     if row["kind"] == "noul" and row["target"][0] not in (0.0, 1.0):
                         graded[row["id"]] = row["target"][0]
@@ -72,12 +77,18 @@ def main():
     parser.add_argument("--tasks", nargs="*", default=sorted(TASKS))
     parser.add_argument("--levels", type=int, nargs="*", default=[0, 1, 2, 3, 4])
     parser.add_argument("--per-level", type=int, default=20)
-    parser.add_argument("--out", type=Path, default=Path("build/procedural-level-calibration"))
+    parser.add_argument("--model", default="~typesafe/jev-latest", help="any model of the OpenRouter decisions API")
+    parser.add_argument("--kinds", nargs="*", help="only these question kinds (choice, noul, score)")
+    parser.add_argument("--out", type=Path, help="default: build/procedural-level-calibration[-<model>]")
     parser.add_argument("--budget-usd", type=float, default=0.5, help="cumulative over --out's cache")
     args = parser.parse_args()
-    shards, level_of, graded = write_shards(args.tasks, args.per_level, args.levels, args.out)
+    if args.out is None:
+        suffix = "" if args.model == "~typesafe/jev-latest" else "-" + args.model.replace("/", "-")
+        args.out = Path(f"build/procedural-level-calibration{suffix}")
+    shards, level_of, graded = write_shards(args.tasks, args.per_level, args.levels, args.out,
+                                            kinds=args.kinds)
     subprocess.run([sys.executable, str(Path(__file__).with_name("audit_jev_tasks.py")), "--shards", str(shards),
-                    "--out", str(args.out), "--per-task", "100000", "--skip-adjudication",
+                    "--out", str(args.out), "--per-task", "100000", "--skip-adjudication", "--jev-model", args.model,
                     "--budget-usd", str(args.budget_usd), "--tasks", *[SOURCE_PREFIX + t for t in args.tasks]],
                    check=True)
     report(args.out, level_of, graded)
