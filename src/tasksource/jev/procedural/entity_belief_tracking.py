@@ -6,14 +6,13 @@ AGENTS = ["alice", "bob", "carol"]
 LOCATIONS = ["desk", "locker", "archive", "lab"]
 MORE_LOCATIONS = LOCATIONS + ["shelf", "drawer", "cabinet", "garage", "attic", "basement", "kitchen", "office",
                               "mailroom", "vault", "studio", "workshop"]
-LONG_LIST_SHARE = 0.3
 
 
 def generate(rng, level=0):
     n_events = sround(5 + 1.4 * level, rng)
     n_objects = sround(2 + 0.35 * level, rng)
     objects = [f"item_{i+1}" for i in range(max(1, n_objects))]
-    locations = rng.sample(MORE_LOCATIONS, rng.randint(8, len(MORE_LOCATIONS))) if rng.random() < LONG_LIST_SHARE else LOCATIONS
+    locations = rng.sample(MORE_LOCATIONS, rng.randint(len(LOCATIONS), len(MORE_LOCATIONS)))
     world = {obj: rng.choice(locations) for obj in objects}
     beliefs = {agent: dict(world) for agent in AGENTS}
     initial = dict(world)

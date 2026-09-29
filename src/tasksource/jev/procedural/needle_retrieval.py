@@ -3,7 +3,6 @@
 from ._common import CITIES, STYLES, Problem, choice_answer, noul_answer, phrase, render_records, sround
 
 SIZES = [8, 20, 50, 120, 250]
-LONG_LIST_SHARE = 0.3
 DOMAINS = [("locker", "city"), ("shipment", "destination"), ("badge", "office"), ("account", "branch")]
 
 
@@ -35,7 +34,7 @@ def generate(rng, level=0):
 
     others = list(dict.fromkeys(r[field] for r in near if r[field] != gold[field]))
     others += [c for c in rng.sample(CITIES, len(CITIES)) if c != gold[field] and c not in others]
-    n_options = rng.randint(10, len(CITIES)) if rng.random() < LONG_LIST_SHARE else 6  # a long-list tail
+    n_options = rng.randint(6, len(CITIES))  # varied option counts, 6 to 20
     options = sorted([gold[field], *others[:n_options - 1]], key=lambda _: rng.random())
 
     proposed = gold[field] if rng.random() < 0.5 else others[0]

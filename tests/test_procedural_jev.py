@@ -247,14 +247,14 @@ class ProceduralJevTest(unittest.TestCase):
             first_hit.append(next(n for n, r in d["rules"].items() if _holds(r[0], d["ticket"])) == meets[0])
         self.assertLess(sum(first_hit) / 300, 0.5)
 
-    def test_long_option_lists_occur(self):
-        counts = Counter()
-        for task, qid in (("needle_retrieval", "value_of_id"), ("table_lookup", "find_person"),
-                          ("entity_belief_tracking", "world_location"), ("taxonomy_routing", "route")):
-            sizes = [len(p.questions[qid]["criteria"]) for p in self.samples(task, 300)]
-            counts[task] = sum(size >= 8 for size in sizes) / len(sizes)
-        self.assertTrue(all(share > 0.15 for share in counts.values()), counts)
-        self.assertGreater(counts["taxonomy_routing"], 0.9)
+    def test_option_counts_vary(self):
+        for task, qid, low, high in (("needle_retrieval", "value_of_id", 6, 20), ("table_lookup", "find_person", 5, 30),
+                                     ("entity_belief_tracking", "world_location", 4, 16),
+                                     ("taxonomy_routing", "route", 4, 50)):
+            sizes = Counter(len(p.questions[qid]["criteria"]) for p in self.samples(task, 300))
+            self.assertLessEqual(min(sizes), low, task)
+            self.assertGreaterEqual(max(sizes), high, task)
+            self.assertLess(max(sizes.values()) / 300, 0.35, (task, sizes))  # no single count dominates
 
     def test_arithmetic_gold_follows_state(self):
         def value(answer):
