@@ -1,4 +1,8 @@
-"""Filter one table by two conditions, join it with a second, and compare years."""
+"""Filter one table by two conditions, join it with a second, and compare years.
+
+From level 2 the person is identified through their manager (a join), and from
+level 3 also by start year, with same-team, same-city colleagues who started later.
+"""
 
 import json
 
@@ -18,8 +22,17 @@ def generate(rng, level=0):
     teams = [{"team": team, "manager": manager} for team, manager in zip(TEAMS, managers)]
 
     person = rng.choice(people)
-    for other in people:  # make the (team, city) pair unique to the chosen person
-        if other is not person and (other["team"], other["city"]) == (person["team"], person["city"]):
+    by_year = level >= 3
+    cut = min(person["start_year"] + rng.randint(1, 3), 2025) if by_year else None
+    peers = [p for p in people if p is not person and (p["team"], p["city"]) == (person["team"], person["city"])]
+    if by_year:  # colleagues sharing team and city started too late to match
+        for other in rng.sample([p for p in people if p is not person], min(2, len(people) - 1)):
+            other.update(team=person["team"], city=person["city"])
+        for other in people:
+            if other is not person and (other["team"], other["city"]) == (person["team"], person["city"]):
+                other["start_year"] = rng.randint(cut, cut + 4)
+    else:  # make the (team, city) pair unique to the chosen person
+        for other in peers:
             other["city"] = rng.choice([c for c in cities if c != person["city"]])
     near = [p["name"] for p in people if p is not person and (p["team"] == person["team"] or p["city"] == person["city"])]
     rest = [p["name"] for p in people if p is not person and p["name"] not in near]
@@ -35,6 +48,7 @@ def generate(rng, level=0):
         if matches < len(COUNTS):
             break
     listed = rng.sample(managers, len(managers))
+    team_manager = {t["team"]: t["manager"] for t in teams}[person["team"]]
 
     style = rng.choice(["json", "table", "csv"])
     if style == "json":
@@ -43,8 +57,9 @@ def generate(rng, level=0):
         state = f"people:\n{render_records(people, style)}\n\nteams:\n{render_records(teams, style)}"
     questions = {
         "find_person": {"type": "choice", "criteria": {o: o for o in options}, "instructions": phrase(rng, [
-            "Who is on the {t} team and based in {c}?", "Which person works in {c} on the {t} team?"],
-            t=person["team"], c=person["city"])},
+            "Who is on {t} and based in {c}{y}?", "Which person works in {c} on {t}{y}?"],
+            t=f"the team managed by {team_manager}" if level >= 2 else f"the {person['team']} team",
+            c=person["city"], y=f" and started before {cut}" if by_year else "")},
         "manager_of": {"type": "choice", "criteria": {m: m for m in listed}, "instructions": phrase(rng, [
             "Who manages the team that {p} belongs to?", "Who is the manager of {p}'s team?"], p=subject["name"])},
         "started_before": {"type": "noul", "instructions": phrase(rng, [
@@ -60,5 +75,5 @@ def generate(rng, level=0):
         "count_matching": score_answer(matches, COUNTS),
     }
     data = {"people": people, "teams": teams, "person": person["name"], "subject": subject["name"],
-            "year": year, "city": city, "since": since}
+            "year": year, "city": city, "since": since, "cut": cut}
     return Problem(state, questions, answers, data)

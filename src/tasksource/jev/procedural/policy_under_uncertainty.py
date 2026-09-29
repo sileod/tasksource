@@ -14,6 +14,8 @@ from .policy_applicability import ACTIONS, ROLES, SENSITIVITY, TEAMS, _matches
 RELIABILITY = [Fraction(2, 3), Fraction(3, 4), Fraction(4, 5), Fraction(9, 10)]
 SOURCES = ["intake form", "directory lookup", "manager's note", "badge log"]
 NONE = "none (default deny)"
+N_POLICIES = [2, 3, 4, 6, 8]
+N_REPORTS = [1, 1, 2, 3, 4]
 PLURAL = {"analyst": "analysts", "engineer": "engineers", "manager": "managers"}
 
 
@@ -61,7 +63,7 @@ def _policy(rng, i, n_policies):
         "teams": sorted(rng.sample(TEAMS, rng.randint(1, len(TEAMS))), key=TEAMS.index),
         "min_clearance": rng.randrange(3),
         "actions": sorted(rng.sample(ACTIONS, rng.randint(1, len(ACTIONS))), key=ACTIONS.index),
-        "max_sensitivity": rng.randrange(len(SENSITIVITY)),
+        "max_sensitivity": rng.choice(SENSITIVITY),
     }
 
 
@@ -71,8 +73,8 @@ def _effect(policies, request, subject, role):
 
 
 def generate(rng, level=0):
-    n_policies = max(2, sround(3 + 0.6 * level, rng))
-    n_reports = max(1, sround(1 + 0.5 * level, rng))
+    n_policies = max(2, sround(N_POLICIES[level] * rng.uniform(0.8, 1.2), rng))
+    n_reports = N_REPORTS[level]
     roles = sorted(rng.sample(ROLES, 2 if rng.random() < 0.6 - 0.1 * level else 3), key=ROLES.index)
     history = {role: rng.randint(2, 30) for role in roles}
     prior = {role: Fraction(count, sum(history.values())) for role, count in history.items()}
@@ -114,7 +116,9 @@ def generate(rng, level=0):
         },
         "policies": policies,
         "semantics": (
-            "A policy matches when all listed constraints match. Apply the highest-priority matching policy; "
+            "A policy matches when all listed constraints match; max_sensitivity is the most sensitive resource "
+            "allowed, in the order public < internal < restricted. Apply the matching policy with the highest "
+            "priority, where a larger priority number wins; "
             "deny if none match. The requester's role is one of the roles in the history, in proportion to "
             "the history counts before the reports are considered. Each report is independent: it names the "
             "true role as often as its reliability says, and otherwise names one of the other possible roles, "

@@ -20,7 +20,9 @@ def _intent(state):
     if any(state["billing"].values()):
         return "billing"
     account, telemetry = state["account"], state["telemetry"]
-    if account["active"] and (account["auth_failures"] >= 2 or account["permission_mismatch"]):
+    failures = account["auth_failures"] if "auth_failures" in account else sum(
+        e["kind"] == "login" and not e["ok"] for e in state["recent_events"])
+    if account["active"] and (failures >= 2 or account["permission_mismatch"]):
         return "access"
     if telemetry["integration_failures"] >= 2 or telemetry["error_rate_percent"] >= 20:
         return "technical"
@@ -65,7 +67,7 @@ def _uncertain_policy_answers(state):
         subject = {**request["subject"], "role": role}
         matching = [p for p in state["policies"] if role in p["roles"] and subject["team"] in p["teams"]
                     and subject["clearance"] >= p["min_clearance"] and request["action"] in p["actions"]
-                    and SENSITIVITY.index(request["resource"]["sensitivity"]) <= p["max_sensitivity"]]
+                    and SENSITIVITY.index(request["resource"]["sensitivity"]) <= SENSITIVITY.index(p["max_sensitivity"])]
         top = max(matching, key=lambda p: p["priority"]) if matching else None
         key = top["id"] if top else "none (default deny)"
         governing[key] = governing.get(key, 0) + weight / total
@@ -98,11 +100,23 @@ class ProceduralJevTest(unittest.TestCase):
             b = TASKS[task].generate(random.Random(1), 2)
             self.assertEqual(a, b)
 
+    def test_generation_does_not_depend_on_the_hash_seed(self):
+        import os, subprocess, sys
+        script = ("import hashlib, json, random\nfrom tasksource.jev.procedural import TASKS\n"
+                  "for t in sorted(TASKS):\n    h = hashlib.sha1()\n    for i in range(20):\n"
+                  "        p = TASKS[t].generate(random.Random(f'x{i}'), i % 5)\n"
+                  "        h.update(json.dumps([p.state, p.questions, p.answers], sort_keys=True, default=str).encode())\n"
+                  "    print(t, h.hexdigest())")
+        outputs = [subprocess.run([sys.executable, "-c", script], capture_output=True, text=True, check=True,
+                                  env={**os.environ, "PYTHONHASHSEED": seed}).stdout for seed in ("1", "2")]
+        self.assertEqual(*outputs)
+
     def test_multi_view_gold_follows_stated_rules(self):
         for problem in self.samples("multi_view_adjudication"):
             state, answers = problem.state, problem.answers
             timeline = state["timeline"]
-            deadline = timeline["deadline_hours"]
+            deadline = timeline["deadline_hours"] if "deadline_hours" in timeline else (
+                None if timeline["due_hour"] is None else timeline["due_hour"] - timeline["now_hour"])
             urgent = timeline["executive_escalation"] or (deadline is not None and deadline <= 24)
             self.assertEqual(answers["intent"]["choice"], _intent(state))
             self.assertEqual(bool(answers["is_urgent"]["noul"]), urgent)
@@ -111,9 +125,13 @@ class ProceduralJevTest(unittest.TestCase):
     def test_state_perturbation_gold_follows_risk_rule(self):
         for problem in self.samples("state_perturbation"):
             rule = problem.state["risk_rule"]
-            delta = _risk(problem.state["after"], rule) - _risk(problem.state["before"], rule)
+            delta = sum(_risk(r, rule) for r in problem.state["after"]) - sum(_risk(r, rule) for r in problem.state["before"])
             expected = 0 if delta < 0 else 2 if delta > 0 else 1
             self.assertEqual(problem.answers["risk_direction"]["score"], expected)
+            before, after = ({r["id"]: r for r in problem.state[k]}[problem.data["probe"]] for k in ("before", "after"))
+            fields = {"authorized": "authorization", "status": "status", "amount": "financial", "owner": "ownership"}
+            changed = [fields[f] for f in fields if before[f] != after[f]] or ["none"]
+            self.assertEqual(changed, [problem.answers["changed_dimension"]["choice"]])
 
     def test_strongest_support_origin_is_not_constant(self):
         answers = {p.answers["strongest_support_origin"]["choice"]
@@ -179,8 +197,12 @@ class ProceduralJevTest(unittest.TestCase):
         for problem in self.samples("needle_retrieval", 300):
             d, a = problem.data, problem.answers
             value = {r["id"]: r[d["field"]] for r in d["records"]}
-            self.assertEqual(a["value_of_id"]["choice"], value[d["key"]])
-            self.assertEqual(a["id_has_value"]["noul"], float(value[d["key"]] == d["proposed"]))
+            key = d["key"]
+            while key in d["reissued"]:
+                key = d["reissued"][key]
+            self.assertEqual(a["value_of_id"]["choice"], value[key])
+            self.assertEqual(a["id_has_value"]["noul"], float(value[key] == d["proposed"]))
+            self.assertFalse(set(d["reissued"]) & set(value))  # reissued ids are never listed
             self.assertEqual(a["id_listed"]["noul"], float(d["probe"] in value))
             for record in d["records"]:  # every rendering keeps every record
                 self.assertIn(record["id"], problem.state)
@@ -190,6 +212,9 @@ class ProceduralJevTest(unittest.TestCase):
             d, a = problem.data, problem.answers
             members = [i for i in d["items"] if i["category"] == d["category"]]
             self.assertEqual(a["count_in_category"]["score"], min(len(members), 9))
+            if "count_filtered" in a:
+                hits = [i for i in members if i["quantity"] >= d["cut"] and (i["in_stock"] or not d["stock"])]
+                self.assertEqual(a["count_filtered"]["score"], min(len(hits), 9))
             self.assertEqual(a["any_out_of_stock"]["noul"], float(any(not i["in_stock"] for i in members)))
             self.assertEqual(a["total_above"]["noul"],
                              float(sum(i["quantity"] for i in members) > d["threshold"]))
@@ -225,7 +250,8 @@ class ProceduralJevTest(unittest.TestCase):
             people = {p["name"]: p for p in d["people"]}
             target = people[d["person"]]
             matching = [p["name"] for p in d["people"]
-                        if (p["team"], p["city"]) == (target["team"], target["city"])]
+                        if (p["team"], p["city"]) == (target["team"], target["city"])
+                        and (d["cut"] is None or p["start_year"] < d["cut"])]
             self.assertEqual(matching, [a["find_person"]["choice"]])
             managers = {t["team"]: t["manager"] for t in d["teams"]}
             subject = people[d["subject"]]
@@ -233,6 +259,51 @@ class ProceduralJevTest(unittest.TestCase):
             self.assertEqual(a["started_before"]["noul"], float(subject["start_year"] < d["year"]))
             self.assertEqual(a["count_matching"]["score"], sum(
                 p["city"] == d["city"] and p["start_year"] >= d["since"] for p in d["people"]))
+
+    def test_entity_beliefs_replay_events(self):
+        nested_differs = 0
+        for problem in self.samples("entity_belief_tracking", 300):
+            d, a = problem.data, problem.answers
+            obj, agent, other = d["object"], d["agent"], d["other"]
+            world = believed = thinks = d["initial"][obj]
+            for event in (e for e in d["events"] if e["object"] == obj):
+                world = event["destination"]
+                if agent in event["witnesses"]:
+                    believed = world
+                    if other in event["witnesses"]:
+                        thinks = world
+            self.assertEqual(a["world_location"]["choice"], world)
+            self.assertEqual(a["agent_belief_location"]["choice"], believed)
+            if "nested_belief_location" in a:
+                self.assertEqual(a["nested_belief_location"]["choice"], thinks)
+                nested_differs += thinks != believed
+        self.assertGreater(nested_differs, 20)  # the second-order question is not the first-order one
+
+    def test_event_log_replay(self):
+        voids = 0
+        for problem in self.samples("event_state_reconstruction", 300):
+            state, answers = problem.state, problem.answers
+            voided = {e["voids_ts"] for e in state["events"] if e["kind"] == "void"}
+            voids += bool(voided)
+            current = dict(state["initial_state"])
+            for event in sorted(state["events"], key=lambda e: e["ts"]):
+                if event["ts"] in voided:
+                    continue
+                current.update({"assign": {"owner": event.get("owner")}, "severity": {"severity": event.get("severity")},
+                                "resolve": {"open": False}, "reopen": {"open": True}}.get(event["kind"], {}))
+            self.assertEqual(answers["current_owner"]["choice"], current["owner"])
+            self.assertEqual(answers["is_open"]["noul"], float(current["open"]))
+            self.assertEqual(answers["current_severity"]["score"], ["routine", "degraded", "critical"].index(current["severity"]))
+        self.assertGreater(voids, 20)
+
+    def test_pretty_order_cycles_levels_then_shuffles(self):
+        from scripts.build_procedural_jev import pretty_order
+        rows = [{"level": i % 5, "i": i} for i in range(100)]
+        rows.sort(key=lambda r: r["level"])
+        ordered = pretty_order(rows, first_rows=20)
+        self.assertEqual([r["level"] for r in ordered[:10]], [0, 1, 2, 3, 4] * 2)
+        self.assertEqual(sorted(r["i"] for r in ordered), list(range(100)))
+        self.assertNotEqual([r["level"] for r in ordered[20:]], sorted(r["level"] for r in ordered[20:]))
 
     def test_taxonomy_routing_gold_follows_rules(self):
         from tasksource.jev.procedural.taxonomy_routing import _holds, _text
@@ -334,8 +405,8 @@ class ProceduralJevTest(unittest.TestCase):
     def test_rendered_tasks_vary_wording_and_build(self):
         for task in ("needle_retrieval", "record_aggregation", "table_lookup"):
             problems = self.samples(task, 100)
-            for qid in problems[0].questions:
-                wordings = {tuple(p.questions[qid]["instructions"].split()[:2]) for p in problems}
+            for qid in {q for p in problems for q in p.questions}:  # some questions are asked from a level on
+                wordings = {tuple(p.questions[qid]["instructions"].split()[:2]) for p in problems if qid in p.questions}
                 self.assertGreater(len(wordings), 1, (task, qid))
             dataset = build_task(task, {"train": 300, "validation": 30, "test": 30}, [0, 1, 2])
             self.assertIsInstance(dataset["test"][0]["state"], str)
