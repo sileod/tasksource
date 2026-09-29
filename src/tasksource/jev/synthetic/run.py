@@ -179,9 +179,16 @@ def stage_teacher_audit(cfg, run_dir: Path) -> list[dict]:
 
     passing = [bundle for bundle in audited
                if bundle.get("teacher_audit", {}).get("pass", True)]
+    audit_questions = [row for bundle in audited
+                       for row in bundle.get("teacher_audit", {}).get("questions", [])]
+    answered = [row for row in audit_questions if row.get("agrees") is not None]
     report = {
         "enabled": cfg.teacher_audit.enabled,
         "states": len(audited),
+        "questions": len(audit_questions),
+        "answered_questions": len(answered),
+        "disagreements": sum(row.get("agrees") is False for row in answered),
+        "auditor_issue_questions": sum(bool(row.get("issues")) for row in audit_questions),
         "complete": sum(bool(b.get("teacher_audit", {}).get("complete", False))
                         for b in audited),
         "passing": len(passing),
@@ -208,11 +215,13 @@ def stage_teacher_audit(cfg, run_dir: Path) -> list[dict]:
 
 
 def stage_select(cfg, run_dir: Path, n_target: int | None = None) -> list[dict]:
-    if (cfg.teacher_audit.enabled and cfg.teacher_audit.drop_confident_disagreements
-            and (run_dir / "audit_passed.jsonl").exists()):
-        source = run_dir / "audit_passed.jsonl"
-    elif (run_dir / "audited.jsonl").exists():
-        source = run_dir / "audited.jsonl"
+    if cfg.teacher_audit.enabled:
+        source = (run_dir / "audit_passed.jsonl" if
+                  cfg.teacher_audit.drop_confident_disagreements else
+                  run_dir / "audited.jsonl")
+        if not source.exists():
+            raise FileNotFoundError(
+                f"Teacher audit artifact {source} is missing; run the teacher_audit stage")
     else:
         source = run_dir / "annotated.jsonl"
     annotated = _read_bundles(source)

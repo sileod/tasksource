@@ -11,6 +11,7 @@ from tasksource.jev.synthetic import annotate as annot_mod
 from tasksource.jev.synthetic import critic as critic_mod
 from tasksource.jev.synthetic import dedup as dedup_mod
 from tasksource.jev.synthetic import providers
+from tasksource.jev.synthetic import run as run_mod
 from tasksource.jev.synthetic import select as select_mod
 from tasksource.jev.synthetic import specs as specs_mod
 from tasksource.jev.synthetic import split as split_mod
@@ -228,6 +229,31 @@ class CriticTest(unittest.TestCase):
 
 
 class TeacherAuditTest(unittest.TestCase):
+    def test_selection_requires_current_audit_artifact(self):
+        cfg = _cfg()
+        cfg.teacher_audit.enabled = True
+        with tempfile.TemporaryDirectory() as tmp:
+            run_dir = Path(tmp)
+            (run_dir / "annotated.jsonl").write_text("", encoding="utf-8")
+            with self.assertRaises(FileNotFoundError):
+                run_mod.stage_select(cfg, run_dir)
+
+    def test_invalid_auditor_answer_does_not_pass(self):
+        from tasksource.jev.synthetic.config import TeacherAuditConfig
+        bundle = {
+            "state_id": "s", "state": "A compact test state.",
+            "questions": [{"question_id": "q0", "format": "choice",
+                           "question": "Which?", "options": ["a", "b"]}],
+            "annotations": [{"probabilities": [0.9, 0.1]}],
+        }
+        audit = teacher_audit_mod.compare_with_teacher(
+            bundle, [{"question_id": "q0", "answer": "not an option",
+                      "confidence": 0.99, "issues": []}],
+            TeacherAuditConfig(enabled=True))
+        self.assertFalse(audit["complete"])
+        self.assertFalse(audit["pass"])
+        self.assertIsNone(audit["questions"][0]["agrees"])
+
     def test_confident_teacher_disagreement_is_flagged(self):
         from tasksource.jev.synthetic.config import TeacherAuditConfig
         bundle = {
@@ -552,7 +578,7 @@ class ConfigTest(unittest.TestCase):
         self.assertEqual(cfg.annotator.name, "jev")
         self.assertTrue(cfg.teacher_audit.enabled)
         self.assertEqual(cfg.provider.name, "albert")
-        self.assertEqual(cfg.teacher_audit_provider().name, "openai")
+        self.assertEqual(cfg.teacher_audit_provider().name, "openrouter")
         self.assertNotEqual(cfg.teacher_audit_provider().name, cfg.provider.name)
         self.assertAlmostEqual(cfg.selection.unfiltered_fraction, 0.20)
 

@@ -17,6 +17,7 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import json
+import math
 from pathlib import Path
 
 from . import providers
@@ -68,6 +69,8 @@ def _parse_independent_answers(raw: dict, bundle: dict) -> list[dict]:
         try:
             confidence = float(item.get("confidence", 0.0))
         except (TypeError, ValueError):
+            confidence = 0.0
+        if not math.isfinite(confidence):
             confidence = 0.0
         parsed.append({
             "question_id": item["question_id"],
@@ -137,7 +140,9 @@ def compare_with_teacher(bundle: dict, independent_answers: list[dict], audit_cf
         teacher_answer, teacher_confidence = _teacher_answer(question, annotation)
         auditor_answer = _normalize_auditor_answer(question, independent.get("answer"))
         auditor_confidence = float(independent.get("confidence", 0.0))
-        agrees = auditor_answer is not None and auditor_answer == teacher_answer
+        if auditor_answer is None:
+            complete = False
+        agrees = None if auditor_answer is None else auditor_answer == teacher_answer
         confident_disagreement = (
             auditor_answer is not None
             and not agrees

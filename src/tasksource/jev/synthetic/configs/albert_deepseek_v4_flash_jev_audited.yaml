@@ -1,4 +1,4 @@
-# DeepSeek generation + independent OpenAI teacher audit + pinned Jev targets.
+# DeepSeek generation + independent OpenAI-model teacher audit + pinned Jev targets.
 # This is intentionally more expensive than the overnight baseline. The auditor
 # never sees Jev's probabilities; it independently answers each question and only
 # flags high-confidence disagreements.
@@ -50,11 +50,11 @@ annotator:
 teacher_audit:
   enabled: true
   provider:
-    name: openai
-    api_key_env: OPENAI_API_KEY
-    base_url: https://api.openai.com/v1
-    model: gpt-6-luna
-  model: gpt-6-luna
+    name: openrouter
+    api_key_env: OPENROUTER_API_KEY
+    base_url: https://openrouter.ai/api/v1
+    model: openai/gpt-4.1-mini
+  model: openai/gpt-4.1-mini
   prompt_version: teacher_audit_v1
   temperature: 0.0
   requests_per_minute: 40
