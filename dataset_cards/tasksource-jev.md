@@ -52,8 +52,9 @@ size_categories:
 - **Multi-question states.** Related decisions share a `group_id` and can be
   asked together. Packed states test reasoning over several items at once, and
   [procedural-typed-decisions](https://huggingface.co/datasets/tasksource/procedural-typed-decisions)
-  adds exact counting, arithmetic, retrieval, state tracking, and exact
-  posteriors when a policy applies to a requester whose role is uncertain.
+  adds exact counting, arithmetic, retrieval, state tracking, routing among
+  up to 60 options, and exact posteriors when a policy applies to a requester
+  whose role is uncertain.
 
 ## Quick start
 

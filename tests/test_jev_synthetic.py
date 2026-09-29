@@ -109,6 +109,16 @@ class SamplerTest(unittest.TestCase):
         self.assertEqual({spec["domain"] for spec in specs}, set(specs_mod.DOMAINS))
         self.assertEqual({spec["difficulty"] for spec in specs}, set(specs_mod.DIFFICULTIES))
         self.assertEqual({spec["ambiguity"] for spec in specs}, set(specs_mod.AMBIGUITY_LEVELS))
+        general = set().union(*specs_mod.GENERAL_TEXT_SKILLS_BY_FORMAT.values())
+        general_rows = [(spec["domain"], q["skill"], q["format"])
+                        for spec in specs for q in spec["questions"]
+                        if q["skill"] in general]
+        self.assertTrue(0.08 < len(general_rows) / sum(formats.values()) < 0.16)
+        self.assertEqual({skill for _, skill, _ in general_rows}, general)
+        self.assertTrue(all(fmt in {"choice", "noul"} for _, _, fmt in general_rows))
+        for skill in general:
+            self.assertGreaterEqual(len({domain for domain, sampled, _ in general_rows
+                                         if sampled == skill}), 15)
 
 
 class BundleTest(unittest.TestCase):

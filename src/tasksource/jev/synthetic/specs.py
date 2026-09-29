@@ -46,7 +46,20 @@ SKILLS = [
     "owner_assignment", "refund_approval", "access_justification",
     "data_sensitivity", "compliance_risk", "customer_effort",
     "resolution_confidence", "contradiction",
+    "topic_classification", "emotion_recognition", "communicative_intent",
+    "claim_support", "stance_detection", "document_purpose", "entity_type",
+    "fact_retrieval",
 ]
+
+# These enter the same domain sampler as every other skill. They are not a
+# separate task family or tied to a fixed benchmark label set.
+GENERAL_TEXT_SKILLS_BY_FORMAT = {
+    "choice": ["topic_classification", "emotion_recognition",
+               "communicative_intent", "claim_support", "stance_detection",
+               "document_purpose", "entity_type", "fact_retrieval"],
+    "noul": ["claim_support"],
+    "score": [],
+}
 
 # Skill groups keep the latent task space broad; each domain draws from
 # two or three groups (compatibility without a Cartesian product).
@@ -224,9 +237,12 @@ def sample_formats(rng: random.Random, n: int, format_weights: dict,
 
 def sample_question_spec(rng: random.Random, fmt: str, skill: str) -> dict:
     if fmt == "choice":
-        n_options = rng.choices(
-            [2, 3, 4, 5, 6, 7, 8],
-            weights=[0.08, 0.22, 0.28, 0.22, 0.12, 0.05, 0.03], k=1)[0]
+        if skill in GENERAL_TEXT_SKILLS_BY_FORMAT["choice"]:
+            n_options = rng.choice([3, 4, 5, 6])
+        else:
+            n_options = rng.choices(
+                [2, 3, 4, 5, 6, 7, 8],
+                weights=[0.08, 0.22, 0.28, 0.22, 0.12, 0.05, 0.03], k=1)[0]
         return {"format": "choice", "skill": skill, "n_options": n_options}
     if fmt == "noul":
         return {"format": "noul", "skill": skill,
@@ -244,6 +260,22 @@ def sample_question_spec(rng: random.Random, fmt: str, skill: str) -> dict:
             "criteria": rubric}
 
 
+def sample_skills(rng: random.Random, pool: list[str], formats: list[str],
+                  general_weight: float) -> list[str]:
+    if not general_weight:
+        return (rng.sample(pool, len(formats)) if len(formats) <= len(pool)
+                else [rng.choice(pool) for _ in formats])
+    picked = []
+    for fmt in formats:
+        base = [skill for skill in pool if skill not in picked]
+        general = [skill for skill in GENERAL_TEXT_SKILLS_BY_FORMAT[fmt]
+                   if skill not in picked]
+        choices = base + general
+        weights = [1.0] * len(base) + [general_weight] * len(general)
+        picked.append(rng.choices(choices, weights=weights, k=1)[0])
+    return picked
+
+
 def sample_spec(index: int, rng: random.Random, sampler_cfg) -> dict:
     domain = rng.choice(DOMAINS)
     n = sample_n_questions(rng, sampler_cfg.questions_per_state)
@@ -252,8 +284,8 @@ def sample_spec(index: int, rng: random.Random, sampler_cfg) -> dict:
                              sampler_cfg.probability_all_formats_if_n_ge_3)
     # Distinct skills per state so questions test distinct aspects.
     pool = domain_skills(domain)
-    skills = (rng.sample(pool, n) if n <= len(pool)
-              else [rng.choice(pool) for _ in range(n)])
+    skills = sample_skills(rng, pool, formats,
+                           sampler_cfg.general_text_skill_weight)
     return {
         "state_id": f"state_{index:06d}",
         "domain": domain,
