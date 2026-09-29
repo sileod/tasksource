@@ -7,6 +7,7 @@ from ._common import CITIES, PEOPLE, Problem, choice_answer, noul_answer, phrase
 SIZES = [6, 10, 16, 24, 36]
 TEAMS = ["billing", "search", "mobile", "security", "data", "support"]
 COUNTS = [str(i) for i in range(13)]
+LONG_LIST_SHARE = 0.3
 
 
 def generate(rng, level=0):
@@ -23,7 +24,8 @@ def generate(rng, level=0):
             other["city"] = rng.choice([c for c in cities if c != person["city"]])
     near = [p["name"] for p in people if p is not person and (p["team"] == person["team"] or p["city"] == person["city"])]
     rest = [p["name"] for p in people if p is not person and p["name"] not in near]
-    options = sorted([person["name"], *(rng.sample(near, len(near)) + rest)[:5]], key=lambda _: rng.random())
+    n_options = rng.randint(8, 40) if rng.random() < LONG_LIST_SHARE else 6  # a long-list tail, capped by the table
+    options = sorted([person["name"], *(rng.sample(near, len(near)) + rest)[:n_options - 1]], key=lambda _: rng.random())
 
     subject = rng.choice(people)
     manager = {t["team"]: t["manager"] for t in teams}[subject["team"]]

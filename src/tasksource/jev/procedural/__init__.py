@@ -12,6 +12,7 @@ from . import (
     arithmetic, entity_belief_tracking, event_state_reconstruction, evidence_sufficiency,
     multi_view_adjudication, needle_retrieval, partial_observation_calibration,
     policy_applicability, policy_under_uncertainty, record_aggregation, state_perturbation, table_lookup,
+    taxonomy_routing,
 )
 
 TASKS = {
@@ -20,6 +21,7 @@ TASKS = {
         arithmetic, entity_belief_tracking, event_state_reconstruction, evidence_sufficiency,
         multi_view_adjudication, needle_retrieval, partial_observation_calibration,
         policy_applicability, policy_under_uncertainty, record_aggregation, state_perturbation, table_lookup,
+        taxonomy_routing,
     )
 }
 

@@ -109,6 +109,14 @@ configs:
     path: table_lookup/validation-*.parquet
   - split: test
     path: table_lookup/test-*.parquet
+- config_name: taxonomy_routing
+  data_files:
+  - split: train
+    path: taxonomy_routing/train-*.parquet
+  - split: validation
+    path: taxonomy_routing/validation-*.parquet
+  - split: test
+    path: taxonomy_routing/test-*.parquet
 ---
 
 # procedural-typed-decisions
@@ -119,7 +127,8 @@ retrieval, and aggregation configs) with **several typed questions over that sam
 Jev / System One request shape: `choice` (pick one criterion), `noul` (a
 number in [0, 1]; a probability or a yes/no), and `score` (an ordered rubric).
 Every answer is computed exactly from the state by rules that the state
-itself spells out, so the labels are noise-free.
+itself spells out, so the labels are noise-free. Several configs have long option lists
+(up to 60), to balance the binary and 4–6-option questions that dominate the rest of Jev.
 
 This is an independent dataset. It is not an official TypeSafe Jev dataset and
 is not produced by or affiliated with TypeSafe or OpenJev.
@@ -129,17 +138,18 @@ is not produced by or affiliated with TypeSafe or OpenJev.
 | config | questions |
 |---|---|
 | `arithmetic` | An order with a discount/shipping rule, an account ledger, or a schedule; each state asks 2–5 of: `amount_due` / `final_balance` / `finish_time` (choice among the result and typical slips), `within_budget`, `went_negative`, `done_by_deadline` (noul), `random_line_bulk`, `random_is_deposit`, `random_is_long` (noul, exact probability k/n), `budget_use`, `net_change` (score, descriptive levels), `lines_above`, `withdrawal_count`, `starts_before_noon` (score), `largest_line`, `lowest_day`, `longest_task` (choice) |
-| `entity_belief_tracking` | `world_location` (choice), `agent_belief_location` (choice), `belief_matches_world` (noul) |
+| `entity_belief_tracking` | `world_location` (choice), `agent_belief_location` (choice), `belief_matches_world` (noul); 4 locations, or 8–16 in about 30% of states |
 | `event_state_reconstruction` | `current_owner` (choice), `is_open` (noul), `current_severity` (score) |
 | `evidence_sufficiency` | `claim_supported` (noul), `has_conflict` (noul), `strongest_support_origin` (choice) |
 | `multi_view_adjudication` | `intent` (choice), `is_urgent` (noul), `workflow_impact` (score) |
-| `needle_retrieval` | `value_of_id` (choice), `id_has_value` (noul), `id_listed` (noul); up to ~300 records whose ids differ from the target by one or two digits |
+| `needle_retrieval` | `value_of_id` (choice), `id_has_value` (noul), `id_listed` (noul); up to ~300 records whose ids differ from the target by one or two digits; 6 options, or 10–20 in about 30% of states |
 | `partial_observation_calibration` | `incident_real` (noul, exact Bayesian posterior) |
 | `policy_applicability` | `access_allowed` (noul), `governing_policy` (choice), `review_risk` (score) |
 | `policy_under_uncertainty` | `access_allowed` (noul), `governing_policy` (choice), `requester_role` (choice); exact posteriors over a role known through history counts and reports of stated reliability |
 | `record_aggregation` | `count_in_category` (score), `largest_quantity` (choice), `any_out_of_stock` (noul), `total_above` (noul) |
 | `state_perturbation` | `material_change` (noul), `changed_dimension` (choice), `risk_direction` (score) |
-| `table_lookup` | `find_person` (choice, two-condition filter), `manager_of` (choice, join), `started_before` (noul), `count_matching` (score) |
+| `table_lookup` | `find_person` (choice, two-condition filter; 6 options, or up to 40 listed people in about 30% of states), `manager_of` (choice, join), `started_before` (noul), `count_matching` (score) |
+| `taxonomy_routing` | `route` (choice among the 8–60 categories of a routing guide drawn fresh per state; many rules share a condition with the right one), `belongs_to` (noul), `conditions_met` (score, 0–3) |
 
 ## Schema
 
