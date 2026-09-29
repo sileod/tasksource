@@ -82,7 +82,8 @@ class ProceduralJevTest(unittest.TestCase):
 
     def test_answers_are_well_typed(self):
         for task in TASKS:
-            for problem in self.samples(task, 50):
+            rng = random.Random(task)
+            for problem in (TASKS[task].generate(rng, level) for level in range(5) for _ in range(40)):
                 self.assertEqual(set(problem.questions), set(problem.answers))
                 for qid, spec in problem.questions.items():
                     answer = problem.answers[qid]
@@ -93,6 +94,7 @@ class ProceduralJevTest(unittest.TestCase):
                         self.assertTrue(0.0 <= answer["noul"] <= 1.0)
                     elif spec["type"] == "score":
                         self.assertLessEqual(len(spec["criteria"]), 10, (task, qid))  # the Jev API limit
+                        self.assertIn(answer["score"], range(len(spec["criteria"])), (task, qid))
 
     def test_generation_is_deterministic(self):
         for task in TASKS:
@@ -316,6 +318,7 @@ class ProceduralJevTest(unittest.TestCase):
             self.assertEqual(a["conditions_met"]["score"], sum(_holds(c, d["ticket"]) for c in d["rules"][d["probe"]]))
             for rule in d["rules"].values():  # every rendering keeps every rule
                 self.assertIn(" and ".join(map(_text, rule)), problem.state)
+                self.assertLess(len(rule), len(problem.questions["conditions_met"]["criteria"]))  # any rule can be probed
             # routing on a rule's first condition alone is a shortcut that must not work
             first_hit.append(next(n for n, r in d["rules"].items() if _holds(r[0], d["ticket"])) == meets[0])
         self.assertLess(sum(first_hit) / 300, 0.5)
