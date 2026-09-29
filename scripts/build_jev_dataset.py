@@ -491,6 +491,23 @@ def _ranked_family_groups(source_buckets, identifiers):
 MAX_MULTILINGUAL_SHARE = 0.2  # a ceiling on multilingual families' share of each format
 
 
+def cardinality_factor(n_options):
+    """A gentle nudge of a family's share by its typical option count (yes/no counts as 2):
+    binary stays the most common case, many-option questions get a little more room."""
+    return 0.9 if n_options <= 2 else 1.0 if n_options <= 5 else 1.1 if n_options <= 20 else 1.2
+
+
+def family_cardinality(dataset, buckets):
+    """Median option count of each family's rows (noul rows count as 2); None without an options column."""
+    if "options" not in dataset.column_names:
+        return None
+    import pyarrow.compute as pc
+    lengths = pc.list_value_length(dataset.with_format("arrow").select_columns(["options"])[:]["options"])
+    lengths = np.maximum(lengths.fill_null(0).to_numpy(zero_copy_only=False), 2)
+    return {family: float(np.median(lengths[[i for indices in configs.values() for i in indices]]))
+            for family, configs in buckets.items()}
+
+
 def diverse_cap(dataset, max_rows):
     """Cap by dataset family, sampling configs and preserving question groups."""
     if max_rows is None or len(dataset) <= max_rows:
@@ -508,6 +525,12 @@ def diverse_cap(dataset, max_rows):
         buckets.setdefault(family, {}).setdefault(source, []).append(index)
     # each family's share of the cap scales with its weight (metadata/weights.py)
     weights = {family: max(task_weight(source) for source in configs) for family, configs in buckets.items()}
+    # ... and slightly with its option count; procedural generators keep equal shares
+    cardinality = family_cardinality(dataset, buckets)
+    if cardinality:
+        weights = {family: weight * (1 if family.startswith(procedural.SOURCE_PREFIX) else
+                                     cardinality_factor(cardinality[family]))
+                   for family, weight in weights.items()}
     multilingual = sum(weight for family, weight in weights.items() if family.startswith("multilingual/"))
     english = sum(weights.values()) - multilingual
     if english and multilingual > MAX_MULTILINGUAL_SHARE * (english + multilingual):
