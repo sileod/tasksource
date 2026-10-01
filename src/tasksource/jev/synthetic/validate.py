@@ -53,6 +53,9 @@ def validate_bundle(bundle: dict, spec: dict | None = None) -> list[str]:
         if MODEL_LEAK.search(text):
             errors.append("question mentions the target model")
     for q in bundle.get("questions", []):
+        if (q.get("skill") == "topic_classification"
+                and re.search(r"\bpurpose\b", q.get("question", ""), re.IGNORECASE)):
+            errors.append(f"topic_classification {q.get('question_id')} asks for document purpose")
         if q.get("format") == "noul" and not valid_noul_question(q.get("question", "")):
             errors.append(f"noul {q.get('question_id')} must ask about one yes/no proposition")
         if (q.get("format") == "score"

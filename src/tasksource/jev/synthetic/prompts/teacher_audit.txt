@@ -8,12 +8,27 @@ BUNDLE:
 {{BUNDLE_JSON}}
 
 For every question:
-- choice: answer with the exact option string from `options`
+- choice: answer with the exact option string from `options` only if one option
+  is supported. Use JSON null and an issue if no option answers the question
+  as worded, or if two options are equally defensible. Do not pick the closest
+  bad option merely because the choices are restricted.
 - score: answer with the zero-based integer index into the ordered `options`
 - noul: answer with JSON true or false
 - confidence: number in [0, 1] representing confidence in that answer
 - issues: short list of any ambiguity, missing evidence, malformed rubric, or
   other reason the answer should not be trusted
+- quality_ok: true only when the question genuinely tests its declared skill,
+  fits the state domain, has enough evidence, and has one defensible answer
+  (or a meaningful ordered scale). Check every choice option separately.
+  A document-purpose answer must describe the whole document. An implicit
+  concern must be inferred from the person's words, not stated outright.
+  Reject two plausible social effects even if one sounds slightly stronger.
+  Toxicity concerns abusive or harmful language, not the hypothetical social
+  impact of an otherwise ordinary discussion. For stakeholder perspective,
+  if the person voices two concerns and options represent both, reject a
+  question asking for the "primary" one unless the state clearly ranks them.
+- quality_issues: short, specific reasons when quality_ok is false
 
 Output STRICT JSON only:
-{"answers": [{"question_id": "...", "answer": ..., "confidence": 0.0, "issues": []}]}
+{"answers": [{"question_id": "...", "answer": ..., "confidence": 0.0,
+              "issues": [], "quality_ok": true, "quality_issues": []}]}

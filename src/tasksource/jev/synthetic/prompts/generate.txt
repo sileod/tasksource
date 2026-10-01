@@ -8,6 +8,9 @@ answers, probabilities, or which option is correct.
 SPEC:
 {{SPEC_JSON}}
 
+SKILL DEFINITIONS:
+{{SKILL_DEFINITIONS}}
+
 Rules:
 - Generate ONE coherent state plus EXACTLY the requested number of questions, in order.
 - Every question must be answerable or meaningfully assessable from the SAME state.
@@ -30,20 +33,46 @@ Rules:
   concern. Audience inference asks whom a message addresses or is designed for,
   not who should handle a ticket; include an actual addressee or clear audience
   cue rather than a generic incident ticket. For implicit concern, use the concerned
-  person's own words; do not invent a concern for someone absent from the
+  person's own words and require an inference; do not ask for an "implicit"
+  concern that the person explicitly states. Do not invent a concern for someone absent from the
   state. Social implication asks how wording or behavior may affect people,
   not what a policy requires next. Include everyday common sense, social
   context, and conversational subtext where they fit. Mix straightforward
   reading with cases that require combining multiple cues.
   Invent varied, context-appropriate options; do not copy labels or wording
   from a named benchmark.
+  Topic classification asks what the text is about; document purpose asks why
+  the document was written. Keep those skills distinct.
+  Sentiment requires a person's expressed positive or negative evaluation; an
+  automated alert, bad metric, outage, or other unfavorable fact has no sentiment
+  unless a person reacts to it in the state. Groundedness requires a particular
+  claim or response whose support is being assessed. Access justification is
+  specifically about access to a resource, system, place, or information.
+  Toxicity asks whether language is abusive or harmful, not whether an ordinary
+  conversation could have a negative social impact. When asking for a person's
+  primary concern, make one concern clearly primary and avoid two defensible
+  options drawn from different concerns they expressed.
 - For choice questions output EXACTLY n_options options (use the requested count).
 - Make exactly ONE choice option best supported by the state. Other options may
   be plausible, but the state must contain evidence that rules them out. Avoid
   pairs of options that are both valid next steps under the stated policy.
+- Include an option that answers the question as actually worded. For a document
+  purpose question, describe what the whole document is for; a dashboard that
+  monitors performance is not primarily a record of a conversation shown on it.
+- Treat SKILL DEFINITIONS as the exact label contract. Match every question to
+  its requested skill and the state's domain. Before output, infer the skill
+  tested by the actual wording and rewrite the question if it differs from the
+  requested label. For example,
+  a fraud-likelihood question must concern possible deception, not whether a
+  contract will be approved; an HR recruiting state must concern recruiting.
 - Before output, solve each choice question from the state and check every
   option. The best interpretation must have clear support; alternatives should
   differ in meaning rather than be near-synonyms.
+- For social implication, make the alternatives distinct effects on people.
+  Do not offer two phrasings of the same likely reaction. For claim support,
+  make the cited evidence actually bear on the specific claim; loyalty or
+  personal background alone does not establish a priority without a stated
+  decision standard.
 - For score questions the spec gives ordered "criteria": reuse them VERBATIM,
   in order, as the "options" array, with matching "min" (first index) and
   "max" (last index). Never rename, merge, or reorder criteria. State what the

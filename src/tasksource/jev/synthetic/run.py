@@ -26,7 +26,7 @@ from . import specs as specs_mod
 from . import split as split_mod
 from . import validate as validate_mod
 from .config import load_config
-from .generate import PROMPTS_DIR, generate_bundles, generation_cache_key, prompt_hash
+from .generate import PROMPTS_DIR, generate_bundles, generation_cache_key, load_prompt, prompt_hash
 from .schemas import bundle_to_flat_rows, flat_to_training_row
 
 STAGES = ("specs", "generate", "validate", "critic", "dedup",
@@ -99,7 +99,13 @@ def stage_generate(cfg, run_dir: Path) -> list[dict]:
     for name in sorted(prompt_versions):
         prompt_file = PROMPTS_DIR / f"{name}.txt"
         if prompt_file.exists():
-            prompt_hashes[name] = prompt_hash(prompt_file.read_text(encoding="utf-8"))
+            if name == cfg.generation.prompt_version:
+                rendered_prompt = load_prompt(name)
+            elif name == cfg.critic.prompt_version:
+                rendered_prompt = critic_mod.load_critic_prompt(name)
+            else:
+                rendered_prompt = prompt_file.read_text(encoding="utf-8")
+            prompt_hashes[name] = prompt_hash(rendered_prompt)
     manifest_mod.write_manifest(
         manifest_path, manifest_mod.build_manifest(
             cfg, preflight, {"candidates": len(bundles),
@@ -172,8 +178,26 @@ def stage_annotate(cfg, run_dir: Path) -> list[dict]:
 def stage_teacher_audit(cfg, run_dir: Path) -> list[dict]:
     """Independently answer generated questions, then compare with Jev locally."""
     bundles = _read_bundles(run_dir / "annotated.jsonl")
-    audited = teacher_audit_mod.audit_bundles(
-        cfg, bundles, run_dir / "raw" / "teacher_audit")
+    audit_sample = teacher_audit_mod.select_audit_sample(
+        bundles, cfg.teacher_audit.sample_size,
+        cfg.teacher_audit.sample_seed_salt)
+    sampled = teacher_audit_mod.audit_bundles(
+        cfg, audit_sample, run_dir / "raw" / "teacher_audit")
+    sampled_by_id = {bundle["state_id"]: bundle for bundle in sampled}
+    audited = []
+    for bundle in bundles:
+        if bundle["state_id"] in sampled_by_id:
+            audited_bundle = sampled_by_id[bundle["state_id"]]
+            audited_bundle["teacher_audit"]["sampled"] = True
+            audited.append(audited_bundle)
+        else:
+            copied = dict(bundle)
+            copied["teacher_audit"] = {
+                "enabled": True, "sampled": False, "pass": True,
+                "complete": False, "confident_disagreements": 0,
+                "quality_failures": 0, "questions": [],
+            }
+            audited.append(copied)
     _write_bundles(run_dir / "audited.jsonl", audited)
     _to_frame(audited).to_parquet(run_dir / "audited.parquet", index=False)
 
@@ -185,6 +209,7 @@ def stage_teacher_audit(cfg, run_dir: Path) -> list[dict]:
     report = {
         "enabled": cfg.teacher_audit.enabled,
         "states": len(audited),
+        "sampled_states": len(sampled),
         "questions": len(audit_questions),
         "answered_questions": len(answered),
         "disagreements": sum(row.get("agrees") is False for row in answered),
@@ -195,13 +220,18 @@ def stage_teacher_audit(cfg, run_dir: Path) -> list[dict]:
         "confident_disagreements": sum(
             int(b.get("teacher_audit", {}).get("confident_disagreements", 0))
             for b in audited),
+        "quality_failures": sum(
+            int(b.get("teacher_audit", {}).get("quality_failures", 0))
+            for b in audited),
         "drop_confident_disagreements": cfg.teacher_audit.drop_confident_disagreements,
+        "drop_quality_failures": cfg.teacher_audit.drop_quality_failures,
         "provider": cfg.teacher_audit_provider().name,
         "model": cfg.teacher_audit.model,
     }
     (run_dir / "teacher_audit_report.json").write_text(
         json.dumps(report, indent=2), encoding="utf-8")
-    if cfg.teacher_audit.drop_confident_disagreements:
+    if (cfg.teacher_audit.drop_confident_disagreements
+            or cfg.teacher_audit.drop_quality_failures):
         _write_bundles(run_dir / "audit_passed.jsonl", passing)
 
     manifest_path = run_dir / "manifest.json"
@@ -211,13 +241,15 @@ def stage_teacher_audit(cfg, run_dir: Path) -> list[dict]:
         audit_config["provider"] = cfg.teacher_audit_provider().__dict__
         manifest["teacher_audit"] = {**audit_config, "report": report}
         manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
-    return passing if cfg.teacher_audit.drop_confident_disagreements else audited
+    return passing if (cfg.teacher_audit.drop_confident_disagreements
+                       or cfg.teacher_audit.drop_quality_failures) else audited
 
 
 def stage_select(cfg, run_dir: Path, n_target: int | None = None) -> list[dict]:
     if cfg.teacher_audit.enabled:
         source = (run_dir / "audit_passed.jsonl" if
-                  cfg.teacher_audit.drop_confident_disagreements else
+                  (cfg.teacher_audit.drop_confident_disagreements
+                   or cfg.teacher_audit.drop_quality_failures) else
                   run_dir / "audited.jsonl")
         if not source.exists():
             raise FileNotFoundError(
@@ -285,10 +317,12 @@ def stage_export(cfg, run_dir: Path) -> dict:
                 "selection_reason": bundle.get("selection_reason", ""),
                 "selection_bucket": bundle.get("selection_bucket", ""),
                 "teacher_audit_enabled": bool(audit.get("enabled", False)),
+                "teacher_audit_sampled": bool(audit.get("sampled", False)),
                 "teacher_audit_agrees": audit_row.get("agrees"),
                 "teacher_audit_confidence": audit_row.get("auditor_confidence"),
                 "teacher_audit_confident_disagreement": audit_row.get(
                     "confident_disagreement"),
+                "teacher_audit_quality_ok": audit_row.get("quality_ok"),
             })
     flat_frame = pd.DataFrame(flat_rows)
     flat_frame.to_parquet(run_dir / "flat.parquet", index=False)
@@ -301,11 +335,35 @@ def stage_export(cfg, run_dir: Path) -> dict:
         if len(part):
             Dataset.from_pandas(part, preserve_index=False).to_parquet(
                 hf_dir / f"flat-{split_name}.parquet")
+        bundled_part = [bundle for bundle in bundles
+                        if bundle.get("split", "train") == split_name]
+        if bundled_part:
+            _to_frame(bundled_part).to_parquet(
+                hf_dir / f"bundled-{split_name}.parquet", index=False)
+    split_entries = "\n".join(
+        f"    - split: {name}\n      path: {{config}}-{name}.parquet"
+        for name in ("train", "validation", "test", "ood"))
     (hf_dir / "README.md").write_text(
-        "# jev-synthetic-decisions\n\nConfigs: `bundled` (one row per state, "
-        "`final.parquet`) and `flat` (one row per decision, `flat.parquet`). "
-        "Flat rows retain target origin, teacher uncertainty, selection arm, and "
-        "independent teacher-audit fields.\n",
+        "---\n"
+        "configs:\n"
+        "- config_name: bundled\n"
+        "  data_files:\n"
+        + split_entries.replace("{config}", "bundled") + "\n"
+        "- config_name: flat\n"
+        "  data_files:\n"
+        + split_entries.replace("{config}", "flat") + "\n"
+        "tags:\n- synthetic\n- text-classification\n---\n\n"
+        "# Synthetic Typed Decisions\n\n"
+        "Synthetic state and typed-decision bundles generated with Albert "
+        "DeepSeek v4 Flash, quality gated by an independent critic, and labeled "
+        "with Jev 1.13 probability distributions.\n\n"
+        "## Configurations\n\n"
+        "- `bundled`: one row per state with all associated questions and targets.\n"
+        "- `flat`: one row per typed decision, ready for training.\n\n"
+        "The flat configuration retains target origin, Jev uncertainty statistics, "
+        "selection metadata, domain, skill, stable IDs, and sampled independent "
+        "teacher-audit fields. Splits include held-out domain and skill pairs in "
+        "`ood`. See the included manifest and reports for exact provenance and counts.\n",
         encoding="utf-8")
     shutil.copyfile(run_dir / "final.parquet", hf_dir / "bundled.parquet")
     shutil.copyfile(run_dir / "flat.parquet", hf_dir / "flat.parquet")
@@ -316,6 +374,11 @@ def stage_export(cfg, run_dir: Path) -> dict:
                           "final_states": len(bundles),
                           "final_decisions": len(flat_rows)}
     manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    for report_name in ("manifest.json", "teacher_audit_report.json",
+                        "selection_report.json", "split_report.json"):
+        report_path = run_dir / report_name
+        if report_path.exists():
+            shutil.copyfile(report_path, hf_dir / report_name)
     return {"states": len(bundles), "decisions": len(flat_rows)}
 
 
@@ -358,7 +421,9 @@ def main(argv: list[str] | None = None) -> None:
     run_dir = run_dir_for(cfg)
     run_dir.mkdir(parents=True, exist_ok=True)
     # Persist the exact config used.
-    shutil.copyfile(args.config, run_dir / "config.yaml")
+    config_snapshot = run_dir / "config.yaml"
+    if Path(args.config).resolve() != config_snapshot.resolve():
+        shutil.copyfile(args.config, config_snapshot)
     stages = STAGES if args.stage == "all" else (args.stage,)
     for stage in stages:
         print(f"[jev-synthetic] stage: {stage}", flush=True)

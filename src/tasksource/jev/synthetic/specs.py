@@ -48,17 +48,62 @@ SKILLS = [
     "resolution_confidence", "contradiction",
     "topic_classification", "emotion_recognition", "communicative_intent",
     "claim_support", "stance_detection", "document_purpose", "main_point",
-    "implicit_concern", "audience_inference", "argument_role",
+    "audience_inference", "argument_role",
     "stakeholder_perspective", "social_implication", "evidence_strength",
     "message_tone",
 ]
+
+# This is the semantic contract shared by the sampler, generator, and critic.
+# Keeping it beside SKILLS prevents the two model stages from silently assigning
+# different meanings to the same training label.
+SKILL_DEFINITIONS = {
+    "incident_routing": "which operational team or queue should receive an incident",
+    "needs_escalation": "whether a case should be escalated under stated conditions",
+    "severity": "how serious the impact or harm is",
+    "triage_priority": "the order or priority for handling a case",
+    "policy_violation": "whether conduct violates a policy explicitly supplied in the state",
+    "sentiment": "the positive, neutral, or negative evaluation expressed",
+    "factual_grounding": "whether a factual proposition follows from the state",
+    "action_selection": "which action should be taken next",
+    "root_cause": "the cause of an observed event or failure",
+    "sla_breach": "whether a stated service deadline or response window was breached",
+    "fraud_likelihood": "the likelihood of deception, fraud, or intentional misrepresentation",
+    "churn_risk": "the likelihood that a customer will leave, cancel, or not renew",
+    "toxicity": "whether language is abusive, hostile, hateful, insulting, or otherwise toxic",
+    "groundedness": "whether a claim or response is supported by the supplied evidence",
+    "completeness": "whether required information or steps are complete",
+    "urgency": "how soon action is required",
+    "owner_assignment": "who is responsible or accountable for handling work",
+    "refund_approval": "whether a refund should be approved under stated facts or policy",
+    "access_justification": "whether access to a resource, system, place, or information is justified or authorized",
+    "data_sensitivity": "the confidentiality or disclosure classification of data or information",
+    "compliance_risk": "risk of failing a stated compliance obligation",
+    "customer_effort": "how much work a customer must perform to resolve an issue",
+    "resolution_confidence": "confidence that an issue will be resolved or a plan will work",
+    "contradiction": "whether statements or evidence conflict",
+    "topic_classification": "what a text is mainly about",
+    "emotion_recognition": "the emotion expressed or experienced by a person",
+    "communicative_intent": "what a speaker is trying to accomplish by communicating",
+    "claim_support": "how evidence bears on a specific claim",
+    "stance_detection": "a speaker's position toward a proposal, claim, or issue",
+    "document_purpose": "why a document was written or what function it serves",
+    "main_point": "the central message or conclusion of a text",
+    "audience_inference": "who a communication is intended for",
+    "argument_role": "whether a passage is a claim, support, caveat, request, or other argument role",
+    "stakeholder_perspective": "a named stakeholder's concern or priority",
+    "social_implication": "a likely effect of wording or behavior on people or relationships",
+    "evidence_strength": "how strongly stated evidence supports a claim",
+    "message_tone": "the interpersonal tone conveyed by wording",
+}
+
+assert set(SKILL_DEFINITIONS) == set(SKILLS)
 
 # These enter the same domain sampler as every other skill. They are not a
 # separate task family or tied to a fixed benchmark label set.
 GENERAL_TEXT_SKILLS_BY_FORMAT = {
     "choice": ["topic_classification", "emotion_recognition",
                "communicative_intent", "claim_support", "stance_detection",
-               "document_purpose", "main_point", "implicit_concern",
+               "document_purpose", "main_point",
                "audience_inference", "argument_role", "stakeholder_perspective",
                "social_implication", "evidence_strength", "message_tone"],
     "noul": ["claim_support"],
@@ -138,7 +183,7 @@ DOMAIN_STYLES = {
 }
 
 # Numeric scales (the Decisions API accepts at most 10 score levels).
-SCORE_RANGES = [(0, 2), (0, 3), (0, 4), (0, 5), (1, 5), (1, 10)]
+SCORE_RANGES = [(0, 2), (0, 3), (0, 4), (1, 5)]
 
 # Named ordered rubrics (3-7 levels); numeric scales cover the rest.
 SEMANTIC_RUBRICS = [

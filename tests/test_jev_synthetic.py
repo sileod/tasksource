@@ -177,6 +177,17 @@ class BundleTest(unittest.TestCase):
         self.assertIn("state leaks sampler metadata field",
                       validate_mod.validate_bundle(bundle))
 
+    def test_topic_question_must_not_ask_for_document_purpose(self):
+        bundle = {
+            "state_id": "s", "state": "The vendor appealed its account suspension.",
+            "questions": [{"question_id": "q0", "format": "choice",
+                           "skill": "topic_classification",
+                           "question": "What is the primary purpose of the appeal?",
+                           "options": ["Contest suspension", "Request a refund"]}],
+        }
+        self.assertTrue(any("asks for document purpose" in error for error in
+                            validate_mod.validate_bundle(bundle)))
+
     def test_flat_preserves_grouping(self):
         spec = specs_mod.sample_specs(_cfg().sampler, 5)[0]
         bundle = mock_realization(spec)
@@ -249,12 +260,25 @@ class AnnotatorGatingTest(unittest.TestCase):
 class CriticTest(unittest.TestCase):
     def test_live_critic_requires_grounded_check_for_each_question(self):
         bundle = {"state": "The customer says the package arrived damaged yesterday.",
-                  "questions": [{"question_id": "q0"}, {"question_id": "q1"}]}
+                  "questions": [
+                      {"question_id": "q0", "format": "noul",
+                       "skill": "factual_grounding",
+                       "question": "Did the package arrive damaged?"},
+                      {"question_id": "q1", "format": "noul",
+                       "skill": "factual_grounding",
+                       "question": "Did the customer report the damage?"},
+                  ]}
         check = lambda qid, quote: {"question_id": qid,
                                     "evidence_quote": quote,
+                                    "inferred_skill": "factual_grounding",
+                                    "answer": True, "policy_sufficient": True,
                                     "skill_match": True, "supported": True,
                                     "unique_answer": True}
         response = {"pass": True, "issues": [], "score": 1.0,
+                    "bundle_checks": {"same_state": True,
+                                      "distinct_questions": True,
+                                      "consistent": True,
+                                      "domain_match": True},
                     "checks": [check("q0", "package arrived damaged"),
                                check("q1", "The customer says")]}
         self.assertTrue(critic_mod.checked_verdict(response, bundle)["pass"])
@@ -262,6 +286,113 @@ class CriticTest(unittest.TestCase):
         self.assertFalse(critic_mod.checked_verdict(response, bundle)["pass"])
         response["checks"] = response["checks"][:1]
         self.assertFalse(critic_mod.checked_verdict(response, bundle)["pass"])
+
+    def test_structured_checks_override_self_contradictory_issue_prose(self):
+        bundle = {"state": "The policy requires approval. Approval is absent.",
+                  "questions": [{"question_id": "q0", "format": "noul",
+                                 "skill": "policy_violation",
+                                 "question": "Was the policy violated?"}]}
+        response = {
+            "pass": False, "score": 1.0,
+            "issues": ["The question is valid. No issue found."],
+            "bundle_checks": {"same_state": True, "distinct_questions": True,
+                              "consistent": True, "domain_match": True},
+            "checks": [{"question_id": "q0", "evidence_quote": "requires approval",
+                        "inferred_skill": "policy_violation", "answer": True,
+                        "policy_sufficient": True, "skill_match": True,
+                        "supported": True, "unique_answer": True}],
+        }
+        verdict = critic_mod.checked_verdict(response, bundle)
+        self.assertTrue(verdict["pass"])
+        self.assertEqual(verdict["model_issues"], response["issues"])
+
+    def test_structured_evidence_and_answer_preserve_skill_meaning(self):
+        bundle = {
+            "state": "The engineer said CPU rose. The manager offered a future discount.",
+            "questions": [
+                {"question_id": "q0", "format": "noul", "skill": "sentiment",
+                 "question": "Did the engineer express negative sentiment?"},
+                {"question_id": "q1", "format": "choice", "skill": "refund_approval",
+                 "question": "Should the refund be approved?",
+                 "options": ["Yes, offer a future discount", "No, deny the refund"]},
+            ],
+        }
+        response = {
+            "pass": True, "issues": [], "score": 1.0,
+            "bundle_checks": {"same_state": True, "distinct_questions": True,
+                              "consistent": True, "domain_match": True},
+            "checks": [
+                {"question_id": "q0", "evidence_quote": "The engineer said CPU rose.",
+                 "inferred_skill": "sentiment", "answer": True,
+                 "policy_sufficient": True, "skill_match": True,
+                 "supported": True, "unique_answer": True},
+                {"question_id": "q1", "evidence_quote": "offered a future discount",
+                 "inferred_skill": "refund_approval", "answer": "Yes, offer a future discount",
+                 "policy_sufficient": True, "skill_match": True,
+                 "supported": True, "unique_answer": True},
+            ],
+        }
+        issues = critic_mod.checked_verdict(response, bundle)["issues"]
+        self.assertTrue(any("does not express sentiment" in issue for issue in issues))
+        self.assertTrue(any("substitutes another remedy" in issue for issue in issues))
+
+    def test_deterministic_guards_reject_observed_skill_drifts(self):
+        def issues(skill, question, state="A detailed operational report.",
+                   fmt="choice", options=None):
+            return critic_mod.deterministic_critic_issues({
+                "state": state,
+                "questions": [{"question_id": "q0", "format": fmt,
+                               "skill": skill, "question": question,
+                               "options": options or ["a", "b"]}],
+            })
+
+        self.assertTrue(issues(
+            "data_sensitivity", "What is the primary purpose of this email?"))
+        self.assertTrue(issues(
+            "toxicity", "What is the main toxicity concern in the rat study?"))
+        self.assertTrue(issues(
+            "sla_breach", "Should the student be allowed to join the club?"))
+        self.assertTrue(issues(
+            "policy_violation", "Did the crew follow proper procedure?",
+            state="The crew tagged a cracked lifeboat."))
+        self.assertTrue(issues(
+            "completeness", "Is the trailer ready to depart?", fmt="noul"))
+        self.assertTrue(issues(
+            "severity", "Rate the severity from 1 to 10.", fmt="score",
+            options=[str(i) for i in range(1, 11)]))
+        self.assertTrue(issues(
+            "policy_violation", "Rate the extent of the policy violation.",
+            state="Policy P1 prohibits sharing records. A record was shared.",
+            fmt="score", options=["0", "1", "2", "3", "4"]))
+
+    def test_deterministic_guards_accept_aligned_questions(self):
+        bundle = {
+            "state": "Policy P1 requires a reply within 24 hours. The reply took 30 hours.",
+            "questions": [
+                {"question_id": "q0", "format": "noul", "skill": "sla_breach",
+                 "question": "Was the 24-hour SLA breached?"},
+                {"question_id": "q1", "format": "choice", "skill": "data_sensitivity",
+                 "question": "How should the personal data be classified for confidentiality?",
+                 "options": ["public", "restricted"]},
+                {"question_id": "q2", "format": "choice", "skill": "toxicity",
+                 "question": "Is the language in the message abusive or hostile?",
+                 "options": ["yes", "no"]},
+            ],
+        }
+        self.assertEqual(critic_mod.deterministic_critic_issues(bundle), [])
+
+    def test_deterministic_guards_reject_policy_and_domain_label_drift(self):
+        bundle = {
+            "domain": "research",
+            "state": "A customer called about an internet bill and missing credit.",
+            "questions": [{"question_id": "q0", "format": "choice",
+                           "skill": "policy_violation",
+                           "question": "What is the main reason for the restriction?",
+                           "options": ["security", "cost"]}],
+        }
+        issues = critic_mod.deterministic_critic_issues(bundle)
+        self.assertTrue(any("declared domain research" in issue for issue in issues))
+        self.assertTrue(any("declared skill policy_violation" in issue for issue in issues))
 
     def test_critic_uses_own_provider(self):
         cfg = _cfg()
@@ -299,6 +430,37 @@ class CriticTest(unittest.TestCase):
 
 
 class TeacherAuditTest(unittest.TestCase):
+    def test_audit_sample_is_stable_and_bounded(self):
+        bundles = [{"state_id": f"s{i}"} for i in range(20)]
+        first = teacher_audit_mod.select_audit_sample(bundles, 5, "sample-test")
+        second = teacher_audit_mod.select_audit_sample(
+            list(reversed(bundles)), 5, "sample-test")
+        self.assertEqual([b["state_id"] for b in first],
+                         [b["state_id"] for b in second])
+        self.assertEqual(len(first), 5)
+        self.assertEqual(
+            teacher_audit_mod.select_audit_sample(bundles, 0, "sample-test"),
+            bundles)
+
+    def test_quality_failure_rejects_bundle_even_with_teacher_agreement(self):
+        from tasksource.jev.synthetic.config import TeacherAuditConfig
+        bundle = {
+            "state_id": "s", "state": "A monitoring dashboard shows a metric alert.",
+            "questions": [{"question_id": "q0", "format": "choice",
+                           "question": "What is its purpose?",
+                           "options": ["Record a meeting", "Monitor a metric"]}],
+            "annotations": [{"probabilities": [0.1, 0.9]}],
+        }
+        answer = {"question_id": "q0", "answer": "Monitor a metric",
+                  "confidence": 0.95, "issues": [], "quality_ok": False,
+                  "quality_issues": ["skill mismatch"]}
+        audit = teacher_audit_mod.compare_with_teacher(
+            bundle, [answer], TeacherAuditConfig(enabled=True,
+                                                 drop_quality_failures=True))
+        self.assertTrue(audit["questions"][0]["agrees"])
+        self.assertEqual(audit["quality_failures"], 1)
+        self.assertFalse(audit["pass"])
+
     def test_selection_requires_current_audit_artifact(self):
         cfg = _cfg()
         cfg.teacher_audit.enabled = True
@@ -653,14 +815,15 @@ class ConfigTest(unittest.TestCase):
         self.assertEqual(other.critic_provider().name, "albert")
 
 
-    def test_audited_config_uses_independent_teacher_auditor(self):
+    def test_audited_config_uses_sampled_albert_auditor(self):
         base = self._config_dir()
         cfg = load_config(str(base / "albert_deepseek_v4_flash_jev_audited.yaml"))
         self.assertEqual(cfg.annotator.name, "jev")
         self.assertTrue(cfg.teacher_audit.enabled)
         self.assertEqual(cfg.provider.name, "albert")
-        self.assertEqual(cfg.teacher_audit_provider().name, "openrouter")
-        self.assertNotEqual(cfg.teacher_audit_provider().name, cfg.provider.name)
+        self.assertEqual(cfg.teacher_audit_provider().name, "albert")
+        self.assertEqual(cfg.teacher_audit.sample_size, 100)
+        self.assertFalse(cfg.teacher_audit.drop_quality_failures)
         self.assertAlmostEqual(cfg.selection.unfiltered_fraction, 0.20)
 
 

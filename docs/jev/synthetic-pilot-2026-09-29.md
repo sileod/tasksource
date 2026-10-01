@@ -42,9 +42,9 @@ independent sustained quotas.
 ## Broad interpretive text understanding
 
 The audited and 4,000-state configurations add low-weight general reading skills
-through the ordinary domain sampler. The current 14 skills cover topic, emotion,
+through the ordinary domain sampler. The current 13 skills cover topic, emotion,
 communicative intent, claim support, stance, document purpose, main point,
-implicit concern, intended audience, argument role, stakeholder perspective,
+intended audience, argument role, stakeholder perspective,
 social implication, evidence strength, and message tone. They share generation,
 validation, critic, Jev annotation, and independent audit with other skills.
 Arithmetic, chronology, entity lookup, and literal retrieval are left to the
@@ -52,9 +52,9 @@ procedural segment. There are no benchmark labels or benchmark-specific paths.
 Prompt files have stable names (`generate.txt`, `critic.txt`, and
 `teacher_audit.txt`) rather than version suffixes.
 
-A deterministic 4,000-spec draw yielded 5,890 questions, including 606 general
-reading questions (10.3%). All 36 domains appeared. Each of the 14 general
-skills appeared in at least 19 domains. The overall mix still includes existing
+A deterministic 4,000-spec draw with the current 13-skill mix yields 5,886
+questions, including 577 general reading questions (9.8%). All 36 domains
+appear; each general skill appears in at least 17 domains. The overall mix still includes existing
 skills such as toxicity, sentiment, and groundedness. Difficulty levels 1–5
 remain available; the general segment intentionally contains both simple text
 classification and questions requiring several cues.
@@ -84,7 +84,7 @@ now explicitly reject those drifts. Jev/auditor agreement did not catch them.
 That current pilot took 582 seconds end to end with one Albert key and pilot
 critic/auditor limits of 120 requests per minute: about 13,900 retained states
 or 17,700 decisions per day if that rate holds. The earlier 115-state pilot
-took 481 seconds with two Albert keys: about 17,200 retained states or 22,100
+took 481 seconds with two Albert keys: about 20,700 retained states or 26,500
 decisions per day by the same extrapolation. These are short-run estimates,
 not sustained throughput guarantees; the production configs use 40 critic and
 auditor requests per minute, and quota, retries, cost, and longer-run quality
@@ -103,3 +103,42 @@ stricter DeepSeek check rejected the ambiguous negotiation question, although
 it still missed the unwarranted projection about tomorrow. This is a concrete
 remaining quality risk. A larger manual sample is needed before treating an
 unattended 4,000-state run as clean training data.
+
+## Quality gate before the long run
+
+A 54-state probe sampled four specs for every general reading skill. All 54
+generated and validated; the stricter DeepSeek critic retained 32, and Jev
+and the independent auditor processed 44 retained decisions. Manual review
+still found answerless options, a question assigned to the wrong skill, and
+ambiguous choices that both auditors accepted. The critic prompt now gives
+explicit checks for these failure modes. A later 24-state fresh probe exposed
+overlapping social-effect options and an `implicit_concern` question whose
+answer was stated directly. `implicit_concern` was removed from the production
+sampler until it can be generated reliably. The generator and critic now also
+distinguish topic from document purpose and social impact from toxicity.
+
+The audit asks for a per-question quality verdict in addition to an answer.
+For the long run it is a deterministic 100-bundle diagnostic sample using
+Albert DeepSeek. Jev through OpenRouter remains the target source for every
+retained bundle. Audited and unaudited rows are marked explicitly, and audit
+findings remain metadata rather than filtering the full dataset. This is an
+automated spot check, not proof that every exported decision is correct; the
+retained sample and eventual large run need human spot checks before training
+or publication.
+
+With those settings, the final 26-state fresh probe produced 25 validated
+states, 7 critic-approved states, and 5 independently audited states containing
+7 Jev decisions. Manual review of those five retained bundles found no clear
+skill mismatch or unsupported choice. The small sample establishes a workable
+screening path, but its high rejection rate and size limit any estimate of
+large-run yield or residual error.
+
+The 4,000-state audited run was started in tmux session
+`jev_synthetic_audited_4000_20260929`. Its run directory is
+`.synthetic_runs/deepseek_v4_flash_jev_audited/`, with `run.log` for progress
+and `exit_code` written on completion. Both Albert credential slots were
+observed in the generation records; credentials are not written to the run
+artifacts. The initial full Luna audit stopped after 854 cached responses when
+the OpenRouter key reached its limit. The run was resumed from its 2,151 cached
+Jev annotations with a 100-bundle Albert audit sample. It is a candidate data
+build, not a training or publication approval.

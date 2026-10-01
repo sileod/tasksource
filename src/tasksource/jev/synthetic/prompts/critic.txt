@@ -5,20 +5,46 @@ and `score` (an ordered scale). A bundle with one question is valid.
 BUNDLE:
 {{BUNDLE_JSON}}
 
+SKILL DEFINITIONS:
+{{SKILL_DEFINITIONS}}
+
+Infer the skill from each question's actual wording before looking at its
+declared `skill`. Use exactly one key from SKILL DEFINITIONS as
+`inferred_skill`. A plausible answer does not repair a skill mismatch.
+
 Check:
 1. All questions genuinely refer to the SAME state (no orphan/hallucinated references).
 2. Questions are not paraphrases of each other; each tests a distinct aspect/skill.
+   Within a choice question, also reject options that express the same answer
+   in different words. For example, "ethical concerns are overridden for
+   career gain" and "the deadline matters more than scientific accuracy"
+   can both describe the same social effect; neither is uniquely best.
 3. Questions are not mutually inconsistent and do not leak the answer.
 4. Requested distinct formats/skills are actually represented.
    In particular, `claim_support` must assess evidence for a specific claim;
    `audience_inference` must identify an intended audience, not ticket routing;
    `implicit_concern` must be grounded in the concerned person's own words;
+   it must require inference. If the person directly says "I am concerned
+   about health effects", asking for that as an implicit concern misses the
+   skill. `claim_support` requires a real evidentiary link; customer loyalty
+   alone does not prove a vendor should prioritize a delay unless the state
+   supplies a relevant priority standard.
    and `social_implication` must concern human response, not policy compliance.
+   Judge the actual meaning of the question, not its declared skill label. A
+   question about whether a contract will be approved is not fraud likelihood.
+   Topic classification asks what the text is about; a question asking why a
+   message was written is document purpose, even if its options make the
+   answer obvious.
+   Toxicity assesses abusive or harmful language, not a possible negative
+   social impact from a non-abusive discussion. For stakeholder perspective,
+   reject a "primary concern" question when the speaker states two concerns
+   without ranking them and options include both.
 5. Each yes/no question asks about a single proposition, and each score question
    matches the meaning of its ordered rubric. Reject mismatches such as urgency
-   with likelihood levels or a numeric scale without defined endpoints.
+   with likelihood levels or a numeric scale without both endpoint meanings
+   defined in the question. Do not infer what 0 or the maximum number means.
 6. The state belongs to its stated domain and does not mention Jev or the
-   dataset construction process.
+   dataset construction process. A sales-team VPN issue is not HR recruiting.
 7. Reject a question when the state omits the policy, deadline, current time,
    or decision standard needed to answer it. Reject specialist safety or legal
    decisions that require outside rules not supplied in the state.
@@ -26,6 +52,14 @@ Check:
    then check every option against it. Reject if none matches, if two or more
    match, or if the best option depends on an unstated interpretation. Do the
    arithmetic for numeric options rather than relying on the wording.
+   Ask whether any option answers the question's exact scope. For example, if
+   asked for a monitoring dashboard's purpose, an option about a disagreement
+   displayed on that dashboard is not the dashboard's purpose. Reject the
+   bundle if its real answer is missing, even if one offered option is closest.
+   Reject time options whose intervals overlap. For example, "immediately,
+   before a flight in 48 hours" overlaps "within the next few days, before the
+   trip." Keep decision types exact: a future discount is not a refund, and an
+   escalation is not an approval. Reject when an option swaps those concepts.
 9. Check temporal and numeric questions against the actual dates and numbers.
    Reject an event-ordering question that treats a planned deadline as an event
    that occurred, or asks for the order of events whose times are not stated.
@@ -33,19 +67,29 @@ Check:
 10. Reject reference questions with multiple plausible antecedents and relation
     questions that infer a role or relationship absent from the state, even if
     it seems plausible from tone or context.
+11. Sentiment requires an expressed evaluation or feeling. A person's causal
+    hypothesis, warning, factual description of an outage, or uncertainty about
+    a deployment does not itself express positive or negative sentiment.
 
 For EACH question, record a short EXACT quote copied from the state that
 supports its answer. Check that the question tests its declared skill and that
 one answer is uniquely supported. A quoted sentence about today's conditions
 does not establish tomorrow's conditions. A quote that merely makes one option
 plausible is insufficient when another option is also plausible.
-The skill list is extensible: judge whether each question matches its declared
-skill, not whether the skill name appears in this prompt. Keep every issue
-short and specific; do not put a reasoning transcript inside an issue string.
+Judge whether each question matches its declared skill. Keep every issue to one
+short sentence. Put only actual failures in `issues`; never explain a valid
+check there and never output a reasoning transcript.
 
 Output STRICT JSON only:
 {"pass": bool, "issues": [str], "score": float,
+ "bundle_checks": {"same_state": bool, "distinct_questions": bool,
+                   "consistent": bool, "domain_match": bool},
  "checks": [{"question_id": str, "evidence_quote": str,
-             "skill_match": bool, "supported": bool, "unique_answer": bool}]}
-Include exactly one check for every question. Set pass to false if any check
-fails. The evidence quote must be a contiguous substring of the state.
+             "inferred_skill": str, "answer": str|bool|int,
+             "policy_sufficient": bool, "skill_match": bool,
+             "supported": bool, "unique_answer": bool}]}
+Include exactly one check for every question. Set pass to false if any check or
+bundle_check fails. The evidence quote must be a contiguous substring of the state.
+For choice, `answer` is the exact option string. For noul it is a JSON boolean.
+For score it is the zero-based option index. Set `policy_sufficient` false when
+the answer depends on an unstated rule, professional standard, or threshold.

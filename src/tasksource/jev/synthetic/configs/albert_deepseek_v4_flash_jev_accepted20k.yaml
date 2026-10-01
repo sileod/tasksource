@@ -2,7 +2,7 @@
 # This is intentionally more expensive than the overnight baseline. The auditor
 # never sees Jev's probabilities; it independently answers each question and only
 # flags high-confidence disagreements.
-run_name: deepseek_v4_flash_jev_deepseek_critic_4000_v2
+run_name: deepseek_v4_flash_jev_deepseek_accepted20k_v3
 output_dir: .synthetic_runs
 
 provider:
@@ -18,11 +18,11 @@ generation:
   max_output_tokens: 4000
   seed: 42
   prompt_version: generate
-  n_states: 4000
+  n_states: 72000
 
 sampler:
   seed: 42
-  n_states: 4000
+  n_states: 72000
   questions_per_state: {'1': 0.65, '2': 0.25, '3': 0.07, '4': 0.03}
   question_formats: {choice: 0.5, noul: 0.4, score: 0.1}
   probability_mixed_formats: 0.85

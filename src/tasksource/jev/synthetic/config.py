@@ -108,13 +108,22 @@ class TeacherAuditConfig:
     prompt_version: str = "teacher_audit"
     temperature: float = 0.0
     requests_per_minute: int = 40
+    # 0 audits every retained bundle. A positive value audits a deterministic
+    # sample and leaves the remainder available with sampled=false metadata.
+    sample_size: int = 0
+    sample_seed_salt: str = "jev-synthetic-audit-sample-v1"
     min_teacher_confidence: float = 0.85
     min_auditor_confidence: float = 0.80
     # False keeps flagged examples in the released artifact and records the
     # disagreement. True makes the stage also emit/use audit_passed.jsonl.
     drop_confident_disagreements: bool = False
+    # Keep the raw audited artifact, but exclude auditor-rejected bundles from
+    # selected/exported training rows when enabled.
+    drop_quality_failures: bool = False
 
     def __post_init__(self):
+        if self.sample_size < 0:
+            raise ValueError(f"sample_size must be non-negative, got {self.sample_size}")
         for name, value in (
             ("min_teacher_confidence", self.min_teacher_confidence),
             ("min_auditor_confidence", self.min_auditor_confidence),
