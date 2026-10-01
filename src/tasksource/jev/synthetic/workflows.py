@@ -263,21 +263,33 @@ async def run(args) -> None:
     print(f"workflows: {len(workflows)}/{args.workflows}", flush=True)
 
     async def one(workflow, index):
-        item = await write_state(llm, workflow, index, args.seed)
-        if item is None:
+        try:
+            item = await write_state(llm, workflow, index, args.seed)
+            if item is None:
+                return None
+            item = await check(llm, item)
+            if args.jev:
+                item = await asyncio.to_thread(label, item, annotator, api_key, out / "cache" / "jev")
+            return item
+        except Exception as exc:  # one failed state must not stop a long run; reruns retry it
+            print(f"{workflow['workflow_id']}_s{index:03d} failed: {str(exc)[:200]}", flush=True)
             return None
-        item = await check(llm, item)
-        if args.jev:
-            item = await asyncio.to_thread(label, item, annotator, api_key, out / "cache" / "jev")
-        return item
 
-    items = [i for i in await asyncio.gather(*[one(w, s) for w in workflows for s in range(args.states)]) if i]
-    (out / "items.jsonl").write_text("".join(json.dumps(i, ensure_ascii=False) + "\n" for i in items))
-    questions = [q for i in items for q in i["questions"]]
-    kept = [q for q in questions if q["kept"]]
-    fit = [q["check"]["fits_target"] for q in questions if q["check"].get("fits_target") is not None]
-    print(f"states: {len(items)}, questions kept {len(kept)}/{len(questions)}, "
-          f"focus readings realized {sum(fit)}/{len(fit)}", flush=True)
+    path = out / "items.jsonl"
+    done = {json.loads(line)["state_id"] for line in path.open()} if path.exists() else set()
+    jobs = [one(w, s) for w in workflows for s in range(args.states)
+            if f"{w['workflow_id']}_s{s:03d}" not in done]
+    kept = total = 0
+    with path.open("a") as handle:
+        for n, job in enumerate(asyncio.as_completed(jobs), 1):
+            item = await job
+            if item is not None:
+                handle.write(json.dumps(item, ensure_ascii=False) + "\n")
+                handle.flush()
+                total += len(item["questions"])
+                kept += sum(q["kept"] for q in item["questions"])
+            if n % 50 == 0 or n == len(jobs):
+                print(f"states {n + len(done)}/{len(done) + len(jobs)}, questions kept {kept}/{total} this session", flush=True)
 
 
 def main(argv=None) -> None:
