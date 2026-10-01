@@ -63,7 +63,7 @@ def label_teachers(item, cache):
     return item
 
 
-def teachers(q):
+def teacher_labels(q):
     return {JEV: q["jev"], **q.get("teachers", {})}
 
 
@@ -105,7 +105,7 @@ def rows(run, teachers=True):
             "questions": json.dumps({q["id"]: jev_question(q) for q in kept}, ensure_ascii=False),
             "answers": json.dumps({q["id"]: jev_answer(q) for q in kept}, ensure_ascii=False),
             "skills": json.dumps({q["id"]: q["skill"] for q in kept}),
-            "teachers": json.dumps({q["id"]: teachers(q) for q in kept}),
+            "teachers": json.dumps({q["id"]: teacher_labels(q) for q in kept}),
             "checker": json.dumps({q["id"]: q["check"]["probabilities"] for q in kept}),
         }
 
