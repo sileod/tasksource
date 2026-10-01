@@ -35,13 +35,14 @@ affiliated with TypeSafe or OpenJev.
 2. **Items.** About 30 items are written per workflow. One or two questions per item get a sampled
    intended reading (a clear option, a borderline one, or a yes/no probability), so answers are balanced
    and some uncertainty is deliberate; the other questions are answered by whatever the item says.
-3. **Check.** A separate blind pass answers every question with probabilities and flags ill-posed ones,
-   which are dropped.
+3. **Check.** A separate blind DeepSeek pass answers every question with probabilities and flags
+   ill-posed ones, which are dropped.
 4. **Labels.** Jev 1.13 (typesafe/jev-1.13 on OpenRouter) labels every kept question; questions where Jev
-   and the check confidently disagree are dropped. `answers` holds Jev's probabilities. `teachers`
-   also has upstage/solar-decide (up to 26 options) and, for yes/no questions, respan/span-01. Against
-   the writers' intended readings, averaging them did not beat Jev alone (Solar is often overconfident),
-   so they serve as a disagreement signal rather than as the target.
+   and the check confidently disagree are dropped. `answers` averages Jev's probabilities with the
+   blind check's. On 75 questions labelled blind by an independent annotator (Claude), the average was
+   closer than either alone (total variation 0.135 vs 0.192 for Jev and 0.179 for the check; same top
+   answer 87% vs 83% and 84%). `teachers` holds each model's probabilities, including
+   upstage/solar-decide (up to 26 options; 0.304) and, for yes/no questions, respan/span-01.
 
 The soft labels carry real uncertainty (see the confidence shares below); train on the full
 distributions rather than the argmax.
@@ -52,10 +53,9 @@ distributions rather than the argmax.
 |---|---|
 | `state` | the item text |
 | `questions` | JSON Jev request: `{id: {type, instructions, criteria}}` |
-| `answers` | JSON Jev answers with probabilities (`noul`, or `probabilities` over the criteria) |
+| `answers` | JSON answers in Jev format with the averaged probabilities (`noul`, or `probabilities` over the criteria) |
 | `teachers` | JSON `{id: {model: probabilities}}` for each decision model |
 | `skills` | JSON `{id: skill}` |
-| `checker` | JSON `{id: probabilities}` from the blind check, for diagnostics |
 | `workflow`, `application`, `domain`, `source` | the decision application; `domain` is a loose tag |
 
 ## Size and splits
