@@ -38,9 +38,10 @@ affiliated with TypeSafe or OpenJev.
 3. **Check.** A separate blind pass answers every question with probabilities and flags ill-posed ones,
    which are dropped.
 4. **Labels.** Jev 1.13 (typesafe/jev-1.13 on OpenRouter) labels every kept question; questions where Jev
-   and the check confidently disagree are dropped. `answers` averages the probabilities of the
-   decision models that accept the question: Jev, upstage/solar-decide (up to 26 options) and, for
-   yes/no questions, respan/span-01. Each model's probabilities are in `teachers`.
+   and the check confidently disagree are dropped. `answers` holds Jev's probabilities. `teachers`
+   also has upstage/solar-decide (up to 26 options) and, for yes/no questions, respan/span-01. Against
+   the writers' intended readings, averaging them did not beat Jev alone (Solar is often overconfident),
+   so they serve as a disagreement signal rather than as the target.
 
 The soft labels carry real uncertainty (see the confidence shares below); train on the full
 distributions rather than the argmax.
@@ -51,7 +52,7 @@ distributions rather than the argmax.
 |---|---|
 | `state` | the item text |
 | `questions` | JSON Jev request: `{id: {type, instructions, criteria}}` |
-| `answers` | JSON answers in Jev format with the averaged probabilities (`noul`, or `probabilities` over the criteria) |
+| `answers` | JSON Jev answers with probabilities (`noul`, or `probabilities` over the criteria) |
 | `teachers` | JSON `{id: {model: probabilities}}` for each decision model |
 | `skills` | JSON `{id: skill}` |
 | `checker` | JSON `{id: probabilities}` from the blind check, for diagnostics |

@@ -1,8 +1,9 @@
 """Build tasksource/synthetic-typed-decisions from workflow runs (src/tasksource/jev/synthetic/workflows.py).
 
-One row per state, in the procedural dataset's format: `questions` is a Jev request and `answers` holds the
-mean of the teachers that accept the question (Jev, and the Jev-like decision models in TEACHERS); each
-teacher's probabilities are kept in `teachers`. Splits are by workflow, so validation and test use
+One row per state, in the procedural dataset's format: `questions` is a Jev request and `answers` holds Jev's
+soft labels; the Jev-like decision models in TEACHERS label the questions they accept into `teachers`.
+Averaging them did not beat Jev alone against the writers' intended readings, so they are kept as a
+disagreement signal rather than mixed into the target. Splits are by workflow, so validation and test use
 decision schemas unseen in train. Teacher calls are cached, so repeated exports only label new items.
 
     python scripts/build_synthetic_jev.py .synthetic_runs/workflows_v2 [more runs] [--upload]
@@ -62,13 +63,12 @@ def label_teachers(item, cache):
     return item
 
 
-def ensemble(q):
-    teachers = {JEV: q["jev"], **q.get("teachers", {})}
-    return [sum(p[i] for p in teachers.values()) / len(teachers) for i in range(len(q["jev"]))], teachers
+def teachers(q):
+    return {JEV: q["jev"], **q.get("teachers", {})}
 
 
 def jev_answer(q):
-    p, _ = ensemble(q)
+    p = [float(x) for x in q["jev"]]
     if q["type"] == "noul":
         return {"type": "noul", "noul": p[0]}
     top = max(range(len(p)), key=p.__getitem__)
@@ -105,7 +105,7 @@ def rows(run, teachers=True):
             "questions": json.dumps({q["id"]: jev_question(q) for q in kept}, ensure_ascii=False),
             "answers": json.dumps({q["id"]: jev_answer(q) for q in kept}, ensure_ascii=False),
             "skills": json.dumps({q["id"]: q["skill"] for q in kept}),
-            "teachers": json.dumps({q["id"]: ensemble(q)[1] for q in kept}),
+            "teachers": json.dumps({q["id"]: teachers(q) for q in kept}),
             "checker": json.dumps({q["id"]: q["check"]["probabilities"] for q in kept}),
         }
 
@@ -139,7 +139,7 @@ def card(splits):
     rows = "\n".join(f"| {split} | {len(items):,} | {sum(len(json.loads(r['questions'])) for r in items):,} | "
                      f"{len({r['workflow'] for r in items})} |" for split, items in splits.items())
     size = (f"| split | items | decisions | workflows |\n|---|---|---|---|\n{rows}\n\n"
-            f"Decisions: {kinds['choice']:,} choice, {kinds['noul']:,} noul, {kinds['score']:,} score. The averaged labels are at "
+            f"Decisions: {kinds['choice']:,} choice, {kinds['noul']:,} noul, {kinds['score']:,} score. Jev is at "
             f"least 0.95 confident on {sum(c >= .95 for c in conf) / len(conf):.0%} of them and below 0.7 on "
             f"{sum(c < .7 for c in conf) / len(conf):.0%}.")
     text = CARD.read_text(encoding="utf-8")
