@@ -31,7 +31,7 @@ sampler:
   difficulty_weights: {'1': 0.30, '2': 0.25, '3': 0.20, '4': 0.15, '5': 0.10}
   ambiguity_weights: {minimal: 0.30, low: 0.25, moderate: 0.20, high: 0.15, extreme: 0.10}
   distractor_weights: {'0': 0.35, '1': 0.30, '2': 0.20, '3': 0.15}
-  general_text_skill_weight: 0.5
+  general_text_skill_weight: 0.3
 critic:
   enabled: true
   provider:

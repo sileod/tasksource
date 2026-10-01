@@ -20,7 +20,10 @@ PROMPTS_DIR = Path(__file__).parent / "prompts"
 
 def load_prompt(version: str) -> str:
     path = PROMPTS_DIR / f"{version}.txt"
-    return path.read_text(encoding="utf-8")
+    return path.read_text(encoding="utf-8").replace(
+        "{{SKILL_DEFINITIONS}}",
+        json.dumps(spec_module.SKILL_DEFINITIONS, indent=2, ensure_ascii=False),
+    )
 
 
 def prompt_hash(prompt: str) -> str:

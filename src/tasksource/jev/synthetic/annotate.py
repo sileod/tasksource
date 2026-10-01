@@ -95,7 +95,7 @@ def _jev_question_payload(question: dict) -> dict:
     return {"type": "noul", "instructions": question["question"]}
 
 
-def _jev_post(url: str, api_key: str, payload: dict, max_retries: int = 4) -> dict:
+def _jev_post(url: str, api_key: str, payload: dict, max_retries: int = 8) -> dict:
     data = json.dumps(payload, ensure_ascii=False).encode("utf-8")
     last_error: Exception | None = None
     for attempt in range(max_retries):
@@ -116,7 +116,7 @@ def _jev_post(url: str, api_key: str, payload: dict, max_retries: int = 4) -> di
             except Exception:
                 pass
             last_error = RuntimeError(f"Jev HTTP {exc.code}: {body}")
-            if exc.code not in (429, 500, 502, 503, 504):
+            if exc.code not in (429, 500, 502, 503, 504, 520):
                 raise last_error from exc
         except Exception as exc:  # noqa: BLE001 — transient network errors
             last_error = RuntimeError(f"Jev request failed: {exc}")

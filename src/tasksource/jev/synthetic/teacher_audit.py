@@ -29,10 +29,24 @@ def load_teacher_audit_prompt(version: str) -> str:
     return (PROMPTS_DIR / f"{version}.txt").read_text(encoding="utf-8")
 
 
+def select_audit_sample(bundles: list[dict], sample_size: int,
+                        seed_salt: str) -> list[dict]:
+    """Choose a stable content-independent audit sample by state ID."""
+    if sample_size <= 0 or sample_size >= len(bundles):
+        return list(bundles)
+    return sorted(
+        bundles,
+        key=lambda bundle: hashlib.sha256(
+            f"{seed_salt}\n{bundle.get('state_id', '')}".encode("utf-8")
+        ).hexdigest(),
+    )[:sample_size]
+
+
 def teacher_audit_cache_key(model: str, temperature: float, prompt: str,
                             bundle: dict, endpoint: str = "") -> str:
     canonical = json.dumps(
-        {"state_id": bundle.get("state_id"), "state": bundle.get("state"),
+        {"state_id": bundle.get("state_id"), "domain": bundle.get("domain"),
+         "state": bundle.get("state"),
          "questions": bundle.get("questions")},
         sort_keys=True, ensure_ascii=False)
     return hashlib.sha256(
@@ -53,7 +67,8 @@ def _mock_independent_answers(bundle: dict) -> list[dict]:
             options = list(question.get("options", []))
             answer = options[0] if options else None
         out.append({"question_id": question["question_id"], "answer": answer,
-                    "confidence": 0.9, "issues": []})
+                    "confidence": 0.9, "issues": [], "quality_ok": True,
+                    "quality_issues": []})
     return out
 
 
@@ -77,6 +92,9 @@ def _parse_independent_answers(raw: dict, bundle: dict) -> list[dict]:
             "answer": item.get("answer"),
             "confidence": max(0.0, min(1.0, confidence)),
             "issues": list(item.get("issues", [])) if isinstance(item.get("issues", []), list) else [],
+            "quality_ok": item.get("quality_ok") is True,
+            "quality_issues": list(item.get("quality_issues", []))
+            if isinstance(item.get("quality_issues", []), list) else [],
         })
     return parsed
 
@@ -128,6 +146,7 @@ def compare_with_teacher(bundle: dict, independent_answers: list[dict], audit_cf
     questions = list(bundle.get("questions", []))
     rows = []
     complete = len(annotations) == len(questions)
+    quality_failures = 0
     for index, question in enumerate(questions):
         independent = by_id.get(question["question_id"])
         annotation = annotations[index] if index < len(annotations) else None
@@ -143,6 +162,8 @@ def compare_with_teacher(bundle: dict, independent_answers: list[dict], audit_cf
         if auditor_answer is None:
             complete = False
         agrees = None if auditor_answer is None else auditor_answer == teacher_answer
+        quality_ok = independent.get("quality_ok", True) is True
+        quality_failures += not quality_ok
         confident_disagreement = (
             auditor_answer is not None
             and not agrees
@@ -158,13 +179,16 @@ def compare_with_teacher(bundle: dict, independent_answers: list[dict], audit_cf
             "agrees": agrees,
             "confident_disagreement": confident_disagreement,
             "issues": independent.get("issues", []),
+            "quality_ok": quality_ok,
+            "quality_issues": independent.get("quality_issues", []),
         })
     disagreements = sum(bool(row.get("confident_disagreement")) for row in rows)
     return {
         "enabled": True,
-        "pass": complete and disagreements == 0,
+        "pass": complete and disagreements == 0 and quality_failures == 0,
         "complete": complete,
         "confident_disagreements": disagreements,
+        "quality_failures": quality_failures,
         "min_teacher_confidence": audit_cfg.min_teacher_confidence,
         "min_auditor_confidence": audit_cfg.min_auditor_confidence,
         "auditor": auditor_meta or {},
@@ -174,7 +198,8 @@ def compare_with_teacher(bundle: dict, independent_answers: list[dict], audit_cf
 
 async def _audit_one(sem, client, model: str, temperature: float, template: str,
                      bundle: dict, raw_dir: Path, audit_cfg,
-                     pacer: RequestPacer | None = None, endpoint: str = "") -> dict:
+                     pacer: RequestPacer | None = None, endpoint: str = "",
+                     credential_slot: int = 0) -> dict:
     key = teacher_audit_cache_key(model, temperature, template, bundle, endpoint)
     cached = raw_dir / f"{key}.json"
     auditor_meta = {"model": model, "endpoint": endpoint}
@@ -197,7 +222,8 @@ async def _audit_one(sem, client, model: str, temperature: float, template: str,
         auditor_meta.update({"provider": "mock", "requested_model": model,
                              "returned_model": model, "cache_key": key})
     else:
-        payload = {"state_id": bundle["state_id"], "state": bundle["state"],
+        payload = {"state_id": bundle["state_id"], "domain": bundle.get("domain"),
+                   "state": bundle["state"],
                    "questions": bundle.get("questions", [])}
         prompt = template.replace(
             "{{BUNDLE_JSON}}", json.dumps(payload, ensure_ascii=False, indent=2))
@@ -215,6 +241,7 @@ async def _audit_one(sem, client, model: str, temperature: float, template: str,
         cached.write_text(json.dumps(
             {"cache_key": key, "state_id": bundle["state_id"], "provider": "teacher-auditor",
              "requested_model": model, "returned_model": result["returned_model"],
+             "credential_slot": credential_slot,
              "raw_response": result["raw"], "raw_text": result["text"],
              "independent_answers": independent},
             ensure_ascii=False, indent=2), encoding="utf-8")
@@ -239,24 +266,29 @@ async def audit_bundles_async(cfg, bundles: list[dict], raw_dir: Path) -> list[d
         return out
     template = load_teacher_audit_prompt(cfg.teacher_audit.prompt_version)
     provider = cfg.teacher_audit_provider()
-    client = None
+    clients = [None]
     if provider.name != "mock":
-        client = providers.make_client(provider, providers.require_api_key(provider))
+        clients = [providers.make_client(provider, key)
+                   for key in providers.available_api_keys(provider)]
     try:
         sem = asyncio.Semaphore(max(1, cfg.generation.concurrency))
-        pacer = RequestPacer(cfg.teacher_audit.requests_per_minute) if client is not None else None
+        pacers = [RequestPacer(cfg.teacher_audit.requests_per_minute)
+                  if client is not None else None for client in clients]
         return list(await asyncio.gather(*[
-            _audit_one(sem, client, cfg.teacher_audit.model, cfg.teacher_audit.temperature,
-                       template, bundle, raw_dir, cfg.teacher_audit, pacer,
-                       f"{provider.name}@{provider.base_url.rstrip('/')}")
-            for bundle in bundles
+            _audit_one(sem, clients[i % len(clients)], cfg.teacher_audit.model,
+                       cfg.teacher_audit.temperature, template, bundle, raw_dir,
+                       cfg.teacher_audit, pacers[i % len(clients)],
+                       f"{provider.name}@{provider.base_url.rstrip('/')}",
+                       i % len(clients))
+            for i, bundle in enumerate(bundles)
         ]))
     finally:
-        if client is not None:
-            try:
-                await client.close()
-            except Exception:
-                pass
+        for client in clients:
+            if client is not None:
+                try:
+                    await client.close()
+                except Exception:
+                    pass
 
 
 def audit_bundles(cfg, bundles: list[dict], raw_dir: Path) -> list[dict]:
