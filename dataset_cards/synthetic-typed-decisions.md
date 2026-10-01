@@ -40,8 +40,8 @@ affiliated with TypeSafe or OpenJev.
 4. **Labels.** Jev 1.13 (typesafe/jev-1.13 on OpenRouter) gives the probabilities in `answers`. Questions
    where Jev and the check confidently disagree are dropped.
 
-Jev is at least 0.95 confident on about 31% of decisions and below 0.7 on about 29%, so the soft
-labels carry real uncertainty; train on the full distributions rather than the argmax.
+The soft labels carry real uncertainty (see the confidence shares below); train on the full
+distributions rather than the argmax.
 
 ## Fields
 
@@ -58,13 +58,8 @@ labels carry real uncertainty; train on the full distributions rather than the a
 
 Splits are by workflow, so validation and test use decision applications never seen in training.
 
-| split | items | decisions | workflows |
-|---|---|---|---|
-| train | 1,225 | 3,928 | 44 |
-| validation | 292 | 1,028 | 10 |
-| test | 118 | 374 | 4 |
-
-Decisions: 2,968 choice (3 to 40 options; 172 with 12 or more), 1,441 noul, 921 score.
+<!-- size -->
+<!-- /size -->
 
 ## Caveats
 

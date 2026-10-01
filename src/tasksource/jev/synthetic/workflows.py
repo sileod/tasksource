@@ -51,7 +51,8 @@ DIFFICULTY = ["Make the relevant cues easy to find.",
 CHOICE_RANGE, MANY_RANGE, P_MANY = (2, 8), (12, 40), 0.3
 SCORE_LEVELS = [3, 4, 5, 5, 7]
 RULE_SKILLS = {"sla_breach", "refund_approval", "access_justification", "completeness"}  # procedural ground
-SKILLS = sorted(set(SKILL_DEFINITIONS) - RULE_SKILLS)
+UNNATURAL_SKILLS = {"argument_role"}  # yields vague questions inside decision applications
+SKILLS = sorted(set(SKILL_DEFINITIONS) - RULE_SKILLS - UNNATURAL_SKILLS)
 NOUL_P = [0.05, 0.2, 0.35, 0.5, 0.65, 0.8, 0.95]
 NAMES = """Aiko Amara Andrés Anika Arjun Astrid Ayşe Bao Beatriz Bilal Bongani Carmen Chen Chidi Dalia Dmitri
 Elif Emeka Esperanza Fatima Femi Freya Giorgos Hamid Hana Ibrahim Ingrid Isabela Jamal Jia Joaquín Kaito Kalani
@@ -262,7 +263,13 @@ async def run(args) -> None:
     (out / "workflows.jsonl").write_text("".join(json.dumps(w, ensure_ascii=False) + "\n" for w in workflows))
     print(f"workflows: {len(workflows)}/{args.workflows}", flush=True)
 
+    in_flight = asyncio.Semaphore(2 * args.concurrency)  # finish states steadily instead of writing all first
+
     async def one(workflow, index):
+        async with in_flight:
+            return await one_state(workflow, index)
+
+    async def one_state(workflow, index):
         try:
             item = await write_state(llm, workflow, index, args.seed)
             if item is None:
