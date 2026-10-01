@@ -1,0 +1,28 @@
+You write one realistic input item for a decision application.
+
+Application: {{APPLICATION}}
+Item: {{ITEM_KIND}}, about {{LENGTH}}.
+{{ENTITIES}}
+
+The application will ask these questions about the item. Write the item so that a careful,
+fair reader would reach the intended reading where one is given:
+{{TARGETS}}
+
+How to realize the intended readings:
+- "clear": the item contains evidence that settles the question for a careful reader, though it
+  may take reading several parts of the item or combining cues; never state the answer in the
+  question's own words.
+- "borderline, mostly X": X is the best reading, but the evidence also genuinely supports one other
+  option that a careful reader could confuse with X (you choose it); the remaining options are ruled out.
+- a probability for yes/no: the evidence should make that probability reasonable. 50% means the
+  relevant evidence is truly balanced or missing, not that the item ignores the question.
+- {{DIFFICULTY}}
+
+Let the evidence carry each reading: never write the conclusion itself (for instance that something
+is urgent, approved, a violation, or that someone is or is not in some category).
+
+The item must read like a real artifact of its kind: concrete details, natural voice, realistic
+noise and irrelevant details, no headings that mirror the questions, no mention of questions,
+answers, labels, probabilities, or of being generated. Facts must stay consistent across the item.
+
+Output strict JSON only: {"state": "the item text"}

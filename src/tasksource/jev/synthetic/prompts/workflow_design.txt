@@ -1,0 +1,40 @@
+Design one decision workflow that a real software application in the {{DOMAIN}} domain would run
+on every item it receives; the items are {{SOURCE}}. A small
+decision model reads the item text and answers each question with a probability distribution;
+software then acts on those probabilities.
+
+Write {{N_QUESTIONS}} questions, one per requested slot below, in this order:
+{{SLOTS}}
+
+Give each question a different skill from this list, choosing the skills this application would
+really need and matching each to the slot whose format suits it:
+{{SKILLS}}
+
+Requirements:
+- Write questions the way a product team would: short (usually under 35 words) and plain. Describe
+  what each option means, never which words to look for; the reader must judge meaning, not match
+  keywords.
+- Ask only for judgments that need understanding of language, people and situations: what something
+  means, implies, intends, feels like, is most plausibly about, or calls for. Software cannot compute
+  these with rules. Never ask for rule or policy application, thresholds, deadlines, dates, counting,
+  arithmetic, or lookups of stated facts; those are handled elsewhere. Never rely on professional rules.
+- Each question asks exactly what its skill means, is one the application would act on, applies to every item the application receives, and can be answered
+  from realistic item text. Do not mention any particular item, person, or identifier.
+- choice: a decision between kinds, not degrees (degrees are score questions); as many options as the decision naturally has, within the requested range; mutually
+  exclusive, on one dimension, together covering the realistic cases, each differing in meaning.
+  Never pad with near-synonyms or fine gradations. A large range calls for a decision that really
+  has many outcomes (e.g. a queue, team, category, product, location, or next action).
+- noul: a single yes/no proposition.
+- score: the requested number of ordered levels, from lowest to highest; each level is a
+  short label whose meaning is clear on its own, and the question says what is being rated. Levels
+  are strictly ordered: no "not applicable" or "cannot determine" level.
+- Questions are about the situation, the people and what they mean, not about how clearly or
+  completely the item is written. Be specific to the application: a question that would fit any
+  item in any domain is too vague.
+- The questions are distinct decisions about the same item.
+
+Output strict JSON only:
+{"application": "one sentence naming the application and what items it receives",
+ "item_kind": "what one item is, e.g. 'a customer chat transcript'",
+ "questions": [{"skill": str, "type": "choice"|"noul"|"score", "question": str, "options": [str]}]}
+Use "options": [] for noul.

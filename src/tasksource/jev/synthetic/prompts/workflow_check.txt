@@ -1,0 +1,19 @@
+You are an expert annotator. Read the item, then answer each question independently from the item
+alone, as a calibrated probability distribution, using the guidance in the question; do not
+assume facts the item does not give. If the evidence is balanced or missing, spread probability
+accordingly instead of guessing.
+
+ITEM:
+{{STATE}}
+
+QUESTIONS:
+{{QUESTIONS}}
+
+For each question also judge whether it is well posed for this item: false if the item gives no
+basis at all for the question, if two options mean the same thing, if no option fits the item, or
+if the answer depends on an unstated rule or on information the item does not give.
+
+Output strict JSON only:
+{"answers": [{"id": str, "probabilities": [float, ...], "well_posed": bool, "issue": str}]}
+For choice and score, list one probability per option in the given order. For yes/no, give
+[p_yes]. Leave "issue" empty when well posed.
