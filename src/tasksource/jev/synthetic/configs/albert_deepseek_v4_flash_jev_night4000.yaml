@@ -12,7 +12,7 @@ generation:
   concurrency: 20
   max_output_tokens: 4000
   seed: 42
-  prompt_version: generate_v2
+  prompt_version: generate
   n_states: 4000
 sampler:
   seed: 42
@@ -31,6 +31,7 @@ sampler:
   difficulty_weights: {'1': 0.30, '2': 0.25, '3': 0.20, '4': 0.15, '5': 0.10}
   ambiguity_weights: {minimal: 0.30, low: 0.25, moderate: 0.20, high: 0.15, extreme: 0.10}
   distractor_weights: {'0': 0.35, '1': 0.30, '2': 0.20, '3': 0.15}
+  general_text_skill_weight: 0.3
 critic:
   enabled: true
   provider:
@@ -40,7 +41,7 @@ critic:
     base_url: https://albert.api.etalab.gouv.fr/v1
     model: deepseek-v4-flash-0731
   model: deepseek-v4-flash-0731
-  prompt_version: critic_v1
+  prompt_version: critic
   temperature: 0.0
   requests_per_minute: 40
 annotator:

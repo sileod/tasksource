@@ -24,7 +24,7 @@ class GenerationConfig:
     concurrency: int = 20
     max_output_tokens: int = 4000
     seed: int = 42
-    prompt_version: str = "generate_v1"
+    prompt_version: str = "generate"
     n_states: int = 1000
 
 
@@ -40,12 +40,16 @@ class SamplerConfig:
     difficulty_weights: dict | None = None
     ambiguity_weights: dict | None = None
     distractor_weights: dict | None = None
+    # Optional low-weight general language skills enter the ordinary domain mix.
+    general_text_skill_weight: float = 0.0
 
     def __post_init__(self):
         from .schemas import FORMATS
         unknown = set(self.question_formats) - set(FORMATS)
         if unknown or not self.question_formats:
             raise ValueError(f"question_formats keys must be among {FORMATS}: {sorted(self.question_formats)}")
+        if not math.isfinite(self.general_text_skill_weight) or self.general_text_skill_weight < 0:
+            raise ValueError("general_text_skill_weight must be finite and non-negative")
         for name in ("difficulty_weights", "ambiguity_weights", "distractor_weights"):
             weights = getattr(self, name)
             if weights is not None and (not weights or any(float(v) < 0 for v in weights.values())
@@ -71,7 +75,7 @@ class CriticConfig:
     # When `provider` is absent, it inherits the generator provider.
     provider: ProviderConfig | None = None
     model: str = "deepseek-v4-flash-0731"
-    prompt_version: str = "critic_v1"
+    prompt_version: str = "critic"
     temperature: float = 0.0
     requests_per_minute: int = 40
 
@@ -101,7 +105,7 @@ class TeacherAuditConfig:
     # check, explicitly choose a different provider/model from the generator.
     provider: ProviderConfig | None = None
     model: str = "deepseek-v4-flash-0731"
-    prompt_version: str = "teacher_audit_v1"
+    prompt_version: str = "teacher_audit"
     temperature: float = 0.0
     requests_per_minute: int = 40
     min_teacher_confidence: float = 0.85

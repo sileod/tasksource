@@ -13,7 +13,7 @@ generation:
   concurrency: 20
   max_output_tokens: 4000
   seed: 42
-  prompt_version: generate_v1
+  prompt_version: generate
   n_states: 1000
 
 sampler:
@@ -32,7 +32,7 @@ critic:
     base_url: https://api.openai.com/v1
     model: gpt-6-luna
   model: gpt-6-luna
-  prompt_version: critic_v1
+  prompt_version: critic
   temperature: 0.0
 
 annotator:
