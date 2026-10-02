@@ -51,6 +51,12 @@ BUCKETS = {
 }
 
 
+# Sources picked by reading them (2026-10-02): rows the scores alone undervalue, e.g. clean binary sets
+PICKED = r"^WANLI$|^anli/|^ai2_arc/|^glue/cola$|dynasent|Dynasent|^IntentGrasp/all$|^MSciNLI$|^ConTRoL-nli$|" \
+         r"^winogrande/|^contract-nli/|^folio$|^dynahate$|^head_qa/en$|^sciq$|^art$|^dadc-limit-nli$|^FOL-nli$"
+PICKED_BOOST = 1.5
+
+
 def bucket(source):
     return next(name for name, (pattern, _) in BUCKETS.items() if re.search(pattern, source))
 
