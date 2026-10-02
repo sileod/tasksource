@@ -1993,6 +1993,12 @@ docred = Classification(
     }},
     pre_process=lambda ds: _docred_relations(_yufei_docred_to_columnar(ds)))
 
+# ChemProt relation groups, as the annotation guidelines name them (CPR:0 is undefined there)
+CHEMPROT_GROUPS = {"CPR:1": "part of", "CPR:2": "regulator (direct or indirect)",
+    "CPR:3": "upregulator or activator", "CPR:4": "downregulator or inhibitor", "CPR:5": "agonist",
+    "CPR:6": "antagonist", "CPR:7": "modulator", "CPR:8": "cofactor", "CPR:9": "substrate or product of",
+    "CPR:10": "explicitly not related"}
+
 def _chemprot_relations(dataset):
     rows = {}
     for split in ["train", "validation", "test"]:
@@ -2003,17 +2009,18 @@ def _chemprot_relations(dataset):
                 for entity in _records(x["entities"])
             }
             for relation in _records(x["relations"]):
-                examples.append({
-                    "text": x["text"],
-                    "entity_pair": f'{entities[relation["arg1"]]} -> {entities[relation["arg2"]]}',
-                    "relation": relation["type"],
-                })
+                if relation["type"] in CHEMPROT_GROUPS:
+                    examples.append({
+                        "text": x["text"],
+                        "entity_pair": f'{entities[relation["arg1"]]} -> {entities[relation["arg2"]]}',
+                        "relation": CHEMPROT_GROUPS[relation["type"]],
+                    })
         rows[split] = Dataset.from_list(examples)
     return DatasetDict(rows)
 
 chemprot = Classification(
     "text", "entity_pair", "relation",
-    question="Which ChemProt relation group (CPR) holds between the chemical and the protein in text_B?",
+    question="Which relation holds between the chemical and the protein in text_B?",
     dataset_name="bigbio/chemprot", config_name="chemprot_full_source",
     pre_process=_chemprot_relations)
 

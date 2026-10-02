@@ -62,7 +62,9 @@ JEV_EXCLUDED_SOURCES = {"silicone/iemocap", "silicone/meld_e", "silicone/meld_s"
                         # the extracted evidence often lacks what the label rests on
                         "hover-3way/nli",
                         # relevance to the U.S. economy: a Dow rally after a Fed hike as not relevant
-                        "crowdflower/economic-news"}
+                        "crowdflower/economic-news",
+                        # depths from one parser's conventions, off by one from any reader's tree
+                        "linguisticprobing/tree_depth"}
 
 
 # Vote shares from fewer annotators than this are coarse (one of three is 0.33): such
