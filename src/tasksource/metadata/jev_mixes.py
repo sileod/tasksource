@@ -62,6 +62,11 @@ PICKED = r"^WANLI$|^anli/|^ai2_arc/|^glue/cola$|dynasent|Dynasent|^IntentGrasp/a
 PICKED_BOOST = 2.0
 
 
+def length_factor(chars):
+    """Long inputs are rare and worth reading: x1.25 at 2k characters, x1.5 from 4k."""
+    return min(1.5, max(1.0, 1 + 0.25 * math.log2(max(chars, 1) / 1000)))
+
+
 def bucket(source):
     return next(name for name, (pattern, _) in BUCKETS.items() if re.search(pattern, source))
 

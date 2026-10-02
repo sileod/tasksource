@@ -1,6 +1,6 @@
 """Per-source scores for the steered mixes (src/tasksource/metadata/jev_mixes.py).
 
-score = trust x zone x interest x clean x options, from audits of sampled decisions:
+score = trust x zone x interest x clean x options x length x picked, from audits of sampled decisions:
 - trust: 0 for sources excluded from Jev builds (their labels failed review);
 - zone (proximal development): how much probability decision models (Jev, Solar, D1 by default) put
   on the gold answer. The judges are stronger than the models trained on the mix, so a source they
@@ -8,6 +8,7 @@ score = trust x zone x interest x clean x options, from audits of sampled decisi
 - interest: Jev's judgment that an example exercises a transferable skill and is not trivial;
 - clean: 1.3 minus how often Jev finds examples malformed, so curated data counts;
 - options: fewer rows for yes/no and two-option sources, more for many-option ones;
+- length: more rows for long inputs, which few sources have (x1.25 at 2k characters, x1.5 from 4k);
 - picked: a boost for sources picked by reading them (PICKED in jev_mixes.py).
 
     python scripts/jev_mix_scores.py --models build/jev-acc-jev build/jev-acc-d1 build/jev-acc-solar \\
@@ -22,7 +23,7 @@ from pathlib import Path
 import pandas as pd
 
 from scripts.build_jev_dataset import JEV_EXCLUDED_SOURCES, PUBLISH_EXCLUDED_PREFIXES
-from tasksource.metadata.jev_mixes import PICKED, PICKED_BOOST
+from tasksource.metadata.jev_mixes import PICKED, PICKED_BOOST, length_factor
 
 OUT = Path(__file__).resolve().parent.parent / "src" / "tasksource" / "metadata" / "jev_source_scores.csv"
 
@@ -63,19 +64,21 @@ def options_factor(n_options):
     return 0.6 if n_options <= 2 else 0.9 if n_options == 3 else 1.0 if n_options <= 5 else 1.2
 
 
-def option_counts(shards):
-    """Median option count per source (yes/no counts as 2), from train shards."""
+def shard_stats(shards):
+    """Median option count (yes/no counts as 2) and state length per source, from train shards."""
     import glob
     import numpy as np
     import pyarrow.compute as pc
     import pyarrow.parquet as pq
-    counts = {}
+    counts, lengths = {}, {}
     for path in glob.glob(str(Path(shards) / "train-*.parquet")):
-        table = pq.read_table(path, columns=["source", "options"])
+        table = pq.read_table(path, columns=["source", "options", "state"])
         if table.num_rows:
-            lengths = pc.list_value_length(table.column("options")).fill_null(0).to_numpy(zero_copy_only=False)
-            counts[table.column("source")[0].as_py()] = float(np.median(np.maximum(lengths, 2)))
-    return pd.Series(counts, name="n_options")
+            options = pc.list_value_length(table.column("options")).fill_null(0).to_numpy(zero_copy_only=False)
+            source = table.column("source")[0].as_py()
+            counts[source] = float(np.median(np.maximum(options, 2)))
+            lengths[source] = float(np.median(pc.utf8_length(table.column("state")).to_numpy(zero_copy_only=False)))
+    return pd.DataFrame({"n_options": counts, "state_chars": lengths})
 
 
 def main():
@@ -90,7 +93,7 @@ def main():
     runs = [run for run in args.models if (Path(run) / "decisions.jsonl").exists()]
     meta = pd.concat([pd.read_csv(path) for path in args.meta if Path(path).exists()])
     meta = meta.drop_duplicates("source", keep="last").set_index("source")[["transferable", "trivial", "malformed"]]
-    scores = model_signals(runs).join(meta, how="left").join(option_counts(args.shards), how="left")
+    scores = model_signals(runs).join(meta, how="left").join(shard_stats(args.shards), how="left")
     scores = scores.fillna(scores.median(numeric_only=True))
     excluded = scores.index.isin(JEV_EXCLUDED_SOURCES) | scores.index.str.startswith(PUBLISH_EXCLUDED_PREFIXES)
     scores["trust"] = (~excluded).astype(float)
@@ -98,8 +101,9 @@ def main():
     scores["interest"] = (0.5 + scores.transferable - 0.5 * scores.trivial).clip(0.3, 1.5)
     scores["clean"] = 1.3 - scores.malformed
     scores["options"] = scores.n_options.map(options_factor)
+    scores["length"] = scores.state_chars.map(length_factor)
     scores["picked"] = [PICKED_BOOST if picked else 1.0 for picked in scores.index.str.contains(PICKED)]
-    scores["score"] = scores.trust * scores.zone * scores.interest * scores.clean * scores.options * scores.picked
+    scores["score"] = scores.trust * scores.zone * scores.interest * scores.clean * scores.options * scores.length * scores.picked
     scores.round(3).sort_values("score", ascending=False).to_csv(args.out, index_label="source")
     print(f"{len(scores)} sources from {len(runs)} model runs -> {args.out}")
 

@@ -22,12 +22,13 @@ from datasets import Dataset, DatasetDict, Features, List, Value, concatenate_da
 from huggingface_hub import HfApi
 import numpy as np
 import pandas as pd
+import pyarrow.compute as pc
 import yaml
 from tasksource import list_tasks, load_task, task_provenance, tasks
 from tasksource.access import lmtasks, load_preprocessing
 from tasksource.preprocess import sample_dataset
 from tasksource.metadata.weights import task_weight
-from tasksource.metadata.jev_mixes import source_quotas
+from tasksource.metadata.jev_mixes import length_factor, source_quotas
 from tasksource.licenses import fetch_card_licenses, provenance_repos, source_license
 from tasksource.jev.augmentations import augment_jev_internal, stable_fraction
 from tasksource.jev.prompt_augmentations import (
@@ -765,18 +766,24 @@ def validate_decisions(rows, split):
 
 def steered_mix(dataset, mix_rows, pretty_rows=1_000):
     """The default config: train rows per source from the jev_mixes quotas, taking whole question groups
-    in a stable random order and never repeating one; validation and test keep the full splits' rows
-    of the mixed sources."""
+    in a stable random order weighted by input length, and never repeating one; validation and test keep
+    the full splits' rows of the mixed sources."""
     train = dataset["train"]
     metadata = train.select_columns(["source", "group_id"])[:]
-    groups = {}
+    states = train.select_columns(["state"]).with_format("arrow")  # respects the pretty_order indices
+    chars = np.concatenate([pc.utf8_length(states[start:start + 100_000]["state"]).to_numpy(zero_copy_only=False)
+                            for start in range(0, len(states), 100_000)])
+    groups, weights = {}, {}
     for index, (source, group) in enumerate(zip(metadata["source"], metadata["group_id"])):
         groups.setdefault(source, {}).setdefault(group, []).append(index)
+        weights[group] = max(weights.get(group, 1.0), length_factor(chars[index]))
     quotas = source_quotas({source: sum(map(len, members.values())) for source, members in groups.items()}, mix_rows)
     keep = []
     for source, quota in quotas.items():
         taken = 0
-        for group in sorted(groups[source], key=lambda group: stable_fraction(group, "steered-mix")):
+        # weighted sampling without replacement: exponential race keys, smallest first
+        race = lambda group: -math.log(1 - stable_fraction(group, "steered-mix")) / weights[group]
+        for group in sorted(groups[source], key=race):
             if taken >= quota:
                 break
             keep.extend(groups[source][group])
