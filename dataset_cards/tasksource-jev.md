@@ -79,7 +79,7 @@ print(row["state"], row["question"], row["options"], row["target"])
 ## Configs
 
 - `default`: a steered mix of about 1M train rows. Sources are first gated on label correctness, then weighted by how interesting they are and how close they sit to the zone of proximal development (judged by decision models). Two-option tasks get fewer rows, and procedural generators get 12%. No row is repeated. Validation and test are the full eval splits, restricted to the mixed sources. Buckets and shares are in [`jev_mixes.py`](https://github.com/sileod/tasksource/blob/main/src/tasksource/metadata/jev_mixes.py) and per-source scores in `jev_source_scores.csv`.
-- `full`: every row that passed the build, with per-source caps (about 2.5M train rows). Before October 2026 this was the `default` config.
+- `full`: every row that passed the build, with per-source caps (about 2.5M train rows).
 
 ## Format
 
@@ -94,7 +94,7 @@ print(row["state"], row["question"], row["options"], row["target"])
 | `source`, `split`, `variant` | Originating task, original split, and recast variant |
 | `license`, `license_use` | The source's license(s), and `commercial`, `non-commercial` or `unspecified` (see below) |
 
-Splits: 2,500,000 train, 15,000 validation (`dev` in `split`), and 15,000 test,
+Splits: train (about 1M rows in `default`, 2.5M in `full`), 15,000 validation (`dev` in `split`), and 15,000 test,
 following each source's own train/dev/test splits where it has them.
 
 ## How it is built
@@ -109,15 +109,14 @@ following each source's own train/dev/test splits where it has them.
     Label-verification and packed questions carry it too.
 - **Variants.** Low-frequency, deterministic variants cover label verification as `noul`, criterion order, and instruction wording.
 - **Packing.** Up to 10% of each classification task's examples are packed, two to four at a time, into `packed_derived` states. Their questions (an item's label, agreement, existence, counts) follow exactly from the gold labels.
-- **Mixing (`full`).** Formats get fixed shares of the train rows (47% classification, 30% multiple choice, 3% token labeling, 10% graded (soft-label sources), 10% procedural). Within a format, dataset families get equal shares, scaled by [hand-set weights](https://github.com/sileod/tasksource/blob/main/src/tasksource/metadata/weights.py) (more for adversarial NLI, long documents and preference pairs; less for templated probes), times [audit weights](https://github.com/sileod/tasksource/blob/main/src/tasksource/metadata/audit_weights.py) from a per-task check of Jev on 200 examples: ×1.5 for hard tasks whose gold is right by construction (synthetic logic, theory of mind, spatial reasoning), ×0.5 for near-solved tasks and for hard tasks whose gold is a judgment call (ratings, preferences, crowd sentiment). The same check found and fixed inverted labels, hidden test labels and unclear questions in about 80 sources. Sources with many options get slightly more room. Related questions are kept together.
+- **Mixing (`full`).** Formats get fixed shares of the train rows (47% classification, 30% multiple choice, 3% token labeling, 10% graded (soft-label sources), 10% procedural). Within a format, dataset families get equal shares, scaled by [hand-set weights](https://github.com/sileod/tasksource/blob/main/src/tasksource/metadata/weights.py) (more for adversarial NLI, long documents and preference pairs; less for templated probes), times [audit weights](https://github.com/sileod/tasksource/blob/main/src/tasksource/metadata/audit_weights.py) from a per-task check of Jev on 200 examples: ×1.5 for hard tasks whose gold is right by construction (synthetic logic, theory of mind, spatial reasoning), ×0.5 for near-solved tasks and for hard tasks whose gold is a judgment call (ratings, preferences, crowd sentiment). Sources with many options get slightly more room. Related questions are kept together.
 - **Mixing (`default`).** About 1M rows drawn from `full`, never repeating a row. Buckets of related sources get set shares ([jev_mixes.py](https://github.com/sileod/tasksource/blob/main/src/tasksource/metadata/jev_mixes.py): 15% logic, 10% NLI, 10% knowledge QA, 9% long documents and fact-checking, 8% intent and routing, 12% procedural, ...). Inside a bucket, sources get rows by score × √size. The [score](https://github.com/sileod/tasksource/blob/main/src/tasksource/metadata/jev_source_scores.csv) multiplies:
   - correctness: sources that failed label review get 0;
   - the zone of proximal development: how much probability the decision models (Jev, Liquid D1) give the gold answer. Near-solved sources and sources the models miss outright both get less;
   - interest and cleanliness, from Jev yes/no checks for transferable skills, trivial examples and malformed rows;
-  - ×0.6 for two-option tasks (32% of rows instead of 42% without the penalty);
+  - ×0.6 for two-option tasks (about a third of the rows);
   - ×2 for sources picked by reading them.
-
-  Further passes with Jev and DeepSeek V4 Flash, with disagreements adjudicated by reading rows, fixed or dropped more sources.
+- **Order and coverage.**
   - The first 1,000 train rows are interleaved to show variety in the Dataset Viewer; the rest is shuffled. Questions of a group stay adjacent throughout.
   - Evaluation benchmarks (BIG-bench, MMLU, BLiMP, MATH test, ...) are left out so they stay clean for evaluation.
 - **Sources.** [sources.yaml](sources.yaml) lists every source with its rows, the Hub dataset and revision it was loaded from, the original dataset behind each tasksource copy, and its licenses.
