@@ -1372,7 +1372,13 @@ logical_fallacy = Classification("source_article", labels="logical_fallacies", d
 
 parade = Classification("Definition1","Definition2", labels=name('Binary labels',["not-paraphrase","paraphrase"]), dataset_name="tasksource/parade")
 
-cladder = Classification("given_info", "question", "answer",dataset_name="tasksource/cladder")
+def _cladder_context(x):
+    """The causal graph decides the answer, but tasksource/cladder keeps it in `reasoning`."""
+    return f'{x["reasoning"]["step0"]} Causal graph: {x["reasoning"]["step1"]}.\n{x["given_info"]}'
+
+cladder = Classification(_cladder_context, "question", "answer", dataset_name="tasksource/cladder",
+    # backdoor-adjustment rows carry no graph at all: identical texts get opposite answers
+    pre_process=lambda ds: ds.filter(lambda x: bool(x["reasoning"]["step1"])))
 
 subjectivity = Classification(
     "Sentence", labels=lambda x: {"OBJ": "objective", "SUBJ": "subjective"}[x["Label"]],
