@@ -63,7 +63,8 @@ Coding agent? Read [AGENTS.md](AGENTS.md): row semantics, rebuilding multi-quest
 ```python
 from datasets import load_dataset
 
-ds = load_dataset("tasksource/tasksource-jev-typed-decisions")
+ds = load_dataset("tasksource/tasksource-jev-typed-decisions")          # steered 1M-row mix
+# full = load_dataset("tasksource/tasksource-jev-typed-decisions", "full")  # every row of the build
 row = ds["train"][0]
 print(row["state"], row["question"], row["options"], row["target"])
 ```
@@ -74,6 +75,11 @@ print(row["state"], row["question"], row["options"], row["target"])
  "kind": "choice", "options": ["The sun was rising.", "The grass was cut."],
  "target": [1.0, 0.0], "source": "super_glue/copa"}
 ```
+
+## Configs
+
+- `default`: a steered mix of about 1M train rows. Sources are first gated on label correctness, then weighted by how interesting they are and how close they sit to the zone of proximal development (judged by decision models). Two-option tasks get fewer rows, and procedural generators get 12%. No row is repeated. Validation and test are the full eval splits, restricted to the mixed sources. Buckets and shares are in [`jev_mixes.py`](https://github.com/sileod/tasksource/blob/main/src/tasksource/metadata/jev_mixes.py) and per-source scores in `jev_source_scores.csv`.
+- `full`: every row that passed the build, with per-source caps (about 2.5M train rows). Before October 2026 this was the `default` config.
 
 ## Format
 

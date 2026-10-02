@@ -27,6 +27,7 @@ from tasksource import list_tasks, load_task, task_provenance, tasks
 from tasksource.access import lmtasks, load_preprocessing
 from tasksource.preprocess import sample_dataset
 from tasksource.metadata.weights import task_weight
+from tasksource.metadata.jev_mixes import source_quotas
 from tasksource.licenses import fetch_card_licenses, provenance_repos, source_license
 from tasksource.jev.augmentations import augment_jev_internal, stable_fraction
 from tasksource.jev.prompt_augmentations import (
@@ -760,9 +761,35 @@ def validate_decisions(rows, split):
                 )
 
 
+def steered_mix(dataset, mix_rows, pretty_rows=1_000):
+    """The default config: train rows per source from the jev_mixes quotas, taking whole question groups
+    in a stable random order and never repeating one; validation and test keep the full splits' rows
+    of the mixed sources."""
+    train = dataset["train"]
+    metadata = train.select_columns(["source", "group_id"])[:]
+    groups = {}
+    for index, (source, group) in enumerate(zip(metadata["source"], metadata["group_id"])):
+        groups.setdefault(source, {}).setdefault(group, []).append(index)
+    quotas = source_quotas({source: sum(map(len, members.values())) for source, members in groups.items()}, mix_rows)
+    keep = []
+    for source, quota in quotas.items():
+        taken = 0
+        for group in sorted(groups[source], key=lambda group: stable_fraction(group, "steered-mix")):
+            if taken >= quota:
+                break
+            keep.extend(groups[source][group])
+            taken += len(groups[source][group])
+    mixed = set(quotas)
+    mix = {"train": pretty_order(train.select(sorted(keep)), pretty_rows)}
+    for split, rows in dataset.items():
+        if split != "train":
+            mix[split] = rows.filter(lambda source: source in mixed, input_columns="source")
+    return DatasetDict(mix)
+
+
 def publish_dataset(
     output, repo_id, pretty_rows=1_000, publish_rows=1_000_000, eval_rows=15_000,
-    allowed_sources=None, procedural_share=0.1,
+    allowed_sources=None, procedural_share=0.1, mix_rows=1_000_000,
 ):
     data_files = {}
     for split in ("train", "validation", "test"):
@@ -885,11 +912,27 @@ def publish_dataset(
         repo_type="dataset",
         commit_message="Add tasksource-jev-typed-decisions dataset card",
     )
+    # "full" holds every row that passed the build; "default" is the steered mix (metadata/jev_mixes.py)
+    mix = steered_mix(dataset, mix_rows, pretty_rows) if mix_rows else None
+    if mix is not None:
+        release_audit["mix"] = {split: {"rows": len(rows), "sources": len(set(rows.select_columns(["source"])[:]["source"]))}
+                                for split, rows in mix.items()}
+        print(f"Steered mix: {json.dumps(release_audit['mix'])}", flush=True)
+        (output / "release-audit.json").write_text(
+            json.dumps(release_audit, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     dataset.push_to_hub(
         repo_id,
+        config_name="full" if mix is not None else "default",
         max_shard_size="256MB",
-        commit_message="Publish tasksource-jev-typed-decisions Parquet dataset",
+        commit_message="Publish tasksource-jev-typed-decisions Parquet dataset (full)",
     )
+    if mix is not None:
+        mix.push_to_hub(
+            repo_id,
+            config_name="default",
+            max_shard_size="256MB",
+            commit_message="Publish the steered default mix",
+        )
     for name in (
         "build-report.jsonl", "build-summary.json", "build-manifest.json",
         "failed-tasks.json", "outdated-datasets.json", "fixed-source-audit.json",
@@ -1235,6 +1278,7 @@ def build(args):
             eval_rows=args.eval_rows,
             allowed_sources=set(tasks.source_id),
             procedural_share=args.procedural_share,
+            mix_rows=args.mix_rows,
         )
 
 
@@ -1319,6 +1363,9 @@ def parse_args():
         "--publish-rows", type=int, default=1_000_000,
         help="Published train rows; 0 disables all capping.",
     )
+    parser.add_argument(
+        "--mix-rows", type=int, default=1_000_000,
+        help="Train rows of the steered default config (0: publish the full build as default only).")
     parser.add_argument(
         "--eval-rows", type=int, default=15_000,
         help="Published rows in each of validation and test.",
