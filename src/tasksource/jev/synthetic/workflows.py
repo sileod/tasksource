@@ -263,7 +263,7 @@ async def run(args) -> None:
     (out / "workflows.jsonl").write_text("".join(json.dumps(w, ensure_ascii=False) + "\n" for w in workflows))
     print(f"workflows: {len(workflows)}/{args.workflows}", flush=True)
 
-    in_flight = asyncio.Semaphore(2 * args.concurrency)  # finish states steadily instead of writing all first
+    in_flight = asyncio.Semaphore(8 * args.concurrency)  # finish states steadily instead of writing all first
 
     async def one(workflow, index):
         async with in_flight:
