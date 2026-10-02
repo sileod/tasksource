@@ -51,6 +51,19 @@ def requests(rows):
 `groupby` works on the stored order because groups are contiguous. Shuffle
 requests, not rows, if you want to keep them together.
 
+## Row order and configs
+
+The first 1,000 train rows rotate through sources (in alphabetical order) so the Hub viewer shows
+variety; after them, train is shuffled by question group. Shuffle before training or taking a
+sample, or the prefix over-represents small sources:
+
+```python
+ds = load_dataset("tasksource/tasksource-jev-typed-decisions", split="train").shuffle(seed=0)
+```
+
+The `default` config is a steered mix of about 1M rows. `full` has every row of the build, about
+2.5M rows (`load_dataset(..., "full")`).
+
 ## Columns you will filter on
 
 - `source`: the tasksource task a row comes from (`multilingual/...` for non-English,
