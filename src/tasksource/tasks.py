@@ -1112,8 +1112,26 @@ folio = Classification("premises","conclusion",
     labels=lambda x:{'False':'contradiction','True':'entailment', 'Uncertain':'neutral'}.get(x["label"]),
     dataset_name="tasksource/folio")
 
+def _tomi_pairs(dataset):
+    """tasksource/tomi-nli pairs every row's valid hypothesis with a coin-flip label; the
+    valid_hypothesis/invalid_hypothesis columns are sound, so each gives one row."""
+    def text(h):
+        h = h.replace("_", " ").replace(" look for the ", " looks for the ").strip()
+        h = re.sub(r" (looks for the \w+) to the ", r" \1 in the ", h)
+        return h[0].upper() + h[1:] + "."
+    def pairs(batch):
+        out = {"premise": [], "hypothesis": [], "label": []}
+        for premise, valid, invalid in zip(batch["premise"], batch["valid_hypothesis"], batch["invalid_hypothesis"]):
+            if valid.strip() != invalid.strip():
+                out["premise"] += [premise, premise]
+                out["hypothesis"] += [text(valid), text(invalid)]
+                out["label"] += ["entailment", "not_entailment"]
+        return out
+    return DatasetDict({split: rows.map(pairs, batched=True, remove_columns=rows.column_names)
+                        for split, rows in dataset.items()})
+
 tomi_nli = Classification("premise","hypothesis","label",
-    dataset_name="tasksource/tomi-nli")
+    dataset_name="tasksource/tomi-nli", pre_process=_tomi_pairs)
 
 avicenna = Classification("Premise 1","Premise 2","Syllogistic relation", question="Do the two premises form a syllogism?",
     dataset_name="tasksource/avicenna")
@@ -1298,7 +1316,9 @@ udep__deprel = TokenClassification(
 ambient= Classification("premise","hypothesis","hypothesis_ambiguous",dataset_name="tasksource/ambient",
     question="Is the hypothesis ambiguous?")
 
-path_naturalness = MultipleChoice(constant(''),choices=['choice1','choice2'],labels="label",
+# the source label marks the less natural path (it points to the longer, odder chain 60% of the time
+# and an LLM audit disagreed with it at kappa -0.35)
+path_naturalness = MultipleChoice(constant(''),choices=['choice1','choice2'],labels=lambda x: 1 - x["label"],
     question="Which chain of relations is more natural?",
     dataset_name="tasksource/path-naturalness-prediction")
 

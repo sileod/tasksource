@@ -49,7 +49,9 @@ JEV_TOKEN_TASKS = {
 # and delivery ("ok ." as happiness): the target cannot be read from the state.
 # puzzte: many height-ordering labels contradict the premises (an entailed "Is Minu the tallest?"
 # as contradiction); the procedural ordering generators cover this with exact labels.
-JEV_EXCLUDED_SOURCES = {"silicone/iemocap", "silicone/meld_e", "silicone/meld_s", "silicone/dyda_e", "puzzte"}
+# SIGA-nli: one adjective pair in similar contexts gets all three labels ("small" entails "tiny").
+JEV_EXCLUDED_SOURCES = {"silicone/iemocap", "silicone/meld_e", "silicone/meld_s", "silicone/dyda_e", "puzzte",
+                        "SIGA-nli"}
 
 
 # Vote shares from fewer annotators than this are coarse (one of three is 0.33): such
