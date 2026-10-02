@@ -1,5 +1,6 @@
 """Ask Jev yes/no questions about sampled decisions of a Jev build: is the gold answer right, is the
-question ambiguous, does it need information the text lacks, is it trivial, is it malformed.
+question ambiguous, does it need information the text lacks, is it trivial, is it malformed, does it
+exercise a transferable skill.
 
 Each decision is shown with its gold answer; the mean probabilities per source point to sources worth
 reading (the probabilities are a screen, not a verdict).
@@ -28,6 +29,8 @@ CHECKS = {
     "trivial": "Is the answer obvious from surface cues alone, without understanding the text?",
     "malformed": "Is the example malformed: garbled text, options that do not fit the question, or a "
                  "question that makes no sense?",
+    "transferable": "Does answering exercise a transferable skill (reasoning, world knowledge, reading "
+                    "between the lines, social understanding) rather than a dataset-specific convention?",
 }
 
 
