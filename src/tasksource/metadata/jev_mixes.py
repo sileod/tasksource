@@ -58,7 +58,7 @@ BUCKETS = {
 
 # Sources picked by reading them (2026-10-02): rows the scores alone undervalue, e.g. clean binary sets
 PICKED = r"^WANLI$|^anli/|^ai2_arc/|^glue/cola$|dynasent|Dynasent|^IntentGrasp/all$|^MSciNLI$|^ConTRoL-nli$|" \
-         r"^winogrande/|^contract-nli/|^folio$|^dynahate$|^head_qa/en$|^sciq$|^art$|^dadc-limit-nli$|^FOL-nli$"
+         r"^winogrande/|^contract-nli/|^folio$|^dynahate$|^head_qa/en$|^sciq$|^art$|^dadc-limit-nli$|^FOL-nli$|^doc-nli$"
 PICKED_BOOST = 2.0
 
 
