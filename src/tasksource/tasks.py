@@ -69,7 +69,12 @@ anli__a3 = Classification('premise','hypothesis','label', splits=['train_r3','de
 
 babi_nli = Classification("premise", "hypothesis", "label",
     dataset_name="tasksource/babi_nli",
-    config_name=BABI_NLI)  # agents-motivations is left out: not as clear-cut as the others
+    config_name=[c for c in BABI_NLI if c != "basic-induction"])  # agents-motivations is left out: not as clear-cut as the others
+
+# induction, not entailment: Greg is a rhino and the known rhino is yellow
+babi_nli_induction = Classification("premise", "hypothesis", "label",
+    question="Generalizing from the other members of its kind in text_A, does text_B follow?",
+    dataset_name="tasksource/babi_nli", config_name="basic-induction")
 
 
 sick__label         = Classification('sentence_A','sentence_B','label', dataset_name="tasksource/sick")
@@ -154,7 +159,8 @@ probability_words_nli = Classification(sentence1="context", sentence2="hypothesi
 
 nan_nli = Classification("premise", "hypothesis", "label", dataset_name="joey234/nan-nli")
 
-nli_fever = Classification("premise","hypothesis","label",
+# the source's "premise" is the FEVER claim and its "hypothesis" the evidence: the label is evidence => claim
+nli_fever = Classification("hypothesis","premise","label",
     dataset_name="pietrolesci/nli_fever", splits=["train","dev",None])
 
 breaking_nli = Classification("sentence1","sentence2","label",
@@ -237,7 +243,8 @@ add_one_rte = Classification("premise","hypothesis","label",
     label_values=ENTAILMENT_LABEL_VALUES)
 
 hlgd = Classification("headline_a", "headline_b", labels="label", dataset_name="tasksource/hlgd",
-    question="Do the two headlines report the same news event?")
+    # HLGD groups headlines by story timeline (a mutiny, then the new prime minister)
+    question="Do the two headlines belong to the same developing news story?")
 
 paws___labeled_final   = Classification("sentence1", "sentence2", name('label',['not_paraphrase','paraphrase']))
 paws___labeled_swap    = Classification("sentence1", "sentence2", name('label',['not_paraphrase','paraphrase']), splits=["train", None, None])
@@ -331,10 +338,18 @@ wiki_hop___original = MultipleChoice(  # query is "relation subject"
     dataset_name="MoE-UNC/wikihop", config_name="default",
     task_id="wiki_hop/original")
 
-wiqa = MultipleChoice('question_stem',
-    choices_list = lambda x: x['choices']['text'],
-    labels='answer_label_as_choice',
-    dataset_name="tasksource/wiqa")
+def _wiqa_input(x):
+    """The question is about this process: without its steps the answer is a guess."""
+    steps = [step for step in x["question_para_step"] if step]
+    return "Process:\n" + "\n".join(f"- {step}" for step in steps) + f"\n\nQuestion: {x['question_stem']}"
+
+_WIQA = "hf://datasets/allenai/wiqa@refs%2Fconvert%2Fparquet/default"
+wiqa = MultipleChoice(_wiqa_input,
+    choices_list=lambda x: x['choices']['text'],
+    labels=lambda x: "ABC".index(x['answer_label_as_choice']),
+    dataset_name="parquet", task_id="wiqa",
+    load_dataset_kwargs={"data_files": {split: f"{_WIQA}/{split}/0000.parquet"
+                                        for split in ("train", "validation", "test")}})
 
 piqa = MultipleChoice('goal', choices=['sol1','sol2'], labels='label',
     dataset_name="baber/piqa")
@@ -1114,7 +1129,10 @@ folio = Classification("premises","conclusion",
 
 def _tomi_pairs(dataset):
     """tasksource/tomi-nli pairs every row's valid hypothesis with a coin-flip label; the
-    valid_hypothesis/invalid_hypothesis columns are sound, so each gives one row."""
+    valid_hypothesis/invalid_hypothesis columns give one row each. Second-order questions ("X think
+    that Y searches") are dropped: their labels ignore what X saw (15% wrong on a belief simulation
+    even without re-entries). So are stories where an agent re-enters a room, whose labels assume
+    that re-entering reveals a container's content, which the text never says."""
     def text(h):
         h = h.replace("_", " ").replace(" look for the ", " looks for the ").strip()
         h = re.sub(r" (looks for the \w+) to the ", r" \1 in the ", h)
@@ -1122,7 +1140,9 @@ def _tomi_pairs(dataset):
     def pairs(batch):
         out = {"premise": [], "hypothesis": [], "label": []}
         for premise, valid, invalid in zip(batch["premise"], batch["valid_hypothesis"], batch["invalid_hypothesis"]):
-            if valid.strip() != invalid.strip():
+            entries = re.findall(r"(\w+ entered the [\w ]+?)\.", premise)
+            if valid.strip() != invalid.strip() and " think that " not in valid \
+                    and len(entries) == len(set(entries)):
                 out["premise"] += [premise, premise]
                 out["hypothesis"] += [text(valid), text(invalid)]
                 out["label"] += ["entailment", "not_entailment"]
@@ -1370,7 +1390,9 @@ it_support_tickets = Classification(
     splits=["train", None, "test"])
     
 control = Classification('premise','hypothesis',"label",dataset_name="tasksource/ConTRoL-nli")
-tracie = Classification("premise","hypothesis","answer",dataset_name='tasksource/tracie')
+# TRACIE labels plausible temporal relations of implicit events, which strict entailment rejects
+tracie = Classification("premise","hypothesis","answer",dataset_name='tasksource/tracie',
+    question="Given the story in text_A, is the temporal relation stated in text_B likely true?")
 sherliic = Classification("premise","hypothesis","label",dataset_name='tasksource/sherliic')
 
 sen_making__1 = MultipleChoice(constant(''), choices=['sentence0','sentence1'],labels='false',

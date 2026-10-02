@@ -51,7 +51,18 @@ JEV_TOKEN_TASKS = {
 # as contradiction); the procedural ordering generators cover this with exact labels.
 # SIGA-nli: one adjective pair in similar contexts gets all three labels ("small" entails "tiny").
 JEV_EXCLUDED_SOURCES = {"silicone/iemocap", "silicone/meld_e", "silicone/meld_s", "silicone/dyda_e", "puzzte",
-                        "SIGA-nli"}
+                        "SIGA-nli",
+                        # probability-word recast of UNLI (UNLI itself is in with its soft labels): its
+                        # "valid" conclusions often are not, and some hypotheses are garbled
+                        "probability_words_nli/usnli",
+                        # persona slots: "a good skater" contradicts "a musician on the weekends"
+                        "dialogue_nli",
+                        # word-count bins that do not match the sentences ("Nope, it's just me." as 9-12 words)
+                        "linguisticprobing/sentence_length",
+                        # the extracted evidence often lacks what the label rests on
+                        "hover-3way/nli",
+                        # relevance to the U.S. economy: a Dow rally after a Fed hike as not relevant
+                        "crowdflower/economic-news"}
 
 
 # Vote shares from fewer annotators than this are coarse (one of three is 0.33): such
