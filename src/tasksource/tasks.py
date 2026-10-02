@@ -1863,8 +1863,40 @@ fewrel = Classification(
     splits=["train_wiki", "val_wiki", "val_nyt"],
     pre_process=_fewrel_relation_match)
 
+# DocRED's relation names (its rel_info.json, the Wikidata property labels)
+DOCRED_RELATIONS = {
+    "P6": "head of government", "P17": "country", "P19": "place of birth", "P20": "place of death",
+    "P22": "father", "P25": "mother", "P26": "spouse", "P27": "country of citizenship", "P30": "continent",
+    "P31": "instance of", "P35": "head of state", "P36": "capital", "P37": "official language",
+    "P39": "position held", "P40": "child", "P50": "author", "P54": "member of sports team",
+    "P57": "director", "P58": "screenwriter", "P69": "educated at", "P86": "composer",
+    "P102": "member of political party", "P108": "employer", "P112": "founder",
+    "P118": "league or competition", "P123": "publisher", "P127": "owned by",
+    "P131": "located in the administrative territorial entity", "P136": "genre", "P137": "operator",
+    "P140": "religion or worldview", "P150": "contains the administrative territorial entity",
+    "P155": "follows", "P156": "followed by", "P159": "headquarters location", "P161": "cast member",
+    "P162": "producer", "P166": "award received", "P170": "creator", "P171": "parent taxon",
+    "P172": "ethnic group", "P175": "performer", "P176": "manufacturer", "P178": "developer",
+    "P179": "part of the series", "P190": "twinned administrative body", "P194": "legislative body",
+    "P205": "basin country", "P206": "located in or next to body of water", "P241": "military branch",
+    "P264": "record label", "P272": "production company", "P276": "location", "P279": "subclass of",
+    "P355": "child organization or unit", "P361": "part of", "P364": "original language of film or TV show",
+    "P400": "platform", "P403": "mouth of the watercourse", "P449": "original broadcaster",
+    "P463": "member of", "P488": "chairperson", "P495": "country of origin", "P527": "has part(s)",
+    "P551": "residence", "P569": "date of birth", "P570": "date of death", "P571": "inception",
+    "P576": "dissolved, abolished or demolished", "P577": "publication date", "P580": "start time",
+    "P582": "end time", "P585": "point in time", "P607": "participated in conflict", "P674": "characters",
+    "P676": "lyricist", "P706": "located in/on physical feature", "P710": "participant",
+    "P737": "influenced by", "P740": "location of formation", "P749": "parent organization or unit",
+    "P800": "notable work", "P807": "separated from", "P840": "narrative location", "P937": "work location",
+    "P1001": "applies to jurisdiction", "P1056": "product or material produced",
+    "P1198": "unemployment rate", "P1336": "territory claimed by", "P1344": "participant in",
+    "P1365": "replaces", "P1366": "replaced by", "P1376": "capital of",
+    "P1412": "languages spoken, written or signed", "P1441": "present in work", "P3373": "sibling",
+}
+
 def _yufei_docred_to_columnar(dataset):
-    """Map YufeiHFUT raw labels ({h,t,r}) to the columnar form _docred_relations expects."""
+    """Map YufeiHFUT raw labels ({h,t,r}, r a Wikidata property id) to the columnar form _docred_relations expects."""
     out = {}
     for split in dataset:
         def convert(x):
@@ -1873,7 +1905,7 @@ def _yufei_docred_to_columnar(dataset):
                 "head": [r["h"] for r in labels],
                 "tail": [r["t"] for r in labels],
                 "relation_id": [r["r"] for r in labels],
-                "relation_text": [r["r"] for r in labels],
+                "relation_text": [DOCRED_RELATIONS[r["r"]] for r in labels],
             }}
         out[split] = dataset[split].map(convert)
     return DatasetDict(out)

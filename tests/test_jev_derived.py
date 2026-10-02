@@ -14,7 +14,7 @@ from tasksource.jev.length import LengthBudget, render_request
 from tasksource.jev.options import choice_permutation, gold_position_violations, permute_choices
 from scripts.build_jev_dataset import (
     TRAINING_FEATURES, add_question_groups, diverse_cap, drop_train_overlap,
-    content_keys, to_training_row, validate_decisions,
+    content_keys, merge_identical_inputs, to_training_row, validate_decisions,
 )
 from datasets import ClassLabel, Features, Value
 from tasksource.tasks import _copa_input, _esci_product
@@ -338,6 +338,19 @@ class ReleaseQualityTest(unittest.TestCase):
             "product_title": "Fan", "product_brand": "Acme", "product_color": None,
             "product_description": "None", "product_bullet_point": "Quiet.",
         }), "Fan\nAcme\nQuiet.")
+
+
+class MergeIdenticalInputsTest(unittest.TestCase):
+    def test_conflicting_labels_become_their_distribution(self):
+        rows = Dataset.from_dict({
+            "state": ["right", "right", "okay", "right"], "question": ["q"] * 4,
+            "options": [["a", "b"]] * 4, "target": [[1.0, 0.0], [0.0, 1.0], [1.0, 0.0], [1.0, 0.0]],
+            "id": ["0", "1", "2", "3"],
+        })
+        merged = merge_identical_inputs(rows)
+        self.assertEqual(merged["id"], ["0", "2"])
+        self.assertEqual(merged["target"][0], [2 / 3, 1 / 3])
+        self.assertEqual(merged["target"][1], [1.0, 0.0])
 
 
 if __name__ == "__main__":

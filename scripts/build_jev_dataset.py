@@ -47,7 +47,9 @@ JEV_TOKEN_TASKS = {
 
 # Emotion and sentiment of isolated dialogue utterances whose labels depend on the conversation
 # and delivery ("ok ." as happiness): the target cannot be read from the state.
-JEV_EXCLUDED_SOURCES = {"silicone/iemocap", "silicone/meld_e", "silicone/meld_s", "silicone/dyda_e"}
+# puzzte: many height-ordering labels contradict the premises (an entailed "Is Minu the tallest?"
+# as contradiction); the procedural ordering generators cover this with exact labels.
+JEV_EXCLUDED_SOURCES = {"silicone/iemocap", "silicone/meld_e", "silicone/meld_s", "silicone/dyda_e", "puzzte"}
 
 
 # Vote shares from fewer annotators than this are coarse (one of three is 0.33): such
@@ -299,6 +301,24 @@ def write_pack_audit(output, split, task_id, records):
     path.write_text("".join(
         json.dumps(record, ensure_ascii=False) + "\n" for record in records
     ), encoding="utf-8")
+
+
+def merge_identical_inputs(rows):
+    """One row per (state, question, options): identical inputs with different targets (a bare
+    "right" as acknowledge, ready or align) get the mean target, the label distribution the
+    input alone supports."""
+    columns = rows.select_columns(["state", "question", "options"])[:]
+    groups = {}
+    for index, key in enumerate(zip(columns["state"], columns["question"], map(tuple, columns["options"]))):
+        groups.setdefault(key, []).append(index)
+    if len(groups) == len(rows):
+        return rows
+    targets = rows["target"]
+    kept = sorted(indices[0] for indices in groups.values())
+    members = {indices[0]: indices for indices in groups.values()}
+    return rows.select(kept).map(
+        lambda row, i: {"target": np.mean([targets[j] for j in members[kept[i]]], axis=0).tolist()},
+        with_indices=True)
 
 
 def check_gold_positions(rows, split, multiple_choice_sources):
@@ -1093,6 +1113,7 @@ def build(args):
                         fn_kwargs={"task_id": task_id, "split": split},
                         remove_columns=split_dataset.column_names,
                     )
+                    split_dataset = merge_identical_inputs(split_dataset)
                     pack_audit = []
                     split_dataset = add_packed_classification(
                         split_dataset, row.task_type, rate=args.pack_rate,
