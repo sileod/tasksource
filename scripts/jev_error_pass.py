@@ -234,7 +234,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--out", type=Path, default=Path("build/jev-error-pass"))
     parser.add_argument("--model", default="albert/deepseek-v4-flash-0731")
-    parser.add_argument("--keys", nargs="+", default=["ALBERT_API_KEY", "ALBERT_API_KEY_2"])
+    parser.add_argument("--keys", nargs="+", default=sorted(k for k in os.environ if re.fullmatch(r"ALBERT_API_KEY(_\d+)?", k)))
     parser.add_argument("--rpm", type=float, default=45, help="per key; Albert allows 50")
     parser.add_argument("--concurrency", type=int, default=12, help="per key")
     parser.add_argument("--max-items", type=int, default=16)
