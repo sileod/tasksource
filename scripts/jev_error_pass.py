@@ -8,8 +8,9 @@ Batched screening over-flags hard examples (adversarial NLI), so `--confirm` re-
 example alone: DeepSeek reasoning step by step after examples of the same source, and Jev. An example is
 bad when both reject the gold (DeepSeek picks another option and Jev gives the gold less than 0.3).
 Models cannot tell hard from wrong, so constructed sources are not checked, and a source with more than
-MAX_BAD_RATE bad is listed for review instead of losing its examples. The removed examples go to
-src/tasksource/metadata/jev_bad_examples.csv, which the build drops.
+MAX_BAD_RATE bad is listed for review instead of losing its examples. The removable examples go to
+build/jev-error-pass/bad-examples.csv; once reviewed, copying them to
+src/tasksource/metadata/jev_bad_examples.csv makes the build drop them.
 
     set -a; . ~/.jev_synth.env; set +a
     PYTHONPATH=.:src python scripts/jev_error_pass.py --limit 2000   # probe
@@ -209,10 +210,12 @@ def main():
     parser.add_argument("--limit", type=int, help="examples to check (a probe)")
     parser.add_argument("--confirm", action="store_true", help="re-check flagged examples, write the bad list")
     parser.add_argument("--jev-budget", type=float, default=5.0)
-    parser.add_argument("--bad", type=Path, default=BAD, help="where --confirm writes the bad examples")
+    parser.add_argument("--bad", type=Path, help="where --confirm writes the removable examples (default: in --out; "
+                        f"copy them to {BAD.name} once reviewed, and the build drops them)")
     args = parser.parse_args()
     from litlm import Failure, complete
     if args.confirm:
+        args.bad = args.bad or args.out / "bad-examples.csv"
         return confirm(args)
 
     args.out.mkdir(parents=True, exist_ok=True)
