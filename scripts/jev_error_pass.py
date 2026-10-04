@@ -5,8 +5,10 @@ One direct row per `example_id` is checked, examples of the `default` config fir
 build/jev-error-pass/verdicts.jsonl (resumable), flagged rows to flagged.jsonl.
 
 Batched screening over-flags hard examples (adversarial NLI), so `--confirm` re-checks each flagged
-example alone: DeepSeek reasoning step by step, and Jev. An example is bad when both reject the gold
-(DeepSeek picks another option and Jev gives the gold less than 0.3). Bad examples go to
+example alone: DeepSeek reasoning step by step after examples of the same source, and Jev. An example is
+bad when both reject the gold (DeepSeek picks another option and Jev gives the gold less than 0.3).
+Models cannot tell hard from wrong, so constructed sources are not checked, and a source with more than
+MAX_BAD_RATE bad is listed for review instead of losing its examples. The removed examples go to
 src/tasksource/metadata/jev_bad_examples.csv, which the build drops.
 
     set -a; . ~/.jev_synth.env; set +a
@@ -59,7 +61,10 @@ def render(index, row, max_chars):
 
 
 def checkable(row):
-    """Hard labels only: soft crowd distributions and uncertain yes/no targets are not errors."""
+    """Hard labels of curated sources only: soft crowd distributions and uncertain yes/no targets are not
+    errors, and constructed labels are right by design."""
+    if re.search(CONSTRUCTED, row["source"]):
+        return False
     target = list(row["target"])
     if row["kind"] == "noul":
         return abs(target[0] - 0.5) >= 0.3
@@ -85,6 +90,14 @@ def batches(rows, max_items, max_chars):
 
 
 ROW_FIELDS = ("id", "example_id", "source", "kind", "state", "question", "options", "target")
+# labels from a generator, solver or simulator: a model rejecting them means a hard example, not an error
+CONSTRUCTED = (r"^procedural-typed-decisions/|logical-entailment|FOL-nli|LogicNLI|FLD|proofwriter|ruletaker|PARARULE|"
+               r"robustLR|clutrr|stepgame|babi_nli|SpaRTUN|spartqa|tomi-nli|mindgames|corr2cause|cladder|nlgraph|"
+               r"conceptrules|regset|satisfiability|monotonicity|missing-item|synthetic-retrieval-NLI")
+# bad apples are rare: above this rate a source disagrees systematically (a convention, or hard data) and is
+# reviewed by reading it instead of losing its flagged examples
+MAX_BAD_RATE = 0.08
+REFERENCES = 3  # examples judged ok, shown when confirming flags of the same source
 BAD = Path(__file__).resolve().parent.parent / "src" / "tasksource" / "metadata" / "jev_bad_examples.csv"
 
 
@@ -107,6 +120,17 @@ def parse(reply, batch):
     return out
 
 
+def confirmation_prompt(row, references):
+    """The adjudication prompt, after examples of the same source with their gold: conventions such as
+    SNLI's "contradiction" for unrelated captions are the dataset's, not errors."""
+    if not references:
+        return adjudication_prompt(row)
+    shown = "\n\n".join(render(i, reference, 4000) for i, reference in enumerate(references, 1))
+    return (f"Examples from the same dataset ({row['source']}) with their gold answers, showing its labeling "
+            f"conventions:\n\n{shown}\n\nNow the example to answer, following those conventions.\n\n"
+            + adjudication_prompt(row))
+
+
 def confirm(args):
     """Re-check flagged examples one by one (DeepSeek reasoning, Jev) and write the bad examples."""
     import pandas as pd
@@ -116,6 +140,10 @@ def confirm(args):
         verdict = json.loads(line)
         verdicts[verdict["example_id"]] = verdict
     flagged = [v for v in verdicts.values() if v["verdict"] != "ok"]
+    references = {}
+    for verdict in verdicts.values():
+        if verdict["verdict"] == "ok" and "row" in verdict:
+            references.setdefault(verdict["source"], []).append(verdict["row"])
     path = args.out / "confirmed.jsonl"
     confirmed = {json.loads(line)["example_id"]: json.loads(line) for line in path.open()} if path.exists() else {}
     todo = [v for v in flagged if v["example_id"] not in confirmed]
@@ -135,7 +163,8 @@ def confirm(args):
     keys = [key for key in args.keys if os.environ.get(key)]
     for start in range(0, len(todo), args.chunk):
         chunk = todo[start:start + args.chunk]
-        replies = complete([adjudication_prompt(v["row"]) for v in chunk], model=args.model,
+        replies = complete([confirmation_prompt(v["row"], references.get(v["source"], [])[:REFERENCES]) for v in chunk],
+                           model=args.model,
                            api_key=os.environ[keys[(start // args.chunk) % len(keys)]], temperature=0.0,
                            max_tokens=4000, max_concurrency=args.concurrency, rpm=args.rpm, timeout=300,
                            num_retries=5, show_progress=False)
@@ -154,12 +183,17 @@ def confirm(args):
         print(f"confirmed {start + len(chunk)}/{len(todo)} {time.strftime('%H:%M')}", flush=True)
     bad = pd.DataFrame([r for r in confirmed.values() if r["bad"]],
                        columns=["example_id", "source", "id", "verdict", "reason", "deepseek", "gold", "jev_gold_probability"])
-    bad.sort_values(["source", "example_id"]).to_csv(BAD, index=False)
     checked = pd.Series([v["source"] for v in verdicts.values()]).value_counts()
-    rates = (bad.source.value_counts().reindex(checked.index, fill_value=0) / checked).rename("bad_rate")
-    pd.concat([checked.rename("checked"), rates], axis=1).sort_values("bad_rate", ascending=False).to_csv(
-        args.out / "per-source.csv", index_label="source")
-    print(f"{len(bad)} bad examples of {len(verdicts)} checked -> {BAD}", flush=True)
+    sources = pd.concat([checked.rename("checked"), bad.source.value_counts().reindex(checked.index, fill_value=0)
+                         .rename("bad")], axis=1)
+    sources["bad_rate"] = sources.bad / sources.checked
+    sources["action"] = ["review" if rate > MAX_BAD_RATE else "remove" if n else "" for rate, n in
+                         zip(sources.bad_rate, sources.bad)]
+    sources.sort_values("bad_rate", ascending=False).to_csv(args.out / "per-source.csv", index_label="source")
+    removed = bad[bad.source.isin(sources.index[sources.action == "remove"])]
+    removed.sort_values(["source", "example_id"]).to_csv(args.bad, index=False)
+    print(f"{len(bad)} bad examples of {len(verdicts)} checked; {len(removed)} removed -> {args.bad}; "
+          f"{(sources.action == 'review').sum()} sources to review -> {args.out / 'per-source.csv'}", flush=True)
 
 
 def main():
@@ -175,6 +209,7 @@ def main():
     parser.add_argument("--limit", type=int, help="examples to check (a probe)")
     parser.add_argument("--confirm", action="store_true", help="re-check flagged examples, write the bad list")
     parser.add_argument("--jev-budget", type=float, default=5.0)
+    parser.add_argument("--bad", type=Path, default=BAD, help="where --confirm writes the bad examples")
     args = parser.parse_args()
     from litlm import Failure, complete
     if args.confirm:
@@ -199,6 +234,12 @@ def main():
     print(f"{len(done)} done; {len(rows)} examples to check in {len(requests)} requests", flush=True)
 
     lock = threading.Lock()
+    references = {}
+    if path.exists():
+        for line in path.open():
+            verdict = json.loads(line)
+            if verdict["verdict"] == "ok" and "row" in verdict:
+                references[verdict["source"]] = references.get(verdict["source"], 0) + 1
 
     def worker(key, mine):
         for start in range(0, len(mine), args.chunk):
@@ -214,8 +255,10 @@ def main():
                     verdicts.update(parse(reply, batch))
             with lock, path.open("a") as handle:
                 for verdict in verdicts.values():
-                    if verdict["verdict"] == "ok":
-                        verdict = {k: v for k, v in verdict.items() if k != "row"}  # keep rows of flags only
+                    if verdict["verdict"] == "ok":  # rows of flags, and a few references per source
+                        references[verdict["source"]] = references.get(verdict["source"], 0) + 1
+                        if references[verdict["source"]] > REFERENCES:
+                            verdict = {k: v for k, v in verdict.items() if k != "row"}
                     handle.write(json.dumps(verdict, ensure_ascii=False) + "\n")
             print(f"[{key}] {start + len(chunk)}/{len(mine)} requests, {len(verdicts)} verdicts "
                   f"({sum(v['verdict'] != 'ok' for v in verdicts.values())} flagged) {time.strftime('%H:%M')}",
