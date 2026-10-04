@@ -132,6 +132,29 @@ def confirmation_prompt(row, references):
             + adjudication_prompt(row))
 
 
+def capture_recapture(verdicts, second, out):
+    """Per source, on Jev's sample: DeepSeek's flags and Jev's doubts are two catches of the wrong labels;
+    their overlap estimates how many both miss (Chapman's estimator)."""
+    import pandas as pd
+    rows = []
+    for example_id, models in second.items():
+        if "jev" in models and example_id in verdicts:
+            verdict = verdicts[example_id]
+            rows.append({"source": verdict["source"], "deepseek": verdict.get("screen", verdict["verdict"]) != "ok",
+                         "jev": "row" in models["jev"]})
+    if not rows:
+        return
+    frame = pd.DataFrame(rows)
+    stats = frame.groupby("source").agg(sample=("jev", "size"), deepseek=("deepseek", "sum"), jev=("jev", "sum"),
+                                        both=("jev", lambda j: (j & frame.loc[j.index, "deepseek"]).sum()))
+    stats["estimated_wrong"] = (stats.deepseek + 1) * (stats.jev + 1) / (stats.both + 1) - 1
+    stats["estimated_missed"] = (stats.estimated_wrong - (stats.deepseek + stats.jev - stats.both)).clip(lower=0)
+    stats["missed_rate"] = stats.estimated_missed / stats["sample"]
+    stats.sort_values("missed_rate", ascending=False).round(3).to_csv(out / "capture-recapture.csv")
+    print(f"capture-recapture: {stats.estimated_missed.sum():.0f} wrong labels missed by both in "
+          f"{stats['sample'].sum()} sampled examples", flush=True)
+
+
 def confirm(args):
     """Re-check flagged examples one by one (DeepSeek reasoning, Jev) and write the bad examples."""
     import pandas as pd
@@ -140,6 +163,16 @@ def confirm(args):
     for line in (args.out / "verdicts.jsonl").open():
         verdict = json.loads(line)
         verdicts[verdict["example_id"]] = verdict
+    second = {}  # gold probabilities of decision models (jev_second_detector.py); their doubts get confirmed too
+    for detector in sorted(args.out.glob("second-*.jsonl")):
+        for line in detector.open():
+            record = json.loads(line)
+            second.setdefault(record["example_id"], {})[record["model"]] = record
+            if "row" in record and record["example_id"] in verdicts and verdicts[record["example_id"]]["verdict"] == "ok":
+                verdicts[record["example_id"]] = {**verdicts[record["example_id"]], "row": record["row"],
+                                                  "verdict": "wrong", "reason": f"{record['model']} doubt",
+                                                  "screen": "ok"}
+    capture_recapture(verdicts, second, args.out)
     flagged = [v for v in verdicts.values() if v["verdict"] != "ok"]
     references = {}
     for verdict in verdicts.values():
