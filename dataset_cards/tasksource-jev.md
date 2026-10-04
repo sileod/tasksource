@@ -91,6 +91,7 @@ print(row["state"], row["question"], row["options"], row["target"])
 | `options` | Runtime criteria; empty for `noul` |
 | `target` | Distribution over `options`, or `[p]` for `noul` |
 | `id`, `group_id`, `question_id` | Link decisions over the same source example |
+| `example_id` | Stable hash of the source example's input and gold; the same across releases unless the label changes |
 | `source`, `split`, `variant` | Originating task, original split, and recast variant |
 | `license`, `license_use` | The source's license(s), and `commercial`, `non-commercial` or `unspecified` (see below) |
 

@@ -14,7 +14,7 @@ from tasksource.jev.length import LengthBudget, render_request
 from tasksource.jev.options import choice_permutation, gold_position_violations, permute_choices
 from scripts.build_jev_dataset import (
     TRAINING_FEATURES, add_question_groups, diverse_cap, drop_train_overlap,
-    content_keys, merge_identical_inputs, to_training_row, validate_decisions,
+    add_example_ids, content_keys, merge_identical_inputs, to_training_row, validate_decisions,
 )
 from datasets import ClassLabel, Features, Value
 from tasksource.tasks import _copa_input, _esci_product
@@ -355,3 +355,20 @@ class MergeIdenticalInputsTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ExampleIdsTest(unittest.TestCase):
+    def test_variants_share_the_direct_rows_id_and_a_new_gold_changes_it(self):
+        def row(id, variant, state, target):
+            return {"id": id, "variant": variant, "source": "s", "state": state,
+                    "options": ["yes", "no"], "target": target}
+        rows = Dataset.from_list([
+            row("s-1:train:0:label-check", "label_verification", "a?", [1.0, 0.0]),
+            row("s-1:train:0", "direct", "a", [1.0, 0.0]),
+            row("s-1:train:1", "direct", "b", [1.0, 0.0]),
+        ])
+        ids = add_example_ids(rows)["example_id"]
+        self.assertEqual(ids[0], ids[1])
+        self.assertNotEqual(ids[1], ids[2])
+        relabeled = add_example_ids(Dataset.from_list([row("s-1:train:0", "direct", "a", [0.0, 1.0])]))
+        self.assertNotEqual(relabeled["example_id"][0], ids[1])

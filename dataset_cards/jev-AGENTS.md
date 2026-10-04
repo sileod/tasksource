@@ -75,6 +75,7 @@ The `default` config is a steered mix of about 1M rows. `full` has every row of 
 - `variant`: `direct` (the source example as is), `label_verification` (a yes/no check of
   one label), `criteria_permutation`, `instruction_paraphrase`, `paired_text_format`
   (surface variations), `packed_derived` (questions over 2-4 packed items).
+- `example_id`: a stable hash of the source example's input and gold answer, shared by its variants. Examples flagged as wrong, ambiguous or malformed are listed in [jev_bad_examples.csv](https://github.com/sileod/tasksource/blob/main/src/tasksource/metadata/jev_bad_examples.csv) and left out.
 - `split`: the source's own split (`train`, `dev`, `test`); it matches the Hub split.
 
 ```python

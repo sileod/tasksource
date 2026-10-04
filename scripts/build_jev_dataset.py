@@ -796,6 +796,42 @@ def steered_mix(dataset, mix_rows, pretty_rows=1_000):
     return DatasetDict(mix)
 
 
+BAD_EXAMPLES = Path(__file__).resolve().parent.parent / "src" / "tasksource" / "metadata" / "jev_bad_examples.csv"
+
+
+def example_key(source, state, options, target):
+    """Stable id of a source example: its input and gold, so a fixed label gets a new id."""
+    gold = options[int(np.argmax(target))] if options else f"{target[0]:.3f}"
+    if len(options) and max(target) < 1:  # soft labels: the whole distribution
+        gold = ",".join(f"{value:.3f}" for value in target)
+    payload = "\x1f".join([source, state, *options, gold])
+    return hashlib.sha1(payload.encode("utf-8")).hexdigest()[:16]
+
+
+def add_example_ids(dataset):
+    """``example_id`` on every row: the key of its group's direct row (variants and label checks of
+    one source example share it), or of the row itself when the group has no direct row."""
+    dataset = add_question_groups(dataset)
+    columns = dataset.select_columns(["group_id", "variant", "source", "state", "options", "target"])
+    keys = {}
+    for start in range(0, len(columns), 50_000):
+        batch = columns[start:start + 50_000]
+        for group, variant, *content in zip(batch["group_id"], batch["variant"], batch["source"],
+                                            batch["state"], batch["options"], batch["target"]):
+            if variant == "direct" or group not in keys:  # the direct row wins over a fallback
+                keys[group] = example_key(*content)
+    return dataset.map(
+        lambda groups: {"example_id": [keys.get(group, group) for group in groups]},
+        input_columns="group_id", batched=True, batch_size=50_000, desc="Example ids")
+
+
+def bad_examples(path=BAD_EXAMPLES):
+    """Example ids flagged as wrong, ambiguous or malformed (scripts/jev_error_pass.py)."""
+    if not path.exists():
+        return set()
+    return set(pd.read_csv(path, usecols=["example_id"])["example_id"])
+
+
 def publish_dataset(
     output, repo_id, pretty_rows=1_000, publish_rows=1_000_000, eval_rows=15_000,
     allowed_sources=None, procedural_share=0.1, mix_rows=1_000_000,
@@ -811,6 +847,12 @@ def publish_dataset(
             split_dataset, allowed_sources=allowed_sources
         )
         for split, split_dataset in dataset.items()
+    })
+    bad = bad_examples()
+    dataset = DatasetDict({
+        split: add_example_ids(rows).filter(
+            lambda key: key not in bad, input_columns="example_id", desc="Bad examples")
+        for split, rows in dataset.items()
     })
     overlap_dropped = {}
     formats = {task: record.get("task_type") for task, record in latest_records(output / "build-report.jsonl").items()}
