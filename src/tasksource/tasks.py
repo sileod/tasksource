@@ -2299,6 +2299,27 @@ mhs__hatespeech = _mhs("hatespeech", "Does this comment contain hate speech, def
     "malicious language targeted at a person or group because of their actual or perceived innate characteristics?",
     ["no", "unclear", "yes"], kind="choice")
 
+# Wikipedia Detox: binary decisions and the distinct ordinal rating distributions.
+def _wikipedia_detox(config, options, question, score=False):
+    return SoftLabeling("text", labels="score_votes" if score else f"{config}_votes",
+        kind="score" if score else "choice", options=options, annotators=10, count="annotators",
+        question=question, dataset_name="tasksource/wikipedia-detox-votes", config_name=config,
+        task_id=f"wikipedia-detox/{config}{'_score' if score else ''}")
+
+wikipedia_detox__attack = _wikipedia_detox("attack", ["not a personal attack", "personal attack"],
+    "How would annotators judge whether this comment contains a personal attack?")
+wikipedia_detox__aggression = _wikipedia_detox("aggression", ["not aggressive", "aggressive"],
+    "How would annotators judge whether this comment is aggressive?")
+wikipedia_detox__aggression_score = _wikipedia_detox("aggression",
+    ["very aggressive (-3)", "aggressive (-2)", "mildly aggressive (-1)", "neutral (0)",
+     "mildly friendly (+1)", "friendly (+2)", "very friendly (+3)"],
+    "How would annotators rate this comment from very aggressive (-3) to very friendly (+3)?", score=True)
+wikipedia_detox__toxicity = _wikipedia_detox("toxicity", ["not toxic", "toxic"],
+    "How would annotators judge whether this comment is toxic?")
+wikipedia_detox__toxicity_score = _wikipedia_detox("toxicity",
+    ["very toxic (-2)", "toxic (-1)", "neutral (0)", "healthy (+1)", "very healthy (+2)"],
+    "How would annotators rate this comment from very toxic (-2) to very healthy (+2)?", score=True)
+
 # LeWiDi 2023 (Learning with Disagreements): soft labels with the per-item annotator count
 def _lewidi(config, sentence1, question, sentence2=None, annotators=5, **kwargs):
     kwargs = {"labels": lambda x: x["soft_label"][1], "kind": "noul", "task_id": f"lewidi/{config}", **kwargs}
@@ -2376,5 +2397,5 @@ oasst2__lang_mismatch = _flag("lang_mismatch", "in the wrong language")
 
 webinstruct___mc = MultipleChoice('prompt', choices_list='options', labels='gold',
     dataset_name='tasksource/webinstruct', config_name='mc')
-webinstruct___binary = Classification('question', labels='label',
+webinstruct___binary = Classification('prompt', labels='label',
     dataset_name='tasksource/webinstruct', config_name='binary', label_values={0: 'no / false', 1: 'yes / true'})

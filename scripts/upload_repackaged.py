@@ -302,16 +302,16 @@ def lewidi():
     return configs
 
 
-def webinstruct():
+def webinstruct(bad_examples=None, repairs=None):
     """WebInstruct verified: single-answer multiple choice and explicit yes/no or true/false answers.
 
     Full preprocessing documentation is in dataset_cards/webinstruct.md.
     """
     from scripts.build_webinstruct import build
-    output = Path('build/webinstruct')
-    build(output)
+    output = Path('build/webinstruct-release')
+    counts = build(output, bad_examples, repairs)
     return {config: DatasetDict({split: Dataset.from_parquet(str(output / config / f'{split}.parquet'))
-                                for split in ['train', 'test']}) for config in ['mc', 'binary']}
+                                for split in ['train', 'test']}) for config in sorted({key.split('/')[0] for key in counts})}
 
 
 BUILDERS = {"webinstruct": ("tasksource/webinstruct", webinstruct, "per-config"),
@@ -341,24 +341,41 @@ def push_card(repo, build):
                  "Repackaged as parquet for [tasksource](https://github.com/sileod/tasksource) by "
                  "[scripts/upload_repackaged.py](https://github.com/sileod/tasksource/blob/main/scripts/upload_repackaged.py).\n")
     if repo == 'tasksource/webinstruct':
-        card.text = (Path(__file__).resolve().parents[1] / 'dataset_cards/webinstruct.md').read_text().split('---', 2)[2]
+        prepared_card = Path('build/webinstruct-release/README.md')
+        source_card = prepared_card if prepared_card.exists() else Path(__file__).resolve().parents[1] / 'dataset_cards/webinstruct.md'
+        card.text = source_card.read_text().split('---', 2)[2]
     card.push_to_hub(repo)
     if repo == 'tasksource/webinstruct':
         from huggingface_hub import HfApi
-        HfApi().upload_file(path_or_fileobj='build/webinstruct/provenance.json', path_in_repo='provenance.json',
+        HfApi().upload_file(path_or_fileobj='build/webinstruct-release/provenance.json', path_in_repo='provenance.json',
                            repo_id=repo, repo_type='dataset', commit_message='Record WebInstruct preprocessing provenance')
+        provenance = json.loads(Path('build/webinstruct-release/provenance.json').read_text())
+        for filename, field in [('bad-examples.jsonl', 'removal_manifest_sha256'), ('repairs.jsonl', 'repairs_sha256')]:
+            if field in provenance:
+                HfApi().upload_file(path_or_fileobj=Path('build/webinstruct-release') / filename, path_in_repo=filename,
+                                   repo_id=repo, repo_type='dataset', commit_message='Record WebInstruct audit decisions')
+        if 'audit' in provenance:
+            for filename in ['audit-prompt.txt', 'audit-settings.json', 'screen-verdicts.jsonl', 'confirm-verdicts.jsonl']:
+                path = Path('build/webinstruct-release') / filename
+                if path.exists():
+                    HfApi().upload_file(path_or_fileobj=path, path_in_repo=filename, repo_id=repo,
+                                       repo_type='dataset', commit_message='Document WebInstruct presentation audit')
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("names", nargs="+", choices=BUILDERS)
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--card-only", action="store_true")
+    parser.add_argument("--bad-examples", type=Path, help="WebInstruct only: confirmed-removal manifest")
+    parser.add_argument("--repairs", type=Path, help="WebInstruct only: verified presentation repairs")
     args = parser.parse_args()
+    if (args.bad_examples or args.repairs) and args.names != ['webinstruct']:
+        parser.error('--bad-examples and --repairs apply only to webinstruct')
     for name in args.names:
         repo, build, *config = BUILDERS[name]
         assert repo in ORIGINALS, f"add {repo} to tasksource/metadata/originals.py"
         if not args.card_only:
-            dataset = build()
+            dataset = build(args.bad_examples, args.repairs) if name == 'webinstruct' else build()
             # a builder returns one DatasetDict, or {config: DatasetDict} for per-config repos
             configs = dataset if config in (["per-language"], ["per-config"]) else {config[0] if config else "default": dataset}
             for config_name, splits in configs.items():

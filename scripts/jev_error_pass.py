@@ -22,7 +22,6 @@ import argparse
 import json
 import os
 import re
-import threading
 import time
 from pathlib import Path
 
@@ -104,13 +103,20 @@ BAD = Path(__file__).resolve().parent.parent / "src" / "tasksource" / "metadata"
 
 def parse(reply, batch):
     out = {}
-    for line in str(reply).splitlines():
-        match = re.search(r"\{.*\}", line)
-        if not match:
-            continue
+    decoder = json.JSONDecoder()
+    text = str(reply)
+    for match in re.finditer(r'\{', text):
         try:
-            item = json.loads(match.group(0))
-            row = batch[int(item["i"]) - 1]
+            item, _ = decoder.raw_decode(text[match.start():])
+            if not (type(item.get('i')) is int or
+                    isinstance(item.get('i'), str) and item['i'].isdigit()):
+                continue
+            index = int(item["i"])
+            if not 1 <= index <= len(batch):
+                continue
+            row = batch[index - 1]
+            if row is None:
+                continue
         except (ValueError, KeyError, IndexError, TypeError):
             continue
         if item.get("verdict") in VERDICTS:
@@ -173,7 +179,7 @@ def confirm(args):
                                                   "verdict": "wrong", "reason": f"{record['model']} doubt",
                                                   "screen": "ok"}
     capture_recapture(verdicts, second, args.out)
-    flagged = [v for v in verdicts.values() if v["verdict"] != "ok"]
+    flagged = [v for v in verdicts.values() if v["verdict"] != "ok" and checkable(v['row'])]
     references = {}
     for verdict in verdicts.values():
         if verdict["verdict"] == "ok" and "row" in verdict:
@@ -181,27 +187,40 @@ def confirm(args):
     path = args.out / "confirmed.jsonl"
     confirmed = {json.loads(line)["example_id"]: json.loads(line) for line in path.open()} if path.exists() else {}
     todo = [v for v in flagged if v["example_id"] not in confirmed]
+    if args.confirm_limit:
+        import random
+        random.Random(43).shuffle(todo)
+        todo = todo[:args.confirm_limit]
     print(f"{len(verdicts)} checked, {len(flagged)} flagged, {len(todo)} to confirm", flush=True)
     rows = [v["row"] for v in todo]
     jev_args = argparse.Namespace(out=args.out, chunk=500, concurrency=32, budget_usd=args.jev_budget)
     config = AnnotatorConfig(name="jev", version="~typesafe/jev-latest", base_url="https://openrouter.ai",
                              api_path="/api/alpha/decisions", api_key_env="JEV_OPENROUTER_API_KEY",
                              model="~typesafe/jev-latest")
-    bundles = bundles_of(rows)
+    jev = {v['example_id']: second[v['example_id']]['jev']['gold_probability'] for v in todo
+           if 'jev' in second.get(v['example_id'], {})}
+    bundles = bundles_of([row for row in rows if row['example_id'] not in jev])
     results, _ = annotate(bundles, config, jev_args)
-    jev = {}
     for bundle in bundles:
         result = results.get(id(bundle))
         for row, annotation in zip(bundle["rows"], (result or {}).get("annotations", [])):
             jev[row["example_id"]] = gold_probability(row, annotation["probabilities"])
     keys = [key for key in args.keys if os.environ.get(key)]
+    if not keys:
+        raise ValueError('No configured provider keys are available')
+    # Only request confirmations with an independent detector result available.
+    # A reached Jev budget must not trigger thousands of unusable DeepSeek calls.
+    todo = [v for v in todo if v['example_id'] in jev]
+    print(f'{len(todo)} flags have independent scores available for confirmation', flush=True)
     for start in range(0, len(todo), args.chunk):
         chunk = todo[start:start + args.chunk]
         replies = complete([confirmation_prompt(v["row"], references.get(v["source"], [])[:REFERENCES]) for v in chunk],
                            model=args.model,
-                           api_key=os.environ[keys[(start // args.chunk) % len(keys)]], temperature=0.0,
-                           max_tokens=4000, max_concurrency=args.concurrency, rpm=args.rpm, timeout=300,
-                           num_retries=5, show_progress=False)
+                           api_key_envs=keys, per_key_rpm=args.rpm, temperature=0.0,
+                           max_tokens=8192, max_concurrency=args.concurrency, timeout=300,
+                           extra_body={'chat_template_kwargs': {'thinking': True}},
+                           response_format={'type': 'text'},
+                           num_retries=0, caching=True, show_progress=False, progress_interval=30)
         with path.open("a") as handle:
             for verdict, reply in zip(chunk, replies):
                 row = verdict["row"]
@@ -242,6 +261,7 @@ def main():
     parser.add_argument("--chunk", type=int, default=400, help="requests per key between saves")
     parser.add_argument("--limit", type=int, help="examples to check (a probe)")
     parser.add_argument("--confirm", action="store_true", help="re-check flagged examples, write the bad list")
+    parser.add_argument("--confirm-limit", type=int, help="limit pending confirmations for a bounded pilot")
     parser.add_argument("--jev-budget", type=float, default=5.0)
     parser.add_argument("--bad", type=Path, help="where --confirm writes the removable examples (default: in --out; "
                         f"copy them to {BAD.name} once reviewed, and the build drops them)")
@@ -258,18 +278,33 @@ def main():
     rows, seen = [], set(done)
     for split in ("train", "validation", "test"):
         full = load_dataset(REPO, "full", split=split)
-        full = full.filter(lambda v: v == "direct", input_columns="variant", desc=f"direct {split}")
+        full = full.filter(lambda identifiers, variants: [variant == 'direct' and identifier not in done
+                            for identifier, variant in zip(identifiers, variants)], batched=True,
+                           input_columns=['example_id', 'variant'], desc=f'pending direct {split}')
         for row in full:
             if row["example_id"] not in seen and checkable(row):
                 seen.add(row["example_id"])
                 rows.append(row)
+    raw_path = args.out / 'screen-retry-raw.jsonl'
+    if raw_path.exists():
+        by_id = {row['example_id']: row for row in rows}
+        recovered = {}
+        for line in raw_path.open():
+            record = json.loads(line)
+            if not record.get('failed'):
+                recovered.update(parse(record['text'], [by_id.get(key) for key in record['example_ids']]))
+        with path.open('a') as handle:
+            for record in recovered.values():
+                handle.write(json.dumps(record, ensure_ascii=False) + '\n')
+        rows = [row for row in rows if row['example_id'] not in recovered]
+        done.update(recovered)
+        print(f'{len(recovered)} pending verdicts recovered from raw responses', flush=True)
     rows.sort(key=lambda row: row["example_id"] not in default_ids)  # stable: default first, then the rest
     if args.limit:
         rows = rows[:args.limit]
     requests = list(batches(rows, args.max_items, args.max_chars))
     print(f"{len(done)} done; {len(rows)} examples to check in {len(requests)} requests", flush=True)
 
-    lock = threading.Lock()
     references = {}
     if path.exists():
         for line in path.open():
@@ -277,35 +312,34 @@ def main():
             if verdict["verdict"] == "ok" and "row" in verdict:
                 references[verdict["source"]] = references.get(verdict["source"], 0) + 1
 
-    def worker(key, mine):
-        for start in range(0, len(mine), args.chunk):
-            chunk = mine[start:start + args.chunk]
-            prompts = [INSTRUCTIONS.format(source=source, examples="\n\n".join(
-                render(i, row, 4 * args.max_chars) for i, row in enumerate(batch, 1))) for source, batch in chunk]
-            replies = complete(prompts, model=args.model, api_key=os.environ[key], temperature=0.0,
-                               max_tokens=8000, max_concurrency=args.concurrency, rpm=args.rpm, timeout=300,
-                               num_retries=5, show_progress=False)
-            verdicts = {}
-            for (_, batch), reply in zip(chunk, replies):
-                if reply is not None and not isinstance(reply, Failure):  # failures retry on the next run
-                    verdicts.update(parse(reply, batch))
-            with lock, path.open("a") as handle:
-                for verdict in verdicts.values():
-                    if verdict["verdict"] == "ok":  # rows of flags, and a few references per source
-                        references[verdict["source"]] = references.get(verdict["source"], 0) + 1
-                        if references[verdict["source"]] > REFERENCES:
-                            verdict = {k: v for k, v in verdict.items() if k != "row"}
-                    handle.write(json.dumps(verdict, ensure_ascii=False) + "\n")
-            print(f"[{key}] {start + len(chunk)}/{len(mine)} requests, {len(verdicts)} verdicts "
-                  f"({sum(v['verdict'] != 'ok' for v in verdicts.values())} flagged) {time.strftime('%H:%M')}",
-                  flush=True)
-
     keys = [key for key in args.keys if os.environ.get(key)]
-    threads = [threading.Thread(target=worker, args=(key, requests[i::len(keys)])) for i, key in enumerate(keys)]
-    for thread in threads:
-        thread.start()
-    for thread in threads:
-        thread.join()
+    if not keys:
+        raise ValueError('No configured provider keys are available')
+    prompts = [INSTRUCTIONS.format(source=source, examples='\n\n'.join(
+        render(i, row, 4 * args.max_chars) for i, row in enumerate(batch, 1))) for source, batch in requests]
+    settled = 0
+    def save(index, reply):
+        nonlocal settled
+        settled += 1
+        source, batch = requests[index]
+        verdicts = parse(reply, batch) if reply is not None and not isinstance(reply, Failure) else {}
+        with (args.out / 'screen-retry-raw.jsonl').open('a') as handle:
+            handle.write(json.dumps({'source': source, 'example_ids': [row['example_id'] for row in batch],
+                                     'text': str(reply), 'failed': isinstance(reply, Failure),
+                                     'received_verdicts': len(verdicts)}, ensure_ascii=False) + '\n')
+        with path.open('a') as handle:
+            for verdict in verdicts.values():
+                if verdict['verdict'] == 'ok':
+                    references[source] = references.get(source, 0) + 1
+                    if references[source] > REFERENCES:
+                        verdict = {k: v for k, v in verdict.items() if k != 'row'}
+                handle.write(json.dumps(verdict, ensure_ascii=False) + '\n')
+        if settled % args.chunk == 0 or settled == len(requests):
+            print(f'{settled}/{len(requests)} requests checkpointed {time.strftime("%H:%M")}', flush=True)
+    replies = complete(prompts, model=args.model, api_key_envs=keys, per_key_rpm=args.rpm,
+                       temperature=0.0, max_tokens=8000, max_concurrency=args.concurrency * len(keys), timeout=300,
+                       num_retries=0, caching=True, show_progress=False, progress_interval=30, on_result=save)
+    print(replies.summary(), flush=True)
 
 
 if __name__ == "__main__":
