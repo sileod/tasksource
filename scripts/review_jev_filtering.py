@@ -9,6 +9,7 @@ import argparse
 import csv
 import hashlib
 import json
+import re
 from collections import Counter, defaultdict
 from pathlib import Path
 
@@ -33,13 +34,19 @@ def prepare(verdicts, output, tasks, shards, per_verdict=1):
     records = [record for group in samples.values() for _, record in group]
     missing = {r['id']: r for r in records if not r.get('row')}
     stems = {key.split(':', 1)[0] for key in missing}
-    for stem in sorted(stems):
-        for path in sorted(shards.glob(f'*-{stem}.parquet')):
-            for batch in pq.ParquetFile(path).iter_batches(batch_size=4096):
-                for row in batch.to_pylist():
-                    if row['variant'] == 'direct' and row['id'] in missing:
-                        record = missing.pop(row['id'])
-                        record['row'] = {**row, 'example_id': record['example_id']}
+    paths = {path for stem in stems for path in shards.glob(f'*-{stem}.parquet')}
+    # Some share-valued tasks derive IDs from the original source, while shards
+    # are named after the recast task. Recover only exact IDs within that source.
+    for record in missing.values():
+        slug = re.sub(r'[^A-Za-z0-9]+', '-', record['source']).strip('-')
+        paths.update(shards.glob(f'*-{slug}-*.parquet'))
+    for path in sorted(paths):
+        for batch in pq.ParquetFile(path).iter_batches(batch_size=4096):
+            for row in batch.to_pylist():
+                record = missing.get(row['id'])
+                if row['variant'] == 'direct' and record and row['source'] == record['source']:
+                    missing.pop(row['id'])
+                    record['row'] = {**row, 'example_id': record['example_id']}
     output.mkdir(parents=True, exist_ok=True)
     with (output / 'per-task.csv').open('w') as handle:
         writer = csv.DictWriter(handle, fieldnames=['source', 'screened', 'ok', 'wrong', 'malformed',

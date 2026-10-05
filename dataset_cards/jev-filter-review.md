@@ -85,3 +85,67 @@ but cannot turn disagreement alone into an exclusion decision.
 The existing two-model confirmation rule and capture-recapture estimates are not
 sufficient adjudication evidence. In particular, dependent, weak detectors and small
 samples do not support treating estimated overlaps as measured label-error rates.
+
+## Random follow-up across the remaining tasks
+
+A second pass sampled 20 tasks uniformly without replacement from the other 589,
+using Python `random.Random(20261005)` on the sorted source list. It reviewed one
+hash-selected passed example and one hash-selected flag where available. Two tasks
+had no flags, yielding **38 complete examples: 20 passes and 18 flags**. No additional
+model calls were made. This covers 30 tasks in total; 569 remain unreviewed.
+
+The source-level sample was random; the example-level sample deliberately separates
+passes from flags. It does not estimate dataset-wide accuracy or filtering precision.
+[jev-filter-random20.csv](jev-filter-random20.csv) records every manual decision,
+source/example IDs and evidence. There are **3 discard candidates, 9 unresolved flags,
+and 26 retained examples**. None has been applied. Retaining a sampled example does
+not certify its entire source task. Conversely, finding one error does not authorize
+removing every flag in that task.
+
+| Task | Screen flags | Decision on the sampled flag |
+| --- | ---: | --- |
+| multilingual/disrpt/fra.sdrt.annodis.rels | 34 / 584 | unresolved |
+| tweet_eval/emoji | 25 / 464 | retain |
+| multilingual/language-identification | 13 / 2708 | discard-candidate |
+| multilingual/xstory_cloze/ar | 2 / 330 | retain |
+| feasibilityQA | 17 / 2924 | discard-candidate |
+| clinc_oos/plus | 36 / 6053 | retain |
+| tweet_eval/stance_climate | 13 / 356 | unresolved |
+| social_i_qa | 1360 / 12505 | unresolved |
+| HelpSteer3/preference | 139 / 8028 | unresolved |
+| civil_comments/severe_toxicity_share | 0 / 18 | No flags; passed example retained |
+| crowdflower/political-media-audience | 71 / 660 | unresolved |
+| multilingual/indic_glue/iitp-pr.hi/sentiment | 36 / 694 | unresolved |
+| syntactic-augmentation-nli | 379 / 3632 | unresolved |
+| multilingual/indic_glue/actsa-sc.te/sentiment | 301 / 696 | unresolved |
+| pragmeval/pdtb | 18 / 300 | retain |
+| nli-veridicality-transitivity | 3 / 3416 | retain |
+| multilingual/xcsr/X-CSQA-fr | 54 / 427 | discard-candidate |
+| linguisticprobing/past_present | 67 / 459 | retain |
+| HatemojiBuild | 137 / 3058 | unresolved |
+| ethics/deontology | 0 / 1023 | No flags; passed example retained |
+
+The three exclusion candidates have concrete presentation/label evidence:
+
+- `ae1733f3f926356b`, language identification: the text is English; gold is Thai.
+- `408c7d32091f414f`, feasibilityQA: a school staff count is expressed in dollars
+  in a hypothesis labeled True. The incompatible unit corrupts the question.
+- `ad5e1efa0233075b`, French X-CSQA: the question says `un vide` (a vacuum/void),
+  while the closet gold and Dyson option require a vacuum cleaner (`aspirateur`).
+
+Important false positives include an Arabic story whose gold correctly says the
+protagonist wins (the flag's own reasoning contradicts its proposed alternative),
+a past-tense example whose reporting verb is `urged`, and a discourse judgment that
+confuses a relation inside the second passage with the relation between passages.
+Emoji prediction, intent categories, subjective preferences and crowd-rating shares
+also admit uncertainty without making their source labels erroneous.
+
+The unresolved cases include potentially garbled Social IQA and syntactic-augmentation
+inputs, implicit stance/audience labels, Hindi/Telugu sentiment, a programming
+preference, French discourse classification, and an emoji hate-speech label. They
+remain pending source/convention review. A stronger model could assist this small
+set later; its agreement would still require explicit supporting evidence.
+
+Complete texts are in `build/jev-task-filter-random20/review-examples.jsonl`;
+`sampling.json` records the task list, seed and example-selection scope. The
+38-row review CSV is committed above, while the full example packs stay local.
