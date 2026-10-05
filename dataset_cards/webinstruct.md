@@ -100,6 +100,9 @@ only source information, retain labels and option order, and undergo source chec
 and a presentation recheck. Unvalidated edits are discarded. The source questions
 remain available for comparison. `bad-examples.jsonl`, `repairs.jsonl`, and
 `provenance.json` record the release decisions, counts, and manifest hashes.
+An independent 50-example spot-check and focused source review of rejected repairs
+also contribute explicit exclusions. Their manifest entries identify the review
+stage and reviewer; a failed repair alone is not grounds for removal.
 
 The Hub release retains every parsed option in source order. When loaded through
 Tasksource, its default MC preprocessing shuffles options and keeps the gold plus

@@ -312,7 +312,7 @@ def main():
         confirmed_keys = {row['key'] for row in confirmed}
         if bad_path.exists():
             confirmed.extend(row for row in map(json.loads, bad_path.read_text().splitlines())
-                             if row.get('stage') == 'independent-spotcheck' and row.get('verdict') in BAD
+                             if row.get('stage') in {'independent-spotcheck', 'source-review'} and row.get('verdict') in BAD
                              and row['key'] in known_keys and row['key'] not in confirmed_keys)
         bad_path.write_text(''.join(json.dumps(x, ensure_ascii=False) + '\n' for x in confirmed))
         print('Individually confirmed bad examples:', len(confirmed))
