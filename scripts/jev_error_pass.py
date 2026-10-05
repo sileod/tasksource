@@ -44,8 +44,9 @@ judge against those conventions, not your preferences. Be conservative: flag onl
 
 {examples}
 
-Reply with one JSON object per example, one per line, nothing else:
-{{"i": <number>, "verdict": "ok|wrong|ambiguous|malformed", "better": "<label of the correct option or null>", "reason": "<at most 12 words>"}}"""
+Return every displayed example exactly once, using these indices: {indices}.
+Reply with one JSON object, nothing else:
+{{"items":[{{"i": <number>, "verdict": "ok|wrong|ambiguous|malformed", "better": "<label of the correct option or null>", "reason": "<at most 12 words>"}}]}}"""
 
 
 def render(index, row, max_chars):
@@ -315,7 +316,7 @@ def main():
     keys = [key for key in args.keys if os.environ.get(key)]
     if not keys:
         raise ValueError('No configured provider keys are available')
-    prompts = [INSTRUCTIONS.format(source=source, examples='\n\n'.join(
+    prompts = [INSTRUCTIONS.format(source=source, indices=', '.join(str(i) for i in range(1, len(batch) + 1)), examples='\n\n'.join(
         render(i, row, 4 * args.max_chars) for i, row in enumerate(batch, 1))) for source, batch in requests]
     settled = 0
     def save(index, reply):
@@ -326,6 +327,7 @@ def main():
         with (args.out / 'screen-retry-raw.jsonl').open('a') as handle:
             handle.write(json.dumps({'source': source, 'example_ids': [row['example_id'] for row in batch],
                                      'text': str(reply), 'failed': isinstance(reply, Failure),
+                                     'error': str(reply.error) if isinstance(reply, Failure) else None,
                                      'received_verdicts': len(verdicts)}, ensure_ascii=False) + '\n')
         with path.open('a') as handle:
             for verdict in verdicts.values():
@@ -338,7 +340,7 @@ def main():
             print(f'{settled}/{len(requests)} requests checkpointed {time.strftime("%H:%M")}', flush=True)
     replies = complete(prompts, model=args.model, api_key_envs=keys, per_key_rpm=args.rpm,
                        temperature=0.0, max_tokens=8000, max_concurrency=args.concurrency * len(keys), timeout=300,
-                       num_retries=0, caching=True, show_progress=False, progress_interval=30, on_result=save)
+                       num_retries=0, caching=True, json=True, show_progress=False, progress_interval=30, on_result=save)
     print(replies.summary(), flush=True)
 
 
