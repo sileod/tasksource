@@ -50,3 +50,30 @@ def test_task_review_recovers_recast_ids_only_from_matching_direct_source(tmp_pa
     assert json.loads((output / 'sampling.json').read_text())['missing_source_text'] == []
     assert next(csv.DictReader((output / 'per-task.csv').open()))['review_status'] == 'pending'
     assert not (output / 'bad-examples.csv').exists()
+
+
+def test_individual_reconfirmation_enforces_gold_and_option_contract():
+    from scripts.reconfirm_jev_filtering import validate
+
+    row = {'example_id': 'one', 'kind': 'choice', 'options': ['first', 'second'], 'target': [1, 0]}
+    data = {'example_id': 'one', 'decision': 'keep', 'answer': 0, 'reason': 'gold defensible'}
+    assert validate({'data': data}, row, 'confirm') == data
+    assert validate({'data': {**data, 'answer': 1}}, row, 'confirm') is None
+    assert validate({'data': {**data, 'decision': 'wrong'}}, row, 'confirm') is None
+    assert validate({'data': {**data, 'example_id': 'other'}}, row, 'confirm') is None
+    assert validate({'data': {**data, 'answer': True}}, row, 'confirm') is None
+    assert validate({'data': {**data, 'decision': 'uncertain', 'answer': None}}, row, 'confirm')
+    assert validate({'data': {**data, 'status': 'answerable', 'answer': 3}}, row, 'blind') is None
+    assert validate({'failed': True, 'data': data}, row, 'confirm') is None
+
+
+def test_individual_reconfirmation_can_explicitly_abstain_with_uncertainty():
+    from scripts.reconfirm_jev_filtering import validate
+
+    row = {'example_id': 'one', 'kind': 'choice', 'options': ['first', 'second'], 'target': [1, 0]}
+    data = {'example_id': 'one', 'decision': 'uncertain', 'answer': None, 'reason': 'Convention unresolved',
+            'confidence': 'low', 'gold_assessment': 'Gold may follow a source convention',
+            'uncertainty': 'Source annotation rules are needed'}
+    assert validate({'data': data}, row, 'confirm', require_confidence=True) == data
+    assert validate({'data': {**data, 'uncertainty': ''}}, row, 'confirm', require_confidence=True) is None
+    assert validate({'data': {**data, 'confidence': 0.9}}, row, 'confirm', require_confidence=True) is None

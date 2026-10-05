@@ -97,7 +97,7 @@ model calls were made. This covers 30 tasks in total; 569 remain unreviewed.
 The source-level sample was random; the example-level sample deliberately separates
 passes from flags. It does not estimate dataset-wide accuracy or filtering precision.
 [jev-filter-random20.csv](jev-filter-random20.csv) records every manual decision,
-source/example IDs and evidence. There are **3 discard candidates, 9 unresolved flags,
+source/example IDs and evidence. There are **2 discard candidates, 10 unresolved flags,
 and 26 retained examples**. None has been applied. Retaining a sampled example does
 not certify its entire source task. Conversely, finding one error does not authorize
 removing every flag in that task.
@@ -120,18 +120,20 @@ removing every flag in that task.
 | multilingual/indic_glue/actsa-sc.te/sentiment | 301 / 696 | unresolved |
 | pragmeval/pdtb | 18 / 300 | retain |
 | nli-veridicality-transitivity | 3 / 3416 | retain |
-| multilingual/xcsr/X-CSQA-fr | 54 / 427 | discard-candidate |
+| multilingual/xcsr/X-CSQA-fr | 54 / 427 | unresolved |
 | linguisticprobing/past_present | 67 / 459 | retain |
 | HatemojiBuild | 137 / 3058 | unresolved |
 | ethics/deontology | 0 / 1023 | No flags; passed example retained |
 
-The three exclusion candidates have concrete presentation/label evidence:
+The two exclusion candidates have concrete presentation/label evidence:
 
-- `ae1733f3f926356b`, language identification: the text is English; gold is Thai.
+- `ae1733f3f926356b`, language identification: the text is English; gold is Swahili.
 - `408c7d32091f414f`, feasibilityQA: a school staff count is expressed in dollars
   in a hypothesis labeled True. The incompatible unit corrupts the question.
-- `ad5e1efa0233075b`, French X-CSQA: the question says `un vide` (a vacuum/void),
-  while the closet gold and Dyson option require a vacuum cleaner (`aspirateur`).
+
+French X-CSQA `ad5e1efa0233075b` says `un vide` (a vacuum/void), but the Dyson
+option may recover the intended vacuum-cleaner meaning. The mistranslation merits
+review; a clearly indefensible gold is not established, so it remains unresolved.
 
 Important false positives include an Arabic story whose gold correctly says the
 protagonist wins (the flag's own reasoning contradicts its proposed alternative),
@@ -149,3 +151,84 @@ set later; its agreement would still require explicit supporting evidence.
 Complete texts are in `build/jev-task-filter-random20/review-examples.jsonl`;
 `sampling.json` records the task list, seed and example-selection scope. The
 38-row review CSV is committed above, while the full example packs stay local.
+
+## Individual reconfirmation pilot
+
+`scripts/reconfirm_jev_filtering.py` reconfirms the 18 flags in the random
+follow-up. Each request contains one complete example; no example text is truncated.
+The first stage hides both gold and the original flag, and asks for a blind solve.
+The second stage reveals gold, flag and blind result, challenges the flag, and keeps
+any defensible source answer. It explicitly permits uncertain judgments.
+
+Task-level guidance is versioned in `jev-review-conventions.json`. Both stages use
+V4 Flash with reasoning enabled through litlm, four interchangeable keys and durable
+CLI checkpoints. Returned IDs, option bounds, nullable answers and keep/wrong
+consistency with gold are validated before writing a comparison. Share-valued
+annotator targets require a separate contract and are rejected by this utility.
+The script produces no removal manifest and changes no Hub dataset.
+
+```bash
+PYTHONPATH=../litlm:.:src python scripts/reconfirm_jev_filtering.py \
+  --key-envs KEY,KEY_2,KEY_3,KEY_4
+```
+
+Raw responses, prompts, validated results and settings are saved under
+`build/jev-individual-reconfirmation`. Rerunning identical inputs/settings retries
+failed or invalid requests and reuses completed ones. The same model is used twice;
+this is not independent corroboration. Task instructions, gold exposure and reasoning
+also differ from the original screen, so this is not a controlled batching-only
+experiment. Results still require manual adjudication before exclusion.
+
+The completed pilot returned 7 keep, 10 wrong and 1 malformed judgments. Seven
+original flags were reversed, including the French question above. These are model
+judgments, not 11 verified errors; several disputed preference and translation labels
+still need source-specific adjudication. One provider timeout was retried individually;
+all 18 blind and 18 confirmation requests now have validated checkpoints.
+
+## Controlled batch comparison and progressive rerun
+
+`scripts/audit_jev_progressive.py benchmark` uses the same 38 reviewed examples,
+prompt, task guidance, reasoning settings and response contract at sizes 1, 4 and 8.
+The contract explicitly permits uncertain judgments, requests exclusion confidence
+(high/medium/low), gold assessment and remaining uncertainty, and validates every ID
+and answer against the verdict. Self-reported confidence is not calibrated.
+
+After one retry of failed/invalid requests, validated coverage was 37/38 for size 1,
+12/38 for size 4 and 0/38 for size 8. Size 1 detected both clear discard anchors and
+made no exclusions among the covered retain anchors. Successful mean request latency
+was 75 seconds at size 1 and 184 seconds at size 4; timeout attempts add overhead.
+Batched requests frequently hit provider 504 timeouts. This favors size 1 operationally;
+missing responses at larger sizes prevent a clean semantic-quality comparison. The
+small sample, especially only two clear errors, does not establish full-run accuracy.
+
+The full rerun uses individual, conservative gold-defensibility reviews and visits one
+pending example per source per round, rather than exhausting tasks in sequence. It pins
+the Hub revision, deduplicates eligible direct examples, preserves complete inputs and
+writes every raw response and validated verdict durably. Valid raw checkpoints are
+replayed after interruption; API/schema failures remain pending for retry. `progress.json`
+tracks total coverage, per-task coverage, decisions and observed-throughput ETA. The
+full audit never publishes exclusions automatically. Constructed tasks, soft targets and
+share-valued `noul` annotations are exempt from this hard-answer contract, rather than
+silently treated as incorrect binary labels.
+
+```bash
+PYTHONPATH=../litlm:.:src python scripts/audit_jev_progressive.py full \
+  --output build/jev-individual-full --batch-size 1 --concurrency 128 --chunk 2048 \
+  --key-envs KEY,KEY_2,KEY_3,KEY_4
+```
+
+Rerunning this command retains completed verdicts and retries only missing examples.
+Benchmark metrics and complete comparisons remain under `build/jev-batch-comparison`.
+
+## Selective WebInstruct publication
+
+`scripts/append_jev_webinstruct.py` builds a patch, and `--push` publishes it atomically
+against the inspected destination revision. It appends filtered WebInstruct MC/binary
+data to both existing configs without resampling old mixtures or replacing old shards.
+The source revision is pinned, every included option and semantic gold is preserved
+through canonical Jev option handling, and binary polarity is explicit. Forty-seven MC
+rows with duplicate option text fail the existing choice contract and are omitted, with
+their IDs in the incremental manifest; no repair is applied. Original source train/test
+assignments remain: 28,440 train and 122 test additions, no validation additions.
+Arrow schema, decision targets, IDs, metadata counts and existing Parquet blob identities
+are checked. The Hub `webinstruct-addition.json` records transformations and provenance.

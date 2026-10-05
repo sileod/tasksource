@@ -1,0 +1,20 @@
+{
+  "multilingual/disrpt/fra.sdrt.annodis.rels": "Discourse labels follow the source SDRT taxonomy. Judge the relation between the two supplied units; closely related labels may require annotation context, so avoid asserting a unique correction when uncertain.",
+  "tweet_eval/emoji": "Predict the original tweet emoji. Several emojis can be plausible; alternative emojis do not prove the original label is wrong. This is predictive annotation, not logical entailment.",
+  "multilingual/language-identification": "Identify the language of the actual displayed text. Distinguish language mismatch from repetition or poor style: repetitive English remains English.",
+  "multilingual/xstory_cloze/ar": "Choose the more coherent Arabic story ending. Track actor names, negation, who wins and who pays. Alternative imaginable events are not sufficient to invalidate a coherent gold ending.",
+  "feasibilityQA": "Judge whether the supplied hypothesis is possible under the premises. Distinguish could be from must be, and inspect quantities and units without inventing missing constraints.",
+  "clinc_oos/plus": "Intent classification uses a fixed label inventory. yes/no/maybe and out-of-scope are legitimate classes; a terse or vague utterance can still express a defensible intent.",
+  "tweet_eval/stance_climate": "Judge stance toward climate change, not general sentiment. Stance may be implicit; an indirect statement is not automatically mislabeled or malformed.",
+  "social_i_qa": "Evaluate the exact social question and supplied answers. Awkward distractors alone are harmless. Check whether the actors and requested outcome are identifiable and whether any offered answer can fit the question.",
+  "HelpSteer3/preference": "This is a human preference between replies, not a factuality-only exam. Compare responses relative to the latest request and conversation. Both can have flaws; do not flag the pair solely because a reply is bad or because preferences are debatable.",
+  "crowdflower/political-media-audience": "Classify constituency versus national audience, not just the geographical scope of a topic. Local references are cues, but a source convention may allow a broader intended audience.",
+  "multilingual/indic_glue/iitp-pr.hi/sentiment": "Judge sentiment in the Hindi text. Affordability and build quality can have opposing implications; use uncertain where the source reading remains defensible.",
+  "syntactic-augmentation-nli": "This source uses syntactic transformations. Unusual order or grammar alone need not invalidate its intended inference. Distinguish recoverable templates from loss of essential meaning; do not guess generation rules.",
+  "multilingual/indic_glue/actsa-sc.te/sentiment": "Judge sentiment in the Telugu text, including negation and temporal contrasts. Do not replace the source label merely because one phrase or entity has negative connotations.",
+  "pragmeval/pdtb": "Judge the discourse relation BETWEEN text_A and text_B under PDTB labels, not a cause or temporal relation occurring inside just one of them. Some fine-grained conventions may remain uncertain.",
+  "nli-veridicality-transitivity": "This is a templated veridicality inference. Factive verbs and nonfactive beliefs have different entailments. Recoverable missing auxiliaries do not by themselves overturn the intended inference.",
+  "multilingual/xcsr/X-CSQA-fr": "Answer the actual French question. Inspect translation sense, particularly when a word can denote different objects. Do not silently substitute an English question or invent a missing referent.",
+  "linguisticprobing/past_present": "Identify the sentence's main-clause tense. Direct-speech verbs and reporting verbs can differ; quotation-like content is not automatically the main clause.",
+  "HatemojiBuild": "Classify hate speech using text and emojis together. Inspect protected-group hostility and negation; merely mentioning gender or bathrooms does not establish hatred. Annotation context may remain unresolved."
+}
