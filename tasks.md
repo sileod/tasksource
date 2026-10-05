@@ -1,4 +1,4 @@
-496 English tasks. Load one with `load_task(id)`; the annotations are in [tasks.py](src/tasksource/tasks.py), and tasks kept out on purpose are in [parked.py](src/tasksource/parked.py).
+498 English tasks. Load one with `load_task(id)`; the annotations are in [tasks.py](src/tasksource/tasks.py), and tasks kept out on purpose are in [parked.py](src/tasksource/parked.py).
 
 | # | id | type | dataset | question |
 |--:|---|---|---|:-:|
@@ -498,6 +498,9 @@
 | 494 | [synthetic-retrieval-NLI/position](src/tasksource/tasks.py#L2069) | Classification | [tasksource/synthetic-retrieval-NLI](https://hf.co/datasets/tasksource/synthetic-retrieval-NLI) |  |
 | 495 | [synthetic-retrieval-NLI/binary](src/tasksource/tasks.py#L2069) | Classification | [tasksource/synthetic-retrieval-NLI](https://hf.co/datasets/tasksource/synthetic-retrieval-NLI) |  |
 | 496 | [github-issue-similarity](src/tasksource/tasks.py#L2078) | Classification | [WhereIsAI/github-issue-similarity](https://hf.co/datasets/WhereIsAI/github-issue-similarity) |  |
+
+| 497 | [webinstruct/mc](src/tasksource/tasks.py#L2377) | MultipleChoice | [tasksource/webinstruct](https://hf.co/datasets/tasksource/webinstruct) |  |
+| 498 | [webinstruct/binary](src/tasksource/tasks.py#L2379) | Classification | [tasksource/webinstruct](https://hf.co/datasets/tasksource/webinstruct) |  |
 
 ## Soft labels
 

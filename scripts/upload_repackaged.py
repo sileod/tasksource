@@ -14,6 +14,7 @@ import inspect
 import json
 import re
 import urllib.request
+from pathlib import Path
 
 from datasets import ClassLabel, Dataset, DatasetDict, load_dataset
 
@@ -301,7 +302,20 @@ def lewidi():
     return configs
 
 
-BUILDERS = {"sharc": ("tasksource/sharc", sharc), "numer_sense": ("tasksource/numer_sense", numer_sense),
+def webinstruct():
+    """WebInstruct verified: single-answer multiple choice and explicit yes/no or true/false answers.
+
+    Full preprocessing documentation is in dataset_cards/webinstruct.md.
+    """
+    from scripts.build_webinstruct import build
+    output = Path('build/webinstruct')
+    build(output)
+    return {config: DatasetDict({split: Dataset.from_parquet(str(output / config / f'{split}.parquet'))
+                                for split in ['train', 'test']}) for config in ['mc', 'binary']}
+
+
+BUILDERS = {"webinstruct": ("tasksource/webinstruct", webinstruct, "per-config"),
+            "sharc": ("tasksource/sharc", sharc), "numer_sense": ("tasksource/numer_sense", numer_sense),
             "clutrr": ("tasksource/clutrr", clutrr), "wellformed": ("tasksource/google_wellformed_query", wellformed),
             "humicroedit": ("tasksource/humicroedit", humicroedit, "subtask-1"), "ethos": ("tasksource/ethos", ethos, "multilabel"),
             "multilingual_sentiments": ("tasksource/multilingual-sentiments", multilingual_sentiments),
@@ -312,7 +326,8 @@ BUILDERS = {"sharc": ("tasksource/sharc", sharc), "numer_sense": ("tasksource/nu
 
 
 # license metadata for repackaged sets, as the originals state it
-LICENSES = {"tasksource/measuring-hate-speech-votes": "cc-by-4.0", "tasksource/lewidi": "other"}
+LICENSES = {"tasksource/measuring-hate-speech-votes": "cc-by-4.0", "tasksource/lewidi": "other",
+            "tasksource/webinstruct": "apache-2.0"}
 
 
 def push_card(repo, build):
@@ -325,7 +340,13 @@ def push_card(repo, build):
     card.text = (f"\n# {repo.split('/')[1]}\n\n{inspect.cleandoc(build.__doc__)}\n\n{sources}"
                  "Repackaged as parquet for [tasksource](https://github.com/sileod/tasksource) by "
                  "[scripts/upload_repackaged.py](https://github.com/sileod/tasksource/blob/main/scripts/upload_repackaged.py).\n")
+    if repo == 'tasksource/webinstruct':
+        card.text = (Path(__file__).resolve().parents[1] / 'dataset_cards/webinstruct.md').read_text().split('---', 2)[2]
     card.push_to_hub(repo)
+    if repo == 'tasksource/webinstruct':
+        from huggingface_hub import HfApi
+        HfApi().upload_file(path_or_fileobj='build/webinstruct/provenance.json', path_in_repo='provenance.json',
+                           repo_id=repo, repo_type='dataset', commit_message='Record WebInstruct preprocessing provenance')
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

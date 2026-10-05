@@ -2372,3 +2372,9 @@ oasst2__hate_speech = _flag("hate_speech", "hate speech")
 oasst2__sexual_content = _flag("sexual_content", "sexual content")
 oasst2__pii = _flag("pii", "revealing personal information")
 oasst2__lang_mismatch = _flag("lang_mismatch", "in the wrong language")
+
+
+webinstruct___mc = MultipleChoice('prompt', choices_list='options', labels='gold',
+    dataset_name='tasksource/webinstruct', config_name='mc')
+webinstruct___binary = Classification('question', labels='label',
+    dataset_name='tasksource/webinstruct', config_name='binary', label_values={0: 'no / false', 1: 'yes / true'})
