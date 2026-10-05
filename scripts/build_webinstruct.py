@@ -51,8 +51,8 @@ def prepare(rows):
 def build(output, bad_examples=None, repairs=None):
     rejected = [json.loads(line) for line in bad_examples.read_text().splitlines()] if bad_examples else []
     bad_keys = {row['key'] for row in rejected}
-    if any(row.get('verdict') not in {'wrong', 'malformed', 'ambiguous'} for row in rejected):
-        raise ValueError('The removal manifest must contain only confirmed bad examples')
+    if any(row.get('verdict') not in {'wrong', 'malformed', 'ambiguous', 'repairable'} for row in rejected):
+        raise ValueError('The removal manifest must contain only confirmed problem or repairable examples')
     edits = [json.loads(line) for line in repairs.read_text().splitlines()] if repairs else []
     edited = {row['key']: row for row in edits}
     if len(edited) != len(edits) or bad_keys & edited.keys():
@@ -102,12 +102,15 @@ def build(output, bad_examples=None, repairs=None):
     provenance = {'source': SOURCE, 'revision': REVISION, 'counts': counts}
     if bad_examples:
         shutil.copyfile(bad_examples, output / 'bad-examples.jsonl')
-        provenance.update(removed=removed, audit_models=sorted({row['model'] for row in rejected}),
+        provenance.update(removed=removed, removal_verdict_counts=dict(Counter(row['verdict'] for row in rejected)),
+                          audit_models=sorted({row['model'] for row in rejected}),
                           removal_manifest_sha256=hashlib.sha256(bad_examples.read_bytes()).hexdigest())
         with (output / 'README.md').open('a') as card:
-            card.write(f"\n## Filtered examples\n\nRemoved {sum(removed.values())} confirmed problem examples; "
+            card.write(f"\n## Filtered examples\n\nRemoved {sum(removed.values())} confirmed problem or repairable examples; "
                        "[bad-examples.jsonl](bad-examples.jsonl) preserves their IDs and audit evidence. "
                        "Counts by config and split are recorded in [provenance.json](provenance.json).\n")
+    if not repairs:
+        (output / 'repairs.jsonl').unlink(missing_ok=True)
     if repairs:
         shutil.copyfile(repairs, output / 'repairs.jsonl')
         provenance.update(repaired=repaired, repairs_sha256=hashlib.sha256(repairs.read_bytes()).hexdigest())

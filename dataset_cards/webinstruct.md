@@ -41,8 +41,8 @@ Original fields (`id`, `question`, `answer`, `answer_type`, `category`, `difficu
 The source answers are used as supplied, without checking their factual correctness.
 
 `mc-unfiltered` and `binary-unfiltered` are the deterministic parsed baseline described below.
-`mc` and `binary` apply confirmed presentation exclusions and verified source-grounded repairs.
-Uncertain judgments and unrepaired examples remain; this is a model-assisted presentation audit,
+`mc` and `binary` exclude confirmed presentation problems and every confirmed `repairable` row.
+No presentation repairs are applied. Uncertain judgments remain; this is a model-assisted presentation audit,
 not a guarantee of factual correctness or complete context. Original source questions and answers
 are retained. Tasksource uses the canonical `prompt` in both filtered configs.
 
@@ -71,7 +71,7 @@ answer are retained, ignoring case and outer whitespace. `label=0` means no/fals
 and `label=1` means yes/true; `method="exact"` records this normalization.
 Letter-only answers and explanatory or unexpected answers are excluded rather
 than assigned a guessed label. Questions and source answers are preserved verbatim;
-`prompt` initially copies `question`, and only verified presentation repairs change it.
+`prompt` copies `question` without rewriting.
 
 ## Reproduction and Tasksource
 
@@ -79,14 +79,16 @@ Run `PYTHONPATH=src python scripts/build_webinstruct.py` in the
 [Tasksource repository](https://github.com/sileod/tasksource).
 Publish with `PYTHONPATH=.:src python scripts/upload_repackaged.py webinstruct`.
 That command prepares the unfiltered configs. To include filtered configs, pass
-`--bad-examples PATH` and optionally `--repairs PATH` from the audit pipeline.
+`--bad-examples build/webinstruct-presentation-audit-v2/bad-examples.jsonl`.
+Do not pass `--repairs`: repairable examples are excluded from this release.
 `provenance.json` records the pinned source revision and retained counts by split.
 The initial deterministic pass retains 19,087 MC and 10,934 binary training rows.
 
 ## Presentation audit
 
 Run `scripts/audit_webinstruct.py --output build/webinstruct-presentation-audit-v2`,
-then the same command with `--stage confirm`, then `--stage repair`.
+then the same command with `--stage confirm`. To regenerate the removal manifest
+from existing confirmation checkpoints without API calls, use `--stage manifest`.
 Requests use litlm with four interchangeable API keys, per-key pacing, resumable
 checkpoints, and `deepseek-v4-flash-0731`. Screening checks the complete original
 question against the parsed prompt and options; it checks essential missing context,
@@ -95,14 +97,15 @@ Ordinary domain knowledge and harmless markup are allowed. Source answers are no
 The prompt also distinguishes checking arithmetic from validating absent setup or rules.
 
 Screening is batched; flags are challenged individually before removal. Confirmation
-uses the same model and is not an independent correctness assessment. Repairs use
-only source information, retain labels and option order, and undergo source checks
-and a presentation recheck. Unvalidated edits are discarded. The source questions
-remain available for comparison. `bad-examples.jsonl`, `repairs.jsonl`, and
-`provenance.json` record the release decisions, counts, and manifest hashes.
-An independent 50-example spot-check and focused source review of rejected repairs
-also contribute explicit exclusions. Their manifest entries identify the review
-stage and reviewer; a failed repair alone is not grounds for removal.
+uses the same model and is not an independent correctness assessment. Both confirmed
+malformed examples and confirmed repairable examples are excluded, including those
+with previously accepted repairs. Filtering only removes rows; retained prompts,
+options and labels are identical to the deterministic baseline.
+`bad-examples.jsonl` records IDs, verdicts and evidence; `provenance.json` records
+counts and the manifest hash. Original examples remain in the unfiltered configs.
+An independent 50-example spot-check and focused source review also contribute
+explicit exclusions. Their manifest entries identify the review stage and reviewer.
+Experimental repair checkpoints exist locally but are not applied to this release.
 
 The Hub release retains every parsed option in source order. When loaded through
 Tasksource, its default MC preprocessing shuffles options and keeps the gold plus

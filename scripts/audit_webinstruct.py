@@ -7,7 +7,8 @@
 Credentials come from KEY, KEY_2, KEY_3, KEY_4 (override --key-envs).
 Raw model replies and validated verdicts are checkpointed separately. Screening
 flags alone never remove a row. Only individually confirmed clear problems go
-to bad-examples.jsonl; uncertain answers and disagreements stay in the dataset.
+to bad-examples.jsonl; uncertain answers and disagreements stay in the dataset. Confirmed repairable
+rows are excluded too; presentation repairs are experimental and not released.
 """
 
 import argparse
@@ -283,9 +284,24 @@ def run(rows, args, stage):
     return results
 
 
+def write_removals(results, flags, rows, output, audit):
+    """Export confirmed exclusions without applying any presentation repairs."""
+    confirmed = [{**x, 'screen_verdict': flags[x['key']]['verdict'], 'screen_reason': flags[x['key']]['reason'],
+                  'model': MODEL, 'audit': audit} for x in results if x['verdict'] in BAD | {'repairable'}]
+    bad_path = output / 'bad-examples.jsonl'
+    known_keys = {row['key'] for row in rows}
+    confirmed_keys = {row['key'] for row in confirmed}
+    if bad_path.exists():
+        confirmed.extend(row for row in map(json.loads, bad_path.read_text().splitlines())
+                         if row.get('stage') in {'independent-spotcheck', 'source-review'} and row.get('verdict') in BAD
+                         and row['key'] in known_keys and row['key'] not in confirmed_keys)
+    bad_path.write_text(''.join(json.dumps(x, ensure_ascii=False) + '\n' for x in confirmed))
+    print('Confirmed exclusions (including repairable):', len(confirmed))
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--stage', choices=['screen', 'confirm', 'repair'], default='screen')
+    parser.add_argument('--stage', choices=['screen', 'confirm', 'manifest', 'repair'], default='screen')
     parser.add_argument('--audit', choices=['presentation', 'correctness'], default='presentation')
     parser.add_argument('--limit', type=int)
     parser.add_argument('--output', type=Path, default=Path('build/webinstruct-audit'))
@@ -304,18 +320,11 @@ def main():
     else:
         flags = {x['key']: x for x in map(json.loads, (args.output / 'screen-verdicts.jsonl').read_text().splitlines())
                  if x['verdict'] in BAD | {'repairable'}}
-        results = run([{**row, 'proposed_flag': flags[row['key']]} for row in rows if row['key'] in flags], args, 'confirm')
-        confirmed = [{**x, 'screen_verdict': flags[x['key']]['verdict'], 'screen_reason': flags[x['key']]['reason'],
-                      'model': MODEL, 'audit': args.audit} for x in results if x['verdict'] in BAD]
-        bad_path = args.output / 'bad-examples.jsonl'
-        known_keys = {row['key'] for row in rows}
-        confirmed_keys = {row['key'] for row in confirmed}
-        if bad_path.exists():
-            confirmed.extend(row for row in map(json.loads, bad_path.read_text().splitlines())
-                             if row.get('stage') in {'independent-spotcheck', 'source-review'} and row.get('verdict') in BAD
-                             and row['key'] in known_keys and row['key'] not in confirmed_keys)
-        bad_path.write_text(''.join(json.dumps(x, ensure_ascii=False) + '\n' for x in confirmed))
-        print('Individually confirmed bad examples:', len(confirmed))
+        if args.stage == 'manifest':
+            results = [json.loads(line) for line in (args.output / 'confirm-verdicts.jsonl').read_text().splitlines()]
+        else:
+            results = run([{**row, 'proposed_flag': flags[row['key']]} for row in rows if row['key'] in flags], args, 'confirm')
+        write_removals(results, flags, rows, args.output, args.audit)
 
 
 if __name__ == '__main__':

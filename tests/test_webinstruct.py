@@ -8,7 +8,7 @@ from datasets import Dataset, DatasetDict
 
 from tasksource import list_tasks
 from scripts.build_webinstruct import _webinstruct_choices, prepare, build
-from scripts.audit_webinstruct import batches, render, validated, validated_repair
+from scripts.audit_webinstruct import batches, render, validated, validated_repair, write_removals
 from tasksource.tasks import (
     webinstruct___binary,
     webinstruct___mc,
@@ -114,3 +114,24 @@ class WebInstructTest(unittest.TestCase):
             self.assertEqual(edited['options'], ['one', 'two'])
             self.assertEqual(len(read('mc', 'test')), 2)
             self.assertEqual(read('binary', 'train')[0]['label'], 1)
+
+    def test_confirmed_repairable_rows_are_excluded_without_edits(self):
+        source = [{'id': 1, 'question': 'Is it true?', 'answer': 'Yes', 'answer_type': 'Boolean'},
+                  {'id': 2, 'question': 'How do I do this?', 'answer': 'Yes', 'answer_type': 'Boolean'}]
+        rows = [{'key': f'binary/train/{r["id"]}'} for r in source]
+        results = [{'key': rows[0]['key'], 'verdict': 'uncertain', 'reason': 'uncertain'},
+                   {'key': rows[1]['key'], 'verdict': 'repairable', 'reason': 'needs recasting'}]
+        flags = {r['key']: r for r in results}
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_removals(results, flags, rows, root, 'presentation')
+            manifest = root / 'bad-examples.jsonl'
+            self.assertEqual([json.loads(x)['key'] for x in manifest.read_text().splitlines()], ['binary/train/2'])
+            Dataset.from_list(source).to_parquet(str(root / 'source.parquet'))
+            with patch('scripts.build_webinstruct.hf_hub_download', return_value=str(root / 'source.parquet')):
+                build(root / 'release', manifest)
+            baseline = Dataset.from_parquet(str(root / 'release/binary-unfiltered/train.parquet')).to_list()
+            retained = Dataset.from_parquet(str(root / 'release/binary/train.parquet')).to_list()
+            self.assertEqual(retained, baseline[:1])
+            self.assertEqual(len(baseline), 2)
+            self.assertFalse((root / 'release/repairs.jsonl').exists())
