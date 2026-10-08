@@ -167,6 +167,9 @@ def code_state():
 
 def build_fingerprint(args):
     shard_args = {name: getattr(args, name, None) for name in SHARD_PARAMETERS}
+    if getattr(args, 'vision', False):
+        shard_args.update({name: getattr(args, name, None)
+                           for name in ('seed', 'grounding_probabilities', 'excluded_sources')})
     payload = json.dumps(shard_args, sort_keys=True, default=str)
     return hashlib.sha256(payload.encode()).hexdigest()[:16]
 
@@ -1160,7 +1163,7 @@ def select_tasks(args):
     return frame.drop_duplicates("source_id", keep="first").reset_index(drop=True)
 
 
-def image_keys(images):
+def image_keys(images, metadata=None):
     """Image content identities in source order, without decoding or re-encoding."""
     keys = []
     for image in images:
@@ -1170,6 +1173,10 @@ def image_keys(images):
         keys.append(hashlib.sha256(data).hexdigest())
     if not keys:
         raise ValueError('Vision decisions need at least one image')
+    if metadata:
+        original = json.loads(metadata).get('augmentation', {}).get('original_image_sha256')
+        if original and original not in keys:
+            keys.append(original)
     return tuple(keys)
 
 
@@ -1181,7 +1188,7 @@ def build_vision(args):
     output.mkdir(parents=True, exist_ok=True)
     data_dir = output / 'data'
     data_dir.mkdir(exist_ok=True)
-    catalog = list_tasks(vision=True)
+    catalog = list_tasks(vision=True, excluded_sources=getattr(args, 'excluded_sources', ()))
     if args.tasks:
         unknown = set(args.tasks) - set(catalog.id)
         if unknown:
@@ -1204,7 +1211,11 @@ def build_vision(args):
         source = task.source_id
         provenance = source_provenance(source)
         dataset = load_task(task.id, vision=True, recast='jev', streaming=True,
-                            max_rows=args.max_rows, max_rows_eval=args.max_rows_eval)
+                            max_rows=args.max_rows, max_rows_eval=args.max_rows_eval,
+                            excluded_sources=getattr(args, 'excluded_sources', ()),
+                            grounding=({'probabilities': args.grounding_probabilities}
+                                       if getattr(args, 'grounding_probabilities', None) is not None else None),
+                            seed=getattr(args, 'seed', 0))
         dataset = disable_image_decoding(dataset)
         counts = {}
         for split, rows in dataset.items():
@@ -1212,9 +1223,10 @@ def build_vision(args):
             for index, example in enumerate(rows):
                 row = to_training_row(example, index, source, split)
                 images = image_keys(row['images'])
+                leakage_images = image_keys(row['images'], row.get('metadata'))
                 if split == 'train':
-                    train_images.update(images)
-                elif any(image in train_images for image in images):
+                    train_images.update(leakage_images)
+                elif any(image in train_images for image in leakage_images):
                     continue  # sibling QAs over a training image stay out of evaluation
                 image_id = hashlib.sha256('\x1f'.join(images).encode()).hexdigest()[:24]
                 state_id = hashlib.sha256(row['state'].encode()).hexdigest()[:16]
@@ -1229,7 +1241,8 @@ def build_vision(args):
                 row['example_id'] = hashlib.sha256(('\x1f'.join(images) + example_key(
                     source, row['state'], row['options'], row['target'])).encode()).hexdigest()[:24]
                 metadata = json.loads(row.get('metadata') or '{}')
-                metadata.update({'provenance': provenance, 'licenses': licenses[source], 'image_ids': list(images), 'image_group_id': image_id})
+                metadata.update({'provenance': provenance, 'licenses': licenses[source], 'image_ids': list(images),
+                    'rendered_image_group_id': image_id, 'image_group_id': metadata.get('image_group_id', image_id)})
                 row['metadata'] = json.dumps(metadata, ensure_ascii=False, sort_keys=True)
                 row.update({key: licenses[source][key] for key in ('license', 'license_use')})
                 converted.append(row)
@@ -1256,7 +1269,7 @@ def build_vision(args):
     for split in list(dataset):
         if split != 'train':
             dataset[split] = dataset[split].filter(
-                lambda images: not any(key in train_images for key in image_keys(images)), input_columns='images')
+                lambda row: not any(key in train_images for key in image_keys(row['images'], row.get('metadata'))))
             if not len(dataset[split]):
                 del dataset[split]
     audit = {'repo_id': args.repo_id, 'config': 'vision', 'splits': {
@@ -1523,6 +1536,9 @@ def parse_args():
     parser.add_argument("--card", type=Path, default=root / "dataset_cards" / "tasksource-jev.md")
     parser.add_argument("--tasks", nargs="*")
     parser.add_argument("--vision", action="store_true", help="Build/publish the separate multimodal vision config.")
+    parser.add_argument("--excluded-sources", nargs="*", default=[], help="Exact Hub sources to exclude, including originals behind mirrors (vision).")
+    parser.add_argument("--grounding-probabilities", type=json.loads, help="SoM variant probability dictionary for candidate grounding tasks.")
+    parser.add_argument("--seed", type=int, default=0, help="Vision sampling and grounding augmentation seed.")
     parser.add_argument("--limit", type=int)
     parser.add_argument(
         "--english-only", action="store_true",

@@ -48,7 +48,7 @@ def pretty_name(x):
     return f"{dn}/{cn}/{tn}".replace('//','/').rstrip('/')
 
 def list_tasks(tasks_path=f'{os.path.dirname(__file__)}/tasks.py', multilingual=False, instruct=False, excluded=(),
-               soft=False, min_annotators=None, license_use=None, vision=False):
+               soft=False, min_annotators=None, license_use=None, vision=False, excluded_sources=()):
     """The task catalog as a DataFrame; ``excluded`` holds substrings of task ids to leave out.
 
     ``soft=False`` lists tasks with hard labels, SoftLabeling annotations by their
@@ -67,6 +67,10 @@ def list_tasks(tasks_path=f'{os.path.dirname(__file__)}/tasks.py', multilingual=
 
     Each call returns a fresh copy, so callers may edit it without affecting later calls."""
     df = _list_tasks(tasks_path, multilingual, instruct, tuple(excluded), soft, min_annotators, vision)
+    if excluded_sources:
+        excluded_repos = set(excluded_sources)
+        df = df[[not excluded_repos.intersection(_task_repos(m, d, i))
+                 for m, d, i in zip(df.mapping, df.dataset_name, df.id)]]
     if license_use is not None:
         uses = {license_use} if isinstance(license_use, str) else set(license_use)
         if uses - set(LICENSE_USES):
@@ -258,8 +262,12 @@ def load_preprocessing(tasks=tasks, **kwargs):
 def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preprocessing_name=None,
          max_rows=None, max_rows_eval=None, multilingual=False, instruct=False,
          recast=None, prompted=False, seed=0, data_file_pins=None, soft=None, min_annotators=None,
-         vision=False, **load_dataset_kwargs):
+         vision=False, grounding=None, excluded_sources=(), **load_dataset_kwargs):
     """Load a standardized task. ``vision=True`` selects the visual catalog.
+
+    ``grounding={"probabilities": {"plain": .5, "som+text": .25, "som-only": .25}}``
+    draws native candidates after sampling. Mark IDs remain stable through Jev
+    option permutation. ``excluded_sources`` rejects exact Hub source IDs before loading.
 
     Capped visual streaming loads sample uniformly across the complete eligible
     split; they bound memory but still scan all rows.
@@ -283,6 +291,10 @@ def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preproc
     if vision and multilingual:
         raise ValueError("vision and multilingual catalogs are separate")
     preprocessing = load_preprocessing(_tasks, **query)
+    if set(excluded_sources).intersection(_task_repos(preprocessing, preprocessing.dataset_name, id or "")):
+        raise ValueError(f"Excluded source: {preprocessing.dataset_name}")
+    if grounding is not None and not vision:
+        raise ValueError("Grounding augmentation requires vision=True")
     soft_labels = isinstance(preprocessing, SoftLabeling) and (recast == "jev" if soft is None else soft)
     if isinstance(preprocessing, SoftLabeling):
         kind, row_options = preprocessing.kind, preprocessing.per_row_options
@@ -331,6 +343,9 @@ def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preproc
         # Jev permutes criteria itself and needs every source option.
         options = dict(gold_first=False, max_options=JEV_MAX_MC_OPTIONS)
     dataset= preprocessing(dataset,max_rows, max_rows_eval, seed=seed, pre_processed=pre_processed, **options)
+    if grounding is not None:
+        from .grounding import augment_grounding
+        dataset = augment_grounding(dataset, seed=seed, excluded_sources=excluded_sources, **grounding)
     question = getattr(preprocessing, "question", None)
     if prompted:
         dataset = add_question(dataset, question)

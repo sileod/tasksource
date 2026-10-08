@@ -5,6 +5,7 @@ import math
 import re
 from datasets import Features, Image, Sequence, Value, IterableDataset
 from .preprocess import VisualClassification, VisualMultipleChoice
+from .grounding import grid_labels, grid_center
 
 
 def figureqa_rows(dataset):
@@ -163,37 +164,20 @@ figureqa = VisualClassification(
 )
 
 
-def grid_labels(point, bins=(7, 7), depth=1):
-    """Row/column labels from a normalized point, including nested cell refinements."""
-    if (len(bins) != 2 or any(type(n) is not int or n <= 0 for n in bins)
-            or type(depth) is not int or depth <= 0):
-        raise ValueError('Grid dimensions and depth must be positive integers')
-    x, y = point
-    if not all(math.isfinite(v) and 0 <= v <= 1 for v in (x, y)):
-        raise ValueError('Point coordinates must be finite and in [0, 1]')
-    nx, ny = bins
-    cells = []
-    for _ in range(depth):
-        c, r = min(int(x * nx), nx - 1), min(int(y * ny), ny - 1)
-        cells.append((r, c))
-        x, y = x * nx - c, y * ny - r
-    return cells
-
-
-def grid_center(cells, bins=(7, 7)):
-    """Decode a cell path to its center in the original normalized image."""
-    grid_labels((0, 0), bins, len(cells))  # validate grid and depth
-    x = y = 0.5
-    nx, ny = bins
-    for r, c in reversed(cells):
-        if not (type(r) is int and type(c) is int and 0 <= r < ny and 0 <= c < nx):
-            raise ValueError('Cell outside grid')
-        x, y = (c + x) / nx, (r + y) / ny
-    return x, y
-
-
 _MIND2WEB = dict(dataset_name='tasksource/multimodal-mind2web',
     load_dataset_kwargs={'revision': 'afa19ed8797c18996d02e06a52fffe2401ba6dbc'})
+
+def mind2web_element_metadata(row):
+    """Recover native candidate geometry already preserved in the data-only mirror."""
+    metadata = json.loads(row['metadata'])
+    width, height = metadata['image_size']
+    def box(rect):
+        x, y, w, h = rect
+        return [x/width, y/height, (x+w)/width, (y+h)/height]
+    return {**metadata, 'question_id': 'element',
+            'source_dataset': 'osunlp/Multimodal-Mind2Web',
+            'target_bbox': box(metadata['bbox']), 'bbox_units': 'normalized_xyxy',
+            'candidate_boxes': [box(json.loads(choice)['bbox']) for choice in row['choices_list']]}
 
 mind2web_action = VisualClassification(
     **_MIND2WEB, task_id='mind2web/action', labels='action',
@@ -205,7 +189,7 @@ mind2web_action = VisualClassification(
 mind2web_element = VisualMultipleChoice(
     **_MIND2WEB, task_id='mind2web/element', choices_list='choices_list', labels='labels',
     question='Which candidate element should be acted on next?',
-    metadata=lambda x: {**json.loads(x['metadata']), 'question_id': 'element'},
+    metadata=mind2web_element_metadata,
 )
 
 mind2web_x10 = VisualClassification(
@@ -395,35 +379,72 @@ vsr_yesno = VisualClassification(
 )
 
 
-def rico_widget_rows(dataset):
+def rico_candidates(value):
+    """Native semantic leaves, scaled by the hierarchy canvas, never by the target."""
+    from .grounding import normalized_box
+    root = json.loads(value)
+    x0, y0, x1, y1 = root['bounds']
+    if x0 != 0 or y0 != 0 or x1 <= 0 or y1 <= 0:
+        raise ValueError('Unsupported RICO annotation canvas')
+    elements = {}
+    def visit(node):
+        children = node.get('children', [])
+        if not children and node.get('componentLabel') and 'bounds' in node:
+            try:
+                box = normalized_box([node['bounds'][0]/x1, node['bounds'][1]/y1,
+                                      node['bounds'][2]/x1, node['bounds'][3]/y1])
+            except (ValueError, TypeError):
+                return
+            text = ' '.join(str(node[k]) for k in ('componentLabel', 'iconClass', 'textButtonClass', 'text') if node.get(k))
+            elements.setdefault(tuple(box), {'bbox': box, 'text': text})
+        for child in children:
+            visit(child)
+    visit(root)
+    return list(elements.values())
+
+
+def rico_widget_rows(dataset, elements=False):
     """Human widget descriptions and normalized boxes; retain native splits/images."""
     def flatten(batch, indices, source_split):
+        from .grounding import grounding_row
         output = {key: [] for key in ('images', 'inputs', 'labels', 'metadata')}
-        for source_index, screen, image, box, captions in zip(indices, batch['screenId'], batch['image'], batch['bbox'], batch['captions']):
+        if elements:
+            output['choices_list'] = []
+        for offset, (source_index, screen, image, box, captions) in enumerate(zip(
+                indices, batch['screenId'], batch['image'], batch['bbox'], batch['captions'])):
             if image is None or len(box) != 4 or not all(math.isfinite(v) for v in box):
                 continue
             x0, y0, x1, y1 = box
             if not (0 <= x0 < x1 <= 1 and 0 <= y0 < y1 <= 1):
                 continue
-            point = ((x0 + x1) / 2, (y0 + y1) / 2)
-            r, c = grid_labels(point)[0]
+            candidates = None
+            if elements:
+                try:
+                    candidates = rico_candidates(batch['semantic_annotations'][offset])
+                except (ValueError, TypeError, KeyError):
+                    continue
             widget = f'{screen}:' + hashlib.sha256(json.dumps(box).encode()).hexdigest()
             # Different human captions are independent descriptions of the same widget.
             for index, caption in enumerate(captions):
                 if not caption.strip():
                     continue
-                output['images'].append([image])
-                output['inputs'].append(caption.strip())
-                output['labels'].append(r * 7 + c)
-                output['metadata'].append(json.dumps({'screenId': screen, 'source_widget': widget,
-                    'source_row': f'{source_split}:{source_index}:{index}', 'image_group_id': f'rico:{screen}',
-                    'target_bbox': box, 'bbox_units': 'normalized_xyxy', 'point': point,
-                    'coordinate_source': 'widget_bbox_center', 'stage': 1, 'bins': [7, 7],
-                    'source_license': 'cc-by-4.0',
-                    'source_license_url': 'https://github.com/google-research-datasets/widget-caption'}, sort_keys=True))
+                try:
+                    record = grounding_row([image], caption.strip(), box, candidates=candidates,
+                        metadata={'screenId': screen, 'source_widget': widget,
+                            'source_row': f'{source_split}:{source_index}:{index}', 'image_group_id': f'rico:{screen}',
+                            'source_dataset': 'bevaya/RICO-WidgetCaptioning',
+                            'source_revision': '6ec57b56bebd722b9c646c78d0f34e1199b6d7a9',
+                            'coordinate_source': 'widget_bbox_center', 'source_license': 'cc-by-4.0',
+                            'source_license_url': 'https://github.com/google-research-datasets/widget-caption'})
+                except ValueError:
+                    continue  # No target insertion, no generated negatives, no target-aware pruning.
+                for key in output:
+                    output[key].append(record[key])
         return output
     features = Features({'images': Sequence(Image(decode=False)), 'inputs': Value('string'),
                          'labels': Value('int64'), 'metadata': Value('string')})
+    if elements:
+        features['choices_list'] = Sequence(Value('string'))
     return type(dataset)({split: rows.map(flatten, batched=True, batch_size=16, with_indices=True,
         fn_kwargs={'source_split': split},
         remove_columns=list(rows.features), features=features) for split, rows in dataset.items()})
@@ -436,4 +457,13 @@ rico_widget_grid7 = VisualClassification(
     question='Which cell contains the described widget center in a 7-row, 7-column grid over the displayed image?',
     load_dataset_kwargs={'revision': '6ec57b56bebd722b9c646c78d0f34e1199b6d7a9', 'streaming': True,
                          'columns': ['screenId', 'image', 'bbox', 'captions']},
+)
+
+
+rico_widget_element = VisualMultipleChoice(
+    dataset_name='bevaya/RICO-WidgetCaptioning', task_id='rico-widget/element',
+    splits=('train', 'val', 'test'), pre_process=lambda ds: rico_widget_rows(ds, elements=True), metadata='metadata',
+    choices_list='choices_list', question='Which element in the displayed image matches the instruction?',
+    load_dataset_kwargs={'revision': '6ec57b56bebd722b9c646c78d0f34e1199b6d7a9', 'streaming': True,
+                         'columns': ['screenId', 'image', 'bbox', 'captions', 'semantic_annotations']},
 )

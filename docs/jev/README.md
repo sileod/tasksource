@@ -385,3 +385,52 @@ Per-label distributions are retained in the JSON. All three views passed
 [native-image loader/Jev smoke checks](visual-expansion-smoke.json); the
 [coarse visual review](visual-expansion-quality.json) records source-quality
 observations separately from recast correctness.
+
+## Grounding and Set-of-Mark
+
+Grounding uses the existing visual templates. `tasksource.grounding.grounding_row`
+projects an image, instruction and normalized `xyxy` target box to grid labels, or
+to MC when supplied real candidate boxes and descriptions. MC requires 2–26
+unique boxes and exactly one matching target; no target box is inserted and no
+negative boxes are invented. Geometry is relative to the displayed image, so a
+separate refinement mirror can supply crop-relative boxes with original geometry
+kept in metadata.
+
+```python
+from tasksource import load_task, list_tasks
+
+excluded = ["osunlp/Multimodal-Mind2Web", "tasksource/multimodal-mind2web"]
+tasks = list_tasks(vision=True, excluded_sources=excluded)
+ds = load_task(
+    "rico-widget/element", vision=True, recast="jev", max_rows=1000,
+    max_rows_eval=100, seed=42, excluded_sources=excluded,
+    grounding={"probabilities": {"plain": 0.5, "som+text": 0.25, "som-only": 0.25}},
+)
+```
+
+Augmentation runs only on sampled rows. `plain` retains encoded images and native
+candidate descriptions with candidate geometry. `som+text` adds numbered boxes
+and keeps the descriptions; `som-only` keeps the instruction and uses `Mark N`
+criteria. All marks have identical styling. Stable mark IDs are content, distinct
+from Jev's shuffled option indices; the gold criterion continues to name the same
+mark. Configure `mark_size` (fraction of the shorter image dimension) and
+`line_width` in `grounding`. Metadata records weights, seed, source identity,
+normalized candidate geometry, original image hash, rendering version and Pillow
+version. Images and metadata stay separate from the rendered textual request.
+
+The loader rejects explicitly excluded sources before downloading and checks
+cross-split screenshot hashes and trajectory/image-group IDs before augmentation.
+The publisher also checks original image hashes when variants change the pixels.
+For a candidate-only release, the builder accepts `--excluded-sources`,
+`--grounding-probabilities '{"plain":0.5,"som+text":0.25,"som-only":0.25}'`
+and `--seed`. Use that option only with grounding tasks providing candidate boxes.
+
+RICO uses native semantic leaf boxes, normalized by their annotation canvas. The
+captioned target must already occur in those candidates. Native splits have a
+previous full screen-ID disjointness audit; the candidate pilot and three visual
+checks are recorded in [rico-grounding-audit.json](rico-grounding-audit.json).
+AndroidControl includes screenshot-aligned serialized accessibility trees, but
+requires a TFRecord/protobuf conversion before it is usable as a canonical Hub
+source. That belongs under `scripts/repackage_dataset/`, with episode-level native
+splits, candidate validity checks, and original revisions/terms recorded; it is
+not yet registered. [Official AndroidControl format](https://github.com/google-research/google-research/blob/master/android_control/README.md).
