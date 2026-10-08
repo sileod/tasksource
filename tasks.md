@@ -536,6 +536,11 @@ Annotations whose label is a distribution (annotator votes, rater shares, survey
 | [measuring-hate-speech/genocide](src/tasksource/tasks.py#L2178) | score | votes | 3 |  | [tasksource/measuring-hate-speech-votes](https://hf.co/datasets/tasksource/measuring-hate-speech-votes) |
 | [measuring-hate-speech/attack_defend](src/tasksource/tasks.py#L2180) | score | votes | 3 |  | [tasksource/measuring-hate-speech-votes](https://hf.co/datasets/tasksource/measuring-hate-speech-votes) |
 | [measuring-hate-speech/hatespeech](src/tasksource/tasks.py#L2182) | choice | votes | 3 |  | [tasksource/measuring-hate-speech-votes](https://hf.co/datasets/tasksource/measuring-hate-speech-votes) |
+| [wikipedia-detox/attack](src/tasksource/tasks.py#L2309) | choice | votes | 10 |  | [tasksource/wikipedia-detox-votes](https://hf.co/datasets/tasksource/wikipedia-detox-votes) |
+| [wikipedia-detox/aggression](src/tasksource/tasks.py#L2311) | choice | votes | 10 |  | [tasksource/wikipedia-detox-votes](https://hf.co/datasets/tasksource/wikipedia-detox-votes) |
+| [wikipedia-detox/aggression_score](src/tasksource/tasks.py#L2313) | score | votes | 10 |  | [tasksource/wikipedia-detox-votes](https://hf.co/datasets/tasksource/wikipedia-detox-votes) |
+| [wikipedia-detox/toxicity](src/tasksource/tasks.py#L2317) | choice | votes | 10 |  | [tasksource/wikipedia-detox-votes](https://hf.co/datasets/tasksource/wikipedia-detox-votes) |
+| [wikipedia-detox/toxicity_score](src/tasksource/tasks.py#L2319) | score | votes | 10 |  | [tasksource/wikipedia-detox-votes](https://hf.co/datasets/tasksource/wikipedia-detox-votes) |
 | [lewidi/md_agreement](src/tasksource/tasks.py#L2197) | noul | votes | 5 |  | [tasksource/lewidi](https://hf.co/datasets/tasksource/lewidi) |
 | [lewidi/hs_brexit](src/tasksource/tasks.py#L2198) | noul | votes | 6 |  | [tasksource/lewidi](https://hf.co/datasets/tasksource/lewidi) |
 | [lewidi/armis](src/tasksource/tasks.py#L2200) | noul | votes | 3 |  | [tasksource/lewidi](https://hf.co/datasets/tasksource/lewidi) |

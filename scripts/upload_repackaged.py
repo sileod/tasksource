@@ -302,6 +302,87 @@ def lewidi():
     return configs
 
 
+# Fixed files from the Wikimedia/Figshare releases. The older aggression file
+# 7383748 contains binary labels only; 7394506 also retains ordinal scores.
+WIKIPEDIA_DETOX_FILES = {
+    "attack": (7554634, 7554637),
+    "aggression": (7038038, 7394506),
+    "toxicity": (7394542, 7394539),
+}
+
+
+def _wikipedia_detox_votes(comments, annotations, dimension):
+    """Join canonical comments to aggregated human votes, validating the join."""
+    import pandas as pd
+    comments = comments.copy()
+    annotations = annotations.copy()
+    for frame in (comments, annotations):
+        ids = pd.to_numeric(frame["rev_id"], errors="raise")
+        if ids.isna().any() or (ids % 1 != 0).any():
+            raise ValueError("Detox rev_id must be an integer")
+        frame["rev_id"] = ids.astype("int64")
+    if comments.rev_id.duplicated().any():
+        raise ValueError("Duplicate Detox comments")
+    if set(comments.rev_id) != set(annotations.rev_id):
+        raise ValueError("Detox comments and annotations have unmatched rev_id values")
+    binary = pd.to_numeric(annotations[dimension], errors="raise")
+    if not binary.isin([0, 1]).all():
+        raise ValueError("Invalid Detox binary label")
+    annotations[dimension] = binary.astype(int)
+    levels = range(-3, 4) if dimension == "aggression" else range(-2, 3)
+    if dimension != "attack":
+        scores = pd.to_numeric(annotations[f"{dimension}_score"], errors="raise")
+        if not scores.isin(levels).all():
+            raise ValueError("Invalid Detox ordinal score")
+        if not ((scores < 0).astype(int) == binary).all():
+            raise ValueError("Detox binary label disagrees with ordinal score")
+        annotations[f"{dimension}_score"] = scores.astype(int)
+    grouped = annotations.groupby("rev_id", sort=False)
+    votes = grouped.size().to_frame("annotators")
+    binary_counts = pd.crosstab(annotations.rev_id, annotations[dimension]).reindex(columns=[0, 1], fill_value=0)
+    votes[f"{dimension}_votes"] = binary_counts.apply(lambda row: row.tolist(), axis=1)
+    if dimension != "attack":
+        score_counts = pd.crosstab(annotations.rev_id, annotations[f"{dimension}_score"]).reindex(
+            columns=levels, fill_value=0)
+        votes["score_votes"] = score_counts.apply(lambda row: row.tolist(), axis=1)
+    rows = comments[["rev_id", "comment", "sample", "year", "ns", "split"]].merge(
+        votes, on="rev_id", how="left", validate="one_to_one").rename(columns={"comment": "text"})
+    rows["text"] = rows.text.str.replace("NEWLINE_TOKEN", "\n", regex=False).str.replace("TAB_TOKEN", "\t", regex=False)
+    if rows.text.isna().any() or not rows.split.isin(["train", "dev", "test"]).all():
+        raise ValueError("Invalid Detox text or canonical split")
+    return DatasetDict({split: Dataset.from_pandas(rows[rows.split == source].drop(columns="split"),
+                                                 preserve_index=False)
+                        for source, split in [("train", "train"), ("dev", "validation"), ("test", "test")]})
+
+
+def wikipedia_detox_votes():
+    """Wikipedia Detox: human vote counts, with attack, aggression and toxicity configs.
+
+    No new annotation. One row per Wikipedia comment. Human annotations are aggregated
+    to vote counts after joining *_annotated_comments.tsv and *_annotations.tsv on rev_id.
+    Original train/dev/test assignments are retained; dev is renamed validation.
+    Binary votes use [not attack/aggression/toxicity, attack/aggression/toxicity] order.
+    Aggression score_votes follow [-3, -2, -1, 0, +1, +2, +3]; toxicity score_votes follow
+    [-2, -1, 0, +1, +2]. Negative scores mean aggressive/toxic. annotators records the
+    actual number of human annotations, rather than assuming ten for every comment.
+    Text NEWLINE_TOKEN and TAB_TOKEN placeholders are restored to newlines and tabs.
+    rev_id, sample, year and ns are retained as provenance; worker IDs and demographics
+    are omitted. Source: [Wikipedia Detox / Wikimedia](https://meta.wikimedia.org/wiki/Research:Detox/Data_Release)
+    and Figshare: [attack](https://doi.org/10.6084/m9.figshare.4054689),
+    [aggression](https://doi.org/10.6084/m9.figshare.4267550),
+    [toxicity](https://doi.org/10.6084/m9.figshare.4563973). Released datasets are CC0.
+    """
+    import pandas as pd
+    configs = {}
+    for dimension, file_ids in WIKIPEDIA_DETOX_FILES.items():
+        frames = []
+        for file_id in file_ids:
+            with urllib.request.urlopen(f"https://ndownloader.figshare.com/files/{file_id}") as response:
+                frames.append(pd.read_csv(response, sep="\t"))
+        configs[dimension] = _wikipedia_detox_votes(*frames, dimension)
+    return configs
+
+
 def webinstruct(bad_examples=None, repairs=None):
     """WebInstruct verified: single-answer multiple choice and explicit yes/no or true/false answers.
 
@@ -322,11 +403,13 @@ BUILDERS = {"webinstruct": ("tasksource/webinstruct", webinstruct, "per-config")
             "mms": ("tasksource/mms", mms, "per-language"),
             "chaos_mnli_ambiguity": ("tasksource/chaos-mnli-ambiguity", chaos_mnli_ambiguity),
             "measuring_hate_speech_votes": ("tasksource/measuring-hate-speech-votes", measuring_hate_speech_votes),
-            "lewidi": ("tasksource/lewidi", lewidi, "per-config")}
+            "lewidi": ("tasksource/lewidi", lewidi, "per-config"),
+            "wikipedia_detox_votes": ("tasksource/wikipedia-detox-votes", wikipedia_detox_votes, "per-config")}
 
 
 # license metadata for repackaged sets, as the originals state it
 LICENSES = {"tasksource/measuring-hate-speech-votes": "cc-by-4.0", "tasksource/lewidi": "other",
+            "tasksource/wikipedia-detox-votes": "cc0-1.0",
             "tasksource/webinstruct": "apache-2.0"}
 
 

@@ -20,6 +20,7 @@ ORIGINALS = {
     "tasksource/chaos-mnli-ambiguity": [],  # ChaosNLI is only on GitHub/Dropbox
     "tasksource/clutrr": ["CLUTRR/v1"],
     "tasksource/lewidi": [],  # the LeWiDi GitHub release; not on the Hub
+    "tasksource/wikipedia-detox-votes": [],  # Wikimedia/Figshare release, not another Hub repository
     "tasksource/measuring-hate-speech-votes": ["ucberkeley-dlab/measuring-hate-speech"],
     "tasksource/contract-nli": ["kiddothe2b/contract-nli"],
     "tasksource/corr2cause": ["causal-nlp/corr2cause"],

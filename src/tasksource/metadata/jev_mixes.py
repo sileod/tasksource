@@ -35,7 +35,7 @@ BUCKETS = {
                        r"agent_action_safety|toxic-chat|BeaverTails|PKU-SafeRLHF/safety|privacy-200k", 0.04),
     "preference_judge": (r"oasst|dpo_pairs|summarize_from_feedback|hh-rlhf|HelpSteer|UltraFeedback|chatbot_arena|SHP|"
                          r"webgpt|PKU-SafeRLHF|synthetic-instruct|argument-feedback|AES2|english-grading|TuringBench", 0.06),
-    "graded_calibration": (r"civil_comments|dynasent/.*votes|UNLI|lewidi|Disagreement|chaos|sts-companion|"
+    "graded_calibration": (r"civil_comments|dynasent/.*votes|UNLI|lewidi|wikipedia-detox|Disagreement|chaos|sts-companion|"
                            r"acceptability|proto_qa|wouldyourather|probability_words|scruples|crowdflower|persuasion|"
                            r"emobank", 0.065),
     "nli_general": (r"anli|WANLI|dataset_train_nli|^glue|super_glue|^snli|lingnli|MSciNLI|scinli|scitail|defeasible|"
@@ -57,7 +57,7 @@ BUCKETS = {
 
 
 # Sources picked by reading them (2026-10-02): rows the scores alone undervalue, e.g. clean binary sets
-PICKED = r"^WANLI$|^anli/|^ai2_arc/|^glue/cola$|dynasent|Dynasent|^IntentGrasp/all$|^MSciNLI$|^ConTRoL-nli$|" \
+PICKED = r"^wikipedia-detox/|^WANLI$|^anli/|^ai2_arc/|^glue/cola$|dynasent|Dynasent|^IntentGrasp/all$|^MSciNLI$|^ConTRoL-nli$|" \
          r"^winogrande/|^contract-nli/|^folio$|^dynahate$|^head_qa/en$|^sciq$|^art$|^dadc-limit-nli$|^FOL-nli$|^doc-nli$"
 PICKED_BOOST = 2.0
 

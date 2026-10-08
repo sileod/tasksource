@@ -2304,6 +2304,7 @@ def _wikipedia_detox(config, options, question, score=False):
     return SoftLabeling("text", labels="score_votes" if score else f"{config}_votes",
         kind="score" if score else "choice", options=options, annotators=10, count="annotators",
         question=question, dataset_name="tasksource/wikipedia-detox-votes", config_name=config,
+        load_dataset_kwargs={"revision": "fdda08224ffe772b417f030ed0d7eff4b664fcb4"},
         task_id=f"wikipedia-detox/{config}{'_score' if score else ''}")
 
 wikipedia_detox__attack = _wikipedia_detox("attack", ["not a personal attack", "personal attack"],

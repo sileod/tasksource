@@ -811,6 +811,9 @@ CARD_LICENSES = {
  "tasksource/wice": [
   "cc-by-sa-4.0"
  ],
+ "tasksource/wikipedia-detox-votes": [
+  "cc0-1.0"
+ ],
  "tasksource/winodict": [
   "cc-by-4.0"
  ],
