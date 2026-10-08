@@ -6,24 +6,73 @@ Huggingface Datasets is an excellent library, but it lacks standardization, and 
 Each dataset is standardized to a `MultipleChoice`, `Classification`, or `TokenClassification` template with canonical fields. We focus on discriminative tasks (= with negative examples or classes) for our annotations but also provide a `SequenceToSequence` template. Browse the [English](catalog_english.md), [multilingual](catalog_multilingual.md), and [vision](catalog_vision.md) task catalogs for the available annotations. A preprocessing is a function that accepts a dataset and returns the standardized dataset. Preprocessing code is concise and human-readable.
 
 ### Usage
-`pip install tasksource`
+
+```bash
+pip install tasksource
+```
+
 ```python
 from tasksource import list_tasks, load_task
-df = list_tasks(multilingual=False) # takes some time
 
+df = list_tasks(multilingual=False) # takes some time
 for id in df[df.task_type=="MultipleChoice"].id:
     dataset = load_task(id) # all yielded datasets can be used interchangeably
 ```
 
-Inputs are kept raw by default. When the inputs alone do not say what to predict, an annotation carries a `question` ("Is this search query a well-formed question?"), exposed as `dataset.question`; `load_task(id, prompted=True)` appends it to the inputs, and the instruct and typed-decision recasts use it as their instruction.
+#### Task catalogs
 
-Browse the 500+ curated tasks in catalog_english.md (tasks kept out on purpose, such as evaluation benchmarks, are in [parked.py](https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py) with the reason) (200+ MultipleChoice tasks, 200+ Classification tasks), and feel free to request a new task. Datasets are downloaded to `$HF_DATASETS_CACHE` (like any Hugging Face dataset), so ensure you have more than 100GB of space available.
+Browse the [English](catalog_english.md), [multilingual](catalog_multilingual.md),
+and [vision](catalog_vision.md) catalogs, and feel free to request a new task.
+The English catalog includes 200+ MultipleChoice tasks and 200+ Classification
+tasks. Tasks kept out on purpose, such as evaluation benchmarks, are in
+[parked.py](src/tasksource/parked.py), with the reason.
 
-Visual tasks are listed in [catalog_vision.md](catalog_vision.md), with annotations in [vision_tasks.py](src/tasksource/vision_tasks.py). Discover them with `list_tasks(vision=True)` and load them with `load_task(id, vision=True)`; use `recast="jev"` or `recast="instruct"` to keep images alongside the rendered decisions or prompts.
+Visual annotations are in [vision_tasks.py](src/tasksource/vision_tasks.py).
+Discover them with `list_tasks(vision=True)` and load them with
+`load_task(id, vision=True)`. Use `recast="jev"` or `recast="instruct"` to keep
+images alongside the rendered decisions or prompts.
 
-Some annotations are distributions rather than single labels: annotator votes, rater shares, survey counts. These `SoftLabeling` annotations load as probabilities with `load_task(id, soft=True)` (`labels` over `options`); most also have a hard view, their majority label on rows with clear agreement, which is what `load_task(id)` and the default `list_tasks()` give. `list_tasks(soft=True)` lists the soft views, including annotations that only make sense as distributions (e.g. ProtoQA survey answers). Each records whether it summarizes annotator votes or mean ratings, and how many annotators judged an item: vote shares from three annotators are coarse (0, 1/3, 2/3, 1), and `min_annotators=5` leaves them out. They are listed at the end of catalog_english.md.
+Datasets are downloaded to `$HF_DATASETS_CACHE`, like any Hugging Face dataset.
+Ensure you have more than 100GB of space available for large multi-task runs.
 
-Licenses are available on demand. `list_tasks(license_use="commercial")` keeps tasks whose sources allow commercial use (also `non-commercial`, `unspecified`, or a list), and `task_licenses()` gives each task's licenses and where they come from. They are read from the Hub cards of the datasets a task loads and of their originals, plus [Data Provenance Initiative](https://www.dataprovenance.org/) annotations, both snapshotted in the package (`task_licenses(fresh=True)` reads the current cards). `license_use` takes the most restrictive license found; `other`, bare `cc` and missing licenses are `unspecified`. This is a best-effort filter, not legal advice.
+#### Prompts
+
+Inputs are kept raw by default. When the inputs alone do not say what to predict,
+an annotation carries a `question` ("Is this search query a well-formed question?"),
+exposed as `dataset.question`.
+
+`load_task(id, prompted=True)` appends the question to the inputs. The instruct
+and typed-decision recasts use it as their instruction.
+
+#### Soft labels
+
+Some annotations are distributions rather than single labels: annotator votes,
+rater shares, survey counts. These `SoftLabeling` annotations load as
+probabilities with `load_task(id, soft=True)` (`labels` over `options`). Most also
+have a hard view: their majority label on rows with clear agreement, which is
+what `load_task(id)` and the default `list_tasks()` give.
+
+`list_tasks(soft=True)` lists the soft views, including annotations that only
+make sense as distributions, such as ProtoQA survey answers. They are listed at
+the end of [catalog_english.md](catalog_english.md).
+
+Each records whether it summarizes annotator votes or mean ratings, and how many
+annotators judged an item. Vote shares from three annotators are coarse
+(0, 1/3, 2/3, 1); `min_annotators=5` leaves them out.
+
+#### Licenses
+
+`list_tasks(license_use="commercial")` keeps tasks whose sources allow commercial
+use. The filter also accepts `non-commercial`, `unspecified`, or a list.
+`task_licenses()` gives each task's licenses and where they come from.
+
+Licenses are read from the Hub cards of the datasets a task loads and of their
+originals, plus [Data Provenance Initiative](https://www.dataprovenance.org/)
+annotations. Both are snapshotted in the package;
+`task_licenses(fresh=True)` reads the current cards.
+
+`license_use` takes the most restrictive license found. `other`, bare `cc`, and
+missing licenses are `unspecified`. This is a best-effort filter, not legal advice.
 
 ### Pretrained models:
 
