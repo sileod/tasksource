@@ -49,7 +49,7 @@ class ModernTaskPreprocessingTest(unittest.TestCase):
         source = DatasetDict({split: Dataset.from_list([row]) for split in ("train", "validation", "test")})
         result = _chemprot_relations(source)["train"][0]
         self.assertEqual(result["entity_pair"], "Drug -> protein")
-        self.assertEqual(result["relation"], "CPR:4")
+        self.assertEqual(result["relation"], "downregulator or inhibitor")
 
     def test_helpsteer_context_preserves_roles(self):
         context = {"context": [{"role": "user", "content": "Hello"}, {"role": "assistant", "content": "Hi"}]}

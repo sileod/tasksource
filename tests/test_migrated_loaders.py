@@ -169,7 +169,7 @@ class MigratedLoaderHelperTest(unittest.TestCase):
             "scicite": "tasksource/scicite",
             "relbert_lexical_relation_classification": "json",
             "social_i_qa": "tasksource/social_i_qa",
-            "wiqa": "tasksource/wiqa",
+            "wiqa": "parquet",  # allenai/wiqa parquet conversion, read through data_files
             "humicroedit___subtask_2": "tasksource/humicroedit",
             "scifact_entailment": "tasksource/scifact_entailment",
             "head_qa___en": "EleutherAI/headqa",
