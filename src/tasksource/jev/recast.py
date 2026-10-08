@@ -2,6 +2,7 @@
 
 import hashlib
 import html
+import json
 import re
 from collections import OrderedDict
 
@@ -174,7 +175,7 @@ def _recast_soft(dataset, task, question, kind, row_options, group):
     return converted.remove_columns([c for c in converted["train"].column_names if c not in keep])
 
 
-def recast_jev(dataset, task=None, question=None, ordinal=False, kind=None, row_options=False, group=None):
+def recast_jev(dataset, task=None, question=None, ordinal=False, kind=None, row_options=False, group=None, score_only=False):
     """Recast a standardized Tasksource dataset as runtime-defined choices.
 
     The output is model- and wire-format-independent. ``criteria`` contains
@@ -184,7 +185,8 @@ def recast_jev(dataset, task=None, question=None, ordinal=False, kind=None, row_
     augmentation is otherwise deliberately separate. The annotation's
     ``question``, when set, replaces the generic choice instruction.
     Ordinal label sets (``ordinal=True`` or a known scale) are put in scale
-    order and about half their rows get ``kind="score"``. Soft labels
+    order and about half their rows get ``kind="score"``; ``score_only=True``
+    requests scores on every row of an ordered 2–10-level classification. Soft labels
     (SoftLabeling, whose ``kind`` is passed) keep their distribution as ``target``;
     ``row_options`` marks options that vary per row, which are permuted;
     ``group`` names the source dataset that sibling soft annotations share.
@@ -204,6 +206,12 @@ def recast_jev(dataset, task=None, question=None, ordinal=False, kind=None, row_
     task_type = _jev_task_type(features)
     labels = features.get("labels")
 
+    def keeps_raw_text(example, index, split):
+        metadata = json.loads(example.get("metadata") or "{}")
+        if isinstance(metadata, dict) and "group" in metadata and "source_row" in metadata:
+            return _keeps_raw_text(metadata["group"], split, metadata["source_row"])
+        return _keeps_raw_text(task, split, index)
+
     if task_type == "Classification":
         if not hasattr(labels, "names"):
             raise TypeError("Classification labels must use datasets.ClassLabel")
@@ -213,12 +221,14 @@ def recast_jev(dataset, task=None, question=None, ordinal=False, kind=None, row_
                 f"Classification label names must be present and unique: {criteria}"
             )
         order = scale_order(criteria, tagged=ordinal)
+        if score_only and (order is None or not 2 <= len(criteria) <= MAX_SCORE_LEVELS):
+            raise ValueError("score_only requires an ordered label set with 2–10 levels")
         position = {source: slot for slot, source in enumerate(order or range(len(criteria)))}
         criteria = [criteria[i] for i in (order or range(len(criteria)))]
         instructions = question or default_question(criteria, "sentence2" in features) or JEV_CLASSIFICATION_INSTRUCTIONS
 
         def convert(example, index, split):
-            raw = _keeps_raw_text(task, split, index)
+            raw = keeps_raw_text(example, index, split)
             state = clean_text(example["inputs" if visual else "sentence1"], raw)
             if "sentence2" in example:
                 state = f"text_A: {state}\ntext_B: {clean_text(example['sentence2'], raw)}"
@@ -231,7 +241,7 @@ def recast_jev(dataset, task=None, question=None, ordinal=False, kind=None, row_
                 "label": label,
                 "answer": criteria[label],
                 "task": task or "",
-                "kind": "score" if order and asks_score(identifier) else "choice",
+                "kind": "score" if order and (score_only or asks_score(identifier)) else "choice",
             }
 
     elif task_type == "MultipleChoice":
@@ -245,7 +255,7 @@ def recast_jev(dataset, task=None, question=None, ordinal=False, kind=None, row_
                 present = choices  # missing gold: keep None so the row is filtered
             if 0 <= label < len(choices):
                 label = present.index(choices[label])
-            raw = _keeps_raw_text(task, split, index)
+            raw = keeps_raw_text(example, index, split)
             criteria, label = permute_choices(
                 [_strip(clean_text(example[name], raw)) for name in present], label,
                 f"{task or ''}:{split}:{index}",
@@ -321,7 +331,17 @@ def recast_jev(dataset, task=None, question=None, ordinal=False, kind=None, row_
             .map(convert, with_indices=True, fn_kwargs={"split": split})
             for split, rows in dataset.items()
         })
-    keep = {"state", "instructions", "criteria", "label", "answer", "task", "kind", "images", "metadata"}
+    elif score_only:
+        raise ValueError("score_only requires classification labels")
+    if "metadata" in features:
+        def identity(example):
+            metadata = json.loads(example["metadata"] or "{}")
+            if not isinstance(metadata, dict):
+                return {}
+            return {key: str(metadata[key]) for key in ("group", "source_row", "question_id") if key in metadata}
+        converted = converted.map(identity)
+    keep = {"state", "instructions", "criteria", "label", "answer", "task", "kind", "images", "metadata",
+            "group", "source_row", "question_id"}
     remove = [name for name in converted["train"].column_names if name not in keep]
     if remove:
         converted = converted.remove_columns(remove)
@@ -352,13 +372,13 @@ def _typed_question(example, instructions):
 
 
 def render_typed_decision(example, question_id="decision", model=None):
-    """Render one canonical Jev row as a System One request with its question kind."""
-    if example.get("images"):
-        raise NotImplementedError("Multimodal rows require an image-aware request adapter")
+    """Render a canonical request; image transport is the caller's responsibility."""
     request = OrderedDict()
     if model is not None:
         request["model"] = model
     request["state"] = example["state"]
+    if example.get("images"):
+        request["images"] = example["images"]
     request["questions"] = {question_id: _typed_question(example, example["instructions"])}
     return dict(request)
 
@@ -368,15 +388,30 @@ def render_typed_decision_group(examples, model=None):
     examples = list(examples)
     if not examples:
         raise ValueError("At least one decision is required")
-    if any(example.get("images") for example in examples):
-        raise NotImplementedError("Multimodal rows require an image-aware request adapter")
+    images = examples[0].get("images", [])
+    def image_identity(image):
+        if isinstance(image, dict):
+            data = image.get("bytes")
+            if data is None:
+                with open(image["path"], "rb") as handle:
+                    data = handle.read()
+            return hashlib.sha256(data).digest()
+        return (image.mode, image.size, hashlib.sha256(image.tobytes()).digest())
+    identities = [image_identity(image) for image in images]
     state = examples[0].get("shared_state", examples[0]["state"])
     request = OrderedDict()
     if model is not None:
         request["model"] = model
     request["state"] = state
+    if images:
+        request["images"] = images
     questions = {}
     for example in examples:
+        if [image_identity(image) for image in example.get("images", [])] != identities:
+            raise ValueError("Grouped decisions must share the same ordered images")
+        for key in ("group", "source_row"):
+            if example.get(key) != examples[0].get(key):
+                raise ValueError(f"Grouped decisions must share {key}")
         if example.get("shared_state", example["state"]) != state:
             raise ValueError("Grouped decisions must share one state")
         question_id = example.get("question_id", "decision")

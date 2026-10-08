@@ -93,7 +93,7 @@ class Preprocessing(DotWiz):
         dataset = fix_splits(dataset, complete=not visual)
 
         for k in list(dataset.keys()):
-            if k not in self.default_splits:
+            if not visual and k not in self.default_splits:
                 del dataset[k]
         dataset = sample_dataset(dataset, max_rows, max_rows_eval,seed=seed)
         dataset = self.on_sampled(dataset)
@@ -326,6 +326,7 @@ class SharedFields:
     question: str = None
     metadata: object = None  # optional source provenance, normalized to a JSON string
     ordinal: bool = False  # labels are an ordered scale, listed in order (Jev asks part as score)
+    score_only: bool = False  # explicitly request score decisions for an ordered label set
     #language:str="en"
     
 

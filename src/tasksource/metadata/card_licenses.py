@@ -10,6 +10,7 @@ CARD_LICENSES = {
  "derek-thomas/ScienceQA": ["cc-by-sa-4.0"],
  "HuggingFaceM4/the_cauldron": [],
  "vikhyatk/figureqa": [],
+ "osunlp/Multimodal-Mind2Web": ["openrail"],
  "12ml/e-CARE": [],
  "AmazonScience/massive": [
   "cc-by-4.0"

@@ -119,3 +119,68 @@ its schema and provenance are documented in the
 [`procedural-typed-decisions` card](../../dataset_cards/procedural-typed-decisions.md). The synthetic
 generation pipeline is a package entry point:
 `python -m tasksource.jev.synthetic.run --config <config.yaml>`.
+
+## GUI decisions
+
+The visual catalog includes six annotations of the pinned
+[`osunlp/Multimodal-Mind2Web`](https://huggingface.co/datasets/osunlp/Multimodal-Mind2Web/tree/1b4c6a8cf9f77b7a5e0d641959935c80c4a05889)
+source: `mind2web/action`, `mind2web/element`, `mind2web/x10`, `mind2web/y10`,
+`mind2web/grid5`, and `mind2web/grid7`. Load them with `vision=True`.
+The source's `train`, `test_task`, `test_website`, and `test_domain` splits remain
+separate; evaluation splits are never fabricated.
+
+All six views use one eligibility filter and deterministic sampling. An action
+needs one explicitly marked original target with a valid box inside the encoded
+screenshot, plus at least one valid negative candidate. Parent-only positives,
+ambiguous targets, and invalid boxes are excluded. Element decisions keep the gold
+and up to 23 negatives, shuffle deterministically, and render every candidate with
+the same attributes. Inputs contain the confirmed task and actions strictly before
+the current action. Current/future action descriptions and current operation values
+are supervision, never input text.
+
+Coordinates are target-box centers, not recorded pointer positions. Bins cover the
+full screenshot: x increases rightward and y downward. Axis annotations request
+score decisions on all rows through `score_only=True`; other ordinal tasks retain
+their existing mixture of score and choice. Fixed grids use 25 or 49 classification
+labels, with all labels retained by Jev. Instruction recasting still uses the existing
+sampled classification distractors; use Jev for the full grid decision.
+
+```python
+from tasksource import load_task, render_typed_decision_group
+
+x = load_task('mind2web/x10', vision=True, recast='jev', max_rows=10, max_rows_eval=5)
+y = load_task('mind2web/y10', vision=True, recast='jev', max_rows=10, max_rows_eval=5)
+request = render_typed_decision_group([x['train'][0], y['train'][0]])
+```
+
+The canonical request keeps ordered `images` alongside `state` and `questions`.
+Grouping verifies the state, screenshot sequence, source namespace and action
+identity. This representation does not establish that a hosted API accepts those
+image objects; the caller must supply its model's image transport. JSON `metadata`
+retains trajectory/action IDs, source element ID, original operation, image dimensions,
+box, and derived point. Original HTML remains available in the pinned source by ID.
+The Hub card reports `openrail`; existing license evidence handling retains that value
+without inferring unrestricted reuse.
+
+For comparisons, use the same eligible action IDs and decode an axis bin to its
+center `(index + 0.5) / 10`. Audit gold-center point-in-box accuracy before training:
+coarse grids can miss small elements on tall screenshots even with a correct label.
+Hierarchical crops and GUI execution are outside this initial integration.
+
+A native-source smoke check read the first 32 source rows of each split and validated
+10 eligible training rows plus 5 per evaluation split for every annotation. On those
+10 training rows, gold-center point-in-box counts were 0/10 for 5×5, 2/10 for 7×7,
+and 1/10 for paired 10-bin axes. This small sample checks the mapping and demonstrates
+quantization loss; it is not a dataset-wide accuracy estimate.
+
+A local GUI-only pilot can be built with:
+
+```bash
+PYTHONPATH=.:src python scripts/build_jev_dataset.py --vision \
+  --output build/jev-gui --tasks mind2web/action mind2web/element \
+  mind2web/x10 mind2web/y10 mind2web/grid5 mind2web/grid7 \
+  --max-rows 1000 --max-rows-eval 100
+```
+
+The vision publisher replaces the entire `vision` config. Include every intended
+visual source when rebuilding it for publication.

@@ -343,6 +343,7 @@ def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preproc
             source_id = f"{source_id}/{preprocessing.config_name}"
         dataset = recast_module.recast_jev(dataset, task=source_id, question=None if prompted else question,
                                            ordinal=getattr(preprocessing, "ordinal", False),
+                                           score_only=getattr(preprocessing, "score_only", False),
                                            kind=kind if soft_labels else None,
                                            row_options=soft_labels and row_options,
                                            group="/".join(filter(None, [preprocessing.dataset_name,

@@ -1217,9 +1217,12 @@ def build_vision(args):
                     continue  # sibling QAs over a training image stay out of evaluation
                 image_id = hashlib.sha256('\x1f'.join(images).encode()).hexdigest()[:24]
                 state_id = hashlib.sha256(row['state'].encode()).hexdigest()[:16]
-                row['group_id'] = f'{source}:{split}:{image_id}:{state_id}'
+                if example.get('source_row') is not None and example.get('group'):
+                    row['group_id'] = f"{example['group']}:{split}:{example['source_row']}"
+                else:
+                    row['group_id'] = f'{source}:{split}:{image_id}:{state_id}'
                 decision = json.dumps([row['state'], row['question'], sorted(row['options'])], ensure_ascii=False)
-                row['question_id'] = hashlib.sha256(decision.encode()).hexdigest()[:24]
+                row['question_id'] = example.get('question_id') or hashlib.sha256(decision.encode()).hexdigest()[:24]
                 row['id'] = row['group_id'] + ':' + row['question_id']
                 row['example_id'] = hashlib.sha256(('\x1f'.join(images) + example_key(
                     source, row['state'], row['options'], row['target'])).encode()).hexdigest()[:24]
@@ -1280,10 +1283,11 @@ def publish_vision(dataset, output, repo_id):
     card_path = hf_hub_download(repo_id, 'README.md', repo_type='dataset', revision=head)
     card = Path(card_path).read_text()
     counts = ', '.join(f'{len(rows):,} {split}' for split, rows in dataset.items())
+    sources = ', '.join(sorted({source.removeprefix('vision/') for rows in dataset.values() for source in rows['source']}))
     section = f'''## Vision config
 
 Load `load_dataset("{repo_id}", "vision")` for the multimodal pilot ({counts}).
-It covers NLVR2, SNLI-VE, A-OKVQA, ScienceQA-IMG, AI2D, and FigureQA, with genuine source labels.
+It covers {sources}, with genuine source labels.
 `state`, `question`, `kind`, `options`, and `target` retain their existing decision semantics.
 `images` is an ordered sequence of Hugging Face Image features; encoded bytes are preserved
 and images decode on access. Feed the images alongside `state` through your model's image adapter.
@@ -1297,11 +1301,12 @@ and [vision/build-manifest.json](vision/build-manifest.json).
 
 The pilot is sampled with a deterministic streaming buffer, capped per source at the limits
 recorded in its manifest; it is not a uniform sample of each complete dataset.
-Only native labeled splits are used. Decisions sharing the same ordered image set and text state
-share `group_id`; `metadata.image_group_id` links an image set across different questions.
+Only native labeled splits are used. Source action identities group related GUI decisions;
+other decisions sharing the same ordered image set and text state share `group_id`.
+`metadata.image_group_id` links an image set across different questions.
 Evaluation rows sharing any image with training are excluded.
 This initial config contains direct decisions; text packing and derived variants are disabled.
-The typed text-request renderers require an image-aware adapter for these rows.
+Typed request renderers preserve images; model-specific image transport remains the caller's responsibility.
 '''
     marker = '\n## Vision config\n'
     if marker in card:

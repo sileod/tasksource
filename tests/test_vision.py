@@ -34,7 +34,9 @@ def template(mc=False, two=False):
 
 def test_catalog():
     vision = list_tasks(vision=True)
-    assert list(vision.id) == ['nlvr2', 'snli-ve', 'aokvqa', 'scienceqa-img', 'ai2d', 'figureqa']
+    assert list(vision.id) == ['nlvr2', 'snli-ve', 'aokvqa', 'scienceqa-img', 'ai2d', 'figureqa',
+                             'mind2web/action', 'mind2web/element', 'mind2web/x10',
+                             'mind2web/y10', 'mind2web/grid5', 'mind2web/grid7']
     assert not set(vision.id) & set(list_tasks().id)
     assert all(task_provenance(i, vision=True)['revision'] for i in vision.id)
     assert 'pingzhili/nlvr2' in hub_datasets(['nlvr2'], vision=True)
@@ -95,7 +97,7 @@ def test_text_regression():
 @pytest.mark.skipif(not os.getenv('TASKSOURCE_VISION_SMOKE'), reason='opt-in Hub downloads')
 @pytest.mark.parametrize('task_id', list(list_tasks(vision=True).id))
 def test_real_sources(task_id):
-    ds = load_task(task_id, vision=True, max_rows=10, max_rows_eval=10)
+    ds = load_task(task_id, vision=True, streaming=True, max_rows=10, max_rows_eval=10)
     assert len(ds['train']) > 0
     assert ds['train'].features['images'] == Sequence(Image())
     assert isinstance(ds['train'].features['labels'], ClassLabel)
@@ -166,8 +168,7 @@ def test_multimodal_jev(mc):
     assert encoded['metadata'] == '{"source_html": "<button>original</button>"}'
     assert encoded['answer'] == encoded['criteria'][encoded['label']]
     assert encoded['answer'] == ('gold' if mc else 'no')
-    with pytest.raises(NotImplementedError, match='image-aware'):
-        render_typed_decision(encoded)
+    assert render_typed_decision(encoded)['images'] == encoded['images']
 
 
 def test_image_aware_deduplication():
@@ -211,3 +212,151 @@ def test_vision_config_builder(tmp_path, monkeypatch):
         assert metadata['provenance']['revision']
         assert metadata['licenses']['license'] == 'unspecified'
     assert (tmp_path / 'sources.yaml').exists()
+
+
+def mind2web_source():
+    import json
+    def option(node, box='50,20,10,10', **flags):
+        return json.dumps({'backend_node_id': str(node), 'tag': 'button',
+            'attributes': json.dumps({'bounding_box_rect': box, 'aria_label': 'Search'}), **flags})
+    buffer = io.BytesIO()
+    PILImage.new('RGB', (100, 100), 'red').save(buffer, format='PNG')
+    image = {'bytes': buffer.getvalue(), 'path': None}
+    row = {'screenshot': image, 'operation': json.dumps({'op': 'CLICK', 'original_op': 'CLICK', 'value': 'SECRET_VALUE'}),
+        'pos_candidates': [option('gold', is_original_target=True)],
+        'neg_candidates': [option(i, '0,0,10,10') for i in range(30)] + [option('gold')],
+        'action_uid': 'action', 'annotation_id': 'train-episode', 'confirmed_task': 'Search for cats',
+        'action_reprs': ['PAST', 'SECRET_CURRENT', 'SECRET_FUTURE'], 'target_action_index': '1',
+        'target_action_reprs': 'SECRET_TARGET', 'raw_html': 'SECRET_RAW', 'website': 'example', 'domain': 'search'}
+    features = Features({'screenshot': Image(), **{k: Value('string') for k, v in row.items() if isinstance(v, str)},
+        **{k: Sequence(Value('string')) for k in ('pos_candidates', 'neg_candidates', 'action_reprs')}})
+    bad_parent = {**row, 'pos_candidates': [option('gold', is_original_target=False, is_top_level_target=True)]}
+    bad_box = {**row, 'pos_candidates': [option('gold', '99,20,10,10', is_original_target=True)]}
+    ambiguous = {**row, 'pos_candidates': [option('gold', is_original_target=True), option('other', is_original_target=True)]}
+    splits = {'train': Dataset.from_list([row, bad_parent, bad_box, ambiguous], features=features)}
+    for split in ('test_task', 'test_website', 'test_domain'):
+        splits[split] = Dataset.from_list([{**row, 'annotation_id': split + '-episode'}], features=features)
+    return DatasetDict(splits)
+
+
+def test_grid_coordinates():
+    from tasksource.vision_tasks import grid_labels, grid_center
+    assert grid_labels((.73, .42)) == [(2, 5)]
+    assert grid_labels((0, 0), depth=2) == [(0, 0), (0, 0)]
+    assert grid_labels((1, 1), bins=(5, 7), depth=2) == [(6, 4), (6, 4)]
+    assert grid_labels((.5, .25), bins=(4, 4)) == [(1, 2)]
+    for point in ((0, 0), (1, 1), (.73, .42), (.5, .25)):
+        cells = grid_labels(point, (5, 7), depth=2)
+        assert grid_labels(grid_center(cells, (5, 7)), (5, 7), depth=2) == cells
+    for point in ((-.1, 0), (0, 1.1), (float('nan'), 0), (float('inf'), 0)):
+        with pytest.raises(ValueError):
+            grid_labels(point)
+    for bins, depth in (((0, 7), 1), ((7.5, 7), 1), ((7, 7), 0)):
+        with pytest.raises(ValueError):
+            grid_labels((0, 0), bins, depth)
+    with pytest.raises(ValueError):
+        grid_center([(7, 0)])
+
+
+def test_mind2web_annotations_and_grouping(monkeypatch):
+    import json
+    import tasksource.access as access
+    from tasksource import render_typed_decision_group
+    from tasksource.preprocess import disable_image_decoding
+    monkeypatch.setattr(access, 'load_dataset', lambda *a, **kw: mind2web_source())
+    views = {}
+    for name in ('action', 'element', 'x10', 'y10', 'grid5', 'grid7'):
+        task = 'mind2web/' + name
+        ds = load_task(task, vision=True, max_rows=10, max_rows_eval=10)
+        assert set(ds) == {'train', 'test_task', 'test_website', 'test_domain'}
+        assert all(len(rows) == 1 for rows in ds.values())
+        row = disable_image_decoding(ds)['train'][0]
+        assert row['inputs'] == 'Search for cats\nPast actions:\nPAST'
+        assert 'SECRET' not in row['inputs']
+        metadata = json.loads(row['metadata'])
+        assert metadata['point'] == [.55, .25]
+        assert metadata['bbox'] == [50., 20., 10., 10.]
+        assert metadata['trajectory_id'] == 'train-episode'
+        assert all(json.loads(rows[0]['metadata'])['trajectory_id'] != 'train-episode'
+                   for split, rows in ds.items() if split != 'train')
+        if name == 'element':
+            assert len([k for k in row if k.startswith('choice')]) == 24
+            assert json.loads(row[f"choice{row['labels']}"])['node'] == 'gold'
+            for key, value in row.items():
+                if key.startswith('choice'):
+                    assert 'is_original_target' not in value and 'SECRET' not in value
+        elif name != 'action':
+            expected = {'x10': 5, 'y10': 2, 'grid5': 7, 'grid7': 10}[name]
+            assert row['labels'] == expected
+        jev = load_task(task, vision=True, recast='jev', max_rows=10, max_rows_eval=10)
+        views[name] = disable_image_decoding(jev)['train'][0]
+        assert views[name]['answer'] == views[name]['criteria'][views[name]['label']]
+        assert views[name]['images'] == row['images']
+    x, y = views['x10'], views['y10']
+    assert x['kind'] == y['kind'] == 'score'
+    assert x['group'] == y['group'] and x['source_row'] == y['source_row']
+    assert len(views['grid7']['criteria']) == 49
+    request = render_typed_decision_group([x, y])
+    assert list(request['questions']) == ['x10', 'y10']
+    assert request['images'] == x['images']
+    with pytest.raises(ValueError, match='ordered images'):
+        render_typed_decision_group([x, {**y, 'images': [png('blue')]}])
+    with pytest.raises(ValueError, match='source_row'):
+        render_typed_decision_group([x, {**y, 'source_row': 'other-action'}])
+    with pytest.raises(ValueError, match='Duplicate question'):
+        render_typed_decision_group([x, x])
+
+
+def test_score_only_validation():
+    from tasksource import recast_jev
+    ds = template()(source())
+    with pytest.raises(ValueError, match='ordered label set'):
+        recast_jev(ds, score_only=True)
+    result = recast_jev(ds, ordinal=True, score_only=True)
+    assert set(result['train']['kind']) == {'score'}
+
+
+def test_gui_builder_keeps_action_groups(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+    import scripts.build_jev_dataset as builder
+    import tasksource.access as access
+    monkeypatch.setattr(access, 'load_dataset', lambda *a, **kw: mind2web_source())
+    monkeypatch.setattr(builder, 'source_licenses', lambda sources: {
+        source: {'license': 'openrail', 'license_use': 'unspecified'} for source in sources})
+    args = SimpleNamespace(output=tmp_path, tasks=['mind2web/x10', 'mind2web/y10'], limit=None,
+                           max_rows=10, max_rows_eval=10, repo_id='test/repo', upload=False)
+    ds = builder.build_vision(args)
+    assert len(ds['train']) == 2
+    assert len(set(ds['train']['group_id'])) == 1
+    assert set(ds['train']['question_id']) == {'x10', 'y10'}
+    assert len(set(ds['train']['id'])) == 2
+    assert set(ds['train']['kind']) == {'score'}
+    assert set(ds) == {'train'}  # synthetic evaluation screenshots duplicate training
+
+
+def test_grouped_recasts_share_text_cleaning():
+    import json
+    from tasksource import recast_jev
+    ds = template()(source())
+    ds = ds.map(lambda row: {'inputs': 'Click the A &amp; B button.',
+        'metadata': json.dumps({'group': 'shared', 'source_row': 'same-action'})})
+    left = recast_jev(ds, task='x10')
+    right = recast_jev(ds, task='y10')
+    assert left['train']['state'] == right['train']['state']
+
+
+def test_mind2web_streaming_uses_shared_loader(monkeypatch):
+    from datasets import IterableDatasetDict
+    import tasksource.access as access
+    from tasksource.preprocess import disable_image_decoding
+    source = mind2web_source()
+    monkeypatch.setattr(access, 'load_dataset', lambda *a, **kw: IterableDatasetDict({
+        split: rows.to_iterable_dataset() for split, rows in source.items()}))
+    ds = load_task('mind2web/x10', vision=True, recast='jev', streaming=True,
+                   max_rows=1, max_rows_eval=1)
+    assert set(ds) == set(source)
+    assert all(len(rows) == 1 for rows in ds.values())
+    assert ds['train'][0]['kind'] == 'score'
+    encoded = disable_image_decoding(ds)
+    original = source['train'].cast_column('screenshot', Image(decode=False))[0]['screenshot']
+    assert encoded['train'][0]['images'] == [original]
