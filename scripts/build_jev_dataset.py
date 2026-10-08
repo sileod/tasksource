@@ -508,9 +508,25 @@ def pretty_order(dataset, first_rows=1_000, seed=0):
 def source_family(source):
     """Balance dataset families, not each configuration as an independent task."""
     parts = source.split("/")
+    if parts[0] == "vision" and len(parts) > 1:
+        return "/".join(parts[:2])
     if parts[0] in {"multilingual", procedural.SOURCE_PREFIX.rstrip("/")} and len(parts) > 1:
         return "/".join(parts[:2])
     return parts[0]
+
+
+
+def cap_vision_families(dataset, max_rows):
+    """Give each visual source family one shared budget across its task views."""
+    if max_rows is None:
+        return dataset
+    families = {}
+    for index, source in enumerate(dataset["source"]):
+        families.setdefault(source_family(source), []).append(index)
+    return concatenate_datasets([
+        diverse_cap(dataset.select(indices), max_rows)
+        for indices in families.values()
+    ]) if families else dataset
 
 
 def _ranked_family_groups(source_buckets, identifiers):
@@ -1198,7 +1214,8 @@ def build_vision(args):
         catalog = catalog.head(args.limit)
     catalog = catalog.assign(source_id='vision/' + catalog.id)
     manifest = build_manifest(args, catalog)
-    manifest['sampling'] = 'uniform reservoir over complete eligible source splits'
+    manifest['sampling'] = 'uniform reservoir over complete eligible source splits; shared per-family export caps'
+    manifest['family_caps'] = {'train': args.max_rows, 'evaluation': args.max_rows_eval}
     (output / 'build-manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
     sources = list(catalog.source_id)
     licenses = source_licenses(sources)
@@ -1272,8 +1289,12 @@ def build_vision(args):
                 lambda row: not any(key in train_images for key in image_keys(row['images'], row.get('metadata'))))
             if not len(dataset[split]):
                 del dataset[split]
+    dataset = DatasetDict({split: cap_vision_families(rows, args.max_rows if split == 'train'
+                                                     else args.max_rows_eval)
+                           for split, rows in dataset.items()})
     audit = {'repo_id': args.repo_id, 'config': 'vision', 'splits': {
-        split: {'rows': len(rows), 'sources': dict(Counter(rows['source']))}
+        split: {'rows': len(rows), 'sources': dict(Counter(rows['source'])),
+                'families': dict(Counter(source_family(source) for source in rows['source']))}
         for split, rows in dataset.items()}}
     (output / 'release-audit.json').write_text(json.dumps(audit, indent=2) + '\n')
     write_sources_yaml(output / 'sources.yaml', audit, records, licenses)
@@ -1327,7 +1348,9 @@ See [vision/sources.yaml](vision/sources.yaml), [vision/release-audit.json](visi
 [vision/build-manifest.json](vision/build-manifest.json), and [vision/quality-audit.json](vision/quality-audit.json)
 when the materialized release was audited.
 
-Sampling: {sampling}. Per-source caps and checkpoint provenance are recorded in the manifests.
+Sampling: {sampling}. Sampling caps and checkpoint provenance are recorded in the manifests.
+Visual task views share one export budget per dataset family, including CLEVR, TallyQA, and RICO;
+individual task IDs remain in `source`, and family totals appear in `release-audit.json`.
 Only native labeled splits are used. Source action identities group related GUI decisions;
 other decisions sharing the same ordered image set and text state share `group_id`.
 `metadata.image_group_id` links source image groups across questions and augmentation variants.

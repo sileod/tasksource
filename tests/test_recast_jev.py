@@ -10,7 +10,7 @@ from tasksource.jev.prompt_augmentations import (
 )
 from tasksource.jev.augmentations import augment_jev_internal
 from scripts.build_jev_dataset import (
-    diverse_cap, diversify_published_prompts, exclude_publish_sources,
+    cap_vision_families, diverse_cap, diversify_published_prompts, exclude_publish_sources,
     fixed_source_audit, pretty_order, read_completed, slug, source_family,
     to_training_row, validate_decisions,
 )
@@ -279,6 +279,22 @@ class RecastJevTest(unittest.TestCase):
         self.assertEqual(source_family("multilingual/xcsr/fr"), "multilingual/xcsr")
         self.assertEqual(source_family("procedural-typed-decisions/policy_applicability"),
                          "procedural-typed-decisions/policy_applicability")
+
+    def test_vision_export_caps_each_family_across_views(self):
+        sources = (["vision/clevr/count"] * 40 + ["vision/clevr/color"] * 40
+                   + ["vision/rico-widget/grid7"] * 40 + ["vision/rico-widget/element"] * 40
+                   + ["vision/tallyqa/count"] * 40 + ["vision/nlvr2"] * 40)
+        dataset = Dataset.from_dict({"source": sources,
+            "id": [f"{source}:train:{index}" for index, source in enumerate(sources)]})
+        capped = cap_vision_families(dataset, 20)
+        self.assertEqual(Counter(source_family(source) for source in capped["source"]), {
+            "vision/clevr": 20, "vision/rico-widget": 20,
+            "vision/tallyqa": 20, "vision/nlvr2": 20})
+        self.assertEqual(Counter(capped["source"])["vision/clevr/count"], 10)
+        self.assertEqual(Counter(capped["source"])["vision/rico-widget/element"], 10)
+        self.assertEqual(source_family("clevr/count"), "clevr")
+        self.assertEqual(source_family("vision/mind2web/grid7/refine"), "vision/mind2web")
+        self.assertEqual(len(cap_vision_families(dataset, None)), len(dataset))
 
     def test_completed_tasks_require_their_parquet_shards(self):
         import json

@@ -435,3 +435,13 @@ requires a TFRecord/protobuf conversion before it is usable as a canonical Hub
 source. That belongs under `scripts/repackage_dataset/`, with episode-level native
 splits, candidate validity checks, and original revisions/terms recorded; it is
 not yet registered. [Official AndroidControl format](https://github.com/google-research/google-research/blob/master/android_control/README.md).
+
+### Visual family budgets
+
+The vision exporter applies `--max-rows` and `--max-rows-eval` as shared
+per-family release caps after preprocessing and recasting. CLEVR attribute,
+yes/no and count views share the `vision/clevr` budget; RICO grid and element
+views share `vision/rico-widget`; TallyQA counting belongs to `vision/tallyqa`.
+Other visual sources receive their own family budget. Views are sampled in
+round-robin order while preserving decision groups, and individual task IDs
+remain in `source`. The release audit reports both task and family counts.
