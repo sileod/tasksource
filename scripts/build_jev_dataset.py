@@ -1222,7 +1222,8 @@ def build_vision(args):
                     row['group_id'] = f"{example['group']}:{split}:{example['source_row']}"
                 else:
                     row['group_id'] = f'{source}:{split}:{image_id}:{state_id}'
-                decision = json.dumps([row['state'], row['question'], sorted(row['options'])], ensure_ascii=False)
+                # Different option orders are different requests and target index spaces.
+                decision = json.dumps([row['state'], row['question'], row['options']], ensure_ascii=False)
                 row['question_id'] = example.get('question_id') or hashlib.sha256(decision.encode()).hexdigest()[:24]
                 row['id'] = row['group_id'] + ':' + row['question_id']
                 row['example_id'] = hashlib.sha256(('\x1f'.join(images) + example_key(

@@ -665,3 +665,23 @@ def test_visual_counts_keep_full_numeric_ontology(task, maximum, monkeypatch):
     assert set(recast['train']['answer']) == {'0', str(maximum)}
     assert all(row['kind'] == 'choice' and len(row['criteria']) == maximum + 1
                for row in recast['train'])
+
+
+def test_vision_builder_distinguishes_option_permutations(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+    import scripts.build_jev_dataset as builder
+    ds = DatasetDict(train=Dataset.from_list([
+        {'images': [png('red')], 'state': 'Same question', 'instructions': 'Choose.',
+         'criteria': options, 'label': label}
+        for options, label in [(['yes', 'no'], 0), (['no', 'yes'], 1)]], features=Features({
+            'images': Sequence(Image(decode=False)), 'state': Value('string'),
+            'instructions': Value('string'), 'criteria': Sequence(Value('string')), 'label': Value('int64')})))
+    monkeypatch.setattr(builder, 'load_task', lambda *args, **kwargs: ds)
+    monkeypatch.setattr(builder, 'source_licenses', lambda sources: {
+        source: {'license': 'unspecified', 'license_use': 'unspecified'} for source in sources})
+    args = SimpleNamespace(output=tmp_path, tasks=['nlvr2'], limit=None, max_rows=2,
+                           max_rows_eval=1, repo_id='test/repo', upload=False)
+    result = builder.build_vision(args)['train']
+    assert len(result) == len(set(result['id'])) == 2
+    assert len(set(result['group_id'])) == 1
+    assert all(row['options'][row['target'].index(1.)] == 'yes' for row in result)
