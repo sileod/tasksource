@@ -1280,7 +1280,10 @@ def publish_vision(dataset, output, repo_id):
     dataset.push_to_hub(repo_id, config_name='vision', max_shard_size='256MB',
                         commit_message='Add multimodal Jev vision config')
     api = HfApi()
-    for name in ('sources.yaml', 'release-audit.json', 'build-manifest.json'):
+    artifacts = ('sources.yaml', 'release-audit.json', 'build-manifest.json', 'quality-audit.json')
+    for name in artifacts:
+        if not (output / name).exists():
+            continue
         api.upload_file(path_or_fileobj=str(output / name), path_in_repo='vision/' + name,
                         repo_id=repo_id, repo_type='dataset',
                         commit_message=f'Add vision {name}')
@@ -1303,7 +1306,8 @@ NLVR2 retains its two images in source order. Answer options remain text.
 and separate Hub-card/DPI license evidence. `license` and `license_use` are also available
 as columns; missing or conflicting evidence is retained rather than replaced by an inferred license.
 See [vision/sources.yaml](vision/sources.yaml), [vision/release-audit.json](vision/release-audit.json),
-and [vision/build-manifest.json](vision/build-manifest.json).
+[vision/build-manifest.json](vision/build-manifest.json), and [vision/quality-audit.json](vision/quality-audit.json)
+when the materialized release was audited.
 
 The pilot uses deterministic uniform reservoir sampling over each complete eligible source split,
 capped per source at the limits recorded in its manifest. This bounds memory and scans the full source.
