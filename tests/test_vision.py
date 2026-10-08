@@ -39,7 +39,9 @@ def test_catalog():
     assert list(vision.id) == ['nlvr2', 'aokvqa', 'scienceqa-img', 'ai2d', 'figureqa',
                              'mind2web/action', 'mind2web/element', 'mind2web/x10',
                              'mind2web/y10', 'mind2web/grid5', 'mind2web/grid7',
-                             'm3cot', 'exams-v', 'visualsphinx', 'muslr/tfu', 'muslr/mc', 'iconqa/text', 'view2space/mcq']
+                             'm3cot', 'exams-v', 'visualsphinx', 'muslr/tfu', 'muslr/mc', 'iconqa/text', 'view2space/mcq', 'visual7w', 'clevr/yesno', 'mapqa/yesno',
+                             'tqa', 'hateful-memes', 'clevr/color', 'clevr/shape', 'clevr/size',
+                             'clevr/material', 'intergps']
     assert not set(vision.id) & set(list_tasks().id)
     assert all(task_provenance(i, vision=True)['revision'] for i in vision.id)
     assert 'pingzhili/nlvr2' in hub_datasets(['nlvr2'], vision=True)
@@ -541,3 +543,83 @@ def test_mind2web_repackaging_audit(tmp_path, monkeypatch):
     # Rebuilding must run eligibility auditing even when dataset caches exist.
     conversion.mind2web()
     assert json.loads((directory / 'provenance.json').read_text())['excluded_rows'] == 5
+
+
+from tasksource.vision_tasks import cauldron_mc_rows, cauldron_closed_rows, parse_cauldron_mc
+
+
+def cauldron_source(answers=('Answer: B',), questions=None):
+    question = 'Question: Which?\nChoices:\nA. first\nB. second\nAnswer with the letter.'
+    return DatasetDict(train=Dataset.from_list([
+        {'images': [png('red'), png('blue')], 'texts': [
+            {'user': q, 'assistant': a, 'source': 'native'}
+            for q, a in zip(questions or [question] * len(answers), answers)]}],
+        features=Features({'images': Sequence(Image(decode=False)), 'texts': [
+            {'user': Value('string'), 'assistant': Value('string'), 'source': Value('string')}]})))
+
+
+@pytest.mark.parametrize('question,answer,reason', [
+    ('Question: open', 'Answer: A', 'no_explicit_choices'),
+    ('Question: Q\nChoices:\nA. same\nB. SAME\nAnswer with the letter.', 'Answer: A', 'duplicate_options'),
+    ('Question: Q\nChoices:\nA. a\nC. c\nAnswer with the letter.', 'Answer: A', 'invalid_option_format'),
+    ('Question: Q\nChoices:\nA. a\nB. b\nAnswer with the letter.', 'Answer: C', 'invalid_gold'),
+])
+def test_cauldron_invalid_mc(question, answer, reason):
+    record, why = parse_cauldron_mc({'user': question, 'assistant': answer})
+    assert record is None and why == reason
+
+
+def test_cauldron_grouped_images_and_native_gold():
+    import json
+    ds = cauldron_mc_rows(cauldron_source(('Answer: B', 'Answer: A')))
+    assert len(ds['train']) == 2
+    assert ds['train']['labels'] == [1, 0]
+    assert ds['train'][0]['images'] == [png('red'), png('blue')]
+    metadata = [json.loads(value) for value in ds['train']['metadata']]
+    assert metadata[0]['image_group_id'] == metadata[1]['image_group_id']
+    assert metadata[0]['id'] != metadata[1]['id']
+    assert metadata[0]['source_answer'] == 'Answer: B'
+    from datasets import IterableDatasetDict
+    streamed = cauldron_mc_rows(IterableDatasetDict(train=cauldron_source()['train'].to_iterable_dataset()))
+    assert next(iter(streamed['train']))['labels'] == 1
+
+
+@pytest.mark.parametrize('task', ['visual7w', 'clevr/yesno', 'mapqa/yesno', 'tqa', 'hateful-memes',
+                                 'clevr/color', 'clevr/shape', 'clevr/size', 'clevr/material', 'intergps'])
+def test_cauldron_task_recasts(task, monkeypatch):
+    import json
+    import tasksource.access as access
+    mapping = list_tasks(vision=True).set_index('id').loc[task, 'mapping']
+    answer = ('Answer: B' if isinstance(mapping, VisualMultipleChoice)
+              else next(iter(mapping.label_values)).capitalize() + '.')
+    native = cauldron_source((answer, 'not in vocabulary'))
+    monkeypatch.setattr(access, 'load_dataset', lambda *args, **kwargs: native)
+    ds = load_task(task, vision=True, max_rows=10)
+    assert set(ds) == {'train'} and len(ds['train']) == 1
+    assert isinstance(ds['train'].features['labels'], ClassLabel)
+    assert ds['train'].features['images'] == Sequence(Image())
+    result = load_task(task, vision=True, max_rows=10, recast='jev')
+    row = disable_image_decoding(result)['train'][0]
+    assert row['images'] == [png('red'), png('blue')]
+    assert row['answer'] == row['criteria'][row['label']]
+    metadata = json.loads(row['metadata'])
+    assert metadata['image_group_id']
+    if task == 'hateful-memes':
+        assert metadata['source_redistribution'] == 'restricted'
+        assert 'LICENSE.txt' in metadata['source_license_url']
+
+
+def test_cauldron_closed_vocabulary():
+    ds = cauldron_closed_rows(cauldron_source(('Yes.', 'Answer: NO.', 'Blue.', 'Unknown.')), ('yes', 'no'))
+    assert ds['train']['labels'] == ['yes', 'no']
+
+
+def test_vision_publish_rejects_restricted_images(tmp_path, monkeypatch):
+    import scripts.build_jev_dataset as builder
+    ds = DatasetDict(train=Dataset.from_list([{'source': 'vision/hateful-memes',
+        'metadata': '{"source_redistribution": "restricted"}'}]))
+    calls = []
+    monkeypatch.setattr(DatasetDict, 'push_to_hub', lambda *args, **kwargs: calls.append(args))
+    with pytest.raises(ValueError, match='hateful-memes'):
+        builder.publish_vision(ds, tmp_path, 'test/repo')
+    assert not calls

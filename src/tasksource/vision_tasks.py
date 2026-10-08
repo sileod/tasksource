@@ -1,4 +1,5 @@
 """Visual tasks, using the shared loader and pinned, data-only Hub sources."""
+import hashlib
 import json
 import math
 import re
@@ -35,6 +36,97 @@ def grouped_mc_rows(dataset):
         remove_columns=list(rows.features), features=features) for split, rows in dataset.items()})
 
 
+def normalize_cauldron_answer(answer):
+    return re.sub(r'^Answer:\s*', '', answer.strip(), flags=re.I).casefold().rstrip('.').strip()
+
+
+def parse_cauldron_mc(qa):
+    """Native prompt-encoded options only; return a canonical QA or an audit reason."""
+    if '\nChoices:\n' not in qa['user']:
+        return None, 'no_explicit_choices'
+    question, options = qa['user'].rsplit('\nChoices:\n', 1)
+    if not options.endswith('\nAnswer with the letter.'):
+        return None, 'invalid_option_format'
+    options = options.removesuffix('\nAnswer with the letter.')
+    markers = list(re.finditer(r'^([A-Z])\.\s+', options, re.M))
+    letters = [marker[1] for marker in markers]
+    choices = [options[marker.end():markers[i + 1].start() if i + 1 < len(markers) else None].strip()
+               for i, marker in enumerate(markers)]
+    if not 2 <= len(choices) <= 26 or letters != list('ABCDEFGHIJKLMNOPQRSTUVWXYZ'[:len(choices)]):
+        return None, 'invalid_option_format'
+    if not all(choices):
+        return None, 'empty_option'
+    if len(set(choice.casefold() for choice in choices)) != len(choices):
+        return None, 'duplicate_options'
+    answer = normalize_cauldron_answer(qa['assistant']).upper()
+    if answer not in letters:
+        return None, 'invalid_gold'
+    inputs = question.removeprefix('Question: ').strip()
+    if not inputs:
+        return None, 'empty_question'
+    return {'inputs': inputs, 'choices_list': choices, 'labels': letters.index(answer)}, None
+
+
+# Original data terms are separate from repository software licenses.
+_CAULDRON_LICENSE_EVIDENCE = {
+    'clevr': {'source_license': 'cc-by-4.0', 'source_license_url': 'https://cs.stanford.edu/people/jcjohns/clevr/'},
+    'mapqa': {'source_license': 'cc-by-sa-4.0', 'source_license_url': 'https://github.com/OSU-slatelab/MapQA#citation'},
+    'tqa': {'source_license': 'cc-by-sa-4.0', 'source_license_url': 'https://registry.opendata.aws/allenai-tqa/'},
+    'visual7w': {'source_license': 'unspecified', 'source_license_url': 'https://ai.stanford.edu/~yukez/visual7w/',
+                 'source_code_license': 'mit'},
+    'intergps': {'source_license': 'unspecified', 'source_license_url': 'https://github.com/lupantech/InterGPS',
+                'source_code_license': 'mit'},
+}
+
+
+def _cauldron_rows(dataset, allowed_answers=None):
+    """Flatten one native source representation, retaining ordered image identities."""
+    from .preprocess import disable_image_decoding
+    allowed = set(allowed_answers) if allowed_answers is not None else None
+    def flatten(batch):
+        output = {key: [] for key in ('images', 'inputs', 'labels', 'metadata')}
+        if allowed is None:
+            output['choices_list'] = []
+        for images, texts in zip(batch['images'], batch['texts']):
+            if not images or any(image is None or not (image.get('bytes') or image.get('path')) for image in images):
+                continue
+            identities = [hashlib.sha256(image['bytes']).hexdigest() if image.get('bytes') is not None else image['path'] for image in images]
+            group = hashlib.sha256(json.dumps(identities).encode()).hexdigest()
+            for index, qa in enumerate(texts):
+                if allowed is None:
+                    record, reason = parse_cauldron_mc(qa)
+                    if reason:
+                        continue
+                else:
+                    answer = normalize_cauldron_answer(qa['assistant'])
+                    if answer not in allowed:
+                        continue
+                    record = {'inputs': qa['user'].removeprefix('Question: ').strip(), 'labels': answer}
+                record['images'] = images
+                record['metadata'] = json.dumps({'image_group_id': group, 'id': f'{group}:{index}',
+                    'source_dataset': qa['source'], 'source_answer': qa['assistant'], 'source_question': qa['user'],
+                    **_CAULDRON_LICENSE_EVIDENCE.get(qa['source'].casefold(), {})},
+                    ensure_ascii=False, sort_keys=True)
+                for key in output:
+                    output[key].append(record[key])
+        return output
+    features = Features({'images': Sequence(Image(decode=False)), 'inputs': Value('string'),
+                         'labels': Value('string' if allowed is not None else 'int64'), 'metadata': Value('string')})
+    if allowed is None:
+        features['choices_list'] = Sequence(Value('string'))
+    dataset = disable_image_decoding(dataset)
+    return type(dataset)({split: rows.map(flatten, batched=True, batch_size=16,
+        remove_columns=list(rows.features), features=features) for split, rows in dataset.items()})
+
+
+def cauldron_mc_rows(dataset):
+    return _cauldron_rows(dataset)
+
+
+def cauldron_closed_rows(dataset, allowed_answers):
+    return _cauldron_rows(dataset, allowed_answers)
+
+
 nlvr2 = VisualClassification(
     images=lambda x: [x['image0'], x['image1']], inputs='sentence', labels='label',
     dataset_name='pingzhili/nlvr2', task_id='nlvr2', metadata=lambda x: {'image_group': x['identifier'].rsplit('-', 1)[0]}, label_values={'False': 'False', 'True': 'True'},
@@ -58,7 +150,7 @@ scienceqa_img = VisualMultipleChoice(
 ai2d = VisualMultipleChoice(
     choices_list='choices_list', metadata='metadata', dataset_name='tasksource/ai2d', task_id='ai2d',
     pre_process=grouped_mc_rows,
-    load_dataset_kwargs={'revision': '24013c0e6bb313a1fc4dfa79f9db936072f6a3af'},
+    load_dataset_kwargs={'revision': '24013c0e6bb313a1fc4dfa79f9db936072f6a3af', 'streaming': True},
 )
 
 figureqa = VisualClassification(
@@ -205,7 +297,7 @@ muslr_mc = VisualMultipleChoice(
 iconqa_text = VisualMultipleChoice(
     choices_list='choices_list', metadata='metadata', dataset_name='tasksource/iconqa-text', task_id='iconqa/text',
     pre_process=grouped_mc_rows,
-    load_dataset_kwargs={'revision': '18c952834f240750908d849c2e4455067a7bf5cd'},
+    load_dataset_kwargs={'revision': '18c952834f240750908d849c2e4455067a7bf5cd', 'streaming': True},
 )
 
 
@@ -213,4 +305,68 @@ view2space_mcq = VisualMultipleChoice(
     choices_list='choices_list', metadata='metadata', pre_process=grouped_mc_rows,
     dataset_name='tasksource/view2space', task_id='view2space/mcq',
     load_dataset_kwargs={'revision': '061e4b2bd587adba48c75a5fbbbac9d6c781bf61'},
+)
+
+
+_CAULDRON = dict(dataset_name='HuggingFaceM4/the_cauldron', metadata='metadata',
+    splits=('train', None, None),
+    load_dataset_kwargs={'revision': '847a98a779b1652d65111daf20c972dfcd333605', 'streaming': True})
+_YESNO = {'no': 'No', 'yes': 'Yes'}
+_COLOR = {v: v for v in ('gray', 'red', 'blue', 'green', 'brown', 'purple', 'cyan', 'yellow')}
+_SHAPE = {v: v for v in ('cube', 'sphere', 'cylinder')}
+_SIZE = {v: v for v in ('small', 'large')}
+_MATERIAL = {v: v for v in ('rubber', 'metal')}
+
+visual7w = VisualMultipleChoice(
+    **_CAULDRON, config_name='visual7w', task_id='visual7w',
+    choices_list='choices_list', pre_process=cauldron_mc_rows,
+)
+
+clevr_yesno = VisualClassification(
+    **_CAULDRON, config_name='clevr', task_id='clevr/yesno', label_values=_YESNO,
+    pre_process=lambda ds: cauldron_closed_rows(ds, _YESNO),
+)
+
+mapqa_yesno = VisualClassification(
+    **_CAULDRON, config_name='mapqa', task_id='mapqa/yesno', label_values=_YESNO,
+    pre_process=lambda ds: cauldron_closed_rows(ds, _YESNO),
+)
+
+tqa = VisualMultipleChoice(
+    **_CAULDRON, config_name='tqa', task_id='tqa', choices_list='choices_list',
+    pre_process=cauldron_mc_rows,
+)
+
+_HATEFUL_TERMS = 'https://huggingface.co/datasets/emily49/hateful-memes/blob/390eaf2f1a31eed27275b49c9bafcfc8ae721733/LICENSE.txt'
+hateful_memes = VisualClassification(
+    **{**_CAULDRON, 'metadata': lambda x: {**json.loads(x['metadata']),
+        'source_license': 'Hateful Memes Dataset License Agreement',
+        'source_license_url': _HATEFUL_TERMS, 'source_redistribution': 'restricted'}},
+    config_name='hateful_memes', task_id='hateful-memes', label_values=_YESNO,
+    pre_process=lambda ds: cauldron_closed_rows(ds, _YESNO),
+)
+
+clevr_color = VisualClassification(
+    **_CAULDRON, config_name='clevr', task_id='clevr/color', label_values=_COLOR,
+    pre_process=lambda ds: cauldron_closed_rows(ds, _COLOR),
+)
+
+clevr_shape = VisualClassification(
+    **_CAULDRON, config_name='clevr', task_id='clevr/shape', label_values=_SHAPE,
+    pre_process=lambda ds: cauldron_closed_rows(ds, _SHAPE),
+)
+
+clevr_size = VisualClassification(
+    **_CAULDRON, config_name='clevr', task_id='clevr/size', label_values=_SIZE,
+    pre_process=lambda ds: cauldron_closed_rows(ds, _SIZE),
+)
+
+clevr_material = VisualClassification(
+    **_CAULDRON, config_name='clevr', task_id='clevr/material', label_values=_MATERIAL,
+    pre_process=lambda ds: cauldron_closed_rows(ds, _MATERIAL),
+)
+
+intergps = VisualMultipleChoice(
+    **_CAULDRON, config_name='intergps', task_id='intergps', choices_list='choices_list',
+    pre_process=cauldron_mc_rows,
 )

@@ -1,0 +1,83 @@
+{
+  "dataset": "HuggingFaceM4/the_cauldron",
+  "revision": "847a98a779b1652d65111daf20c972dfcd333605",
+  "scope": "Full native QA text audit; image integrity is checked separately on native smoke fixtures.",
+  "tasks": {
+    "clevr/color": {
+      "dropped_by_reason": {
+        "outside_vocabulary": 637151
+      },
+      "image_groups": 70000,
+      "retained_qas": 62838,
+      "total_qas": 699989
+    },
+    "clevr/material": {
+      "dropped_by_reason": {
+        "outside_vocabulary": 637159
+      },
+      "image_groups": 70000,
+      "retained_qas": 62830,
+      "total_qas": 699989
+    },
+    "clevr/shape": {
+      "dropped_by_reason": {
+        "outside_vocabulary": 636837
+      },
+      "image_groups": 70000,
+      "retained_qas": 63152,
+      "total_qas": 699989
+    },
+    "clevr/size": {
+      "dropped_by_reason": {
+        "outside_vocabulary": 637060
+      },
+      "image_groups": 70000,
+      "retained_qas": 62929,
+      "total_qas": 699989
+    },
+    "clevr/yesno": {
+      "dropped_by_reason": {
+        "outside_vocabulary": 417155
+      },
+      "image_groups": 70000,
+      "retained_qas": 282834,
+      "total_qas": 699989
+    },
+    "hateful-memes": {
+      "dropped_by_reason": {},
+      "image_groups": 8500,
+      "retained_qas": 8500,
+      "total_qas": 8500
+    },
+    "intergps": {
+      "dropped_by_reason": {
+        "duplicate_options": 7
+      },
+      "image_groups": 1280,
+      "retained_qas": 1753,
+      "total_qas": 1760
+    },
+    "mapqa/yesno": {
+      "dropped_by_reason": {
+        "outside_vocabulary": 344897
+      },
+      "image_groups": 37417,
+      "retained_qas": 138519,
+      "total_qas": 483416
+    },
+    "tqa": {
+      "dropped_by_reason": {
+        "duplicate_options": 9
+      },
+      "image_groups": 1493,
+      "retained_qas": 6473,
+      "total_qas": 6482
+    },
+    "visual7w": {
+      "dropped_by_reason": {},
+      "image_groups": 14366,
+      "retained_qas": 69817,
+      "total_qas": 69817
+    }
+  }
+}

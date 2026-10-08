@@ -1,0 +1,55 @@
+{
+  "scope": "Loader injection of the first 32 native image groups per config, without modifying source records.",
+  "tasks": {
+    "visual7w": {
+      "native_groups": 32,
+      "rows": 10,
+      "jev_rows": 10
+    },
+    "clevr/yesno": {
+      "native_groups": 32,
+      "rows": 10,
+      "jev_rows": 10
+    },
+    "mapqa/yesno": {
+      "native_groups": 32,
+      "rows": 10,
+      "jev_rows": 10
+    },
+    "tqa": {
+      "native_groups": 32,
+      "rows": 10,
+      "jev_rows": 10
+    },
+    "hateful-memes": {
+      "native_groups": 32,
+      "rows": 10,
+      "jev_rows": 10
+    },
+    "clevr/color": {
+      "native_groups": 32,
+      "rows": 10,
+      "jev_rows": 10
+    },
+    "clevr/shape": {
+      "native_groups": 32,
+      "rows": 10,
+      "jev_rows": 10
+    },
+    "clevr/size": {
+      "native_groups": 32,
+      "rows": 10,
+      "jev_rows": 10
+    },
+    "clevr/material": {
+      "native_groups": 32,
+      "rows": 10,
+      "jev_rows": 10
+    },
+    "intergps": {
+      "native_groups": 32,
+      "rows": 10,
+      "jev_rows": 10
+    }
+  }
+}

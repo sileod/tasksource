@@ -240,3 +240,65 @@ SNLI-VE is parked as unsound and removed from the published vision pilot. Its
 caption-derived labels do not reliably supervise image entailment; reannotation
 of neutral evaluation pairs does not repair this source's training labels. See
 [E-ViL](https://openaccess.thecvf.com/content/ICCV2021/papers/Kayser_E-ViL_A_Dataset_and_Benchmark_for_Natural_Language_Explanations_in_ICCV_2021_paper.pdf).
+
+
+## Native Cauldron tasks
+
+`visual7w`, `tqa`, and `intergps` use explicit native multiple-choice answers.
+`clevr/yesno`, `mapqa/yesno`, and `hateful-memes` use named yes/no labels;
+`clevr/color`, `clevr/shape`, `clevr/size`, and `clevr/material` use separate,
+disjoint attribute vocabularies. They all load the same pinned Cauldron revision
+`847a98a779b1652d65111daf20c972dfcd333605` directly, with only its labeled
+training split. MC preprocessing rejects malformed options, duplicate options,
+and invalid gold letters; it creates no distractors. Metadata retains the native
+question and answer, an ordered-image hash in `image_group_id`, and a stable QA ID.
+
+The declarations default to streaming. A capped visual load scans the complete
+eligible source split using uniform reservoir sampling; a cap limits memory and
+output rows, not download volume. Images stay encoded until accessed.
+
+[QA audit](cauldron-audit.json) records full-source retained and excluded counts,
+with reasons. [Native-image smoke results](cauldron-smoke.json) exercise all ten
+views through the public loader and Jev recast on the first 32 native image groups
+per config, injected at the loader boundary without modifying their records.
+| Task | Retained QAs | Excluded QAs | Reason |
+|---|---:|---:|---|
+| `visual7w` | 69,817 | 0 | None |
+| `clevr/yesno` | 282,834 | 417,155 | outside_vocabulary |
+| `mapqa/yesno` | 138,519 | 344,897 | outside_vocabulary |
+| `tqa` | 6,473 | 9 | duplicate_options |
+| `hateful-memes` | 8,500 | 0 | None |
+| `clevr/color` | 62,838 | 637,151 | outside_vocabulary |
+| `clevr/shape` | 63,152 | 636,837 | outside_vocabulary |
+| `clevr/size` | 62,929 | 637,060 | outside_vocabulary |
+| `clevr/material` | 62,830 | 637,159 | outside_vocabulary |
+| `intergps` | 1,753 | 7 | duplicate_options |
+
+These smoke fixtures are bounded checks, not representative training samples.
+TQA and InterGPS additionally passed direct, complete-split Hub loading with
+`load_task(id, vision=True, recast='jev', max_rows=10)`.
+Reproduce the audit and fixtures with:
+
+```bash
+python scripts/audit_cauldron.py --output docs/jev/cauldron-audit.json \
+  --samples build/cauldron-samples
+python scripts/audit_cauldron.py --smoke-only --samples build/cauldron-samples \
+  --output docs/jev/cauldron-smoke.json
+```
+
+Original data license evidence is separate from software licensing. CLEVR's
+[original release](https://cs.stanford.edu/people/jcjohns/clevr/) states CC BY 4.0;
+[MapQA](https://github.com/OSU-slatelab/MapQA#citation) and AllenAI's
+[TQA registry entry](https://registry.opendata.aws/allenai-tqa/) state CC BY-SA 4.0.
+The MIT licenses on the Visual7W toolkit and InterGPS software do not establish
+an image or annotation redistribution license; their data terms remain
+`unspecified` in metadata, with original source links and separate code-license evidence.
+
+HatefulMemes remains a direct Cauldron mapping with its native prompt and answers.
+Its [original dataset agreement](https://huggingface.co/datasets/emily49/hateful-memes/blob/390eaf2f1a31eed27275b49c9bafcfc8ae721733/LICENSE.txt)
+is recorded as custom terms in metadata, with `source_redistribution: restricted`.
+The Apache license on supplementary annotation code does not cover the images.
+No Tasksource image mirror is published for it. The vision publisher rejects
+rows marked restricted before making any upload; omit `hateful-memes` when
+building a public vision config. Loading this direct mapping does not replace
+the original agreement or establish permission for Cauldron's redistribution.

@@ -1272,6 +1272,11 @@ def build_vision(args):
 
 def publish_vision(dataset, output, repo_id):
     """Publish only the vision config and its own audit artifacts."""
+    restricted = {row.get('source', 'unknown') for rows in dataset.values()
+                  for row in rows.select_columns([key for key in ('source', 'metadata') if key in rows.column_names])
+                  if json.loads(row.get('metadata') or '{}').get('source_redistribution') == 'restricted'}
+    if restricted:
+        raise ValueError(f'Image redistribution is restricted for: {sorted(restricted)}')
     dataset.push_to_hub(repo_id, config_name='vision', max_shard_size='256MB',
                         commit_message='Add multimodal Jev vision config')
     api = HfApi()
