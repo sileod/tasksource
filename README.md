@@ -5,7 +5,7 @@ Huggingface Datasets is an excellent library, but it lacks standardization, and 
 
 Each dataset is standardized to a `MultipleChoice`, `Classification`, or `TokenClassification` template with canonical fields. We focus on discriminative tasks (= with negative examples or classes) for our annotations but also provide a `SequenceToSequence` template. Browse the [English](catalog_english.md), [multilingual](catalog_multilingual.md), and [vision](catalog_vision.md) task catalogs for the available annotations. A preprocessing is a function that accepts a dataset and returns the standardized dataset. Preprocessing code is concise and human-readable.
 
-### Installation and usage:
+### Usage
 `pip install tasksource`
 ```python
 from tasksource import list_tasks, load_task
