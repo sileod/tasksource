@@ -24,8 +24,12 @@ for id in df[df.task_type=="MultipleChoice"].id:
 Browse the [English](catalog_english.md), [multilingual](catalog_multilingual.md),
 and [vision](catalog_vision.md) catalogs, and feel free to request a new task.
 The English catalog includes 200+ MultipleChoice tasks and 200+ Classification
-tasks. Tasks kept out on purpose, such as evaluation benchmarks, are in
-[parked.py](src/tasksource/parked.py), with the reason.
+tasks. Evaluation benchmarks are kept separate in
+[eval_only.py](src/tasksource/eval_only.py). Annotations excluded for duplicates,
+source problems, or unsound supervision remain in
+[parked.py](src/tasksource/parked.py). Both record the reason for exclusion.
+Use `from tasksource import eval_only` to access a benchmark annotation directly;
+these annotations are excluded from the training catalogs.
 
 Visual annotations are in [vision_tasks.py](src/tasksource/vision_tasks.py).
 Discover them with `list_tasks(vision=True)` and load them with

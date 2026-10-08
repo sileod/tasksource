@@ -13,7 +13,7 @@ datasets.get_dataset_config_names = refuse
 socket.socket.connect = refuse
 socket.create_connection = refuse
 import tasksource
-from tasksource import list_tasks, parked
+from tasksource import list_tasks, parked, eval_only
 print(len(list_tasks()), len(list_tasks(multilingual=True)))
 """
 

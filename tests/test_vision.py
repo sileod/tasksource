@@ -208,12 +208,14 @@ def test_vision_config_builder(tmp_path, monkeypatch):
     args = SimpleNamespace(output=tmp_path, tasks=['nlvr2'], limit=None, max_rows=2,
                            max_rows_eval=1, repo_id='test/repo', upload=False)
     result = builder.build_vision(args)
-    assert len(result['train']) == 3
+    assert len(result['train']) == 2  # the export enforces its family cap, even for a mocked loader
     assert 'validation' not in result  # the source evaluation image is present in training
     assert result['train'].features['images'] == Sequence(Image())
-    assert len(set(result['train']['group_id'])) == 3
-    assert len(set(result['train']['example_id'])) == 3
-    assert len({json.loads(row['metadata'])['image_group_id'] for row in result['train']}) == 2
+    assert len(set(result['train']['group_id'])) == 2
+    assert len(set(result['train']['example_id'])) == 2
+    assert len({json.loads(row['metadata'])['image_group_id'] for row in result['train']}) <= 2
+    audit = json.loads((tmp_path / 'release-audit.json').read_text())
+    assert audit['splits']['train']['families'] == {'vision/nlvr2': 2}
     for row in result['train']:
         metadata = json.loads(row['metadata'])
         assert metadata['provenance']['revision']

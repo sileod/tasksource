@@ -40,7 +40,8 @@ def write(path, multilingual=False, vision=False):
     lines = [
         f"{len(tasks)} {kind} tasks. Load one with `load_task(id{flag})`; "
         f"the annotations are in [{name}.py]({module})"
-        + ", and tasks kept out on purpose are in [parked.py](src/tasksource/parked.py).",
+        + ". Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); "
+        + "other excluded annotations are in [parked.py](src/tasksource/parked.py).",
         "",
         "| # | id | type | dataset | question |",
         "|--:|---|---|---|:-:|",

@@ -1,4 +1,4 @@
-550 multilingual tasks. Load one with `load_task(id, multilingual=True)`; the annotations are in [multilingual_tasks.py](src/tasksource/multilingual_tasks.py), and tasks kept out on purpose are in [parked.py](src/tasksource/parked.py).
+550 multilingual tasks. Load one with `load_task(id, multilingual=True)`; the annotations are in [multilingual_tasks.py](src/tasksource/multilingual_tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
 
 | # | id | type | dataset | question |
 |--:|---|---|---|:-:|
