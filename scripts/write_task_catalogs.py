@@ -1,4 +1,4 @@
-"""Write the task catalogs tasks.md (English) and mtasks.md (multilingual).
+"""Write the English, multilingual, and visual task catalogs.
 
     PYTHONPATH=src python scripts/write_task_catalogs.py
 
@@ -30,16 +30,17 @@ def annotation_lines(source):
             for m in re.finditer(r"^(\w+)\s*=", source, flags=re.M)}
 
 
-def write(path, multilingual):
-    tasks = list_tasks(multilingual=multilingual)
-    module = f"src/tasksource/{'multilingual_tasks' if multilingual else 'tasks'}.py"
+def write(path, multilingual=False, vision=False):
+    tasks = list_tasks(multilingual=multilingual, vision=vision)
+    name = 'vision_tasks' if vision else ('multilingual_tasks' if multilingual else 'tasks')
+    kind = 'visual' if vision else ('multilingual' if multilingual else 'English')
+    flag = ', vision=True' if vision else (', multilingual=True' if multilingual else '')
+    module = f"src/tasksource/{name}.py"
     lines_of = annotation_lines((ROOT / module).read_text())
     lines = [
-        f"{len(tasks)} {'multilingual' if multilingual else 'English'} tasks. Load one with "
-        f"`load_task(id{', multilingual=True' if multilingual else ''})`; the annotations are in "
-        f"[{'multilingual_tasks' if multilingual else 'tasks'}.py](src/tasksource/"
-        f"{'multilingual_tasks' if multilingual else 'tasks'}.py), and tasks kept out on purpose are in "
-        "[parked.py](src/tasksource/parked.py).",
+        f"{len(tasks)} {kind} tasks. Load one with `load_task(id{flag})`; "
+        f"the annotations are in [{name}.py]({module})"
+        + ("." if vision else ", and tasks kept out on purpose are in [parked.py](src/tasksource/parked.py)."),
         "",
         "| # | id | type | dataset | question |",
         "|--:|---|---|---|:-:|",
@@ -49,7 +50,7 @@ def write(path, multilingual):
             str(index), f"[{cell(row.id)}]({module}#L{lines_of[row.preprocessing_name]})", row.task_type,
             dataset_link(row.dataset_name), "✓" if getattr(row.mapping, "question", None) else "",
         ]) + " |")
-    soft = list_tasks(multilingual=multilingual, soft=True)
+    soft = list_tasks(multilingual=multilingual, vision=vision, soft=True)
     soft = soft[soft.soft_labels]
     if len(soft):
         lines += [
@@ -77,3 +78,4 @@ def write(path, multilingual):
 if __name__ == "__main__":
     write(ROOT / "tasks.md", multilingual=False)
     write(ROOT / "mtasks.md", multilingual=True)
+    write(ROOT / "vision_tasks.md", vision=True)
