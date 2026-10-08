@@ -12,6 +12,7 @@ import numpy as np
 import copy
 import datasets
 import time
+import json
 
 MAX_MC_OPTIONS = 4
 
@@ -21,6 +22,30 @@ def get_column_names(dataset):
         return set(fc.flatten(cn.values()))
     else:
         return set(cn)
+
+
+def disable_image_decoding(dataset):
+    """Keep encoded image bytes through source filtering, mapping and recasts."""
+    def visit(feature):
+        if isinstance(feature, datasets.Image):
+            feature.decode = False
+        elif isinstance(feature, dict):
+            for value in feature.values():
+                visit(value)
+        elif isinstance(feature, (list, tuple)):
+            for value in feature:
+                visit(value)
+        elif hasattr(feature, 'feature'):
+            visit(feature.feature)
+    result = {}
+    for split, rows in dataset.items():
+        features = copy.deepcopy(rows.features)
+        visit(features)
+        for name, feature in features.items():
+            if feature != rows.features[name]:
+                rows = rows.cast_column(name, feature)
+        result[split] = rows
+    return type(dataset)(result)
 
 
 def sample_dataset(dataset,n=10000, n_eval=1000,seed=0):
@@ -52,6 +77,9 @@ class Preprocessing(DotWiz):
 
     def __call__(self,dataset, max_rows=None, max_rows_eval=None,seed=0, pre_processed=False):
         """``pre_processed=True`` skips ``pre_process`` (already applied, e.g. before streaming sampling)."""
+        visual = "images" in self.to_dict()
+        if visual:
+            dataset = disable_image_decoding(dataset)
         if not pre_processed:
             dataset = self.pre_process(dataset)
 
@@ -62,7 +90,7 @@ class Preprocessing(DotWiz):
                 del dataset[v]
             if k in dataset and not v: # obfuscated label
                 del dataset[k]
-        dataset = fix_splits(dataset)
+        dataset = fix_splits(dataset, complete=not visual)
 
         for k in list(dataset.keys()):
             if k not in self.default_splits:
@@ -86,12 +114,30 @@ class Preprocessing(DotWiz):
                                     fn_kwargs={'fn':v,'target':k})
 
         dataset=dataset.remove_columns(  # question is metadata, never a column
-            get_column_names(dataset)-(set(self.to_dict().keys())-{'question'}))
-        dataset = fix_labels(dataset)
+            get_column_names(dataset)-(set(self.to_dict().keys())-{'question'}
+            - ({'metadata'} if self.metadata is None else set())))
+        if 'metadata' in get_column_names(dataset):
+            def encode_metadata(row):
+                value = row['metadata']
+                if value is None:
+                    return {'metadata': None}
+                if isinstance(value, str):
+                    json.loads(value)
+                    return {'metadata': value}
+                return {'metadata': json.dumps(value, ensure_ascii=False, sort_keys=True)}
+            dataset = dataset.map(encode_metadata)
+        if visual:
+            dataset = dataset.cast_column("images", datasets.Sequence(datasets.Image(decode=False)))
+        if not (visual and self.label_values):
+            dataset = fix_labels(dataset)
         if self.label_values:
             dataset = cast_explicit_label_values(dataset, self.label_values)
-        dataset = fix_splits(dataset) # again: label mapping changed
+        dataset = fix_splits(dataset, complete=not visual) # again: label mapping changed
         dataset = self.post_process(dataset)
+        if visual and not isinstance(self, MultipleChoiceFields):
+            if not isinstance(dataset['train'].features['labels'], datasets.ClassLabel):
+                raise ValueError('Visual classification requires named labels or explicit label_values')
+            dataset = dataset.cast_column("images", datasets.Sequence(datasets.Image()))
         return dataset
 
 
@@ -278,6 +324,7 @@ class SharedFields:
     # appends it, and the instruct and Jev recasts use it as their instruction.
     # Questions that vary per row belong in sentence2 or the MC inputs instead.
     question: str = None
+    metadata: object = None  # optional source provenance, normalized to a JSON string
     ordinal: bool = False  # labels are an ordered scale, listed in order (Jev asks part as score)
     #language:str="en"
     
@@ -287,6 +334,33 @@ class Classification(SharedFields, ClassificationFields): pass
 
 @dataclass
 class MultipleChoice(SharedFields, MultipleChoiceFields): pass
+
+@dataclass
+class VisualClassification(SharedFields, Preprocessing):
+    images: object = "images"
+    inputs: str = "inputs"
+    labels: str = "labels"
+
+
+@dataclass
+class VisualMultipleChoice(SharedFields, MultipleChoiceFields):
+    images: object = "images"
+    inputs: str = "inputs"
+
+    def __call__(self, dataset, *args, **kwargs):
+        dataset = super().__call__(dataset, *args, gold_first=False, max_options=None, **kwargs)
+        choices = sorted((c for c in dataset['train'].features if re.fullmatch(r'choice\d+', c)),
+                         key=lambda c: int(c[6:]))
+        if not 2 <= len(choices) <= 26:
+            raise ValueError("Visual MC requires 2–26 text options")
+        for rows in dataset.values():
+            for row in rows.select_columns(['labels', *choices]):
+                label = row['labels']
+                if label is None or not 0 <= label < len(choices) or row[choices[label]] is None:
+                    raise ValueError("Visual MC label must index a non-null source option")
+        dataset = dataset.cast_column('labels', datasets.ClassLabel(names=list('ABCDEFGHIJKLMNOPQRSTUVWXYZ'[:len(choices)])))
+        return dataset.cast_column('images', datasets.Sequence(datasets.Image()))
+
 
 @dataclass
 class TokenClassification(SharedFields, TokenClassificationFields): pass
@@ -532,11 +606,14 @@ def add_question(dataset, question):
     def prompt(x):
         text = x.get(field)
         return {field: f"{text}\n\n{question}" if text else question}
+    if 'images' in features:
+        dataset = disable_image_decoding(dataset).map(prompt)
+        return dataset.cast_column('images', features['images'])
     return dataset.map(prompt)
 
-def fix_splits(dataset):
+def fix_splits(dataset, complete=True):
 
-    if len(dataset)==1 and "train" not in dataset:
+    if complete and len(dataset)==1 and "train" not in dataset:
         k = list(dataset)[0]
         dataset['train'] = copy.deepcopy(dataset[k])
         del dataset[k]
@@ -548,12 +625,15 @@ def fix_splits(dataset):
         test_labels = set(fc.flatten(dataset['test']['labels']))
         # one placeholder value (-1, None, or a value train never uses); a real single-class test set is kept
         train_labels = set(fc.flatten(dataset['train']['labels'])) if 'train' in dataset and 'labels' in dataset['train'].features else set()
-        if len(test_labels)==1 and (test_labels & {-1, None} or not test_labels & train_labels):
+        if len(test_labels)==1 and (test_labels & {-1, None} or (complete and not test_labels & train_labels)):
             del dataset['test']
 
     for split in list(dataset):  # rows whose answer is hidden (a null label) cannot be trained or scored on
         if isinstance(dataset[split].features.get('labels'), datasets.ClassLabel) and None in dataset[split].unique('labels'):
             dataset[split] = dataset[split].filter(lambda label: label is not None, input_columns='labels')
+
+    if not complete:
+        return dataset
 
     if 'validation' in dataset and 'train' not in dataset:
         train_validation = dataset['validation'].train_test_split(0.5, seed=0)

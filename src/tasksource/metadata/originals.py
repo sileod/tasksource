@@ -11,6 +11,7 @@ by scripts/upload_repackaged.py) or a task switches to a mirror.
 """
 
 ORIGINALS = {
+    "pingzhili/snli-ve": ["HuggingFaceM4/SNLI-VE"],
     # third-party mirrors
     "bogdanminko/wildguardmix-cleaned": ["allenai/wildguardmix"],
     # re-uploaded under tasksource/

@@ -46,14 +46,17 @@ def negative_sample_options(y, labels,N=4, rng=random):
     return [x for x in labels if x in chosen]
 
 def shuffle_choices(x, rng=random):
-    choices = sorted([k for k in x if 'choice' in k])
-    choices_texts = [x[c] for c in choices]
-    correct_choice =choices_texts[x['labels']]
-    rng.shuffle(choices_texts)
-    for c, ct in zip(choices, choices_texts):
-        x[c]=ct
-    x["labels"]=choices_texts.index(correct_choice)
+    choices = sorted((k for k in x if k.startswith('choice')), key=lambda k: int(k[6:]))
+    texts = [x[c] for c in choices]
+    gold = x['labels']
+    order = [i for i, text in enumerate(texts) if text is not None]
+    rng.shuffle(order)
+    for c in choices:
+        del x[c]
+    x.update({f'choice{i}': texts[j] for i, j in enumerate(order)})
+    x['labels'] = order.index(gold)
     return x
+
 
 def recast_dataset_classification_to_mc(dataset,sep="[SEP]",N=4):
 
@@ -86,7 +89,11 @@ def recast_instruct(dataset, question=None, seed=0, options=False):
     features = dataset['train'].features
     labels = features['labels']
 
-    if "sentence1" in features:
+    visual = "images" in features
+    if visual:
+        from .preprocess import disable_image_decoding
+        dataset = disable_image_decoding(dataset)
+    if "sentence1" in features or (visual and "inputs" in features):
         task_type='Classification'
     if "choice0" in features:
         task_type = "MultipleChoice"
@@ -97,8 +104,8 @@ def recast_instruct(dataset, question=None, seed=0, options=False):
         x=shuffle_choices(x, rng)
         if question:
             x['inputs'] = f"{x['inputs']}\n{question}" if x['inputs'] else question
-        choices = sorted([k for k in x if 'choice' in k])
-        if all([x[c] in x['inputs'] for c in choices]):
+        choices = sorted((k for k in x if k.startswith('choice')), key=lambda k: int(k[6:]))
+        if not visual and all([x[c] in x['inputs'] for c in choices]):
             return {"inputs":x['inputs'], 'targets': x[f"choice{x['labels']}"].strip()+".",
                     'options': [x[c].strip()+"." for c in choices]}
         else:
@@ -116,7 +123,7 @@ def recast_instruct(dataset, question=None, seed=0, options=False):
         if 'sentence2' in x:
             text=f"text_A: {x['sentence1']}\ntext_B: {x['sentence2']}"
         else:
-            text=x['sentence1']
+            text=x['inputs'] if visual else x['sentence1']
             
         answer=labels.int2str(x['labels']).strip()
         options= negative_sample_options(answer, labels._int2str, rng=rng)
@@ -130,8 +137,10 @@ def recast_instruct(dataset, question=None, seed=0, options=False):
                 "options": [clean_text(o) for o in row["options"]]}
     dataset = DatasetDict({split: rows.map(convert, with_indices=True, fn_kwargs={"split": split})
                            for split, rows in dataset.items()})
-    kept = ['inputs', 'targets'] + (['options'] if options else [])
+    kept = ['inputs', 'targets'] + (['images'] if visual else []) + (['metadata'] if 'metadata' in features else []) + (['options'] if options else [])
     dataset = dataset.remove_columns([k for k in dataset['train'].column_names if k not in kept])
+    if visual:
+        dataset = dataset.cast_column('images', features['images'])
     return dataset
 
 

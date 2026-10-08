@@ -18,7 +18,7 @@ import time
 from collections import Counter, deque
 from pathlib import Path
 
-from datasets import Dataset, DatasetDict, Features, List, Value, concatenate_datasets, load_dataset
+from datasets import Dataset, DatasetDict, Features, Image, Sequence, List, Value, concatenate_datasets, load_dataset
 from huggingface_hub import HfApi
 import numpy as np
 import pandas as pd
@@ -26,7 +26,7 @@ import pyarrow.compute as pc
 import yaml
 from tasksource import list_tasks, load_task, task_provenance, tasks
 from tasksource.access import lmtasks, load_preprocessing
-from tasksource.preprocess import sample_dataset
+from tasksource.preprocess import sample_dataset, disable_image_decoding
 from tasksource.metadata.weights import task_weight
 from tasksource.metadata.jev_mixes import length_factor, source_quotas
 from tasksource.licenses import fetch_card_licenses, provenance_repos, source_license
@@ -297,6 +297,7 @@ def to_training_row(example, index, task_id, split):
     group_id = f"{slug(example.get('group') or task_id)}:{split}:{source_row}"
     row_id = group_id if question_id == "decision" else f"{group_id}:{question_id}"
     return {
+        **{name: example[name] for name in ("images", "metadata") if name in example},
         "id": row_id,
         "kind": example.get("kind") or "choice",  # ordinal tasks: part score
         "options": options,
@@ -324,10 +325,15 @@ def merge_identical_inputs(rows):
     """One row per (state, question, options): identical inputs with different targets (a bare
     "right" as acknowledge, ready or align) get the mean target, the label distribution the
     input alone supports."""
+    if 'images' in rows.features:
+        encoded = disable_image_decoding(DatasetDict(train=rows))['train']
+        image_inputs = [image_keys(row['images']) for row in encoded.select_columns(['images'])]
+    else:
+        image_inputs = [()] * len(rows)
     columns = rows.select_columns(["state", "question", "options"])[:]
     groups = {}
     for index, key in enumerate(zip(columns["state"], columns["question"], map(tuple, columns["options"]))):
-        groups.setdefault(key, []).append(index)
+        groups.setdefault((*key, image_inputs[index]), []).append(index)
     if len(groups) == len(rows):
         return rows
     targets = rows["target"]
@@ -1005,6 +1011,8 @@ def source_provenance(source):
     if source.startswith(procedural.SOURCE_PREFIX):
         return {"dataset": procedural.REPO_ID, "config": source[len(procedural.SOURCE_PREFIX):],
                 "generated": "procedural (tasksource.jev.procedural)"}
+    if source.startswith("vision/"):
+        return task_provenance(source[len("vision/"):], vision=True)
     if source.startswith("multilingual/"):
         return task_provenance(source[len("multilingual/"):], multilingual=True)
     return task_provenance(source)
@@ -1152,7 +1160,164 @@ def select_tasks(args):
     return frame.drop_duplicates("source_id", keep="first").reset_index(drop=True)
 
 
+def image_keys(images):
+    """Image content identities in source order, without decoding or re-encoding."""
+    keys = []
+    for image in images:
+        data = image.get('bytes')
+        if data is None:
+            data = Path(image['path']).read_bytes()
+        keys.append(hashlib.sha256(data).hexdigest())
+    if not keys:
+        raise ValueError('Vision decisions need at least one image')
+    return tuple(keys)
+
+
+def build_vision(args):
+    """Build the vision config using the canonical shared Tasksource loader/recast."""
+    output = args.output.resolve()
+    if output.name == 'tasksource-jev-typed-decisions':
+        output = output / 'vision'
+    output.mkdir(parents=True, exist_ok=True)
+    data_dir = output / 'data'
+    data_dir.mkdir(exist_ok=True)
+    catalog = list_tasks(vision=True)
+    if args.tasks:
+        unknown = set(args.tasks) - set(catalog.id)
+        if unknown:
+            raise ValueError(f'Unknown vision tasks: {sorted(unknown)}')
+        catalog = catalog[catalog.id.isin(args.tasks)]
+    if args.limit:
+        catalog = catalog.head(args.limit)
+    catalog = catalog.assign(source_id='vision/' + catalog.id)
+    manifest = build_manifest(args, catalog)
+    (output / 'build-manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
+    sources = list(catalog.source_id)
+    licenses = source_licenses(sources)
+    features = Features({**TRAINING_FEATURES, 'images': Sequence(Image(decode=False)),
+                         'metadata': Value('string'), 'group_id': Value('string'),
+                         'question_id': Value('string'), 'example_id': Value('string'),
+                         'license': Value('string'), 'license_use': Value('string')})
+    frames, records, train_images = {}, {}, set()
+    for task in catalog.itertuples():
+        source = task.source_id
+        provenance = source_provenance(source)
+        dataset = load_task(task.id, vision=True, recast='jev', streaming=True,
+                            max_rows=args.max_rows, max_rows_eval=args.max_rows_eval)
+        dataset = disable_image_decoding(dataset)
+        counts = {}
+        for split, rows in dataset.items():
+            converted = []
+            for index, example in enumerate(rows):
+                row = to_training_row(example, index, source, split)
+                images = image_keys(row['images'])
+                if split == 'train':
+                    train_images.update(images)
+                elif any(image in train_images for image in images):
+                    continue  # sibling QAs over a training image stay out of evaluation
+                image_id = hashlib.sha256('\x1f'.join(images).encode()).hexdigest()[:24]
+                state_id = hashlib.sha256(row['state'].encode()).hexdigest()[:16]
+                row['group_id'] = f'{source}:{split}:{image_id}:{state_id}'
+                decision = json.dumps([row['state'], row['question'], sorted(row['options'])], ensure_ascii=False)
+                row['question_id'] = hashlib.sha256(decision.encode()).hexdigest()[:24]
+                row['id'] = row['group_id'] + ':' + row['question_id']
+                row['example_id'] = hashlib.sha256(('\x1f'.join(images) + example_key(
+                    source, row['state'], row['options'], row['target'])).encode()).hexdigest()[:24]
+                metadata = json.loads(row.get('metadata') or '{}')
+                metadata.update({'provenance': provenance, 'licenses': licenses[source], 'image_ids': list(images), 'image_group_id': image_id})
+                row['metadata'] = json.dumps(metadata, ensure_ascii=False, sort_keys=True)
+                row.update({key: licenses[source][key] for key in ('license', 'license_use')})
+                converted.append(row)
+            if not converted:
+                continue
+            training = Dataset.from_list(converted, features=features)
+            training = merge_identical_inputs(training)
+            training = training.map(lambda row: {'example_id': hashlib.sha256(('\x1f'.join(
+                image_keys(row['images'])) + example_key(source, row['state'], row['options'], row['target'])).encode()).hexdigest()[:24]})
+            validate_decisions(training, split)
+            if len(set(training['id'])) != len(training):
+                raise ValueError(f'Duplicate vision decision IDs for {source}/{split}')
+            path = data_dir / f'{split}-{slug(source)}.parquet'
+            training.to_parquet(path)
+            frames.setdefault(split, []).append(training)
+            counts[split] = len(training)
+        if not counts.get('train'):
+            raise ValueError(f'{source} has no labeled training decisions')
+        records[source] = {'status': 'ok', 'task_type': task.task_type, 'rows': counts,
+                           'revisions': {provenance['dataset']: provenance['revision']}}
+        print(f'{source}: {counts}', flush=True)
+    dataset = DatasetDict({split: concatenate_datasets(rows).shuffle(seed=0)
+                           for split, rows in frames.items()})
+    for split in list(dataset):
+        if split != 'train':
+            dataset[split] = dataset[split].filter(
+                lambda images: not any(key in train_images for key in image_keys(images)), input_columns='images')
+            if not len(dataset[split]):
+                del dataset[split]
+    audit = {'repo_id': args.repo_id, 'config': 'vision', 'splits': {
+        split: {'rows': len(rows), 'sources': dict(Counter(rows['source']))}
+        for split, rows in dataset.items()}}
+    (output / 'release-audit.json').write_text(json.dumps(audit, indent=2) + '\n')
+    write_sources_yaml(output / 'sources.yaml', audit, records, licenses)
+    dataset = dataset.cast_column('images', Sequence(Image()))
+    dataset.save_to_disk(str(output / 'dataset'))
+    if args.upload:
+        publish_vision(dataset, output, args.repo_id)
+    return dataset
+
+
+def publish_vision(dataset, output, repo_id):
+    """Publish only the vision config and its own audit artifacts."""
+    dataset.push_to_hub(repo_id, config_name='vision', max_shard_size='256MB',
+                        commit_message='Add multimodal Jev vision config')
+    api = HfApi()
+    for name in ('sources.yaml', 'release-audit.json', 'build-manifest.json'):
+        api.upload_file(path_or_fileobj=str(output / name), path_in_repo='vision/' + name,
+                        repo_id=repo_id, repo_type='dataset',
+                        commit_message=f'Add vision {name}')
+    from huggingface_hub import hf_hub_download
+    head = api.dataset_info(repo_id).sha
+    card_path = hf_hub_download(repo_id, 'README.md', repo_type='dataset', revision=head)
+    card = Path(card_path).read_text()
+    counts = ', '.join(f'{len(rows):,} {split}' for split, rows in dataset.items())
+    section = f'''## Vision config
+
+Load `load_dataset("{repo_id}", "vision")` for the multimodal pilot ({counts}).
+It covers NLVR2, SNLI-VE, A-OKVQA, ScienceQA-IMG, AI2D, and FigureQA, with genuine source labels.
+`state`, `question`, `kind`, `options`, and `target` retain their existing decision semantics.
+`images` is an ordered sequence of Hugging Face Image features; encoded bytes are preserved
+and images decode on access. Feed the images alongside `state` through your model's image adapter.
+NLVR2 retains its two images in source order. Answer options remain text.
+
+`metadata` is a JSON string preserving available source identifiers, pinned provenance,
+and separate Hub-card/DPI license evidence. `license` and `license_use` are also available
+as columns; missing or conflicting evidence is retained rather than replaced by an inferred license.
+See [vision/sources.yaml](vision/sources.yaml), [vision/release-audit.json](vision/release-audit.json),
+and [vision/build-manifest.json](vision/build-manifest.json).
+
+The pilot is sampled with a deterministic streaming buffer, capped per source at the limits
+recorded in its manifest; it is not a uniform sample of each complete dataset.
+Only native labeled splits are used. Decisions sharing the same ordered image set and text state
+share `group_id`; `metadata.image_group_id` links an image set across different questions.
+Evaluation rows sharing any image with training are excluded.
+This initial config contains direct decisions; text packing and derived variants are disabled.
+The typed text-request renderers require an image-aware adapter for these rows.
+'''
+    marker = '\n## Vision config\n'
+    if marker in card:
+        before, after = card.split(marker, 1)
+        following = after.find('\n## ')
+        card = before.rstrip() + '\n\n' + section + (after[following:] if following >= 0 else '')
+    else:
+        card = card.rstrip() + '\n\n' + section
+    api.upload_file(path_or_fileobj=card.encode(), path_in_repo='README.md', repo_id=repo_id,
+                    repo_type='dataset', parent_commit=head,
+                    commit_message='Document the multimodal vision config')
+
+
 def build(args):
+    if getattr(args, "vision", False):
+        return build_vision(args)
     output = args.output.resolve()
     data_dir = output / "data"
     data_dir.mkdir(parents=True, exist_ok=True)
@@ -1341,6 +1506,7 @@ def parse_args():
     parser.add_argument("--output", type=Path, default=root / "build" / "tasksource-jev-typed-decisions")
     parser.add_argument("--card", type=Path, default=root / "dataset_cards" / "tasksource-jev.md")
     parser.add_argument("--tasks", nargs="*")
+    parser.add_argument("--vision", action="store_true", help="Build/publish the separate multimodal vision config.")
     parser.add_argument("--limit", type=int)
     parser.add_argument(
         "--english-only", action="store_true",

@@ -3,6 +3,13 @@
 Repo -> the card's ``license`` list, ``unknown`` dropped; empty when the card has none."""
 
 CARD_LICENSES = {
+ "pingzhili/nlvr2": [],
+ "pingzhili/snli-ve": [],
+ "HuggingFaceM4/SNLI-VE": ["bsd-3-clause"],
+ "HuggingFaceM4/A-OKVQA": [],
+ "derek-thomas/ScienceQA": ["cc-by-sa-4.0"],
+ "HuggingFaceM4/the_cauldron": [],
+ "vikhyatk/figureqa": [],
  "12ml/e-CARE": [],
  "AmazonScience/massive": [
   "cc-by-4.0"

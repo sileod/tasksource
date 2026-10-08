@@ -1,10 +1,10 @@
-from .preprocess import Preprocessing, MultipleChoiceFields, SoftLabeling, add_question
+from .preprocess import Preprocessing, MultipleChoiceFields, SoftLabeling, add_question, disable_image_decoding
 from .jev.options import JEV_MAX_MC_OPTIONS
 import re
 from urllib.parse import unquote
 import numpy as np
 import pandas as pd
-from . import tasks, recast as recast_module
+from . import tasks, vision_tasks, recast as recast_module
 from .metadata import dataset_rank
 from .metadata.originals import ORIGINALS
 from .metadata.canonical import CANONICAL
@@ -48,7 +48,7 @@ def pretty_name(x):
     return f"{dn}/{cn}/{tn}".replace('//','/').rstrip('/')
 
 def list_tasks(tasks_path=f'{os.path.dirname(__file__)}/tasks.py', multilingual=False, instruct=False, excluded=(),
-               soft=False, min_annotators=None, license_use=None):
+               soft=False, min_annotators=None, license_use=None, vision=False):
     """The task catalog as a DataFrame; ``excluded`` holds substrings of task ids to leave out.
 
     ``soft=False`` lists tasks with hard labels, SoftLabeling annotations by their
@@ -63,8 +63,10 @@ def list_tasks(tasks_path=f'{os.path.dirname(__file__)}/tasks.py', multilingual=
     tasks with that use and adds ``license`` and ``license_use`` columns; see
     ``task_licenses``.
 
+    ``vision=True`` selects the visual catalog; default calls list text tasks.
+
     Each call returns a fresh copy, so callers may edit it without affecting later calls."""
-    df = _list_tasks(tasks_path, multilingual, instruct, tuple(excluded), soft, min_annotators)
+    df = _list_tasks(tasks_path, multilingual, instruct, tuple(excluded), soft, min_annotators, vision)
     if license_use is not None:
         uses = {license_use} if isinstance(license_use, str) else set(license_use)
         if uses - set(LICENSE_USES):
@@ -75,7 +77,11 @@ def list_tasks(tasks_path=f'{os.path.dirname(__file__)}/tasks.py', multilingual=
     return df.copy()
 
 @cache
-def _list_tasks(tasks_path, multilingual, instruct, excluded, soft=False, min_annotators=None):
+def _list_tasks(tasks_path, multilingual, instruct, excluded, soft=False, min_annotators=None, vision=False):
+    if vision and multilingual:
+        raise ValueError("vision and multilingual catalogs are separate")
+    if vision:
+        tasks_path = tasks_path.replace("/tasks.py", "/vision_tasks.py")
     if multilingual:
         tasks_path=tasks_path.replace('/tasks.py','/multilingual_tasks.py')
     task_order = open(tasks_path).readlines()
@@ -84,7 +90,7 @@ def _list_tasks(tasks_path, multilingual, instruct, excluded, soft=False, min_an
     task_order = fc.flip(dict(enumerate(task_order)))
 
     l = []
-    _tasks = (lmtasks if multilingual else tasks)
+    _tasks = vision_tasks if vision else (lmtasks if multilingual else tasks)
 
     for key in dir(_tasks):
         if key not in task_order:
@@ -142,7 +148,7 @@ def _task_licenses(df, multilingual, cards=None):
     return [source_license(("multilingual/" if multilingual else "") + i, _task_repos(m, d, i), cards)
             for i, m, d in zip(df.id, df.mapping, df.dataset_name)]
 
-def task_licenses(task_ids=None, multilingual=False, fresh=False):
+def task_licenses(task_ids=None, multilingual=False, fresh=False, vision=False):
     """License of each task: ``license``, ``license_use`` and the sources they come from.
 
     ``license`` lists the license of the Hub card of each repo the task loads (and of the
@@ -151,7 +157,7 @@ def task_licenses(task_ids=None, multilingual=False, fresh=False):
     non-commercial or academic-only, else ``commercial`` if one allows commercial use,
     else ``unspecified``. Cards come from a checked-in snapshot; ``fresh=True`` reads
     the current cards from the Hub. A best-effort filter, not legal advice."""
-    df = _every_task(multilingual=multilingual)
+    df = _every_task(multilingual=multilingual, vision=vision)
     if task_ids is not None:
         missing = set(task_ids) - set(df.id)
         if missing:
@@ -166,18 +172,18 @@ def task_licenses(task_ids=None, multilingual=False, fresh=False):
                          "card_licenses": [x.get("card_licenses", {}) for x in licenses],
                          "dpi_licenses": [x.get("dpi_licenses", []) for x in licenses]})
 
-def _every_task(multilingual=False):
+def _every_task(multilingual=False, vision=False):
     """Hard and soft views together: every task id, each once."""
-    return pd.concat([list_tasks(multilingual=multilingual, soft=s) for s in (True, False)]).drop_duplicates("id")
+    return pd.concat([list_tasks(multilingual=multilingual, soft=s, vision=vision) for s in (True, False)]).drop_duplicates("id")
 
-def hub_datasets(task_ids=None, multilingual=None):
+def hub_datasets(task_ids=None, multilingual=None, vision=False):
     """Hub dataset ids behind tasks, for the ``datasets:`` field of a model card.
 
     Lists the repo each task loads from, repos read through hf:// data files,
     and the originals of tasksource copies and mirrors (metadata/originals.py).
     ``task_ids`` defaults to every task; ``multilingual=None`` searches both lists.
     """
-    frames = [_every_task(multilingual=m) for m in ([False, True] if multilingual is None else [multilingual])]
+    frames = [_every_task(multilingual=m, vision=vision) for m in ([False] if vision else ([False, True] if multilingual is None else [multilingual]))]
     df = pd.concat(frames)
     if task_ids is not None:
         missing = set(task_ids) - set(df.id)
@@ -186,10 +192,10 @@ def hub_datasets(task_ids=None, multilingual=None):
         df = df[df.id.isin(task_ids)]
     return sorted({repo for row in df.itertuples() for repo in _task_repos(row.mapping, row.dataset_name, row.id)})
 
-def task_provenance(task_id, multilingual=False):
+def task_provenance(task_id, multilingual=False, vision=False):
     """Where one task's data comes from: the loading repo and config, repos read
     through hf:// data files, and the originals of tasksource copies and mirrors."""
-    df = _every_task(multilingual=multilingual)
+    df = _every_task(multilingual=multilingual, vision=vision)
     row = df[df.id == task_id]
     if row.empty:
         raise KeyError(f"unknown task: {task_id}")
@@ -233,14 +239,14 @@ def pin_hf_urls(value, pins):
     return value
 
 def load_preprocessing(tasks=tasks, **kwargs):
-    df = _every_task(multilingual=tasks==lmtasks)
+    df = _every_task(multilingual=tasks==lmtasks, vision=tasks==vision_tasks)
     matches = df[np.logical_and.reduce([df[k] == v for k, v in kwargs.items()] + [np.ones(len(df), bool)])]
     if matches.empty:
         raise KeyError(f"unknown task: {kwargs}")
     if len(matches) > 1:
         raise ValueError(f"{kwargs} matches {len(matches)} tasks ({', '.join(matches.id[:5])}...); pass a task id")
     y = matches.iloc[0]
-    preprocessing= copy.copy(getattr(tasks, y.preprocessing_name))
+    preprocessing= copy.copy(y.mapping)
     for c in 'dataset_name','config_name':
         if not isinstance(getattr(preprocessing,c), str):
              setattr(preprocessing,c,getattr(y,c))
@@ -252,8 +258,8 @@ def load_preprocessing(tasks=tasks, **kwargs):
 def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preprocessing_name=None,
          max_rows=None, max_rows_eval=None, multilingual=False, instruct=False,
          recast=None, prompted=False, seed=0, data_file_pins=None, soft=None, min_annotators=None,
-         **load_dataset_kwargs):
-    """Load a standardized task.
+         vision=False, **load_dataset_kwargs):
+    """Load a standardized task. ``vision=True`` selects the visual catalog.
 
     ``data_file_pins`` ({repo: commit}) pins the task's ``hf://`` data files, as
     ``revision`` pins its Hub dataset.
@@ -270,7 +276,9 @@ def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preproc
     query = {k:v for k,v in query.items() if v}
     if 'dataset_name' in query:
         query['dataset_name'] = CANONICAL.get(query['dataset_name'], query['dataset_name'])
-    _tasks = (lmtasks if multilingual else tasks)
+    _tasks = vision_tasks if vision else (lmtasks if multilingual else tasks)
+    if vision and multilingual:
+        raise ValueError("vision and multilingual catalogs are separate")
     preprocessing = load_preprocessing(_tasks, **query)
     soft_labels = isinstance(preprocessing, SoftLabeling) and (recast == "jev" if soft is None else soft)
     if isinstance(preprocessing, SoftLabeling):
@@ -301,17 +309,19 @@ def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preproc
         # bounded before materializing them. Apply source filtering first, then
         # deterministically shuffle a finite buffer and take the same limits
         # used by ordinary Tasksource sampling.
+        if vision:
+            dataset = disable_image_decoding(dataset)
         dataset = preprocessing.pre_process(dataset)
         pre_processed = True
         materialized = {}
         for split, rows in dataset.items():
             limit = max_rows if split == "train" else max_rows_eval
             if limit:
-                rows = rows.shuffle(seed=seed, buffer_size=max(10_000, limit)).take(limit)
-            materialized[split] = Dataset.from_list(list(rows))
+                rows = rows.shuffle(seed=seed, buffer_size=max(100 if vision else 10_000, limit)).take(limit)
+            materialized[split] = Dataset.from_list(list(rows), **({"features": rows.features} if vision else {}))
         dataset = DatasetDict(materialized)
     options = {}
-    if recast == "jev" and isinstance(preprocessing, MultipleChoiceFields):
+    if recast == "jev" and not vision and isinstance(preprocessing, MultipleChoiceFields):
         # Jev permutes criteria itself and needs every source option.
         options = dict(gold_first=False, max_options=JEV_MAX_MC_OPTIONS)
     dataset= preprocessing(dataset,max_rows, max_rows_eval, seed=seed, pre_processed=pre_processed, **options)

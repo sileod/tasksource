@@ -79,7 +79,7 @@ def _valid_criteria(criteria):
 
 
 def _jev_task_type(features):
-    if "sentence1" in features:
+    if "sentence1" in features or ("images" in features and "inputs" in features and not _choice_columns(features)):
         return "Classification"
     if _choice_columns(features) and "inputs" in features:
         return "MultipleChoice"
@@ -195,6 +195,10 @@ def recast_jev(dataset, task=None, question=None, ordinal=False, kind=None, row_
         raise ValueError("recast_jev expects a train split")
 
     features = dataset["train"].features
+    visual = "images" in features
+    if visual:
+        from ..preprocess import disable_image_decoding
+        dataset = disable_image_decoding(dataset)
     if kind is not None:
         return _recast_soft(dataset, task, question, kind, row_options, group)
     task_type = _jev_task_type(features)
@@ -215,7 +219,7 @@ def recast_jev(dataset, task=None, question=None, ordinal=False, kind=None, row_
 
         def convert(example, index, split):
             raw = _keeps_raw_text(task, split, index)
-            state = clean_text(example["sentence1"], raw)
+            state = clean_text(example["inputs" if visual else "sentence1"], raw)
             if "sentence2" in example:
                 state = f"text_A: {state}\ntext_B: {clean_text(example['sentence2'], raw)}"
             label = position[int(example["labels"])]
@@ -317,10 +321,12 @@ def recast_jev(dataset, task=None, question=None, ordinal=False, kind=None, row_
             .map(convert, with_indices=True, fn_kwargs={"split": split})
             for split, rows in dataset.items()
         })
-    keep = {"state", "instructions", "criteria", "label", "answer", "task", "kind"}
+    keep = {"state", "instructions", "criteria", "label", "answer", "task", "kind", "images", "metadata"}
     remove = [name for name in converted["train"].column_names if name not in keep]
     if remove:
         converted = converted.remove_columns(remove)
+    if visual:
+        converted = converted.cast_column("images", features["images"])
     return converted
 
 
@@ -347,6 +353,8 @@ def _typed_question(example, instructions):
 
 def render_typed_decision(example, question_id="decision", model=None):
     """Render one canonical Jev row as a System One request with its question kind."""
+    if example.get("images"):
+        raise NotImplementedError("Multimodal rows require an image-aware request adapter")
     request = OrderedDict()
     if model is not None:
         request["model"] = model
@@ -360,6 +368,8 @@ def render_typed_decision_group(examples, model=None):
     examples = list(examples)
     if not examples:
         raise ValueError("At least one decision is required")
+    if any(example.get("images") for example in examples):
+        raise NotImplementedError("Multimodal rows require an image-aware request adapter")
     state = examples[0].get("shared_state", examples[0]["state"])
     request = OrderedDict()
     if model is not None:

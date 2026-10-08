@@ -80,6 +80,7 @@ print(row["state"], row["question"], row["options"], row["target"])
 
 - `default`: a steered mix of about 1M train rows. Sources are first gated on label correctness, then weighted by how interesting they are and how close they sit to the zone of proximal development (judged by decision models). Two-option tasks get fewer rows, and procedural generators get 12%. No row is repeated. Validation and test are the full eval splits, restricted to the mixed sources. Buckets and shares are in [`jev_mixes.py`](https://github.com/sileod/tasksource/blob/main/src/tasksource/metadata/jev_mixes.py) and per-source scores in `jev_source_scores.csv`.
 - `full`: every row that passed the build, with per-source caps (about 2.5M train rows).
+- `vision`: a multimodal pilot covering NLVR2, SNLI-VE, A-OKVQA, ScienceQA-IMG, AI2D, and FigureQA. It uses the same decision fields plus ordered `images` and a JSON-string `metadata` column. Load it with `load_dataset("tasksource/tasksource-jev-typed-decisions", "vision")`. Images remain encoded in the dataset and decode on access; the model input adapter must consume them alongside `state`. Native source splits are preserved, and evaluation rows sharing a training image are excluded. See [vision/sources.yaml](vision/sources.yaml) for pinned sources and license evidence.
 
 ## Format
 
