@@ -295,6 +295,11 @@ class RecastJevTest(unittest.TestCase):
         self.assertEqual(source_family("clevr/count"), "clevr")
         self.assertEqual(source_family("vision/mind2web/grid7/refine"), "vision/mind2web")
         self.assertEqual(len(cap_vision_families(dataset, None)), len(dataset))
+        shuffled = dataset.shuffle(seed=7)
+        sampled = cap_vision_families(shuffled, 20)
+        retained = set(sampled["id"])
+        self.assertEqual(sampled["id"], [identifier for identifier in shuffled["id"]
+                                         if identifier in retained])
 
     def test_completed_tasks_require_their_parquet_shards(self):
         import json

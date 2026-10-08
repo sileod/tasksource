@@ -520,13 +520,15 @@ def cap_vision_families(dataset, max_rows):
     """Give each visual source family one shared budget across its task views."""
     if max_rows is None:
         return dataset
+    columns = ["source", "id"] + (["options"] if "options" in dataset.column_names else [])
+    metadata = dataset.select_columns(columns).add_column("_export_index", list(range(len(dataset))))
     families = {}
-    for index, source in enumerate(dataset["source"]):
+    for index, source in enumerate(metadata["source"]):
         families.setdefault(source_family(source), []).append(index)
-    return concatenate_datasets([
-        diverse_cap(dataset.select(indices), max_rows)
-        for indices in families.values()
-    ]) if families else dataset
+    selected = []
+    for indices in families.values():
+        selected.extend(diverse_cap(metadata.select(indices), max_rows)["_export_index"])
+    return dataset.select(sorted(selected))  # retain the shuffled input order across families
 
 
 def _ranked_family_groups(source_buckets, identifiers):
