@@ -40,7 +40,7 @@ def write(path, multilingual=False, vision=False):
     lines = [
         f"{len(tasks)} {kind} tasks. Load one with `load_task(id{flag})`; "
         f"the annotations are in [{name}.py]({module})"
-        + ("." if vision else ", and tasks kept out on purpose are in [parked.py](src/tasksource/parked.py)."),
+        + ", and tasks kept out on purpose are in [parked.py](src/tasksource/parked.py).",
         "",
         "| # | id | type | dataset | question |",
         "|--:|---|---|---|:-:|",

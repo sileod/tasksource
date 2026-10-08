@@ -11,6 +11,9 @@ by scripts/upload_repackaged.py) or a task switches to a mirror.
 """
 
 ORIGINALS = {
+    "tasksource/ai2d": ["HuggingFaceM4/the_cauldron"],
+    "tasksource/iconqa-text": ["HuggingFaceM4/the_cauldron"],
+    "tasksource/multimodal-mind2web": ["osunlp/Multimodal-Mind2Web"],
     "tasksource/view2space": ["Pokerme/view2space-train"],
     "pingzhili/snli-ve": ["HuggingFaceM4/SNLI-VE"],
     # third-party mirrors

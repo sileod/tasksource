@@ -3,6 +3,9 @@
 Repo -> the card's ``license`` list, ``unknown`` dropped; empty when the card has none."""
 
 CARD_LICENSES = {
+ "tasksource/ai2d": ["cc-by-sa-4.0"],
+ "tasksource/iconqa-text": ["cc-by-nc-sa-4.0"],
+ "tasksource/multimodal-mind2web": ["openrail"],
  "tasksource/view2space": ["cc-by-4.0"],
  "pingzhili/nlvr2": [],
  "pingzhili/snli-ve": [],

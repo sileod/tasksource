@@ -190,7 +190,7 @@ visual source when rebuilding it for publication.
 The existing visual templates also cover `m3cot`, `exams-v`, `visualsphinx`,
 `muslr/tfu`, `muslr/mc`, and `iconqa/text`. M3CoT, EXAMS-V and VisualSphinx
 load their pinned Parquet releases directly. MuSLR uses its native Hugging Face
-image-folder dataset. IconQA reuses the existing Cauldron `iconqa` upload and keeps
+image-folder dataset. IconQA uses a prepared `tasksource/iconqa-text` mirror and keeps
 only explicit text-choice QAs; image-choice and open-answer QAs are excluded.
 MuSLR truth questions have an explicit True/False/Unknown ontology, while its
 MC questions retain their source options. Rationales and explanations remain in
@@ -220,3 +220,23 @@ prepared mirrors and a local cache for repeated runs. Native source smoke checks
 above deliberately inspect small source slices and are schema checks, not uniform
 population samples. Text streaming and instruction option shuffling keep their
 existing behavior; padding removal applies only to visual instruction recasts.
+
+## Prepared source mirrors
+
+Source-specific builders live in [scripts/repackage_dataset/](../../scripts/repackage_dataset/).
+Run `python -m scripts.repackage_dataset ai2d iconqa_text mind2web` to reproduce
+and publish the mirrors; `--dry-run` builds locally. The existing
+`scripts/upload_repackaged.py` command remains available.
+
+AI2D and IconQA parse their Cauldron prompts into canonical grouped QAs once,
+retaining original image bytes and option order. Mind2Web prepares one eligible
+action pool with source IDs, history, geometry and deterministic candidate options.
+Its six annotations share the prepared mirror instead of rerunning candidate
+validation and screenshot-header inspection on every load. Native evaluation
+splits are preserved. Conversion hashes, source revisions, license evidence and
+exclusion manifests accompany the mirrors.
+
+SNLI-VE is parked as unsound and removed from the published vision pilot. Its
+caption-derived labels do not reliably supervise image entailment; reannotation
+of neutral evaluation pairs does not repair this source's training labels. See
+[E-ViL](https://openaccess.thecvf.com/content/ICCV2021/papers/Kayser_E-ViL_A_Dataset_and_Benchmark_for_Natural_Language_Explanations_in_ICCV_2021_paper.pdf).

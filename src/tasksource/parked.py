@@ -14,7 +14,7 @@ To revive one, move it back to tasks.py and drop its PARKED entry.
 from .access import parse_var_name
 from .metadata import bigbench_discriminative_english, blimp_hard as blimp_hard_configs
 from .metadata.configs import MMLU, UNIVERSAL_DEPENDENCIES
-from .preprocess import Preprocessing, cat, constant, get, regen, name, Classification, TokenClassification, MultipleChoice
+from .preprocess import Preprocessing, VisualClassification, cat, constant, get, regen, name, Classification, TokenClassification, MultipleChoice
 
 # MMLU is an evaluation benchmark; no train split
 mmlu = MultipleChoice('question',labels='answer',choices_list='choices',splits=['validation','dev','test'],
@@ -261,6 +261,17 @@ prompt_injection_geekyrakshit = Classification(
     question="Is this prompt a prompt-injection attempt?",
     label_values={0: "benign", 1: "injection"})
 
+# Caption-derived labels are not reliable image-grounded training supervision.
+# Neutral evaluation pairs were reannotated, but the original train is uncorrected.
+# https://openaccess.thecvf.com/content/ICCV2021/papers/Kayser_E-ViL_A_Dataset_and_Benchmark_for_Natural_Language_Explanations_in_ICCV_2021_paper.pdf
+snli_ve = VisualClassification(
+    images=lambda x: [x['image']], inputs='sentence', labels='gold_label',
+    dataset_name='pingzhili/snli-ve', task_id='snli-ve', metadata=lambda x: {'image_id': x['Flickr30K_ID']},
+    question='Does the image entail, contradict, or leave the statement neutral?',
+    label_values={'entailment': 'entailment', 'neutral': 'neutral', 'contradiction': 'contradiction'},
+    load_dataset_kwargs={'revision': '176e5ba43a2219043ebdaa057d9aaf42d2f34dc8'},
+)
+
 KINDS = {
     "evaluation": "evaluation benchmark: useful for evaluation, kept out of training",
     "duplicate": "duplicates or is covered by a listed task",
@@ -271,6 +282,7 @@ KINDS = {
 }
 
 PARKED = {
+    "snli_ve": ("unsound", "caption-derived SNLI labels are not image-grounded; neutral evaluation pairs were reannotated, but this training source is uncorrected; hypothesis-only artifacts remain"),
     'xglue__ner': ('duplicate', 'repackages CoNLL-2002/2003 NER, which conll2002 (es, nl) and conll2003 (en) cover; the German part is not openly licensed; script-only'),
     'xglue__pos': ('duplicate', 'repackages Universal Dependencies POS, which udep__pos covers; script-only'),
     'udep__deprel_multilingual': ('unsound', 'all-language variant of udep__deprel; relation labels depend on the head word, which the task does not show'),

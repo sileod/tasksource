@@ -6,7 +6,9 @@ from datasets import Dataset, DatasetDict, Features, Image, Sequence, Value, Cla
 from tasksource import list_tasks, load_task, task_provenance, hub_datasets
 from tasksource.preprocess import VisualClassification, VisualMultipleChoice, Classification
 from tasksource.recast import recast_instruct
-from tasksource.vision_tasks import figureqa_rows, ai2d_rows
+from tasksource.vision_tasks import figureqa_rows, grouped_mc_rows
+from scripts.repackage_dataset.vision import prepare_cauldron, prepare_mind2web
+from tasksource.preprocess import disable_image_decoding
 
 
 def png(color):
@@ -34,7 +36,7 @@ def template(mc=False, two=False):
 
 def test_catalog():
     vision = list_tasks(vision=True)
-    assert list(vision.id) == ['nlvr2', 'snli-ve', 'aokvqa', 'scienceqa-img', 'ai2d', 'figureqa',
+    assert list(vision.id) == ['nlvr2', 'aokvqa', 'scienceqa-img', 'ai2d', 'figureqa',
                              'mind2web/action', 'mind2web/element', 'mind2web/x10',
                              'mind2web/y10', 'mind2web/grid5', 'mind2web/grid7',
                              'm3cot', 'exams-v', 'visualsphinx', 'muslr/tfu', 'muslr/mc', 'iconqa/text', 'view2space/mcq']
@@ -84,7 +86,8 @@ def test_grouped_sources():
     assert ds['train']['inputs'] == ['q1', 'q2']
     ai = Dataset.from_list([{'images': [png('blue')], 'texts': [{'user': 'Question: q\nChoices:\nA. x\nB. y\nAnswer with the letter.', 'assistant': 'Answer: B', 'source': 'AI2D'}]}],
         features=Features({'images': Sequence(Image(decode=False)), 'texts': [{'user': Value('string'), 'assistant': Value('string'), 'source': Value('string')}]}))
-    ds = VisualMultipleChoice(choices_list='choices_list', pre_process=ai2d_rows)(DatasetDict(train=ai))
+    ds = VisualMultipleChoice(choices_list='choices_list', pre_process=grouped_mc_rows)(
+        prepare_cauldron(disable_image_decoding(DatasetDict(train=ai)), 'ai2d'))
     assert ds['train'][0]['labels'] == 1 and ds['train'][0]['choice1'] == 'y'
 
 
@@ -234,10 +237,15 @@ def mind2web_source():
     bad_parent = {**row, 'pos_candidates': [option('gold', is_original_target=False, is_top_level_target=True)]}
     bad_box = {**row, 'pos_candidates': [option('gold', '99,20,10,10', is_original_target=True)]}
     ambiguous = {**row, 'pos_candidates': [option('gold', is_original_target=True), option('other', is_original_target=True)]}
-    splits = {'train': Dataset.from_list([row, bad_parent, bad_box, ambiguous], features=features)}
+    splits = {'train': Dataset.from_list([row, bad_parent, bad_box, ambiguous, {**row, 'screenshot': None},
+        {**row, 'screenshot': {'bytes': b'invalid image', 'path': None}}], features=features)}
     for split in ('test_task', 'test_website', 'test_domain'):
         splits[split] = Dataset.from_list([{**row, 'annotation_id': split + '-episode'}], features=features)
     return DatasetDict(splits)
+
+
+def mind2web_mirror():
+    return prepare_mind2web(disable_image_decoding(mind2web_source()))
 
 
 def test_grid_coordinates():
@@ -264,7 +272,7 @@ def test_mind2web_annotations_and_grouping(monkeypatch):
     import tasksource.access as access
     from tasksource import render_typed_decision_group
     from tasksource.preprocess import disable_image_decoding
-    monkeypatch.setattr(access, 'load_dataset', lambda *a, **kw: mind2web_source())
+    monkeypatch.setattr(access, 'load_dataset', lambda *a, **kw: mind2web_mirror())
     views = {}
     for name in ('action', 'element', 'x10', 'y10', 'grid5', 'grid7'):
         task = 'mind2web/' + name
@@ -321,7 +329,7 @@ def test_gui_builder_keeps_action_groups(tmp_path, monkeypatch):
     from types import SimpleNamespace
     import scripts.build_jev_dataset as builder
     import tasksource.access as access
-    monkeypatch.setattr(access, 'load_dataset', lambda *a, **kw: mind2web_source())
+    monkeypatch.setattr(access, 'load_dataset', lambda *a, **kw: mind2web_mirror())
     monkeypatch.setattr(builder, 'source_licenses', lambda sources: {
         source: {'license': 'openrail', 'license_use': 'unspecified'} for source in sources})
     args = SimpleNamespace(output=tmp_path, tasks=['mind2web/x10', 'mind2web/y10'], limit=None,
@@ -350,7 +358,7 @@ def test_mind2web_streaming_uses_shared_loader(monkeypatch):
     from datasets import IterableDatasetDict
     import tasksource.access as access
     from tasksource.preprocess import disable_image_decoding
-    source = mind2web_source()
+    source = mind2web_mirror()
     monkeypatch.setattr(access, 'load_dataset', lambda *a, **kw: IterableDatasetDict({
         split: rows.to_iterable_dataset() for split, rows in source.items()}))
     ds = load_task('mind2web/x10', vision=True, recast='jev', streaming=True,
@@ -359,8 +367,8 @@ def test_mind2web_streaming_uses_shared_loader(monkeypatch):
     assert all(len(rows) == 1 for rows in ds.values())
     assert ds['train'][0]['kind'] == 'score'
     encoded = disable_image_decoding(ds)
-    original = source['train'].cast_column('screenshot', Image(decode=False))[0]['screenshot']
-    assert encoded['train'][0]['images'] == [original]
+    original = source['train'].cast_column('images', Sequence(Image(decode=False)))[0]['images']
+    assert encoded['train'][0]['images'] == original
 
 
 @pytest.mark.parametrize('task_id', ['m3cot', 'exams-v', 'visualsphinx', 'muslr/tfu', 'muslr/mc', 'iconqa/text'])
@@ -403,6 +411,8 @@ def test_reasoning_catalog_mappings(task_id, monkeypatch):
             features=Features({'images': Sequence(Image()), 'texts': [{'user': Value('string'), 'assistant': Value('string'), 'source': Value('string')}]}))
         gold = 'gold'
     source_ds = DatasetDict(train=source_rows)
+    if task_id == 'iconqa/text':
+        source_ds = prepare_cauldron(disable_image_decoding(source_ds), 'iconqa')
     monkeypatch.setattr(access, 'load_dataset', lambda *a, **kw: source_ds)
     ds = load_task(task_id, vision=True, recast='jev')
     assert set(ds) == {'train'} and len(ds['train']) == 1
@@ -504,3 +514,30 @@ def test_text_shuffling_retains_its_original_option_slots():
 def test_exam_option_positions(answer, position):
     from tasksource.vision_tasks import exam_option_position
     assert exam_option_position(answer) == position
+
+
+def test_snli_ve_is_parked_for_label_quality():
+    from tasksource import parked
+    assert parked.PARKED['snli_ve'][0] == 'unsound'
+    assert 'snli-ve' not in set(list_tasks(vision=True).id)
+    assert 'training source is uncorrected' in parked.REASONS['snli_ve']
+
+
+def test_mind2web_repackaging_audit(tmp_path, monkeypatch):
+    import json
+    import scripts.repackage_dataset.vision as conversion
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(conversion, '_parquet_source', lambda *a, **kw: disable_image_decoding(mind2web_source()))
+    ds = conversion.mind2web()
+    assert set(ds) == {'train', 'test_task', 'test_website', 'test_domain'}
+    assert all(len(rows) == 1 for rows in ds.values())
+    assert ds['train'][0]['labels'] < len(ds['train'][0]['choices_list'])
+    directory = tmp_path / 'build/multimodal-mind2web-release'
+    report = json.loads((directory / 'provenance.json').read_text())
+    assert report['excluded_rows'] == 5
+    assert report['splits']['train']['questions'] == 1
+    assert report['conversion_sha256'] and report['revision']
+    assert len((directory / 'excluded-questions.jsonl').read_text().splitlines()) == 5
+    # Rebuilding must run eligibility auditing even when dataset caches exist.
+    conversion.mind2web()
+    assert json.loads((directory / 'provenance.json').read_text())['excluded_rows'] == 5
