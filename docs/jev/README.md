@@ -184,3 +184,39 @@ PYTHONPATH=.:src python scripts/build_jev_dataset.py --vision \
 
 The vision publisher replaces the entire `vision` config. Include every intended
 visual source when rebuilding it for publication.
+
+## Additional visual reasoning sources
+
+The existing visual templates also cover `m3cot`, `exams-v`, `visualsphinx`,
+`muslr/tfu`, `muslr/mc`, and `iconqa/text`. M3CoT, EXAMS-V and VisualSphinx
+load their pinned Parquet releases directly. MuSLR uses its native Hugging Face
+image-folder dataset. IconQA reuses the existing Cauldron `iconqa` upload and keeps
+only explicit text-choice QAs; image-choice and open-answer QAs are excluded.
+MuSLR truth questions have an explicit True/False/Unknown ontology, while its
+MC questions retain their source options. Rationales and explanations remain in
+JSON metadata and are excluded from model inputs. M3CoT rows missing images are
+filtered before sampling. Path-only images are embedded after sampling using
+Datasets' file reader, preserving their encoded bytes without decoding pixels.
+
+`view2space/mcq` uses the pinned [tasksource/view2space](https://huggingface.co/datasets/tasksource/view2space) mirror.
+VIEW2SPACE's JSON and image archive require preparation. Reproduce its MCQ mirror
+with `python scripts/upload_repackaged.py view2space` (`--dry-run` builds locally).
+The script pins the original release, reads the original PNG bytes, and groups
+QAs by their ordered image set. Its data-only schema is `images`,
+`image_group_id`, and `qa`, with canonical `inputs`, `choices_list`, `labels`,
+and JSON `metadata` inside each QA. The native ImageFolder ZIP stores each
+original PNG once and appends a canonical `metadata.jsonl`; `load_dataset` handles its images without a custom script.
+The conversion retains 425,494 training MCQs, input box annotations and source
+option order, with reasoning in metadata. It records 506 excluded questions whose
+gold answer text appears more than once; repeated distractors are deduplicated
+with gold indices remapped. Counting and detection questions are excluded.
+No evaluation splits are synthesized. The mirror card and `provenance.json` record the original
+release, conversion code hash, included counts and source license.
+
+Capped visual streaming loads use uniform reservoir sampling over the **complete
+eligible split**, with deterministic seeds and bounded memory. This removes the
+bias toward the first shuffle buffer. It still reads the entire source; use the
+prepared mirrors and a local cache for repeated runs. Native source smoke checks
+above deliberately inspect small source slices and are schema checks, not uniform
+population samples. Text streaming and instruction option shuffling keep their
+existing behavior; padding removal applies only to visual instruction recasts.

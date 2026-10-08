@@ -45,7 +45,16 @@ def negative_sample_options(y, labels,N=4, rng=random):
     chosen = {y, *rng.sample([x for x in labels if x!=y], N-1)}
     return [x for x in labels if x in chosen]
 
-def shuffle_choices(x, rng=random):
+def shuffle_choices(x, rng=random, visual=False):
+    if not visual:
+        # Preserve the established text recast, including its option slots.
+        choices = sorted(k for k in x if 'choice' in k)
+        texts = [x[c] for c in choices]
+        correct = texts[x['labels']]
+        rng.shuffle(texts)
+        x.update(zip(choices, texts))
+        x['labels'] = texts.index(correct)
+        return x
     choices = sorted((k for k in x if k.startswith('choice')), key=lambda k: int(k[6:]))
     texts = [x[c] for c in choices]
     gold = x['labels']
@@ -101,7 +110,7 @@ def recast_instruct(dataset, question=None, seed=0, options=False):
         task_type = "TokenClassification"
 
     def recast_MultipleChoice(x, rng):
-        x=shuffle_choices(x, rng)
+        x=shuffle_choices(x, rng, visual=visual)
         if question:
             x['inputs'] = f"{x['inputs']}\n{question}" if x['inputs'] else question
         choices = sorted((k for k in x if k.startswith('choice')), key=lambda k: int(k[6:]))

@@ -11,6 +11,7 @@ by scripts/upload_repackaged.py) or a task switches to a mirror.
 """
 
 ORIGINALS = {
+    "tasksource/view2space": ["Pokerme/view2space-train"],
     "pingzhili/snli-ve": ["HuggingFaceM4/SNLI-VE"],
     # third-party mirrors
     "bogdanminko/wildguardmix-cleaned": ["allenai/wildguardmix"],

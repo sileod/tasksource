@@ -3,6 +3,7 @@
 Repo -> the card's ``license`` list, ``unknown`` dropped; empty when the card has none."""
 
 CARD_LICENSES = {
+ "tasksource/view2space": ["cc-by-4.0"],
  "pingzhili/nlvr2": [],
  "pingzhili/snli-ve": [],
  "HuggingFaceM4/SNLI-VE": ["bsd-3-clause"],
@@ -11,6 +12,10 @@ CARD_LICENSES = {
  "HuggingFaceM4/the_cauldron": [],
  "vikhyatk/figureqa": [],
  "osunlp/Multimodal-Mind2Web": ["openrail"],
+ "LightChen2333/M3CoT": ["mit"],
+ "MBZUAI/EXAMS-V": [],
+ "VisualSphinx/VisualSphinx-V1-RL-20K": ["cc-by-nc-4.0"],
+ "Aiden0526/MuSLR": ["mit"],
  "12ml/e-CARE": [],
  "AmazonScience/massive": [
   "cc-by-4.0"

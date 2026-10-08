@@ -1,4 +1,4 @@
-from .preprocess import Preprocessing, MultipleChoiceFields, SoftLabeling, add_question, disable_image_decoding
+from .preprocess import Preprocessing, MultipleChoiceFields, SoftLabeling, add_question, disable_image_decoding, reservoir_sample
 from .jev.options import JEV_MAX_MC_OPTIONS
 import re
 from urllib.parse import unquote
@@ -261,6 +261,9 @@ def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preproc
          vision=False, **load_dataset_kwargs):
     """Load a standardized task. ``vision=True`` selects the visual catalog.
 
+    Capped visual streaming loads sample uniformly across the complete eligible
+    split; they bound memory but still scan all rows.
+
     ``data_file_pins`` ({repo: commit}) pins the task's ``hf://`` data files, as
     ``revision`` pins its Hub dataset.
 
@@ -305,10 +308,8 @@ def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preproc
     )
     pre_processed = False
     if isinstance(dataset, IterableDatasetDict):
-        # Keep bounded streaming sources (e.g. multilingual sentiment pools)
-        # bounded before materializing them. Apply source filtering first, then
-        # deterministically shuffle a finite buffer and take the same limits
-        # used by ordinary Tasksource sampling.
+        # Visual samples cover the entire eligible source with bounded memory.
+        # Text streaming retains its existing bounded-buffer behavior.
         if vision:
             dataset = disable_image_decoding(dataset)
         dataset = preprocessing.pre_process(dataset)
@@ -316,9 +317,14 @@ def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preproc
         materialized = {}
         for split, rows in dataset.items():
             limit = max_rows if split == "train" else max_rows_eval
-            if limit:
-                rows = rows.shuffle(seed=seed, buffer_size=max(100 if vision else 10_000, limit)).take(limit)
-            materialized[split] = Dataset.from_list(list(rows), **({"features": rows.features} if vision else {}))
+            if vision and limit:
+                selected = reservoir_sample(rows, limit, seed)
+            elif limit:
+                rows = rows.shuffle(seed=seed, buffer_size=max(10_000, limit)).take(limit)
+                selected = list(rows)
+            else:
+                selected = list(rows)
+            materialized[split] = Dataset.from_list(selected, **({"features": rows.features} if vision else {}))
         dataset = DatasetDict(materialized)
     options = {}
     if recast == "jev" and not vision and isinstance(preprocessing, MultipleChoiceFields):

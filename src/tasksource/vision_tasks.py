@@ -24,18 +24,20 @@ def figureqa_rows(dataset):
                           for split, rows in dataset.items()})
 
 
-def ai2d_rows(dataset):
-    """Expand the Cauldron AI2D training subset's fixed Question/Choices format."""
+def ai2d_rows(dataset, mc_only=False):
+    """Expand Cauldron's fixed Question/Choices format; optionally keep MC QAs only."""
     def flatten(batch):
         result = {'images': [], 'inputs': [], 'choices_list': [], 'labels': []}
         for images, texts in zip(batch['images'], batch['texts']):
             for qa in texts:
+                if mc_only and '\nChoices:\n' not in qa['user']:
+                    continue
                 question, options = qa['user'].split('\nChoices:\n')
                 options = options.removesuffix('\nAnswer with the letter.')
                 matches = re.findall(r'^([A-Z])\. (.*)$', options, re.MULTILINE)
                 answer = qa['assistant'].removeprefix('Answer: ').strip()
                 if not matches or [letter for letter, _ in matches] != list('ABCDEFGHIJKLMNOPQRSTUVWXYZ'[:len(matches)]) or answer not in [letter for letter, _ in matches]:
-                    raise ValueError('Unexpected pinned AI2D option format')
+                    raise ValueError('Unexpected pinned Cauldron option format')
                 result['images'].append(images)
                 result['inputs'].append(question.removeprefix('Question: '))
                 result['choices_list'].append([text for _, text in matches])
@@ -47,6 +49,21 @@ def ai2d_rows(dataset):
                                         remove_columns=list(rows.features),
                                         **({'features': features} if not isinstance(rows, IterableDataset) else {}))
                           for split, rows in dataset.items()})
+
+
+def grouped_mc_rows(dataset):
+    """Flatten canonical QAs that share ordered encoded images in a visual mirror."""
+    def flatten(batch):
+        rows = [(images, group, qa) for images, group, qas in zip(
+            batch['images'], batch['image_group_id'], batch['qa']) for qa in qas]
+        return {'images': [images for images, group, qa in rows],
+                **{key: [qa[key] for images, group, qa in rows] for key in ('inputs', 'choices_list', 'labels')},
+                'metadata': [json.dumps({**json.loads(qa['metadata']), 'image_group_id': group},
+                    ensure_ascii=False, sort_keys=True) for images, group, qa in rows]}
+    features = Features({'images': Sequence(Image(decode=False)), 'inputs': Value('string'),
+        'choices_list': Sequence(Value('string')), 'labels': Value('int64'), 'metadata': Value('string')})
+    return type(dataset)({split: rows.map(flatten, batched=True, batch_size=16,
+        remove_columns=list(rows.features), features=features) for split, rows in dataset.items()})
 
 
 nlvr2 = VisualClassification(
@@ -254,4 +271,80 @@ mind2web_grid7 = VisualClassification(
     label_values={i: f'r{i // 7}c{i % 7}' for i in range(49)},
     question='Which cell contains the target center in a 7-row, 7-column grid over the full screenshot?',
     metadata=lambda x: {**json.loads(x['metadata']), 'question_id': 'grid7'},
+)
+
+
+m3cot = VisualMultipleChoice(
+    images=lambda x: [x['image']], inputs=lambda x: '\n'.join(filter(None, [x['context'], x['question']])),
+    choices_list='choices', labels=lambda x: ord(x['answer']) - ord('A'),
+    dataset_name='LightChen2333/M3CoT', task_id='m3cot',
+    pre_process=lambda ds: ds.filter(lambda x: x['image'] is not None),
+    metadata=lambda x: {'id': x['id'], 'image_id': x['image_id'], 'rationale': x['rationale'],
+                           'domain': x['domain'], 'topic': x['topic']},
+    load_dataset_kwargs={'revision': '48cf35001d595a6b0290c82c897a4b4563390821'},
+)
+
+def exam_option_position(answer):
+    """Native Latin/Cyrillic letters and one-based numbers denote option positions."""
+    answer = str(answer).strip().upper()
+    if answer in 'ABCDE' and len(answer) == 1:
+        return ord(answer) - ord('A')
+    if answer in 'АБВГД' and len(answer) == 1:
+        return 'АБВГД'.index(answer)
+    return int(answer) - 1 if answer in ('1', '2', '3', '4', '5') else None
+
+
+exams_v = VisualClassification(
+    images=lambda x: [x['image']], inputs=lambda x: 'Answer the exam question in the image. Choose the position of the correct option among those displayed.',
+    labels=lambda x: exam_option_position(x['answer_key']),
+    label_values={i: name + ' option' for i, name in enumerate(('first', 'second', 'third', 'fourth', 'fifth'))},
+    dataset_name='MBZUAI/EXAMS-V', task_id='exams-v',
+    pre_process=lambda ds: ds.filter(lambda x: x['image'] is not None and exam_option_position(x['answer_key']) is not None),
+    metadata=lambda x: {'sample_id': x['sample_id'], 'language': x['language'], 'subject': x['subject'], 'grade': x['grade'],
+                        'source_answer_key': x['answer_key']},
+    load_dataset_kwargs={'revision': '7594b37a10e87fcfbc4def0fa61809ad7114b7f2'},
+)
+
+visualsphinx = VisualMultipleChoice(
+    inputs=lambda x: x['problem'].replace('<image>', '').strip(),
+    choices_list=lambda x: list(json.loads(x['choice']).values()),
+    labels=lambda x: list(json.loads(x['choice'])).index(x['answer']),
+    dataset_name='VisualSphinx/VisualSphinx-V1-RL-20K', task_id='visualsphinx',
+    metadata=lambda x: {'id': x['id'], 'explanation': x['explanation'], 'readability': x['readability'],
+                           'reasonableness': x['reasonableness'], 'has_duplicate': x['has_duplicate']},
+    load_dataset_kwargs={'revision': '2d6dccaef5e72ac12569fd977dc37dc048870176'},
+)
+
+muslr_tfu = VisualClassification(
+    images=lambda x: [x['image']], inputs=lambda x: x['full_context'] + '\n\n' + x['question'], labels='answer',
+    label_values={answer: answer for answer in ('True', 'False', 'Unknown')},
+    dataset_name='Aiden0526/MuSLR', task_id='muslr/tfu',
+    pre_process=lambda ds: ds.filter(lambda x: x['choices'] is None),
+    metadata=lambda x: {'id': x['id'], 'domain': x['domain'], 'symbol': x['symbol'], 'depth': x['depth'], 'reasoning': x['reasoning']},
+    load_dataset_kwargs={'revision': '16dbb73e00bfc49011f645bcb97510f0ad7de962'},
+)
+
+muslr_mc = VisualMultipleChoice(
+    images=lambda x: [x['image']], inputs=lambda x: x['full_context'] + '\n\n' + x['question'],
+    choices_list=lambda x: [re.sub(r'^[A-Z]\.\s*', '', option) for option in json.loads(x['choices'])],
+    labels=lambda x: ord(x['answer']) - ord('A'),
+    dataset_name='Aiden0526/MuSLR', task_id='muslr/mc',
+    pre_process=lambda ds: ds.filter(lambda x: x['choices'] is not None),
+    metadata=lambda x: {'id': x['id'], 'domain': x['domain'], 'symbol': x['symbol'], 'depth': x['depth'], 'reasoning': x['reasoning']},
+    load_dataset_kwargs={'revision': '16dbb73e00bfc49011f645bcb97510f0ad7de962'},
+)
+
+iconqa_text = VisualMultipleChoice(
+    choices_list='choices_list', dataset_name='HuggingFaceM4/the_cauldron', config_name='iconqa', task_id='iconqa/text',
+    pre_process=lambda ds: ai2d_rows(ds, mc_only=True),
+    metadata=lambda x: {'source_dataset': 'IconQA', 'source_license': 'cc-by-nc-sa-4.0',
+                        'source_license_url': 'https://iconqa.github.io/'},
+    load_dataset_kwargs={'revision': '847a98a779b1652d65111daf20c972dfcd333605'},
+)
+
+
+view2space_mcq = VisualMultipleChoice(
+    choices_list='choices_list', metadata='metadata', pre_process=grouped_mc_rows,
+    dataset_name='tasksource/view2space', task_id='view2space/mcq',
+    load_dataset_kwargs={'revision': '061e4b2bd587adba48c75a5fbbbac9d6c781bf61'},
 )

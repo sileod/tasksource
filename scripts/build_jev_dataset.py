@@ -1191,6 +1191,7 @@ def build_vision(args):
         catalog = catalog.head(args.limit)
     catalog = catalog.assign(source_id='vision/' + catalog.id)
     manifest = build_manifest(args, catalog)
+    manifest['sampling'] = 'uniform reservoir over complete eligible source splits'
     (output / 'build-manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
     sources = list(catalog.source_id)
     licenses = source_licenses(sources)
@@ -1299,8 +1300,8 @@ as columns; missing or conflicting evidence is retained rather than replaced by 
 See [vision/sources.yaml](vision/sources.yaml), [vision/release-audit.json](vision/release-audit.json),
 and [vision/build-manifest.json](vision/build-manifest.json).
 
-The pilot is sampled with a deterministic streaming buffer, capped per source at the limits
-recorded in its manifest; it is not a uniform sample of each complete dataset.
+The pilot uses deterministic uniform reservoir sampling over each complete eligible source split,
+capped per source at the limits recorded in its manifest. This bounds memory and scans the full source.
 Only native labeled splits are used. Source action identities group related GUI decisions;
 other decisions sharing the same ordered image set and text state share `group_id`.
 `metadata.image_group_id` links an image set across different questions.

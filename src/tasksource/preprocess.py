@@ -13,6 +13,7 @@ import copy
 import datasets
 import time
 import json
+import random
 
 MAX_MC_OPTIONS = 4
 
@@ -54,6 +55,22 @@ def sample_dataset(dataset,n=10000, n_eval=1000,seed=0):
         if n_k and len(dataset[k])>n_k:
             dataset[k]=dataset[k].train_test_split(train_size=n_k,seed=seed)['train']
     return dataset
+
+
+def reservoir_sample(rows, limit, seed=0):
+    """Uniform sample of an entire iterable, with bounded memory and stable row order."""
+    if limit <= 0:
+        raise ValueError('Sample size must be positive')
+    rng = random.Random(seed)
+    sample = []
+    for index, row in enumerate(rows):
+        if index < limit:
+            sample.append((index, row))
+        else:
+            slot = rng.randrange(index + 1)
+            if slot < limit:
+                sample[slot] = (index, row)
+    return [row for index, row in sorted(sample)]
 
 class Preprocessing(DotWiz):
     default_splits = ('train','validation','test')
@@ -128,6 +145,16 @@ class Preprocessing(DotWiz):
             dataset = dataset.map(encode_metadata)
         if visual:
             dataset = dataset.cast_column("images", datasets.Sequence(datasets.Image(decode=False)))
+            def embed_images(row):
+                from datasets.utils.file_utils import xopen
+                images = []
+                for image in row['images']:
+                    if image.get('bytes') is None:
+                        with xopen(image['path'], 'rb') as handle:
+                            image = {'bytes': handle.read(), 'path': None}
+                    images.append(image)
+                return {'images': images}
+            dataset = dataset.map(embed_images)
         if not (visual and self.label_values):
             dataset = fix_labels(dataset)
         if self.label_values:

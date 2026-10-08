@@ -36,7 +36,8 @@ def test_catalog():
     vision = list_tasks(vision=True)
     assert list(vision.id) == ['nlvr2', 'snli-ve', 'aokvqa', 'scienceqa-img', 'ai2d', 'figureqa',
                              'mind2web/action', 'mind2web/element', 'mind2web/x10',
-                             'mind2web/y10', 'mind2web/grid5', 'mind2web/grid7']
+                             'mind2web/y10', 'mind2web/grid5', 'mind2web/grid7',
+                             'm3cot', 'exams-v', 'visualsphinx', 'muslr/tfu', 'muslr/mc', 'iconqa/text', 'view2space/mcq']
     assert not set(vision.id) & set(list_tasks().id)
     assert all(task_provenance(i, vision=True)['revision'] for i in vision.id)
     assert 'pingzhili/nlvr2' in hub_datasets(['nlvr2'], vision=True)
@@ -149,7 +150,7 @@ def test_real_single_class_test_split_is_kept():
 def test_duplicate_choices_keep_gold_index():
     from tasksource.recast import shuffle_choices
     import random
-    result = shuffle_choices({'choice0': 'same', 'choice1': 'same', 'choice2': None, 'labels': 1}, random.Random(1))
+    result = shuffle_choices({'choice0': 'same', 'choice1': 'same', 'choice2': None, 'labels': 1}, random.Random(1), visual=True)
     assert result['labels'] == 0
     assert set(result) == {'choice0', 'choice1', 'labels'}
 
@@ -360,3 +361,146 @@ def test_mind2web_streaming_uses_shared_loader(monkeypatch):
     encoded = disable_image_decoding(ds)
     original = source['train'].cast_column('screenshot', Image(decode=False))[0]['screenshot']
     assert encoded['train'][0]['images'] == [original]
+
+
+@pytest.mark.parametrize('task_id', ['m3cot', 'exams-v', 'visualsphinx', 'muslr/tfu', 'muslr/mc', 'iconqa/text'])
+def test_reasoning_catalog_mappings(task_id, monkeypatch):
+    import json
+    import tasksource.access as access
+    from tasksource.preprocess import disable_image_decoding
+    if task_id == 'm3cot':
+        rows = [{'image': png('red'), 'context': 'Context', 'question': 'Question',
+                 'choices': ['a', 'b', 'c', 'd', 'gold'], 'answer': 'E', 'id': 'q', 'image_id': 'i',
+                 'rationale': 'SECRET_REASON', 'domain': 'science', 'topic': 'math'}]
+        features = Features({'image': Image(), 'choices': Sequence(Value('string')),
+                             **{k: Value('string') for k, v in rows[0].items() if isinstance(v, str)}})
+        source_rows = Dataset.from_list(rows + [{**rows[0], 'image': None}], features=features)
+        gold = 'gold'
+    elif task_id == 'exams-v':
+        source_rows = Dataset.from_list([{'image': png('red'), 'answer_key': 'D', 'sample_id': 'q',
+            'language': 'Arabic', 'subject': 'Chemistry', 'grade': '10'}], features=Features({
+                'image': Image(), **{k: Value('string') for k in ('answer_key', 'sample_id', 'language', 'subject', 'grade')}}))
+        gold = 'fourth option'
+    elif task_id == 'visualsphinx':
+        source_rows = Dataset.from_list([{'images': [png('red'), png('blue')], 'problem': '<image>Question',
+            'choice': json.dumps({k: k for k in 'ABCDEFGHIJ'}), 'answer': 'J', 'id': 'q',
+            'explanation': 'SECRET_REASON', 'readability': 4, 'reasonableness': 4, 'has_duplicate': False}],
+            features=Features({'images': Sequence(Image()), **{k: Value('string') for k in ('problem', 'choice', 'answer', 'id', 'explanation')},
+                'readability': Value('int64'), 'reasonableness': Value('int64'), 'has_duplicate': Value('bool')}))
+        gold = 'J'
+    elif task_id.startswith('muslr/'):
+        common = {'image': png('red'), 'full_context': 'Context', 'question': 'Question', 'id': 'q',
+                  'domain': 'science', 'symbol': 'pl', 'depth': 2, 'reasoning': 'SECRET_REASON'}
+        source_rows = Dataset.from_list([{**common, 'choices': None, 'answer': 'Unknown'},
+            {**common, 'choices': json.dumps(['A. wrong', 'B. gold']), 'answer': 'B'}],
+            features=Features({'image': Image(), 'depth': Value('int64'),
+                **{k: Value('string') for k in ('full_context', 'question', 'id', 'domain', 'symbol', 'reasoning', 'choices', 'answer')}}))
+        gold = 'Unknown' if task_id.endswith('tfu') else 'gold'
+    else:
+        source_rows = Dataset.from_list([{'images': [png('red')], 'texts': [
+            {'user': 'Question: Q\nChoices:\nA. wrong\nB. gold\nAnswer with the letter.', 'assistant': 'Answer: B', 'source': 'IconQA'},
+            {'user': 'Question: Open answer?', 'assistant': 'SECRET_REASON', 'source': 'IconQA'}]}],
+            features=Features({'images': Sequence(Image()), 'texts': [{'user': Value('string'), 'assistant': Value('string'), 'source': Value('string')}]}))
+        gold = 'gold'
+    source_ds = DatasetDict(train=source_rows)
+    monkeypatch.setattr(access, 'load_dataset', lambda *a, **kw: source_ds)
+    ds = load_task(task_id, vision=True, recast='jev')
+    assert set(ds) == {'train'} and len(ds['train']) == 1
+    row = disable_image_decoding(ds)['train'][0]
+    assert row['answer'] == gold == row['criteria'][row['label']]
+    assert 'SECRET_REASON' not in row['state']
+    assert row['images'][0] == png('red')
+    if task_id == 'visualsphinx':
+        assert len(row['criteria']) == 10
+        assert row['images'] == [png('red'), png('blue')]
+    if task_id == 'm3cot':
+        assert len(row['criteria']) == 5
+        assert json.loads(row['metadata'])['rationale'] == 'SECRET_REASON'
+
+
+def test_sampled_image_paths_embed_original_bytes(monkeypatch):
+    import datasets.utils.file_utils as file_utils
+    from tasksource.preprocess import disable_image_decoding
+    raw = Dataset.from_list([{'images': [{'path': f'https://example.com/{i}.png', 'bytes': None}], 'inputs': str(i), 'labels': 'yes'}
+        for i in range(5)], features=Features({'images': Sequence(Image()), 'inputs': Value('string'), 'labels': Value('string')}))
+    calls = []
+    def reader(path, mode):
+        calls.append(path)
+        return io.BytesIO(png('red')['bytes'])
+    monkeypatch.setattr(file_utils, 'xopen', reader)
+    ds = VisualClassification()(DatasetDict(train=raw), max_rows=2)
+    assert len(calls) == 2
+    assert all(row['images'] == [png('red')] for row in disable_image_decoding(ds)['train'])
+
+
+def test_view2space_repackaging(tmp_path, monkeypatch):
+    import json
+    import zipfile
+    import huggingface_hub
+    from scripts.upload_repackaged import view2space
+    monkeypatch.chdir(tmp_path)
+    rows = [{'q_idx': str(i), 'q_type': 'mcq', 'question': 'Question', 'question_prompt': 'Prompt',
+        'options': {'A': 'wrong', 'B': 'gold'}, 'answer': 'B', 'image_paths': ['images/red.png', 'images/blue.png'],
+        'supporting': {'chain_of_thought': 'SECRET_REASON', 'draw_boxes': None}} for i in range(2)]
+    rows.append({**rows[0], 'q_type': 'count', 'options': {}, 'answer': 2})
+    rows.append({**rows[0], 'q_idx': 'dedup', 'options': {'A': 'wrong', 'B': 'wrong', 'C': 'gold'}, 'answer': 'C'})
+    rows.append({**rows[0], 'q_idx': 'ambiguous', 'options': {'A': 'gold', 'B': 'gold'}, 'answer': 'A'})
+    (tmp_path / 'overall.jsonl').write_text('\n'.join(json.dumps(r) for r in rows))
+    with zipfile.ZipFile(tmp_path / 'images.zip', 'w') as archive:
+        for color in ('red', 'blue'):
+            archive.writestr('home/source/images/' + color + '.png', png(color)['bytes'])
+    monkeypatch.setattr(huggingface_hub, 'hf_hub_download', lambda repo, filename, **kw: str(tmp_path / filename))
+    directory = view2space()
+    from datasets import load_dataset
+    from tasksource.preprocess import disable_image_decoding
+    ds = disable_image_decoding(load_dataset(str(directory), download_mode='force_redownload'))
+    assert set(ds) == {'train'} and len(ds['train']) == 1
+    row = ds['train'][0]
+    from datasets.utils.file_utils import xopen
+    assert [xopen(image['path'], 'rb').read() for image in row['images']] == [png('red')['bytes'], png('blue')['bytes']]
+    assert len(row['qa']) == 3
+    assert set(row['qa'][0]) == {'inputs', 'choices_list', 'labels', 'metadata'}
+    assert row['qa'][0]['choices_list'][row['qa'][0]['labels']] == 'gold'
+    assert 'SECRET_REASON' not in row['qa'][0]['inputs']
+    assert json.loads(row['qa'][0]['metadata'])['reasoning'] == 'SECRET_REASON'
+    from tasksource.vision_tasks import grouped_mc_rows
+    flat = VisualMultipleChoice(choices_list='choices_list', metadata='metadata', pre_process=grouped_mc_rows)(ds)
+    assert len(flat['train']) == 3
+    assert flat['train'][0]['choice1'] == 'gold' and flat['train'][0]['labels'] == 1
+    assert flat['train'][2]['choice1'] == 'gold' and flat['train'][2]['labels'] == 1
+    assert json.loads(flat['train'][2]['metadata'])['option_keys'] == ['A', 'C']
+    report = json.loads((directory / 'provenance.json').read_text())
+    assert report['questions'] == 3 and report['excluded_questions'] == 1
+    assert report['deduplicated_distractor_rows'] == 1
+
+
+def test_uniform_streaming_sample_covers_the_entire_source():
+    from tasksource.preprocess import reservoir_sample
+    seen = []
+    def rows():
+        for i in range(10000):
+            seen.append(i)
+            yield {'index': i}
+    selected = reservoir_sample(rows(), 100, seed=0)
+    assert len(seen) == 10000 and len(selected) == 100
+    assert selected == reservoir_sample(({'index': i} for i in range(10000)), 100, seed=0)
+    indices = [row['index'] for row in selected]
+    assert indices == sorted(indices) and len(set(indices)) == 100
+    assert sum(i >= 5000 for i in indices) > 30
+    assert max(indices) > 9900
+    assert reservoir_sample(iter([1, 2]), 10) == [1, 2]
+
+
+def test_text_shuffling_retains_its_original_option_slots():
+    from tasksource.recast import shuffle_choices
+    import random
+    result = shuffle_choices({'choice0': 'same', 'choice1': 'same', 'choice2': None, 'labels': 1}, random.Random(1))
+    assert result == {'choice0': 'same', 'choice1': None, 'choice2': 'same', 'labels': 0}
+
+
+@pytest.mark.parametrize('answer, position', [('A', 0), ('b', 1), ('E', 4), ('1', 0), ('4', 3),
+                                            ('А', 0), ('Б', 1), ('В', 2), ('г', 3), ('Д', 4),
+                                            ('-1', None), (None, None), ('bad', None)])
+def test_exam_option_positions(answer, position):
+    from tasksource.vision_tasks import exam_option_position
+    assert exam_option_position(answer) == position

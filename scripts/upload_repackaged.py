@@ -1,4 +1,4 @@
-"""Repackage hard-to-load datasets as parquet under tasksource/ on the Hub.
+"""Repackage hard-to-load datasets as data-only mirrors under tasksource/ on the Hub.
 
 These sources only exist as GitHub files, loading scripts or inconsistent
 JSON, which makes them slow and brittle to load. Each function returns a clean
@@ -395,7 +395,92 @@ def webinstruct(bad_examples=None, repairs=None):
                                 for split in ['train', 'test']}) for config in sorted({key.split('/')[0] for key in counts})}
 
 
-BUILDERS = {"webinstruct": ("tasksource/webinstruct", webinstruct, "per-config"),
+def view2space():
+    """VIEW2SPACE's native training MCQs, grouped by ordered source images.
+
+    Source: Pokerme/view2space-train at 1af36aa39a18143db6599a049da6de657e18215c.
+    Only explicit multiple-choice questions are included; counting and detection are
+    excluded. Original PNG bytes, image order, question IDs, input boxes and reasoning
+    are preserved. Reasoning is metadata, never question input. Related QAs share one
+    image group to avoid repeating image bytes for every question. The source has only
+    a training split; no evaluation split is fabricated. The source README states CC BY 4.0.
+    Duplicate distractors are deduplicated with gold indices remapped; ambiguous duplicate
+    gold options are excluded and recorded in excluded-questions.jsonl.
+    """
+    import hashlib
+    import zipfile
+    import shutil
+    from huggingface_hub import hf_hub_download
+
+    repo, revision = 'Pokerme/view2space-train', '1af36aa39a18143db6599a049da6de657e18215c'
+    root = Path('build/view2space-original')
+    root.mkdir(parents=True, exist_ok=True)
+    paths = {name: hf_hub_download(repo, name, repo_type='dataset', revision=revision, local_dir=root)
+             for name in ('overall.jsonl', 'images.zip')}
+    groups, excluded, deduplicated = {}, [], 0
+    with open(paths['overall.jsonl']) as handle:
+        for line in handle:
+            row = json.loads(line)
+            if row['q_type'] != 'mcq':
+                continue
+            options = row['options']
+            if not 2 <= len(options) <= 26 or row['answer'] not in options:
+                raise ValueError(f"Invalid source options: {row['q_idx']}")
+            gold = options[row['answer']]
+            if list(options.values()).count(gold) != 1:
+                excluded.append({'id': row['q_idx'], 'reason': 'ambiguous duplicate gold option'})
+                continue
+            kept = {}
+            for key, value in options.items():
+                if value not in kept.values():
+                    kept[key] = value
+            deduplicated += len(kept) != len(options)
+            supporting = row.get('supporting') or {}
+            groups.setdefault(tuple(row['image_paths']), []).append({
+                'inputs': '\n'.join(filter(None, [row['question'], row['question_prompt'],
+                    'Image files in order: ' + json.dumps(row['image_paths']) if supporting.get('draw_boxes') else '',
+                    'Input boxes: ' + json.dumps(supporting['draw_boxes'], sort_keys=True) if supporting.get('draw_boxes') else ''])),
+                'choices_list': list(kept.values()), 'labels': list(kept).index(row['answer']),
+                'metadata': json.dumps({'id': row['q_idx'], 'image_paths': row['image_paths'],
+                    'source_answer': row['answer'], 'option_keys': list(kept), 'source_options': options,
+                    'draw_boxes': supporting.get('draw_boxes'),
+                    'reasoning': supporting.get('chain_of_thought'), 'source_revision': revision},
+                    ensure_ascii=False, sort_keys=True)})
+    output = Path('build/view2space-release-imagefolder')
+    output.mkdir(parents=True, exist_ok=True)
+    conversion = hashlib.sha256(inspect.getsource(view2space).encode()).hexdigest()
+    # Keep each original PNG once. Native ImageFolder supports ZIP + metadata.jsonl.
+    packaged = output / 'data.zip'
+    if not packaged.exists() or packaged.stat().st_size != Path(paths['images.zip']).stat().st_size:
+        shutil.copyfile(paths['images.zip'], packaged)
+    with zipfile.ZipFile(packaged, 'a') as archive:
+        members = {name[name.index('images/'):]: name for name in archive.namelist()
+                   if 'images/' in name and not name.endswith('/')}
+        needed = {name for images in groups for name in images}
+        # Append one canonical manifest while retaining the original compressed images.
+        manifest = zipfile.ZipInfo('metadata.jsonl')  # fixed timestamp for reproducible bytes
+        manifest.compress_type = zipfile.ZIP_DEFLATED
+        with archive.open(manifest, 'w', force_zip64=True) as handle:
+            for images, qas in groups.items():
+                handle.write((json.dumps({'file_names': [members[name] for name in images],
+                    'image_group_id': hashlib.sha256('\x1f'.join(images).encode()).hexdigest(),
+                    'qa': qas}, ensure_ascii=False) + '\n').encode())
+    report = {'source': repo, 'revision': revision, 'rows': len(groups), 'images': len(needed),
+              'questions': sum(len(qas) for qas in groups.values()), 'license': 'cc-by-4.0',
+              'format': 'imagefolder ZIP: ordered images + grouped canonical MC QAs', 'format_version': 1,
+              'conversion_sha256': conversion, 'excluded_questions': len(excluded),
+              'deduplicated_distractor_rows': deduplicated}
+    output.joinpath('provenance.json').write_text(json.dumps(report, indent=2) + '\n')
+    output.joinpath('excluded-questions.jsonl').write_text(''.join(json.dumps(row) + '\n' for row in excluded))
+    # Native imagefolder maps file_names to Sequence(Image); no custom loader.
+    output.joinpath('README.md').write_text('---\nlicense: cc-by-4.0\nconfigs:\n'
+        '- config_name: default\n  data_files:\n  - split: train\n'
+        '    path: data.zip\n---\n')
+    return output
+
+
+BUILDERS = {"view2space": ("tasksource/view2space", view2space),
+            "webinstruct": ("tasksource/webinstruct", webinstruct, "per-config"),
             "sharc": ("tasksource/sharc", sharc), "numer_sense": ("tasksource/numer_sense", numer_sense),
             "clutrr": ("tasksource/clutrr", clutrr), "wellformed": ("tasksource/google_wellformed_query", wellformed),
             "humicroedit": ("tasksource/humicroedit", humicroedit, "subtask-1"), "ethos": ("tasksource/ethos", ethos, "multilabel"),
@@ -408,7 +493,7 @@ BUILDERS = {"webinstruct": ("tasksource/webinstruct", webinstruct, "per-config")
 
 
 # license metadata for repackaged sets, as the originals state it
-LICENSES = {"tasksource/measuring-hate-speech-votes": "cc-by-4.0", "tasksource/lewidi": "other",
+LICENSES = {"tasksource/view2space": "cc-by-4.0", "tasksource/measuring-hate-speech-votes": "cc-by-4.0", "tasksource/lewidi": "other",
             "tasksource/wikipedia-detox-votes": "cc0-1.0",
             "tasksource/webinstruct": "apache-2.0"}
 
@@ -420,14 +505,20 @@ def push_card(repo, build):
         card.data.license = LICENSES[repo]
     sources = ", ".join(f"[{name}](https://huggingface.co/datasets/{name})" for name in ORIGINALS[repo])
     sources = f"Original data: {sources}. " if sources else ""  # an empty entry: the original is not on the Hub
+    storage = 'native ImageFolder' if repo == 'tasksource/view2space' else 'parquet'
     card.text = (f"\n# {repo.split('/')[1]}\n\n{inspect.cleandoc(build.__doc__)}\n\n{sources}"
-                 "Repackaged as parquet for [tasksource](https://github.com/sileod/tasksource) by "
+                 f"Repackaged as {storage} for [tasksource](https://github.com/sileod/tasksource) by "
                  "[scripts/upload_repackaged.py](https://github.com/sileod/tasksource/blob/main/scripts/upload_repackaged.py).\n")
     if repo == 'tasksource/webinstruct':
         prepared_card = Path('build/webinstruct-release/README.md')
         source_card = prepared_card if prepared_card.exists() else Path(__file__).resolve().parents[1] / 'dataset_cards/webinstruct.md'
         card.text = source_card.read_text().split('---', 2)[2]
     card.push_to_hub(repo)
+    if repo == 'tasksource/view2space':
+        from huggingface_hub import HfApi
+        HfApi().upload_file(path_or_fileobj='build/view2space-release-imagefolder/provenance.json',
+            path_in_repo='provenance.json', repo_id=repo, repo_type='dataset',
+            commit_message='Record pinned VIEW2SPACE conversion provenance')
     if repo == 'tasksource/webinstruct':
         from huggingface_hub import HfApi
         HfApi().upload_file(path_or_fileobj='build/webinstruct-release/provenance.json', path_in_repo='provenance.json',
@@ -459,10 +550,22 @@ if __name__ == "__main__":
         assert repo in ORIGINALS, f"add {repo} to tasksource/metadata/originals.py"
         if not args.card_only:
             dataset = build(args.bad_examples, args.repairs) if name == 'webinstruct' else build()
+            if isinstance(dataset, Path):  # native imagefolder: retain one copy of each image
+                print(repo, json.loads((dataset / 'provenance.json').read_text()))
+                if args.dry_run:
+                    continue
+                from huggingface_hub import HfApi
+                api = HfApi()
+                api.create_repo(repo, repo_type='dataset', exist_ok=True)
+                api.upload_large_folder(repo_id=repo, repo_type='dataset', folder_path=dataset,
+                    allow_patterns=['data.zip', 'README.md', 'provenance.json', 'excluded-questions.jsonl'],
+                    num_workers=8)
+                push_card(repo, build)
+                continue
             # a builder returns one DatasetDict, or {config: DatasetDict} for per-config repos
             configs = dataset if config in (["per-language"], ["per-config"]) else {config[0] if config else "default": dataset}
             for config_name, splits in configs.items():
-                print(repo, config_name, splits, splits["train"][0], sep="\n")
+                print(repo, config_name, splits, sep="\n")
                 if not args.dry_run:
                     splits.push_to_hub(repo, config_name=config_name)
             if args.dry_run:
