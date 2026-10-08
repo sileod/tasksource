@@ -76,6 +76,6 @@ def write(path, multilingual=False, vision=False):
 
 
 if __name__ == "__main__":
-    write(ROOT / "tasks.md", multilingual=False)
-    write(ROOT / "mtasks.md", multilingual=True)
-    write(ROOT / "vision_tasks.md", vision=True)
+    write(ROOT / "catalog_english.md", multilingual=False)
+    write(ROOT / "catalog_multilingual.md", multilingual=True)
+    write(ROOT / "catalog_vision.md", vision=True)

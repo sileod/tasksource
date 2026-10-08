@@ -123,7 +123,7 @@ following each source's own train/dev/test splits where it has them.
   - Evaluation benchmarks (BIG-bench, MMLU, BLiMP, MATH test, ...) are left out so they stay clean for evaluation.
 - **Sources.** [sources.yaml](sources.yaml) lists every source with its rows, the Hub dataset and revision it was loaded from, the original dataset behind each tasksource copy, and its licenses.
 - **Audit trail.** The [source mix](release-audit.json), [failed source list](failed-tasks.json), and [build manifest](build-manifest.json) ship with the data.
-- **Reproducible.** The [build runbook](https://github.com/sileod/tasksource/blob/main/docs/jev/README.md) rebuilds the release from [Tasksource](https://github.com/sileod/tasksource)'s [task catalog](https://github.com/sileod/tasksource/blob/main/tasks.md).
+- **Reproducible.** The [build runbook](https://github.com/sileod/tasksource/blob/main/docs/jev/README.md) rebuilds the release from [Tasksource](https://github.com/sileod/tasksource)'s [task catalog](https://github.com/sileod/tasksource/blob/main/catalog_english.md).
 
 ## License and scope
 
