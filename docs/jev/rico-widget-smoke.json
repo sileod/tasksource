@@ -1,0 +1,31 @@
+{
+  "scope": "First three unmodified native widget rows per split injected at the loader boundary.",
+  "revision": "6ec57b56bebd722b9c646c78d0f34e1199b6d7a9",
+  "splits": {
+    "train": {
+      "rows": 3,
+      "answers": [
+        "r0c6",
+        "r1c6",
+        "r6c6"
+      ]
+    },
+    "test": {
+      "rows": 3,
+      "answers": [
+        "r1c3",
+        "r3c3",
+        "r3c3"
+      ]
+    },
+    "validation": {
+      "rows": 3,
+      "answers": [
+        "r0c2",
+        "r0c4",
+        "r0c4"
+      ]
+    }
+  },
+  "image_decoding": "Every smoke image decoded successfully."
+}

@@ -1,0 +1,22 @@
+{
+  "scope": "Coarse visual review of three Jev-recast train examples per task from bounded native-image fixtures. Not an exhaustive semantic audit.",
+  "tasks": {
+    "clevr/count": {
+      "reviewed": 3,
+      "result": "No obvious image/question/gold mismatch."
+    },
+    "tallyqa/count": {
+      "reviewed": 3,
+      "result": "No obvious image/question/gold mismatch."
+    },
+    "vsr/yesno": {
+      "reviewed": 3,
+      "result": "Recast preserves native answers. One native caption says orange while depicted citrus appears to be lemon; native gold is Yes."
+    },
+    "rico-widget/grid7": {
+      "reviewed": 3,
+      "result": "Widget descriptions, annotated boxes, and grid-cell golds matched the displayed screenshots."
+    }
+  },
+  "refinement_views": "Deferred to crop mirrors and the model accuracy gate; no refinement training experiment was run."
+}

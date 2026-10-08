@@ -76,6 +76,9 @@ _CAULDRON_LICENSE_EVIDENCE = {
                  'source_code_license': 'mit'},
     'intergps': {'source_license': 'unspecified', 'source_license_url': 'https://github.com/lupantech/InterGPS',
                 'source_code_license': 'mit'},
+    'tallyqa': {'source_license': 'unspecified', 'source_license_url': 'https://github.com/manoja328/TallyQA_dataset'},
+    'vsr': {'source_license': 'apache-2.0', 'source_license_url': 'https://github.com/cambridgeltl/visual-spatial-reasoning',
+            'image_license_note': 'COCO images retain their individual original licenses.'},
 }
 
 
@@ -369,4 +372,68 @@ clevr_material = VisualClassification(
 intergps = VisualMultipleChoice(
     **_CAULDRON, config_name='intergps', task_id='intergps', choices_list='choices_list',
     pre_process=cauldron_mc_rows,
+)
+
+clevr_count = VisualClassification(
+    **_CAULDRON, config_name='clevr', task_id='clevr/count',
+    label_values={str(i): str(i) for i in range(11)},
+    pre_process=lambda ds: cauldron_closed_rows(ds, tuple(str(i) for i in range(11))),
+    question='How many? Choose the count that answers the question about the image.',
+)
+
+tallyqa_count = VisualClassification(
+    **_CAULDRON, config_name='tallyqa', task_id='tallyqa/count',
+    label_values={str(i): str(i) for i in range(16)},
+    pre_process=lambda ds: cauldron_closed_rows(ds, tuple(str(i) for i in range(16))),
+    question='How many? Choose the count that answers the question about the image.',
+)
+
+vsr_yesno = VisualClassification(
+    **_CAULDRON, config_name='vsr', task_id='vsr/yesno', label_values=_YESNO,
+    pre_process=lambda ds: cauldron_closed_rows(ds, _YESNO),
+    question='Is the spatial statement true for the image?',
+)
+
+
+def rico_widget_rows(dataset):
+    """Human widget descriptions and normalized boxes; retain native splits/images."""
+    def flatten(batch, indices, source_split):
+        output = {key: [] for key in ('images', 'inputs', 'labels', 'metadata')}
+        for source_index, screen, image, box, captions in zip(indices, batch['screenId'], batch['image'], batch['bbox'], batch['captions']):
+            if image is None or len(box) != 4 or not all(math.isfinite(v) for v in box):
+                continue
+            x0, y0, x1, y1 = box
+            if not (0 <= x0 < x1 <= 1 and 0 <= y0 < y1 <= 1):
+                continue
+            point = ((x0 + x1) / 2, (y0 + y1) / 2)
+            r, c = grid_labels(point)[0]
+            widget = f'{screen}:' + hashlib.sha256(json.dumps(box).encode()).hexdigest()
+            # Different human captions are independent descriptions of the same widget.
+            for index, caption in enumerate(captions):
+                if not caption.strip():
+                    continue
+                output['images'].append([image])
+                output['inputs'].append(caption.strip())
+                output['labels'].append(r * 7 + c)
+                output['metadata'].append(json.dumps({'screenId': screen, 'source_widget': widget,
+                    'source_row': f'{source_split}:{source_index}:{index}', 'image_group_id': f'rico:{screen}',
+                    'target_bbox': box, 'bbox_units': 'normalized_xyxy', 'point': point,
+                    'coordinate_source': 'widget_bbox_center', 'stage': 1, 'bins': [7, 7],
+                    'source_license': 'cc-by-4.0',
+                    'source_license_url': 'https://github.com/google-research-datasets/widget-caption'}, sort_keys=True))
+        return output
+    features = Features({'images': Sequence(Image(decode=False)), 'inputs': Value('string'),
+                         'labels': Value('int64'), 'metadata': Value('string')})
+    return type(dataset)({split: rows.map(flatten, batched=True, batch_size=16, with_indices=True,
+        fn_kwargs={'source_split': split},
+        remove_columns=list(rows.features), features=features) for split, rows in dataset.items()})
+
+
+rico_widget_grid7 = VisualClassification(
+    dataset_name='bevaya/RICO-WidgetCaptioning', task_id='rico-widget/grid7',
+    splits=('train', 'val', 'test'), pre_process=rico_widget_rows, metadata='metadata',
+    label_values={i: f'r{i // 7}c{i % 7}' for i in range(49)},
+    question='Which cell contains the described widget center in a 7-row, 7-column grid over the displayed image?',
+    load_dataset_kwargs={'revision': '6ec57b56bebd722b9c646c78d0f34e1199b6d7a9', 'streaming': True,
+                         'columns': ['screenId', 'image', 'bbox', 'captions']},
 )

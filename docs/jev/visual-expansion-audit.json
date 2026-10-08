@@ -1,0 +1,62 @@
+{
+  "dataset": "HuggingFaceM4/the_cauldron",
+  "revision": "847a98a779b1652d65111daf20c972dfcd333605",
+  "scope": "Full native QA text audit; image integrity is checked separately on native smoke fixtures.",
+  "tasks": {
+    "clevr/count": {
+      "dropped_by_reason": {
+        "outside_vocabulary": 534583
+      },
+      "image_groups": 70000,
+      "label_distribution": {
+        "0": 48658,
+        "1": 57907,
+        "10": 24,
+        "2": 29855,
+        "3": 15256,
+        "4": 7418,
+        "5": 3615,
+        "6": 1662,
+        "7": 647,
+        "8": 259,
+        "9": 105
+      },
+      "retained_qas": 165406,
+      "total_qas": 699989
+    },
+    "tallyqa/count": {
+      "dropped_by_reason": {},
+      "image_groups": 98680,
+      "label_distribution": {
+        "0": 40070,
+        "1": 45756,
+        "10": 773,
+        "11": 530,
+        "12": 491,
+        "13": 250,
+        "14": 201,
+        "15": 65,
+        "2": 50771,
+        "3": 19917,
+        "4": 11257,
+        "5": 5502,
+        "6": 3579,
+        "7": 2108,
+        "8": 1694,
+        "9": 1022
+      },
+      "retained_qas": 183986,
+      "total_qas": 183986
+    },
+    "vsr/yesno": {
+      "dropped_by_reason": {},
+      "image_groups": 2157,
+      "label_distribution": {
+        "no": 1629,
+        "yes": 1725
+      },
+      "retained_qas": 3354,
+      "total_qas": 3354
+    }
+  }
+}

@@ -41,7 +41,8 @@ def test_catalog():
                              'mind2web/y10', 'mind2web/grid5', 'mind2web/grid7',
                              'm3cot', 'exams-v', 'visualsphinx', 'muslr/tfu', 'muslr/mc', 'iconqa/text', 'view2space/mcq', 'visual7w', 'clevr/yesno', 'mapqa/yesno',
                              'tqa', 'hateful-memes', 'clevr/color', 'clevr/shape', 'clevr/size',
-                             'clevr/material', 'intergps']
+                             'clevr/material', 'intergps', 'clevr/count', 'tallyqa/count', 'vsr/yesno',
+                             'rico-widget/grid7']
     assert not set(vision.id) & set(list_tasks().id)
     assert all(task_provenance(i, vision=True)['revision'] for i in vision.id)
     assert 'pingzhili/nlvr2' in hub_datasets(['nlvr2'], vision=True)
@@ -585,7 +586,8 @@ def test_cauldron_grouped_images_and_native_gold():
 
 
 @pytest.mark.parametrize('task', ['visual7w', 'clevr/yesno', 'mapqa/yesno', 'tqa', 'hateful-memes',
-                                 'clevr/color', 'clevr/shape', 'clevr/size', 'clevr/material', 'intergps'])
+                                 'clevr/color', 'clevr/shape', 'clevr/size', 'clevr/material', 'intergps',
+                                 'clevr/count', 'tallyqa/count', 'vsr/yesno'])
 def test_cauldron_task_recasts(task, monkeypatch):
     import json
     import tasksource.access as access
@@ -623,3 +625,43 @@ def test_vision_publish_rejects_restricted_images(tmp_path, monkeypatch):
     with pytest.raises(ValueError, match='hateful-memes'):
         builder.publish_vision(ds, tmp_path, 'test/repo')
     assert not calls
+
+
+def test_rico_widget_captions_geometry_and_recast(monkeypatch):
+    import json
+    import tasksource.access as access
+    features = Features({'screenId': Value('int64'), 'image': Image(),
+        'bbox': Sequence(Value('float64')), 'captions': Sequence(Value('string'))})
+    def rows(screen):
+        return Dataset.from_list([
+            {'screenId': screen, 'image': png('red'), 'bbox': [0.8, 0.8, 1.0, 1.0],
+             'captions': ['open settings', 'settings menu', '']},
+            {'screenId': screen, 'image': png('blue'), 'bbox': [0.5, 0.5, 0.2, 0.2],
+             'captions': ['invalid box']}], features=features)
+    native = DatasetDict(train=rows(1), val=rows(2), test=rows(3))
+    monkeypatch.setattr(access, 'load_dataset', lambda *args, **kwargs: native)
+    ds = load_task('rico-widget/grid7', vision=True, recast='jev', max_rows=10)
+    assert set(ds) == {'train', 'validation', 'test'}
+    for split in disable_image_decoding(ds).values():
+        assert len(split) == 2
+        raw = split
+        assert raw[0]['images'] == [png('red')]
+        assert all(row['answer'] == 'r6c6' for row in raw)
+        metadata = [json.loads(row['metadata']) for row in raw]
+        assert metadata[0]['source_widget'] == metadata[1]['source_widget']
+        assert metadata[0]['source_row'] != metadata[1]['source_row']
+        assert metadata[0]['target_bbox'] == [0.8, 0.8, 1.0, 1.0]
+
+
+@pytest.mark.parametrize('task,maximum', [('clevr/count', 10), ('tallyqa/count', 15)])
+def test_visual_counts_keep_full_numeric_ontology(task, maximum, monkeypatch):
+    import tasksource.access as access
+    native = cauldron_source((f'{maximum}.', '0.', str(maximum + 1)))
+    monkeypatch.setattr(access, 'load_dataset', lambda *args, **kwargs: native)
+    canonical = load_task(task, vision=True, max_rows=10)
+    assert canonical['train'].features['labels'].names == [str(i) for i in range(maximum + 1)]
+    assert set(canonical['train']['labels']) == {0, maximum}
+    recast = load_task(task, vision=True, recast='jev', max_rows=10)
+    assert set(recast['train']['answer']) == {'0', str(maximum)}
+    assert all(row['kind'] == 'choice' and len(row['criteria']) == maximum + 1
+               for row in recast['train'])

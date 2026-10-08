@@ -1,0 +1,20 @@
+{
+  "scope": "Loader injection of the first 32 native image groups per config, without modifying source records.",
+  "tasks": {
+    "clevr/count": {
+      "native_groups": 32,
+      "rows": 10,
+      "jev_rows": 10
+    },
+    "tallyqa/count": {
+      "native_groups": 32,
+      "rows": 10,
+      "jev_rows": 10
+    },
+    "vsr/yesno": {
+      "native_groups": 32,
+      "rows": 10,
+      "jev_rows": 10
+    }
+  }
+}

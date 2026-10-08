@@ -302,3 +302,86 @@ No Tasksource image mirror is published for it. The vision publisher rejects
 rows marked restricted before making any upload; omit `hateful-memes` when
 building a public vision config. Loading this direct mapping does not replace
 the original agreement or establish permission for Cauldron's redistribution.
+
+## Counting, spatial relations, and widget grounding
+
+`clevr/count`, `tallyqa/count`, and `vsr/yesno` use the existing pinned Cauldron
+release and shared closed-answer preprocessing. Counts use explicit vocabularies
+(CLEVR 0–10; TallyQA 0–15). They become Jev `choice` decisions: neither vocabulary
+fits Jev's current 2–10-level `score` constraint. VSR uses explicit No/Yes labels.
+Only Cauldron's native training split is included; evaluation splits are not invented.
+TallyQA data licensing remains unspecified, with the original project recorded in
+metadata. VSR records its project's Apache 2.0 terms and notes that individual
+COCO image licenses still apply.
+
+`rico-widget/grid7` directly uses the packaged RICO Widget Captioning source at
+`6ec57b56bebd722b9c646c78d0f34e1199b6d7a9`. Each nonempty human caption yields a
+49-class decision at the normalized widget-box center. Invalid boxes and missing
+images are excluded. Encoded screenshots are preserved; no crop or resize runs
+in task preprocessing. Native `val` is exposed as `validation`. Screen, widget,
+and caption identities remain separate in metadata alongside normalized boxes
+and target centers. The source Parquet columns are projected to screenshot,
+caption, box, and screen ID, omitting semantic renderings, icons, and DOM trees.
+The full-source screen overlap audit is reproducible with:
+
+```bash
+PYTHONPATH=src python scripts/audit_rico_widget.py --output docs/jev/rico-widget-audit.json
+PYTHONPATH=src python scripts/audit_cauldron.py \
+  --tasks clevr/count tallyqa/count vsr/yesno \
+  --samples build/cauldron-samples --output docs/jev/visual-expansion-audit.json
+PYTHONPATH=src python scripts/audit_cauldron.py --smoke-only \
+  --tasks clevr/count tallyqa/count vsr/yesno \
+  --samples build/cauldron-samples --output docs/jev/visual-expansion-smoke.json
+```
+
+### Refinement views need repackaging
+
+`mind2web/grid7/refine` and `rico-widget/grid7/refine` are deferred: screenshot
+pixel decoding, exact parent-cell cropping, and crop encoding belong in
+`scripts/repackage_dataset/vision.py`, followed by separate pinned data-only
+mirrors. Loading either existing stage-1 task should not regenerate crops or
+increase its download size. Native crop resolution and lossless encoding are
+preferred; model adapters handle resizing. A future builder must record its
+configuration/code hashes, actual integer pixel crop rectangles, original
+geometry, source revision, and both original action/widget and stage-specific
+row identities. Labels must refer to the displayed crop. Integer pixel rounding
+must be included in coordinate round-trip tests, since pixel crop boundaries
+need not coincide exactly with ideal normalized seventh boundaries.
+
+Stage-1 and stage-2 images belong in separate Jev requests. Refinement data stays
+out of the published training mix until experiments compare single-pass,
+recursive stage-1-only, and refinement-trained decoding by target-box hit rate,
+including the oracle-parent-cell upper bound. No model experiment or accuracy
+improvement is claimed by these task additions.
+
+The full RICO screen audit found 41,221 native train widget rows on 14,878 screens,
+3,483 validation rows on 1,292 screens, and 3,621 test rows on 1,265 screens.
+No `screenId` crosses those split boundaries. See
+[rico-widget-audit.json](rico-widget-audit.json) and the bounded native-image
+[smoke](rico-widget-smoke.json). Three recast train examples per new family were
+opened for a coarse visual pass. Counting and RICO golds were coherent with the
+images. VSR showed a source-caption naming issue: “banana is on the orange” has
+a native Yes label although the depicted sliced citrus appears to be a lemon.
+That native answer is preserved; correct recasting does not establish that all
+VSR source labels or object names are correct. These additions have not rebuilt
+the published Jev vision config.
+
+RICO caption eligibility retained 109,359 training, 9,416 validation, and 9,794
+test descriptions; one empty training caption was excluded. No invalid boxes
+were found. All 49-cell label distributions are in the audit JSON. The smoke
+loads retain three recast rows per native split, with image decoding and gold
+criterion checks. Original widget-caption terms are
+[CC BY 4.0](https://github.com/google-research-datasets/widget-caption).
+
+The full pinned Cauldron [answer audit](visual-expansion-audit.json) records:
+
+| Task | Retained training QAs | Excluded QAs | Reason |
+|---|---:|---:|---|
+| `clevr/count` | 165,406 | 534,583 | Other CLEVR answer vocabularies |
+| `tallyqa/count` | 183,986 | 0 | All native answers are in 0–15 |
+| `vsr/yesno` | 3,354 | 0 | All native answers are yes/no |
+
+Per-label distributions are retained in the JSON. All three views passed
+[native-image loader/Jev smoke checks](visual-expansion-smoke.json); the
+[coarse visual review](visual-expansion-quality.json) records source-quality
+observations separately from recast correctness.
