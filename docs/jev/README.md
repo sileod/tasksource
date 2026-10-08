@@ -392,7 +392,8 @@ Grounding uses the existing visual templates. `tasksource.grounding.grounding_ro
 projects an image, instruction and normalized `xyxy` target box to grid labels, or
 to MC when supplied real candidate boxes and descriptions. MC requires 2–26
 unique boxes and exactly one matching target; no target box is inserted and no
-negative boxes are invented. Geometry is relative to the displayed image, so a
+negative boxes are invented. `projection='grid'` retains native candidates for
+SoM while using grid supervision. Geometry is relative to the displayed image, so a
 separate refinement mirror can supply crop-relative boxes with original geometry
 kept in metadata.
 

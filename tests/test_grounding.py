@@ -7,7 +7,7 @@ from PIL import Image as PILImage
 
 from tasksource import load_task, list_tasks
 from tasksource.grounding import grounding_row, augment_grounding
-from tasksource.preprocess import VisualMultipleChoice
+from tasksource.preprocess import VisualMultipleChoice, VisualClassification
 from tasksource.recast import recast_jev
 from tasksource.vision_tasks import rico_widget_rows
 
@@ -148,3 +148,17 @@ def test_augmented_image_leakage_keeps_original_hash():
     row = augment_grounding(processed(canonical())).cast_column('images', Sequence(Image(decode=False)))['train'][0]
     original = json.loads(row['metadata'])['augmentation']['original_image_sha256']
     assert original in image_keys(row['images'], row['metadata'])
+
+
+def test_grid_projection_keeps_candidates_for_som():
+    row = grounding_row([image()], 'Find search', candidates()[1]['bbox'],
+                        candidates=candidates(), metadata={'source_row': 'grid-a'}, projection='grid')
+    assert 'choices_list' not in row
+    assert row['labels'] == 4*7+5
+    assert json.loads(row['metadata'])['candidate_boxes'] == [candidate['bbox'] for candidate in candidates()]
+    source = DatasetDict(train=Dataset.from_list([row], features=Features({
+        'images': Sequence(Image(decode=False)), 'inputs': Value('string'),
+        'labels': Value('int64'), 'metadata': Value('string')})))
+    ds = VisualClassification(metadata='metadata', label_values={i: f'r{i//7}c{i%7}' for i in range(49)})(source)
+    recast = recast_jev(augment_grounding(ds, {'som-only': 1}), task='grid')['train'][0]
+    assert recast['answer'] == 'r4c5'

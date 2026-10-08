@@ -48,12 +48,13 @@ def grid_center(cells, bins=(7, 7)):
     return x, y
 
 
-def grounding_row(images, instruction, target_bbox, *, metadata, candidates=None, bins=(7, 7)):
+def grounding_row(images, instruction, target_bbox, *, metadata, candidates=None, bins=(7, 7), projection=None):
     """Project native geometry to a visual grid or MC row, without adding distractors.
 
     Candidates are {bbox: normalized xyxy, text: native description} in stable source
     order. The target must match exactly one supplied box; it is never injected.
     Source identity, split, revision and screenshot/trajectory IDs belong in metadata.
+    Set projection='grid' to retain candidates for SoM with grid supervision.
     """
     if not images or not instruction.strip():
         raise ValueError('Grounding requires images and a nonempty instruction')
@@ -61,20 +62,26 @@ def grounding_row(images, instruction, target_bbox, *, metadata, candidates=None
     point = [(target[0] + target[2]) / 2, (target[1] + target[3]) / 2]
     info = {**metadata, 'target_bbox': target, 'bbox_units': 'normalized_xyxy', 'point': point}
     row = {'images': images, 'inputs': instruction}
-    if candidates is None:
+    projection = projection or ('element' if candidates is not None else 'grid')
+    if projection not in ('element', 'grid'):
+        raise ValueError('Grounding projection must be element or grid')
+    boxes = [normalized_box(candidate['bbox']) for candidate in candidates] if candidates is not None else []
+    if len({tuple(box) for box in boxes}) != len(boxes):
+        raise ValueError('Grounding requires unique native candidate boxes')
+    if candidates is not None:
+        info['candidate_boxes'] = boxes
+    if projection == 'grid':
         r, c = grid_labels(point, bins)[0]
         row['labels'] = r * bins[0] + c
         info.update(bins=list(bins), stage=info.get('stage', 1))
     else:
-        boxes = [normalized_box(candidate['bbox']) for candidate in candidates]
-        if not 2 <= len(boxes) <= 26 or len({tuple(box) for box in boxes}) != len(boxes):
+        if not 2 <= len(boxes) <= 26:
             raise ValueError('MC grounding needs 2–26 unique native candidate boxes')
         matches = [i for i, box in enumerate(boxes) if max(abs(a-b) for a, b in zip(box, target)) <= 1e-6]
         if len(matches) != 1:
             raise ValueError('Target must match one native candidate, without insertion')
         row.update(choices_list=[f'Element {i+1}: {candidate.get("text", "")}; box={json.dumps(boxes[i])}' for i, candidate in enumerate(candidates)],
                    labels=matches[0])
-        info['candidate_boxes'] = boxes
     row['metadata'] = json.dumps(info, sort_keys=True)
     return row
 

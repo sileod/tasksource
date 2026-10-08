@@ -1307,13 +1307,17 @@ def publish_vision(dataset, output, repo_id):
     card = Path(card_path).read_text()
     counts = ', '.join(f'{len(rows):,} {split}' for split, rows in dataset.items())
     sources = ', '.join(sorted({source.removeprefix('vision/') for rows in dataset.values() for source in rows['source']}))
+    manifest_path = output / 'build-manifest.json'
+    sampling = (json.loads(manifest_path.read_text()).get('sampling', 'See the per-source manifests')
+                if manifest_path.exists() else 'See the per-source manifests')
     section = f'''## Vision config
 
 Load `load_dataset("{repo_id}", "vision")` for the multimodal pilot ({counts}).
 It covers {sources}, with genuine source labels.
 `state`, `question`, `kind`, `options`, and `target` retain their existing decision semantics.
-`images` is an ordered sequence of Hugging Face Image features; encoded bytes are preserved
-and images decode on access. Feed the images alongside `state` through your model's image adapter.
+`images` is an ordered sequence of Hugging Face Image features. Source bytes are preserved
+unless `metadata.augmentation` records SoM rendering; images decode on access.
+Feed the images alongside `state` through your model's image adapter.
 NLVR2 retains its two images in source order. Answer options remain text.
 
 `metadata` is a JSON string preserving available source identifiers, pinned provenance,
@@ -1323,11 +1327,10 @@ See [vision/sources.yaml](vision/sources.yaml), [vision/release-audit.json](visi
 [vision/build-manifest.json](vision/build-manifest.json), and [vision/quality-audit.json](vision/quality-audit.json)
 when the materialized release was audited.
 
-The pilot uses deterministic uniform reservoir sampling over each complete eligible source split,
-capped per source at the limits recorded in its manifest. This bounds memory and scans the full source.
+Sampling: {sampling}. Per-source caps and checkpoint provenance are recorded in the manifests.
 Only native labeled splits are used. Source action identities group related GUI decisions;
 other decisions sharing the same ordered image set and text state share `group_id`.
-`metadata.image_group_id` links an image set across different questions.
+`metadata.image_group_id` links source image groups across questions and augmentation variants.
 Evaluation rows sharing any image with training are excluded.
 This initial config contains direct decisions; text packing and derived variants are disabled.
 Typed request renderers preserve images; model-specific image transport remains the caller's responsibility.
