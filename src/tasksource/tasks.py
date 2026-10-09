@@ -941,9 +941,19 @@ exaggeration_detection = Classification(
     labels="exaggeration_label", 
     dataset_name="copenlu/scientific-exaggeration-detection"
 )
-quarel = Classification(
-    "question",
-    labels=lambda x: "AB"[x["answer_index"]]
+def _quarel_parts(question):
+    """Native two-option questions; letters are positions, not class meanings."""
+    match = re.fullmatch(r"(.*?)\s*\(A\)\s*(.*?)\s*\(B\)\s*(.*?)\s*", question, re.S)
+    if not match or any(not part.strip() for part in match.groups()):
+        raise ValueError("QuaRel question must have a stem and nonempty (A)/(B) options")
+    return tuple(part.strip() for part in match.groups())
+
+
+quarel = MultipleChoice(
+    inputs=lambda x: _quarel_parts(x["question"])[0],
+    choices_list=lambda x: list(_quarel_parts(x["question"])[1:]),
+    labels="answer_index", dataset_name="community-datasets/quarel",
+    question="Which option correctly answers or completes the question?",
 )
 
 mwong_fever_evidence_related = Classification(sentence1="claim", sentence2="evidence", labels=name("labels",['unrelated','related']),
@@ -1416,13 +1426,6 @@ logical_fallacy = Classification("source_article", labels="logical_fallacies", d
 
 parade = Classification("Definition1","Definition2", labels=name('Binary labels',["not-paraphrase","paraphrase"]), dataset_name="tasksource/parade")
 
-def _cladder_context(x):
-    """The causal graph decides the answer, but tasksource/cladder keeps it in `reasoning`."""
-    return f'{x["reasoning"]["step0"]} Causal graph: {x["reasoning"]["step1"]}.\n{x["given_info"]}'
-
-cladder = Classification(_cladder_context, "question", "answer", dataset_name="tasksource/cladder",
-    # backdoor-adjustment rows carry no graph at all: identical texts get opposite answers
-    pre_process=lambda ds: ds.filter(lambda x: bool(x["reasoning"]["step1"])))
 
 subjectivity = Classification(
     "Sentence", labels=lambda x: {"OBJ": "objective", "SUBJ": "subjective"}[x["Label"]],
@@ -1690,7 +1693,8 @@ gs_step = MultipleChoice(lambda x: f"Goal: {x['sent2']}\nStep:", regen("ending[0
         dataset_name="tasksource/goal-step-wikihow", config_name="step")
 
 gs_order = MultipleChoice("sent2",regen("ending[0-1]"),"label",
-        dataset_name="tasksource/goal-step-wikihow",config_name="order")
+        dataset_name="tasksource/goal-step-wikihow",config_name="order",
+        question="Which step should be done first to achieve this goal?")
 
 paradise = MultipleChoice("sent2",regen("ending[0-3]"),"label",
       dataset_name="GGLab/PARADISE")
@@ -2174,8 +2178,19 @@ tasksource_dpo = MultipleChoice("prompt",choices=['chosen','rejected'],labels=co
 seahorse = Classification('article',cat(["summary", "question"]),'answer',
     dataset_name="tasksource/seahorse_summarization_evaluation")
 
-mip = Classification(lambda x: x["prompt"].split("\nProvide no explanation")[0].strip(),  # drop the answer-format instruction
+def _missing_item_pair(row):
+    # Split only the native membership question, retaining every list symbol.
+    prompt = row["prompt"].split("\nProvide no explanation", 1)[0].strip()
+    match = re.fullmatch(r'(.*)\. Is "(.*)" in the previous list\?', prompt, re.S)
+    if not match:
+        raise ValueError("Missing-item contrastive prompt has no native membership question")
+    return {"items": match[1], "queried_item": match[2]}
+
+
+mip = Classification("items", "queried_item",
     labels=lambda x: x["y"].rstrip(".").lower(),
+    pre_process=lambda ds: ds.map(_missing_item_pair),
+    question="Does the list in text_A contain the item in text_B?",
     dataset_name="sileod/missing-item-prediction",config_name="contrastive")
 
 jigsaw_toxicity = Classification('comment_text',labels=name("toxic",["not toxic","toxic"]),

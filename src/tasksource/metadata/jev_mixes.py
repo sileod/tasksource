@@ -19,7 +19,7 @@ BUCKETS = {
     "procedural": (r"^procedural-typed-decisions/", 0.12),
     "multilingual": (r"^multilingual/", 0.03),
     "logic_synthetic": (r"FOL-nli|LogicNLI|FLD|proofwriter|ruletaker|PARARULE|robustLR|folio|logiqa|reclor|lsat|clutrr|"
-                        r"babi_nli|stepgame|SpaRTUN|spartqa|ReSQ|SpaceNLI|tomi-nli|mindgames|nlgraph|corr2cause|cladder|"
+                        r"babi_nli|stepgame|SpaRTUN|spartqa|ReSQ|SpaceNLI|tomi-nli|mindgames|nlgraph|corr2cause|"
                         r"puzzte|brainteasers|math_qa|prm800k|satisfiability|temporal-nli|tracie|conceptrules|regset|"
                         r"logical-|monotonicity|strategy-qa|riddle_sense|winodict|missing-item", 0.15),
     "knowledge_mcqa": (r"medmcqa|MedQA|wikimedqa|head_qa|ScienceQA|sciq|qasc|openbookqa|ai2_arc|^race|quail|cosmos_qa|"

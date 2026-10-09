@@ -146,7 +146,16 @@ imppres__log = Classification("premise","hypothesis","gold_label_log",
     dataset_name="tasksource/imppres", config_name=imppres_implicature,
     post_process=lambda x: _imppres_post_process(x,'logical'))
 
+def _cladder_context(x):
+    """The causal graph decides the answer, but tasksource/cladder keeps it in `reasoning`."""
+    return f'{x["reasoning"]["step0"]} Causal graph: {x["reasoning"]["step1"]}.\n{x["given_info"]}'
+
+cladder = Classification(_cladder_context, "question", "answer", dataset_name="tasksource/cladder",
+    # backdoor-adjustment rows carry no graph at all: identical texts get opposite answers
+    pre_process=lambda ds: ds.filter(lambda x: bool(x["reasoning"]["step1"])))
+
 REASONS = {
+    'cladder': 'CLadder is a causal-reasoning evaluation benchmark, not a training source',
     'mmlu': 'MMLU is an evaluation benchmark; no train split',
     'blimp_hard': 'BLiMP is an evaluation benchmark (test-only minimal pairs)',
     'bigbench': 'BIG-bench is an evaluation suite',

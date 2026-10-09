@@ -41,7 +41,7 @@ from tasksource.jev.options import gold_position_violations
 
 
 SUPPORTED_TYPES = {"Classification", "MultipleChoice", "TokenClassification", "SoftLabeling"}
-PUBLISH_EXCLUDED_PREFIXES = ("bigbench/", "mmlu/", "blimp/")
+PUBLISH_EXCLUDED_PREFIXES = ("bigbench/", "mmlu/", "blimp/", "cladder")
 JEV_TOKEN_TASKS = {
     "conll2003/ner_tags", "wnut_17/wnut_17",
 }
