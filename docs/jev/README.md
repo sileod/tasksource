@@ -86,10 +86,20 @@ removes known answer-style suffixes from 18,353 training rows and deduplicates
 12 identical MapQA requests with identical gold answers. It preserves all source
 families, image bytes, native splits and retained targets. Current totals are
 66,085 train, 972 validation and 475 test decisions. Training license-use counts
-are 26,987 commercial, 7,000 non-commercial and 32,098 unspecified; unresolved
+at that revision were 26,987 commercial, 7,000 non-commercial and 32,098 unspecified; unresolved
 sources are retained and marked, never treated as permission. Original questions
 remain in metadata. The hosted `vision/repair-audit.json` and `vision/repair.py`
 record the pinned parent, exact transformation and reproducible checks.
+
+The [component-license correction](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/commit/b84bfb587aa2118940c25399eb31401eaf542b77)
+adds scoped annotation/image evidence to 32,595 rows from nine source families.
+It resolves FigureQA and BAPPS training restrictions, recording FigureQA's
+redistribution prohibition. Current training counts are 26,987 commercial,
+13,000 non-commercial and 26,098 with unresolved complete-row coverage. Row
+counts, images and decisions are unchanged. The hosted
+[verification receipt](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/blob/main/vision/license-verification.json)
+checks all 49 updated Parquet hashes and the 42 other unchanged Parquet files,
+and reads back 100 updated BAPPS validation rows.
 
 ## Environment and inputs
 
