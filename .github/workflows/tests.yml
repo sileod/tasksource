@@ -16,6 +16,6 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - run: python -m pip install . pytest
+      - run: python -m pip install . pytest requests
       - run: python -c "import tasksource; tasksource.list_tasks(); tasksource.list_tasks(multilingual=True)"
       - run: python -m pytest -q tests

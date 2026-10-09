@@ -174,7 +174,8 @@ def task_licenses(task_ids=None, multilingual=False, fresh=False, vision=False):
 
     ``license`` lists the license of the Hub card of each repo the task loads (and of the
     original behind a tasksource copy) and the licenses recorded by the Data Provenance
-    Initiative, marked ``(DPI)``. ``license_use`` is ``non-commercial`` if any is
+    Initiative, marked ``(DPI)``, plus reviewed original dataset terms with source URLs.
+    ``license_use`` is ``non-commercial`` if any is
     non-commercial or academic-only, else ``commercial`` if one allows commercial use,
     else ``unspecified``. Cards come from a checked-in snapshot; ``fresh=True`` reads
     the current cards from the Hub. A best-effort filter, not legal advice."""

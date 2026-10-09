@@ -1040,7 +1040,7 @@ def source_provenance(source):
 
 
 def source_licenses(sources):
-    """License of each published source, from current Hub cards and the DPI snapshot."""
+    """License evidence from current Hub cards, DPI and reviewed original data terms."""
     repos = {}
     for source in sources:
         try:
