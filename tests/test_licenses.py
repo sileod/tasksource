@@ -7,6 +7,16 @@ from tasksource.licenses import source_license
 
 
 class SourceLicenseTest(unittest.TestCase):
+    def test_original_visual_data_terms_fill_missing_cards(self):
+        for task in ('vision/clevr/count', 'clevr/color', 'vision/mapqa/yesno', 'vision/tqa'):
+            info = source_license(task, ['HuggingFaceM4/the_cauldron'], {})
+            self.assertEqual(info['license_use'], 'commercial')
+            self.assertIn('https://', info['source_license_evidence']['url'])
+        restricted = source_license('vision/clevr/count', ['test/restricted'], {'test/restricted': ['cc-by-nc-4.0']})
+        self.assertEqual(restricted['license_use'], 'non-commercial')
+        # Software terms do not fill missing photo rights.
+        self.assertEqual(source_license('vision/nlvr2', ['pingzhili/nlvr2'], {})['license_use'], 'unspecified')
+
     def test_most_restrictive_license_wins(self):
         repos = ["a/copy", "b/original"]
         self.assertEqual(source_license("x", repos, {"a/copy": ["mit"], "b/original": ["cc-by-nc-4.0"]})["license_use"],

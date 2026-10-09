@@ -1,5 +1,23 @@
 # tasksource-jev-typed-decisions build
 
+Vision source prompts are normalized before recasting: known Cauldron
+answer-length/yes-no suffixes are removed, while `metadata.source_question`
+retains the complete original. Only exact standalone suffixes are removed;
+native task content and answer options are preserved.
+
+Vision exports retain mixed licenses by default. Use
+`python -m scripts.build_jev_dataset --vision --license-use commercial --output BUILD_DIR`
+to exclude unresolved and non-commercial source families before loading data.
+The build manifest records allowed classes and excluded sources; the release
+audit reports row counts by `license_use`. The classification is evidence-based
+metadata, not clearance of every third-party image right. Original data terms for
+[CLEVR](https://cs.stanford.edu/people/jcjohns/clevr/),
+[MapQA](https://github.com/OSU-slatelab/MapQA/blob/main/license), and
+[TQA](https://registry.opendata.aws/allenai-tqa/) now supplement missing Hub cards.
+NLVR2 photo rights and other unresolved sources remain `unspecified`; software
+licenses do not establish image rights. LVIS/COCO source-wide classification
+remains conservatively non-commercial because their mirrors include NC images.
+
 The builders live in [`scripts/`](../../scripts/); canonical recasts, token
 label handling, procedural generators, and augmentations live in
 [`src/tasksource/jev/`](../../src/tasksource/jev/). The public

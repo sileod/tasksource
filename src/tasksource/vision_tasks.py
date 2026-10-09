@@ -6,6 +6,7 @@ import re
 from datasets import Features, Image, Sequence, Value, IterableDataset
 from .preprocess import VisualClassification, VisualMultipleChoice
 from .grounding import grid_labels, grid_center
+from .metadata.source_license_evidence import SOURCE_LICENSE_EVIDENCE
 
 
 def figureqa_rows(dataset):
@@ -47,6 +48,26 @@ def normalize_cauldron_answer(answer):
     return re.sub(r'^Answer:\s*', '', answer.strip(), flags=re.I).casefold().rstrip('.').strip()
 
 
+_CAULDRON_ANSWER_SUFFIXES = frozenset({
+    'Give a very brief answer.', 'Short answer required.', 'Be succinct.',
+    'Quick response, please.', 'Keep it brief.', 'Concise answer only.',
+    'Write a very short answer.', 'Answer briefly.', 'Offer a very short reply.',
+    'Keep it short and to the point.', 'Offer a terse response.',
+    'Your response must be concise.', 'Provide a short and direct response.',
+    'Make the answer very short.', 'Your answer should be very brief.',
+    'Provide a succinct answer.', 'Ensure brevity in your answer.',
+    'Your answer should be compact.', 'Answer yes or no.',
+})
+
+
+def clean_cauldron_question(question):
+    """Remove only known standalone generation suffixes; retain the source in metadata."""
+    lines = question.removeprefix('Question: ').strip().splitlines()
+    while len(lines) > 1 and lines[-1].strip() in _CAULDRON_ANSWER_SUFFIXES:
+        lines.pop()
+    return '\n'.join(lines).strip()
+
+
 def parse_cauldron_mc(qa):
     """Native prompt-encoded options only; return a canonical QA or an audit reason."""
     if '\nChoices:\n' not in qa['user']:
@@ -68,7 +89,7 @@ def parse_cauldron_mc(qa):
     answer = normalize_cauldron_answer(qa['assistant']).upper()
     if answer not in letters:
         return None, 'invalid_gold'
-    inputs = question.removeprefix('Question: ').strip()
+    inputs = clean_cauldron_question(question)
     if not inputs:
         return None, 'empty_question'
     return {'inputs': inputs, 'choices_list': choices, 'labels': letters.index(answer)}, None
@@ -76,9 +97,8 @@ def parse_cauldron_mc(qa):
 
 # Original data terms are separate from repository software licenses.
 _CAULDRON_LICENSE_EVIDENCE = {
-    'clevr': {'source_license': 'cc-by-4.0', 'source_license_url': 'https://cs.stanford.edu/people/jcjohns/clevr/'},
-    'mapqa': {'source_license': 'cc-by-sa-4.0', 'source_license_url': 'https://github.com/OSU-slatelab/MapQA#citation'},
-    'tqa': {'source_license': 'cc-by-sa-4.0', 'source_license_url': 'https://registry.opendata.aws/allenai-tqa/'},
+    **{source: {'source_license': info['license'], 'source_license_url': info['url']}
+       for source, info in SOURCE_LICENSE_EVIDENCE.items()},
     'visual7w': {'source_license': 'unspecified', 'source_license_url': 'https://ai.stanford.edu/~yukez/visual7w/',
                  'source_code_license': 'mit'},
     'intergps': {'source_license': 'unspecified', 'source_license_url': 'https://github.com/lupantech/InterGPS',
@@ -111,7 +131,7 @@ def _cauldron_rows(dataset, allowed_answers=None):
                     answer = normalize_cauldron_answer(qa['assistant'])
                     if answer not in allowed:
                         continue
-                    record = {'inputs': qa['user'].removeprefix('Question: ').strip(), 'labels': answer}
+                    record = {'inputs': clean_cauldron_question(qa['user']), 'labels': answer}
                 record['images'] = images
                 record['metadata'] = json.dumps({'image_group_id': group, 'id': f'{group}:{index}',
                     'source_dataset': qa['source'], 'source_answer': qa['assistant'], 'source_question': qa['user'],

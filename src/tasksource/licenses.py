@@ -1,7 +1,8 @@
 """Task licenses from Hub dataset cards and Data Provenance Initiative annotations.
 
 A task's licenses are the ``license`` of the card of each repo it loads (and of
-the original behind a tasksource copy), plus the licenses DPI records for it.
+the original behind a tasksource copy), plus the licenses DPI records for it
+and reviewed original dataset terms in ``metadata/source_license_evidence.py``.
 ``license_use`` takes the most restrictive classified license: ``non-commercial``
 if any is non-commercial or academic-only, else ``commercial`` if one allows
 commercial use (share-alike and copyleft included), else ``unspecified``
@@ -16,6 +17,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 
 from .metadata.card_licenses import CARD_LICENSES
+from .metadata.source_license_evidence import SOURCE_LICENSE_EVIDENCE
 from .metadata.dpi_licenses import LICENSE_USE as DPI_USE, REPO_LICENSES as DPI_REPOS, TASK_LICENSES as DPI_TASKS
 
 LICENSE_USES = ("commercial", "non-commercial", "unspecified")
@@ -51,16 +53,22 @@ def source_license(task_id, repos, cards=None):
     ``cards`` maps repo -> card licenses and defaults to the checked-in snapshot."""
     cards = CARD_LICENSES if cards is None else cards
     card = {repo: cards[repo] for repo in repos if cards.get(repo)}
-    task = task_id.removeprefix("multilingual/")
+    task = task_id.removeprefix("multilingual/").removeprefix("vision/")
+    evidence = SOURCE_LICENSE_EVIDENCE.get(task.split('/')[0])
     # DPI annotated older tasksource ids; a whole-dataset id also covers its configs
     dpi = sorted(set(DPI_TASKS.get(task, DPI_TASKS.get(task.split("/")[0], []))).union(
         *[DPI_REPOS.get(repo.lower(), []) for repo in repos]))
     uses = {card_license_use(license) for licenses in card.values() for license in licenses}
     uses |= {dpi_license_use(license) for license in dpi}
+    if evidence:
+        uses.add(card_license_use(evidence['license']))
     use = "non-commercial" if "non-commercial" in uses else "commercial" if "commercial" in uses else "unspecified"
     names = sorted({license for licenses in card.values() for license in licenses}) + [f"{name} (DPI)" for name in dpi]
+    if evidence:
+        names.append(f"{evidence['license']} (original source)")
     return {"license": ", ".join(names) or "unspecified", "license_use": use,
-            **({"card_licenses": card} if card else {}), **({"dpi_licenses": dpi} if dpi else {})}
+            **({"card_licenses": card} if card else {}), **({"dpi_licenses": dpi} if dpi else {}),
+            **({'source_license_evidence': evidence} if evidence else {})}
 
 
 def fetch_card_licenses(repos):

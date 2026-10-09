@@ -17,6 +17,7 @@ from pathlib import Path
 
 from datasets import Image, Sequence, load_from_disk
 from PIL import Image as PILImage
+from tasksource.vision_tasks import clean_cauldron_question
 
 
 def image_bytes(image):
@@ -68,6 +69,8 @@ def audit(root, output, sample_per_source=3):
                     split_report["decoded_images"] += 1
                 hashes.append(hashlib.sha256(data).hexdigest())
             metadata = json.loads(row["metadata"])
+            if metadata.get('source_question'):
+                assert clean_cauldron_question(row['state']) == row['state'], 'Leftover source answer-format instruction'
             assert metadata.get("image_group_id") and metadata.get("provenance")
             assert metadata.get("image_ids") == hashes
             if samples[source] < sample_per_source:

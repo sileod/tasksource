@@ -1,5 +1,6 @@
 import io
 import os
+import json
 import pytest
 from PIL import Image as PILImage
 from datasets import Dataset, DatasetDict, Features, Image, Sequence, Value, ClassLabel
@@ -560,6 +561,36 @@ def test_mind2web_repackaging_audit(tmp_path, monkeypatch):
 
 
 from tasksource.vision_tasks import cauldron_mc_rows, cauldron_closed_rows, parse_cauldron_mc
+from tasksource.vision_tasks import clean_cauldron_question, _CAULDRON_ANSWER_SUFFIXES
+
+
+@pytest.mark.parametrize('suffix', sorted(_CAULDRON_ANSWER_SUFFIXES))
+def test_cauldron_answer_style_suffixes(suffix):
+    assert clean_cauldron_question('Question: Count the blue things?\n' + suffix) == 'Count the blue things?'
+
+
+def test_cauldron_prompt_cleanup_preserves_source_and_gold():
+    question = 'Question: Are there two blue things?\nGive a very brief answer.'
+    ds = cauldron_closed_rows(cauldron_source(('Yes.',), [question]), ['yes', 'no'])
+    assert ds['train'][0]['inputs'] == 'Are there two blue things?'
+    assert ds['train'][0]['labels'] == 'yes'
+    assert json.loads(ds['train'][0]['metadata'])['source_question'] == question
+    text = 'Read this caption: Give a very brief answer.\nIs it legible?'
+    assert clean_cauldron_question(text) == text
+    mc = 'Question: Which?\nKeep it brief.\nChoices:\nA. first\nB. second\nAnswer with the letter.'
+    record, reason = parse_cauldron_mc({'user': mc, 'assistant': 'Answer: B'})
+    assert reason is None and record == {'inputs': 'Which?', 'choices_list': ['first', 'second'], 'labels': 1}
+
+
+def test_vision_builder_license_policy_rejects_before_loading(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+    import scripts.build_jev_dataset as builder
+    monkeypatch.setattr(builder, 'source_licenses', lambda sources: {
+        source: {'license': 'unspecified', 'license_use': 'unspecified'} for source in sources})
+    monkeypatch.setattr(builder, 'load_task', lambda *a, **kw: pytest.fail('Rejected source was loaded'))
+    args = SimpleNamespace(output=tmp_path, tasks=['nlvr2'], limit=None, license_use=['commercial'])
+    with pytest.raises(ValueError, match='license policy'):
+        builder.build_vision(args)
 
 
 def cauldron_source(answers=('Answer: B',), questions=None):

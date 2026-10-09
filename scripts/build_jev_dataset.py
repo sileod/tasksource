@@ -29,7 +29,7 @@ from tasksource.access import lmtasks, load_preprocessing
 from tasksource.preprocess import sample_dataset, disable_image_decoding
 from tasksource.metadata.weights import task_weight
 from tasksource.metadata.jev_mixes import length_factor, source_quotas
-from tasksource.licenses import fetch_card_licenses, provenance_repos, source_license
+from tasksource.licenses import LICENSE_USES, fetch_card_licenses, provenance_repos, source_license
 from tasksource.jev.augmentations import augment_jev_internal, stable_fraction
 from tasksource.jev.prompt_augmentations import (
     published_pair_style, published_question_style,
@@ -169,7 +169,7 @@ def build_fingerprint(args):
     shard_args = {name: getattr(args, name, None) for name in SHARD_PARAMETERS}
     if getattr(args, 'vision', False):
         shard_args.update({name: getattr(args, name, None)
-                           for name in ('seed', 'grounding_probabilities', 'excluded_sources')})
+                           for name in ('seed', 'grounding_probabilities', 'excluded_sources', 'license_use')})
     payload = json.dumps(shard_args, sort_keys=True, default=str)
     return hashlib.sha256(payload.encode()).hexdigest()[:16]
 
@@ -1215,12 +1215,18 @@ def build_vision(args):
     if args.limit:
         catalog = catalog.head(args.limit)
     catalog = catalog.assign(source_id='vision/' + catalog.id)
+    licenses = source_licenses(list(catalog.source_id))
+    allowed_uses = getattr(args, 'license_use', None) or list(LICENSE_USES)
+    rejected = {source: info['license_use'] for source, info in licenses.items()
+                if info['license_use'] not in allowed_uses}
+    catalog = catalog[~catalog.source_id.isin(rejected)]
+    if catalog.empty:
+        raise ValueError('No vision tasks satisfy the requested license policy')
     manifest = build_manifest(args, catalog)
     manifest['sampling'] = 'uniform reservoir over complete eligible source splits; shared per-family export caps'
     manifest['family_caps'] = {'train': args.max_rows, 'evaluation': args.max_rows_eval}
+    manifest['license_policy'] = {'allowed_uses': allowed_uses, 'excluded_sources': rejected}
     (output / 'build-manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
-    sources = list(catalog.source_id)
-    licenses = source_licenses(sources)
     features = Features({**TRAINING_FEATURES, 'images': Sequence(Image(decode=False)),
                          'metadata': Value('string'), 'group_id': Value('string'),
                          'question_id': Value('string'), 'example_id': Value('string'),
@@ -1297,6 +1303,7 @@ def build_vision(args):
                            for split, rows in dataset.items()})
     audit = {'repo_id': args.repo_id, 'config': 'vision', 'splits': {
         split: {'rows': len(rows), 'sources': dict(Counter(rows['source'])),
+                'license_use': dict(Counter(rows['license_use'])),
                 'families': dict(Counter(source_family(source) for source in rows['source']))}
         for split, rows in dataset.items()}}
     (output / 'release-audit.json').write_text(json.dumps(audit, indent=2) + '\n')
@@ -1376,6 +1383,8 @@ Typed request renderers preserve images; model-specific image transport remains 
 def build(args):
     if getattr(args, "vision", False):
         return build_vision(args)
+    if getattr(args, 'license_use', None):
+        raise ValueError('--license-use currently requires --vision')
     output = args.output.resolve()
     data_dir = output / "data"
     data_dir.mkdir(parents=True, exist_ok=True)
@@ -1578,6 +1587,8 @@ def parse_args():
         help="Resume even when existing shards come from other code or shard settings.",
     )
     parser.add_argument("--max-rows", type=int, default=30_000)
+    parser.add_argument('--license-use', nargs='+', choices=LICENSE_USES,
+                        help='Vision export: include only these license-use classes; default retains all classes explicitly.')
     parser.add_argument("--max-rows-eval", type=int, default=3_000)
     parser.add_argument(
         "--noul-rate", type=float, default=0.05,
