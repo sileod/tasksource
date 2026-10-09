@@ -621,3 +621,13 @@ while retaining their names in row provenance, excludes requests exceeding 131,0
 metadata in a sidecar without changing the existing text schema. WebLINX is
 marked non-commercial (CC BY-NC-SA 4.0); source license evidence is recorded for
 all six annotations. Visual Mind2Web remains outside this text addition.
+
+The browser addition is published in [data revision
+`1dcd61f`](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/commit/1dcd61f30efb1853adf53b0715609a9848b876a9):
+5,596 train, 573 validation, and 1,149 test decisions were appended identically
+to `default` and `full`. The [verification receipt](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/blob/main/additions/167c5ad6fb79/verification.json)
+records SHA-256 checks for all six added Parquet paths, preservation of all 91
+existing Parquet blobs, and reading/validation of all 1,149 hosted test rows.
+The [coarse audit](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/blob/main/additions/167c5ad6fb79/quality-audit.json)
+covers two training examples per task and records one ambiguous native WebSRC
+stock-availability question. It does not certify every source answer.
