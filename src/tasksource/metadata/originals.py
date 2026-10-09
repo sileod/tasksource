@@ -11,6 +11,8 @@ by scripts/upload_repackaged.py) or a task switches to a mirror.
 """
 
 ORIGINALS = {
+    "tasksource/websrc": ["X-LANCE/WebSRC_v1.0"],
+    "tasksource/superclevr": ["RyanWW/Super-CLEVR"],
     "tasksource/coco-regions": ["winvoker/lvis", "srishti-kaushik/COCO-2017"],
     "tasksource/doclaynet-region": ["docling-project/DocLayNet-v1.1", "docling-project/DocLayNet"],
     "tasksource/bapps": [],  # official BAPPS archives are hosted outside the Hub

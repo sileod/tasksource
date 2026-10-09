@@ -1,6 +1,6 @@
 # Dataset repackaging
 
-Source-specific preparation lives in `text.py`, `vision.py`, and `regions.py`. Publish a pinned,
+Source-specific preparation lives in the Python modules in this directory. Publish a pinned,
 data-only mirror with either command:
 
 ```bash
@@ -23,6 +23,25 @@ Preserve native splits, encoded image bytes and stable source IDs. Keep source
 interpretation, eligibility checks, candidate sampling and geometry calculations
 here. Runtime task declarations should select canonical fields and ontologies;
 a short grouped-QA expansion is retained to avoid repeating stored image bytes.
+
+## Archive-only HTML and Super-CLEVR
+
+```bash
+python -m scripts.repackage_dataset websrc superclevr --max-rows 1000 --max-rows-eval 100 --seed 42
+```
+
+`browser.py` prepares WebSRC's native yes/no and answer-element views as separate
+configs. It preserves original HTML and website splits, verifies native span
+offsets, and records every rejected annotation. Element candidates are all
+nonempty native nodes on eligible pages; the 128-candidate cap excludes whole
+pages independently of the target. Public test answers are not used. Cleaned
+WebLINX is already loadable directly and needs no mirror or new HTML cleaner.
+
+`superclevr.py` joins pinned native question tables, functional programs and
+the image archive without extracting thousands of files. It stores original
+PNG bytes once per sampled image and canonical QAs tagged by program-derived
+view. Row caps count questions across the whole family, not per view. The full
+native ontology and image split disjointness are checked before sampling.
 
 ## Region, preference and correspondence sources
 

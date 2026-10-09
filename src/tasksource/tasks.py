@@ -5,8 +5,10 @@ from datasets import Sequence, ClassLabel, Dataset, DatasetDict, Features, Value
 import ast
 import hashlib
 import html
+import json
 import random
 import re
+import warnings
 
 # the Hub's automatic parquet export of script-only datasets (same splits and features)
 PARQUET = "refs/convert/parquet"
@@ -2400,3 +2402,79 @@ webinstruct___mc = MultipleChoice('prompt', choices_list='options', labels='gold
     dataset_name='tasksource/webinstruct', config_name='mc')
 webinstruct___binary = Classification('prompt', labels='label',
     dataset_name='tasksource/webinstruct', config_name='binary', label_values={0: 'no / false', 1: 'yes / true'})
+
+
+def weblinx_record(row, elements=False):
+    """Use native pre-action context and retrieved candidates, never action arguments."""
+    match = re.match(r'^(click|say|text_input|scroll|load|submit|change)\(', row['action'])
+    if not match:
+        return None, 'invalid_action'
+    operation = match[1]
+    history = row['action_history'] or ''
+    utterances = row['utterances'] or ''
+    if utterances == 'N o   i n s t r u c t o r   u t t e r a n c e ;':
+        utterances = ''
+    if not (history.strip() or utterances.strip()):
+        return None, 'missing_context'
+    inputs = f"User dialogue:\n{utterances}\nPrevious actions:\n{history}\nDOM:\n{row['clean_html']}"
+    metadata = {'id': f"weblinx:{row['demo']}:{row['turn']}", 'demo': row['demo'],
+                'turn': row['turn'], 'input_view': 'dom', 'source_dataset': 'McGill-NLP/WebLINX',
+                'source_revision': _WEBLINX['load_dataset_kwargs']['revision']}
+    if not elements:
+        return {'inputs': inputs + '\nCandidates:\n' + (row['candidates'] or ''),
+                'labels': operation, 'metadata': json.dumps(metadata, sort_keys=True)}, None
+    if operation not in {'click', 'text_input', 'change', 'submit'}:
+        return None, 'non_element_action'
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', SyntaxWarning)
+            action = ast.parse(row['action'], mode='eval').body
+        uid = next((ast.literal_eval(k.value) for k in action.keywords if k.arg == 'uid'), None)
+    except (SyntaxError, ValueError, AttributeError):
+        return None, 'invalid_action'
+    candidates = row['candidates'] or ''
+    markers = list(re.finditer(r'^\(uid = ([\w-]+)\)', candidates, re.M))
+    ids = [marker[1] for marker in markers]
+    if uid is None or ids.count(uid) != 1:
+        return None, 'unresolved_target'
+    if len(ids) < 2 or len(set(ids)) != len(ids):
+        return None, 'invalid_candidates'
+    choices = [candidates[m.start():markers[i+1].start() if i+1 < len(markers) else None].strip()
+               for i, m in enumerate(markers)]
+    metadata['candidate_ids'] = ids
+    metadata['target_id'] = uid
+    return {'inputs': inputs + f'\nOperation: {operation}', 'choices_list': choices,
+            'labels': ids.index(uid), 'metadata': json.dumps(metadata, sort_keys=True)}, None
+
+
+def weblinx_rows(dataset, elements=False):
+    # "test" is the upstream alias of test_iid, not a second evaluation set.
+    if 'test' in dataset and 'test_iid' in dataset:
+        dataset = type(dataset)({k: v for k, v in dataset.items() if k != 'test_iid'})
+    def flatten(batch):
+        records = [weblinx_record(dict(zip(batch, values)), elements)[0] for values in zip(*batch.values())]
+        return {key: [row[key] for row in records if row is not None] for key in features}
+    features = Features({'inputs': Value('string'), 'labels': Value('int64' if elements else 'string'),
+                         'metadata': Value('string')})
+    if elements:
+        features['choices_list'] = Sequence(Value('string'))
+    return type(dataset)({split: rows.map(flatten, batched=True, remove_columns=list(rows.features),
+        features=features) for split, rows in dataset.items()})
+
+
+_WEBLINX = dict(dataset_name='McGill-NLP/WebLINX', config_name='chat', metadata='metadata',
+    complete_splits=False, load_dataset_kwargs={'revision': 'a30ff2cbecb75f2d04fac75a2b92721c6c9e3f13'})
+weblinx__action = Classification('inputs', labels='labels', **_WEBLINX, task_id='weblinx/action',
+    pre_process=weblinx_rows, question='What browser operation comes next?',
+    label_values={v: v for v in ('click', 'say', 'text_input', 'scroll', 'load', 'submit', 'change')})
+weblinx__dom_element = MultipleChoice('inputs', choices_list='choices_list', labels='labels',
+    **_WEBLINX, task_id='weblinx/dom-element', pre_process=lambda ds: weblinx_rows(ds, elements=True),
+    question='Which candidate DOM element should receive the specified operation?')
+
+_WEB_SRC = dict(dataset_name='tasksource/websrc', metadata='metadata', complete_splits=False,
+    load_dataset_kwargs={'revision': 'afdf231cddb18341070f84d3634d36372d9f6297'})
+websrc__yesno = Classification('inputs', labels='labels', **_WEB_SRC, config_name='yesno',
+    task_id='websrc/yesno', label_values={'no': 'No', 'yes': 'Yes'})
+websrc__element = MultipleChoice('inputs', choices_list='choices_list', labels='labels',
+    **_WEB_SRC, config_name='element', task_id='websrc/element',
+    question='Which native DOM element is the deepest element containing the answer?')

@@ -1,0 +1,81 @@
+{
+  "source": "RyanWW/Super-CLEVR",
+  "revision": "2ecf1d00d1fa06b4a4ed9330269ac57d2f411090",
+  "sample_size": 12,
+  "scope": "Two source-image/question pairs per view; full program-output/answer and native split consistency checked over 300000 QAs.",
+  "findings": "Images decode, match their source question identifiers and preserve PNG bytes. Straightforward color, count-zero, size and boolean examples are visually consistent. Several relational/material/subtype questions need careful visual interpretation; this coarse pass is not independent gold reannotation.",
+  "examples": [
+    {
+      "inputs": "There is another rubber thing that is the same shape as the purple matte thing; what is its color?",
+      "labels": "red",
+      "view": "color",
+      "metadata": "{\"id\": \"superclevr:107654\", \"question_family_index\": 26, \"source_answer\": \"red\", \"source_dataset\": \"RyanWW/Super-CLEVR\", \"source_revision\": \"2ecf1d00d1fa06b4a4ed9330269ac57d2f411090\", \"terminal_type\": \"query_color\"}"
+    },
+    {
+      "inputs": "The big cruiser has what color?",
+      "labels": "yellow",
+      "view": "color",
+      "metadata": "{\"id\": \"superclevr:94902\", \"question_family_index\": 4, \"source_answer\": \"yellow\", \"source_dataset\": \"RyanWW/Super-CLEVR\", \"source_revision\": \"2ecf1d00d1fa06b4a4ed9330269ac57d2f411090\", \"terminal_type\": \"query_color\"}"
+    },
+    {
+      "inputs": "How many large red rubber tandem bikes are there?",
+      "labels": "0",
+      "view": "count",
+      "metadata": "{\"id\": \"superclevr:149275\", \"question_family_index\": 0, \"source_answer\": 0, \"source_dataset\": \"RyanWW/Super-CLEVR\", \"source_revision\": \"2ecf1d00d1fa06b4a4ed9330269ac57d2f411090\", \"terminal_type\": \"count\"}"
+    },
+    {
+      "inputs": "What number of other things are the same size as the metallic school bus?",
+      "labels": "3",
+      "view": "count",
+      "metadata": "{\"id\": \"superclevr:169582\", \"question_family_index\": 4, \"source_answer\": 3, \"source_dataset\": \"RyanWW/Super-CLEVR\", \"source_revision\": \"2ecf1d00d1fa06b4a4ed9330269ac57d2f411090\", \"terminal_type\": \"count\"}"
+    },
+    {
+      "inputs": "What material is the big articulated bus in front of the brown bus that is to the left of the yellow bus made of?",
+      "labels": "rubber",
+      "view": "material",
+      "metadata": "{\"id\": \"superclevr:3116\", \"question_family_index\": 4, \"source_answer\": \"rubber\", \"source_dataset\": \"RyanWW/Super-CLEVR\", \"source_revision\": \"2ecf1d00d1fa06b4a4ed9330269ac57d2f411090\", \"terminal_type\": \"query_material\"}"
+    },
+    {
+      "inputs": "There is a small object that is the same shape as the big shiny thing; what material is it?",
+      "labels": "rubber",
+      "view": "material",
+      "metadata": "{\"id\": \"superclevr:8930\", \"question_family_index\": 27, \"source_answer\": \"rubber\", \"source_dataset\": \"RyanWW/Super-CLEVR\", \"source_revision\": \"2ecf1d00d1fa06b4a4ed9330269ac57d2f411090\", \"terminal_type\": \"query_material\"}"
+    },
+    {
+      "inputs": "What shape is the blue object that is behind the tiny green matte thing in front of the tiny bus?",
+      "labels": "school bus",
+      "view": "shape",
+      "metadata": "{\"id\": \"superclevr:13026\", \"question_family_index\": 5, \"source_answer\": \"school bus\", \"source_dataset\": \"RyanWW/Super-CLEVR\", \"source_revision\": \"2ecf1d00d1fa06b4a4ed9330269ac57d2f411090\", \"terminal_type\": \"query_shape\"}"
+    },
+    {
+      "inputs": "The cyan metallic object behind the rubber thing to the left of the cyan metallic object in front of the tiny red object is what shape?",
+      "labels": "sedan",
+      "view": "shape",
+      "metadata": "{\"id\": \"superclevr:106321\", \"question_family_index\": 3, \"source_answer\": \"sedan\", \"source_dataset\": \"RyanWW/Super-CLEVR\", \"source_revision\": \"2ecf1d00d1fa06b4a4ed9330269ac57d2f411090\", \"terminal_type\": \"query_shape\"}"
+    },
+    {
+      "inputs": "There is a shiny thing that is both right of the brown metallic object and in front of the large green shiny road bike; what is its size?",
+      "labels": "small",
+      "view": "size",
+      "metadata": "{\"id\": \"superclevr:83450\", \"question_family_index\": 1, \"source_answer\": \"small\", \"source_dataset\": \"RyanWW/Super-CLEVR\", \"source_revision\": \"2ecf1d00d1fa06b4a4ed9330269ac57d2f411090\", \"terminal_type\": \"query_size\"}"
+    },
+    {
+      "inputs": "What size is the gray shiny bicycle?",
+      "labels": "small",
+      "view": "size",
+      "metadata": "{\"id\": \"superclevr:97589\", \"question_family_index\": 5, \"source_answer\": \"small\", \"source_dataset\": \"RyanWW/Super-CLEVR\", \"source_revision\": \"2ecf1d00d1fa06b4a4ed9330269ac57d2f411090\", \"terminal_type\": \"query_size\"}"
+    },
+    {
+      "inputs": "Do the brown object to the left of the rubber minivan and the small purple matte thing have the same shape?",
+      "labels": "no",
+      "view": "yesno",
+      "metadata": "{\"id\": \"superclevr:137522\", \"question_family_index\": 13, \"source_answer\": false, \"source_dataset\": \"RyanWW/Super-CLEVR\", \"source_revision\": \"2ecf1d00d1fa06b4a4ed9330269ac57d2f411090\", \"terminal_type\": \"equal_shape\"}"
+    },
+    {
+      "inputs": "There is a rubber motorbike that is behind the green airliner; is its size the same as the rubber aeroplane in front of the small matte motorbike?",
+      "labels": "yes",
+      "view": "yesno",
+      "metadata": "{\"id\": \"superclevr:195815\", \"question_family_index\": 6, \"source_answer\": true, \"source_dataset\": \"RyanWW/Super-CLEVR\", \"source_revision\": \"2ecf1d00d1fa06b4a4ed9330269ac57d2f411090\", \"terminal_type\": \"equal_size\"}"
+    }
+  ]
+}

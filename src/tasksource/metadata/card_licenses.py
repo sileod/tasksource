@@ -3,6 +3,11 @@
 Repo -> the card's ``license`` list, ``unknown`` dropped; empty when the card has none."""
 
 CARD_LICENSES = {
+ "McGill-NLP/WebLINX": ["cc-by-nc-sa-4.0"],
+ "X-LANCE/WebSRC_v1.0": ["cc-by-4.0"],
+ "tasksource/websrc": ["cc-by-4.0"],
+ "RyanWW/Super-CLEVR": ["mit"],
+ "tasksource/superclevr": ["mit"],
  "0jl/SPair-71k": [],
  "docling-project/DocLayNet": ["other"],
  "docling-project/DocLayNet-v1.1": ["other"],

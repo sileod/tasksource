@@ -43,7 +43,8 @@ def test_catalog():
                              'tqa', 'hateful-memes', 'clevr/color', 'clevr/shape', 'clevr/size',
                              'clevr/material', 'intergps', 'clevr/count', 'tallyqa/count', 'vsr/yesno',
                              'rico-widget/grid7', 'rico-widget/element', 'lvis/region', 'coco/panoptic-region',
-                             'doclaynet/region', 'bapps/preference', 'spair71k/grid7']
+                             'doclaynet/region', 'bapps/preference', 'spair71k/grid7', 'superclevr/yesno', 'superclevr/count', 'superclevr/color',
+                             'superclevr/shape', 'superclevr/size', 'superclevr/material']
     assert not set(vision.id) & set(list_tasks().id)
     assert all(task_provenance(i, vision=True)['revision'] for i in vision.id)
     assert 'pingzhili/nlvr2' in hub_datasets(['nlvr2'], vision=True)

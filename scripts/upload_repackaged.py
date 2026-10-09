@@ -16,10 +16,14 @@ from scripts.repackage_dataset.text import (
     lewidi, wikipedia_detox_votes, webinstruct, _wikipedia_detox_votes,
 )
 from scripts.repackage_dataset.vision import view2space, ai2d, iconqa_text, mind2web
+from scripts.repackage_dataset.browser import websrc
+from scripts.repackage_dataset.superclevr import superclevr
 from scripts.repackage_dataset.regions import coco_regions, doclaynet_region, bapps, spair71k_grid
 
 
-BUILDERS = {"coco_regions": ("tasksource/coco-regions", coco_regions, "per-config"),
+BUILDERS = {"websrc": ("tasksource/websrc", websrc, "per-config"),
+            "superclevr": ("tasksource/superclevr", superclevr),
+            "coco_regions": ("tasksource/coco-regions", coco_regions, "per-config"),
             "doclaynet_region": ("tasksource/doclaynet-region", doclaynet_region),
             "bapps": ("tasksource/bapps", bapps),
             "spair71k_grid": ("tasksource/spair71k-grid", spair71k_grid),
@@ -40,7 +44,9 @@ BUILDERS = {"coco_regions": ("tasksource/coco-regions", coco_regions, "per-confi
 
 
 # license metadata for repackaged sets, as the originals state it
-LICENSES = {"tasksource/coco-regions": ["other", "cc-by-4.0", "cc-by-2.0",
+LICENSES = {"tasksource/websrc": "cc-by-4.0",
+            "tasksource/superclevr": "mit",
+            "tasksource/coco-regions": ["other", "cc-by-4.0", "cc-by-2.0",
                                       "cc-by-nc-2.0", "cc-by-nc-sa-2.0"],
             "tasksource/doclaynet-region": "cdla-permissive-1.0",
             "tasksource/bapps": "other", "tasksource/spair71k-grid": "other",
@@ -61,7 +67,7 @@ def push_card(repo, build):
     card.text = (f"\n# {repo.split('/')[1]}\n\n{inspect.cleandoc(build.__doc__)}\n\n{sources}"
                  f"Repackaged as {storage} for [tasksource](https://github.com/sileod/tasksource) by "
                  "[scripts/repackage_dataset/](https://github.com/sileod/tasksource/tree/main/scripts/repackage_dataset).\n")
-    if repo in ('tasksource/coco-regions', 'tasksource/doclaynet-region', 'tasksource/bapps', 'tasksource/spair71k-grid'):
+    if repo in ('tasksource/coco-regions', 'tasksource/doclaynet-region', 'tasksource/bapps', 'tasksource/spair71k-grid', 'tasksource/superclevr', 'tasksource/websrc'):
         report = json.loads((Path('build') / (repo.split('/')[1] + '-release') / 'provenance.json').read_text())
         reports = {'default': report} if 'splits' in report else report
         card.text += '\n## Release scope\n\nBounded samples of the eligible native annotations; full classification ontologies are retained.\n\n'
@@ -75,7 +81,7 @@ def push_card(repo, build):
         card.text = source_card.read_text().split('---', 2)[2]
     card.push_to_hub(repo)
     if repo in ('tasksource/view2space', 'tasksource/ai2d', 'tasksource/iconqa-text', 'tasksource/multimodal-mind2web',
-                'tasksource/coco-regions', 'tasksource/doclaynet-region', 'tasksource/bapps', 'tasksource/spair71k-grid'):
+                'tasksource/coco-regions', 'tasksource/doclaynet-region', 'tasksource/bapps', 'tasksource/spair71k-grid', 'tasksource/superclevr', 'tasksource/websrc'):
         from huggingface_hub import HfApi
         directory = Path('build') / ('view2space-release-imagefolder' if repo == 'tasksource/view2space' else repo.split('/')[1] + '-release')
         for filename in ('provenance.json', 'excluded-questions.jsonl'):

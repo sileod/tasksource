@@ -107,10 +107,10 @@ class Preprocessing(DotWiz):
                 del dataset[v]
             if k in dataset and not v: # obfuscated label
                 del dataset[k]
-        dataset = fix_splits(dataset, complete=not visual)
+        dataset = fix_splits(dataset, complete=not visual and self.complete_splits)
 
         for k in list(dataset.keys()):
-            if not visual and k not in self.default_splits:
+            if not visual and self.complete_splits and k not in self.default_splits:
                 del dataset[k]
         dataset = sample_dataset(dataset, max_rows, max_rows_eval,seed=seed)
         dataset = self.on_sampled(dataset)
@@ -155,11 +155,11 @@ class Preprocessing(DotWiz):
                     images.append(image)
                 return {'images': images}
             dataset = dataset.map(embed_images)
-        if not (visual and self.label_values):
+        if not self.label_values:
             dataset = fix_labels(dataset)
         if self.label_values:
             dataset = cast_explicit_label_values(dataset, self.label_values)
-        dataset = fix_splits(dataset, complete=not visual) # again: label mapping changed
+        dataset = fix_splits(dataset, complete=not visual and self.complete_splits) # again: label mapping changed
         dataset = self.post_process(dataset)
         if visual and not isinstance(self, MultipleChoiceFields):
             if not isinstance(dataset['train'].features['labels'], datasets.ClassLabel):
@@ -354,6 +354,7 @@ class SharedFields:
     metadata: object = None  # optional source provenance, normalized to a JSON string
     ordinal: bool = False  # labels are an ordered scale, listed in order (Jev asks part as score)
     score_only: bool = False  # explicitly request score decisions for an ordered label set
+    complete_splits: bool = True  # opt out for source-grouped native partitions
     #language:str="en"
     
 

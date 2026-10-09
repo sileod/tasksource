@@ -1,0 +1,229 @@
+{
+  "source": "McGill-NLP/WebLINX",
+  "revision": "a30ff2cbecb75f2d04fac75a2b92721c6c9e3f13",
+  "splits": {
+    "train": {
+      "rows": 24418,
+      "counts": {
+        "action/eligible": 18232,
+        "dom-element/unresolved_target": 2881,
+        "dom-element/eligible": 13515,
+        "action/missing_context": 6186,
+        "dom-element/missing_context": 6186,
+        "dom-element/non_element_action": 1819,
+        "dom-element/invalid_action": 17
+      },
+      "action_labels": {
+        "click": 13788,
+        "text_input": 2173,
+        "load": 368,
+        "scroll": 1451,
+        "change": 78,
+        "submit": 374
+      }
+    },
+    "validation": {
+      "rows": 2126,
+      "counts": {
+        "action/eligible": 1537,
+        "dom-element/eligible": 895,
+        "dom-element/unresolved_target": 436,
+        "action/missing_context": 589,
+        "dom-element/missing_context": 589,
+        "dom-element/non_element_action": 204,
+        "dom-element/invalid_action": 2
+      },
+      "action_labels": {
+        "click": 1176,
+        "text_input": 129,
+        "submit": 22,
+        "load": 34,
+        "scroll": 170,
+        "change": 6
+      }
+    },
+    "test": {
+      "rows": 2308,
+      "counts": {
+        "action/eligible": 1700,
+        "dom-element/eligible": 1013,
+        "dom-element/unresolved_target": 529,
+        "action/missing_context": 608,
+        "dom-element/missing_context": 608,
+        "dom-element/non_element_action": 152,
+        "dom-element/invalid_action": 6
+      },
+      "action_labels": {
+        "click": 1322,
+        "scroll": 124,
+        "text_input": 194,
+        "submit": 32,
+        "load": 28
+      }
+    },
+    "test_geo": {
+      "rows": 7672,
+      "counts": {
+        "action/eligible": 5883,
+        "dom-element/eligible": 2419,
+        "dom-element/unresolved_target": 2778,
+        "action/missing_context": 1789,
+        "dom-element/missing_context": 1789,
+        "dom-element/non_element_action": 685,
+        "dom-element/invalid_action": 1
+      },
+      "action_labels": {
+        "click": 4411,
+        "text_input": 581,
+        "scroll": 611,
+        "submit": 122,
+        "change": 84,
+        "load": 74
+      }
+    },
+    "test_vis": {
+      "rows": 9023,
+      "counts": {
+        "action/eligible": 6342,
+        "dom-element/eligible": 3056,
+        "action/missing_context": 2681,
+        "dom-element/missing_context": 2681,
+        "dom-element/unresolved_target": 2775,
+        "dom-element/non_element_action": 503,
+        "dom-element/invalid_action": 8
+      },
+      "action_labels": {
+        "click": 4922,
+        "text_input": 682,
+        "scroll": 369,
+        "load": 134,
+        "change": 71,
+        "submit": 164
+      }
+    },
+    "test_cat": {
+      "rows": 5971,
+      "counts": {
+        "action/eligible": 4536,
+        "dom-element/eligible": 1468,
+        "action/missing_context": 1435,
+        "dom-element/missing_context": 1435,
+        "dom-element/unresolved_target": 2609,
+        "dom-element/non_element_action": 453,
+        "dom-element/invalid_action": 6
+      },
+      "action_labels": {
+        "click": 3511,
+        "text_input": 430,
+        "scroll": 349,
+        "load": 104,
+        "submit": 97,
+        "change": 45
+      }
+    },
+    "test_web": {
+      "rows": 4856,
+      "counts": {
+        "action/eligible": 3639,
+        "dom-element/unresolved_target": 1669,
+        "dom-element/eligible": 1488,
+        "action/missing_context": 1217,
+        "dom-element/missing_context": 1217,
+        "dom-element/non_element_action": 456,
+        "dom-element/invalid_action": 26
+      },
+      "action_labels": {
+        "click": 2716,
+        "text_input": 407,
+        "change": 22,
+        "submit": 38,
+        "load": 78,
+        "scroll": 378
+      }
+    }
+  },
+  "demo_overlap": {
+    "train:validation": 0,
+    "train:test": 0,
+    "train:test_geo": 0,
+    "train:test_vis": 0,
+    "train:test_cat": 0,
+    "train:test_web": 0,
+    "validation:test": 0,
+    "validation:test_geo": 0,
+    "validation:test_vis": 0,
+    "validation:test_cat": 0,
+    "validation:test_web": 0,
+    "test:test_geo": 0,
+    "test:test_vis": 0,
+    "test:test_cat": 0,
+    "test:test_web": 0,
+    "test_geo:test_vis": 0,
+    "test_geo:test_cat": 0,
+    "test_geo:test_web": 0,
+    "test_vis:test_cat": 0,
+    "test_vis:test_web": 0,
+    "test_cat:test_web": 0
+  },
+  "coarse_review": {
+    "sample_size": {
+      "action": 2,
+      "dom-element": 2
+    },
+    "findings": [
+      "The first two action labels are native click operations; one lacks a resolvable DOM target and is usable only for operation classification.",
+      "Two retained DOM-selection samples keep the native target among retrieved elements; action arguments are not inputs.",
+      "Garbled no-instructor placeholders and missing histories are excluded when no usable dialogue remains."
+    ],
+    "limitations": "Candidate descriptions and HTML are upstream-truncated; some nested targets remain visually or textually ambiguous."
+  },
+  "websrc": {
+    "source": "X-LANCE/WebSRC_v1.0",
+    "revision": "7aa0bc6efc7ef43f68c192e2091108541acbaf1a",
+    "format_version": 1,
+    "excluded_rows": 71502,
+    "license": "cc-by-4.0",
+    "license_url": "https://huggingface.co/datasets/X-LANCE/WebSRC_v1.0/blob/7aa0bc6efc7ef43f68c192e2091108541acbaf1a/README.md",
+    "selection": {
+      "seed": 42,
+      "max_rows": 1000,
+      "max_rows_eval": 100
+    },
+    "source_counts": {
+      "validation/element/eligible": 36106,
+      "train/element/eligible": 224663,
+      "validation/excluded/candidate_count": 11458,
+      "train/yesno/eligible": 23391,
+      "train/excluded/candidate_count": 48896,
+      "validation/yesno/eligible": 4479,
+      "validation/excluded/non_deepest_target": 783,
+      "train/excluded/non_deepest_target": 10365
+    },
+    "max_candidates": 128,
+    "parser_sha256": "a337b44d70f741c776020a974d30157e4447595107eb33e3b9f107222a03af48",
+    "record_sha256": "b43860657469ae2df8f8cb1a9f42498b2b0898db924518991bb889101eb7d0b3",
+    "pilot": {
+      "yesno": {
+        "train": 1000,
+        "validation": 100
+      },
+      "element": {
+        "train": 1000,
+        "validation": 100
+      }
+    },
+    "coarse_review": {
+      "sample_size": {
+        "yesno": 2,
+        "element": 2
+      },
+      "findings": [
+        "Horsepower answer 192 hp is attached to its native table-cell tid.",
+        "Player age 33 years old is attached to the deepest native list item.",
+        "The director question correctly rejects Brie Larson; HTML names Lenny Abrahamson.",
+        "Inventory yes/no has weaker evidence: a listed product has an Add to Cart control; no explicit stock sentence."
+      ],
+      "limitations": "Native yes/no annotations can require implicit page semantics. Public test answers are deliberately unused."
+    }
+  }
+}

@@ -6,6 +6,39 @@ label handling, procedural generators, and augmentations live in
 `tasksource.recast_jev` and `load_task(..., recast="jev")` APIs are unchanged.
 The release card is [`dataset_cards/tasksource-jev.md`](../../dataset_cards/tasksource-jev.md).
 
+## Browser structure and Super-CLEVR
+
+`weblinx/action` and `weblinx/dom-element` load the pinned cleaned WebLINX
+`chat` tables directly, using ordinary text templates. Inputs contain only
+recorded dialogue, previous actions and pre-action DOM context. Element choices
+are native retrieved candidates: unresolved targets are excluded, never inserted.
+Native evaluation partitions are retained; `test_iid` is represented once as
+`test`. All demonstration IDs are disjoint across partitions. The data license
+is CC BY-NC-SA 4.0, including the original third-party terms.
+
+`websrc/yesno` and `websrc/element` use the reproducible
+[`browser.py`](../../scripts/repackage_dataset/browser.py) archive conversion.
+The pilot mirror has 1,000 train and 100 native development rows per view.
+Original HTML and website/page identities are retained; spans and deepest DOM
+targets are checked. Pages with more than 128 text-bearing elements are excluded
+from element selection. No test answers or synthetic options are used. Source
+license: CC BY 4.0. See [browser-audit.json](browser-audit.json) for retained and
+dropped counts and the small manual review. Screenshot-dependent WebLINX views
+still require heavier preparation; the proposed SWDE repository was unavailable.
+
+Super-CLEVR uses six visual views: `superclevr/{yesno,count,color,shape,size,material}`.
+The pinned source requires joining its image archive with questions and programs;
+[`superclevr.py`](../../scripts/repackage_dataset/superclevr.py) performs this once.
+The pilot retains 1,000 train and 100 questions per native evaluation split,
+shared across the six views. Original PNGs are grouped once per image. Program
+terminals determine the view; counts cover 0–10 and shape covers 21 native vehicle
+subtypes. Programs and answers remain outside model inputs. The source card
+licenses the dataset under MIT. The export shares one `vision/superclevr` family
+budget. See [superclevr-audit.json](superclevr-audit.json) for the coarse review.
+
+Reproduce either pilot with `python -m scripts.upload_repackaged websrc --max-rows
+1000 --max-rows-eval 100 --seed 42` or the same command with `superclevr`.
+
 ## Environment and inputs
 
 Run commands from the repository root with Tasksource's Python dependencies,

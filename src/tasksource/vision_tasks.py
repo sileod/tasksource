@@ -22,19 +22,25 @@ def figureqa_rows(dataset):
                           for split, rows in dataset.items()})
 
 
-def grouped_mc_rows(dataset):
-    """Flatten canonical QAs that share ordered encoded images in a visual mirror."""
+def grouped_qa_rows(dataset, view=None, multiple_choice=False):
+    """Flatten canonical QAs sharing encoded images, optionally selecting a source view."""
     def flatten(batch):
         rows = [(images, group, qa) for images, group, qas in zip(
-            batch['images'], batch['image_group_id'], batch['qa']) for qa in qas]
+            batch['images'], batch['image_group_id'], batch['qa']) for qa in qas if view is None or qa['view'] == view]
         return {'images': [images for images, group, qa in rows],
-                **{key: [qa[key] for images, group, qa in rows] for key in ('inputs', 'choices_list', 'labels')},
+                **{key: [qa[key] for images, group, qa in rows] for key in (('inputs', 'choices_list', 'labels') if multiple_choice else ('inputs', 'labels'))},
                 'metadata': [json.dumps({**json.loads(qa['metadata']), 'image_group_id': group},
                     ensure_ascii=False, sort_keys=True) for images, group, qa in rows]}
     features = Features({'images': Sequence(Image(decode=False)), 'inputs': Value('string'),
-        'choices_list': Sequence(Value('string')), 'labels': Value('int64'), 'metadata': Value('string')})
+        'labels': Value('int64' if multiple_choice else 'string'), 'metadata': Value('string')})
+    if multiple_choice:
+        features['choices_list'] = Sequence(Value('string'))
     return type(dataset)({split: rows.map(flatten, batched=True, batch_size=16,
         remove_columns=list(rows.features), features=features) for split, rows in dataset.items()})
+
+
+def grouped_mc_rows(dataset):
+    return grouped_qa_rows(dataset, multiple_choice=True)
 
 
 def normalize_cauldron_answer(answer):
@@ -500,3 +506,24 @@ spair71k_grid7 = VisualClassification(
              'Rows r0–r6 run top to bottom; columns c0–c6 run left to right.',
     load_dataset_kwargs={'revision': 'bb618c093d81057971b6f6ea49833a505ceb1228'},
 )
+
+
+_SUPERCLEVR = dict(dataset_name='tasksource/superclevr', metadata='metadata',
+    load_dataset_kwargs={'revision': 'b1dcf17611d997e227ff13fd5692d3705fbf35a1'})
+_SUPERCLEVR_SHAPE = {v: v for v in ('airliner', 'articulated bus', 'biplane', 'chopper',
+    'cruiser', 'dirtbike', 'double bus', 'fighter', 'jet', 'minivan', 'mountain bike',
+    'regular bus', 'road bike', 'school bus', 'scooter', 'sedan', 'suv', 'tandem bike',
+    'truck', 'utility bike', 'wagon')}
+
+superclevr__yesno = VisualClassification(**_SUPERCLEVR, task_id='superclevr/yesno',
+    pre_process=lambda ds: grouped_qa_rows(ds, 'yesno'), label_values=_YESNO)
+superclevr__count = VisualClassification(**_SUPERCLEVR, task_id='superclevr/count',
+    pre_process=lambda ds: grouped_qa_rows(ds, 'count'), label_values={str(i): str(i) for i in range(11)})
+superclevr__color = VisualClassification(**_SUPERCLEVR, task_id='superclevr/color',
+    pre_process=lambda ds: grouped_qa_rows(ds, 'color'), label_values=_COLOR)
+superclevr__shape = VisualClassification(**_SUPERCLEVR, task_id='superclevr/shape',
+    pre_process=lambda ds: grouped_qa_rows(ds, 'shape'), label_values=_SUPERCLEVR_SHAPE)
+superclevr__size = VisualClassification(**_SUPERCLEVR, task_id='superclevr/size',
+    pre_process=lambda ds: grouped_qa_rows(ds, 'size'), label_values=_SIZE)
+superclevr__material = VisualClassification(**_SUPERCLEVR, task_id='superclevr/material',
+    pre_process=lambda ds: grouped_qa_rows(ds, 'material'), label_values=_MATERIAL)
