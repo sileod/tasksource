@@ -101,6 +101,19 @@ counts, images and decisions are unchanged. The hosted
 checks all 49 updated Parquet hashes and the 42 other unchanged Parquet files,
 and reads back 100 updated BAPPS validation rows.
 
+The [English task rebuild](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/commit/015600d0873de20a5d9f418ca412a05d627d906c)
+makes missing-item membership and WikiHow step ordering explicit, and converts
+QuaRel's native (A)/(B) alternatives to MC answer text with remapped golds.
+Missing-item's query was present at the end of the previous state; it is now
+separated from the list. The rebuild removes obsolete generic prompt variants,
+QuaRel's classification-only packs, and all CLadder rows. CLadder's annotation
+is retained in `eval_only.py`. Training counts are now 1,026,061 (`default`),
+2,523,746 (`full`), and 1,305,072 (`filtered-full`); default/full evaluation counts
+are 14,977 validation and 15,098 test. Other tasks and all vision files are
+unchanged. The [verification receipt](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/blob/main/english-task-verification.json)
+checks all 35 changed Parquet hashes, 56 unchanged Parquet files (including all
+50 vision shards), and reads back hosted examples of the three corrected tasks.
+
 ## Environment and inputs
 
 Run commands from the repository root with Tasksource's Python dependencies,
