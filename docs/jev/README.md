@@ -39,6 +39,18 @@ budget. See [superclevr-audit.json](superclevr-audit.json) for the coarse review
 Reproduce either pilot with `python -m scripts.upload_repackaged websrc --max-rows
 1000 --max-rows-eval 100 --seed 42` or the same command with `superclevr`.
 
+The [2026-10-09 selective vision update](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/commit/94c2ebb18662a11f9d362f9f469aa13599e6f2dd)
+adds the five prepared region/preference/correspondence tasks and six Super-CLEVR
+views. It preserves the existing shards and adds 6,000 train, 597 validation and
+300 test decisions, with a 1,000-train-row cap per new family. Totals are 66,097
+train, 972 validation and 475 test rows. Every added image decoded and every
+recast gold answer matched the native mirror label; 20 previously reviewed
+examples were reopened in the exported rows. Mind2Web remains excluded. These
+are coarse source-quality checks, not independent reannotation of every label.
+HTML-only WebLINX and WebSRC tasks are in the English catalog rather than this
+visual config. Parent revision, source pins, append recipe, exclusions and checks
+are recorded under the hosted dataset's `vision/` directory.
+
 ## Environment and inputs
 
 Run commands from the repository root with Tasksource's Python dependencies,
