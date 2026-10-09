@@ -2493,3 +2493,13 @@ websrc__yesno = Classification('inputs', labels='labels', **_WEB_SRC, config_nam
 websrc__element = MultipleChoice('inputs', choices_list='choices_list', labels='labels',
     **_WEB_SRC, config_name='element', task_id='websrc/element',
     question='Which native DOM element is the deepest element containing the answer?')
+
+# Public training trajectories only; mirror supplies trajectory/page-disjoint internal holdouts.
+_MIND2WEB_DOM = dict(dataset_name='tasksource/mind2web-dom', metadata='metadata', complete_splits=False,
+    load_dataset_kwargs={'revision': '90e03a996737ec06e16401ee800f99b53535f556'})
+mind2web__action = Classification('inputs', labels='labels', **_MIND2WEB_DOM,
+    config_name='action', task_id='mind2web/action', question='What browser operation comes next?',
+    label_values={v: v for v in ('CLICK', 'TYPE', 'SELECT')})
+mind2web__dom_element = MultipleChoice('inputs', choices_list='choices_list', labels='labels',
+    **_MIND2WEB_DOM, config_name='dom-element', task_id='mind2web/dom-element',
+    question='Which candidate DOM element should receive the specified operation?')

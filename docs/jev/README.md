@@ -583,3 +583,41 @@ or preference task and 5,000 SPair examples, with up to 100 per native evaluatio
 split. The [coarse audit](region-audit.json) records three samples per task,
 label distributions and exclusion counts. One small, occluded LVIS object remains
 visually uncertain; BAPPS labels are subjective native human preferences.
+
+### HTML browser decisions
+
+The English catalog exposes `weblinx/action`, `weblinx/dom-element`,
+`websrc/yesno`, `websrc/element`, `mind2web/action`, and `mind2web/dom-element`.
+They use ordinary Classification/MultipleChoice templates with HTML/DOM text;
+no screenshot or visual template is required. For example:
+
+```python
+load_task('mind2web/dom-element', recast='jev', max_rows=10)
+```
+
+Mind2Web reads the pinned `tasksource/mind2web-dom` mirror. Its only upstream
+input is the **public training pool**: 1,009 trajectories / 7,775 actions.
+Internal holdouts keep whole trajectories and identical DOM snapshots together;
+the deterministic 80/10/10 group assignment yields 789 training, 103 validation,
+and 117 test trajectories. Action rows number 6,108 / 773 / 894; eligible native
+four-way element rows number 4,040 / 516 / 553. Missing/ambiguous original targets
+are excluded from element selection. All alternative positives are excluded
+from negative candidates. Current/future action descriptions and target values
+never enter inputs; only past actions are included.
+
+These holdouts are not the official Mind2Web cross-task/website/domain benchmark
+partitions. The Decision Index Space publishes Mind2Web scores but does not
+publish its private evaluation row IDs; exact alignment/non-overlap with that
+private set has **not** been verified. Original trajectory/action IDs, snapshot
+hashes and the full split index are published in the mirror's `provenance.json`
+and row metadata so that a later overlap check can use source identity.
+
+`python -m scripts.append_jev_browser` stages direct browser decisions for the
+hosted `default` and `full` configs; `--push` publishes the reviewed patch with a
+parent-revision guard. Existing Parquet blobs are checked for preservation.
+The patch keeps source partitions, caps each task at 1,000 train / 100 rows per
+native evaluation split, folds WebLINX named test subsets into hosted `test`
+while retaining their names in row provenance, excludes requests exceeding 131,072 UTF-8 bytes, and records source-row
+metadata in a sidecar without changing the existing text schema. WebLINX is
+marked non-commercial (CC BY-NC-SA 4.0); source license evidence is recorded for
+all six annotations. Visual Mind2Web remains outside this text addition.

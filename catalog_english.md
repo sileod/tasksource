@@ -1,4 +1,4 @@
-501 English tasks. Load one with `load_task(id)`; the annotations are in [tasks.py](src/tasksource/tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
+503 English tasks. Load one with `load_task(id)`; the annotations are in [tasks.py](src/tasksource/tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
 
 | # | id | type | dataset | question |
 |--:|---|---|---|:-:|
@@ -329,10 +329,10 @@
 | 325 | [oasst2_dense_flat/toxicity](src/tasksource/tasks.py#L1323) | Classification | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) | ✓ |
 | 326 | [oasst2_dense_flat/helpfulness](src/tasksource/tasks.py#L1325) | Classification | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) | ✓ |
 | 327 | [mindgames](src/tasksource/tasks.py#L1328) | Classification | [sileod/mindgames](https://hf.co/datasets/sileod/mindgames) |  |
-| 328 | [universal_dependencies/en_lines/deprel](src/tasksource/tasks.py#L1342) | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
-| 329 | [universal_dependencies/en_partut/deprel](src/tasksource/tasks.py#L1342) | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
-| 330 | [universal_dependencies/en_gum/deprel](src/tasksource/tasks.py#L1342) | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
-| 331 | [universal_dependencies/en_ewt/deprel](src/tasksource/tasks.py#L1342) | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| 328 | [universal_dependencies/en_gum/deprel](src/tasksource/tasks.py#L1342) | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| 329 | [universal_dependencies/en_ewt/deprel](src/tasksource/tasks.py#L1342) | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| 330 | [universal_dependencies/en_lines/deprel](src/tasksource/tasks.py#L1342) | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
+| 331 | [universal_dependencies/en_partut/deprel](src/tasksource/tasks.py#L1342) | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) |  |
 | 332 | [ambient](src/tasksource/tasks.py#L1348) | Classification | [tasksource/ambient](https://hf.co/datasets/tasksource/ambient) | ✓ |
 | 333 | [path-naturalness-prediction](src/tasksource/tasks.py#L1353) | MultipleChoice | [tasksource/path-naturalness-prediction](https://hf.co/datasets/tasksource/path-naturalness-prediction) | ✓ |
 | 334 | [civil_comments/toxicity](src/tasksource/tasks.py#L1363) | Classification | [google/civil_comments](https://hf.co/datasets/google/civil_comments) | ✓ |
@@ -494,8 +494,8 @@
 | 490 | [jigsaw_toxicity](src/tasksource/tasks.py#L2196) | Classification | [tasksource/jigsaw_toxicity](https://hf.co/datasets/tasksource/jigsaw_toxicity) |  |
 | 491 | [Pol_NLI](src/tasksource/tasks.py#L2199) | Classification | [mlburnham/Pol_NLI](https://hf.co/datasets/mlburnham/Pol_NLI) |  |
 | 492 | [synthetic-retrieval-NLI/binary](src/tasksource/tasks.py#L2202) | Classification | [tasksource/synthetic-retrieval-NLI](https://hf.co/datasets/tasksource/synthetic-retrieval-NLI) |  |
-| 493 | [synthetic-retrieval-NLI/count](src/tasksource/tasks.py#L2202) | Classification | [tasksource/synthetic-retrieval-NLI](https://hf.co/datasets/tasksource/synthetic-retrieval-NLI) |  |
-| 494 | [synthetic-retrieval-NLI/position](src/tasksource/tasks.py#L2202) | Classification | [tasksource/synthetic-retrieval-NLI](https://hf.co/datasets/tasksource/synthetic-retrieval-NLI) |  |
+| 493 | [synthetic-retrieval-NLI/position](src/tasksource/tasks.py#L2202) | Classification | [tasksource/synthetic-retrieval-NLI](https://hf.co/datasets/tasksource/synthetic-retrieval-NLI) |  |
+| 494 | [synthetic-retrieval-NLI/count](src/tasksource/tasks.py#L2202) | Classification | [tasksource/synthetic-retrieval-NLI](https://hf.co/datasets/tasksource/synthetic-retrieval-NLI) |  |
 | 495 | [github-issue-similarity](src/tasksource/tasks.py#L2211) | Classification | [WhereIsAI/github-issue-similarity](https://hf.co/datasets/WhereIsAI/github-issue-similarity) |  |
 | 496 | [webinstruct/mc](src/tasksource/tasks.py#L2416) | MultipleChoice | [tasksource/webinstruct](https://hf.co/datasets/tasksource/webinstruct) |  |
 | 497 | [webinstruct/binary](src/tasksource/tasks.py#L2418) | Classification | [tasksource/webinstruct](https://hf.co/datasets/tasksource/webinstruct) |  |
@@ -503,6 +503,8 @@
 | 499 | [weblinx/dom-element](src/tasksource/tasks.py#L2485) | MultipleChoice | [McGill-NLP/WebLINX](https://hf.co/datasets/McGill-NLP/WebLINX) | ✓ |
 | 500 | [websrc/yesno](src/tasksource/tasks.py#L2491) | Classification | [tasksource/websrc](https://hf.co/datasets/tasksource/websrc) |  |
 | 501 | [websrc/element](src/tasksource/tasks.py#L2493) | MultipleChoice | [tasksource/websrc](https://hf.co/datasets/tasksource/websrc) | ✓ |
+| 502 | [mind2web/action](src/tasksource/tasks.py#L2500) | Classification | [tasksource/mind2web-dom](https://hf.co/datasets/tasksource/mind2web-dom) | ✓ |
+| 503 | [mind2web/dom-element](src/tasksource/tasks.py#L2503) | MultipleChoice | [tasksource/mind2web-dom](https://hf.co/datasets/tasksource/mind2web-dom) | ✓ |
 
 ## Soft labels
 

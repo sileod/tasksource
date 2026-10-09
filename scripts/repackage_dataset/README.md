@@ -83,3 +83,20 @@ labels are target-image cells in a 7×7 grid. Original keypoint coordinates,
 image identities and geometry remain in metadata, separate from inputs.
 Official archive content hashes are verified before either archive-based
 conversion runs. SPair's PASCAL/Flickr source terms remain applicable.
+
+`mind2web_dom` prepares HTML-only action classification and four-way native DOM
+element selection from `osunlp/Mind2Web`'s public training trajectories. It
+retains original trajectory/action IDs, cleaned DOM content, and only past
+actions. Missing/ambiguous original targets are excluded from element selection;
+alternative positives never become distractors. The mirror uses all eligible
+training-source actions, with deterministic 80/10/10 internal holdouts grouped
+by whole trajectory and identical DOM snapshots. These are **not** the official
+benchmark test splits. Reproduce with:
+
+```bash
+python -m scripts.repackage_dataset mind2web_dom
+```
+
+The data-only mirror is `tasksource/mind2web-dom` (`action`, `dom-element` configs).
+`provenance.json` records the pinned upstream revision, file/code hashes, counts,
+and complete trajectory-to-split mapping. No protected benchmark tests are read.
