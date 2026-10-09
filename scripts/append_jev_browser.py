@@ -18,6 +18,7 @@ import yaml
 
 from tasksource import load_task, task_provenance, list_tasks
 from tasksource.jev.length import render_request
+from tasksource.licenses import provenance_repos
 from scripts.build_jev_dataset import (PUBLISH_EXCLUDED_PREFIXES, example_key, slug,
                                       to_training_row, validate_decisions, source_licenses)
 
@@ -72,9 +73,8 @@ def build(output, max_rows=1000, max_rows_eval=100):
                 if meta.get('page_group_id'):
                     page_sets[split].add((task.split('/')[0], meta['page_group_id']))
             counts[split] = sum(row['source'] == task for row in rows[split])
-        sources['sources'][task] = dict(rows=counts, dataset=provenance[task]['dataset'],
-            revisions={provenance[task]['dataset']:provenance[task]['revision']},
-            config=provenance[task]['config'], license=licenses[task]['license'], license_use=licenses[task]['license_use'])
+        sources['sources'][task] = dict(**provenance[task], rows=counts,
+            revisions={provenance[task]['dataset']:provenance[task]['revision']}, **licenses[task])
     for a in rows:
         for b in rows:
             if a != b:
@@ -114,7 +114,7 @@ def build(output, max_rows=1000, max_rows_eval=100):
             split['num_bytes'] += addition['num_bytes']
         info['dataset_size'] += sum(v['num_bytes'] for v in stats.values())
         info['download_size'] += sum(v['file_bytes'] for v in stats.values())
-    sources['datasets'] = sorted(set(sources['datasets']) | {p['dataset'] for p in provenance.values()} | {'osunlp/Mind2Web'})
+    sources['datasets'] = sorted(set(sources['datasets']) | {repo for p in provenance.values() for repo in provenance_repos(p)})
     manifest = dict(parent_revision=before.sha, tasks=tasks, configs=['default','full'],
         max_rows=max_rows, max_rows_eval=max_rows_eval, splits=stats, provenance=provenance,
         excluded=exclusions, max_request_bytes=131072, licenses=licenses,
