@@ -69,6 +69,16 @@ HTML-only WebLINX and WebSRC tasks are in the English catalog rather than this
 visual config. Parent revision, source pins, append recipe, exclusions and checks
 are recorded under the hosted dataset's `vision/` directory.
 
+The [prompt/license correction](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/commit/9a2996d4a25ab99493dd27080b30cb9b2fedce6d)
+removes known answer-style suffixes from 18,353 training rows and deduplicates
+12 identical MapQA requests with identical gold answers. It preserves all source
+families, image bytes, native splits and retained targets. Current totals are
+66,085 train, 972 validation and 475 test decisions. Training license-use counts
+are 26,987 commercial, 7,000 non-commercial and 32,098 unspecified; unresolved
+sources are retained and marked, never treated as permission. Original questions
+remain in metadata. The hosted `vision/repair-audit.json` and `vision/repair.py`
+record the pinned parent, exact transformation and reproducible checks.
+
 ## Environment and inputs
 
 Run commands from the repository root with Tasksource's Python dependencies,
