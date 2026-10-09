@@ -11,6 +11,10 @@ by scripts/upload_repackaged.py) or a task switches to a mirror.
 """
 
 ORIGINALS = {
+    "tasksource/coco-regions": ["winvoker/lvis", "srishti-kaushik/COCO-2017"],
+    "tasksource/doclaynet-region": ["docling-project/DocLayNet-v1.1", "docling-project/DocLayNet"],
+    "tasksource/bapps": [],  # official BAPPS archives are hosted outside the Hub
+    "tasksource/spair71k-grid": ["0jl/SPair-71k"],
     "tasksource/ai2d": ["HuggingFaceM4/the_cauldron"],
     "tasksource/iconqa-text": ["HuggingFaceM4/the_cauldron"],
     "tasksource/multimodal-mind2web": ["osunlp/Multimodal-Mind2Web"],

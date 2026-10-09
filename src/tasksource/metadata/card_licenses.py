@@ -3,6 +3,15 @@
 Repo -> the card's ``license`` list, ``unknown`` dropped; empty when the card has none."""
 
 CARD_LICENSES = {
+ "0jl/SPair-71k": [],
+ "docling-project/DocLayNet": ["other"],
+ "docling-project/DocLayNet-v1.1": ["other"],
+ "srishti-kaushik/COCO-2017": ["cc-by-4.0"],
+ "tasksource/bapps": ["other"],
+ "tasksource/coco-regions": ["other", "cc-by-4.0", "cc-by-2.0", "cc-by-nc-2.0", "cc-by-nc-sa-2.0"],
+ "tasksource/doclaynet-region": ["cdla-permissive-1.0"],
+ "tasksource/spair71k-grid": ["other"],
+ "winvoker/lvis": ["cc-by-4.0"],
  "tasksource/ai2d": ["cc-by-sa-4.0"],
  "tasksource/iconqa-text": ["cc-by-nc-sa-4.0"],
  "tasksource/multimodal-mind2web": ["openrail"],

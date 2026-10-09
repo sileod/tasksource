@@ -467,3 +467,36 @@ rico_widget_element = VisualMultipleChoice(
     load_dataset_kwargs={'revision': '6ec57b56bebd722b9c646c78d0f34e1199b6d7a9', 'streaming': True,
                          'columns': ['screenId', 'image', 'bbox', 'captions', 'semantic_annotations']},
 )
+
+
+lvis_region = VisualClassification(
+    dataset_name='tasksource/coco-regions', config_name='lvis', task_id='lvis/region',
+    metadata='metadata', question='What object category is highlighted in red?',
+    load_dataset_kwargs={'revision': '0ab5c2f908e4a4db268515869bcde3913de2bc91'},
+)
+
+coco_panoptic_region = VisualClassification(
+    dataset_name='tasksource/coco-regions', config_name='panoptic', task_id='coco/panoptic-region',
+    metadata='metadata', question='What category is the image segment highlighted in red?',
+    load_dataset_kwargs={'revision': '0ab5c2f908e4a4db268515869bcde3913de2bc91'},
+)
+
+doclaynet_region = VisualClassification(
+    dataset_name='tasksource/doclaynet-region', task_id='doclaynet/region',
+    metadata='metadata', question='What document layout category is highlighted in red?',
+    load_dataset_kwargs={'revision': 'ad3465ea6385871b9102308865554150358d5656'},
+)
+
+bapps_preference = VisualMultipleChoice(
+    dataset_name='tasksource/bapps', task_id='bapps/preference', choices_list='choices_list',
+    metadata='metadata', question='Which alternative image is closer to the reference?',
+    load_dataset_kwargs={'revision': 'cb0940d9a9dc43e6a4a03bf49627ad8bd18eb418'},
+)
+
+spair71k_grid7 = VisualClassification(
+    dataset_name='tasksource/spair71k-grid', task_id='spair71k/grid7',
+    metadata='metadata',
+    question='Which cell of the second image contains the corresponding point? '
+             'Rows r0–r6 run top to bottom; columns c0–c6 run left to right.',
+    load_dataset_kwargs={'revision': 'bb618c093d81057971b6f6ea49833a505ceb1228'},
+)

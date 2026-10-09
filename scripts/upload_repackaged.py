@@ -16,9 +16,14 @@ from scripts.repackage_dataset.text import (
     lewidi, wikipedia_detox_votes, webinstruct, _wikipedia_detox_votes,
 )
 from scripts.repackage_dataset.vision import view2space, ai2d, iconqa_text, mind2web
+from scripts.repackage_dataset.regions import coco_regions, doclaynet_region, bapps, spair71k_grid
 
 
-BUILDERS = {"ai2d": ("tasksource/ai2d", ai2d),
+BUILDERS = {"coco_regions": ("tasksource/coco-regions", coco_regions, "per-config"),
+            "doclaynet_region": ("tasksource/doclaynet-region", doclaynet_region),
+            "bapps": ("tasksource/bapps", bapps),
+            "spair71k_grid": ("tasksource/spair71k-grid", spair71k_grid),
+            "ai2d": ("tasksource/ai2d", ai2d),
             "iconqa_text": ("tasksource/iconqa-text", iconqa_text),
             "mind2web": ("tasksource/multimodal-mind2web", mind2web),
             "view2space": ("tasksource/view2space", view2space),
@@ -35,7 +40,11 @@ BUILDERS = {"ai2d": ("tasksource/ai2d", ai2d),
 
 
 # license metadata for repackaged sets, as the originals state it
-LICENSES = {"tasksource/ai2d": "cc-by-sa-4.0", "tasksource/iconqa-text": "cc-by-nc-sa-4.0",
+LICENSES = {"tasksource/coco-regions": ["other", "cc-by-4.0", "cc-by-2.0",
+                                      "cc-by-nc-2.0", "cc-by-nc-sa-2.0"],
+            "tasksource/doclaynet-region": "cdla-permissive-1.0",
+            "tasksource/bapps": "other", "tasksource/spair71k-grid": "other",
+            "tasksource/ai2d": "cc-by-sa-4.0", "tasksource/iconqa-text": "cc-by-nc-sa-4.0",
             "tasksource/multimodal-mind2web": "openrail", "tasksource/view2space": "cc-by-4.0", "tasksource/measuring-hate-speech-votes": "cc-by-4.0", "tasksource/lewidi": "other",
             "tasksource/wikipedia-detox-votes": "cc0-1.0",
             "tasksource/webinstruct": "apache-2.0"}
@@ -52,12 +61,21 @@ def push_card(repo, build):
     card.text = (f"\n# {repo.split('/')[1]}\n\n{inspect.cleandoc(build.__doc__)}\n\n{sources}"
                  f"Repackaged as {storage} for [tasksource](https://github.com/sileod/tasksource) by "
                  "[scripts/repackage_dataset/](https://github.com/sileod/tasksource/tree/main/scripts/repackage_dataset).\n")
+    if repo in ('tasksource/coco-regions', 'tasksource/doclaynet-region', 'tasksource/bapps', 'tasksource/spair71k-grid'):
+        report = json.loads((Path('build') / (repo.split('/')[1] + '-release') / 'provenance.json').read_text())
+        reports = {'default': report} if 'splits' in report else report
+        card.text += '\n## Release scope\n\nBounded samples of the eligible native annotations; full classification ontologies are retained.\n\n'
+        for config, info in reports.items():
+            counts = ', '.join(f'{split}: {count["rows"]:,}' for split, count in info['splits'].items())
+            card.text += f'- {config}: {counts}.\n'
+        card.text += '\nSee [provenance.json](provenance.json) for source pins, selection seeds, rendering configuration and exclusions.\n'
     if repo == 'tasksource/webinstruct':
         prepared_card = Path('build/webinstruct-release/README.md')
         source_card = prepared_card if prepared_card.exists() else Path(__file__).resolve().parents[1] / 'dataset_cards/webinstruct.md'
         card.text = source_card.read_text().split('---', 2)[2]
     card.push_to_hub(repo)
-    if repo in ('tasksource/view2space', 'tasksource/ai2d', 'tasksource/iconqa-text', 'tasksource/multimodal-mind2web'):
+    if repo in ('tasksource/view2space', 'tasksource/ai2d', 'tasksource/iconqa-text', 'tasksource/multimodal-mind2web',
+                'tasksource/coco-regions', 'tasksource/doclaynet-region', 'tasksource/bapps', 'tasksource/spair71k-grid'):
         from huggingface_hub import HfApi
         directory = Path('build') / ('view2space-release-imagefolder' if repo == 'tasksource/view2space' else repo.split('/')[1] + '-release')
         for filename in ('provenance.json', 'excluded-questions.jsonl'):
@@ -86,14 +104,23 @@ def main():
     parser.add_argument("--card-only", action="store_true")
     parser.add_argument("--bad-examples", type=Path, help="WebInstruct only: confirmed-removal manifest")
     parser.add_argument("--repairs", type=Path, help="WebInstruct only: verified presentation repairs")
+    parser.add_argument("--max-rows", type=int, help="Rendered mirrors: maximum training examples (default 5000)")
+    parser.add_argument("--max-rows-eval", type=int, help="Rendered mirrors: maximum examples per native evaluation split (default 100)")
+    parser.add_argument("--seed", type=int, help="Rendered mirrors: deterministic source annotation sampling seed")
     args = parser.parse_args()
+    options = {key: getattr(args, key) for key in ("max_rows", "max_rows_eval", "seed")
+               if getattr(args, key) is not None}
+    if any(options.get(key, 1) < 1 for key in ("max_rows", "max_rows_eval")):
+        parser.error("Row limits must be positive")
     if (args.bad_examples or args.repairs) and args.names != ['webinstruct']:
         parser.error('--bad-examples and --repairs apply only to webinstruct')
     for name in args.names:
         repo, build, *config = BUILDERS[name]
         assert repo in ORIGINALS, f"add {repo} to tasksource/metadata/originals.py"
+        if options.keys() - inspect.signature(build).parameters.keys():
+            parser.error(f"Sampling arguments are not supported by {name}")
         if not args.card_only:
-            dataset = build(args.bad_examples, args.repairs) if name == 'webinstruct' else build()
+            dataset = build(args.bad_examples, args.repairs) if name == 'webinstruct' else build(**options)
             if isinstance(dataset, Path):  # native imagefolder: retain one copy of each image
                 print(repo, json.loads((dataset / 'provenance.json').read_text()))
                 if args.dry_run:

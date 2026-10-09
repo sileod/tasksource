@@ -1,4 +1,4 @@
-33 visual tasks. Load one with `load_task(id, vision=True)`; the annotations are in [vision_tasks.py](src/tasksource/vision_tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
+38 visual tasks. Load one with `load_task(id, vision=True)`; the annotations are in [vision_tasks.py](src/tasksource/vision_tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
 
 | # | id | type | dataset | question |
 |--:|---|---|---|:-:|
@@ -35,6 +35,11 @@
 | 31 | [vsr/yesno](src/tasksource/vision_tasks.py#L375) | VisualClassification | [HuggingFaceM4/the_cauldron](https://hf.co/datasets/HuggingFaceM4/the_cauldron) | ✓ |
 | 32 | [rico-widget/grid7](src/tasksource/vision_tasks.py#L453) | VisualClassification | [bevaya/RICO-WidgetCaptioning](https://hf.co/datasets/bevaya/RICO-WidgetCaptioning) | ✓ |
 | 33 | [rico-widget/element](src/tasksource/vision_tasks.py#L463) | VisualMultipleChoice | [bevaya/RICO-WidgetCaptioning](https://hf.co/datasets/bevaya/RICO-WidgetCaptioning) | ✓ |
+| 34 | [lvis/region](src/tasksource/vision_tasks.py#L472) | VisualClassification | [tasksource/coco-regions](https://hf.co/datasets/tasksource/coco-regions) | ✓ |
+| 35 | [coco/panoptic-region](src/tasksource/vision_tasks.py#L478) | VisualClassification | [tasksource/coco-regions](https://hf.co/datasets/tasksource/coco-regions) | ✓ |
+| 36 | [doclaynet/region](src/tasksource/vision_tasks.py#L484) | VisualClassification | [tasksource/doclaynet-region](https://hf.co/datasets/tasksource/doclaynet-region) | ✓ |
+| 37 | [bapps/preference](src/tasksource/vision_tasks.py#L490) | VisualMultipleChoice | [tasksource/bapps](https://hf.co/datasets/tasksource/bapps) | ✓ |
+| 38 | [spair71k/grid7](src/tasksource/vision_tasks.py#L496) | VisualClassification | [tasksource/spair71k-grid](https://hf.co/datasets/tasksource/spair71k-grid) | ✓ |
 
 ### Candidate grounding
 

@@ -445,3 +445,33 @@ views share `vision/rico-widget`; TallyQA counting belongs to `vision/tallyqa`.
 Other visual sources receive their own family budget. Views are sampled in
 round-robin order while preserving decision groups, and individual task IDs
 remain in `source`. The release audit reports both task and family counts.
+
+### Prepared region and correspondence tasks
+
+Region highlighting and source-keypoint rendering belong in
+[`scripts/repackage_dataset/regions.py`](../../scripts/repackage_dataset/regions.py),
+with preparation commands and source terms in the
+[repackaging guide](../../scripts/repackage_dataset/README.md#region-preference-and-correspondence-sources).
+The resulting tasks use the existing visual classification and MC templates;
+loading or recasting a task does not regenerate its marked pixels.
+
+LVIS and COCO Panoptic share one pinned COCO image cache, with full source
+ontologies in `ClassLabel`. Their annotation partitions are intersected with
+matching COCO image partitions, preventing a shared COCO image from
+crossing training and validation between these views. DocLayNet checks native
+page and document partitions. Region marks have uniform styling independent
+of gold class. Original image hashes, source geometry and licensing remain in
+JSON metadata, separate from the Jev state and criteria.
+
+BAPPS retains the reference/p0/p1 image order; criteria name the alternative
+images, so Jev option permutation does not change their visual referents.
+Native tied preferences have no hard gold and are excluded. SPair marks only
+the source keypoint; the unmarked target is classified by its 7×7 cell. Target
+coordinates remain in metadata and never enter the question. Its native image
+sets are checked for overlap across train, validation and test.
+
+The first source-mirror release contains 1,000 training examples per new region
+or preference task and 5,000 SPair examples, with up to 100 per native evaluation
+split. The [coarse audit](region-audit.json) records three samples per task,
+label distributions and exclusion counts. One small, occluded LVIS object remains
+visually uncertain; BAPPS labels are subjective native human preferences.
