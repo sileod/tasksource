@@ -93,7 +93,10 @@ class Preprocessing(DotWiz):
             self.dataset_name, self.config_name, **self.load_dataset_kwargs))
 
     def __call__(self,dataset, max_rows=None, max_rows_eval=None,seed=0, pre_processed=False):
-        """``pre_processed=True`` skips ``pre_process`` (already applied, e.g. before streaming sampling)."""
+        """``pre_processed=True`` skips ``pre_process`` (already applied, e.g. before streaming sampling).
+
+        Empty training splits raise ValueError; empty evaluation splits retain the canonical schema.
+        """
         visual = "images" in self.to_dict()
         if visual:
             dataset = disable_image_decoding(dataset)
@@ -108,12 +111,14 @@ class Preprocessing(DotWiz):
             if k in dataset and not v: # obfuscated label
                 del dataset[k]
         dataset = fix_splits(dataset, complete=not visual and self.complete_splits)
+        require_training_rows(dataset, 'preprocessing')
 
         for k in list(dataset.keys()):
             if not visual and self.complete_splits and k not in self.default_splits:
                 del dataset[k]
         dataset = sample_dataset(dataset, max_rows, max_rows_eval,seed=seed)
         dataset = self.on_sampled(dataset)
+        require_training_rows(dataset, 'on_sampled')
         
         # field annotated with a string
         substitutions = {v:k for k,v in self.to_dict().items()
@@ -130,6 +135,7 @@ class Preprocessing(DotWiz):
                 dataset=dataset.map(self.__map_to_target,
                                     fn_kwargs={'fn':v,'target':k})
 
+        dataset = align_empty_splits(dataset)
         dataset=dataset.remove_columns(  # question is metadata, never a column
             get_column_names(dataset)-(set(self.to_dict().keys())-{'question'}
             - ({'metadata'} if self.metadata is None else set())))
@@ -161,11 +167,12 @@ class Preprocessing(DotWiz):
             dataset = cast_explicit_label_values(dataset, self.label_values)
         dataset = fix_splits(dataset, complete=not visual and self.complete_splits) # again: label mapping changed
         dataset = self.post_process(dataset)
+        require_training_rows(dataset, 'post_process')
         if visual and not isinstance(self, MultipleChoiceFields):
             if not isinstance(dataset['train'].features['labels'], datasets.ClassLabel):
                 raise ValueError('Visual classification requires named labels or explicit label_values')
             dataset = dataset.cast_column("images", datasets.Sequence(datasets.Image()))
-        return dataset
+        return align_empty_splits(dataset)
 
 
 @dataclass
@@ -248,7 +255,8 @@ class MultipleChoiceFields(Preprocessing):
         ``max_options=None``, every option (padding short rows with None)."""
         dataset = super().__call__(dataset, *args, **kwargs)
         if self.choices_list:
-            dataset = dataset.filter(lambda x: 1<len(x['choices_list']))
+            dataset = dataset.filter(lambda x: x['choices_list'] is not None and 1<len(x['choices_list']))
+            require_training_rows(dataset, 'multiple-choice filtering (at least two options required)')
             lengths = [len(x) for k in dataset for x in dataset[k]['choices_list']]
             if gold_first:
                 n_options = min(MAX_MC_OPTIONS,min(lengths))
@@ -264,7 +272,7 @@ class MultipleChoiceFields(Preprocessing):
             dataset = dataset.map(self.sample_choices, fn_kwargs={'n_options':MAX_MC_OPTIONS})
         elif max_options is not None:
             dataset = dataset.map(self.ordered_sample_choices, fn_kwargs={'n_options':max_options})
-        return dataset
+        return align_empty_splits(dataset)
 
     @staticmethod
     def _ordered_subset(choices, label, n_options):
@@ -388,7 +396,7 @@ class VisualMultipleChoice(SharedFields, MultipleChoiceFields):
                 if label is None or not 0 <= label < len(choices) or row[choices[label]] is None:
                     raise ValueError("Visual MC label must index a non-null source option")
         dataset = dataset.cast_column('labels', datasets.ClassLabel(names=list('ABCDEFGHIJKLMNOPQRSTUVWXYZ'[:len(choices)])))
-        return dataset.cast_column('images', datasets.Sequence(datasets.Image()))
+        return align_empty_splits(dataset.cast_column('images', datasets.Sequence(datasets.Image())))
 
 
 @dataclass
@@ -640,6 +648,20 @@ def add_question(dataset, question):
         return dataset.cast_column('images', features['images'])
     return dataset.map(prompt)
 
+def require_training_rows(dataset, stage):
+    """Training must be nonempty; empty evaluation splits keep their schema."""
+    if 'train' not in dataset or not len(dataset['train']):
+        raise ValueError(f'{stage}: requires a nonempty train split')
+
+
+def align_empty_splits(dataset):
+    # Datasets.map/cast can skip empty tables, leaving their old source schema.
+    for split in dataset:
+        if not len(dataset[split]):
+            dataset[split] = dataset['train'].select([])
+    return dataset
+
+
 def fix_splits(dataset, complete=True):
 
     if complete and len(dataset)==1 and "train" not in dataset:
@@ -661,15 +683,21 @@ def fix_splits(dataset, complete=True):
         if isinstance(dataset[split].features.get('labels'), datasets.ClassLabel) and None in dataset[split].unique('labels'):
             dataset[split] = dataset[split].filter(lambda label: label is not None, input_columns='labels')
 
+    # Avoid opaque train_test_split failures after filtering away every label.
+    if 'train' in dataset:
+        require_training_rows(dataset, 'fix_splits')
+
     if not complete:
         return dataset
 
     if 'validation' in dataset and 'train' not in dataset:
+        if not len(dataset['validation']):
+            raise ValueError('fix_splits: cannot create train from an empty validation split')
         train_validation = dataset['validation'].train_test_split(0.5, seed=0)
         dataset['train'] = train_validation['train']
         dataset['validation']=train_validation['test']
     
-    if 'validation' in dataset and 'test' not in dataset:
+    if 'validation' in dataset and len(dataset['validation']) and 'test' not in dataset:
         validation_test = dataset['validation'].train_test_split(0.5, seed=0)
         dataset['validation'] = validation_test['train']
         dataset['test']=validation_test['test']
@@ -679,7 +707,7 @@ def fix_splits(dataset, complete=True):
         dataset['train'] = train_val['train']
         dataset['validation']=train_val['test']
 
-    if 'test' in dataset and 'validation' not in dataset:
+    if 'test' in dataset and len(dataset['test']) and 'validation' not in dataset:
         validation_test = dataset['test'].train_test_split(0.5, seed=0)
         dataset['validation'] = validation_test['train']
         dataset['test']=validation_test['test']
@@ -694,6 +722,7 @@ def fix_splits(dataset, complete=True):
     return dataset 
 
 def fix_labels(dataset, label_key='labels'):
+    require_training_rows(dataset, 'fix_labels')
     if type(dataset['train'][label_key][0]) in [int,list,float]:
         return dataset
     if type(dataset['train'][label_key][0])==bool:  # names must be strings: "False", "True"

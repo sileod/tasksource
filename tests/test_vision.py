@@ -50,6 +50,15 @@ def test_catalog():
     assert 'pingzhili/nlvr2' in hub_datasets(['nlvr2'], vision=True)
 
 
+@pytest.mark.parametrize('mc', [False, True])
+def test_empty_evaluation_has_canonical_visual_schema(mc):
+    dataset = source()
+    dataset['validation'] = dataset['validation'].select([])
+    result = template(mc)(dataset)
+    assert len(result['validation']) == 0
+    assert result['validation'].features == result['train'].features
+
+
 @pytest.mark.parametrize('two', [False, True])
 @pytest.mark.parametrize('mc', [False, True])
 def test_images_labels_and_splits(mc, two):

@@ -1,10 +1,12 @@
 from .preprocess import Preprocessing, MultipleChoiceFields, SoftLabeling, add_question, disable_image_decoding, reservoir_sample
 from .jev.options import JEV_MAX_MC_OPTIONS
 import re
+import ast
+from importlib import import_module
 from urllib.parse import unquote
 import numpy as np
 import pandas as pd
-from . import tasks, vision_tasks, recast as recast_module
+from . import tasks, recast as recast_module
 from .metadata import dataset_rank
 from .metadata.originals import ORIGINALS
 from .metadata.canonical import CANONICAL
@@ -18,15 +20,17 @@ from functools import cache
 import random
 
 
-class lazy_mtasks:
+class lazy_tasks:
+    def __init__(self, module):
+        self.module = module
+
     def __getattr__(self, name):
-        from . import multilingual_tasks
-        return getattr(multilingual_tasks, name)
+        return getattr(import_module(f'.{self.module}', __package__), name)
 
     def __dir__(self):
-        from . import multilingual_tasks
-        return dir(multilingual_tasks)
-lmtasks=lazy_mtasks()
+        return dir(import_module(f'.{self.module}', __package__))
+lmtasks = lazy_tasks('multilingual_tasks')
+vision_tasks = lazy_tasks('vision_tasks')
 
 def parse_var_name(s):
     config_name,task_name = None,None
@@ -80,6 +84,22 @@ def list_tasks(tasks_path=f'{os.path.dirname(__file__)}/tasks.py', multilingual=
         df = df[df.license_use.isin(uses)]
     return df.copy()
 
+def _declaration_order(tasks_path):
+    """Top-level assigned names in source order, independent of formatting."""
+    with open(tasks_path, encoding='utf-8') as source:
+        body = ast.parse(source.read(), filename=str(tasks_path)).body
+    names = []
+    for node in body:
+        if isinstance(node, ast.Assign):
+            targets = node.targets
+        elif isinstance(node, ast.AnnAssign):
+            targets = [node.target]
+        else:
+            continue
+        names.extend(target.id for target in targets if isinstance(target, ast.Name))
+    return {name: rank for rank, name in enumerate(names)}
+
+
 @cache
 def _list_tasks(tasks_path, multilingual, instruct, excluded, soft=False, min_annotators=None, vision=False):
     if vision and multilingual:
@@ -88,10 +108,7 @@ def _list_tasks(tasks_path, multilingual, instruct, excluded, soft=False, min_an
         tasks_path = tasks_path.replace("/tasks.py", "/vision_tasks.py")
     if multilingual:
         tasks_path=tasks_path.replace('/tasks.py','/multilingual_tasks.py')
-    task_order = open(tasks_path).readlines()
-    task_order = [x.split('=')[0].rstrip() for x in task_order if '=' in x]
-    task_order = [x for x in task_order if x.isidentifier()]
-    task_order = fc.flip(dict(enumerate(task_order)))
+    task_order = _declaration_order(tasks_path)
 
     l = []
     _tasks = vision_tasks if vision else (lmtasks if multilingual else tasks)
@@ -243,7 +260,9 @@ def pin_hf_urls(value, pins):
     return value
 
 def load_preprocessing(tasks=tasks, **kwargs):
-    df = _every_task(multilingual=tasks==lmtasks, vision=tasks==vision_tasks)
+    module = getattr(tasks, '__name__', None)
+    df = _every_task(multilingual=module == f'{__package__}.multilingual_tasks',
+                     vision=module == f'{__package__}.vision_tasks')
     matches = df[np.logical_and.reduce([df[k] == v for k, v in kwargs.items()] + [np.ones(len(df), bool)])]
     if matches.empty:
         raise KeyError(f"unknown task: {kwargs}")
