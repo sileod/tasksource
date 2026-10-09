@@ -104,7 +104,8 @@ _CAULDRON_LICENSE_EVIDENCE = {
     'intergps': {'source_license': 'unspecified', 'source_license_url': 'https://github.com/lupantech/InterGPS',
                 'source_code_license': 'mit'},
     'tallyqa': {'source_license': 'unspecified', 'source_license_url': 'https://github.com/manoja328/TallyQA_dataset'},
-    'vsr': {'source_license': 'apache-2.0', 'source_license_url': 'https://github.com/cambridgeltl/visual-spatial-reasoning',
+    'vsr': {'source_license': 'cc-by-4.0', 'source_license_url': 'https://huggingface.co/datasets/cambridgeltl/vsr_random',
+            'source_code_license': 'apache-2.0',
             'image_license_note': 'COCO images retain their individual original licenses.'},
 }
 

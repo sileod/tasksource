@@ -6,7 +6,9 @@ and reviewed original dataset terms in ``metadata/source_license_evidence.py``.
 ``license_use`` takes the most restrictive classified license: ``non-commercial``
 if any is non-commercial or academic-only, else ``commercial`` if one allows
 commercial use (share-alike and copyleft included), else ``unspecified``
-(missing, ``other``, bare ``cc``, no-derivatives). Both snapshots are checked in
+(missing, ``other``, bare ``cc``, no-derivatives). Scoped original-source reviews
+can keep incomplete image coverage unspecified despite permissive annotation
+terms, or record research-only restrictions. Both snapshots are checked in
 (``scripts/update_licenses.py``); nothing is fetched at import.
 
 This is a best-effort filter, not legal advice: cards can be wrong or incomplete.
@@ -17,7 +19,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 
 from .metadata.card_licenses import CARD_LICENSES
-from .metadata.source_license_evidence import SOURCE_LICENSE_EVIDENCE
+from .metadata.source_license_evidence import SOURCE_LICENSE_EVIDENCE, SOURCE_LICENSE_REVIEWS
 from .metadata.dpi_licenses import LICENSE_USE as DPI_USE, REPO_LICENSES as DPI_REPOS, TASK_LICENSES as DPI_TASKS
 
 LICENSE_USES = ("commercial", "non-commercial", "unspecified")
@@ -63,12 +65,20 @@ def source_license(task_id, repos, cards=None):
     if evidence:
         uses.add(card_license_use(evidence['license']))
     use = "non-commercial" if "non-commercial" in uses else "commercial" if "commercial" in uses else "unspecified"
+    review = SOURCE_LICENSE_REVIEWS.get(task.split('/')[0])
+    if review:
+        # Scoped reviews override permissive cards that omit image restrictions.
+        use = "non-commercial" if "non-commercial" in uses else review['license_use']
     names = sorted({license for licenses in card.values() for license in licenses}) + [f"{name} (DPI)" for name in dpi]
     if evidence:
         names.append(f"{evidence['license']} (original source)")
+    if review:
+        names.extend(f"{info['license']} ({component})" for component in ('annotations', 'images')
+                     if (info := review.get(component)) and info['license'] != 'unspecified')
     return {"license": ", ".join(names) or "unspecified", "license_use": use,
             **({"card_licenses": card} if card else {}), **({"dpi_licenses": dpi} if dpi else {}),
-            **({'source_license_evidence': evidence} if evidence else {})}
+            **({'source_license_evidence': evidence} if evidence else {}),
+            **({'license_review': {'checked': '2026-10-09', **review}} if review else {})}
 
 
 def fetch_card_licenses(repos):

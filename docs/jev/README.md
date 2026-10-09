@@ -18,6 +18,18 @@ NLVR2 photo rights and other unresolved sources remain `unspecified`; software
 licenses do not establish image rights. LVIS/COCO source-wide classification
 remains conservatively non-commercial because their mirrors include NC images.
 
+Component-level reviews now distinguish annotation terms from image terms in
+`metadata.licenses.license_review`, including evidence URLs, review status and
+remaining gaps. NLVR2 and VSR annotations are CC BY 4.0; A-OKVQA/TallyQA
+repositories specify Apache 2.0, and InterGPS specifies MIT. These findings do
+not clear third-party images. FigureQA's official sample archive contains a
+Microsoft Research Open Data License restricting use and **prohibiting dataset
+redistribution/hosting**; its generator's MIT terms cover code only. BAPPS
+training patches inherit the MIT–Adobe FiveK research image licenses. All
+sources remain included under the requested mixed-license policy, with these
+restrictions explicitly recorded. See the
+[Hub review](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/blob/main/vision/license-review.json).
+
 The builders live in [`scripts/`](../../scripts/); canonical recasts, token
 label handling, procedural generators, and augmentations live in
 [`src/tasksource/jev/`](../../src/tasksource/jev/). The public

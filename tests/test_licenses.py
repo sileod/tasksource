@@ -63,3 +63,27 @@ def test_task_weight_multiplies_hand_and_audit_weights():
     assert task_weight("english-grading/syntax") == 0.5
     assert task_weight("tomi-nli") == 1.5
     assert task_weight("glue/rte") == 1
+
+
+def test_annotation_license_does_not_clear_image_terms():
+    for task in ('aokvqa', 'nlvr2', 'tallyqa/count', 'vsr/yesno', 'intergps', 'spair71k/grid7'):
+        info = source_license('vision/' + task, ['mirror/data'], {'mirror/data': ['mit']})
+        assert info['license_use'] == 'unspecified'
+        assert info['license_review']['unresolved']
+        assert info['license_review']['annotations']['license'] != 'unspecified'
+    assert source_license('vision/vsr/yesno', [], {})['license_review']['annotations']['license'] == 'cc-by-4.0'
+
+
+def test_research_image_restrictions_and_no_redistribution_are_recorded():
+    for task in ('figureqa', 'bapps/preference'):
+        info = source_license('vision/' + task, ['mirror/data'], {'mirror/data': ['mit']})
+        assert info['license_use'] == 'non-commercial'
+        assert info['license_review']['images']['license']
+    figure = source_license('vision/figureqa', [], {})['license_review']
+    assert figure['redistribution'] == 'prohibited'
+    assert figure['archive_member'].endswith('.pdf')
+
+
+def test_review_does_not_weaken_known_noncommercial_terms():
+    info = source_license('vision/aokvqa', ['upstream'], {'upstream': ['cc-by-nc-4.0']})
+    assert info['license_use'] == 'non-commercial'
