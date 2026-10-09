@@ -1229,7 +1229,8 @@ def build_vision(args):
     for task in catalog.itertuples():
         source = task.source_id
         provenance = source_provenance(source)
-        dataset = load_task(task.id, vision=True, recast='jev', streaming=True,
+        dataset = load_task(task.id, vision=True, recast='jev',
+                            streaming=task.mapping.load_dataset_kwargs.get('streaming', True),
                             max_rows=args.max_rows, max_rows_eval=args.max_rows_eval,
                             excluded_sources=getattr(args, 'excluded_sources', ()),
                             grounding=({'probabilities': args.grounding_probabilities}

@@ -478,25 +478,25 @@ rico_widget_element = VisualMultipleChoice(
 lvis_region = VisualClassification(
     dataset_name='tasksource/coco-regions', config_name='lvis', task_id='lvis/region',
     metadata='metadata', question='What object category is highlighted in red?',
-    load_dataset_kwargs={'revision': '0ab5c2f908e4a4db268515869bcde3913de2bc91'},
+    load_dataset_kwargs={'revision': '0ab5c2f908e4a4db268515869bcde3913de2bc91', 'streaming': False},
 )
 
 coco_panoptic_region = VisualClassification(
     dataset_name='tasksource/coco-regions', config_name='panoptic', task_id='coco/panoptic-region',
     metadata='metadata', question='What category is the image segment highlighted in red?',
-    load_dataset_kwargs={'revision': '0ab5c2f908e4a4db268515869bcde3913de2bc91'},
+    load_dataset_kwargs={'revision': '0ab5c2f908e4a4db268515869bcde3913de2bc91', 'streaming': False},
 )
 
 doclaynet_region = VisualClassification(
     dataset_name='tasksource/doclaynet-region', task_id='doclaynet/region',
     metadata='metadata', question='What document layout category is highlighted in red?',
-    load_dataset_kwargs={'revision': 'ad3465ea6385871b9102308865554150358d5656'},
+    load_dataset_kwargs={'revision': 'ad3465ea6385871b9102308865554150358d5656', 'streaming': False},
 )
 
 bapps_preference = VisualMultipleChoice(
     dataset_name='tasksource/bapps', task_id='bapps/preference', choices_list='choices_list',
     metadata='metadata', question='Which alternative image is closer to the reference?',
-    load_dataset_kwargs={'revision': 'cb0940d9a9dc43e6a4a03bf49627ad8bd18eb418'},
+    load_dataset_kwargs={'revision': 'cb0940d9a9dc43e6a4a03bf49627ad8bd18eb418', 'streaming': False},
 )
 
 spair71k_grid7 = VisualClassification(
@@ -504,12 +504,12 @@ spair71k_grid7 = VisualClassification(
     metadata='metadata',
     question='Which cell of the second image contains the corresponding point? '
              'Rows r0–r6 run top to bottom; columns c0–c6 run left to right.',
-    load_dataset_kwargs={'revision': 'bb618c093d81057971b6f6ea49833a505ceb1228'},
+    load_dataset_kwargs={'revision': 'bb618c093d81057971b6f6ea49833a505ceb1228', 'streaming': False},
 )
 
 
 _SUPERCLEVR = dict(dataset_name='tasksource/superclevr', metadata='metadata',
-    load_dataset_kwargs={'revision': 'b1dcf17611d997e227ff13fd5692d3705fbf35a1'})
+    load_dataset_kwargs={'revision': 'b1dcf17611d997e227ff13fd5692d3705fbf35a1', 'streaming': False})
 _SUPERCLEVR_SHAPE = {v: v for v in ('airliner', 'articulated bus', 'biplane', 'chopper',
     'cruiser', 'dirtbike', 'double bus', 'fighter', 'jet', 'minivan', 'mountain bike',
     'regular bus', 'road bike', 'school bus', 'scooter', 'sedan', 'suv', 'tandem bike',
