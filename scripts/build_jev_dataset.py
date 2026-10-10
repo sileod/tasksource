@@ -38,6 +38,7 @@ from tasksource.jev import procedural
 from tasksource.jev.derived import VARIANT as PACKED_VARIANT, add_packed_classification, packed_items
 from tasksource.jev.length import LengthBudget, render_request
 from tasksource.jev.options import gold_position_violations
+from tasksource.jev.recast import MAX_SCORE_LEVELS
 
 
 SUPPORTED_TYPES = {"Classification", "MultipleChoice", "TokenClassification", "SoftLabeling"}
@@ -779,6 +780,7 @@ def validate_decisions(rows, split):
                 texts = [str(option).strip() for option in options if option is not None]
                 valid = (
                     kind in {"choice", "score"} and len(options) >= 2
+                    and (kind != "score" or len(options) <= MAX_SCORE_LEVELS)
                     and len(texts) == len(options) and all(texts)
                     and len(set(texts)) == len(texts)
                     and len(options) == len(target)

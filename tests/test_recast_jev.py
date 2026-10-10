@@ -355,6 +355,16 @@ class RecastJevTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Invalid score target"):
             validate_decisions(bad, "train")
 
+    def test_export_score_limit_matches_renderer_without_limiting_choices(self):
+        def rows(kind, size):
+            return Dataset.from_dict({"id": ["bounded"], "kind": [kind],
+                "options": [[str(i) for i in range(size)]],
+                "target": [[1.0] + [0.0] * (size - 1)]})
+        validate_decisions(rows("score", 10), "train")
+        validate_decisions(rows("choice", 49), "train")
+        with self.assertRaisesRegex(ValueError, "Invalid score target"):
+            validate_decisions(rows("score", 11), "train")
+
     def test_token_classification_is_readable_bounded_and_deterministic(self):
         features = Features({
             "tokens": Sequence(Value("string")),
