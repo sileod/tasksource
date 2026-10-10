@@ -1,4 +1,4 @@
-503 English tasks. Load one with `load_task(id)`; the annotations are in [tasks.py](src/tasksource/tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
+506 English tasks. Load one with `load_task(id)`; the annotations are in [tasks.py](src/tasksource/tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
 
 | # | id | type | dataset | question |
 |--:|---|---|---|:-:|
@@ -505,10 +505,13 @@
 | 501 | [websrc/element](src/tasksource/tasks.py#L2493) | MultipleChoice | [tasksource/websrc](https://hf.co/datasets/tasksource/websrc) | ✓ |
 | 502 | [mind2web/action](src/tasksource/tasks.py#L2500) | Classification | [tasksource/mind2web-dom](https://hf.co/datasets/tasksource/mind2web-dom) | ✓ |
 | 503 | [mind2web/dom-element](src/tasksource/tasks.py#L2503) | MultipleChoice | [tasksource/mind2web-dom](https://hf.co/datasets/tasksource/mind2web-dom) | ✓ |
+| 504 | [sentfin](src/tasksource/tasks.py#L2508) | Classification | [tasksource/sentfin](https://hf.co/datasets/tasksource/sentfin) | ✓ |
+| 505 | [wands](src/tasksource/tasks.py#L2512) | Classification | [tasksource/wands](https://hf.co/datasets/tasksource/wands) | ✓ |
+| 506 | [scirepeval/search](src/tasksource/tasks.py#L2516) | Classification | [tasksource/scirepeval-search](https://hf.co/datasets/tasksource/scirepeval-search) | ✓ |
 
 ## Soft labels
 
-Annotations whose label is a distribution (annotator votes, rater shares, survey counts), loaded with `load_task(id, soft=True)`. Those with a hard view are also listed above, by their majority label; the others have soft labels only. `votes` are shares of annotators, `mean` a mean rating; annotators is the typical count per item (vote shares from fewer than five are coarse, and the Jev build leaves them out).
+Annotations whose label is a distribution (annotator votes, rater shares, survey counts), loaded with `load_task(id, soft=True)`. Those with a hard view are also listed above, by their majority label; the others have soft labels only. `votes` are shares of annotators, `mean` a numeric value interpolated over score anchors (see each task for its meaning); annotators is the typical count per item (vote shares from fewer than five are coarse, and the Jev build leaves them out).
 
 | id | kind | aggregation | annotators | default view | dataset |
 |---|---|---|--:|---|---|
@@ -574,3 +577,4 @@ Annotations whose label is a distribution (annotator votes, rater shares, survey
 | [oasst2/sexual_content](src/tasksource/tasks.py#L2411) | noul | votes | 3 |  | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) |
 | [oasst2/pii](src/tasksource/tasks.py#L2412) | noul | votes | 3 |  | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) |
 | [oasst2/lang_mismatch](src/tasksource/tasks.py#L2413) | noul | votes | 3 |  | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) |
+| [scirepeval/search](src/tasksource/tasks.py#L2516) | score | mean |  | regression | [tasksource/scirepeval-search](https://hf.co/datasets/tasksource/scirepeval-search) |

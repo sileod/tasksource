@@ -171,7 +171,8 @@ def _recast_soft(dataset, task, question, kind, row_options, group):
         .filter(lambda row: row["kind"] == "noul" or _valid_criteria(row["criteria"])))
         for split, rows in dataset.items() if len(rows)  # e.g. hidden test labels
     })
-    keep = {"state", "instructions", "criteria", "target", "task", "kind", "group", "source_row", "question_id"}
+    keep = {"state", "instructions", "criteria", "target", "task", "kind", "group", "source_row", "question_id",
+            "metadata", "images"}
     return converted.remove_columns([c for c in converted["train"].column_names if c not in keep])
 
 

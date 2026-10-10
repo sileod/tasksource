@@ -2503,3 +2503,19 @@ mind2web__action = Classification('inputs', labels='labels', **_MIND2WEB_DOM,
 mind2web__dom_element = MultipleChoice('inputs', choices_list='choices_list', labels='labels',
     **_MIND2WEB_DOM, config_name='dom-element', task_id='mind2web/dom-element',
     question='Which candidate DOM element should receive the specified operation?')
+
+# Prepared once: native entity labels, query-disjoint product grades and click-derived scores.
+sentfin = Classification('sentence1', 'sentence2', labels='labels', dataset_name='tasksource/sentfin',
+    metadata='metadata', complete_splits=False, load_dataset_kwargs={'revision': 'dbd1d5665ff8d64254459a89a3a542c7728a3268'},
+    label_values={v:v for v in ('negative','neutral','positive')},
+    question='What sentiment does headline text_A express toward entity text_B?')
+wands = Classification('sentence1', 'sentence2', labels='labels', dataset_name='tasksource/wands',
+    metadata='metadata', complete_splits=False, load_dataset_kwargs={'revision': '96a856e9d45eb0e5847a07a026d07f2b13092733'},
+    label_values={0:'irrelevant',1:'partial match',2:'exact match'}, ordinal=True, score_only=True,
+    question='How relevant is product text_B to search query text_A, from irrelevant to partial to exact match?')
+scirepeval__search = SoftLabeling('sentence1', 'sentence2', labels='labels',
+    dataset_name='tasksource/scirepeval-search', task_id='scirepeval/search', metadata='metadata',
+    complete_splits=False, load_dataset_kwargs={'revision': '7ff532ab52c10274a818d812c8d47f63b3af7af4'}, kind='score',
+    low=0, high=14, step=2, options=[str(i) for i in range(0,15,2)], aggregation='mean', regression=True,
+    question='Predict the click-derived search score (0–14) of paper text_B for query text_A.',
+    soft_question='Predict the click-derived search score of paper text_B for query text_A. Numeric criteria are score anchors, not human rating categories.')

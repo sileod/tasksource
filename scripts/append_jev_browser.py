@@ -1,4 +1,4 @@
-"""Append HTML/browser text tasks to default/full, preserving all existing data.
+"""Append selected text tasks to default/full, preserving all existing data.
 
 Stages a reviewable, parent-revision-guarded patch; publication requires --push.
 Only direct decisions are added. Source identity/provenance remain in a sidecar
@@ -25,8 +25,8 @@ from scripts.build_jev_dataset import (PUBLISH_EXCLUDED_PREFIXES, example_key, s
 REPO = 'tasksource/tasksource-jev-typed-decisions'
 
 
-def build(output, max_rows=1000, max_rows_eval=100):
-    tasks = ['mind2web/action', 'mind2web/dom-element', 'weblinx/action', 'weblinx/dom-element', 'websrc/yesno', 'websrc/element']
+def build(output, max_rows=1000, max_rows_eval=100, tasks=None, description=None):
+    tasks = tasks or ['mind2web/action', 'mind2web/dom-element', 'weblinx/action', 'weblinx/dom-element', 'websrc/yesno', 'websrc/element']
     formats = dict(zip(list_tasks().id, list_tasks().task_type))
     licenses = source_licenses(tasks)
     api = HfApi()
@@ -45,6 +45,7 @@ def build(output, max_rows=1000, max_rows_eval=100):
     rows = {split: [] for split in ('train', 'validation', 'test')}
     trajectory_sets = {split: set() for split in rows}
     page_sets = {split: set() for split in rows}
+    split_groups = {split: set() for split in rows}
     for task in tasks:
         print('Stage', task, flush=True)
         provenance[task] = task_provenance(task)
@@ -68,6 +69,8 @@ def build(output, max_rows=1000, max_rows_eval=100):
                 row['example_id'] = example_key(task, row['state'], row['options'], row['target'])
                 evidence[row['id']] = meta
                 rows[split].append({key: row[key] for key in schema.names})
+                if meta.get('split_group_id'):
+                    split_groups[split].add((task.split('/')[0],meta['split_group_id']))
                 if meta.get('trajectory_id') or meta.get('demo'):
                     trajectory_sets[split].add((task.split('/')[0], meta.get('trajectory_id') or meta['demo']))
                 if meta.get('page_group_id'):
@@ -80,6 +83,7 @@ def build(output, max_rows=1000, max_rows_eval=100):
             if a != b:
                 assert not trajectory_sets[a] & trajectory_sets[b], 'Trajectory leakage'
                 assert not page_sets[a] & page_sets[b], 'Page leakage'
+                assert not split_groups[a] & split_groups[b], 'Source group leakage'
     for split, examples in rows.items():
         table = pa.Table.from_pylist(examples, schema=schema)
         validate_decisions(Dataset(table), split)
@@ -99,7 +103,7 @@ def build(output, max_rows=1000, max_rows_eval=100):
             formats={kind:sum(count for task,count in counts.items() if formats[task] == kind)
                      for kind in ('Classification','MultipleChoice')},
             families={family:sum(count for task,count in counts.items() if task.split('/')[0] == family)
-                      for family in {task.split('/')[0] for task in counts}}, kinds={'choice':len(examples)},
+                      for family in {task.split('/')[0] for task in counts}}, kinds=dict(Counter(row['kind'] for row in examples)),
             variants={'direct':len(examples)}, license_use=dict(Counter(row['license_use'] for row in examples))).items():
             for key, count in increments.items():
                 published[field][key] = published[field].get(key, 0) + count
@@ -123,7 +127,7 @@ def build(output, max_rows=1000, max_rows_eval=100):
         preserved_parquets={s.rfilename:s.blob_id for s in before.siblings if s.rfilename.endswith('.parquet')})
     audit.setdefault('incremental_additions', []).append(dict(tasks=tasks,
         manifest=f'additions/{stamp}/manifest.json', rows={s:v['rows'] for s,v in stats.items()}))
-    card.text += ('\n\n## HTML/browser text additions\n\n'
+    card.text += (description + f'\n\nSource-row metadata: additions/{stamp}/rows.json.\n') if description else ('\n\n## HTML/browser text additions\n\n'
         'WebLINX action/DOM-element and WebSRC yes/no/element tasks retain their source partitions. '
         'WebLINX named test subsets are combined into the hosted test split, with native split names in row provenance. '
         '`mind2web/action` and `mind2web/dom-element` use only the original public training trajectories. '
@@ -147,7 +151,7 @@ def push(manifest, additions):
     api = HfApi()
     commit = api.create_commit(REPO,repo_type='dataset',parent_commit=manifest['parent_revision'],
         operations=[CommitOperationAdd(path_in_repo=name,path_or_fileobj=path) for name,path in additions],
-        commit_message='Add HTML browser decisions from WebLINX, WebSRC and public-train Mind2Web')
+        commit_message='Append validated Tasksource decisions: ' + ', '.join(manifest['tasks']))
     after = api.dataset_info(REPO,revision=commit.oid,files_metadata=True)
     blobs = {s.rfilename:s.blob_id for s in after.siblings}
     assert all(blobs.get(name) == blob for name,blob in manifest['preserved_parquets'].items())
@@ -159,9 +163,11 @@ if __name__ == '__main__':
     parser.add_argument('--output', type=Path, default=Path('build/jev-browser-addition'))
     parser.add_argument('--max-rows', type=int, default=1000)
     parser.add_argument('--max-rows-eval', type=int, default=100)
+    parser.add_argument('--tasks', nargs='+', help='New task IDs (defaults to browser tasks)')
+    parser.add_argument('--description', help='Dataset-card note for this addition')
     parser.add_argument('--push', action='store_true')
     args = parser.parse_args()
-    manifest, additions = build(args.output,args.max_rows,args.max_rows_eval)
+    manifest, additions = build(args.output,args.max_rows,args.max_rows_eval,args.tasks,args.description)
     print(json.dumps(manifest['splits'],indent=2),flush=True)
     if args.push:
         push(manifest,additions)

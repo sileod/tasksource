@@ -32,7 +32,7 @@ def test_incremental_browser_patch_keeps_unrelated_configs_and_native_ids(tmp_pa
     fake = SimpleNamespace(sha='parent',siblings=[SimpleNamespace(rfilename='vision/old.parquet',blob_id='preserved')])
     monkeypatch.setattr(release,'HfApi',lambda:SimpleNamespace(dataset_info=lambda *a,**kw:fake))
     monkeypatch.setattr(release,'hf_hub_download',lambda repo,name,**kw:str(base/('schema.parquet' if name.endswith('.parquet') else name)))
-    monkeypatch.setattr(release,'task_provenance',lambda task:dict(dataset='native/source',revision='pinned',config=task.split('/')[1]))
+    monkeypatch.setattr(release,'task_provenance',lambda task:dict(dataset='native/source',revision='pinned',config=task.split('/')[-1]))
     monkeypatch.setattr(release,'source_licenses',lambda tasks:{task:dict(license='cc-by-nc-sa-4.0' if task.startswith('weblinx/') else 'cc-by-4.0',license_use='non-commercial' if task.startswith('weblinx/') else 'commercial') for task in tasks})
     def load(task, **kwargs):
         native_splits = [*stats, *(['test_geo'] if task.startswith('weblinx/') else [])]
@@ -57,6 +57,24 @@ def test_incremental_browser_patch_keeps_unrelated_configs_and_native_ids(tmp_pa
     assert table.schema.equals(schema)
     audit = json.loads((output/'release-audit.json').read_text())
     assert sum(audit['splits']['train']['license_use'].values()) == 16
+    # The same publisher preserves soft numeric targets and checks source groups.
+    def scored(task, **kwargs):
+        return {s:Dataset.from_list([dict(state=s,kind='score',criteria=['0','2','4'],
+            target=[0.5,0.5,0.0],instructions='Predict click score.',
+            metadata=json.dumps(dict(id=s,split_group_id=s)))]) for s in stats}
+    monkeypatch.setattr(release,'load_task',scored)
+    numeric = tmp_path/'numeric'
+    release.build(numeric,tasks=['scirepeval/search'],description='Numeric scores.')
+    numeric_rows=pq.read_table(next(numeric.glob('train-*.parquet'))).to_pylist()
+    assert numeric_rows[0]['target']==[0.5,0.5,0.0]
+    updated_audit=json.loads((numeric/'release-audit.json').read_text())
+    assert updated_audit['splits']['train']['kinds']['score']==1
+    def query_leaking(task, **kwargs):
+        return {s:d.map(lambda row: {'metadata':json.dumps(dict(id=s,split_group_id='shared-query'))})
+                for s,d in scored(task).items()}
+    monkeypatch.setattr(release,'load_task',query_leaking)
+    with pytest.raises(AssertionError,match='Source group leakage'):
+        release.build(tmp_path/'query-leak',tasks=['scirepeval/search'])
     # A source trajectory shared between train and test must block publication.
     def leaking(task,**kwargs):
         data=load(task,**kwargs)

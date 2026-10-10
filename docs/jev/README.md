@@ -631,3 +631,41 @@ existing Parquet blobs, and reading/validation of all 1,149 hosted test rows.
 The [coarse audit](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/blob/main/additions/167c5ad6fb79/quality-audit.json)
 covers two training examples per task and records one ambiguous native WebSRC
 stock-availability question. It does not certify every source answer.
+
+### Entity sentiment and search relevance
+
+`sentfin` asks for the sentiment toward a named entity in a financial headline.
+The pinned [mirror](https://huggingface.co/datasets/tasksource/sentfin) contains
+11,412 train / 1,489 validation / 1,417 test judgments. Conversion repairs 13
+malformed annotation strings without changing their entity names, collapses 73
+duplicate pairs and excludes seven contradictory headline/entity pairs.
+Normalized headlines stay together in deterministic internal holdouts.
+
+`wands` uses native Wayfair relevance grades: irrelevant, partial match, exact
+match. Its ordinal, score-only Jev view preserves that ordering. The joined
+upstream Hub copy splits individual rows, causing extensive query overlap;
+the [mirror](https://huggingface.co/datasets/tasksource/wands) regroups all
+233,448 judgments by normalized query into 183,053 / 21,790 / 28,605 rows.
+These are derived query-disjoint holdouts, not official benchmark partitions.
+Product popularity and ratings never enter the input.
+
+`scirepeval/search` uses native **click-derived scores**, not continuous human
+relevance ratings. Its [mirror](https://huggingface.co/datasets/tasksource/scirepeval-search)
+scans all native train/validation shards and deterministically samples 5,000 /
+500 query/paper pairs. Validation queries occurring anywhere in native training
+are excluded; official evaluation data is unused. Most native scores are zero,
+so this is weak implicit-feedback supervision. Default loading retains numeric
+scores. Jev linearly interpolates over eight anchors `0,2,...,14`; the expected
+score equals the original value, and the weights do not represent human votes.
+The source does not specify a text/data license; it stays marked unspecified.
+SEntFiN and WANDS record their original repository MIT license evidence.
+
+All three reuse existing templates and the shared loader. Their reproducible
+builders are in `scripts/repackage_dataset/relevance.py`; source revisions,
+conversion hashes, exclusions and split policies are published in each mirror.
+RELISH and SciNUP are omitted because they are evaluation collections without
+native training partitions. They are not converted into synthetic training sets.
+
+The incremental publisher also accepts `--tasks sentfin wands scirepeval/search`
+and a `--description` for the dataset card, reusing the same schema checks,
+source-group leakage checks and parent-revision guard as browser additions.

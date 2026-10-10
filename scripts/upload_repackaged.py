@@ -18,11 +18,15 @@ from scripts.repackage_dataset.text import (
 from scripts.repackage_dataset.vision import view2space, ai2d, iconqa_text, mind2web
 from scripts.repackage_dataset.browser import websrc
 from scripts.repackage_dataset.mind2web import mind2web_dom
+from scripts.repackage_dataset.relevance import sentfin, wands, scirepeval_search
 from scripts.repackage_dataset.superclevr import superclevr
 from scripts.repackage_dataset.regions import coco_regions, doclaynet_region, bapps, spair71k_grid
 
 
-BUILDERS = {"mind2web_dom": ("tasksource/mind2web-dom", mind2web_dom, "per-config"),
+BUILDERS = {"sentfin": ("tasksource/sentfin", sentfin),
+            "wands": ("tasksource/wands", wands),
+            "scirepeval_search": ("tasksource/scirepeval-search", scirepeval_search),
+            "mind2web_dom": ("tasksource/mind2web-dom", mind2web_dom, "per-config"),
             "websrc": ("tasksource/websrc", websrc, "per-config"),
             "superclevr": ("tasksource/superclevr", superclevr),
             "coco_regions": ("tasksource/coco-regions", coco_regions, "per-config"),
@@ -46,7 +50,9 @@ BUILDERS = {"mind2web_dom": ("tasksource/mind2web-dom", mind2web_dom, "per-confi
 
 
 # license metadata for repackaged sets, as the originals state it
-LICENSES = {"tasksource/mind2web-dom": "cc-by-4.0",
+LICENSES = {"tasksource/sentfin": "mit", "tasksource/wands": "mit",
+            "tasksource/scirepeval-search": "other",
+            "tasksource/mind2web-dom": "cc-by-4.0",
             "tasksource/websrc": "cc-by-4.0",
             "tasksource/superclevr": "mit",
             "tasksource/coco-regions": ["other", "cc-by-4.0", "cc-by-2.0",
@@ -84,7 +90,8 @@ def push_card(repo, build):
         card.text = source_card.read_text().split('---', 2)[2]
     card.push_to_hub(repo)
     if repo in ('tasksource/view2space', 'tasksource/ai2d', 'tasksource/iconqa-text', 'tasksource/multimodal-mind2web',
-                'tasksource/coco-regions', 'tasksource/doclaynet-region', 'tasksource/bapps', 'tasksource/spair71k-grid', 'tasksource/superclevr', 'tasksource/websrc', 'tasksource/mind2web-dom'):
+                'tasksource/coco-regions', 'tasksource/doclaynet-region', 'tasksource/bapps', 'tasksource/spair71k-grid', 'tasksource/superclevr', 'tasksource/websrc', 'tasksource/mind2web-dom',
+                'tasksource/sentfin', 'tasksource/wands', 'tasksource/scirepeval-search'):
         from huggingface_hub import HfApi
         directory = Path('build') / ('view2space-release-imagefolder' if repo == 'tasksource/view2space' else repo.split('/')[1] + '-release')
         for filename in ('provenance.json', 'excluded-questions.jsonl'):

@@ -59,7 +59,8 @@ def write(path, multilingual=False, vision=False):
             "Annotations whose label is a distribution (annotator votes, rater shares, survey counts), "
             "loaded with `load_task(id, soft=True)`. Those with a hard view are also listed above, by "
             "their majority label; the others have soft labels only. `votes` are shares of annotators, "
-            "`mean` a mean rating; annotators is the typical count per item (vote shares from fewer than "
+            "`mean` a numeric value interpolated over score anchors (see each task for its meaning); "
+            "annotators is the typical count per item (vote shares from fewer than "
             "five are coarse, and the Jev build leaves them out).",
             "",
             "| id | kind | aggregation | annotators | default view | dataset |",
