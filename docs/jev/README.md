@@ -669,3 +669,12 @@ native training partitions. They are not converted into synthetic training sets.
 The incremental publisher also accepts `--tasks sentfin wands scirepeval/search`
 and a `--description` for the dataset card, reusing the same schema checks,
 source-group leakage checks and parent-revision guard as browser additions.
+
+Published in [data revision `2451442`](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/commit/24514425e993f617d462cc740912e26f2acf6d76):
+1,000 training rows per task, 100 validation rows per task, and 100 test rows each
+for SEntFiN/WANDS (Search has no added test data). Both `default` and `full` receive
+3,000 / 300 / 200 decisions. The [coarse audit](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/blob/main/additions/2d27d40ae2fe/quality-audit.json)
+records source-label alignment for all 3,500 rows, three inspected training
+examples per task, and the weak/context-dependent source-label caveats.
+The [verification receipt](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/blob/main/additions/2d27d40ae2fe/verification.json)
+checks all six hosted shards and preservation of all 97 pre-existing Parquet blobs.
