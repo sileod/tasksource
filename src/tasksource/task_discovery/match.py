@@ -43,6 +43,20 @@ def previous_decisions():
     return json.loads(Path(__file__).with_name('decisions.json').read_text())
 
 
+def queued_sources(path=None):
+    """Read source names from the human queue's tables without maintaining a second list."""
+    path = Path(path) if path else Path(__file__).with_name('todo_batch.md')
+    sources = {}
+    for line in path.read_text().splitlines():
+        if not line.startswith('| '):
+            continue
+        name, views, status = (cell.strip() for cell in line.strip('|').split('|'))
+        if name == 'Source':
+            continue
+        sources[normalized(name)] = dict(name=name, views=views, status=status)
+    return sources
+
+
 
 def decision_matches(row, records):
     names = {normalized(n) for n in [row['name'], *row.get('aliases', [])]}
@@ -57,7 +71,7 @@ def decision_matches(row, records):
             yield record
 
 
-def match(candidates, names, repos, decisions=()):
+def match(candidates, names, repos, decisions=(), queue=None):
     for row in deduplicate(candidates):
         evidence = []
         for name in [row['name'], *row.get('aliases', [])]:
@@ -68,8 +82,10 @@ def match(candidates, names, repos, decisions=()):
             if repo in repos:
                 evidence.append(dict(by='hub_repository', value=repo, tasks=sorted(repos[repo])))
         history = list(decision_matches(row, decisions))
+        queued = {normalized(n) for n in [row['name'], *row.get('aliases', [])]} & (queue or {}).keys()
         yield dict(row, matches=evidence, previous_decisions=history,
-            status='catalog_match' if evidence else 'previously_reviewed' if history else 'candidate')
+            queue_matches=[queue[n] for n in sorted(queued)],
+            status='catalog_match' if evidence else 'previously_reviewed' if history else 'queued' if queued else 'candidate')
 
 
 def catalog_hash(names, repos):

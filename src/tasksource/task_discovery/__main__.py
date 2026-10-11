@@ -4,7 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 
-from .match import catalog_hash, catalog_index, deduplicate, match, previous_decisions
+from .match import catalog_hash, catalog_index, deduplicate, match, previous_decisions, queued_sources
 from .paperswithcode import retrieve
 from .link import link
 
@@ -25,7 +25,7 @@ def main():
     compare = commands.add_parser('match', help='Deduplicate and compare any canonical candidate JSONL')
     compare.add_argument('input', type=Path)
     compare.add_argument('--unmatched-only', action='store_true')
-    compare.add_argument('--unreviewed-only', action='store_true', help='Exclude catalog matches and previously assessed sources')
+    compare.add_argument('--unreviewed-only', action='store_true', help='Exclude catalog matches, previously assessed sources and the human queue')
     enrich = commands.add_parser('link', help='Link papers and suggest Hub mirrors using cached metadata')
     enrich.add_argument('input', type=Path)
     enrich.add_argument('--cache', type=Path, required=True)
@@ -62,11 +62,14 @@ def main():
         raw = args.input.read_bytes()
         names, repos = catalog_index()
         decisions = previous_decisions()
-        rows = list(match([json.loads(line) for line in raw.splitlines() if line.strip()], names, repos, decisions))
+        queue = queued_sources()
+        rows = list(match([json.loads(line) for line in raw.splitlines() if line.strip()], names, repos, decisions, queue))
         manifest = dict(input_sha256=hashlib.sha256(raw).hexdigest(), catalog_sha256=catalog_hash(names, repos),
                         unique_candidates=len(rows), catalog_matches=sum(bool(r['matches']) for r in rows),
                         previous_decisions_sha256=hashlib.sha256(json.dumps(decisions,sort_keys=True).encode()).hexdigest(),
-                        previously_reviewed=sum(r['status']=='previously_reviewed' for r in rows))
+                        previously_reviewed=sum(r['status']=='previously_reviewed' for r in rows),
+                        human_queue_sha256=hashlib.sha256(json.dumps(queue,sort_keys=True).encode()).hexdigest(),
+                        already_queued=sum(r['status']=='queued' for r in rows))
         if args.unmatched_only:
             rows = [r for r in rows if not r['matches']]
         if args.unreviewed_only:

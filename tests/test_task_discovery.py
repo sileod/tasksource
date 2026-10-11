@@ -67,6 +67,23 @@ def test_previous_decisions_match_source_ids_and_do_not_block_other_views():
     assert list(match([row],{},{},[record]))[0]['status']=='previously_reviewed'
 
 
+def test_human_queue_matches_names_without_merging_versions_or_overriding_catalog(tmp_path):
+    from tasksource.task_discovery.match import queued_sources
+    path=tmp_path/'queue.md'
+    text='| Source | Requested views | Status |\n|---|---|---|\n| SST-5 | Sentiment | Pending review |\n'
+    path.write_text(text)
+    queue=queued_sources(path)
+    rows={r['name']:r for r in match([dict(name='sst5'),dict(name='SST-2'),
+        dict(name='Mirror',aliases=['SST-5'])],{'mirror':{'existing/view'}},{},queue=queue)}
+    assert rows['sst5']['status']=='queued'
+    assert rows['sst5']['queue_matches'][0]['status']=='Pending review'
+    assert rows['SST-2']['status']=='candidate' and not rows['SST-2']['queue_matches']
+    assert rows['Mirror']['status']=='catalog_match' and rows['Mirror']['queue_matches']
+    assert path.read_text()==text
+    actual=queued_sources()
+    assert {'maven','mavenarg','sst5'} <= actual.keys()
+
+
 def test_structured_history_preserves_existing_reasons():
     from tasksource import parked,eval_only
     from tasksource.task_discovery.match import previous_decisions
