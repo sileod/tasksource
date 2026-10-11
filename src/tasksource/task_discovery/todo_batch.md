@@ -40,7 +40,7 @@ Eleven views across batches 2–3 were added to Jev `default` and `full` in [Hub
 
 Five further views were published to Jev `default` and `full` in [Hub commit 71f31c69](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/commit/71f31c69db4325a92f8639093362578b696ba62f): FNC-1 stance, PERSPECTRUM stance, UKPConvArg convincingness, DiscoGeM relation votes and PubMed RCT role. Added 4,998 train / 300 validation / 500 test rows; previous Parquet blobs were preserved. [Source and final-export review](../../../docs/jev/stance-expansion-audit.json) records examples, native label caveats, source revisions and reviewer identity. Git implementation: `c4d35fb`; regression checks: 205 passed, 44 skipped. VAST and UKP Sentential are deferred with source-indexed reasons in `decisions.json`; they were not added to training.
 
-## Batch 4 — reviewed; accepted views staged for publication
+## Batch 4 — reviewed and published
 
 12 accepted sources, 14 training views. Nine sources load directly from existing Hub repositories; only Spider (schema join), SemCor (matching WordNet 1.6 inventory) and STREUSLE (original JSON) require repackaging. [Source and exact-export audit](../../../docs/jev/linguistic-expansion-audit.json) records native annotation caveats, sampled rows, pins, reviewer identity and split checks.
 
@@ -60,7 +60,7 @@ Five further views were published to Jev `default` and `full` in [Hub commit 71f
 | STREUSLE | Marked expression → supersense | Original versioned JSON; noun and verb views, including discontinuous expressions; native review partitions |
 | SST-5 | Five-level sentence sentiment | Direct `SetFit/sst5`; native splits with duplicate/conflicting texts excluded; ordered score-only decisions |
 
-The staged pilot contains 14,000 train, 1,000 validation and 800 test rows for Jev `default` and `full` (up to 1,000 train and 100 per existing evaluation split per task). Publication status is updated after the Hub commit is verified.
+Published 14,000 train, 1,000 validation and 800 test rows to Jev `default` and `full` in [Hub commit bf1e4a87](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/commit/bf1e4a874575dfb16852af90f62eb739a737fd17), up to 1,000 train and 100 per existing evaluation split per task. Prior Parquet blobs were preserved. Implementation Git `cad17f7`; regression run: 517 passed, 44 skipped, followed by 46 passing focused checks after the final parking changes. SemEval 2023 Task 3 and the two fine-grained OLID views are explicitly deferred rather than silently forgotten.
 
 ## Selection rules
 

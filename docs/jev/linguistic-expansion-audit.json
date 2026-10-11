@@ -853,5 +853,12 @@
       "test": 800
     },
     "manifest": "additions/a9a3d118186b/manifest.json"
+  },
+  "publication": {
+    "repo": "tasksource/tasksource-jev-typed-decisions",
+    "commit": "bf1e4a874575dfb16852af90f62eb739a737fd17",
+    "url": "https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/commit/bf1e4a874575dfb16852af90f62eb739a737fd17",
+    "implementation_git_revision": "cad17f7cba6a3a129f93c8854dec037e3fbbff54",
+    "previous_parquet_blobs_preserved": true
   }
 }
