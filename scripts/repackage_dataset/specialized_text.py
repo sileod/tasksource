@@ -14,6 +14,69 @@ from huggingface_hub import hf_hub_download
 
 from .relevance import text_key, write_mirror
 
+PUBMED_SOURCE = 'zj88zj/PubMed_200k_RCT'
+PUBMED_REVISION = '2bc68a9b902ae51b856b3c22e48181a76ba10849'
+PUBMED_ORIGINAL_REVISION = '17ed2cb0590decfca0266add0c76f254f67232b4'
+
+
+def pubmed_rows(path):
+    """Parse native PMID headers and role/tab/sentence lines without losing grouping."""
+    pmid=None;index=0
+    with Path(path).open() as source:
+        for line in source:
+            line=line.rstrip('\r\n')
+            if line.startswith('###'):
+                pmid=line[3:];index=0
+            elif line.strip():
+                label,text=line.split('\t',1)
+                if not pmid or label not in ('BACKGROUND','OBJECTIVE','METHODS','RESULTS','CONCLUSIONS'):
+                    raise ValueError('Invalid PubMed sentence/PMID annotation')
+                yield dict(sentence1=text,sentence2='',labels=label,
+                    metadata=json.dumps(dict(id=f'{pmid}:{index}',split_group_id=pmid,pmid=pmid,sentence_index=index),sort_keys=True))
+                index+=1
+
+
+def pubmed_rct():
+    """PubMed 200k RCT sentence roles, retaining native PMID/abstract partitions.
+
+    Converts the pinned plaintext training Hub copy, preserving PMID headers
+    and numbers. Uses original dev/test files because the Hub dev file is RTF,
+    not plaintext. Streaming conversion avoids collecting 2.2 million sentence dictionaries in memory. Native train/dev/test
+    are preserved and verified PMID-disjoint. Original data distribution:
+    https://github.com/Franck-Dernoncourt/pubmed-rct.
+    Terms remain unspecified: the original README warns that PubMed abstracts
+    can be copyrighted; free availability does not establish redistribution rights.
+    """
+    from datasets import Dataset, DatasetDict, Features, Value
+    from huggingface_hub import hf_hub_download
+    directory=Path('build/pubmed-rct-release');directory.mkdir(parents=True,exist_ok=True)
+    features=Features({k:Value('string') for k in ('sentence1','sentence2','labels','metadata')})
+    import pyarrow.compute as pc
+    data,groups,hashes,counts={},{},{},{}
+    for split,native in [('train','train'),('validation','dev'),('test','test')]:
+        if split=='train':
+            path=hf_hub_download(PUBMED_SOURCE,native+'.txt',repo_type='dataset',revision=PUBMED_REVISION)
+        else:
+            path=Path('build/source-archives/Franck-Dernoncourt/pubmed-rct')/PUBMED_ORIGINAL_REVISION/'PubMed_200k_RCT'/(native+'.txt')
+            if not path.exists():
+                path.parent.mkdir(parents=True,exist_ok=True)
+                url=f'https://raw.githubusercontent.com/Franck-Dernoncourt/pubmed-rct/{PUBMED_ORIGINAL_REVISION}/PubMed_200k_RCT/{native}.txt'
+                path.write_bytes(urllib.request.urlopen(url,timeout=60).read())
+        groups[split]={l.strip()[3:] for l in Path(path).open() if l.startswith('###')}
+        hashes[native]=hashlib.sha256(Path(path).read_bytes()).hexdigest()
+        data[split]=Dataset.from_generator(pubmed_rows,gen_kwargs=dict(path=str(path)),features=features)
+        counts[split]={r['values']:r['counts'] for r in pc.value_counts(data[split].data.column('labels')).to_pylist()}
+        data[split].to_parquet(str(directory/(split+'.parquet')))
+    assert all(not groups[a]&groups[b] for a in groups for b in groups if a!=b),'PubMed PMID overlap'
+    report=dict(source='https://github.com/Franck-Dernoncourt/pubmed-rct',hub_source=PUBMED_SOURCE,
+        source_revision=PUBMED_REVISION,original_revision=PUBMED_ORIGINAL_REVISION,source_hashes=hashes,
+        splits={s:len(d) for s,d in data.items()},label_counts=counts,
+        abstracts={s:len(g) for s,g in groups.items()},split_policy='native PMID partitions',license='unspecified',
+        conversion_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest())
+    (directory/'provenance.json').write_text(json.dumps(report,indent=2)+'\n')
+    return DatasetDict(data)
+
+
 ACORD_REVISION = '7ba1c6f2e0baaa32e78c78c2b02e9c57b102af4e'
 EDOS_REVISION = 'b1f1fbcca9d42de0395432ada8fcfb5c35f68c77'
 EVIDENCE_URL = 'https://evidence-inference.ebm-nlp.com/v2.0.tar.gz'

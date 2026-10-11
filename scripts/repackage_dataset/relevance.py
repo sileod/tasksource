@@ -44,14 +44,17 @@ def parse_sentfin(value):
     return result, repaired
 
 
-def write_mirror(name, splits, label_type, report):
+def write_mirror(name, splits, label_type, report, features=None):
     directory = Path('build') / (name + '-release')
     directory.mkdir(parents=True, exist_ok=True)
-    features = Features(dict(sentence1=Value('string'), sentence2=Value('string'),
-                             labels=Value(label_type), metadata=Value('string')))
-    data = DatasetDict({split:Dataset.from_list(rows,features=features) for split,rows in splits.items()})
+    features = features or Features(dict(sentence1=Value('string'), sentence2=Value('string'),
+                                         labels=Value(label_type), metadata=Value('string')))
+    data = DatasetDict({split:Dataset.from_list(rows,features=features) if rows else
+        Dataset.from_dict({key:[] for key in features},features=features) for split,rows in splits.items()})
     report.setdefault('conversion_sha256',hashlib.sha256(Path(__file__).read_bytes()).hexdigest())
     report.update(splits={s:len(d) for s,d in data.items()})
+    if label_type in ('string','int64'):
+        report['label_counts']={s:dict(Counter(str(r['labels']) for r in rows)) for s,rows in splits.items()}
     for split, rows in data.items():
         rows.to_parquet(str(directory / (split + '.parquet')))
     (directory/'excluded-questions.jsonl').write_text('')

@@ -1561,5 +1561,120 @@
       "https://github.com/sileod/tasksource/blob/main/src/tasksource/eval_only.py"
     ],
     "reconsider_if": "The recorded issue is resolved and a suitable training source is verified."
+  },
+  {
+    "name": "Schema-Guided Dialogue categorical slots",
+    "scope": "task",
+    "tasks": [
+      "schema-guided/categorical-slot"
+    ],
+    "status": "deferred",
+    "reason_code": "ambiguous_supervision",
+    "reason": "Coarse projection review: user asks for an economical restaurant but native state selects moderate rather than inexpensive. Do not guess replacement state labels.",
+    "huggingface": [
+      "google-research-datasets/schema_guided_dstc8"
+    ],
+    "github": [
+      "google-research-datasets/dstc8-schema-guided-dialogue"
+    ],
+    "papers": [],
+    "source_revisions": {
+      "google-research-datasets/schema_guided_dstc8": "a8029ad8c12e13cdbfefc2f649e245fa135bc98a"
+    },
+    "evidence": [
+      "Dialogue 1_00000, turn 12, Restaurants_1:price_range"
+    ],
+    "reconsider_if": "Categorical state semantics can be verified against user context and schema, without guessed label repairs.",
+    "checked_on": "2026-10-11",
+    "reviews": [
+      {
+        "reviewer": {
+          "kind": "model",
+          "model": "gpt-6.1-sol",
+          "model_id_source": "user-provided"
+        },
+        "checked_on": "2026-10-11",
+        "verdict": "deferred",
+        "findings": "Coarse projection review: user asks for an economical restaurant but native state selects moderate rather than inexpensive. Do not guess replacement state labels.",
+        "evidence": [
+          "Dialogue 1_00000, turn 12, Restaurants_1:price_range"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "UKP Sentential Argument Mining",
+    "scope": "source",
+    "tasks": [],
+    "status": "deferred",
+    "reason_code": "source_access_required",
+    "reason": "Official archive content endpoint requires authentication. Distribution licenses annotations separately; original sentence text requires reconstruction and rights verification.",
+    "huggingface": [],
+    "github": [
+      "UKPLab/acl2019-BERT-argument-classification-and-clustering"
+    ],
+    "papers": [],
+    "evidence": [
+      "https://tudatalib.ulb.tu-darmstadt.de/items/18c6544d-fa61-4505-ae8f-1304352c06e6",
+      "Official bitstream 90a1de18-7a2e-4706-89e6-cf8108cfd3e9 returned HTTP 401"
+    ],
+    "reconsider_if": "Official archive is accessible and source sentence reconstruction/redistribution terms are verified.",
+    "checked_on": "2026-10-11",
+    "reviews": [
+      {
+        "reviewer": {
+          "kind": "model",
+          "model": "gpt-6.1-sol",
+          "model_id_source": "user-provided"
+        },
+        "checked_on": "2026-10-11",
+        "verdict": "deferred",
+        "findings": "Official archive content endpoint requires authentication. Distribution licenses annotations separately; original sentence text requires reconstruction and rights verification.",
+        "evidence": [
+          "https://tudatalib.ulb.tu-darmstadt.de/items/18c6544d-fa61-4505-ae8f-1304352c06e6",
+          "Official bitstream 90a1de18-7a2e-4706-89e6-cf8108cfd3e9 returned HTTP 401"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "PubMed RCT Hub validation copy",
+    "scope": "projection",
+    "tasks": [
+      "pubmed-rct/role"
+    ],
+    "status": "repackaged",
+    "reason_code": "malformed_source",
+    "reason": "Pinned Hub dev.txt is RTF rather than native tab-separated annotations. Mirror uses original repository plaintext dev/test; training remains the pinned Hub plaintext copy.",
+    "huggingface": [
+      "zj88zj/PubMed_200k_RCT"
+    ],
+    "github": [
+      "Franck-Dernoncourt/pubmed-rct"
+    ],
+    "papers": [],
+    "source_revisions": {
+      "zj88zj/PubMed_200k_RCT": "2bc68a9b902ae51b856b3c22e48181a76ba10849"
+    },
+    "evidence": [
+      "https://github.com/Franck-Dernoncourt/pubmed-rct"
+    ],
+    "reconsider_if": "Hub validation file is corrected to the original plaintext annotations.",
+    "checked_on": "2026-10-11",
+    "reviews": [
+      {
+        "reviewer": {
+          "kind": "model",
+          "model": "gpt-6.1-sol",
+          "model_id_source": "user-provided"
+        },
+        "checked_on": "2026-10-11",
+        "verdict": "repackaged",
+        "findings": "Pinned Hub dev.txt is RTF rather than native tab-separated annotations. Mirror uses original repository plaintext dev/test; training remains the pinned Hub plaintext copy.",
+        "evidence": [
+          "https://github.com/Franck-Dernoncourt/pubmed-rct"
+        ]
+      }
+    ]
   }
 ]

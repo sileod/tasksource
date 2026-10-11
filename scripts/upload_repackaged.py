@@ -21,11 +21,17 @@ from scripts.repackage_dataset.mind2web import mind2web_dom
 from scripts.repackage_dataset.relevance import sentfin, wands, scirepeval_search
 from scripts.repackage_dataset.specialized_text import acord, edos, evidence_inference
 from scripts.repackage_dataset.dialogue import slurp, mcscript2
+from scripts.repackage_dataset.stance import vast, fnc1, perspectrum, ukpconvarg, discogem
+from scripts.repackage_dataset.specialized_text import pubmed_rct
 from scripts.repackage_dataset.superclevr import superclevr
 from scripts.repackage_dataset.regions import coco_regions, doclaynet_region, bapps, spair71k_grid
 
 
 BUILDERS = {"slurp": ("tasksource/slurp", slurp),
+            "pubmed-rct": ("tasksource/pubmed-rct", pubmed_rct),
+            "vast": ("tasksource/vast", vast), "fnc1": ("tasksource/fnc1", fnc1),
+            "perspectrum": ("tasksource/perspectrum", perspectrum),
+            "ukpconvarg": ("tasksource/ukpconvarg", ukpconvarg), "discogem": ("tasksource/discogem", discogem),
             "mcscript2": ("tasksource/mcscript2", mcscript2),
             "sentfin": ("tasksource/sentfin", sentfin),
             "acord": ("tasksource/acord", acord),
@@ -58,6 +64,9 @@ BUILDERS = {"slurp": ("tasksource/slurp", slurp),
 
 # license metadata for repackaged sets, as the originals state it
 LICENSES = {"tasksource/slurp": "cc-by-4.0", "tasksource/mcscript2": "other",
+            "tasksource/pubmed-rct": "other",
+            "tasksource/vast": "other", "tasksource/fnc1": "other", "tasksource/perspectrum": "cc-by-sa-4.0",
+            "tasksource/ukpconvarg": "cc-by-4.0", "tasksource/discogem": "other",
             "tasksource/sentfin": "mit", "tasksource/wands": "mit",
             "tasksource/acord": "cc-by-4.0", "tasksource/edos": "cc0-1.0",
             "tasksource/evidence-inference": "other",
@@ -109,13 +118,11 @@ def push_card(repo, build):
         source_card = prepared_card if prepared_card.exists() else Path(__file__).resolve().parents[1] / 'dataset_cards/webinstruct.md'
         card.text = source_card.read_text().split('---', 2)[2]
     card.push_to_hub(repo)
-    if repo in ('tasksource/view2space', 'tasksource/ai2d', 'tasksource/iconqa-text', 'tasksource/multimodal-mind2web',
-                'tasksource/coco-regions', 'tasksource/doclaynet-region', 'tasksource/bapps', 'tasksource/spair71k-grid', 'tasksource/superclevr', 'tasksource/websrc', 'tasksource/mind2web-dom',
-                'tasksource/sentfin', 'tasksource/wands', 'tasksource/scirepeval-search',
-                'tasksource/acord', 'tasksource/edos', 'tasksource/evidence-inference', 'tasksource/slurp', 'tasksource/mcscript2'):
+    if provenance.exists() and repo != 'tasksource/webinstruct':
         from huggingface_hub import HfApi
         directory = Path('build') / ('view2space-release-imagefolder' if repo == 'tasksource/view2space' else repo.split('/')[1] + '-release')
         for filename in ('provenance.json', 'excluded-questions.jsonl'):
+            if not (directory / filename).exists():continue
             HfApi().upload_file(path_or_fileobj=directory / filename, path_in_repo=filename,
                 repo_id=repo, repo_type='dataset', commit_message='Record visual conversion provenance and exclusions')
     if repo == 'tasksource/webinstruct':

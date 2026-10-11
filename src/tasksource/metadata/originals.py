@@ -11,6 +11,12 @@ by scripts/upload_repackaged.py) or a task switches to a mirror.
 """
 
 ORIGINALS = {
+    "tasksource/pubmed-rct": ["zj88zj/PubMed_200k_RCT"],  # native PMID headers, not flattened sentences
+    "tasksource/vast": [],  # original VAST CSVs, not the unrelated VAST Hub chatbot
+    "tasksource/fnc1": [],  # original FakeNewsChallenge CSVs; joined without text stripping
+    "tasksource/perspectrum": [],  # original CogComp claim/perspective pool
+    "tasksource/ukpconvarg": [],  # original UKPConvArg1Strict topic CSVs
+    "tasksource/discogem": [],  # original DiscoGeM 1.0 crowd distributions
     "tasksource/slurp": [],  # official textual annotations, without audio
     "tasksource/mcscript2": [],  # original Saarland XML archive
 

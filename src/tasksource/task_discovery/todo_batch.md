@@ -17,7 +17,7 @@ MAUD (six views), ACORD, Evidence Inference, DDI, Hallmarks of Cancer, Patent Cl
 | QuAC | Answerability, yes/no/neither, follow-up | Answerability published; yes/no and follow-up deferred after ambiguous native labels in coarse review |
 | SLURP | Intent; possible slot tagging | Text-only mirror and 60-class scenario/action intent published; slots pending |
 | MultiWOZ 2.2 | Intent, dialogue act, categorical slots | Dialogue act and categorical slots published; intent deferred after stale active-intent labels in coarse review; single-act rows only |
-| Schema-Guided Dialogue | Intent and categorical slot values | Intent published; schema-grounded slot projection pending |
+| Schema-Guided Dialogue | Intent and categorical slot values | Intent published; categorical-slot projection deferred after ambiguous economical → moderate state in native dialogue 1_00000, turn 12 |
 | HotpotQA | Native supporting-fact membership | Published; explicit native sentence identities |
 | MCScript2.0 | Native two-choice comprehension | Original XML mirror and native MC view published; license still unspecified |
 
@@ -31,7 +31,7 @@ Eleven views across batches 2–3 were added to Jev `default` and `full` in [Hub
 | VAST | Topic-conditioned pro/con/neutral | Pending native CSV, label ontology and split checks |
 | FNC-1 | Headline/body stance | Pending original CSV join; inspected Hub copy strips source text |
 | DiscoGeM | Discourse relation / annotator votes | Pending original partitions and vote verification |
-| UKP Sentential Argument Mining | Topic-conditioned pro/con/no argument | Pending original source and split verification |
+| UKP Sentential Argument Mining | Topic-conditioned pro/con/no argument | Deferred: official archive requires authentication; sentence reconstruction and separate text rights must be verified |
 | CoQA | Native exact yes/no with prior dialogue | Published to Jev default/full |
 | QASPER | Native scientific yes/no; possible evidence selection | Binary consensus view published; all cited evidence must occur in supplied text; answer style is not used as a target |
 | TOPv2 | Root intent; possible slot types | Root intent published to Jev default/full |
