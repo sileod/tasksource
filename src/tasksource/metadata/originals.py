@@ -11,6 +11,9 @@ by scripts/upload_repackaged.py) or a task switches to a mirror.
 """
 
 ORIGINALS = {
+    "tasksource/semcor": ["thesofakillers/SemCor"],
+    "tasksource/streusle": [],
+    "tasksource/spider": ["minktn/spider-data"],
     "tasksource/pubmed-rct": ["zj88zj/PubMed_200k_RCT"],  # native PMID headers, not flattened sentences
     "tasksource/vast": [],  # original VAST CSVs, not the unrelated VAST Hub chatbot
     "tasksource/fnc1": [],  # original FakeNewsChallenge CSVs; joined without text stripping
