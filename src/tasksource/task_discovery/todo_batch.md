@@ -27,16 +27,16 @@ Eleven views across batches 2–3 were added to Jev `default` and `full` in [Hub
 
 | Source | Requested views | Status / remaining checks |
 |---|---|---|
-| UKPConvArg1Strict | More convincing argument, native pair preferences | Pending original topic CSV conversion and source-group split policy |
-| VAST | Topic-conditioned pro/con/neutral | Pending native CSV, label ontology and split checks |
-| FNC-1 | Headline/body stance | Pending original CSV join; inspected Hub copy strips source text |
-| DiscoGeM | Discourse relation / annotator votes | Pending original partitions and vote verification |
+| UKPConvArg1Strict | More convincing argument, native pair preferences | Implemented from original Strict TSVs; 8,819/1,303/1,528 rows in documented topic-disjoint derived train/validation/test |
+| VAST | Topic-conditioned pro/con/neutral | Deferred after native row 18506 contradicts its omnivore topic; mirror records the quality finding |
+| FNC-1 | Headline/body stance | Implemented original CSV join with complete article bodies; 49,753 train / 25,413 native test, body-disjoint |
+| DiscoGeM | Discourse relation / annotator votes | Implemented native annotator votes; 1,282 train / 1,288 test after removing paragraph overlap; no validation |
 | UKP Sentential Argument Mining | Topic-conditioned pro/con/no argument | Deferred: official archive requires authentication; sentence reconstruction and separate text rights must be verified |
 | CoQA | Native exact yes/no with prior dialogue | Published to Jev default/full |
 | QASPER | Native scientific yes/no; possible evidence selection | Binary consensus view published; all cited evidence must occur in supplied text; answer style is not used as a target |
 | TOPv2 | Root intent; possible slot types | Root intent published to Jev default/full |
-| PERSPECTRUM | Claim/perspective supports/opposes | Pending original perspective join and claim splits |
-| PubMed 200k RCT | Sentence rhetorical role | Pending source preserving PMID/abstract identity and native partitions |
+| PERSPECTRUM | Claim/perspective supports/opposes | Implemented primary native perspectives and official claim partitions; 2,939/910/1,204 rows |
+| PubMed 200k RCT | Sentence rhetorical role | Implemented pinned plaintext mirror; 2,211,861/28,932/29,493 sentences, native PMID-disjoint partitions; original eval files repair a malformed Hub dev copy |
 
 ## Batch 4 — queued after the earlier batches
 

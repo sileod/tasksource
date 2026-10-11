@@ -171,7 +171,7 @@ def discogem():
         splits[split].append(_row(r['arg1'],r['arg2'],discourse_votes(r['majority_softlabel'],int(r['observations'])),r['itemid'],r['datasource'],
             observations=int(r['observations']),genre=r['genre'],native_votes=r['majority_softlabel']))
     report.update(excluded_native=excluded,split_policy='native paragraph partitions',license='unspecified',vote_order=list(DISCO_RELATIONS))
-    splits=_holdouts(splits,report)
+    splits={s:rows for s,rows in _holdouts(splits,report).items() if rows}
     report['vote_counts']={s:dict(zip(DISCO_RELATIONS,map(sum,zip(*(r['labels'] for r in rows))))) for s,rows in splits.items()}
     features=Features(dict(sentence1=Value('string'),sentence2=Value('string'),labels=Sequence(Value('float64')),metadata=Value('string')))
     return write_mirror('discogem',splits,'float64',report,features)

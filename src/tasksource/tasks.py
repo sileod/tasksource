@@ -2,6 +2,7 @@ from .preprocess import cat, get, regen, name, constant, Classification, TokenCl
 from .metadata import udep_en_configs
 from .metadata.configs import BABI_NLI
 from .metadata.source_revisions import SOURCE_REVISIONS
+from .metadata.discourse import DISCO_RELATIONS
 from datasets import Sequence, ClassLabel, Dataset, DatasetDict, Features, Value, concatenate_datasets
 import ast
 import hashlib
@@ -2927,3 +2928,33 @@ slurp__intent = Classification('sentence1',labels='labels',dataset_name='tasksou
 mcscript2 = MultipleChoice(inputs='inputs',choices_list='choices_list',labels='labels',
     dataset_name='tasksource/mcscript2',metadata='metadata',complete_splits=False,
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/mcscript2']})
+
+
+fnc1__stance = Classification('sentence1','sentence2','labels',dataset_name='tasksource/fnc1',
+    task_id='fnc1/stance',metadata='metadata',complete_splits=False,
+    label_values={x:x for x in ('agree','disagree','discuss','unrelated')},
+    question='Does article body text_B agree with headline text_A, disagree with it, discuss it without taking a stance, or concern an unrelated topic?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/fnc1']})
+perspectrum__stance = Classification('sentence1','sentence2','labels',dataset_name='tasksource/perspectrum',
+    task_id='perspectrum/stance',metadata='metadata',complete_splits=False,
+    label_values={'SUPPORT':'supports','UNDERMINE':'opposes'},
+    question='Does perspective text_B support or oppose claim text_A?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/perspectrum']})
+ukpconvarg__convincingness = MultipleChoice(inputs='inputs',choices_list='choices_list',labels='labels',
+    dataset_name='tasksource/ukpconvarg',task_id='ukpconvarg/convincingness',metadata='metadata',complete_splits=False,
+    question='Which argument is more convincing for this debate topic, according to human judgments?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/ukpconvarg']})
+
+discogem__relation = SoftLabeling('sentence1','sentence2','labels',dataset_name='tasksource/discogem',
+    task_id='discogem/relation',options=list(DISCO_RELATIONS.values()),hard=.6,annotators=10,
+    count=lambda x:json.loads(x['metadata'])['observations'],metadata='metadata',complete_splits=False,
+    question='Which discourse relation links text_A and text_B?',
+    soft_question='How are the native annotator judgments distributed over discourse relations linking text_A and text_B?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/discogem']})
+
+
+pubmed_rct__role = Classification('sentence1',labels='labels',dataset_name='tasksource/pubmed-rct',
+    task_id='pubmed-rct/role',metadata='metadata',complete_splits=False,
+    label_values={x:x.lower() for x in ('BACKGROUND','OBJECTIVE','METHODS','RESULTS','CONCLUSIONS')},
+    question='What rhetorical role does this sentence play in its randomized controlled trial abstract?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/pubmed-rct']})

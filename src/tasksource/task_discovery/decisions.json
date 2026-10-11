@@ -1676,5 +1676,44 @@
         ]
       }
     ]
+  },
+  {
+    "name": "VAST",
+    "scope": "task",
+    "tasks": [
+      "vast/stance"
+    ],
+    "status": "deferred",
+    "reason_code": "incorrect_native_label",
+    "reason": "Native training row 18506 endorses humans being omnivores but labels topic omnivore as con (0). The recast preserves the source correctly; do not train on this projection without validating topic/stance alignment.",
+    "huggingface": [
+      "tasksource/vast"
+    ],
+    "github": [
+      "emilyallaway/zero-shot-stance"
+    ],
+    "papers": [],
+    "checked_on": "2026-10-11",
+    "evidence": [
+      "Native new_id 18506, type_idx 3 (ListTopic), ori_topic everyone, new_topic omnivore",
+      "https://github.com/emilyallaway/zero-shot-stance/blob/master/data/README.md"
+    ],
+    "reconsider_if": "Source topic/stance alignment is verified or a validated subset is supplied without guessed labels.",
+    "reviews": [
+      {
+        "reviewer": {
+          "kind": "model",
+          "model": "gpt-6.1-sol",
+          "model_id_source": "user-provided"
+        },
+        "checked_on": "2026-10-11",
+        "verdict": "defer",
+        "findings": "Native training row 18506 endorses humans being omnivores but labels topic omnivore as con (0). The recast preserves the source correctly; do not train on this projection without validating topic/stance alignment.",
+        "evidence": [
+          "Native new_id 18506, type_idx 3 (ListTopic), ori_topic everyone, new_topic omnivore",
+          "https://github.com/emilyallaway/zero-shot-stance/blob/master/data/README.md"
+        ]
+      }
+    ]
   }
 ]

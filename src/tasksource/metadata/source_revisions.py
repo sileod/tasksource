@@ -1,6 +1,13 @@
 """Reviewed source snapshots; keep opaque revision IDs out of task annotations."""
 
 SOURCE_REVISIONS = {
+    "tasksource/pubmed-rct": "b5c96c8c80ac929a88cc6ad7b9818063b6e95b6c",
+    "tasksource/vast": "9748982e719f065af00a41c774776590a3acac3e",
+    "tasksource/fnc1": "4effe53583062803a710231955bec178b31c9635",
+    "tasksource/perspectrum": "721184de6ed05314fba04c6b706863fff4a5b647",
+    "tasksource/ukpconvarg": "80ef4995b8206dea60fad7fb5c23939acab77c39",
+    "tasksource/discogem": "71953deb6a8fe211466f45453322414732cc42b5",
+
     "Hate-speech-CNERG/hatexplain": "b0e5676acc1d0dcb31d6ce8e93e7e94109044ed6",
     "OpenMed/DDI-Corpus-Processed": "f97e24e60366180e77423ccd9c4643e34f59c1c8",
     "Salesforce/wikisql": "48cfb60afd0d5f9d2231ca90f76edf9f975181bc",

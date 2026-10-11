@@ -1,0 +1,818 @@
+{
+  "checked_on": "2026-10-11",
+  "reviewer": {
+    "kind": "model",
+    "model": "gpt-6.1-sol",
+    "model_id_source": "user-provided"
+  },
+  "scope": "Coarse source and conversion review; three training rows per source (indices 0, 1, 49), not a statistical label audit.",
+  "sources": {
+    "vast": {
+      "findings": "Native training row 18506 endorses humans being omnivores but labels topic omnivore as con (0). The recast preserves the source correctly; do not train on this projection without validating topic/stance alignment.",
+      "provenance": {
+        "source": "https://github.com/emilyallaway/zero-shot-stance",
+        "revision": "e7c4775182b184730f350995f8260579c9e066fe",
+        "source_hashes": {
+          "data/VAST/vast_train.csv": "b2f0d69a73231b8ef22f10e4df7d759cf228505ce5252506068da6aa7fe42109",
+          "data/VAST/vast_dev.csv": "ea6f4c4aa7d35c1f961a7e041099b7e8a7420cdb1199b96b8f4f1d0e7d01d02c",
+          "data/VAST/vast_test.csv": "32931d3390c5bf71fcfbb98e517ae38a11388d4258afbb5b0d612a6211335cec"
+        },
+        "conversion_sha256": "32aec03d9c79ab7959747d178567b9fdb70e3b809a6882d797bf5d4fa88998b6",
+        "excluded_synthetic_neutral": {
+          "train": 2313,
+          "validation": 672,
+          "test": 999
+        },
+        "split_policy": "native comment-disjoint partitions",
+        "license": "unspecified",
+        "excluded_group_overlap": {
+          "test": 0,
+          "validation": 0,
+          "train": 0
+        },
+        "splits": {
+          "train": 11164,
+          "validation": 1390,
+          "test": 2007
+        },
+        "label_counts": {
+          "train": {
+            "0": 5595,
+            "1": 5327,
+            "2": 242
+          },
+          "validation": {
+            "0": 684,
+            "1": 681,
+            "2": 25
+          },
+          "test": {
+            "1": 944,
+            "0": 1018,
+            "2": 45
+          }
+        }
+      },
+      "samples": [
+        {
+          "index": 0,
+          "sentence1": "Regulation of corporations has been subverted by corporations. States that incorporate corporations are not equipped to regulate corporations that are rich enough to influence elections, are rich enough to muster a legal team that can bankrupt the state. Money from corporations and their principals cannot be permitted in the political process if democracy is to survive.",
+          "sentence2": "companies",
+          "labels": "0",
+          "metadata": "{\"annotation_type\": \"1\", \"article_id\": \"16621568\", \"id\": \"4650\", \"seen_topic\": \"1\", \"split_group_id\": \"48ec825ec003a221d6f4cd262dca37964a204f6c612124a67b9bb967e93317de\"}"
+        },
+        {
+          "index": 1,
+          "sentence1": "Regulation of corporations has been subverted by corporations. States that incorporate corporations are not equipped to regulate corporations that are rich enough to influence elections, are rich enough to muster a legal team that can bankrupt the state. Money from corporations and their principals cannot be permitted in the political process if democracy is to survive.",
+          "sentence2": "regulation",
+          "labels": "0",
+          "metadata": "{\"annotation_type\": \"3\", \"article_id\": \"16621568\", \"id\": \"4651\", \"seen_topic\": \"1\", \"split_group_id\": \"48ec825ec003a221d6f4cd262dca37964a204f6c612124a67b9bb967e93317de\"}"
+        },
+        {
+          "index": 49,
+          "sentence1": "Perhaps the government should start by rating K-12 schools. Identify the myriad failing public schools -- how hard should that be? And then, give these students vouchers to give them a shot at a meaningful K-12 education, Improve K--12 education first, and then worry about the colleges.",
+          "sentence2": "k-12 schools",
+          "labels": "1",
+          "metadata": "{\"annotation_type\": \"3\", \"article_id\": \"11894812\", \"id\": \"14886\", \"seen_topic\": \"1\", \"split_group_id\": \"510051f7f75db45b4144f69e58df6e5f8b1fc187ff04b6a9ad52d8e73e64d8bd\"}"
+        }
+      ],
+      "verdict": "defer"
+    },
+    "fnc1": {
+      "findings": "Complete bodies joined correctly. Sample unrelated headlines and the article agreeing with a flood headline have appropriate native labels. This is article stance, not fact verification.",
+      "provenance": {
+        "source": "https://github.com/FakeNewsChallenge/fnc-1",
+        "revision": "29d473af2d15278f0464d5e41e4cbe7eb58231f2",
+        "source_hashes": {
+          "train_bodies.csv": "f1960cf7aa6972a9308aedbd3b393ab773893604d7d323378b75f66112f0c27a",
+          "train_stances.csv": "89d2e76db8ddb3a68d9dc7e572bc84c3cba7fb61827b3ee10925885245d7d167",
+          "competition_test_bodies.csv": "60c9eeb15b904764d2e6512eaea31c6edf148206867284a281e11c29c9919046",
+          "competition_test_stances.csv": "39d5c2572e61d2f65116fdd20183aeff533abaf26134078966c337e6a8ec3329"
+        },
+        "conversion_sha256": "32aec03d9c79ab7959747d178567b9fdb70e3b809a6882d797bf5d4fa88998b6",
+        "split_policy": "native train/competition-test, body-disjoint",
+        "license": "unspecified",
+        "excluded_group_overlap": {
+          "test": 0,
+          "train": 219
+        },
+        "splits": {
+          "train": 49753,
+          "test": 25413
+        },
+        "label_counts": {
+          "train": {
+            "unrelated": 36373,
+            "agree": 3675,
+            "disagree": 840,
+            "discuss": 8865
+          },
+          "test": {
+            "unrelated": 18349,
+            "agree": 1903,
+            "discuss": 4464,
+            "disagree": 697
+          }
+        }
+      },
+      "samples": [
+        {
+          "index": 0,
+          "sentence1": "Police find mass graves with at least '15 bodies' near Mexico town where 43 students disappeared after police clash",
+          "sentence2": "Danny Boyle is directing the untitled film\n\nSeth Rogen is being eyed to play Apple co-founder Steve Wozniak in Sony’s Steve Jobs biopic.\n\nDanny Boyle is directing the untitled film, based on Walter Isaacson's book and adapted by Aaron Sorkin, which is one of the most anticipated biopics in recent years.\n\nNegotiations have not yet begun, and it’s not even clear if Rogen has an official offer, but the producers — Scott Rudin, Guymon Casady and Mark Gordon — have set their sights on the talent and are in talks.\n\nOf course, this may all be for naught as Christian Bale, the actor who is to play Jobs, is still in the midst of closing his deal. Sources say that dealmaking process is in a sensitive stage.\n\nInsiders say Boyle will is flying to Los Angeles to meet with actress to play one of the female leads, an assistant to Jobs. Insiders say that Jessica Chastain is one of the actresses on the meeting list.\n\nWozniak, known as \"Woz,\" co-founded Apple with Jobs and Ronald Wayne. He first met Jobs when they worked at Atari and later was responsible for creating the early Apple computers.",
+          "labels": "unrelated",
+          "metadata": "{\"body_id\": \"712\", \"id\": \"train:0\", \"split_group_id\": \"9a9901e01b15604fb6100df94864785a496c4c78d3c12d82b57f409d1a2279d8\"}"
+        },
+        {
+          "index": 1,
+          "sentence1": "Hundreds of Palestinians flee floods in Gaza as Israel opens dams",
+          "sentence2": "Hundreds of Palestinians were evacuated from their homes Sunday morning after Israeli authorities opened a number of dams near the border, flooding the Gaza Valley in the wake of a recent severe winter storm.\n\nThe Gaza Ministry of Interior said in a statement that civil defense services and teams from the Ministry of Public Works had evacuated more than 80 families from both sides of the Gaza Valley (Wadi Gaza) after their homes flooded as water levels reached more than three meters.\n\nGaza has experienced flooding in recent days amid a major storm that saw temperatures drop and frigid rain pour down.\n\nThe storm displaced dozens and caused hardship for tens of thousands, including many of the approximately 110,000 Palestinians left homeless by Israel's assault over summer.\n\nThe suffering is compounded by the fact that Israel has maintained a complete siege over Gaza for the last eight years, severely limiting electricity and the availability of fuel for generators. It has also prevented the displaced from rebuilding their homes, as construction materials are largely banned from entering.\n\nGaza civil defense services spokesman Muhammad al-Midana warned that further harm could be caused if Israel opens up more dams in the area, noting that water is currently flowing at a high speed from the Israel border through the valley and into the Mediterranean sea.\n\nEvacuated families have been sent to shelters sponsored by UNRWA, the UN agency for Palestinian refugees, in al-Bureij refugee camp and in al-Zahra neighborhood in the central Gaza Strip.\n\nThe Gaza Valley (Wadi Gaza) is a wetland located in the central Gaza Strip between al-Nuseirat refugee camp and al-Moghraqa. It is called HaBesor in Hebrew, and it flows from two streams -- one whose source runs from near Beersheba, and the other from near Hebron.\n\nIsraeli dams on the river to collect rainwater have dried up the wetlands inside Gaza, and destroyed the only source of surface water in the area.\n\nLocals have continued to use it to dispose of their waste for lack of other ways to do so, however, creating an environmental hazard.\n\nThis is not the first time Israeli authorities have opened the Gaza Valley dams.\n\nIn Dec. 2013, Israeli authorities also opened the dams amid heavy flooding in the Gaza Strip. The resulting floods damaged dozens of homes and forces many families in the area from their homes.\n\nIn 2010, the dams were opened as well, forcing 100 families from their homes. At the time civil defense services said that they had managed to save seven people who had been at risk of drowning.",
+          "labels": "agree",
+          "metadata": "{\"body_id\": \"158\", \"id\": \"train:1\", \"split_group_id\": \"e71e94b3648e3b633a12bda2c78895fc19538e5de2b327d240f1b543e9e05d05\"}"
+        },
+        {
+          "index": 49,
+          "sentence1": "‘Banksy’ Instagram tribute to Charlie Hebdo victims not posted by artist",
+          "sentence2": "Pentagon investigating claims but admits one load missing and it would be embarrassing if it ended up in terror group’s hands\n\nA US airdrop of arms to besieged Kurds in Kobani appears to have missed its target and ended up in the hands of Islamic State (Isis) militants.\n\nVideo footage released by Isis shows what appears to be one of its fighters for in desert scrubland with a stack of boxes attached to a parachute. The boxes are opened to show an array of weapons, some rusty, some new. A canister is broken out to reveal a hand grenade.\n\nThe Pentagon said it was investigating the claim but admitted that one of its airdrops had gone missing. If confirmed, it would be an embarrassment for the US, given the advanced precision technology available to its air force.\n\nThe seemingly bungled airdrop comes against a steady stream of US-supplied weapons being lost to Isis forces, mainly from the dysfunctional Iraqi army. Isis is reported to have stolen seven American M1 Abrams tanks from three Iraqi army bases in Anbar province last week.\n\nThe Pentagon spokesman, Rear Admiral John Kirby, told reporters that analysts at Centcom headquarters in Tampa, Florida, were examining the video. “We’re still taking a look at it and assessing the validity of it,” he said. “So I honestly don’t know if that was one of the one dropped.”\n\nThe US began dropping munitions, supplied by Kurdish authorities in the semi-autonomous region of northern Iraq, to their compatriots in Kobani, which sits close to the Iraqi-Turkish border; Isis fighters have encircled much of the town.\n\nKirby confirmed the weapons shown in the video were the kind that were dropped. “So it’s not out of the realm of the possibility in that regard,” he said.\n\n“I do want to add, though, that we are very confident that the vast majority of the bundles did end up in the right hands. In fact, we’re only aware of one bundle that did not.”\n\nThe airdrops were carried out by three C-130 planes. The video shows a man in camouflage clothes and balaclava looking through the boxes of munitions. He says they were dropped by US forces and had been intended for the Kurds. He described them as the spoils of war.\n\nAs well as grenades, the boxes appeared to contain parts for rocket-propelled grenades. Some of the equipment appears to be east European in origin, which might seem odd given the weapons were dropped by Americans, but the munitions were supplied by the Kurdish authorities who had been stocking up.\n\nKirby said the situation in Kobani remained tense, with Kurdish forces in control of most of the city. The US-led coalition has mounted more than 130 air strikes round the town in an effort to stop Isis taking complete control.\n\nWhile the US has carried out air strikes in Kobani, cloud cover last week prevented them hitting much of the rest of Iraq, particularly around the contested Mosul dam. If the dam was to fall to I, it would provide huge leverage for the group, a strategic loss with potentially catastrophic consequences.\n\nBritain has been supplying the Kurdish semi-autonomous region with weapons but so far supplies have been limited. The Kurds report receiving about 40 heavy machine guns but say they badly need heavier equipment, in particular armoured vehicles.",
+          "labels": "unrelated",
+          "metadata": "{\"body_id\": \"1120\", \"id\": \"train:49\", \"split_group_id\": \"d436d0510a1051779eecb17fc4aec50a981e654ff5345da80d2837c9bc1a305c\"}"
+        }
+      ]
+    },
+    "perspectrum": {
+      "findings": "Native primary perspectives support/oppose their paired claims; original claim partitions retained. Expanded paraphrase pool deliberately omitted.",
+      "provenance": {
+        "source": "https://github.com/CogComp/perspectrum",
+        "revision": "b42c27b85f20f2a35c0a0895698fa242ccf160ab",
+        "source_hashes": {
+          "data/dataset/perspective_pool_v1.0.json": "d4d4e78c4777ea971d26546a8819aa9e02c5a68ffff45e10b40ca0cb91b43ae4",
+          "data/dataset/dataset_split_v1.0.json": "5ba5296f6e5956c44a2fd014b15a3f7c10b9a253451162932acaf217f20cd7da",
+          "data/dataset/perspectrum_with_answers_v1.0.json": "39d0391d26ebe21efb1cc3162abcc3c4212d2eadfb07514129c3015d6f6ae1f1"
+        },
+        "conversion_sha256": "32aec03d9c79ab7959747d178567b9fdb70e3b809a6882d797bf5d4fa88998b6",
+        "split_policy": "native claim partitions",
+        "license": "cc-by-sa-4.0",
+        "excluded_group_overlap": {
+          "test": 0,
+          "validation": 4,
+          "train": 38
+        },
+        "splits": {
+          "train": 2939,
+          "validation": 910,
+          "test": 1204
+        },
+        "label_counts": {
+          "train": {
+            "UNDERMINE": 1442,
+            "SUPPORT": 1497
+          },
+          "validation": {
+            "SUPPORT": 472,
+            "UNDERMINE": 438
+          },
+          "test": {
+            "SUPPORT": 635,
+            "UNDERMINE": 569
+          }
+        }
+      },
+      "samples": [
+        {
+          "index": 0,
+          "sentence1": "Male infant circumcision is tantamount to child abuse",
+          "sentence2": "Parents have the right to use their best judgment, in the light of medical advice, as to what is in the best interest of their child ",
+          "labels": "UNDERMINE",
+          "metadata": "{\"claim_id\": 167, \"id\": \"167:1242\", \"native_cluster\": [1242, 21983, 21984], \"perspective_id\": 1242, \"split_group_id\": \"fef933218efb79881c8a43c3841468bd378036c8dfb870b490b2ac4317d17814\", \"votes\": [0, 0, 0, 3, 0]}"
+        },
+        {
+          "index": 1,
+          "sentence1": "punishment should fit the criminal",
+          "sentence2": "It will cause less re-offenders.",
+          "labels": "SUPPORT",
+          "metadata": "{\"claim_id\": 944, \"id\": \"944:7584\", \"native_cluster\": [7584, 26958, 26959], \"perspective_id\": 7584, \"split_group_id\": \"5806807d512a5ff7d208cb4b81905053d04fc3d223da10b09b666c7be337d791\", \"votes\": [3, 0, 0, 0, 0]}"
+        },
+        {
+          "index": 49,
+          "sentence1": "The right to anonymous posting on the internet should be protected by law",
+          "sentence2": "Internet anonymity enables citizens to exercise their right to free speech",
+          "labels": "SUPPORT",
+          "metadata": "{\"claim_id\": 163, \"id\": \"163:1206\", \"native_cluster\": [1206, 21951], \"perspective_id\": 1206, \"split_group_id\": \"93af72e11b81264dd7e994c39e33c6a6019ba46eceb403a82e51a00931b819b6\", \"votes\": [3, 0, 0, 0, 0]}"
+        }
+      ]
+    },
+    "ukpconvarg": {
+      "findings": "Gold preferences select the native second argument in inspected pairs. Judgments compare convincingness, not factual correctness. Debate topics are kept together in derived holdouts.",
+      "provenance": {
+        "source": "https://github.com/UKPLab/acl2016-convincing-arguments",
+        "revision": "ca9d24e41b8805ff2e1d3585d552b49bb64a65f7",
+        "source_hashes": {
+          "data/UKPConvArg1Strict-CSV/ban-plastic-water-bottles_no-bad-for-the-economy.csv": "d1efc6d3f08a0167d6b71cf8f50ccb9d89da8e353162a712629dbaddee9fc883",
+          "data/UKPConvArg1Strict-CSV/ban-plastic-water-bottles_yes-emergencies-only.csv": "f1b594fcd3feb274a819b9bdd59673034f555d89acbabe7c0b40adcfc8df13de",
+          "data/UKPConvArg1Strict-CSV/christianity-or-atheism-_atheism.csv": "c9784346115d1275cab5fb6288a635e5a67b32110d73b2677629263e38a2f16e",
+          "data/UKPConvArg1Strict-CSV/christianity-or-atheism-_christianity.csv": "e90ce4eabeb3c6a34ad772e34ba7f5255364fa27cd87eaf2406824af401e1dcb",
+          "data/UKPConvArg1Strict-CSV/evolution-vs-creation_creation.csv": "722c40b9b2e6725036fcaca243fe7421deedf253f939a66a2c332e8a8395406b",
+          "data/UKPConvArg1Strict-CSV/evolution-vs-creation_evolution.csv": "0b8218b8b9bb8c3d7660a8b6008ddefc081c1d301de329dc7af796ab55f3a563",
+          "data/UKPConvArg1Strict-CSV/firefox-vs-internet-explorer_it-has-a-cute-logo-oh-and-extensions-err-add-ons.csv": "9a33cbec5bcb9f3651bc3747117ed1faa9b7c3cf93a86a3ba3bab9d3435898b1",
+          "data/UKPConvArg1Strict-CSV/firefox-vs-internet-explorer_there-s-more-browsers-than-the-ie-firefox-is-an-animal.csv": "101719aae383d31cc05195524a8a79efacca767268bf91c1f7ad2be5aca8cacd",
+          "data/UKPConvArg1Strict-CSV/gay-marriage-right-or-wrong_allowing-gay-marriage-is-right.csv": "c504170720075bb247bf857b4a74e2a0006e227874d41a365d4cf742143af02c",
+          "data/UKPConvArg1Strict-CSV/gay-marriage-right-or-wrong_allowing-gay-marriage-is-wrong.csv": "2759c1ad9c0748a1fa8cbbf6166e104b9a731d46c007eec9221746ec78a27fd2",
+          "data/UKPConvArg1Strict-CSV/human-growth-and-development-should-parents-use-spanking-as-an-option-to-discipline-_no.csv": "7a3ac8558be74f3f4f085293d545800f866f66b0b8cfdf8702c1d32b70dfe7a8",
+          "data/UKPConvArg1Strict-CSV/human-growth-and-development-should-parents-use-spanking-as-an-option-to-discipline-_yes.csv": "103403421f41b18f102954f9a8968aa18a6edf759379cccec19e2dcd10af8d71",
+          "data/UKPConvArg1Strict-CSV/if-your-spouse-committed-murder-and-he-or-she-confided-in-you-would-you-turn-them-in-_no.csv": "924bbb29b79990b196ac2f17c25a8a5ada2c1eb44369052ad006731f272459ea",
+          "data/UKPConvArg1Strict-CSV/if-your-spouse-committed-murder-and-he-or-she-confided-in-you-would-you-turn-them-in-_yes.csv": "c8c5ed3510f842aa60d4935f3137293637b2a8c775788ccbe00ac925d625d45d",
+          "data/UKPConvArg1Strict-CSV/india-has-the-potential-to-lead-the-world-_no-against.csv": "fc5d6699740e343606133afd9cb8eb5e44accaf9ddca5502c41809d40592d4d5",
+          "data/UKPConvArg1Strict-CSV/india-has-the-potential-to-lead-the-world-_yes-for.csv": "5183a1587bb9c688f13da61efe8247e1c0833d459ed59cc79c0e9ceac9bbc4b3",
+          "data/UKPConvArg1Strict-CSV/is-it-better-to-have-a-lousy-father-or-to-be-fatherless-_fatherless.csv": "90ea69a4800eebc6aec6935dccc72d592bae2ea3acf0b8a199cb43552be2948d",
+          "data/UKPConvArg1Strict-CSV/is-it-better-to-have-a-lousy-father-or-to-be-fatherless-_lousy-father.csv": "129e2e19214db77b98a04feb66a4e85c3d78cc494b0dfb1b3d099c3e37ef0b6a",
+          "data/UKPConvArg1Strict-CSV/is-porn-wrong-_no-is-is-not.csv": "b6b30bede4567c84dbc2ec8db0c6acb74f818d2685534e8d09d35f48c3f230fe",
+          "data/UKPConvArg1Strict-CSV/is-porn-wrong-_yes-porn-is-wrong.csv": "1a827506b88b7f5d7ce1a781cb935d4fe3f019b79b83bd2a778526e10c9ff6f1",
+          "data/UKPConvArg1Strict-CSV/is-the-school-uniform-a-good-or-bad-idea-_bad.csv": "7ebb532dcaedd836a7a96a65a7cc45bb10e92d49fd7d94a265795ecf68e1927a",
+          "data/UKPConvArg1Strict-CSV/is-the-school-uniform-a-good-or-bad-idea-_good.csv": "db2948b209b9d59e8aa256aa020dcc7bd53581ede762f403e2550d7eb60dad1e",
+          "data/UKPConvArg1Strict-CSV/personal-pursuit-or-advancing-the-common-good-_advancing-the-commond-good.csv": "4e0dcc10f2e9c360f0786aeb1545440943794c65c290d4f4d144c7ab22420748",
+          "data/UKPConvArg1Strict-CSV/personal-pursuit-or-advancing-the-common-good-_personal-pursuit.csv": "3ddb7f9b04425a02eaff86394b02ef3a516317457283bc4ba84cf38bb6048e0a",
+          "data/UKPConvArg1Strict-CSV/pro-choice-vs-pro-life_pro-choice.csv": "7f98ca0c5eec48782c1ce6d43aefad41428c82cb3bb0ed2b8cda48c7a035352f",
+          "data/UKPConvArg1Strict-CSV/pro-choice-vs-pro-life_pro-life.csv": "648586dff1eb6e4c22d7eb528cca79219daecc9b99906c8bae59f810bf532585",
+          "data/UKPConvArg1Strict-CSV/should-physical-education-be-mandatory-in-schools-_no-.csv": "9fa60eee8b161ff400b0b88b01c3e6a1b44bedc4795eea4a75c7089b784e7c16",
+          "data/UKPConvArg1Strict-CSV/should-physical-education-be-mandatory-in-schools-_yes-.csv": "133e27fb57352eeb1bc71638051536546cabc84b90bff4f7e6d7313da944176c",
+          "data/UKPConvArg1Strict-CSV/tv-is-better-than-books_books.csv": "2d8b8247570aab28837febfdfdd7324f4e1fac2efe58a77d7fc355c89509642f",
+          "data/UKPConvArg1Strict-CSV/tv-is-better-than-books_tv.csv": "76677ba0814e95380b1f5b9a459670fd3e71ad1f5cb02ecc7ac094e3f5dfb58e",
+          "data/UKPConvArg1Strict-CSV/william-farquhar-ought-to-be-honoured-as-the-rightful-founder-of-singapore_no-it-is-raffles-.csv": "112defbb0e49db425a7ed3e28de9a5b133c17f739fa9d0b8d08c9ee00facf785",
+          "data/UKPConvArg1Strict-CSV/william-farquhar-ought-to-be-honoured-as-the-rightful-founder-of-singapore_yes-of-course-.csv": "67addb83292e7e2d638edac70d2cc670e0b3d7ec19f57b101c8fd9ff975bab4e"
+        },
+        "conversion_sha256": "32aec03d9c79ab7959747d178567b9fdb70e3b809a6882d797bf5d4fa88998b6",
+        "split_policy": "derived hash-ranked topics, two validation/two test",
+        "topic_partitions": {
+          "human-growth-and-development-should-parents-use-spanking-as-an-option-to-discipline-": "test",
+          "india-has-the-potential-to-lead-the-world-": "test",
+          "is-it-better-to-have-a-lousy-father-or-to-be-fatherless-": "validation",
+          "if-your-spouse-committed-murder-and-he-or-she-confided-in-you-would-you-turn-them-in-": "validation",
+          "firefox-vs-internet-explorer": "train",
+          "pro-choice-vs-pro-life": "train",
+          "is-the-school-uniform-a-good-or-bad-idea-": "train",
+          "personal-pursuit-or-advancing-the-common-good-": "train",
+          "gay-marriage-right-or-wrong": "train",
+          "christianity-or-atheism-": "train",
+          "evolution-vs-creation": "train",
+          "tv-is-better-than-books": "train",
+          "is-porn-wrong-": "train",
+          "william-farquhar-ought-to-be-honoured-as-the-rightful-founder-of-singapore": "train",
+          "should-physical-education-be-mandatory-in-schools-": "train",
+          "ban-plastic-water-bottles": "train"
+        },
+        "license": "cc-by-4.0",
+        "splits": {
+          "train": 8819,
+          "validation": 1303,
+          "test": 1528
+        },
+        "label_counts": {
+          "train": {
+            "1": 4344,
+            "0": 4475
+          },
+          "validation": {
+            "0": 634,
+            "1": 669
+          },
+          "test": {
+            "0": 763,
+            "1": 765
+          }
+        }
+      },
+      "samples": [
+        {
+          "index": 0,
+          "inputs": "Debate topic: ban plastic water bottles",
+          "choices_list": [
+            "jesus loves plastic water bottles, and you cant argue with that logic",
+            "Bottled water consumption has grown exponentially over the past ten to fifteen years. This growth has taken place globally, but particularly in Europe and North America. The bottled water industry has literally created its own water culture which is good for american industries."
+          ],
+          "labels": 1,
+          "metadata": "{\"id\": \"ban-plastic-water-bottles_no-bad-for-the-economy:arg219237_arg219207\", \"native_pair\": \"arg219237_arg219207\", \"split_group_id\": \"ban-plastic-water-bottles\"}"
+        },
+        {
+          "index": 1,
+          "inputs": "Debate topic: ban plastic water bottles",
+          "choices_list": [
+            "The American Water companies are Aquafina (Pepsi), Dasani (Coke), Perrier (Nestle) which provide jobs for the american citizens,",
+            "Americans spend billions on bottled water every year. Banning their sale would greatly hurt an already struggling economy. In addition to the actual sale of water bottles, the plastics that they are made out of, and the advertising on both the bottles and packaging are also big business. In addition to this, compostable waters bottle are also coming onto the market, these can be used instead of plastics to eliminate that detriment. Moreover, bottled water not only has a cleaner safety record than municipal water, but it easier to trace when a potential health risk does occur. <br/> (http://www.friendsjournal.org/bottled-water) (http://www.cdc.gov/healthywater/drinking/bottled/)"
+          ],
+          "labels": 1,
+          "metadata": "{\"id\": \"ban-plastic-water-bottles_no-bad-for-the-economy:arg219203_arg219206\", \"native_pair\": \"arg219203_arg219206\", \"split_group_id\": \"ban-plastic-water-bottles\"}"
+        },
+        {
+          "index": 49,
+          "inputs": "Debate topic: ban plastic water bottles",
+          "choices_list": [
+            "can be recycled to make other things. like more water bottles. it also makes the water companys rich. theyre not expensive, its like 3 bucks for one of those big packs at shaws. that will keep you un-thirsty for a couple weeks for pocket change.",
+            "U.S. alone grew by over 13%. According to research and consulting done by the Beverage Marketing Corporation, the global bottled water industry has exploded to over $35 billion. Americans alone paid $7.7 billion for bottled water in 2002. In 2001, for example globally bottled water companies produced over 130,000 million liters of water. This produced roughly 35,000 million dollars in revenue for the world's thousands of bottled water companies in 2001."
+          ],
+          "labels": 1,
+          "metadata": "{\"id\": \"ban-plastic-water-bottles_no-bad-for-the-economy:arg219200_arg219245\", \"native_pair\": \"arg219200_arg219245\", \"split_group_id\": \"ban-plastic-water-bottles\"}"
+        }
+      ]
+    },
+    "discogem": {
+      "findings": "Native crowd counts reconstructed exactly. Inspected items have substantial disagreement; retained as distributions rather than confident single-label judgments. Dev paragraphs overlap test and are removed.",
+      "provenance": {
+        "source": "https://github.com/merelscholman/DiscoGeM",
+        "revision": "95ea9a45681bfdbe7ecbd66fcaf03f42d5141468",
+        "source_hashes": {
+          "DiscoGeM 1.0/DiscoGeM 1.0_items/DiscoGeM1.0.wide.csv": "12404506c90c958379a177cb14048a51bd5d339c5f0ac71f57f9c93b1dfa7be0"
+        },
+        "conversion_sha256": "4aebda668c0078732f38738b7c7a4e900e7a686274b0d9106a83100f344792a4",
+        "excluded_native": 302,
+        "split_policy": "native paragraph partitions",
+        "license": "unspecified",
+        "vote_order": [
+          "synchronous",
+          "precedence",
+          "succession",
+          "reason",
+          "result",
+          "arg1-as-cond",
+          "arg2-as-cond",
+          "arg1-as-negcond",
+          "arg2-as-negcond",
+          "arg1-as-goal",
+          "arg2-as-goal",
+          "arg1-as-denier",
+          "arg2-as-denier",
+          "contrast",
+          "similarity",
+          "conjunction",
+          "disjunction",
+          "arg1-as-instance",
+          "arg2-as-instance",
+          "arg1-as-detail",
+          "arg2-as-detail",
+          "equivalence",
+          "arg1-as-manner",
+          "arg2-as-manner",
+          "arg1-as-excpt",
+          "arg2-as-excpt",
+          "arg2-as-subst",
+          "differentcon",
+          "norel"
+        ],
+        "excluded_group_overlap": {
+          "test": 0,
+          "validation": 650,
+          "train": 3285
+        },
+        "vote_counts": {
+          "train": {
+            "synchronous": 321,
+            "precedence": 1164,
+            "succession": 60,
+            "reason": 846,
+            "result": 2388,
+            "arg1-as-cond": 0,
+            "arg2-as-cond": 4,
+            "arg1-as-negcond": 2,
+            "arg2-as-negcond": 0,
+            "arg1-as-goal": 2,
+            "arg2-as-goal": 1,
+            "arg1-as-denier": 329,
+            "arg2-as-denier": 632,
+            "contrast": 396,
+            "similarity": 246,
+            "conjunction": 2815,
+            "disjunction": 9,
+            "arg1-as-instance": 42,
+            "arg2-as-instance": 677,
+            "arg1-as-detail": 293,
+            "arg2-as-detail": 2060,
+            "equivalence": 38,
+            "arg1-as-manner": 4,
+            "arg2-as-manner": 9,
+            "arg1-as-excpt": 0,
+            "arg2-as-excpt": 3,
+            "arg2-as-subst": 97,
+            "differentcon": 466,
+            "norel": 28
+          },
+          "test": {
+            "synchronous": 201,
+            "precedence": 898,
+            "succession": 102,
+            "reason": 724,
+            "result": 2586,
+            "arg1-as-cond": 0,
+            "arg2-as-cond": 1,
+            "arg1-as-negcond": 1,
+            "arg2-as-negcond": 0,
+            "arg1-as-goal": 6,
+            "arg2-as-goal": 1,
+            "arg1-as-denier": 350,
+            "arg2-as-denier": 712,
+            "contrast": 397,
+            "similarity": 223,
+            "conjunction": 3143,
+            "disjunction": 7,
+            "arg1-as-instance": 28,
+            "arg2-as-instance": 761,
+            "arg1-as-detail": 312,
+            "arg2-as-detail": 1933,
+            "equivalence": 36,
+            "arg1-as-manner": 1,
+            "arg2-as-manner": 4,
+            "arg1-as-excpt": 2,
+            "arg2-as-excpt": 1,
+            "arg2-as-subst": 85,
+            "differentcon": 667,
+            "norel": 47
+          }
+        },
+        "splits": {
+          "train": 1282,
+          "test": 1288
+        }
+      },
+      "samples": [
+        {
+          "index": 0,
+          "sentence1": "Why then do we continue in this miserable condition? Because nearly the whole of the produce of our labour is stolen from us by human beings.",
+          "sentence2": "There, comrades, is the answer to all our problems. It is summed up in a single word - Man.",
+          "labels": [
+            0.0,
+            1.0,
+            0.0,
+            2.0,
+            3.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            2.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ],
+          "metadata": "{\"genre\": \"novel\", \"id\": \"Animal_Farm_EN_batch_01_item_08\", \"native_votes\": \"synchronous:0; precedence:0.1; succession:0; reason:0.2; result:0.3; arg1-as-cond:0; arg2-as-cond:0; arg1-as-negcond:0; arg2-as-negcond:0; arg1-as-goal:0; arg2-as-goal:0; arg1-as-denier:0; arg2-as-denier:0; contrast:0; similarity:0; conjunction:0; disjunction:0; arg1-as-instance:0; arg2-as-instance:0; arg1-as-detail:0.1; arg2-as-detail:0.2; equivalence:0; arg1-as-manner:0; arg2-as-manner:0; arg1-as-excpt:0; arg2-as-excpt:0; arg2-as-subst:0; differentcon:0.1; norel:0\", \"observations\": 10, \"split_group_id\": \"Animal_Farm_EN_paragraph_02\"}"
+        },
+        {
+          "index": 1,
+          "sentence1": "Because nearly the whole of the produce of our labour is stolen from us by human beings. There, comrades, is the answer to all our problems.",
+          "sentence2": "It is summed up in a single word - Man. Man is the only real enemy we have.",
+          "labels": [
+            0.0,
+            1.0,
+            0.0,
+            2.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            3.0,
+            2.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ],
+          "metadata": "{\"genre\": \"novel\", \"id\": \"Animal_Farm_EN_batch_01_item_09\", \"native_votes\": \"synchronous:0; precedence:0.1; succession:0; reason:0.2; result:0.1; arg1-as-cond:0; arg2-as-cond:0; arg1-as-negcond:0; arg2-as-negcond:0; arg1-as-goal:0; arg2-as-goal:0; arg1-as-denier:0; arg2-as-denier:0; contrast:0; similarity:0; conjunction:0; disjunction:0; arg1-as-instance:0; arg2-as-instance:0; arg1-as-detail:0.3; arg2-as-detail:0.2; equivalence:0; arg1-as-manner:0; arg2-as-manner:0; arg1-as-excpt:0; arg2-as-excpt:0; arg2-as-subst:0; differentcon:0.1; norel:0\", \"observations\": 10, \"split_group_id\": \"Animal_Farm_EN_paragraph_02\"}"
+        },
+        {
+          "index": 49,
+          "sentence1": "The judge closed his preliminary investigation. No further proceedings were taken in his case for a period of two months, during which time Arsène was seen almost constantly lying on his bed with his face turned toward the wall.",
+          "sentence2": "The changing of his cell seemed to discourage him. He refused to see his advocate.",
+          "labels": [
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            6.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "metadata": "{\"genre\": \"novel\", \"id\": \"Arsene Lupin_FR_EN_batch_03_item_01\", \"native_votes\": \"synchronous:0; precedence:0; succession:0; reason:0.1; result:0.1; arg1-as-cond:0; arg2-as-cond:0; arg1-as-negcond:0; arg2-as-negcond:0; arg1-as-goal:0; arg2-as-goal:0; arg1-as-denier:0; arg2-as-denier:0; contrast:0; similarity:0; conjunction:0.6; disjunction:0; arg1-as-instance:0; arg2-as-instance:0; arg1-as-detail:0.1; arg2-as-detail:0.1; equivalence:0; arg1-as-manner:0; arg2-as-manner:0; arg1-as-excpt:0; arg2-as-excpt:0; arg2-as-subst:0; differentcon:0; norel:0\", \"observations\": 10, \"split_group_id\": \"Arsene Lupin_FR_EN_paragraph_977\"}"
+        }
+      ]
+    },
+    "pubmed-rct": {
+      "findings": "Native rhetorical labels and numbers retained; PMID partitions disjoint. Some background sentences describe study design, so isolated sentence roles can remain subjective. Malformed Hub dev copy replaced with original plaintext.",
+      "provenance": {
+        "source": "https://github.com/Franck-Dernoncourt/pubmed-rct",
+        "hub_source": "zj88zj/PubMed_200k_RCT",
+        "source_revision": "2bc68a9b902ae51b856b3c22e48181a76ba10849",
+        "original_revision": "17ed2cb0590decfca0266add0c76f254f67232b4",
+        "source_hashes": {
+          "train": "55cfc8b28de035fad1534a9255fdcf78f2589e7f71591e86cca372708c05d4c5",
+          "dev": "b2cab6d765608cd616a98a4b98ac639ff4da04baf1fb9539db13388084ec6b96",
+          "test": "28186b4944b8855e62e210e3d5009d9718fef214095432eb53c2d6c79a4cf9bf"
+        },
+        "splits": {
+          "train": 2211861,
+          "validation": 28932,
+          "test": 29493
+        },
+        "label_counts": {
+          "train": {
+            "BACKGROUND": 196689,
+            "METHODS": 722586,
+            "CONCLUSIONS": 339714,
+            "RESULTS": 766271,
+            "OBJECTIVE": 186601
+          },
+          "validation": {
+            "BACKGROUND": 2575,
+            "RESULTS": 9977,
+            "CONCLUSIONS": 4396,
+            "OBJECTIVE": 2425,
+            "METHODS": 9559
+          },
+          "test": {
+            "BACKGROUND": 2663,
+            "METHODS": 9751,
+            "RESULTS": 10276,
+            "CONCLUSIONS": 4426,
+            "OBJECTIVE": 2377
+          }
+        },
+        "abstracts": {
+          "train": 190654,
+          "validation": 2500,
+          "test": 2500
+        },
+        "split_policy": "native PMID partitions",
+        "license": "unspecified",
+        "conversion_sha256": "ae1c61b8d65e993315dc9a1bf28e6f776b5cf642daab74760370018f489fa007"
+      },
+      "samples": [
+        {
+          "index": 0,
+          "sentence1": "The emergence of HIV as a chronic condition means that people living with HIV are required to take more responsibility for the self-management of their condition , including making physical , emotional and social adjustments .",
+          "sentence2": "",
+          "labels": "BACKGROUND",
+          "metadata": "{\"id\": \"24491034:0\", \"pmid\": \"24491034\", \"sentence_index\": 0, \"split_group_id\": \"24491034\"}"
+        },
+        {
+          "index": 1,
+          "sentence1": "This paper describes the design and evaluation of Positive Outlook , an online program aiming to enhance the self-management skills of gay men living with HIV .",
+          "sentence2": "",
+          "labels": "BACKGROUND",
+          "metadata": "{\"id\": \"24491034:1\", \"pmid\": \"24491034\", \"sentence_index\": 1, \"split_group_id\": \"24491034\"}"
+        },
+        {
+          "index": 49,
+          "sentence1": "We conducted randomized , crossover studies that compared the pharmacokinetics ( PK ) , bioequivalence and safety of topical diclofenac sodium 2 % twice daily ( BID ) , diclofenac sodium 1.5 % four times daily ( QID ) and oral diclofenac sodium in healthy subjects .",
+          "sentence2": "",
+          "labels": "BACKGROUND",
+          "metadata": "{\"id\": \"26077436:1\", \"pmid\": \"26077436\", \"sentence_index\": 1, \"split_group_id\": \"26077436\"}"
+        }
+      ]
+    }
+  },
+  "export_reviews": [
+    {
+      "task": "fnc1/stance",
+      "verdict": "retain",
+      "findings": "Mexico graves headline and Yemen hostage-rescue article are unrelated; the native target and body/headline prompt agree.",
+      "sample": {
+        "id": "fnc1:train:train:29588:fnc1-stance-98316b9860",
+        "split": "train",
+        "recast_sha256": "3e2ce15f7aa55f77f0ddc602eb0bf0f4eb4a2ec357e24bdadf85cfbd18bbc989",
+        "options": [
+          "agree",
+          "disagree",
+          "discuss",
+          "unrelated"
+        ],
+        "target": [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "provenance": {
+        "dataset": "tasksource/fnc1",
+        "revision": "4effe53583062803a710231955bec178b31c9635"
+      },
+      "limitations": "One final exported training example inspected, alongside coarse source samples; no corpus-wide accuracy estimate."
+    },
+    {
+      "task": "perspectrum/stance",
+      "verdict": "retain",
+      "findings": "Calling forced marriage slavery and rape supports banning forced marriage. Claim/perspective direction and target align.",
+      "sample": {
+        "id": "perspectrum:train:789:6416:perspectrum-stance-e240662cde",
+        "split": "train",
+        "recast_sha256": "96ffd577edf9b739754f9b1016f7192ce5fb9eb93dd251768f70cc5c654e12ca",
+        "options": [
+          "supports",
+          "opposes"
+        ],
+        "target": [
+          1.0,
+          0.0
+        ]
+      },
+      "provenance": {
+        "dataset": "tasksource/perspectrum",
+        "revision": "721184de6ed05314fba04c6b706863fff4a5b647"
+      },
+      "limitations": "One final exported training example inspected, alongside coarse source samples; no corpus-wide accuracy estimate."
+    },
+    {
+      "task": "ukpconvarg/convincingness",
+      "verdict": "retain",
+      "findings": "Native human preference selects the FF/IE loading-speed argument over the insulting alternative. Choice permutation preserves that native preference; this is subjective convincingness, not fact checking.",
+      "sample": {
+        "id": "ukpconvarg:train:firefox-vs-internet-explorer_there-s-more-browsers-than-the-ie-firefox-is-an-animal:12381_12374:ukpconvarg-convincingness-f1b273f885",
+        "split": "train",
+        "recast_sha256": "6cc65e869571517ad614596ac70d18c8c1c701a891f96e60c99f8553af2b4bad",
+        "options": [
+          "They say FF loads faster than IE, but 9 times out of 10, someone who had just installed FF will experience slower program load times than loading up IE.",
+          "IE is scum, stole the idea of tabbed browsing from all the other browsers, and you can't get extensions for it."
+        ],
+        "target": [
+          1.0,
+          0.0
+        ]
+      },
+      "provenance": {
+        "dataset": "tasksource/ukpconvarg",
+        "revision": "80ef4995b8206dea60fad7fb5c23939acab77c39"
+      },
+      "limitations": "One final exported training example inspected, alongside coarse source samples; no corpus-wide accuracy estimate."
+    },
+    {
+      "task": "discogem/relation",
+      "verdict": "retain",
+      "findings": "The second passage elaborates the preceding description; native votes assign 0.6 to text_B elaborates text_A, with 0.2 synchronous and two 0.1 alternatives. Export preserves disagreement and all 29 directional criteria.",
+      "sample": {
+        "id": "discogem:train:The_Great_Gatsby_EN_batch_04_item_17:discogem-relation-101c6c9201",
+        "split": "train",
+        "recast_sha256": "f36f501d308d5b8f21a2914f21030d937a1f10ce893e36b667cf12dd89de0b24",
+        "options": [
+          "events overlap in time",
+          "text_A happens before text_B",
+          "text_B happens before text_A",
+          "text_B explains the cause of text_A",
+          "text_B is a result of text_A",
+          "text_A is a condition for text_B",
+          "text_B is a condition for text_A",
+          "text_A is a negative condition for text_B",
+          "text_B is a negative condition for text_A",
+          "text_A is the goal of text_B",
+          "text_B is the goal of text_A",
+          "text_A denies an expectation from text_B",
+          "text_B denies an expectation from text_A",
+          "contrast",
+          "similarity",
+          "additional information",
+          "alternatives",
+          "text_A exemplifies text_B",
+          "text_B exemplifies text_A",
+          "text_A elaborates text_B",
+          "text_B elaborates text_A",
+          "equivalent descriptions",
+          "text_A describes how text_B happens",
+          "text_B describes how text_A happens",
+          "text_A is an exception to text_B",
+          "text_B is an exception to text_A",
+          "text_B substitutes for text_A",
+          "another connective relation",
+          "no discourse relation"
+        ],
+        "target": [
+          0.2,
+          0.0,
+          0.0,
+          0.0,
+          0.1,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.1,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.6,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "provenance": {
+        "dataset": "tasksource/discogem",
+        "revision": "71953deb6a8fe211466f45453322414732cc42b5"
+      },
+      "limitations": "One final exported training example inspected, alongside coarse source samples; no corpus-wide accuracy estimate."
+    },
+    {
+      "task": "pubmed-rct/role",
+      "verdict": "retain",
+      "findings": "The sentence lists safety measurements and procedures, consistent with the native methods label. No gold role or future abstract sentences enter the input.",
+      "sample": {
+        "id": "pubmed-rct:train:18307373:10:pubmed-rct-role-3fb579e577",
+        "split": "train",
+        "recast_sha256": "b67ae6f6de7819551a843ede40b631cfccdb13a105de546ae428a4e0eaf63f1e",
+        "options": [
+          "background",
+          "objective",
+          "methods",
+          "results",
+          "conclusions"
+        ],
+        "target": [
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ]
+      },
+      "provenance": {
+        "dataset": "tasksource/pubmed-rct",
+        "revision": "b5c96c8c80ac929a88cc6ad7b9818063b6e95b6c",
+        "originals": [
+          "zj88zj/PubMed_200k_RCT"
+        ]
+      },
+      "limitations": "One final exported training example inspected, alongside coarse source samples; no corpus-wide accuracy estimate."
+    }
+  ],
+  "export": {
+    "configs": [
+      "default",
+      "full"
+    ],
+    "rows": {
+      "train": 4998,
+      "validation": 300,
+      "test": 500
+    },
+    "manifest": "additions/b221677e3faf/manifest.json"
+  }
+}
