@@ -5,6 +5,10 @@ Keys are task families, shared by their visual classification/MC views.
 """
 
 SOURCE_LICENSE_EVIDENCE = {
+    'infotabs': {'license': 'apache-2.0', 'scope': 'original dataset repository',
+                'url': 'https://github.com/infotabs/infotabs/blob/master/LICENSE'},
+    'multidogo': {'license': 'cdla-permissive-1.0', 'scope': 'original dataset distribution',
+                 'url': 'https://github.com/awslabs/multi-domain-goal-oriented-dialogues-dataset/blob/master/LICENSE.txt'},
     'clevr': {'license': 'cc-by-4.0', 'scope': 'all dataset data',
               'url': 'https://cs.stanford.edu/people/jcjohns/clevr/'},
     'mapqa': {'license': 'cc-by-sa-4.0', 'scope': 'dataset repository (data and code)',

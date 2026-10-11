@@ -210,7 +210,6 @@ REASONS = {key: reason for key, (_, reason) in PARKED.items()}
 
 # Candidates considered but never annotated.
 NOT_ANNOTATED = {
-    "ccdv/patent-classification": ("todo", "abstract to patent section; not annotated yet"),
     "clue/clue cmnli": ("duplicate", "machine-translated MNLI; XNLI covers Chinese"),
     "dbarbedillo/SMS_Spam_Multilingual_Collection_Dataset": ("unsound", "machine-translated; many translations degenerate"),
     "ylacombe/xsum_factuality": ("unavailable", "no longer on the Hub"),

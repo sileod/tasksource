@@ -1,0 +1,1247 @@
+{
+  "ddi/relation": {
+    "rows": {
+      "train": 5744,
+      "test": 1398
+    },
+    "overlaps": {
+      "train/test": 0
+    },
+    "duplicate_ids": {
+      "train": 0,
+      "test": 0
+    },
+    "labels": {
+      "train": {
+        "1": 1687,
+        "0": 1319,
+        "2": 826,
+        "4": 1723,
+        "3": 189
+      },
+      "test": {
+        "1": 360,
+        "4": 419,
+        "2": 221,
+        "0": 302,
+        "3": 96
+      }
+    },
+    "scope": "complete canonical dataset"
+  },
+  "infotabs": {
+    "rows": {
+      "train": 16538,
+      "test1": 1800,
+      "test2": 1800,
+      "test3": 1800,
+      "validation": 1800
+    },
+    "overlaps": {
+      "train/test1": 0,
+      "train/test2": 0,
+      "train/test3": 0,
+      "train/validation": 0,
+      "test1/test2": 0,
+      "test1/test3": 0,
+      "test1/validation": 0,
+      "test2/test3": 0,
+      "test2/validation": 0,
+      "test3/validation": 0
+    },
+    "duplicate_ids": {
+      "train": 0,
+      "test1": 0,
+      "test2": 0,
+      "test3": 0,
+      "validation": 0
+    },
+    "labels": {
+      "train": {
+        "0": 5495,
+        "2": 5538,
+        "1": 5505
+      },
+      "test1": {
+        "0": 600,
+        "2": 600,
+        "1": 600
+      },
+      "test2": {
+        "1": 600,
+        "2": 600,
+        "0": 600
+      },
+      "test3": {
+        "0": 600,
+        "2": 600,
+        "1": 600
+      },
+      "validation": {
+        "0": 600,
+        "2": 600,
+        "1": 600
+      }
+    },
+    "scope": "complete canonical dataset"
+  },
+  "squad-v2/answerability": {
+    "rows": {
+      "train": 130319,
+      "validation": 11873
+    },
+    "overlaps": {
+      "train/validation": 0
+    },
+    "duplicate_ids": {
+      "train": 0,
+      "validation": 0
+    },
+    "labels": {
+      "train": {
+        "1": 86821,
+        "0": 43498
+      },
+      "validation": {
+        "1": 5928,
+        "0": 5945
+      }
+    },
+    "scope": "complete canonical dataset"
+  },
+  "cuad/answerability": {
+    "rows": {
+      "train": 22450,
+      "test": 4182
+    },
+    "overlaps": {
+      "train/test": 0
+    },
+    "duplicate_ids": {
+      "train": 0,
+      "test": 0
+    },
+    "labels": {
+      "train": {
+        "1": 11180,
+        "0": 11270
+      },
+      "test": {
+        "1": 1244,
+        "0": 2938
+      }
+    },
+    "scope": "up to 1000 training / 100 per evaluation split after full-source preprocessing"
+  },
+  "maud/consideration": {
+    "rows": {
+      "train": 224,
+      "validation": 55,
+      "test": 61
+    },
+    "overlaps": {
+      "train/validation": 0,
+      "train/test": 0,
+      "validation/test": 0
+    },
+    "duplicate_ids": {
+      "train": 0,
+      "validation": 0,
+      "test": 0
+    },
+    "labels": {
+      "train": {
+        "0": 121,
+        "1": 54,
+        "2": 35,
+        "3": 14
+      },
+      "validation": {
+        "0": 31,
+        "1": 12,
+        "2": 6,
+        "3": 6
+      },
+      "test": {
+        "0": 33,
+        "1": 18,
+        "2": 7,
+        "3": 3
+      }
+    },
+    "scope": "complete canonical dataset"
+  },
+  "maud/bringdown-timing": {
+    "rows": {
+      "train": 220,
+      "validation": 53,
+      "test": 60
+    },
+    "overlaps": {
+      "train/validation": 0,
+      "train/test": 0,
+      "validation/test": 0
+    },
+    "duplicate_ids": {
+      "train": 0,
+      "validation": 0,
+      "test": 0
+    },
+    "labels": {
+      "train": {
+        "0": 55,
+        "1": 165
+      },
+      "validation": {
+        "0": 17,
+        "1": 36
+      },
+      "test": {
+        "0": 22,
+        "1": 38
+      }
+    },
+    "scope": "complete canonical dataset"
+  },
+  "maud/ordinary-course-consent": {
+    "rows": {
+      "train": 220,
+      "validation": 52,
+      "test": 62
+    },
+    "overlaps": {
+      "train/validation": 0,
+      "train/test": 0,
+      "validation/test": 0
+    },
+    "duplicate_ids": {
+      "train": 0,
+      "validation": 0,
+      "test": 0
+    },
+    "labels": {
+      "train": {
+        "0": 200,
+        "1": 20
+      },
+      "validation": {
+        "0": 47,
+        "1": 5
+      },
+      "test": {
+        "0": 53,
+        "1": 9
+      }
+    },
+    "scope": "complete canonical dataset"
+  },
+  "maud/ordinary-course-efforts": {
+    "rows": {
+      "train": 215,
+      "validation": 52,
+      "test": 67
+    },
+    "overlaps": {
+      "train/validation": 0,
+      "train/test": 0,
+      "validation/test": 0
+    },
+    "duplicate_ids": {
+      "train": 0,
+      "validation": 0,
+      "test": 0
+    },
+    "labels": {
+      "train": {
+        "0": 70,
+        "1": 112,
+        "2": 33
+      },
+      "validation": {
+        "0": 19,
+        "1": 25,
+        "2": 8
+      },
+      "test": {
+        "0": 24,
+        "1": 35,
+        "2": 8
+      }
+    },
+    "scope": "complete canonical dataset"
+  },
+  "maud/antitrust-efforts": {
+    "rows": {
+      "train": 294,
+      "validation": 78,
+      "test": 62
+    },
+    "overlaps": {
+      "train/validation": 0,
+      "train/test": 0,
+      "validation/test": 0
+    },
+    "duplicate_ids": {
+      "train": 0,
+      "validation": 0,
+      "test": 0
+    },
+    "labels": {
+      "train": {
+        "0": 119,
+        "1": 12,
+        "2": 163
+      },
+      "validation": {
+        "0": 30,
+        "1": 3,
+        "2": 45
+      },
+      "test": {
+        "0": 2,
+        "1": 8,
+        "2": 52
+      }
+    },
+    "scope": "complete canonical dataset"
+  },
+  "maud/specific-performance": {
+    "rows": {
+      "train": 211,
+      "validation": 52,
+      "test": 64
+    },
+    "overlaps": {
+      "train/validation": 0,
+      "train/test": 0,
+      "validation/test": 0
+    },
+    "duplicate_ids": {
+      "train": 0,
+      "validation": 0,
+      "test": 0
+    },
+    "labels": {
+      "train": {
+        "0": 12,
+        "1": 199
+      },
+      "validation": {
+        "0": 8,
+        "1": 44
+      },
+      "test": {
+        "0": 7,
+        "1": 57
+      }
+    },
+    "scope": "complete canonical dataset"
+  },
+  "patent-classification/abstract": {
+    "rows": {
+      "train": 24642,
+      "validation": 4971,
+      "test": 4976
+    },
+    "overlaps": {
+      "train/validation": 0,
+      "train/test": 0,
+      "validation/test": 0
+    },
+    "duplicate_ids": {
+      "train": 0,
+      "validation": 0,
+      "test": 0
+    },
+    "labels": {
+      "train": {
+        "6": 5330,
+        "0": 3559,
+        "7": 5232,
+        "8": 2523,
+        "2": 2066,
+        "4": 696,
+        "1": 3315,
+        "3": 204,
+        "5": 1717
+      },
+      "validation": {
+        "5": 346,
+        "8": 493,
+        "6": 1085,
+        "1": 700,
+        "2": 419,
+        "0": 699,
+        "3": 40,
+        "7": 1043,
+        "4": 146
+      },
+      "test": {
+        "8": 497,
+        "1": 646,
+        "6": 1104,
+        "2": 391,
+        "7": 1031,
+        "0": 751,
+        "5": 356,
+        "4": 156,
+        "3": 44
+      }
+    },
+    "scope": "complete canonical dataset"
+  },
+  "tabfact": {
+    "rows": {
+      "train": 91974,
+      "validation": 12739,
+      "test": 12727
+    },
+    "overlaps": {
+      "train/validation": 0,
+      "train/test": 0,
+      "validation/test": 0
+    },
+    "duplicate_ids": {
+      "train": 0,
+      "validation": 0,
+      "test": 0
+    },
+    "labels": {
+      "train": {
+        "1": 50580,
+        "0": 41394
+      },
+      "validation": {
+        "1": 6444,
+        "0": 6295
+      },
+      "test": {
+        "1": 6395,
+        "0": 6332
+      }
+    },
+    "scope": "complete canonical dataset"
+  },
+  "hallmarks-of-cancer/yesno": {
+    "rows": {
+      "train": 121190,
+      "validation": 17980,
+      "test": 35470
+    },
+    "overlaps": {
+      "train/validation": 0,
+      "train/test": 0,
+      "validation/test": 0
+    },
+    "duplicate_ids": {
+      "train": 0,
+      "validation": 0,
+      "test": 0
+    },
+    "labels": {
+      "train": {
+        "0": 117522,
+        "1": 3668
+      },
+      "validation": {
+        "0": 17453,
+        "1": 527
+      },
+      "test": {
+        "0": 34429,
+        "1": 1041
+      }
+    },
+    "scope": "complete canonical dataset"
+  },
+  "record/candidate": {
+    "rows": {
+      "train": 1000,
+      "validation": 100
+    },
+    "overlaps": {
+      "train/validation": 0
+    },
+    "duplicate_ids": {
+      "train": 0,
+      "validation": 0
+    },
+    "labels": {
+      "train": {
+        "0": 873,
+        "1": 127
+      },
+      "validation": {
+        "0": 83,
+        "1": 17
+      }
+    },
+    "scope": "up to 1000 training / 100 per evaluation split after full-source preprocessing"
+  },
+  "semeval2014-absa/laptops": {
+    "rows": {
+      "train": 2357,
+      "test": 654
+    },
+    "overlaps": {
+      "train/test": 0
+    },
+    "duplicate_ids": {
+      "train": 0,
+      "test": 0
+    },
+    "labels": {
+      "train": {
+        "1": 459,
+        "2": 987,
+        "0": 866,
+        "3": 45
+      },
+      "test": {
+        "2": 341,
+        "0": 128,
+        "1": 169,
+        "3": 16
+      }
+    },
+    "scope": "complete canonical dataset"
+  },
+  "semeval2014-absa/restaurants": {
+    "rows": {
+      "train": 3692,
+      "test": 1134
+    },
+    "overlaps": {
+      "train/test": 0
+    },
+    "duplicate_ids": {
+      "train": 0,
+      "test": 0
+    },
+    "labels": {
+      "train": {
+        "0": 805,
+        "2": 2163,
+        "1": 633,
+        "3": 91
+      },
+      "test": {
+        "2": 728,
+        "3": 14,
+        "1": 196,
+        "0": 196
+      }
+    },
+    "scope": "complete canonical dataset"
+  },
+  "multidogo/airline/intent": {
+    "rows": {
+      "train": 14346,
+      "validation": 2048,
+      "test": 4066
+    },
+    "overlaps": {
+      "train/validation": 0,
+      "train/test": 0,
+      "validation/test": 0
+    },
+    "duplicate_ids": {
+      "train": 0,
+      "validation": 0,
+      "test": 0
+    },
+    "labels": {
+      "train": {
+        "7": 1665,
+        "0": 396,
+        "4": 4598,
+        "3": 2311,
+        "10": 1145,
+        "9": 1130,
+        "5": 597,
+        "8": 559,
+        "6": 225,
+        "2": 441,
+        "1": 1279
+      },
+      "validation": {
+        "7": 249,
+        "5": 86,
+        "4": 679,
+        "3": 308,
+        "1": 172,
+        "10": 189,
+        "9": 149,
+        "6": 32,
+        "8": 72,
+        "0": 57,
+        "2": 55
+      },
+      "test": {
+        "7": 473,
+        "6": 46,
+        "4": 1370,
+        "8": 133,
+        "3": 640,
+        "10": 311,
+        "1": 349,
+        "9": 332,
+        "2": 110,
+        "5": 185,
+        "0": 117
+      }
+    },
+    "scope": "complete canonical dataset"
+  },
+  "multidogo/finance/intent": {
+    "rows": {
+      "train": 15379,
+      "validation": 2206,
+      "test": 4418
+    },
+    "overlaps": {
+      "train/validation": 0,
+      "train/test": 0,
+      "validation/test": 0
+    },
+    "duplicate_ids": {
+      "train": 0,
+      "validation": 0,
+      "test": 0
+    },
+    "labels": {
+      "train": {
+        "9": 1277,
+        "14": 406,
+        "5": 5757,
+        "4": 1828,
+        "11": 1193,
+        "16": 2090,
+        "17": 263,
+        "0": 326,
+        "12": 846,
+        "3": 536,
+        "13": 89,
+        "18": 347,
+        "6": 219,
+        "7": 44,
+        "1": 46,
+        "2": 68,
+        "10": 40,
+        "8": 2,
+        "15": 2
+      },
+      "validation": {
+        "14": 64,
+        "11": 165,
+        "5": 813,
+        "4": 266,
+        "16": 303,
+        "12": 130,
+        "9": 185,
+        "17": 43,
+        "0": 48,
+        "13": 11,
+        "18": 56,
+        "3": 71,
+        "2": 12,
+        "6": 19,
+        "1": 7,
+        "7": 8,
+        "10": 3,
+        "15": 1,
+        "8": 1
+      },
+      "test": {
+        "9": 383,
+        "11": 355,
+        "5": 1652,
+        "12": 244,
+        "4": 535,
+        "18": 104,
+        "14": 117,
+        "16": 574,
+        "3": 133,
+        "17": 72,
+        "0": 97,
+        "7": 17,
+        "6": 65,
+        "10": 14,
+        "1": 16,
+        "2": 24,
+        "13": 16
+      }
+    },
+    "scope": "complete canonical dataset"
+  },
+  "multidogo/insurance/intent": {
+    "rows": {
+      "train": 14497,
+      "validation": 2039,
+      "test": 4107
+    },
+    "overlaps": {
+      "train/validation": 0,
+      "train/test": 0,
+      "validation/test": 0
+    },
+    "duplicate_ids": {
+      "train": 0,
+      "validation": 0,
+      "test": 0
+    },
+    "labels": {
+      "train": {
+        "5": 1482,
+        "6": 886,
+        "3": 5502,
+        "2": 2247,
+        "9": 1399,
+        "7": 915,
+        "4": 916,
+        "8": 293,
+        "1": 424,
+        "0": 433
+      },
+      "validation": {
+        "5": 212,
+        "4": 128,
+        "3": 763,
+        "2": 328,
+        "9": 199,
+        "8": 37,
+        "7": 141,
+        "0": 66,
+        "6": 109,
+        "1": 56
+      },
+      "test": {
+        "5": 435,
+        "0": 122,
+        "3": 1576,
+        "2": 595,
+        "9": 386,
+        "4": 248,
+        "7": 267,
+        "6": 247,
+        "1": 126,
+        "8": 105
+      }
+    },
+    "scope": "complete canonical dataset"
+  },
+  "multidogo/media/intent": {
+    "rows": {
+      "train": 12236,
+      "validation": 1748,
+      "test": 3491
+    },
+    "overlaps": {
+      "train/validation": 0,
+      "train/test": 0,
+      "validation/test": 0
+    },
+    "duplicate_ids": {
+      "train": 0,
+      "validation": 0,
+      "test": 0
+    },
+    "labels": {
+      "train": {
+        "6": 1581,
+        "9": 1564,
+        "3": 3729,
+        "7": 392,
+        "2": 1986,
+        "8": 1497,
+        "5": 199,
+        "10": 703,
+        "1": 439,
+        "13": 11,
+        "14": 116,
+        "4": 2,
+        "12": 1,
+        "15": 2,
+        "0": 6,
+        "11": 8
+      },
+      "validation": {
+        "9": 214,
+        "3": 541,
+        "2": 301,
+        "8": 205,
+        "6": 219,
+        "1": 72,
+        "10": 85,
+        "5": 30,
+        "7": 63,
+        "13": 2,
+        "14": 13,
+        "15": 1,
+        "0": 2
+      },
+      "test": {
+        "9": 443,
+        "3": 1062,
+        "8": 421,
+        "6": 463,
+        "2": 551,
+        "10": 185,
+        "1": 156,
+        "7": 108,
+        "5": 64,
+        "15": 2,
+        "14": 30,
+        "0": 1,
+        "11": 3,
+        "13": 2
+      }
+    },
+    "scope": "complete canonical dataset"
+  },
+  "multidogo/software/intent": {
+    "rows": {
+      "train": 13551,
+      "validation": 1842,
+      "test": 3857
+    },
+    "overlaps": {
+      "train/validation": 0,
+      "train/test": 0,
+      "validation/test": 0
+    },
+    "duplicate_ids": {
+      "train": 0,
+      "validation": 0,
+      "test": 0
+    },
+    "labels": {
+      "train": {
+        "7": 1670,
+        "13": 269,
+        "4": 4455,
+        "3": 2376,
+        "10": 1390,
+        "8": 950,
+        "0": 26,
+        "15": 860,
+        "2": 314,
+        "11": 410,
+        "5": 337,
+        "14": 13,
+        "12": 354,
+        "1": 108,
+        "6": 9,
+        "9": 10
+      },
+      "validation": {
+        "4": 626,
+        "3": 304,
+        "10": 199,
+        "7": 235,
+        "5": 52,
+        "15": 118,
+        "2": 35,
+        "11": 43,
+        "8": 109,
+        "12": 52,
+        "13": 39,
+        "1": 22,
+        "9": 3,
+        "0": 3,
+        "6": 2
+      },
+      "test": {
+        "7": 471,
+        "11": 116,
+        "4": 1286,
+        "10": 416,
+        "3": 690,
+        "2": 99,
+        "8": 245,
+        "12": 82,
+        "13": 79,
+        "1": 41,
+        "15": 225,
+        "5": 91,
+        "6": 3,
+        "14": 3,
+        "0": 6,
+        "9": 4
+      }
+    },
+    "scope": "complete canonical dataset"
+  },
+  "multidogo/fastfood/intent": {
+    "rows": {
+      "train": 15090,
+      "validation": 2058,
+      "test": 4366
+    },
+    "overlaps": {
+      "train/validation": 0,
+      "train/test": 0,
+      "validation/test": 0
+    },
+    "duplicate_ids": {
+      "train": 0,
+      "validation": 0,
+      "test": 0
+    },
+    "labels": {
+      "train": {
+        "3": 1391,
+        "8": 1370,
+        "11": 594,
+        "2": 3935,
+        "1": 1867,
+        "7": 1233,
+        "13": 1158,
+        "12": 1727,
+        "9": 460,
+        "0": 498,
+        "5": 399,
+        "10": 106,
+        "4": 47,
+        "6": 305
+      },
+      "validation": {
+        "3": 196,
+        "9": 67,
+        "12": 245,
+        "2": 479,
+        "13": 161,
+        "1": 300,
+        "0": 66,
+        "7": 149,
+        "11": 84,
+        "8": 169,
+        "6": 46,
+        "5": 74,
+        "10": 18,
+        "4": 4
+      },
+      "test": {
+        "3": 420,
+        "1": 576,
+        "2": 1125,
+        "8": 409,
+        "12": 507,
+        "11": 184,
+        "0": 134,
+        "7": 327,
+        "13": 312,
+        "5": 127,
+        "6": 80,
+        "10": 40,
+        "9": 117,
+        "4": 8
+      }
+    },
+    "scope": "complete canonical dataset"
+  },
+  "wikisql/aggregation": {
+    "rows": {
+      "train": 1000,
+      "validation": 100,
+      "test": 100
+    },
+    "overlaps": {
+      "train/validation": 0,
+      "train/test": 0,
+      "validation/test": 0
+    },
+    "duplicate_ids": {
+      "train": 0,
+      "validation": 0,
+      "test": 0
+    },
+    "labels": {
+      "train": {
+        "0": 703,
+        "1": 56,
+        "2": 62,
+        "5": 36,
+        "3": 94,
+        "4": 49
+      },
+      "validation": {
+        "2": 8,
+        "0": 69,
+        "5": 2,
+        "1": 10,
+        "3": 8,
+        "4": 3
+      },
+      "test": {
+        "0": 69,
+        "4": 2,
+        "1": 12,
+        "3": 10,
+        "2": 5,
+        "5": 2
+      }
+    },
+    "scope": "up to 1000 training / 100 per evaluation split after full-source preprocessing"
+  },
+  "wikisql/column": {
+    "rows": {
+      "train": 1000,
+      "validation": 100,
+      "test": 100
+    },
+    "overlaps": {
+      "train/validation": 0,
+      "train/test": 0,
+      "validation/test": 0
+    },
+    "duplicate_ids": {
+      "train": 0,
+      "validation": 0,
+      "test": 0
+    },
+    "labels": {
+      "train": {
+        "1": 253,
+        "0": 242,
+        "2": 263,
+        "3": 242
+      },
+      "validation": {
+        "1": 29,
+        "2": 22,
+        "3": 33,
+        "0": 16
+      },
+      "test": {
+        "0": 18,
+        "2": 25,
+        "3": 26,
+        "1": 31
+      }
+    },
+    "scope": "up to 1000 training / 100 per evaluation split after full-source preprocessing"
+  },
+  "wikisql/operator": {
+    "rows": {
+      "train": 1000,
+      "validation": 100,
+      "test": 100
+    },
+    "overlaps": {
+      "train/validation": 0,
+      "train/test": 0,
+      "validation/test": 0
+    },
+    "duplicate_ids": {
+      "train": 0,
+      "validation": 0,
+      "test": 0
+    },
+    "labels": {
+      "train": {
+        "0": 857,
+        "1": 70,
+        "2": 73
+      },
+      "validation": {
+        "0": 89,
+        "1": 5,
+        "2": 6
+      },
+      "test": {
+        "0": 81,
+        "1": 6,
+        "2": 13
+      }
+    },
+    "scope": "up to 1000 training / 100 per evaluation split after full-source preprocessing"
+  },
+  "acord": {
+    "scope": "mirror build",
+    "provenance": {
+      "conversion_sha256": "cd3d9e493eaab12e07b931be2c92b9eda03e65145b74f4745e257172131b486c",
+      "source": "theatticusproject/acord",
+      "revision": "7ba1c6f2e0baaa32e78c78c2b02e9c57b102af4e",
+      "archive_sha256": "c9e851456a14aed161033b856e9f40f3cc9f46cf7282c2007b143420e93a65c3",
+      "counts": {
+        "train/grade/3": 287,
+        "train/grade/1": 1036,
+        "train/grade/4": 74,
+        "train/grade/0": 56973,
+        "train/grade/2": 159,
+        "validation/grade/3": 28,
+        "validation/grade/2": 25,
+        "validation/grade/1": 122,
+        "validation/grade/0": 5964,
+        "validation/grade/4": 3,
+        "test/grade/2": 219,
+        "test/grade/3": 348,
+        "test/grade/4": 53,
+        "test/grade/1": 1137,
+        "test/grade/0": 60231
+      },
+      "query_counts": {
+        "train": 51,
+        "validation": 6,
+        "test": 57
+      },
+      "split_policy": "native query partitions",
+      "license": "cc-by-4.0",
+      "splits": {
+        "train": 58529,
+        "validation": 6142,
+        "test": 61988
+      }
+    }
+  },
+  "edos": {
+    "scope": "mirror build",
+    "provenance": {
+      "conversion_sha256": "cd3d9e493eaab12e07b931be2c92b9eda03e65145b74f4745e257172131b486c",
+      "source_url": "https://raw.githubusercontent.com/rewire-online/edos/b1f1fbcca9d42de0395432ada8fcfb5c35f68c77/data/edos_labelled_aggregated.csv",
+      "revision": "b1f1fbcca9d42de0395432ada8fcfb5c35f68c77",
+      "source_sha256": "607bdbb766e1803a28f0eb8fc21c14b6b9dfa20039f726ba6767438584b47f9b",
+      "excluded_train_overlap": 0,
+      "split_policy": "native partitions; training copies of evaluation text removed",
+      "license": "cc0-1.0",
+      "splits": {
+        "train": 14000,
+        "validation": 2000,
+        "test": 4000
+      }
+    }
+  },
+  "evidence-inference": {
+    "scope": "mirror build",
+    "provenance": {
+      "conversion_sha256": "cd3d9e493eaab12e07b931be2c92b9eda03e65145b74f4745e257172131b486c",
+      "source_url": "https://evidence-inference.ebm-nlp.com/v2.0.tar.gz",
+      "archive_sha256": "6abe0d4ec0d331834981c0171c3c79d47515761867f82f1dc6066e43863a1586",
+      "reviewed_exclusions_revision": "35dce6aba1b3eb9eb9af9bdc38ebeda73dad15b9",
+      "known_bad_prompt_ids": [
+        346,
+        911,
+        912,
+        1261,
+        1262,
+        3044,
+        3111,
+        3248,
+        3514,
+        3620,
+        4308,
+        4324,
+        4325,
+        4490,
+        4491,
+        4492,
+        4715,
+        4807,
+        4824,
+        4948,
+        5000,
+        5001,
+        5002,
+        5037,
+        5046,
+        5047,
+        5639,
+        5710,
+        5752,
+        5775,
+        5776,
+        5777,
+        5778,
+        5779,
+        5780,
+        5781,
+        5782,
+        5841,
+        5843,
+        5861,
+        5862,
+        5863,
+        5964,
+        5965,
+        5966,
+        5975,
+        6034,
+        6065,
+        6066,
+        6666,
+        6667,
+        6668,
+        6669,
+        7040,
+        7042,
+        7811,
+        7812,
+        7813,
+        7814,
+        7815,
+        7944,
+        8118,
+        8197,
+        8198,
+        8199,
+        8200,
+        8201,
+        8536,
+        8590,
+        8593,
+        8605,
+        8606,
+        8631,
+        8635,
+        8639,
+        8640,
+        8745,
+        8747,
+        8749,
+        8767,
+        8773,
+        8870,
+        8875,
+        8876,
+        8877,
+        8878,
+        8884,
+        8885,
+        8886,
+        8917,
+        8921,
+        9295,
+        9297,
+        9429,
+        9430,
+        9431,
+        9432,
+        9862,
+        10032,
+        10035,
+        10885,
+        10886,
+        10887,
+        10888,
+        10889,
+        10890
+      ],
+      "counts": {
+        "retained/0": 5584,
+        "retained/1": 3844,
+        "retained/-1": 3024,
+        "excluded/invalid_or_unassigned_prompt": 392,
+        "excluded/tied_or_invalid_labels": 21
+      },
+      "split_policy": "native article partitions",
+      "label_policy": "majority verified labels; ties excluded",
+      "license": "unspecified",
+      "splits": {
+        "train": 10006,
+        "validation": 1231,
+        "test": 1215
+      }
+    }
+  }
+}

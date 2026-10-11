@@ -678,3 +678,5 @@ records source-label alignment for all 3,500 rows, three inspected training
 examples per task, and the weak/context-dependent source-label caveats.
 The [verification receipt](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/blob/main/additions/2d27d40ae2fe/verification.json)
 checks all six hosted shards and preservation of all 97 pre-existing Parquet blobs.
+
+Legal, biomedical and structured-text annotations: [source mappings and preparation](specialized-text.md).

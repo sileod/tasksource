@@ -50,8 +50,8 @@ def write_mirror(name, splits, label_type, report):
     features = Features(dict(sentence1=Value('string'), sentence2=Value('string'),
                              labels=Value(label_type), metadata=Value('string')))
     data = DatasetDict({split:Dataset.from_list(rows,features=features) for split,rows in splits.items()})
-    report.update(conversion_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
-                  splits={s:len(d) for s,d in data.items()})
+    report.setdefault('conversion_sha256',hashlib.sha256(Path(__file__).read_bytes()).hexdigest())
+    report.update(splits={s:len(d) for s,d in data.items()})
     for split, rows in data.items():
         rows.to_parquet(str(directory / (split + '.parquet')))
     (directory/'excluded-questions.jsonl').write_text('')

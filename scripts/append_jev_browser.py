@@ -60,7 +60,7 @@ def build(output, max_rows=1000, max_rows_eval=100, tasks=None, description=None
                 meta['native_split'] = native_split
                 row = to_training_row(example, index, task, split)
                 # Source identity is stable across text/visual views and permutations.
-                group = f"{task.split('/')[0]}:{split}:{meta.get('source_row') or meta['id']}"
+                group = f"{task.split('/')[0]}:{native_split}:{meta.get('source_row') or meta['id']}"
                 row.update(id=f'{group}:{slug(task)}', group_id=group, question_id=slug(task),
                            license=licenses[task]['license'], license_use=licenses[task]['license_use'])
                 if len(render_request(row['state'], [row]).encode()) > 131_072:
@@ -77,7 +77,26 @@ def build(output, max_rows=1000, max_rows_eval=100, tasks=None, description=None
                     page_sets[split].add((task.split('/')[0], meta['page_group_id']))
             counts[split] = sum(row['source'] == task for row in rows[split])
         sources['sources'][task] = dict(**provenance[task], rows=counts,
-            revisions={provenance[task]['dataset']:provenance[task]['revision']}, **licenses[task])
+            revisions={**provenance[task].get('data_file_revisions', {}),
+                       **({provenance[task]['dataset']:provenance[task]['revision']}
+                          if provenance[task].get('dataset') else {})}, **licenses[task])
+    # Different annotations of one source can have overlapping native partitions.
+    # Keep holdout membership and remove lower-priority copies across the family.
+    for split in ('validation','train'):
+        forbidden = split_groups['test'] | (split_groups['validation'] if split=='train' else set())
+        retained = []
+        for row in rows[split]:
+            group = (row['source'].split('/')[0], evidence[row['id']].get('split_group_id'))
+            if group[1] and group in forbidden:
+                exclusions.append(dict(id=row['id'],source=row['source'],split=split,reason='source_family_holdout_overlap'))
+            else:
+                retained.append(row)
+        rows[split] = retained
+        split_groups[split] = {(r['source'].split('/')[0],evidence[r['id']]['split_group_id'])
+                              for r in retained if evidence[r['id']].get('split_group_id')}
+    for task in tasks:
+        sources['sources'][task]['rows'] = {s:sum(r['source']==task for r in examples)
+                                           for s,examples in rows.items() if any(r['source']==task for r in examples)}
     for a in rows:
         for b in rows:
             if a != b:

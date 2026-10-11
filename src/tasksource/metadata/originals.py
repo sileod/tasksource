@@ -11,6 +11,9 @@ by scripts/upload_repackaged.py) or a task switches to a mirror.
 """
 
 ORIGINALS = {
+    "tasksource/acord": ["theatticusproject/acord"],
+    "tasksource/edos": [],  # pinned official GitHub CSV
+    "tasksource/evidence-inference": [],  # upstream archive; article rights vary
     "tasksource/sentfin": [],  # pinned original GitHub CSV
     "tasksource/wands": ["napsternxg/wands"],
     "tasksource/scirepeval-search": ["allenai/scirepeval"],

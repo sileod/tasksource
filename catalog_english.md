@@ -1,4 +1,4 @@
-506 English tasks. Load one with `load_task(id)`; the annotations are in [tasks.py](src/tasksource/tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
+534 English tasks. Load one with `load_task(id)`; the annotations are in [tasks.py](src/tasksource/tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
 
 | # | id | type | dataset | question |
 |--:|---|---|---|:-:|
@@ -508,6 +508,34 @@
 | 504 | [sentfin](src/tasksource/tasks.py#L2508) | Classification | [tasksource/sentfin](https://hf.co/datasets/tasksource/sentfin) | ✓ |
 | 505 | [wands](src/tasksource/tasks.py#L2512) | Classification | [tasksource/wands](https://hf.co/datasets/tasksource/wands) | ✓ |
 | 506 | [scirepeval/search](src/tasksource/tasks.py#L2516) | Classification | [tasksource/scirepeval-search](https://hf.co/datasets/tasksource/scirepeval-search) | ✓ |
+| 507 | [maud/consideration](src/tasksource/tasks.py#L2567) | Classification | [theatticusproject/maud](https://hf.co/datasets/theatticusproject/maud) | ✓ |
+| 508 | [maud/bringdown-timing](src/tasksource/tasks.py#L2571) | Classification | [theatticusproject/maud](https://hf.co/datasets/theatticusproject/maud) | ✓ |
+| 509 | [maud/ordinary-course-consent](src/tasksource/tasks.py#L2575) | Classification | [theatticusproject/maud](https://hf.co/datasets/theatticusproject/maud) | ✓ |
+| 510 | [maud/ordinary-course-efforts](src/tasksource/tasks.py#L2579) | Classification | [theatticusproject/maud](https://hf.co/datasets/theatticusproject/maud) | ✓ |
+| 511 | [maud/antitrust-efforts](src/tasksource/tasks.py#L2583) | Classification | [theatticusproject/maud](https://hf.co/datasets/theatticusproject/maud) | ✓ |
+| 512 | [maud/specific-performance](src/tasksource/tasks.py#L2587) | Classification | [theatticusproject/maud](https://hf.co/datasets/theatticusproject/maud) | ✓ |
+| 513 | [ddi/relation](src/tasksource/tasks.py#L2592) | Classification | [OpenMed/DDI-Corpus-Processed](https://hf.co/datasets/OpenMed/DDI-Corpus-Processed) | ✓ |
+| 514 | [patent-classification/abstract](src/tasksource/tasks.py#L2599) | Classification | [ccdv/patent-classification](https://hf.co/datasets/ccdv/patent-classification) | ✓ |
+| 515 | [tabfact](src/tasksource/tasks.py#L2606) | Classification | parquet | ✓ |
+| 516 | [infotabs](src/tasksource/tasks.py#L2613) | Classification | [table-benchmark/infotabs](https://hf.co/datasets/table-benchmark/infotabs) | ✓ |
+| 517 | [squad-v2/answerability](src/tasksource/tasks.py#L2625) | Classification | [rajpurkar/squad_v2](https://hf.co/datasets/rajpurkar/squad_v2) | ✓ |
+| 518 | [cuad/answerability](src/tasksource/tasks.py#L2630) | Classification | parquet | ✓ |
+| 519 | [hallmarks-of-cancer/yesno](src/tasksource/tasks.py#L2649) | Classification | parquet | ✓ |
+| 520 | [semeval2014-absa/restaurants](src/tasksource/tasks.py#L2672) | Classification | parquet | ✓ |
+| 521 | [semeval2014-absa/laptops](src/tasksource/tasks.py#L2672) | Classification | parquet | ✓ |
+| 522 | [record/candidate](src/tasksource/tasks.py#L2695) | Classification | [aps/super_glue](https://hf.co/datasets/aps/super_glue) | ✓ |
+| 523 | [multidogo/finance/intent](src/tasksource/tasks.py#L2718) | Classification | parquet | ✓ |
+| 524 | [multidogo/fastfood/intent](src/tasksource/tasks.py#L2718) | Classification | parquet | ✓ |
+| 525 | [multidogo/software/intent](src/tasksource/tasks.py#L2718) | Classification | parquet | ✓ |
+| 526 | [multidogo/airline/intent](src/tasksource/tasks.py#L2718) | Classification | parquet | ✓ |
+| 527 | [multidogo/insurance/intent](src/tasksource/tasks.py#L2718) | Classification | parquet | ✓ |
+| 528 | [multidogo/media/intent](src/tasksource/tasks.py#L2718) | Classification | parquet | ✓ |
+| 529 | [wikisql/aggregation](src/tasksource/tasks.py#L2747) | Classification | [Salesforce/wikisql](https://hf.co/datasets/Salesforce/wikisql) | ✓ |
+| 530 | [wikisql/column](src/tasksource/tasks.py#L2752) | MultipleChoice | [Salesforce/wikisql](https://hf.co/datasets/Salesforce/wikisql) | ✓ |
+| 531 | [wikisql/operator](src/tasksource/tasks.py#L2757) | Classification | [Salesforce/wikisql](https://hf.co/datasets/Salesforce/wikisql) | ✓ |
+| 532 | [acord](src/tasksource/tasks.py#L2762) | Classification | [tasksource/acord](https://hf.co/datasets/tasksource/acord) | ✓ |
+| 533 | [edos](src/tasksource/tasks.py#L2766) | Classification | [tasksource/edos](https://hf.co/datasets/tasksource/edos) | ✓ |
+| 534 | [evidence-inference](src/tasksource/tasks.py#L2769) | Classification | [tasksource/evidence-inference](https://hf.co/datasets/tasksource/evidence-inference) | ✓ |
 
 ## Soft labels
 

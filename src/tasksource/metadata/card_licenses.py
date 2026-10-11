@@ -3,6 +3,22 @@
 Repo -> the card's ``license`` list, ``unknown`` dropped; empty when the card has none."""
 
 CARD_LICENSES = {
+ "OpenMed/DDI-Corpus-Processed": ["cc-by-nc-4.0"],
+ "Salesforce/wikisql": [],
+ "alexcadillon/SemEval2014Task4": [],
+ "bigbio/hallmarks_of_cancer": ["gpl-3.0"],
+ "ccdv/patent-classification": [],
+ "jpcorb20/multidogo": ["other"],
+ "rajpurkar/squad_v2": ["cc-by-sa-4.0"],
+ "table-benchmark/infotabs": [],
+ "tasksource/acord": ["cc-by-4.0"],
+ "tasksource/edos": ["cc0-1.0"],
+ "tasksource/evidence-inference": ["other"],
+ "theatticusproject/acord": ["cc-by-4.0"],
+ "theatticusproject/cuad-qa": ["cc-by-4.0"],
+ "theatticusproject/maud": ["cc-by-4.0"],
+ "wenhu/tab_fact": ["cc-by-4.0"],
+
  "McGill-NLP/WebLINX": ["cc-by-nc-sa-4.0"],
  "X-LANCE/WebSRC_v1.0": ["cc-by-4.0"],
  "tasksource/websrc": ["cc-by-4.0"],
