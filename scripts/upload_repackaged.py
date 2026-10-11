@@ -20,11 +20,14 @@ from scripts.repackage_dataset.browser import websrc
 from scripts.repackage_dataset.mind2web import mind2web_dom
 from scripts.repackage_dataset.relevance import sentfin, wands, scirepeval_search
 from scripts.repackage_dataset.specialized_text import acord, edos, evidence_inference
+from scripts.repackage_dataset.dialogue import slurp, mcscript2
 from scripts.repackage_dataset.superclevr import superclevr
 from scripts.repackage_dataset.regions import coco_regions, doclaynet_region, bapps, spair71k_grid
 
 
-BUILDERS = {"sentfin": ("tasksource/sentfin", sentfin),
+BUILDERS = {"slurp": ("tasksource/slurp", slurp),
+            "mcscript2": ("tasksource/mcscript2", mcscript2),
+            "sentfin": ("tasksource/sentfin", sentfin),
             "acord": ("tasksource/acord", acord),
             "edos": ("tasksource/edos", edos),
             "evidence_inference": ("tasksource/evidence-inference", evidence_inference),
@@ -54,7 +57,8 @@ BUILDERS = {"sentfin": ("tasksource/sentfin", sentfin),
 
 
 # license metadata for repackaged sets, as the originals state it
-LICENSES = {"tasksource/sentfin": "mit", "tasksource/wands": "mit",
+LICENSES = {"tasksource/slurp": "cc-by-4.0", "tasksource/mcscript2": "other",
+            "tasksource/sentfin": "mit", "tasksource/wands": "mit",
             "tasksource/acord": "cc-by-4.0", "tasksource/edos": "cc0-1.0",
             "tasksource/evidence-inference": "other",
             "tasksource/scirepeval-search": "other",
@@ -77,11 +81,21 @@ def push_card(repo, build):
     if repo in LICENSES:
         card.data.license = LICENSES[repo]
     sources = ", ".join(f"[{name}](https://huggingface.co/datasets/{name})" for name in ORIGINALS[repo])
+    directory = Path('build') / ('view2space-release-imagefolder' if repo == 'tasksource/view2space' else repo.split('/')[1] + '-release')
+    provenance = directory / 'provenance.json'
+    if provenance.exists():
+        report = json.loads(provenance.read_text())
+        upstream = report.get('source_url') or report.get('source', '')
+        if isinstance(upstream, str) and upstream.startswith(('https://', 'http://')):
+            sources = ', '.join(filter(None, (sources, f'[original distribution]({upstream})')))
     sources = f"Original data: {sources}. " if sources else ""  # an empty entry: the original is not on the Hub
+    script = Path(inspect.getsourcefile(build)).resolve().relative_to(Path(__file__).resolve().parents[1]).as_posix()
     storage = 'native ImageFolder' if repo == 'tasksource/view2space' else 'parquet'
     card.text = (f"\n# {repo.split('/')[1]}\n\n{inspect.cleandoc(build.__doc__)}\n\n{sources}"
                  f"Repackaged as {storage} for [tasksource](https://github.com/sileod/tasksource) by "
-                 "[scripts/repackage_dataset/](https://github.com/sileod/tasksource/tree/main/scripts/repackage_dataset).\n")
+                 f"[{script}](https://github.com/sileod/tasksource/blob/main/{script}#L{inspect.getsourcelines(build)[1]}).\n")
+    if provenance.exists():
+        card.text += '\n[Conversion provenance](provenance.json): source revisions, hashes, configuration and exclusions.\n'
     if repo in ('tasksource/coco-regions', 'tasksource/doclaynet-region', 'tasksource/bapps', 'tasksource/spair71k-grid', 'tasksource/superclevr', 'tasksource/websrc'):
         report = json.loads((Path('build') / (repo.split('/')[1] + '-release') / 'provenance.json').read_text())
         reports = {'default': report} if 'splits' in report else report
@@ -98,7 +112,7 @@ def push_card(repo, build):
     if repo in ('tasksource/view2space', 'tasksource/ai2d', 'tasksource/iconqa-text', 'tasksource/multimodal-mind2web',
                 'tasksource/coco-regions', 'tasksource/doclaynet-region', 'tasksource/bapps', 'tasksource/spair71k-grid', 'tasksource/superclevr', 'tasksource/websrc', 'tasksource/mind2web-dom',
                 'tasksource/sentfin', 'tasksource/wands', 'tasksource/scirepeval-search',
-                'tasksource/acord', 'tasksource/edos', 'tasksource/evidence-inference'):
+                'tasksource/acord', 'tasksource/edos', 'tasksource/evidence-inference', 'tasksource/slurp', 'tasksource/mcscript2'):
         from huggingface_hub import HfApi
         directory = Path('build') / ('view2space-release-imagefolder' if repo == 'tasksource/view2space' else repo.split('/')[1] + '-release')
         for filename in ('provenance.json', 'excluded-questions.jsonl'):

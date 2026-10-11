@@ -1,0 +1,84 @@
+"""Small original-source conversions that avoid audio downloads or legacy loaders."""
+from collections import Counter
+import hashlib
+import io
+import json
+from pathlib import Path
+import urllib.request
+import xml.etree.ElementTree as ET
+import zipfile
+
+from datasets import Dataset, DatasetDict
+
+from .relevance import text_key, write_mirror
+
+SLURP_REVISION = '8eb16545762be97ace75334109d73824217311f1'
+MCSCRIPT_URL = 'https://fedora.clarin-d.uni-saarland.de/sfb1102/MCScript-2.0.zip'
+MCSCRIPT_SHA256 = '50037b08123a4660e2e00ad07bcfa2a7ddc1d666b05b198d359cd2cda8f5e88c'
+
+
+def slurp():
+    """SLURP original human transcripts and intent labels, without bundled audio.
+
+    Native real train/devel/test partitions; synthetic speech is not included.
+    Identical transcripts with inconsistent intents are excluded, and duplicate
+    transcripts stay in their highest-priority native holdout (test, dev, train).
+    One- and two-word transcripts are excluded as insufficient intent context.
+    Original terms: CC BY 4.0. All removals and source hashes are recorded.
+    """
+    splits={}; hashes={}; labels={};counts=Counter()
+    for split,native in [('train','train'),('validation','devel'),('test','test')]:
+        url=f'https://raw.githubusercontent.com/pswietojanski/slurp/{SLURP_REVISION}/dataset/slurp/{native}.jsonl'
+        raw=urllib.request.urlopen(url).read();hashes[native]=hashlib.sha256(raw).hexdigest()
+        splits[split]=[json.loads(line) for line in raw.splitlines() if line.strip()]
+        for row in splits[split]:labels.setdefault(text_key(row['sentence']),set()).add(row['intent'])
+    output={};seen=set()
+    for split in ('test','validation','train'):
+        output[split]=[]
+        for row in splits[split]:
+            key=text_key(row['sentence'])
+            reason='ambiguous_intent' if len(labels[key])!=1 else 'short_transcript' if len(row['sentence'].split())<3 else 'duplicate_transcript' if key in seen else None
+            if reason:counts[split+'/'+reason]+=1;continue
+            seen.add(key)
+            meta=dict(id=str(row['slurp_id']),split_group_id=key,scenario=row['scenario'],entities=row['entities'],source_revision=SLURP_REVISION)
+            output[split].append(dict(sentence1=row['sentence'],sentence2='',labels=row['intent'],metadata=json.dumps(meta,sort_keys=True)))
+    return write_mirror('slurp',output,'string',dict(source='https://github.com/pswietojanski/slurp',revision=SLURP_REVISION,
+        source_hashes=hashes,excluded=dict(counts),split_policy='native splits; exact transcript conflicts and overlap removed',
+        conversion_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),license='cc-by-4.0'))
+
+
+def mcscript2():
+    """MCScript2.0 native two-answer reading comprehension, original XML partitions.
+
+    Preserve stories, questions and native choices; exactly one gold answer and
+    two distinct non-empty options are required. Story hashes prevent train/dev/
+    test copies. Source URL/archive hash and per-split counts are recorded.
+    Dataset terms: unspecified until original distribution terms are verified.
+    """
+    raw=urllib.request.urlopen(MCSCRIPT_URL).read()
+    if hashlib.sha256(raw).hexdigest()!=MCSCRIPT_SHA256:raise ValueError('MCScript archive changed')
+    output={};groups={};counts=Counter()
+    with zipfile.ZipFile(io.BytesIO(raw)) as archive:
+        for split,native in [('train','train'),('validation','dev'),('test','test')]:
+            output[split]=[];groups[split]=set()
+            for story in ET.fromstring(archive.read(native+'-data.xml')):
+                text=story.findtext('text');group=text_key(text);groups[split].add(group)
+                for question in story.findall('./questions/question'):
+                    choices=[a.attrib['text'] for a in question.findall('answer')]
+                    gold=[i for i,a in enumerate(question.findall('answer')) if a.attrib['correct'].lower()=='true']
+                    if len(choices)!=2 or len(set(choices))!=2 or not all(c.strip() for c in choices) or len(gold)!=1:
+                        counts[split+'/invalid_choices']+=1;continue
+                    meta=dict(id=story.attrib['id']+':'+question.attrib['id'],split_group_id=group,
+                        scenario=story.attrib['scenario'],question_type=question.attrib['type'])
+                    output[split].append(dict(inputs=f"Story: {text}\nQuestion: {question.attrib['text']}",
+                        choices_list=choices,labels=gold[0],metadata=json.dumps(meta,sort_keys=True)))
+    assert all(not groups[a]&groups[b] for a in groups for b in groups if a!=b),'MCScript story overlap'
+    data=DatasetDict({s:Dataset.from_list(r) for s,r in output.items()})
+    directory=Path('build/mcscript2-release');directory.mkdir(parents=True,exist_ok=True)
+    for split,rows in data.items():rows.to_parquet(str(directory/(split+'.parquet')))
+    provenance=dict(source_url=MCSCRIPT_URL,archive_sha256=MCSCRIPT_SHA256,excluded=dict(counts),
+        splits={s:len(r) for s,r in data.items()},split_policy='native story partitions',
+        conversion_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),license='unspecified')
+    (directory/'provenance.json').write_text(json.dumps(provenance,indent=2)+'\n')
+    (directory/'excluded-questions.jsonl').write_text('')
+    return data

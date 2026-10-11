@@ -11,6 +11,9 @@ by scripts/upload_repackaged.py) or a task switches to a mirror.
 """
 
 ORIGINALS = {
+    "tasksource/slurp": [],  # official textual annotations, without audio
+    "tasksource/mcscript2": [],  # original Saarland XML archive
+
     "tasksource/acord": ["theatticusproject/acord"],
     "tasksource/edos": [],  # pinned official GitHub CSV
     "tasksource/evidence-inference": [],  # upstream archive; article rights vary
