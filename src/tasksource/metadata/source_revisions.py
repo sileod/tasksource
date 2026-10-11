@@ -1,0 +1,32 @@
+"""Reviewed source snapshots; keep opaque revision IDs out of task annotations."""
+
+SOURCE_REVISIONS = {
+    "Hate-speech-CNERG/hatexplain": "b0e5676acc1d0dcb31d6ce8e93e7e94109044ed6",
+    "OpenMed/DDI-Corpus-Processed": "f97e24e60366180e77423ccd9c4643e34f59c1c8",
+    "Salesforce/wikisql": "48cfb60afd0d5f9d2231ca90f76edf9f975181bc",
+    "WillHeld/top_v2": "5e382a8497d4dd28842cc0bfa85387f965ac9d8d",
+    "alexcadillon/SemEval2014Task4": "ed389216928315d393473721fb832cde529ee42e",
+    "allenai/qasper": "06806e4608976fc2fac0a090ac425d5b2b29caf4",
+    "allenai/quac": "768addbf2099da8efabd67d3a669f6483b813c1b",
+    "aps/super_glue": "3de24cf8022e94f4ee4b9d55a6f539891524d646",
+    "bigbio/hallmarks_of_cancer": "b78c5a2c56ed30bb64f184b204c46362092cebdf",
+    "ccdv/patent-classification": "17bd94cd6594bac1b82a697e811fb7cf34a7af35",
+    "google-research-datasets/schema_guided_dstc8": "a8029ad8c12e13cdbfefc2f649e245fa135bc98a",
+    "hotpotqa/hotpot_qa": "1908d6afbbead072334abe2965f91bd2709910ab",
+    "jpcorb20/multidogo": "503eee0894f308dbd1d74c1b4ecf4cfc99dd43f9",
+    "pfb30/multi_woz_v22": "a65d2d3261c42a309b634179c186628bf35d9298",
+    "rajpurkar/squad_v2": "3ffb306f725f7d2ce8394bc1873b24868140c412",
+    "stanfordnlp/coqa": "0d9e9952f1ef6e5415492d3d84b5873259137e3c",
+    "table-benchmark/infotabs": "5e26f025fbbf2055f6905cf553ad9c81048891ea",
+    "tasksource/acord": "c59eb8c197be75fb21f16d993e5896c2ab5f39b7",
+    "tasksource/edos": "af629562a8a56cb6501c30d7da5de13610982e24",
+    "tasksource/evidence-inference": "f078c91c3b95b50feae0411ebce7be138fae0acd",
+    "tasksource/mcscript2": "3b9c261f28c82ba15e6073990c0d70f05db60c4a",
+    "tasksource/scirepeval-search": "7ff532ab52c10274a818d812c8d47f63b3af7af4",
+    "tasksource/sentfin": "dbd1d5665ff8d64254459a89a3a542c7728a3268",
+    "tasksource/slurp": "a21c5fbc1b0821a04f0ee9cb6de927f96dbd5338",
+    "tasksource/wands": "96a856e9d45eb0e5847a07a026d07f2b13092733",
+    "theatticusproject/cuad-qa": "d9c4ee0250ae2eb97bdb5b50773ab14ea62d0631",
+    "theatticusproject/maud": "37d5c3b95d18dcd8404cc5ce3fd5069be062392f",
+    "wenhu/tab_fact": "cecfbe87432b0e7fdcac4578f8ac6fc87d08db76"
+}

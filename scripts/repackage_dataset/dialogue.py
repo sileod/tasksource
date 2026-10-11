@@ -17,6 +17,10 @@ MCSCRIPT_URL = 'https://fedora.clarin-d.uni-saarland.de/sfb1102/MCScript-2.0.zip
 MCSCRIPT_SHA256 = '50037b08123a4660e2e00ad07bcfa2a7ddc1d666b05b198d359cd2cda8f5e88c'
 
 
+def _slurp_intent(row):
+    return row['scenario']+'_'+row['action']
+
+
 def slurp():
     """SLURP original human transcripts and intent labels, without bundled audio.
 
@@ -24,14 +28,15 @@ def slurp():
     Identical transcripts with inconsistent intents are excluded, and duplicate
     transcripts stay in their highest-priority native holdout (test, dev, train).
     One- and two-word transcripts are excluded as insufficient intent context.
-    Original terms: CC BY 4.0. All removals and source hashes are recorded.
+    Intent is the native scenario/action pair; inconsistent raw intent aliases
+    are retained in metadata. Original terms: CC BY 4.0.
     """
     splits={}; hashes={}; labels={};counts=Counter()
     for split,native in [('train','train'),('validation','devel'),('test','test')]:
         url=f'https://raw.githubusercontent.com/pswietojanski/slurp/{SLURP_REVISION}/dataset/slurp/{native}.jsonl'
         raw=urllib.request.urlopen(url).read();hashes[native]=hashlib.sha256(raw).hexdigest()
         splits[split]=[json.loads(line) for line in raw.splitlines() if line.strip()]
-        for row in splits[split]:labels.setdefault(text_key(row['sentence']),set()).add(row['intent'])
+        for row in splits[split]:labels.setdefault(text_key(row['sentence']),set()).add(_slurp_intent(row))
     output={};seen=set()
     for split in ('test','validation','train'):
         output[split]=[]
@@ -40,10 +45,13 @@ def slurp():
             reason='ambiguous_intent' if len(labels[key])!=1 else 'short_transcript' if len(row['sentence'].split())<3 else 'duplicate_transcript' if key in seen else None
             if reason:counts[split+'/'+reason]+=1;continue
             seen.add(key)
-            meta=dict(id=str(row['slurp_id']),split_group_id=key,scenario=row['scenario'],entities=row['entities'],source_revision=SLURP_REVISION)
-            output[split].append(dict(sentence1=row['sentence'],sentence2='',labels=row['intent'],metadata=json.dumps(meta,sort_keys=True)))
+            meta=dict(id=str(row['slurp_id']),split_group_id=key,scenario=row['scenario'],action=row['action'],
+                native_intent=row['intent'],entities=row['entities'],source_revision=SLURP_REVISION)
+            output[split].append(dict(sentence1=row['sentence'],sentence2='',labels=_slurp_intent(row),metadata=json.dumps(meta,sort_keys=True)))
     return write_mirror('slurp',output,'string',dict(source='https://github.com/pswietojanski/slurp',revision=SLURP_REVISION,
         source_hashes=hashes,excluded=dict(counts),split_policy='native splits; exact transcript conflicts and overlap removed',
+        intent_definition='native scenario + action',
+        normalized_intents={s:sum(r['intent']!=_slurp_intent(r) for r in rows) for s,rows in splits.items()},
         conversion_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),license='cc-by-4.0'))
 
 

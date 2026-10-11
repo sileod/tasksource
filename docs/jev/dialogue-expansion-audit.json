@@ -279,6 +279,321 @@
         "revision": "3b9c261f28c82ba15e6073990c0d70f05db60c4a"
       },
       "limitations": "Small sample; not an estimate of corpus-wide label accuracy."
+    },
+    {
+      "task": "quac/answerability",
+      "reviewer": {
+        "kind": "model",
+        "model": "gpt-6.1-sol",
+        "model_id_source": "user-provided"
+      },
+      "checked_on": "2026-10-11",
+      "scope": "exact staged export inspection",
+      "verdict": "retain_with_source_caveat",
+      "sampled_examples": [
+        {
+          "id": "quac:train:C_04a01eb83156458e9258f9a152d9618f_0_q#5:quac-answerability-bb7c4463e8",
+          "split": "train",
+          "recast_sha256": "2061da69184f4d57274be3c8c85fe3fb9d5938093693b2d4885ec0cec8cedd25",
+          "gold": [
+            "yes"
+          ]
+        }
+      ],
+      "findings": "The passage names Alix Bailey as the wife, supporting answerability. Prior native QA turns contain noisy answers, retained as conversation context.",
+      "provenance": {
+        "dataset": "allenai/quac",
+        "config": "plain_text",
+        "revision": "768addbf2099da8efabd67d3a669f6483b813c1b"
+      },
+      "limitations": "One exported training row inspected; not a corpus-wide accuracy estimate."
+    },
+    {
+      "task": "hatexplain/majority",
+      "reviewer": {
+        "kind": "model",
+        "model": "gpt-6.1-sol",
+        "model_id_source": "user-provided"
+      },
+      "checked_on": "2026-10-11",
+      "scope": "exact staged export inspection",
+      "verdict": "retain_with_source_caveat",
+      "sampled_examples": [
+        {
+          "id": "hatexplain:train:3826117_gab:hatexplain-majority-4b2a472634",
+          "split": "train",
+          "recast_sha256": "00d35820a85f7e2cdcb92879eba4f67efcfeb8af400e70702bcf195c337346b9",
+          "gold": [
+            "hate speech"
+          ]
+        }
+      ],
+      "findings": "The recast retains the native hate-speech majority for the inspected group-directed post. Source annotator judgments are subjective; no replacement labels were inferred.",
+      "provenance": {
+        "dataset": "Hate-speech-CNERG/hatexplain",
+        "revision": "b0e5676acc1d0dcb31d6ce8e93e7e94109044ed6"
+      },
+      "limitations": "One exported training row inspected; not a corpus-wide accuracy estimate."
+    },
+    {
+      "task": "hotpotqa/supporting-fact",
+      "reviewer": {
+        "kind": "model",
+        "model": "gpt-6.1-sol",
+        "model_id_source": "user-provided"
+      },
+      "checked_on": "2026-10-11",
+      "scope": "exact staged export inspection",
+      "verdict": "retain",
+      "sampled_examples": [
+        {
+          "id": "hotpotqa:train:5ae1fb09554299234fd04382:The Formula (1980 film):2:hotpotqa-supporting-fact-274a376cc2",
+          "split": "train",
+          "recast_sha256": "d03a3caf85c1d53fae204cc83f1aa83ccb82cab23be12790599a44d993dacb5a",
+          "gold": [
+            "not a supporting fact"
+          ]
+        }
+      ],
+      "findings": "The inspected Craig T. Nelson sentence is not in the native supporting-fact set. The criterion explicitly asks for annotation membership; it does not claim all other sentences are irrelevant.",
+      "provenance": {
+        "dataset": "hotpotqa/hotpot_qa",
+        "config": "distractor",
+        "revision": "1908d6afbbead072334abe2965f91bd2709910ab"
+      },
+      "limitations": "One exported training row inspected; not a corpus-wide accuracy estimate."
+    },
+    {
+      "task": "multiwoz22/dialogue-act",
+      "reviewer": {
+        "kind": "model",
+        "model": "gpt-6.1-sol",
+        "model_id_source": "user-provided"
+      },
+      "checked_on": "2026-10-11",
+      "scope": "exact staged export inspection",
+      "verdict": "retain",
+      "sampled_examples": [
+        {
+          "id": "multiwoz22:train:SNG0065.json:0:multiwoz22-dialogue-act-7a1cf5f5fd",
+          "split": "train",
+          "recast_sha256": "0e52758a129cf4c6d92aaba61d52babbee72ada663a6270033b430565bc3e688",
+          "gold": [
+            "Taxi-Inform"
+          ]
+        }
+      ],
+      "findings": "The current user gives taxi pickup/destination details; native Taxi-Inform is consistent. No future response or gold state enters input.",
+      "provenance": {
+        "dataset": "pfb30/multi_woz_v22",
+        "config": "v2.2",
+        "revision": "a65d2d3261c42a309b634179c186628bf35d9298"
+      },
+      "limitations": "One exported training row inspected; not a corpus-wide accuracy estimate."
+    },
+    {
+      "task": "multiwoz22/categorical-slot",
+      "reviewer": {
+        "kind": "model",
+        "model": "gpt-6.1-sol",
+        "model_id_source": "user-provided"
+      },
+      "checked_on": "2026-10-11",
+      "scope": "exact staged export inspection",
+      "verdict": "retain",
+      "sampled_examples": [
+        {
+          "id": "multiwoz22:train:PMUL0242.json:18:restaurant-area:multiwoz22-categorical-slot-2a476f8ce2",
+          "split": "train",
+          "recast_sha256": "3abdbcbbd83b989795f2177ccf5ebc9f9475d5e1998084db377a13374f5ae00a",
+          "gold": [
+            "centre"
+          ]
+        }
+      ],
+      "findings": "Restaurant-area=centre is explicitly stated earlier and carried forward in the dialogue state. The question asks for current state, not a new fact in the final goodbye.",
+      "provenance": {
+        "dataset": "pfb30/multi_woz_v22",
+        "config": "v2.2",
+        "revision": "a65d2d3261c42a309b634179c186628bf35d9298"
+      },
+      "limitations": "One exported training row inspected; not a corpus-wide accuracy estimate."
+    },
+    {
+      "task": "schema-guided/intent",
+      "reviewer": {
+        "kind": "model",
+        "model": "gpt-6.1-sol",
+        "model_id_source": "user-provided"
+      },
+      "checked_on": "2026-10-11",
+      "scope": "exact staged export inspection",
+      "verdict": "retain",
+      "sampled_examples": [
+        {
+          "id": "schema-guided:train:24_00103:2:RentalCars_2:schema-guided-intent-3c604d923b",
+          "split": "train",
+          "recast_sha256": "8f933087eef09b464fcbdee9bfcf9eca689618cfccbb16d493f24f23c049ba6d",
+          "gold": [
+            "GetCarsAvailable"
+          ]
+        }
+      ],
+      "findings": "Sydney rental-car and March 3 context supports native GetCarsAvailable. The service is identified and only previous turns are shown.",
+      "provenance": {
+        "dataset": "google-research-datasets/schema_guided_dstc8",
+        "config": "dialogues",
+        "revision": "a8029ad8c12e13cdbfefc2f649e245fa135bc98a"
+      },
+      "limitations": "One exported training row inspected; not a corpus-wide accuracy estimate."
+    },
+    {
+      "task": "coqa/yesno",
+      "reviewer": {
+        "kind": "model",
+        "model": "gpt-6.1-sol",
+        "model_id_source": "user-provided"
+      },
+      "checked_on": "2026-10-11",
+      "scope": "exact staged export inspection",
+      "verdict": "retain",
+      "sampled_examples": [
+        {
+          "id": "coqa:train:5a5b3edd97c4d2ca071f0c67a98cf97ff717c08b3183cf9af389503b548ae7fe:11:coqa-yesno-6b0f120687",
+          "split": "train",
+          "recast_sha256": "c1c9e8832401e6a18e7610695c96734fbbf26550ed79e7b1f3049c0a29ffa12b",
+          "gold": [
+            "yes"
+          ]
+        }
+      ],
+      "findings": "The earlier answer lists clean living spaces; the passage lists vaccinations, food and clothing too, supporting yes to anything else.",
+      "provenance": {
+        "dataset": "stanfordnlp/coqa",
+        "revision": "0d9e9952f1ef6e5415492d3d84b5873259137e3c"
+      },
+      "limitations": "One exported training row inspected; not a corpus-wide accuracy estimate."
+    },
+    {
+      "task": "qasper/yesno",
+      "reviewer": {
+        "kind": "model",
+        "model": "gpt-6.1-sol",
+        "model_id_source": "user-provided"
+      },
+      "checked_on": "2026-10-11",
+      "scope": "exact staged export inspection",
+      "verdict": "retain",
+      "sampled_examples": [
+        {
+          "id": "qasper:train:cd1034c183edf630018f47ff70b48d74d2bb1649:qasper-yesno-283c368943",
+          "split": "train",
+          "recast_sha256": "7a4c33ad8589bfc2135273837d41dbd2606f20169df84386919152217b2f169d",
+          "gold": [
+            "yes"
+          ]
+        }
+      ],
+      "findings": "The supplied paper contrasts near-random human detection with up to 97% automatic detection, supporting yes. Tightened the filter after a prior macro-F1 example depended on omitted table evidence: all cited evidence must now occur in supplied text, not merely one paragraph.",
+      "provenance": {
+        "dataset": "allenai/qasper",
+        "config": "qasper",
+        "revision": "06806e4608976fc2fac0a090ac425d5b2b29caf4"
+      },
+      "limitations": "One exported training row inspected; not a corpus-wide accuracy estimate."
+    },
+    {
+      "task": "topv2/intent",
+      "reviewer": {
+        "kind": "model",
+        "model": "gpt-6.1-sol",
+        "model_id_source": "user-provided"
+      },
+      "checked_on": "2026-10-11",
+      "scope": "exact staged export inspection",
+      "verdict": "retain",
+      "sampled_examples": [
+        {
+          "id": "topv2:train:54b52eeff568a74553d96b4705d6e7032a2128db9075094b9a3f7192a04e020c:topv2-intent-2b01248592",
+          "split": "train",
+          "recast_sha256": "21426263d901cb7f3dfc4ab8cecfd7f8da2989892a1b3b398c2512bd02e3e8c1",
+          "gold": [
+            "get reminder"
+          ]
+        }
+      ],
+      "findings": "The request asks to retrieve upcoming email reminders, consistent with the native get_reminder root intent. Gold semantic parse is excluded.",
+      "provenance": {
+        "dataset": "WillHeld/top_v2",
+        "revision": "5e382a8497d4dd28842cc0bfa85387f965ac9d8d"
+      },
+      "limitations": "One exported training row inspected; not a corpus-wide accuracy estimate."
+    },
+    {
+      "task": "slurp/intent",
+      "reviewer": {
+        "kind": "model",
+        "model": "gpt-6.1-sol",
+        "model_id_source": "user-provided"
+      },
+      "checked_on": "2026-10-11",
+      "scope": "exact staged export inspection",
+      "verdict": "retain_with_source_caveat",
+      "sampled_examples": [
+        {
+          "id": "slurp:train:10987:slurp-intent-dd2971bc8b",
+          "split": "train",
+          "recast_sha256": "99f6ed4308d0e70593fe3be38eecd44cb060fc9f31dd39d0535f74b44808706b",
+          "gold": [
+            "lists_remove"
+          ]
+        }
+      ],
+      "findings": "Deleting a to-do list matches lists_remove. Rebuilt the mirror using scenario/action pairs (60 intents); raw aliases such as query previously conflated intents. Native raw labels remain in metadata. Some utterances still underspecify media type.",
+      "provenance": {
+        "dataset": "tasksource/slurp",
+        "revision": "a21c5fbc1b0821a04f0ee9cb6de927f96dbd5338"
+      },
+      "limitations": "One exported training row inspected; not a corpus-wide accuracy estimate."
+    },
+    {
+      "task": "mcscript2",
+      "reviewer": {
+        "kind": "model",
+        "model": "gpt-6.1-sol",
+        "model_id_source": "user-provided"
+      },
+      "checked_on": "2026-10-11",
+      "scope": "exact staged export inspection",
+      "verdict": "retain",
+      "sampled_examples": [
+        {
+          "id": "mcscript2:train:2435:2:mcscript2-1af6d87229",
+          "split": "train",
+          "recast_sha256": "61291e6d79443c561d5eb33abf14ea0622a4dfa8f3c02dc9796be05f1ef4ca10",
+          "gold": [
+            "After they finished the job"
+          ]
+        }
+      ],
+      "findings": "Moving furniture back after finishing wallpapering is consistent with the story and native option. This is implicit script reasoning rather than a verbatim answer span.",
+      "provenance": {
+        "dataset": "tasksource/mcscript2",
+        "revision": "3b9c261f28c82ba15e6073990c0d70f05db60c4a"
+      },
+      "limitations": "One exported training row inspected; not a corpus-wide accuracy estimate."
     }
-  ]
+  ],
+  "export": {
+    "configs": [
+      "default",
+      "full"
+    ],
+    "splits": {
+      "train": 10272,
+      "validation": 1060,
+      "test": 795
+    },
+    "manifest": "additions/aebc640a1ba7/manifest.json"
+  }
 }

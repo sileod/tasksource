@@ -8,22 +8,22 @@ This is the user-approved queue, in batch order. Keep it separate from machine-d
 
 MAUD (six views), ACORD, Evidence Inference, DDI, Hallmarks of Cancer, Patent Classification (abstract), CUAD answerability, TabFact, SQuAD v2 answerability, MultiDoGO intent (six domains), InfoTabS, WikiSQL (aggregation/column/operator), EDOS, SemEval 2014 ABSA (laptops/restaurants).
 
-## Batch 2 — integration in progress
+## Batch 2 — first views published; remaining projections queued
 
 | Source | Requested views | Status / remaining checks |
 |---|---|---|
 | FEVEROUS | Evidence-conditioned supports/refutes/NEI | Pending faithful evidence/table join and native split verification; heavy preparation may need a mirror |
-| HateXplain | Majority classification; optional votes | Majority view implemented locally; existing vote view retained |
-| QuAC | Answerability, yes/no/neither, follow-up | Answerability implemented locally; yes/no and follow-up deferred after ambiguous native labels in coarse review |
-| SLURP | Intent; possible slot tagging | Text-only mirror published; intent integration in progress; slots pending |
-| MultiWOZ 2.2 | Intent, dialogue act, categorical slots | Dialogue act and categorical slots implemented locally; intent deferred after stale active-intent labels in coarse review; single-act rows only |
-| Schema-Guided Dialogue | Intent and categorical slot values | Intent implemented locally; schema-grounded slot projection pending |
-| HotpotQA | Native supporting-fact membership | Implemented locally; explicit native sentence identities |
-| MCScript2.0 | Native two-choice comprehension | Original XML mirror published; integration in progress; license still unspecified |
+| HateXplain | Majority classification; optional votes | Majority view published; existing vote view retained |
+| QuAC | Answerability, yes/no/neither, follow-up | Answerability published; yes/no and follow-up deferred after ambiguous native labels in coarse review |
+| SLURP | Intent; possible slot tagging | Text-only mirror and 60-class scenario/action intent published; slots pending |
+| MultiWOZ 2.2 | Intent, dialogue act, categorical slots | Dialogue act and categorical slots published; intent deferred after stale active-intent labels in coarse review; single-act rows only |
+| Schema-Guided Dialogue | Intent and categorical slot values | Intent published; schema-grounded slot projection pending |
+| HotpotQA | Native supporting-fact membership | Published; explicit native sentence identities |
+| MCScript2.0 | Native two-choice comprehension | Original XML mirror and native MC view published; license still unspecified |
 
-These views have not yet been added to the Jev training export.
+Eleven views across batches 2–3 were added to Jev `default` and `full` in [Hub commit f2529310](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/commit/f2529310ce099771d5d6911e94ba24f4b1ce3ec4): 10,272 train, 1,060 validation and 795 test rows. One exact exported training row per task was inspected, alongside source/recast samples; [review findings](../../../docs/jev/dialogue-expansion-audit.json) preserve the model identifier, sample IDs, revisions and limitations. Existing Parquet shards were preserved.
 
-## Batch 3 — queued; a few initial mappings in progress
+## Batch 3 — three views published; remaining sources queued
 
 | Source | Requested views | Status / remaining checks |
 |---|---|---|
@@ -32,9 +32,9 @@ These views have not yet been added to the Jev training export.
 | FNC-1 | Headline/body stance | Pending original CSV join; inspected Hub copy strips source text |
 | DiscoGeM | Discourse relation / annotator votes | Pending original partitions and vote verification |
 | UKP Sentential Argument Mining | Topic-conditioned pro/con/no argument | Pending original source and split verification |
-| CoQA | Native exact yes/no with prior dialogue | Implemented locally; publication pending |
-| QASPER | Native scientific yes/no; possible evidence selection | Binary consensus mapping in progress; text evidence required; answer style is not used as a target |
-| TOPv2 | Root intent; possible slot types | Root intent implemented locally; publication pending |
+| CoQA | Native exact yes/no with prior dialogue | Published to Jev default/full |
+| QASPER | Native scientific yes/no; possible evidence selection | Binary consensus view published; all cited evidence must occur in supplied text; answer style is not used as a target |
+| TOPv2 | Root intent; possible slot types | Root intent published to Jev default/full |
 | PERSPECTRUM | Claim/perspective supports/opposes | Pending original perspective join and claim splits |
 | PubMed 200k RCT | Sentence rhetorical role | Pending source preserving PMID/abstract identity and native partitions |
 

@@ -73,8 +73,12 @@ def test_incremental_browser_patch_keeps_unrelated_configs_and_native_ids(tmp_pa
         return {s:d.map(lambda row: {'metadata':json.dumps(dict(id=s,split_group_id='shared-query'))})
                 for s,d in scored(task).items()}
     monkeypatch.setattr(release,'load_task',query_leaking)
-    with pytest.raises(AssertionError,match='Source group leakage'):
-        release.build(tmp_path/'query-leak',tasks=['scirepeval/search'])
+    held_out = tmp_path/'query-leak'
+    manifest, _ = release.build(held_out,tasks=['scirepeval/search'])
+    assert {s:info['rows'] for s,info in manifest['splits'].items()} == {
+        'train':0, 'validation':0, 'test':1}
+    assert len(manifest['excluded']) == 2
+    assert all(row['reason']=='source_family_holdout_overlap' for row in manifest['excluded'])
     # A source trajectory shared between train and test must block publication.
     def leaking(task,**kwargs):
         data=load(task,**kwargs)

@@ -46,7 +46,12 @@ def test_catalog():
                              'rico-widget/grid7', 'rico-widget/element', 'lvis/region', 'coco/panoptic-region',
                              'doclaynet/region', 'bapps/preference', 'spair71k/grid7', 'superclevr/yesno', 'superclevr/count', 'superclevr/color',
                              'superclevr/shape', 'superclevr/size', 'superclevr/material']
-    assert not set(vision.id) & set(list_tasks().id)
+    text = list_tasks()
+    assert set(vision.id) & set(text.id) == {'mind2web/action'}
+    assert not any(isinstance(mapping, (VisualClassification, VisualMultipleChoice))
+                   for mapping in text.mapping)
+    assert all(isinstance(mapping, (VisualClassification, VisualMultipleChoice))
+               for mapping in vision.mapping)
     assert all(task_provenance(i, vision=True)['revision'] for i in vision.id)
     assert 'pingzhili/nlvr2' in hub_datasets(['nlvr2'], vision=True)
 

@@ -335,6 +335,8 @@ def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preproc
     source_config = preprocessing.config_name
     if preprocessing.dataset_name in {"csv", "json", "text", "parquet"}:
         source_config = None
+    # Data-only exports may expose a default builder with native subsets in data_dir.
+    source_config = source_kwargs.pop("name", source_config)
     dataset = load_dataset(
         preprocessing.dataset_name, source_config, **source_kwargs
     )

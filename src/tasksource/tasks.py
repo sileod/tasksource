@@ -1,6 +1,7 @@
 from .preprocess import cat, get, regen, name, constant, Classification, TokenClassification, MultipleChoice, SoftLabeling
 from .metadata import udep_en_configs
 from .metadata.configs import BABI_NLI
+from .metadata.source_revisions import SOURCE_REVISIONS
 from datasets import Sequence, ClassLabel, Dataset, DatasetDict, Features, Value, concatenate_datasets
 import ast
 import hashlib
@@ -2506,16 +2507,16 @@ mind2web__dom_element = MultipleChoice('inputs', choices_list='choices_list', la
 
 # Prepared once: native entity labels, query-disjoint product grades and click-derived scores.
 sentfin = Classification('sentence1', 'sentence2', labels='labels', dataset_name='tasksource/sentfin',
-    metadata='metadata', complete_splits=False, load_dataset_kwargs={'revision': 'dbd1d5665ff8d64254459a89a3a542c7728a3268'},
+    metadata='metadata', complete_splits=False, load_dataset_kwargs={'revision': SOURCE_REVISIONS['tasksource/sentfin']},
     label_values={v:v for v in ('negative','neutral','positive')},
     question='What sentiment does headline text_A express toward entity text_B?')
 wands = Classification('sentence1', 'sentence2', labels='labels', dataset_name='tasksource/wands',
-    metadata='metadata', complete_splits=False, load_dataset_kwargs={'revision': '96a856e9d45eb0e5847a07a026d07f2b13092733'},
+    metadata='metadata', complete_splits=False, load_dataset_kwargs={'revision': SOURCE_REVISIONS['tasksource/wands']},
     label_values={0:'irrelevant',1:'partial match',2:'exact match'}, ordinal=True, score_only=True,
     question='How relevant is product text_B to search query text_A, from irrelevant to partial to exact match?')
 scirepeval__search = SoftLabeling('sentence1', 'sentence2', labels='labels',
     dataset_name='tasksource/scirepeval-search', task_id='scirepeval/search', metadata='metadata',
-    complete_splits=False, load_dataset_kwargs={'revision': '7ff532ab52c10274a818d812c8d47f63b3af7af4'}, kind='score',
+    complete_splits=False, load_dataset_kwargs={'revision': SOURCE_REVISIONS['tasksource/scirepeval-search']}, kind='score',
     low=0, high=14, step=2, options=[str(i) for i in range(0,15,2)], aggregation='mean', regression=True,
     question='Predict the click-derived search score (0–14) of paper text_B for query text_A.',
     soft_question='Predict the click-derived search score of paper text_B for query text_A. Numeric criteria are score anchors, not human rating categories.')
@@ -2562,7 +2563,7 @@ _MAUD = dict(dataset_name='theatticusproject/maud', labels='answer', complete_sp
     metadata=lambda r:_decision_metadata(hashlib.sha256((r['question']+r['sentence1']).encode()).hexdigest(),
         hashlib.sha256(r['sentence1'].encode()).hexdigest() if r['contract_name'].startswith('<') else r['contract_name'],
         data_type=r['data_type'],contract_name=r['contract_name'],native_id=r['id']),
-    load_dataset_kwargs={'revision':'37d5c3b95d18dcd8404cc5ce3fd5069be062392f',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['theatticusproject/maud'],
         'data_files':{s:f'MAUD_v1/MAUD_{n}.csv' for s,n in [('train','train'),('validation','dev'),('test','test')]}})
 maud__consideration = Classification('text', **_MAUD, task_id='maud/consideration',
     pre_process=lambda d:_maud_question(d,'Type of Consideration-Answer'),
@@ -2594,28 +2595,29 @@ ddi__relation = Classification('sentence',lambda r:f"Drug pair: {r['drug1']} / {
     metadata=lambda r:_decision_metadata(r['pair_id'],r['source_file'],sentence_id=r['sentence_id']),
     label_values={'MECHANISM':'mechanism','EFFECT':'effect','ADVISE':'advice','INT':'interaction','NONE':'no interaction'},
     question='What interaction between the two specified drugs is described in text_A?',
-    load_dataset_kwargs={'revision':'f97e24e60366180e77423ccd9c4643e34f59c1c8'})
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['OpenMed/DDI-Corpus-Processed']})
 
 patent_classification = Classification('text',labels='label',dataset_name='ccdv/patent-classification',
     config_name='abstract',task_id='patent-classification/abstract',complete_splits=False,
     pre_process=lambda d:_unique_text_splits(d,lambda r:r['text'],'label'),
     metadata=lambda r:_decision_metadata(hashlib.sha256(r['sentence1'].encode()).hexdigest(),hashlib.sha256(r['sentence1'].encode()).hexdigest()),
     question='Which patent classification section best describes this invention?',
-    load_dataset_kwargs={'revision':'17bd94cd6594bac1b82a697e811fb7cf34a7af35'})
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['ccdv/patent-classification']})
 
 tabfact = Classification(lambda r:r['table_caption']+'\n'+r['table_text'],'statement','label',
-    dataset_name='parquet',task_id='tabfact',complete_splits=False,label_values={0:'refuted',1:'entailed'},
+    dataset_name='wenhu/tab_fact',config_name='tab_fact',task_id='tabfact',complete_splits=False,label_values={0:'refuted',1:'entailed'},
     pre_process=lambda d:_unique_text_splits(d,lambda r:(r['table_id'],r['statement']),'label'),
     metadata=lambda r:_decision_metadata(hashlib.sha256((r['table_id']+r['sentence2']).encode()).hexdigest(),r['table_id']),
     question='Is statement text_B entailed or refuted by table text_A?',
-    load_dataset_kwargs={'data_files':{s:f'hf://datasets/wenhu/tab_fact@cecfbe87432b0e7fdcac4578f8ac6fc87d08db76/tab_fact/{s}/*.parquet'
-        for s in ('train','validation','test')}})
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['wenhu/tab_fact'],'name':'default','data_dir':'{config_name}'})
+
+
 infotabs = Classification(lambda r:r['table_title']+'\n'+r['table'],'question','answer',
     dataset_name='table-benchmark/infotabs',task_id='infotabs',complete_splits=False,splits=['train','dev',None],
     label_values={'Entailment':'entailment','Contradiction':'contradiction','Neutral':'neutral'},
     metadata=lambda r:_decision_metadata(r['original_dataset_id'],hashlib.sha256((r['table']+'\n'+r['sentence2']).encode()).hexdigest()),
     question='Does table text_A entail statement text_B, contradict it, or leave it undetermined?',
-    load_dataset_kwargs={'revision':'5e26f025fbbf2055f6905cf553ad9c81048891ea'})
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['table-benchmark/infotabs']})
 
 
 def _answerability_metadata(row):
@@ -2626,13 +2628,13 @@ squad_v2__answerability = Classification('context','question',lambda r:'yes' if 
     dataset_name='rajpurkar/squad_v2',task_id='squad-v2/answerability',complete_splits=False,
     metadata=_answerability_metadata,label_values={'no':'no','yes':'yes'},
     question='Can question text_B be answered using only passage text_A?',
-    load_dataset_kwargs={'revision':'3ffb306f725f7d2ce8394bc1873b24868140c412'})
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['rajpurkar/squad_v2']})
 cuad__answerability = Classification('context','question',lambda r:'yes' if r['answers']['text'] else 'no',
-    dataset_name='parquet',task_id='cuad/answerability',complete_splits=False,
+    dataset_name='theatticusproject/cuad-qa',task_id='cuad/answerability',complete_splits=False,
     metadata=_answerability_metadata,label_values={'no':'no','yes':'yes'},
     question='Does contract text_A contain an answer to the extraction request in text_B?',
-    load_dataset_kwargs={'data_files':{s:f'hf://datasets/theatticusproject/cuad-qa@d9c4ee0250ae2eb97bdb5b50773ab14ea62d0631/default/{s}/*.parquet'
-        for s in ('train','test')}})
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['theatticusproject/cuad-qa'],'name':'default','data_dir':'default'})
+
 
 _HALLMARKS = ('evading growth suppressors','tumor promoting inflammation','enabling replicative immortality',
     'cellular energetics','resisting cell death','activating invasion and metastasis',
@@ -2646,12 +2648,11 @@ def _hoc_records(row):
             metadata=_decision_metadata(row['document_id']+':'+hallmark,row['document_id'].rsplit('_',1)[0]))
 
 
-hallmarks_of_cancer = Classification('sentence1','sentence2','labels',dataset_name='parquet',
+hallmarks_of_cancer = Classification('sentence1','sentence2','labels',dataset_name='bigbio/hallmarks_of_cancer',config_name='hallmarks_of_cancer_bigbio_text',
     task_id='hallmarks-of-cancer/yesno',pre_process=lambda d:_flatten_text(d,_hoc_records),
     metadata='metadata',complete_splits=False,label_values={'no':'no','yes':'yes'},
     question='Answer the hallmark question in text_B using sentence text_A.',
-    load_dataset_kwargs={'data_files':{s:f'hf://datasets/bigbio/hallmarks_of_cancer@b78c5a2c56ed30bb64f184b204c46362092cebdf/hallmarks_of_cancer_bigbio_text/{s}/*.parquet'
-        for s in ('train','validation','test')}})
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['bigbio/hallmarks_of_cancer'],'name':'default','data_dir':'{config_name}'})
 
 
 def _absa_records(row):
@@ -2669,13 +2670,12 @@ def _absa_rows(dataset):
     return _flatten_text(dataset,_absa_records)
 
 
-semeval2014_absa = Classification('sentence1','sentence2','labels',dataset_name='parquet',
+semeval2014_absa = Classification('sentence1','sentence2','labels',dataset_name='alexcadillon/SemEval2014Task4',
     config_name=['laptops','restaurants'],task_id='semeval2014-absa/{config_name}',metadata='metadata',
     pre_process=_absa_rows,complete_splits=False,
     splits=['train',None,'test'],label_values={v:v for v in ('negative','neutral','positive','conflict')},
     question='What sentiment does sentence text_A express toward the specified aspect in text_B?',
-    load_dataset_kwargs={'data_files':{s:f'hf://datasets/alexcadillon/SemEval2014Task4@ed389216928315d393473721fb832cde529ee42e/{{config_name}}/{s}/*.parquet'
-        for s in ('train','test')}})
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['alexcadillon/SemEval2014Task4'],'name':'default','data_dir':'{config_name}'})
 
 
 def _record_candidates(row):
@@ -2697,7 +2697,7 @@ record__candidate = Classification('sentence1','sentence2','labels',dataset_name
     splits=['train','validation',None],label_values={'no':'no','yes':'yes'},
     pre_process=lambda d:_flatten_text(DatasetDict({s:r for s,r in d.items() if s!='test'}),_record_candidates),
     question='Is the candidate a correct replacement for @placeholder in the cloze query, using passage text_A?',
-    load_dataset_kwargs={'revision':'3de24cf8022e94f4ee4b9d55a6f539891524d646'})
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['aps/super_glue']})
 
 
 def _multidogo_context(dataset):
@@ -2715,12 +2715,11 @@ def _multidogo_context(dataset):
     return DatasetDict({s:context(r) for s,r in dataset.items()})
 
 
-multidogo__intent = Classification('sentence1','sentence2','intent',dataset_name='parquet',
+multidogo__intent = Classification('sentence1','sentence2','intent',dataset_name='jpcorb20/multidogo',
     config_name=['airline','fastfood','finance','insurance','media','software'],task_id='multidogo/{config_name}/intent',
     pre_process=_multidogo_context,metadata='metadata',complete_splits=False,
     question='What intent does the current utterance in text_B express, given earlier dialogue text_A?',
-    load_dataset_kwargs={'data_files':{s:f'hf://datasets/jpcorb20/multidogo@503eee0894f308dbd1d74c1b4ecf4cfc99dd43f9/splits_annotated_at_sentence_level/{{config_name}}/{n}.parquet'
-        for s,n in [('train','train'),('validation','dev'),('test','test')]}})
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['jpcorb20/multidogo'],'name':'default','data_dir':'splits_annotated_at_sentence_level/{config_name}'})
 
 
 def _wikisql_inputs(row):
@@ -2743,7 +2742,7 @@ def _wikisql_rows(dataset):
 
 
 _WIKISQL = dict(dataset_name='Salesforce/wikisql',complete_splits=False,
-    load_dataset_kwargs={'revision':'48cfb60afd0d5f9d2231ca90f76edf9f975181bc'})
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['Salesforce/wikisql']})
 wikisql__aggregation = Classification(_wikisql_inputs,labels=lambda r:str(r['sql']['agg']),
     **_WIKISQL,task_id='wikisql/aggregation',pre_process=_wikisql_rows,
     metadata=lambda r:_decision_metadata(r['table']['id']+':'+r['question'],r['table']['id']),
@@ -2761,13 +2760,170 @@ wikisql__operator = Classification('sentence1','sentence2','labels',**_WIKISQL,t
 
 acord = Classification('sentence1','sentence2','labels',dataset_name='tasksource/acord',
     metadata='metadata',complete_splits=False,ordinal=True,score_only=True,
-    label_values={str(i):str(i) for i in range(5)},load_dataset_kwargs={'revision':'c59eb8c197be75fb21f16d993e5896c2ab5f39b7'},
+    label_values={str(i):str(i) for i in range(5)},load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/acord']},
     question='Rate clause text_B for the attorney drafting query text_A: 0 is least relevant, 4 is most relevant.')
 edos = Classification('sentence1',labels='labels',dataset_name='tasksource/edos',metadata='metadata',
     complete_splits=False,label_values={v:v for v in ('not sexist','sexist')},
-    question='Does this post express sexism against women?',load_dataset_kwargs={'revision':'af629562a8a56cb6501c30d7da5de13610982e24'})
+    question='Does this post express sexism against women?',load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/edos']})
 evidence_inference = Classification('sentence1','sentence2','labels',dataset_name='tasksource/evidence-inference',
     task_id='evidence-inference',metadata='metadata',complete_splits=False,
     label_values={'-1':'significantly decreased','0':'no significant difference','1':'significantly increased'},
     question='According to article text_A, how did the intervention affect the stated outcome compared with the comparator in text_B?',
-    load_dataset_kwargs={'revision':'f078c91c3b95b50feae0411ebce7be138fae0acd'})
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/evidence-inference']})
+
+
+def _quac_records(row):
+    history=[]
+    passage=row['context'].removesuffix('CANNOTANSWER').rstrip()
+    for i,question in enumerate(row['questions']):
+        answer=row['orig_answers']['texts'][i]
+        yield dict(sentence1=f"{row['wikipedia_page_title']} — {row['section_title']}\n{passage}\nEarlier dialogue:\n"+'\n'.join(history),
+            sentence2=question,labels='no' if answer=='CANNOTANSWER' else 'yes',
+            metadata=_decision_metadata(row['turn_ids'][i],row['wikipedia_page_title'],dialogue_id=row['dialogue_id']))
+        history.extend([f'Question: {question}',f'Answer: {answer}'])
+
+
+_QUAC = dict(dataset_name='allenai/quac',config_name='plain_text',metadata='metadata',complete_splits=False,
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['allenai/quac'],'name':'default','data_dir':'{config_name}'})
+
+
+quac__answerability = Classification('sentence1','sentence2','labels',**_QUAC,task_id='quac/answerability',
+    pre_process=lambda d:_flatten_text(d,_quac_records),
+    label_values={'no':'no','yes':'yes'},question='Can the current question in text_B be answered from passage and earlier dialogue text_A?')
+def _hatexplain_majority(row):
+    votes=[row['annotators']['label'].count(i) for i in range(3)]
+    return votes.index(max(votes)) if votes.count(max(votes))==1 else None
+
+
+hatexplain__majority = Classification(lambda r:' '.join(r['post_tokens']),labels=_hatexplain_majority,
+    dataset_name='Hate-speech-CNERG/hatexplain',task_id='hatexplain/majority',complete_splits=False,
+    pre_process=lambda d:d.filter(lambda r:_hatexplain_majority(r) is not None),
+    metadata=lambda r:_decision_metadata(r['id'],hashlib.sha256(' '.join(r['post_tokens']).encode()).hexdigest(),votes=r['annotators']['label']),
+    label_values={0:'hate speech',1:'normal',2:'offensive'},question='Does this post contain hate speech, offensive language, or normal language?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['Hate-speech-CNERG/hatexplain'],'data_dir':'plain_text'})
+
+
+def _hotpot_facts(row):
+    gold=set(zip(row['supporting_facts']['title'],row['supporting_facts']['sent_id']))
+    for title,sentences in zip(row['context']['title'],row['context']['sentences']):
+        for index,sentence in enumerate(sentences):
+            yield dict(sentence1=row['question'],sentence2=f'Title: {title}\nSentence: {sentence}',
+                labels='yes' if (title,index) in gold else 'no',
+                metadata=_decision_metadata(f"{row['id']}:{title}:{index}",row['id'],title=title,sentence_index=index))
+
+
+hotpotqa__supporting_fact = Classification('sentence1','sentence2','labels',
+    dataset_name='hotpotqa/hotpot_qa',config_name='distractor',task_id='hotpotqa/supporting-fact',
+    pre_process=lambda d:_flatten_text(d,_hotpot_facts),metadata='metadata',complete_splits=False,
+    label_values={'no':'not a supporting fact','yes':'supporting fact'},
+    question='Is candidate sentence text_B annotated as supporting evidence for question text_A?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['hotpotqa/hotpot_qa']})
+
+
+_MULTIWOZ_CATEGORICAL = {
+    **{domain+'-area':{'north','south','east','west','centre','dontcare'} for domain in ('hotel','restaurant','attraction')},
+    **{domain+'-pricerange':{'cheap','moderate','expensive','dontcare'} for domain in ('hotel','restaurant')},
+    'hotel-type':{'hotel','guesthouse','dontcare'},'hotel-parking':{'yes','no','dontcare'},
+    'hotel-internet':{'yes','no','dontcare'},'hotel-stars':{str(i) for i in range(6)}|{'dontcare'}}
+
+
+def _dialogue_records(row, view):
+    turns=row['turns'];history=[]
+    group=hashlib.sha256('\n'.join(turns['utterance']).encode()).hexdigest()
+    for i,(speaker,utterance,frame) in enumerate(zip(turns['speaker'],turns['utterance'],turns['frames'])):
+        if speaker==0:
+            context='\n'.join(history+[f'Current user: {utterance}'])
+            if view=='act':
+                acts=list(dict.fromkeys(turns['dialogue_acts'][i]['dialog_act']['act_type']))
+                if len(acts)==1:
+                    yield dict(sentence1=context,sentence2='Classify the current user dialogue act.',labels=acts[0],
+                        metadata=_decision_metadata(f"{row['dialogue_id']}:{i}",group,dialogue_id=row['dialogue_id']))
+            else:
+                for service,state in zip(frame['service'],frame['state']):
+                    if view=='intent' and state['active_intent'] not in ('','NONE'):
+                        yield dict(sentence1=context,sentence2=f'Service: {service}',labels=state['active_intent'],
+                            metadata=_decision_metadata(f"{row['dialogue_id']}:{i}:{service}",group,dialogue_id=row['dialogue_id']))
+                    elif view=='slot':
+                        values=state['slots_values']
+                        for slot,answers in zip(values['slots_values_name'],values['slots_values_list']):
+                            if slot in _MULTIWOZ_CATEGORICAL and len(answers)==1 and answers[0] in _MULTIWOZ_CATEGORICAL[slot]:
+                                yield dict(sentence1=context,sentence2=f'Current dialogue-state slot: {slot}',labels=answers[0],
+                                    metadata=_decision_metadata(f"{row['dialogue_id']}:{i}:{slot}",group,dialogue_id=row['dialogue_id']))
+        history.append(f"{'User' if speaker==0 else 'Assistant'}: {utterance}")
+
+
+_MULTIWOZ = dict(dataset_name='pfb30/multi_woz_v22',config_name='v2.2',metadata='metadata',complete_splits=False,
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['pfb30/multi_woz_v22'],'name':'default','data_dir':'{config_name}'})
+
+
+multiwoz22__act = Classification('sentence1','sentence2','labels',**_MULTIWOZ,task_id='multiwoz22/dialogue-act',
+    pre_process=lambda d:_flatten_text(d,lambda r:_dialogue_records(r,'act')),
+    question='What dialogue act does the current user utterance perform?')
+multiwoz22__categorical_slot = Classification('sentence1','sentence2','labels',**_MULTIWOZ,task_id='multiwoz22/categorical-slot',
+    pre_process=lambda d:_flatten_text(d,lambda r:_dialogue_records(r,'slot')),
+    question='What is the value of the specified categorical slot after the current user turn?')
+schema_guided__intent = Classification('sentence1','sentence2','labels',dataset_name='google-research-datasets/schema_guided_dstc8',config_name='dialogues',metadata='metadata',
+    task_id='schema-guided/intent',complete_splits=False,
+    pre_process=lambda d:_flatten_text(d,lambda r:_dialogue_records(r,'intent')),
+    question='What is the active intent in the current dialogue state for the service in text_B?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['google-research-datasets/schema_guided_dstc8'],'name':'default','data_dir':'{config_name}'})
+
+
+def _coqa_yesno(row):
+    group=hashlib.sha256(row['story'].encode()).hexdigest();history=[]
+    for i,(question,answer) in enumerate(zip(row['questions'],row['answers']['input_text'])):
+        label=answer.strip().casefold()
+        if label in ('yes','no'):
+            yield dict(sentence1=row['story']+'\nEarlier dialogue:\n'+'\n'.join(history),sentence2=question,labels=label,
+                metadata=_decision_metadata(f'{group}:{i}',group,source_domain=row['source']))
+        history.extend([f'Question: {question}',f'Answer: {answer}'])
+
+
+coqa__yesno = Classification('sentence1','sentence2','labels',dataset_name='stanfordnlp/coqa',
+    task_id='coqa/yesno',pre_process=lambda d:_flatten_text(d,_coqa_yesno),metadata='metadata',complete_splits=False,
+    label_values={'no':'no','yes':'yes'},question='Answer the current question in text_B using the passage and earlier dialogue in text_A.',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['stanfordnlp/coqa']})
+
+
+def _qasper_yesno(row):
+    paragraphs=[p for section in row['full_text']['paragraphs'] for p in section]
+    evidence_text={' '.join(p.split()) for p in paragraphs}
+    paper=row['title']+'\n'+row['abstract']+'\n'+'\n'.join(paragraphs)
+    for question,identity,annotations in zip(row['qas']['question'],row['qas']['question_id'],row['qas']['answers']):
+        answers=annotations['answer']
+        # Answer style (span vs paraphrase) is not an objective question label.
+        if not answers or any(a['yes_no'] is None or a['unanswerable'] for a in answers):continue
+        labels={a['yes_no'] for a in answers}
+        evidence=[p for a in answers for p in a['evidence']]
+        if len(labels)!=1 or not evidence or any(' '.join(p.split()) not in evidence_text for p in evidence):continue
+        yield dict(sentence1=paper,sentence2=question,labels='yes' if labels.pop() else 'no',
+            metadata=_decision_metadata(identity,row['id'],annotation_ids=annotations['annotation_id']))
+
+
+qasper__yesno = Classification('sentence1','sentence2','labels',dataset_name='allenai/qasper',config_name='qasper',
+    task_id='qasper/yesno',pre_process=lambda d:_flatten_text(d,_qasper_yesno),metadata='metadata',complete_splits=False,
+    label_values={'no':'no','yes':'yes'},question='Answer scientific question text_B using paper text_A.',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['allenai/qasper'],'name':'default','data_dir':'{config_name}'})
+
+
+def _top_intent(row):
+    match=re.match(r'^\[IN:([A-Z_]+)\s',row['semantic_parse'])
+    if match is None:raise ValueError('TOPv2 parse has no valid root intent')
+    return match[1].lower().replace('_',' ')
+
+
+topv2__intent = Classification('utterance',labels=_top_intent,dataset_name='WillHeld/top_v2',task_id='topv2/intent',
+    splits=['train','eval','test'],complete_splits=False,
+    pre_process=lambda d:_unique_text_splits(d,lambda r:r['utterance'],_top_intent),
+    metadata=lambda r:_decision_metadata(hashlib.sha256(r['sentence1'].encode()).hexdigest(),hashlib.sha256(r['sentence1'].encode()).hexdigest(),domain=r['domain']),
+    question='What is the top-level intent of this utterance?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['WillHeld/top_v2']})
+
+
+slurp__intent = Classification('sentence1',labels='labels',dataset_name='tasksource/slurp',
+    task_id='slurp/intent',metadata='metadata',complete_splits=False,
+    question='What is the intent of this utterance?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/slurp']})
+mcscript2 = MultipleChoice(inputs='inputs',choices_list='choices_list',labels='labels',
+    dataset_name='tasksource/mcscript2',metadata='metadata',complete_splits=False,
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/mcscript2']})
