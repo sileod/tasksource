@@ -2958,3 +2958,37 @@ pubmed_rct__role = Classification('sentence1',labels='labels',dataset_name='task
     label_values={x:x.lower() for x in ('BACKGROUND','OBJECTIVE','METHODS','RESULTS','CONCLUSIONS')},
     question='What rhetorical role does this sentence play in its randomized controlled trial abstract?',
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/pubmed-rct']})
+
+
+def _maven_arg_records(row):
+    text=row['input'];group=hashlib.sha256(text.encode()).hexdigest()
+    annotations={}
+    for event_type,events in row['output']['json_structures'].items():
+        for event in events or []:
+            trigger=event['trigger']
+            for argument in event['arguments'] or []:
+                spans=((trigger['start'],trigger['end']),(argument['start'],argument['end']))
+                for (start,end),mention in zip(spans,(trigger,argument)):
+                    if not 0<=start<end<=len(text) or text[start:end]!=mention['text']:
+                        raise ValueError('MAVEN-Arg annotation does not match the document')
+                annotations.setdefault((event_type,spans),set()).add(argument['role'])
+    for (event_type,spans),roles in annotations.items():
+        if len(roles)!=1:continue  # A single-label view cannot represent multiple native roles.
+        boundaries={}
+        for name,(start,end) in zip(('TRIGGER','ARGUMENT'),spans):
+            boundaries.setdefault(start,[]).append(f'[{name}]')
+            boundaries.setdefault(end,[]).insert(0,f'[/{name}]')
+        points=sorted({0,len(text),*boundaries})
+        marked=''.join(''.join(boundaries.get(a,[]))+text[a:b] for a,b in zip(points,points[1:]))
+        marked+=''.join(boundaries.get(len(text),[]))
+        identity=group+':'+event_type+':'+':'.join(str(v) for span in spans for v in span)
+        yield dict(sentence1=marked,sentence2='Event type: '+event_type.replace('_',' '),
+            labels=next(iter(roles)).replace('_',' '),
+            metadata=_decision_metadata(identity,group,trigger_span=spans[0],argument_span=spans[1],event_type=event_type))
+
+
+maven_arg__role = Classification('sentence1','sentence2','labels',dataset_name='mneb/maven-arg',
+    task_id='maven-arg/role',pre_process=lambda d:_flatten_text(d,_maven_arg_records),
+    metadata='metadata',complete_splits=False,
+    question='What semantic role does [ARGUMENT] play in the event marked [TRIGGER], given the event type in text_B?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['mneb/maven-arg']})

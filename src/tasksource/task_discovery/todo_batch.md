@@ -53,7 +53,7 @@ Five further views were published to Jev `default` and `full` in [Hub commit 71f
 | MAGPIE | Idiomatic/literal use | Verify native filtered train/dev/test; likely mirror |
 | PreCo | Mention-pair coreference | Verify native mentions/clusters; do not infer negatives from missing annotation |
 | ReDial | Movie-conditioned human judgments | Join native movie annotations; preserve dialogue splits |
-| MAVEN-Arg | Event-conditioned argument role | Verify trigger/argument alignment and document splits; likely mirror |
+| MAVEN-Arg | Event-conditioned argument role | Direct `mneb/maven-arg` mapping implemented; all 3,623 documents and 466,720 expanded argument spans match the original, native splits are document-disjoint. No mirror needed; Jev publication pending. [Audit](../../../docs/jev/maven-arg-source-audit.json) |
 | SemEval 2023 Task 3 | Annotated persuasion techniques | Verify span/multilabel projection and original article partitions |
 | STREUSLE | Marked expression → supersense | Verify multiword spans, inventory and native splits |
 | SST-5 | Five-level sentence sentiment | Check existing coverage and faithful sentence-level native partitions |

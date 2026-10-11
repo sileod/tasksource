@@ -80,6 +80,7 @@ def test_pubmed_preserves_pmids_indices_and_numbers_and_rejects_malformed_roles(
     p=tmp_path/'native.txt';p.write_text('###123\nMETHODS\tWe enrolled 80 patients.\n  \n###456\nRESULTS\tTen recovered.\n')
     rows=list(pubmed_rows(p))
     assert rows[0]['sentence1']=='We enrolled 80 patients.'
+    assert 'sentence2' not in rows[0]
     assert [json.loads(r['metadata'])['id'] for r in rows]==['123:0','456:0']
     p.write_text('###123\nUNKNOWN\tText\n')
     with pytest.raises(ValueError,match='Invalid PubMed'):list(pubmed_rows(p))

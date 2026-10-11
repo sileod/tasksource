@@ -31,7 +31,7 @@ def pubmed_rows(path):
                 label,text=line.split('\t',1)
                 if not pmid or label not in ('BACKGROUND','OBJECTIVE','METHODS','RESULTS','CONCLUSIONS'):
                     raise ValueError('Invalid PubMed sentence/PMID annotation')
-                yield dict(sentence1=text,sentence2='',labels=label,
+                yield dict(sentence1=text,labels=label,
                     metadata=json.dumps(dict(id=f'{pmid}:{index}',split_group_id=pmid,pmid=pmid,sentence_index=index),sort_keys=True))
                 index+=1
 
@@ -50,7 +50,7 @@ def pubmed_rct():
     from datasets import Dataset, DatasetDict, Features, Value
     from huggingface_hub import hf_hub_download
     directory=Path('build/pubmed-rct-release');directory.mkdir(parents=True,exist_ok=True)
-    features=Features({k:Value('string') for k in ('sentence1','sentence2','labels','metadata')})
+    features=Features({k:Value('string') for k in ('sentence1','labels','metadata')})
     import pyarrow.compute as pc
     data,groups,hashes,counts={},{},{},{}
     for split,native in [('train','train'),('validation','dev'),('test','test')]:

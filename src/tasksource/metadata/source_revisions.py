@@ -1,7 +1,8 @@
 """Reviewed source snapshots; keep opaque revision IDs out of task annotations."""
 
 SOURCE_REVISIONS = {
-    "tasksource/pubmed-rct": "b5c96c8c80ac929a88cc6ad7b9818063b6e95b6c",
+    "mneb/maven-arg": "f7f8764f69c13d2dc823a92e0dfd2649b207f3db",
+    "tasksource/pubmed-rct": "bc06b7e877baa17e239b0a197146b77c976e1097",
     "tasksource/vast": "9748982e719f065af00a41c774776590a3acac3e",
     "tasksource/fnc1": "4effe53583062803a710231955bec178b31c9635",
     "tasksource/perspectrum": "721184de6ed05314fba04c6b706863fff4a5b647",

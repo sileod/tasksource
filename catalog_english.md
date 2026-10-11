@@ -1,4 +1,4 @@
-550 English tasks. Load one with `load_task(id)`; the annotations are in [tasks.py](src/tasksource/tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
+551 English tasks. Load one with `load_task(id)`; the annotations are in [tasks.py](src/tasksource/tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
 
 | # | id | type | dataset | question |
 |--:|---|---|---|:-:|
@@ -552,6 +552,7 @@
 | 548 | [ukpconvarg/convincingness](src/tasksource/tasks.py#L2943) | MultipleChoice | [tasksource/ukpconvarg](https://hf.co/datasets/tasksource/ukpconvarg) | ✓ |
 | 549 | [discogem/relation](src/tasksource/tasks.py#L2948) | Classification | [tasksource/discogem](https://hf.co/datasets/tasksource/discogem) | ✓ |
 | 550 | [pubmed-rct/role](src/tasksource/tasks.py#L2956) | Classification | [tasksource/pubmed-rct](https://hf.co/datasets/tasksource/pubmed-rct) | ✓ |
+| 551 | [maven-arg/role](src/tasksource/tasks.py#L2990) | Classification | [mneb/maven-arg](https://hf.co/datasets/mneb/maven-arg) | ✓ |
 
 ## Soft labels
 

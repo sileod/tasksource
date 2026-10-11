@@ -1,0 +1,179 @@
+{
+  "source": "mneb/maven-arg",
+  "revision": "f7f8764f69c13d2dc823a92e0dfd2649b207f3db",
+  "original_source": "https://github.com/THU-KEG/MAVEN-Argument",
+  "original_revision": "b2672448a933510c815f45322ced6226a3ffef9e",
+  "original_archive_sha256": "d535cee2ea29293e5f20339a851be021328197a1b3148dc771510324f7ec53f1",
+  "reviewer": {
+    "model": "gpt-6.1-sol",
+    "model_id_source": "user-provided"
+  },
+  "checks": {
+    "native_document_partitions": true,
+    "identical_documents_across_splits": 0,
+    "method": "Compared every document and the complete set of (event type, trigger span, role, argument span) tuples with the original archive, expanding native entity coreference mentions. Verified every offset against document text.",
+    "results": {
+      "train": {
+        "counts": {
+          "arguments": 380830,
+          "extra_vs_original": 0,
+          "missing_vs_original": 0,
+          "documents": 2913
+        },
+        "examples": [
+          {
+            "event": "Achieve",
+            "trigger": {
+              "text": "achieve",
+              "start": 1208,
+              "end": 1215
+            },
+            "argument": {
+              "role": "Agent",
+              "text": "Garibaldi",
+              "start": 1186,
+              "end": 1195
+            }
+          },
+          {
+            "event": "Achieve",
+            "trigger": {
+              "text": "achieve",
+              "start": 1208,
+              "end": 1215
+            },
+            "argument": {
+              "role": "Agent",
+              "text": "Giuseppe Garibaldi",
+              "start": 871,
+              "end": 889
+            }
+          },
+          {
+            "event": "Achieve",
+            "trigger": {
+              "text": "achieve",
+              "start": 1208,
+              "end": 1215
+            },
+            "argument": {
+              "role": "Agent",
+              "text": "giuseppe garibaldi",
+              "start": 166,
+              "end": 184
+            }
+          }
+        ]
+      },
+      "validation": {
+        "counts": {
+          "arguments": 85890,
+          "extra_vs_original": 0,
+          "missing_vs_original": 0,
+          "documents": 710
+        },
+        "examples": [
+          {
+            "event": "Achieve",
+            "trigger": {
+              "text": "achieved",
+              "start": 1371,
+              "end": 1379
+            },
+            "argument": {
+              "role": "Agent",
+              "text": "Brant",
+              "start": 1365,
+              "end": 1370
+            }
+          },
+          {
+            "event": "Achieve",
+            "trigger": {
+              "text": "achieved",
+              "start": 1371,
+              "end": 1379
+            },
+            "argument": {
+              "role": "Goal",
+              "text": "an undeserved reputation for brutality",
+              "start": 1380,
+              "end": 1418
+            }
+          },
+          {
+            "event": "Aiming",
+            "trigger": {
+              "text": "targeted",
+              "start": 490,
+              "end": 498
+            },
+            "argument": {
+              "role": "Agent",
+              "text": "Seneca",
+              "start": 329,
+              "end": 335
+            }
+          }
+        ]
+      }
+    }
+  },
+  "limitations": [
+    "Original IDs and coreference links are absent in this Hub copy. Tasksource uses document SHA-256 and annotated spans for stable identity.",
+    "Single-label projection drops arguments assigned multiple roles for the same trigger and event type.",
+    "Annotation fidelity does not establish that every native semantic judgment is unambiguous."
+  ],
+  "publication": "Source accepted; Jev export pending.",
+  "jev_smoke": {
+    "task": "maven-arg/role",
+    "train_rows": 3,
+    "validation_rows": 1,
+    "test_fabricated": false,
+    "examples": [
+      {
+        "metadata": "{\"argument_span\": [606, 620], \"event_type\": \"Motion\", \"id\": \"7a02bcd0bd999cf5feae64b2eed829f88b62e9ce56dd7663aa133e7f0d32d555:Motion:637:648:606:620\", \"split_group_id\": \"7a02bcd0bd999cf5feae64b2eed829f88b62e9ce56dd7663aa133e7f0d32d555\", \"trigger_span\": [637, 648]}",
+        "state": "text_A: Hurricane Lili was a relatively long-lived hurricane of the 1996 Atlantic hurricane season that affected countries from Central America to the United Kingdom . Lili formed on October 14 from a tropical wave , which emerged from the coast of west Africa on October 4 . After the storm formed , further strengthening of Lili was gradual , first to tropical storm status on October 16 and then to hurricane status on October 17 . The next day , Lili struck Cuba and moved across the central portion of the island , the first hurricane to hit the country since Hurricane Kate in 1985 . After emerging into the [ARGUMENT]Atlantic Ocean[/ARGUMENT] , the hurricane [TRIGGER]accelerated[/TRIGGER] northeastward , briefly peaking as a category 3 hurricane on the Saffir-Simpson Hurricane Scale near the Bahamas . For almost an entire week , Hurricane Lili oscillated in intensity while fluctuating several times in forward speed . About two weeks passed before Lili transitioned into an extratropical storm north of the Azores on October 27 , which subsequently moved across Ireland and Great Britain . Early in its duration , Lili caused flooding in Central America that left thousands homeless and killed 14 people . Damage was heaviest in Cuba , mostly due to the hurricane 's heavy rainfall which totaled 29.41 in ( 747 mm ) . The hurricane affected 11 Cuban provinces , damaging 92,542 houses and destroying another 6,369 . The rains heavily damaged the sugar cane and banana crops , and overall damage in the country was estimated at $ 362 million ( 1996 USD ) . After 269,995 people were evacuated in advance of Lili , there were no deaths in the country . In nearby Florida , one person died after being swept into a drain during the storm 's heavy rains . Moisture from Lili also fueled a storm that struck the northeastern United States , which contributed indirectly to a death when a man in Maine tried driving across a flooded roadway . Damage in the Bahamas was not severe , limited to some damaged roofs and downed trees . When the remnants of Lili struck Ireland and the United Kingdom , it produced strong winds and high seas that damaged hundreds of houses , causing $ 300 million in damage ( 1996 USD ) and six deaths .\ntext_B: Event type: Motion",
+        "instructions": "What semantic role does [ARGUMENT] play in the event marked [TRIGGER], given the event type in text_B?",
+        "criteria": [
+          "Agent",
+          "Location",
+          "Location original"
+        ],
+        "label": 2,
+        "answer": "Location original",
+        "task": "maven-arg/role",
+        "kind": "choice"
+      },
+      {
+        "metadata": "{\"argument_span\": [1800, 1808], \"event_type\": \"Perception_active\", \"id\": \"ad3fbd1ec7670652579b91a16ff7fb7406aa0f76c70fb72cdf391745c154280d:Perception_active:1820:1829:1800:1808\", \"split_group_id\": \"ad3fbd1ec7670652579b91a16ff7fb7406aa0f76c70fb72cdf391745c154280d\", \"trigger_span\": [1820, 1829]}",
+        "state": "text_A: The Second Battle of Kosovo ( Hungarian : `` m\u00e1sodik rig\u00f3mezei csata '' , Turkish : `` \u0130kinci Kosova Sava\u015f\u0131 '' ) ( 17\u201320 October 1448 ) was a land battle between a Hungarian-led Crusader army and the Ottoman Empire at Kosovo Polje . It was the culmination of a Hungarian offensive to avenge the defeat at Varna four years earlier . In the three-day battle the Ottoman army under the command of Sultan Murad II defeated the Crusader army of regent John Hunyadi . Calculating that he would need more than 40,000 men to defeat the Ottomans , the Hungarian regent sought to join up with anti-Ottoman Albanian forces , possibly led by Skanderbeg . The Ottomans in their base at Sofia received word of the Crusader army 's march route and subsequently began readying their men . Having failed to locate the main Ottoman army , whom he believed to still be at their capital in Edirne , Hunyadi was caught by surprise on 17 October when the Ottoman army appeared in front of his men at Kosovo Field . He constructed a `` tabor '' wagon fort at Plementina hill from which to fight the Ottomans , who built their own stockade in response . Cavalry skirmishing on the flanks of the stockades during the first two days and a Crusader night-time attack using their wagons and guns against the Sultan 's central position on the night of 18/19 October produced much bloodshed but no conclusive results . On 19 October Murad II used his `` sipahi '' cavalry from Thessaly to envelop the cavalry on the Crusader left flank , along with a general assault all along the line to distract Hunyadi from the primary effort . The maneuver worked and the Wallachian , Moldavian and Hungarian cavalry were cut down by the `` sipahis '' , who took no prisoners . Much of the Crusader army then retreated . On 20 October , with [ARGUMENT]Murad II[/ARGUMENT] personally [TRIGGER]observing[/TRIGGER] the struggle , the Janissaries attacked and killed everyone left in the stockade . The battle ended any hopes of saving Constantinople from the Ottoman Empire . The Hungarian kingdom no longer had the military and financial resources to mount an offensive against the Ottomans . With the end of the half-century-long Crusader threat to their European frontier , Murad 's son Mehmed II was free to lay siege to Constantinople in 1453 .\ntext_B: Event type: Perception active",
+        "instructions": "What semantic role does [ARGUMENT] play in the event marked [TRIGGER], given the event type in text_B?",
+        "criteria": [
+          "Agent",
+          "Location",
+          "Location original"
+        ],
+        "label": 0,
+        "answer": "Agent",
+        "task": "maven-arg/role",
+        "kind": "choice"
+      },
+      {
+        "metadata": "{\"argument_span\": [584, 590], \"event_type\": \"Hold\", \"id\": \"1b0a55788ceef31bc8f5e884c59e982635a3508cdc35f03b14292242892166d0:Hold:214:221:584:590\", \"split_group_id\": \"1b0a55788ceef31bc8f5e884c59e982635a3508cdc35f03b14292242892166d0\", \"trigger_span\": [214, 221]}",
+        "state": "text_A: The Ceremonials Tour was the second concert tour by English indie rock band Florence and the Machine . The tour included performances at Music festivals because it is lead singer Florence Welch 's favourite way to [TRIGGER]perform[/TRIGGER] live . Welch had originally planned to spend over one year touring for `` Ceremonials '' ( their previous tour lasted almost three and a half years ) before announcing that the December 2012 dates would be the final performances of the tour . On 25 February 2013 it was announced that Florence and the Machine would be playing at the Coke Live Music Festival in [ARGUMENT]Poland[/ARGUMENT] on 10 August 2013 , and on 26 March 2013 it was announced that the band would be playing at Chime for Change 's `` The Sound of Change Live '' concert at London 's Twickenham Stadium alongside Beyonc\u00e9 , Ellie Goulding and Haim , amongst others . The Ceremonials Tour was a critical and commercial success . Pollstar announced that the Ceremonials Tour was the 40th best-selling tour in the world in 2012 having earned $ 31.8 million worldwide and having sold 618,436 tickets . `` Paste Magazine '' ranked the tour as the 7th best tour of 2012 .\ntext_B: Event type: Hold",
+        "instructions": "What semantic role does [ARGUMENT] play in the event marked [TRIGGER], given the event type in text_B?",
+        "criteria": [
+          "Agent",
+          "Location",
+          "Location original"
+        ],
+        "label": 1,
+        "answer": "Location",
+        "task": "maven-arg/role",
+        "kind": "choice"
+      }
+    ],
+    "review": "Read all three rendered training examples. Trigger and argument markers identify the intended spans; event types and native gold roles survive recasting. Native cluster-level annotations can link mentions across sentences, as in the concert-tour example; these are not necessarily sentence-local arguments."
+  }
+}
