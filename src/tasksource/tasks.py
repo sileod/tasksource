@@ -2528,8 +2528,9 @@ def _decision_metadata(identifier, group, **extra):
     return json.dumps(dict(id=str(identifier), split_group_id=str(group), **extra), sort_keys=True)
 
 
-def _flatten_text(dataset, records):
-    features = Features({k:Value('string') for k in ('sentence1','sentence2','labels','metadata')})
+def _flatten_text(dataset, records, paired=True):
+    fields = ('sentence1','sentence2','labels','metadata') if paired else ('sentence1','labels','metadata')
+    features = Features({k:Value('string') for k in fields})
     def flatten(batch):
         rows = [item for values in zip(*batch.values()) for item in records(dict(zip(batch,values)))]
         return {k:[r[k] for r in rows] for k in features}
@@ -2974,13 +2975,7 @@ def _maven_arg_records(row):
                 annotations.setdefault((event_type,spans),set()).add(argument['role'])
     for (event_type,spans),roles in annotations.items():
         if len(roles)!=1:continue  # A single-label view cannot represent multiple native roles.
-        boundaries={}
-        for name,(start,end) in zip(('TRIGGER','ARGUMENT'),spans):
-            boundaries.setdefault(start,[]).append(f'[{name}]')
-            boundaries.setdefault(end,[]).insert(0,f'[/{name}]')
-        points=sorted({0,len(text),*boundaries})
-        marked=''.join(''.join(boundaries.get(a,[]))+text[a:b] for a,b in zip(points,points[1:]))
-        marked+=''.join(boundaries.get(len(text),[]))
+        marked=_marked_spans(text,[(name,*span) for name,span in zip(('TRIGGER','ARGUMENT'),spans)])
         identity=group+':'+event_type+':'+':'.join(str(v) for span in spans for v in span)
         yield dict(sentence1=marked,sentence2='Event type: '+event_type.replace('_',' '),
             labels=next(iter(roles)).replace('_',' '),
@@ -2992,3 +2987,161 @@ maven_arg__role = Classification('sentence1','sentence2','labels',dataset_name='
     metadata='metadata',complete_splits=False,
     question='What semantic role does [ARGUMENT] play in the event marked [TRIGGER], given the event type in text_B?',
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['mneb/maven-arg']})
+
+
+def _marked_spans(text, spans):
+    boundaries={}
+    for name,start,end in spans:
+        if not 0<=start<end<=len(text):raise ValueError('Invalid annotated character span')
+        boundaries.setdefault(start,[]).append(f'[{name}]')
+        boundaries.setdefault(end,[]).insert(0,f'[/{name}]')
+    points=sorted({0,len(text),*boundaries})
+    return ''.join(''.join(boundaries.get(a,[]))+text[a:b] for a,b in zip(points,points[1:]))+''.join(boundaries.get(len(text),[]))
+
+
+def _maven_triggers(row):
+    text=row['input'];group=hashlib.sha256(text.encode()).hexdigest();annotations={}
+    for label,events in row['output']['json_structures'].items():
+        for event in events or []:
+            t=event['trigger'];span=(t['start'],t['end'])
+            if text[slice(*span)]!=t['text']:raise ValueError('MAVEN trigger mismatch')
+            annotations.setdefault(span,set()).add(label)
+    for (start,end),labels in annotations.items():
+        if len(labels)!=1:continue
+        yield dict(sentence1=_marked_spans(text,[('TARGET',start,end)]),sentence2='',
+            labels=next(iter(labels)).replace('_',' '),
+            metadata=_decision_metadata(f'{group}:{start}:{end}',group,trigger_span=[start,end]))
+
+
+maven__event = Classification('sentence1',sentence2=None,labels='labels',dataset_name='mneb/maven',task_id='maven/event',
+    pre_process=lambda d:_flatten_text(d,_maven_triggers,paired=False),metadata='metadata',complete_splits=False,
+    question='What type of event does the marked [TARGET] trigger express?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['mneb/maven']})
+empathetic_dialogues__emotion = Classification(lambda r:r['prompt'].replace('_comma_',','),labels='context',
+    dataset_name='facebook/empathetic_dialogues',task_id='empathetic-dialogues/emotion',complete_splits=False,
+    pre_process=lambda d:_unique_text_splits(d,lambda r:r['prompt'],'context'),
+    metadata=lambda r:_decision_metadata(r['conv_id'],r['conv_id']),
+    question='Which emotion did the speaker report for this personal situation?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['facebook/empathetic_dialogues'],'data_dir':'default'})
+
+
+olid__offensive = Classification('tweet',labels='subtask_a',dataset_name='christophsonntag/OLID',task_id='olid/offensive',
+    pre_process=lambda d:_unique_text_splits(d,lambda r:r['tweet'],'subtask_a'),complete_splits=False,
+    label_values={'NOT':'not offensive','OFF':'offensive'},
+    metadata=lambda r:_decision_metadata(r['id'],hashlib.sha256(r['sentence1'].encode()).hexdigest()),
+    question='Does this post contain offensive language?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['christophsonntag/OLID'],'data_dir':'1.0.0'})
+isarcasm__intended = Classification('sentence',labels='sentiment',dataset_name='viethq1906/isarcasm_2022_taskA_En',
+    task_id='isarcasm/intended',complete_splits=False,label_values={0:'not sarcastic',1:'sarcastic'},
+    pre_process=lambda d:_unique_text_splits(d.filter(lambda r:r['sentence'].strip().lower() not in ('','nan')),lambda r:' '.join(r['sentence'].split()),'sentiment'),
+    metadata=lambda r:_decision_metadata(hashlib.sha256(r['sentence1'].encode()).hexdigest(),hashlib.sha256(r['sentence1'].encode()).hexdigest()),
+    question='Did the author intend this post to be sarcastic?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['viethq1906/isarcasm_2022_taskA_En'],
+        'data_files':{'train':['train.json','validation.json'],'test':'test.json'}})
+
+
+def _magpie_records(row):
+    if row['label'] not in ('i','l') or row['confidence']<.75:return
+    context=list(row['context']);context[2]=_marked_spans(context[2],[('TARGET',a,b) for a,b in row['offsets']])
+    yield dict(sentence1='\n'.join(context),sentence2='Expression: '+row['idiom'],labels=row['label'],
+        metadata=_decision_metadata(row['id'],row['document_id'],confidence=row['confidence'],votes=row['label_distribution']))
+
+
+def _document_holdouts(dataset, column):
+    seen=set();result={}
+    for split in sorted(dataset,key=lambda s:(s=='train',s in ('validation','dev'))):
+        keys=dataset[split][column] if isinstance(column,str) else [column(r) for r in dataset[split]]
+        result[split]=dataset[split].select([i for i,key in enumerate(keys) if key not in seen])
+        seen.update(keys)
+    return DatasetDict({s:result[s] for s in dataset})
+
+
+magpie__idiomatic = Classification('sentence1','sentence2','labels',dataset_name='idioms-collaboration/magpie',
+    task_id='magpie/idiomatic',complete_splits=False,metadata='metadata',label_values={'i':'idiomatic','l':'literal'},
+    pre_process=lambda d:_flatten_text(_document_holdouts(d,'document_id'),_magpie_records),
+    question='Is the marked expression used idiomatically or literally in this context?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['idioms-collaboration/magpie']})
+
+
+def _preco_pairs(row):
+    # Both positives and negatives come from explicitly annotated coreference clusters.
+    tokens=[t for sentence in row['sentences'] for t in sentence];text=' '.join(tokens)
+    starts=[];position=0
+    for token in tokens:starts.append(position);position+=len(token)+1
+    sentence_offsets=[];position=0
+    for sentence in row['sentences']:sentence_offsets.append(position);position+=len(sentence)
+    mentions=[]
+    for cluster,values in enumerate(row['mention_clusters']):
+        for sentence,start,end in values:
+            if not 0<=start<end<=len(row['sentences'][sentence]):raise ValueError('Invalid PreCo mention')
+            a=sentence_offsets[sentence]+start;b=sentence_offsets[sentence]+end-1
+            mentions.append((starts[a],starts[b]+len(tokens[b]),cluster))
+    pairs={};history=[];previous={}
+    for a,b,cluster in sorted(mentions):
+        candidates=[previous[cluster]] if cluster in previous else []
+        negative=next((m for m in reversed(history) if m[2]!=cluster and m[1]<=a),None)
+        if negative:candidates.append(negative)
+        for c,d,other in candidates:
+            if d>a:continue
+            label='yes' if cluster==other else 'no';pairs[c,d,a,b]=label
+        previous[cluster]=(a,b,cluster);history.append((a,b,cluster))
+    for label in ('yes','no'):
+        eligible=[p for p,value in pairs.items() if value==label]
+        for c,d,a,b in sorted(eligible,key=lambda p:hashlib.sha256(f'{row["id"]}:{p}'.encode()).hexdigest())[:4]:
+            yield dict(sentence1=_marked_spans(text,[('A',c,d),('B',a,b)]),sentence2='',labels=label,
+                metadata=_decision_metadata(f'{row["id"]}:{c}:{d}:{a}:{b}',row['id'],mention_spans=[[c,d],[a,b]],sampling='up to four pairs per label per document; sha256 order'))
+
+
+preco__coreference = Classification('sentence1',sentence2=None,labels='labels',dataset_name='coref-data/preco_raw',
+    task_id='preco/coreference',pre_process=lambda d:_flatten_text(_document_holdouts(d,
+        lambda r:hashlib.sha256(' '.join(t for sentence in r['sentences'] for t in sentence).encode()).hexdigest()),_preco_pairs,paired=False),
+    metadata='metadata',complete_splits=False,
+    label_values={'no':'no','yes':'yes'},question='Do marked mentions [A] and [B] refer to the same entity in this document?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['coref-data/preco_raw']})
+
+
+def _redial_preferences(row):
+    movies={m['movieId']:m['movieName'] for m in row['movieMentions']}
+    dialogue='\n'.join(('Seeker: ' if m['senderWorkerId']==row['initiatorWorkerId'] else 'Recommender: ')+
+        re.sub(r'@(\d+)',lambda match:movies.get(match[1],match[0]),m['text']) for m in row['messages'])
+    other={q['movieId']:q for q in row['respondentQuestions']}
+    for q in row['initiatorQuestions']:
+        movie=q['movieId'];label=q['liked']
+        if movie not in movies or movie not in other or label not in (0,1,2) or other[movie]['liked']!=label:continue
+        yield dict(sentence1=dialogue,sentence2='Movie: '+movies[movie],labels=str(label),
+            metadata=_decision_metadata(f'{row["conversationId"]}:{movie}',row['conversationId'],movie_id=movie,annotation='both participants agree'))
+
+
+redial__preference = Classification('sentence1','sentence2','labels',dataset_name='community-datasets/re_dial',
+    task_id='redial/preference',pre_process=lambda d:_flatten_text(d,_redial_preferences),metadata='metadata',complete_splits=False,
+    label_values={'0':'disliked','1':'liked','2':'did not say'},
+    question='Does the seeker express liking or disliking the movie or its recommendation in text_B, or do they not say?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['community-datasets/re_dial']})
+sst5 = Classification('text',labels='label',dataset_name='SetFit/sst5',complete_splits=False,ordinal=True,score_only=True,
+    label_values={0:'very negative',1:'negative',2:'neutral',3:'positive',4:'very positive'},
+    pre_process=lambda d:_unique_text_splits(d,lambda r:r['text'],'label'),
+    metadata=lambda r:_decision_metadata(hashlib.sha256(r['sentence1'].encode()).hexdigest(),hashlib.sha256(r['sentence1'].encode()).hexdigest()),
+    question='How negative or positive is the sentiment expressed by this movie review?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['SetFit/sst5']})
+
+
+spider__aggregation = Classification('sentence1',labels='labels',dataset_name='tasksource/spider',config_name='aggregation',
+    task_id='spider/aggregation',metadata='metadata',complete_splits=False,
+    label_values={x:x for x in ('none','maximum','minimum','count','sum','average')},
+    question='Which SQL aggregation is required for the single output requested by this question?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/spider']})
+spider__column = MultipleChoice(inputs='inputs',choices_list='choices_list',labels='labels',dataset_name='tasksource/spider',config_name='column',
+    task_id='spider/column',metadata='metadata',complete_splits=False,
+    question='Which database column supplies the single output requested by this question?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/spider']})
+semcor = MultipleChoice(inputs='inputs',choices_list='choices_list',labels='labels',dataset_name='tasksource/semcor',
+    metadata='metadata',complete_splits=False,question='Which WordNet definition matches the marked [TARGET] expression in context?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/semcor']})
+streusle__noun = Classification('sentence1',labels='labels',dataset_name='tasksource/streusle',task_id='streusle/noun',
+    pre_process=lambda d:d.filter(lambda r:r['labels'].startswith('n.')),metadata='metadata',complete_splits=False,
+    question='Which noun semantic supersense describes the marked [TARGET] expression?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/streusle']})
+streusle__verb = Classification('sentence1',labels='labels',dataset_name='tasksource/streusle',task_id='streusle/verb',
+    pre_process=lambda d:d.filter(lambda r:r['labels'].startswith('v.')),metadata='metadata',complete_splits=False,
+    question='Which verb semantic supersense describes the marked [TARGET] expression?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/streusle']})

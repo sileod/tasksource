@@ -1715,5 +1715,183 @@
         ]
       }
     ]
+  },
+  {
+    "name": "SemEval 2023 Task 3",
+    "scope": "source",
+    "tasks": [],
+    "status": "deferred",
+    "reason_code": "source_access_required",
+    "reason": "The original news corpus requires registration and vetted access. Public Hub searches did not find a faithful English training copy. The original persuasion task is paragraph-level multilabel, not the proposed span classification.",
+    "evidence": [
+      "https://propaganda.math.unipd.it/semeval2023task3/",
+      "https://aclanthology.org/2023.semeval-1.317/"
+    ],
+    "checked_on": "2026-10-11",
+    "reconsider_if": "A legitimately accessible original release or faithful authorized copy with native paragraph labels and partitions.",
+    "huggingface": [],
+    "github": [],
+    "papers": [
+      "2023.semeval-1.317"
+    ],
+    "source_revisions": {},
+    "reviews": [
+      {
+        "reviewer": {
+          "kind": "model",
+          "model": "gpt-6.1-sol",
+          "model_id_source": "user-provided"
+        },
+        "checked_on": "2026-10-11",
+        "verdict": "defer",
+        "findings": "The original news corpus requires registration and vetted access. Public Hub searches did not find a faithful English training copy. The original persuasion task is paragraph-level multilabel, not the proposed span classification.",
+        "evidence": [
+          "https://propaganda.math.unipd.it/semeval2023task3/",
+          "https://aclanthology.org/2023.semeval-1.317/"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "FEVEROUS",
+    "scope": "source",
+    "tasks": [],
+    "status": "deferred",
+    "reason_code": "incomplete_evidence",
+    "reason": "Available joined Hub copies omit table headers or parts of annotated evidence, so labels cannot reliably be decided from the supplied context. Dzeniks train ID 24435 supplies team names but omits the appearances/goals columns named in the claim. KingTechnician train ID 76255 supplies only a location sentence for a multi-part refuted claim.",
+    "evidence": [
+      "https://huggingface.co/datasets/Dzeniks/feverous_3way",
+      "https://huggingface.co/datasets/KingTechnician/feverous-label-evidence"
+    ],
+    "checked_on": "2026-10-11",
+    "reconsider_if": "A faithful evidence join retaining table row/column headers and all native evidence items, audited against the original Wikipedia dump.",
+    "huggingface": [
+      "Dzeniks/feverous_3way"
+    ],
+    "github": [],
+    "papers": [
+      "arxiv:2106.05707"
+    ],
+    "source_revisions": {
+      "Dzeniks/feverous_3way": "c5bcfdb1808aef95004086a62ebe6a2d84fba449"
+    },
+    "reviews": [
+      {
+        "reviewer": {
+          "kind": "model",
+          "model": "gpt-6.1-sol",
+          "model_id_source": "user-provided"
+        },
+        "checked_on": "2026-10-11",
+        "verdict": "defer",
+        "findings": "Available joined Hub copies omit table headers or parts of annotated evidence, so labels cannot reliably be decided from the supplied context. Dzeniks train ID 24435 supplies team names but omits the appearances/goals columns named in the claim. KingTechnician train ID 76255 supplies only a location sentence for a multi-part refuted claim.",
+        "evidence": [
+          "https://huggingface.co/datasets/Dzeniks/feverous_3way",
+          "https://huggingface.co/datasets/KingTechnician/feverous-label-evidence"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "olid/targeted",
+    "scope": "task",
+    "tasks": [
+      "olid/targeted"
+    ],
+    "status": "deferred",
+    "reason_code": "ambiguous_supervision",
+    "reason": "native fine-grained label ambiguity; see task_discovery/decisions.json",
+    "evidence": [
+      {
+        "task": "olid/targeted",
+        "id": "88918",
+        "state": "@USER is the brainchild of @USER - He is playing dirty against @USER and Jen is using her ill gotten money against @USER Mailer linking Nixon to anti-Semitism was approved by top Cuomo aides URL",
+        "gold": "untargeted profanity"
+      }
+    ],
+    "checked_on": "2026-10-11",
+    "reconsider_if": "Native fine-grained label semantics or corrected annotations resolve these observed ambiguities.",
+    "huggingface": [
+      "christophsonntag/OLID"
+    ],
+    "github": [],
+    "papers": [
+      "https://aclanthology.org/N19-1144/"
+    ],
+    "source_revisions": {
+      "christophsonntag/OLID": "738a82a7b014ff63cb7b830544081daefd0c27aa"
+    },
+    "reviews": [
+      {
+        "reviewer": {
+          "kind": "model",
+          "model": "gpt-6.1-sol",
+          "model_id_source": "user-provided"
+        },
+        "checked_on": "2026-10-11",
+        "verdict": "defer",
+        "findings": "Fine-grained coarse review found native UNT row 88918 is a directed accusation without profanity; native OFF/TIN/OTH row 27540 is a neutral policy appeal. Broader offensive classification is retained, with native annotation noise noted.",
+        "evidence": [
+          {
+            "task": "olid/targeted",
+            "id": "88918",
+            "state": "@USER is the brainchild of @USER - He is playing dirty against @USER and Jen is using her ill gotten money against @USER Mailer linking Nixon to anti-Semitism was approved by top Cuomo aides URL",
+            "gold": "untargeted profanity"
+          }
+        ]
+      }
+    ],
+    "annotation": "tasksource.parked.olid__targeted"
+  },
+  {
+    "name": "olid/target",
+    "scope": "task",
+    "tasks": [
+      "olid/target"
+    ],
+    "status": "deferred",
+    "reason_code": "ambiguous_supervision",
+    "reason": "native fine-grained label ambiguity; see task_discovery/decisions.json",
+    "evidence": [
+      {
+        "task": "olid/target",
+        "id": "27540",
+        "state": "@USER @USER What difference does it make if the gun death was a “fight” or “random”! Holding parents accountable could be part of gun control legislation. Write you Congressional representatives and demand it! Until Congress deals w/ gun violence it will continue & ALL Americans are at risk!",
+        "gold": "other target"
+      }
+    ],
+    "checked_on": "2026-10-11",
+    "reconsider_if": "Native fine-grained label semantics or corrected annotations resolve these observed ambiguities.",
+    "huggingface": [
+      "christophsonntag/OLID"
+    ],
+    "github": [],
+    "papers": [
+      "https://aclanthology.org/N19-1144/"
+    ],
+    "source_revisions": {
+      "christophsonntag/OLID": "738a82a7b014ff63cb7b830544081daefd0c27aa"
+    },
+    "reviews": [
+      {
+        "reviewer": {
+          "kind": "model",
+          "model": "gpt-6.1-sol",
+          "model_id_source": "user-provided"
+        },
+        "checked_on": "2026-10-11",
+        "verdict": "defer",
+        "findings": "Fine-grained coarse review found native UNT row 88918 is a directed accusation without profanity; native OFF/TIN/OTH row 27540 is a neutral policy appeal. Broader offensive classification is retained, with native annotation noise noted.",
+        "evidence": [
+          {
+            "task": "olid/target",
+            "id": "27540",
+            "state": "@USER @USER What difference does it make if the gun death was a “fight” or “random”! Holding parents accountable could be part of gun control legislation. Write you Congressional representatives and demand it! Until Congress deals w/ gun violence it will continue & ALL Americans are at risk!",
+            "gold": "other target"
+          }
+        ]
+      }
+    ],
+    "annotation": "tasksource.parked.olid__target"
   }
 ]

@@ -182,4 +182,5 @@ def test_region_license_filter_preserves_image_terms_and_uncertainty():
                          'bapps/preference', 'spair71k/grid7'], vision=True).set_index('id').license_use
     assert uses['lvis/region'] == uses['coco/panoptic-region'] == 'non-commercial'
     assert uses['doclaynet/region'] == 'commercial'
-    assert uses['bapps/preference'] == uses['spair71k/grid7'] == 'unspecified'
+    assert uses['bapps/preference'] == 'non-commercial'
+    assert uses['spair71k/grid7'] == 'unspecified'

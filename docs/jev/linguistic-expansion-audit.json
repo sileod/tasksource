@@ -1,0 +1,857 @@
+{
+  "checked_on": "2026-10-11",
+  "reviewer": {
+    "kind": "model",
+    "model": "gpt-6.1-sol",
+    "model_id_source": "user-provided"
+  },
+  "scope": "Coarse source/recast review and one exact staged training row per accepted task; not a statistical or corpus-wide correctness estimate.",
+  "source_strategy": {
+    "direct": [
+      "mneb/maven",
+      "mneb/maven-arg",
+      "facebook/empathetic_dialogues",
+      "christophsonntag/OLID",
+      "viethq1906/isarcasm_2022_taskA_En",
+      "idioms-collaboration/magpie",
+      "coref-data/preco_raw",
+      "community-datasets/re_dial",
+      "SetFit/sst5"
+    ],
+    "repackaged": {
+      "tasksource/spider": "Native questions, parsed SQL and schemas require a pinned join; ordinary xlangai/spider rows omit the needed parsed SQL/schema.",
+      "tasksource/semcor": "Native sense keys require the matching WordNet 1.6 inventory join.",
+      "tasksource/streusle": "No usable Hub training source found; convert original versioned JSON."
+    }
+  },
+  "source_checks": {
+    "maven": {
+      "train": {
+        "verified_native_mentions": 77993,
+        "native_documents": 2913
+      },
+      "validation": {
+        "verified_native_mentions": 18904,
+        "native_documents": 710
+      },
+      "cross_maven_arg_document_overlap": {
+        "train-train": 2913,
+        "train-validation": 0,
+        "validation-train": 0,
+        "validation-validation": 710
+      }
+    },
+    "isarcasm": {
+      "isarcasm_train": {
+        "original": 3468,
+        "hub": 3468,
+        "missing": 1,
+        "extra": 1
+      },
+      "isarcasm_test": {
+        "original": 1400,
+        "hub": 1400,
+        "missing": 40,
+        "extra": 40
+      }
+    },
+    "text_overlap": {
+      "coref-data/preco_raw": {
+        "train-validation": 5
+      },
+      "community-datasets/re_dial": {
+        "test-train": 0
+      }
+    },
+    "preco_training_documents_removed": 5,
+    "isarcasm_note": "Raw string differences are trailing whitespace, plus one empty training post rendered nan. All nonempty original texts and labels match after whitespace normalization.",
+    "magpie": {
+      "train": {
+        "native": 38715,
+        "retained": 5409,
+        "removed_document_overlap": 33306
+      },
+      "validation": {
+        "native": 4840,
+        "retained": 1205,
+        "removed_document_overlap": 3635
+      },
+      "test": {
+        "native": 4840,
+        "retained": 4840,
+        "removed_document_overlap": 0
+      }
+    }
+  },
+  "mirror_provenance": {
+    "spider": {
+      "source": "https://github.com/taoyds/spider",
+      "hub_source": "minktn/spider-data",
+      "revision": "20060fadce13ab8a88c24d60dc7ad39e3eced695",
+      "configs": {
+        "aggregation": {
+          "source": "https://github.com/taoyds/spider",
+          "hub_source": "minktn/spider-data",
+          "revision": "20060fadce13ab8a88c24d60dc7ad39e3eced695",
+          "source_hashes": {
+            "tables": "61bb20aa401f03164e2d7f3b16509b7b5f79cc9c943ca7bd159046df1159e2ed",
+            "train_spider": "c43d0d72e59e1a9e1a60837da9bf70d5a6277226bdb7f634d544f380646f527a",
+            "dev": "30d64a3fccde493226df79687aed9e4a1c0129525baf44f29c0573d914d758a4"
+          },
+          "excluded": {
+            "multiple_outputs_or_set_operation": 3225,
+            "arithmetic_or_nested_aggregation": 4
+          },
+          "license": "cc-by-sa-4.0",
+          "split_policy": "native database partitions",
+          "conversion_sha256": "baea8d29ffdf8e356f9c9c75d547928a63d0f225d10c7959db43e1b174cfc4ed",
+          "excluded_group_overlap": {
+            "validation": 0,
+            "train": 0
+          },
+          "splits": {
+            "train": 4194,
+            "validation": 611
+          },
+          "label_counts": {
+            "train": {
+              "count": 890,
+              "average": 166,
+              "none": 3002,
+              "sum": 109,
+              "maximum": 24,
+              "minimum": 3
+            },
+            "validation": {
+              "count": 172,
+              "none": 380,
+              "average": 33,
+              "minimum": 6,
+              "maximum": 9,
+              "sum": 11
+            }
+          }
+        },
+        "column": {
+          "source": "https://github.com/taoyds/spider",
+          "hub_source": "minktn/spider-data",
+          "revision": "20060fadce13ab8a88c24d60dc7ad39e3eced695",
+          "source_hashes": {
+            "tables": "61bb20aa401f03164e2d7f3b16509b7b5f79cc9c943ca7bd159046df1159e2ed",
+            "train_spider": "c43d0d72e59e1a9e1a60837da9bf70d5a6277226bdb7f634d544f380646f527a",
+            "dev": "30d64a3fccde493226df79687aed9e4a1c0129525baf44f29c0573d914d758a4"
+          },
+          "excluded": {
+            "aggregated_or_wildcard_column": 1484,
+            "multiple_outputs_or_set_operation": 3225,
+            "foreign_key_equivalent_column": 371,
+            "arithmetic_or_nested_aggregation": 4
+          },
+          "license": "cc-by-sa-4.0",
+          "split_policy": "native database partitions",
+          "conversion_sha256": "baea8d29ffdf8e356f9c9c75d547928a63d0f225d10c7959db43e1b174cfc4ed",
+          "excluded_group_overlap": {
+            "validation": 0,
+            "train": 0
+          },
+          "splits": {
+            "train": 2624,
+            "validation": 326
+          },
+          "label_counts": {
+            "train": {
+              "7": 155,
+              "2": 166,
+              "8": 123,
+              "9": 157,
+              "20": 23,
+              "18": 42,
+              "1": 409,
+              "5": 168,
+              "16": 35,
+              "11": 148,
+              "3": 109,
+              "22": 48,
+              "19": 29,
+              "42": 2,
+              "45": 4,
+              "14": 68,
+              "6": 147,
+              "4": 113,
+              "10": 103,
+              "12": 88,
+              "0": 21,
+              "25": 13,
+              "29": 4,
+              "47": 2,
+              "36": 7,
+              "63": 6,
+              "53": 3,
+              "54": 2,
+              "49": 14,
+              "56": 6,
+              "13": 85,
+              "34": 7,
+              "41": 2,
+              "50": 2,
+              "26": 19,
+              "37": 8,
+              "30": 24,
+              "23": 6,
+              "17": 17,
+              "15": 57,
+              "24": 18,
+              "46": 5,
+              "27": 21,
+              "33": 12,
+              "32": 22,
+              "21": 55,
+              "40": 1,
+              "58": 4,
+              "65": 2,
+              "64": 2,
+              "38": 3,
+              "59": 1,
+              "61": 1,
+              "28": 9,
+              "185": 2,
+              "275": 2,
+              "144": 2,
+              "330": 2,
+              "209": 2,
+              "208": 2,
+              "206": 2,
+              "35": 2,
+              "75": 2,
+              "69": 2,
+              "67": 2,
+              "79": 2,
+              "48": 2
+            },
+            "validation": {
+              "9": 10,
+              "10": 28,
+              "18": 2,
+              "2": 16,
+              "8": 42,
+              "13": 2,
+              "1": 84,
+              "6": 16,
+              "3": 11,
+              "21": 2,
+              "22": 2,
+              "19": 12,
+              "17": 2,
+              "4": 24,
+              "5": 15,
+              "16": 4,
+              "15": 5,
+              "26": 2,
+              "37": 4,
+              "33": 2,
+              "11": 6,
+              "24": 4,
+              "28": 2,
+              "34": 4,
+              "52": 2,
+              "42": 2,
+              "25": 2,
+              "7": 4,
+              "0": 1,
+              "23": 10,
+              "40": 2,
+              "48": 2
+            }
+          }
+        }
+      }
+    },
+    "semcor": {
+      "source": "https://wordnet.princeton.edu/semcor",
+      "hub_source": "thesofakillers/SemCor",
+      "revision": "2db8cc29752777441ed3bed7ca97352171059550",
+      "inventory_url": "https://wordnetcode.princeton.edu/1.6/wn16.unix.tar.gz",
+      "inventory_sha256": "9fc5cbd1bc358d793364dc4659e239bb91bfdcdf9ff5e30bac76e7bb317c438d",
+      "source_hashes": {
+        "brown1": "8e9198978eb932ddb8364edd7240e0aad1a5cbbfaca7da5d6dae1843bc8c89d6",
+        "brown2": "86487e2c5652d7b97a8e144ed138382c5f6d01fe00aa32f14ec3d88b3bf61263",
+        "brownv": "ebcec3440efe881fa4cd82146f6935472fe482ecbcd20e004f2c88aa262df96f"
+      },
+      "excluded": {
+        "single_sense_or_duplicate_gloss": 42568,
+        "unresolved_or_multiple_senses": 703
+      },
+      "license": "wordnet",
+      "split_policy": "native training corpus, no evaluation data",
+      "conversion_sha256": "23bfea3f389d60e371363eebdce29e706db804acf55e989f2475d369cbbd5e61",
+      "excluded_group_overlap": {
+        "train": 0
+      },
+      "splits": {
+        "train": 190865
+      },
+      "label_counts": {
+        "train": {
+          "1": 36836,
+          "3": 12267,
+          "2": 21609,
+          "5": 15889,
+          "7": 3655,
+          "0": 64920,
+          "17": 644,
+          "6": 5251,
+          "8": 5765,
+          "10": 2816,
+          "11": 1734,
+          "13": 924,
+          "4": 10941,
+          "24": 118,
+          "9": 1908,
+          "12": 990,
+          "19": 149,
+          "37": 497,
+          "32": 409,
+          "27": 34,
+          "35": 106,
+          "16": 423,
+          "15": 274,
+          "34": 110,
+          "14": 510,
+          "31": 212,
+          "23": 182,
+          "26": 130,
+          "20": 135,
+          "18": 531,
+          "25": 108,
+          "33": 57,
+          "54": 3,
+          "28": 137,
+          "40": 18,
+          "29": 80,
+          "22": 126,
+          "21": 204,
+          "30": 97,
+          "42": 7,
+          "41": 17,
+          "47": 5,
+          "39": 10,
+          "57": 2,
+          "36": 18,
+          "38": 3,
+          "43": 4
+        }
+      }
+    },
+    "streusle": {
+      "source": "https://github.com/nert-nlp/streusle",
+      "revision": "8ba61fe4f216e7967500a862554a4fff79d25f5d",
+      "source_hashes": {
+        "train/streusle.ud_train.json": "36aef0205a6e2e154b681d7520858693a264d3c40ba7d97c089345bbd1149a22",
+        "dev/streusle.ud_dev.json": "56cc1783962ce8c9f06b7649ffdccb48cea14ee7e4a8be2e35214ffc71303e9a",
+        "test/streusle.ud_test.json": "f8144e6227db2e845cda4aa832f8d5644cb40b9e743d1dbe05663dd687d2c70c"
+      },
+      "license": "cc-by-sa-4.0",
+      "split_policy": "native review partitions",
+      "conversion_sha256": "23bfea3f389d60e371363eebdce29e706db804acf55e989f2475d369cbbd5e61",
+      "excluded_group_overlap": {
+        "test": 0,
+        "validation": 0,
+        "train": 0
+      },
+      "splits": {
+        "train": 13595,
+        "validation": 1700,
+        "test": 1683
+      },
+      "label_counts": {
+        "train": {
+          "n.POSSESSION": 299,
+          "n.COGNITION": 607,
+          "v.social": 754,
+          "n.BODY": 71,
+          "n.GROUP": 1101,
+          "v.possession": 285,
+          "v.stative": 2215,
+          "v.communication": 854,
+          "v.change": 244,
+          "n.ARTIFACT": 821,
+          "n.COMMUNICATION": 345,
+          "n.EVENT": 358,
+          "v.perception": 109,
+          "v.cognition": 936,
+          "n.PERSON": 989,
+          "n.PROCESS": 25,
+          "v.consumption": 74,
+          "n.ANIMAL": 78,
+          "n.FEELING": 34,
+          "n.NATURALOBJECT": 41,
+          "n.QUANTITY": 102,
+          "n.FOOD": 578,
+          "n.ACT": 493,
+          "v.creation": 51,
+          "v.motion": 520,
+          "n.LOCATION": 480,
+          "v.emotion": 193,
+          "n.ATTRIBUTE": 167,
+          "n.TIME": 465,
+          "v.body": 77,
+          "v.contact": 41,
+          "n.MOTIVE": 19,
+          "n.SHAPE": 6,
+          "n.STATE": 40,
+          "n.OTHER": 42,
+          "n.SUBSTANCE": 27,
+          "n.RELATION": 28,
+          "v.competition": 7,
+          "n.PHENOMENON": 16,
+          "n.PLANT": 3
+        },
+        "validation": {
+          "n.PERSON": 123,
+          "v.cognition": 68,
+          "n.ARTIFACT": 103,
+          "v.possession": 18,
+          "v.stative": 291,
+          "v.social": 90,
+          "n.POSSESSION": 27,
+          "v.motion": 46,
+          "n.FOOD": 121,
+          "n.ATTRIBUTE": 28,
+          "n.GROUP": 199,
+          "v.competition": 3,
+          "v.perception": 20,
+          "n.COGNITION": 75,
+          "n.ACT": 108,
+          "n.STATE": 5,
+          "n.EVENT": 34,
+          "v.change": 17,
+          "v.communication": 61,
+          "n.OTHER": 3,
+          "n.LOCATION": 80,
+          "n.TIME": 36,
+          "n.NATURALOBJECT": 7,
+          "v.creation": 10,
+          "n.ANIMAL": 6,
+          "n.MOTIVE": 3,
+          "n.QUANTITY": 10,
+          "n.COMMUNICATION": 43,
+          "v.emotion": 25,
+          "n.PLANT": 2,
+          "n.BODY": 7,
+          "n.SUBSTANCE": 8,
+          "n.RELATION": 5,
+          "v.body": 3,
+          "n.FEELING": 4,
+          "n.PHENOMENON": 3,
+          "v.consumption": 8
+        },
+        "test": {
+          "v.communication": 65,
+          "n.PERSON": 126,
+          "v.emotion": 26,
+          "n.LOCATION": 71,
+          "n.ACT": 123,
+          "n.GROUP": 196,
+          "v.stative": 267,
+          "n.COMMUNICATION": 46,
+          "n.FOOD": 73,
+          "v.motion": 44,
+          "n.COGNITION": 69,
+          "n.ATTRIBUTE": 33,
+          "n.EVENT": 36,
+          "v.change": 37,
+          "n.ARTIFACT": 83,
+          "n.RELATION": 2,
+          "v.social": 102,
+          "v.cognition": 99,
+          "n.POSSESSION": 28,
+          "n.STATE": 7,
+          "n.PHENOMENON": 4,
+          "v.perception": 17,
+          "v.consumption": 11,
+          "n.TIME": 40,
+          "v.possession": 13,
+          "n.MOTIVE": 3,
+          "n.NATURALOBJECT": 8,
+          "n.BODY": 12,
+          "v.contact": 7,
+          "n.OTHER": 4,
+          "n.QUANTITY": 13,
+          "n.ANIMAL": 4,
+          "v.creation": 5,
+          "n.PROCESS": 1,
+          "v.competition": 1,
+          "n.FEELING": 3,
+          "v.body": 3,
+          "n.SUBSTANCE": 1
+        }
+      }
+    }
+  },
+  "reviews": [
+    {
+      "task": "maven-arg/role",
+      "verdict": "retain_with_native_annotation_caveat",
+      "findings": "The marked himself refers to Michael Monsoor, the recipient/winner of the award. Original event-cluster annotations propagate arguments to coreferent trigger/argument mentions. Complete Hub/original span comparison is in maven-arg-source-audit.json.",
+      "reviewer": {
+        "kind": "model",
+        "model": "gpt-6.1-sol",
+        "model_id_source": "user-provided"
+      },
+      "sample": {
+        "id": "maven-arg:train:8f1bdffff7ace03ea83a9b82f5774614eefe1d29505db12d2bd10032231c36c0:Award:1116:1123:1209:1216:maven-arg-role-0ec984a411",
+        "split": "train",
+        "state": "text_A: The Battle of Ramadi in 2006 ( sometimes referred to as the Second Battle of Ramadi ) was fought during the Iraq War from March 2006 to November 2006 , for control of the capital of the Al Anbar Governorate in western Iraq . A combined force of U.S . Soldiers , U.S. Marines , U.S. Navy SEALs , and Iraqi Security Forces fought insurgents for control of key locations in Ramadi , including the Government Centre and the General Hospital . Coalition strategy relied on establishing a number of patrol bases called Combat Operation Posts throughout the city . U.S. military officers believe that insurgent actions during the battle led to the formation of the Anbar Awakening . In August , insurgents executed a tribal sheik who was encouraging his kinsmen to join the Iraqi police and prevented his body from being buried in accordance with Islamic laws . In response , Sunni sheiks banded together to drive insurgents from Ramadi . In September 2006 , Sheik Abdul Sattar Abu Risha formed the Anbar Salvation Council , an alliance of approximately 40 Sunni tribes . U.S. Navy SEAL Michael A. Monsoor was posthumously [TRIGGER]awarded[/TRIGGER] the Medal of Honor for actions during the battle . On September 29 , 2006 , he threw [ARGUMENT]himself[/ARGUMENT] upon a grenade which threatened the lives of the other members of his team . Monsoor had previously been awarded the Silver Star in May for rescuing an injured comrade in the city . The battle also marked the first use of chlorine bombs by insurgents during the war . On October 21 , 2006 , insurgents detonated a car-bomb with two 100-pound chlorine tanks , injuring three Iraqi policemen and a civilian in Ramadi .\ntext_B: Event type: Award",
+        "instructions": "What semantic role does [ARGUMENT] play in the event marked [TRIGGER], given the event type in text_B?",
+        "gold": [
+          "Winner"
+        ],
+        "recast_sha256": "048df5dcb517ee4468e978806e2ea46d8e1f65d7957f41d31355dcff7e385ffd"
+      },
+      "provenance": {
+        "dataset": "mneb/maven-arg",
+        "revision": "f7f8764f69c13d2dc823a92e0dfd2649b207f3db"
+      }
+    },
+    {
+      "task": "maven/event",
+      "verdict": "retain_with_native_annotation_caveat",
+      "findings": "Launching the network is the marked event; Process start is consistent. All 96,897 native event mentions retain their sentence and event type. Hub trigger strings use actual surface case rather than occasionally lowercased native trigger_word values.",
+      "reviewer": {
+        "kind": "model",
+        "model": "gpt-6.1-sol",
+        "model_id_source": "user-provided"
+      },
+      "sample": {
+        "id": "maven:train:d38800a7fd390958cfb0e50b3327c748de67584d6ef7a5253d4368c83b019c4b:26:32:maven-event-8d5cbef5ad",
+        "split": "train",
+        "state": "In October 2017, with the [TARGET]launch[/TARGET] of the Global Wrestling Network, the event became available to stream on demand.",
+        "instructions": "What type of event does the marked [TARGET] trigger express?",
+        "gold": [
+          "Process start"
+        ],
+        "recast_sha256": "7491e39f522b13039af5785a980e940a479605edfea62b76a968e9245288d5cb"
+      },
+      "provenance": {
+        "dataset": "mneb/maven",
+        "revision": "c66136ce40fd2fa2efc245bbdbcf45f148d0c2bc"
+      }
+    },
+    {
+      "task": "empathetic-dialogues/emotion",
+      "verdict": "retain_with_native_annotation_caveat",
+      "findings": "The speaker says being laid off will destroy them, consistent with self-reported devastated. One prompt per unique situation; dialogue replies are not mislabeled as having the speaker emotion. Fine-grained self-reports remain subjective.",
+      "reviewer": {
+        "kind": "model",
+        "model": "gpt-6.1-sol",
+        "model_id_source": "user-provided"
+      },
+      "sample": {
+        "id": "empathetic-dialogues:train:hit:4919_conv:9838:empathetic-dialogues-emotion-43477c5a09",
+        "split": "train",
+        "state": "I just got laid off from my job! I am floored! This will destroy me!",
+        "instructions": "Which emotion did the speaker report for this personal situation?",
+        "gold": [
+          "devastated"
+        ],
+        "recast_sha256": "822143184f382ab16eb502e8207c182f193154514ddf3172693d0cf148a73093"
+      },
+      "provenance": {
+        "dataset": "facebook/empathetic_dialogues",
+        "revision": "d5b57ae707b0b9a384af8ed50c043c608d597ca7"
+      }
+    },
+    {
+      "task": "olid/offensive",
+      "verdict": "retain_with_native_annotation_caveat",
+      "findings": "The inspected pharmacist/price-fixing post contains no clear insult or profanity, consistent with not offensive. Native crowd labels have noise; two fine-grained views are withheld after the recorded contradictions.",
+      "reviewer": {
+        "kind": "model",
+        "model": "gpt-6.1-sol",
+        "model_id_source": "user-provided"
+      },
+      "sample": {
+        "id": "olid:train:71629:olid-offensive-8e9f038aed",
+        "split": "train",
+        "state": "@USER My pharmacist is a friend and he told me ALL about it last year!  THANK YOU for opening discussing how pharmacists are being held hostage rather than tell WE THE PEOPLE about the price fixes! #MAGA",
+        "instructions": "Does this post contain offensive language?",
+        "gold": [
+          "not offensive"
+        ],
+        "recast_sha256": "c3cbfc03a11dfd8f5c66069c2f95d6a51e2dc9ca03d691982dadc4e5b16bfd50"
+      },
+      "provenance": {
+        "dataset": "christophsonntag/OLID",
+        "revision": "738a82a7b014ff63cb7b830544081daefd0c27aa"
+      }
+    },
+    {
+      "task": "isarcasm/intended",
+      "verdict": "retain_with_native_annotation_caveat",
+      "findings": "The inspected post makes a serious conflict-of-interest argument, consistent with author-labeled not sarcastic. Author-intended sarcasm is not always uniquely recoverable without social context. Explicit files recover native training and 1,400 test records, omitting 23 custom test rows and one originally empty training post rendered nan by the Hub conversion.",
+      "reviewer": {
+        "kind": "model",
+        "model": "gpt-6.1-sol",
+        "model_id_source": "user-provided"
+      },
+      "sample": {
+        "id": "isarcasm:train:0392193dded96b0cce8a54f5784e3b46baf95ce6c7f5b6d45d3c50b8ed9b62e6:isarcasm-intended-f887888ebe",
+        "split": "train",
+        "state": "@NicelySpunch @Ayjchan @NateSilver538 Also, invitations to academic conferences are pretty much never viewed as COIs. Neither is having once co-authored a paper with someone who worked at a different place who worked with someone else.",
+        "instructions": "Did the author intend this post to be sarcastic?",
+        "gold": [
+          "not sarcastic"
+        ],
+        "recast_sha256": "3094cf130ac4a5ba13340aba67be1bd180ecf8f7a14e85ed988c47e1bc9db9b6"
+      },
+      "provenance": {
+        "dataset": "viethq1906/isarcasm_2022_taskA_En",
+        "revision": "5f0b1c17c4f023b9bd7ea2159d12879a46b02d90"
+      }
+    },
+    {
+      "task": "magpie/idiomatic",
+      "verdict": "retain_with_native_annotation_caveat",
+      "findings": "Act of God is used as a fixed legal expression, consistent with idiomatic. Native discontinuous token offsets, surrounding sentences and crowd confidence are retained. Source idiom interpretations can be debatable.",
+      "reviewer": {
+        "kind": "model",
+        "model": "gpt-6.1-sol",
+        "model_id_source": "user-provided"
+      },
+      "sample": {
+        "id": "magpie:train:27942:magpie-idiomatic-9964397cb2",
+        "split": "train",
+        "state": "text_A: While temporarily unloaded from any of the said vehicles in the course of a journey for a period of up to 72 hours ( not counting Sunday or any Public Holiday ) anywhere in England Scotland or Wales .\nA haulier can make it a condition that he incurs no liability under these circumstances :\n[TARGET]act[/TARGET] [TARGET]of[/TARGET] [TARGET]God[/TARGET]\nact of war or civil war\nseizure under legal process\ntext_B: Expression: act of God",
+        "instructions": "Is the marked expression used idiomatically or literally in this context?",
+        "gold": [
+          "idiomatic"
+        ],
+        "recast_sha256": "6f808efecac74b5de36b3e5fec67d0af46e935e4d5476b146be9f64b2e39fed9"
+      },
+      "provenance": {
+        "dataset": "idioms-collaboration/magpie",
+        "revision": "57bbec065c99f38e33a138427bc66a2f04db9fbd"
+      }
+    },
+    {
+      "task": "preco/coreference",
+      "verdict": "retain_with_native_annotation_caveat",
+      "findings": "Marked We and our both refer to the article narrators. Positive and negative pairs come from explicit coreference clusters, including native singleton mentions; no negatives are inferred from missing annotations. Five training copies of validation documents are removed before flattening.",
+      "reviewer": {
+        "kind": "model",
+        "model": "gpt-6.1-sol",
+        "model_id_source": "user-provided"
+      },
+      "sample": {
+        "id": "preco:train:train_33125:682:684:1471:1474:preco-coreference-accae63779",
+        "split": "train",
+        "state": "This week in our Foreign Student Series , we talk about getting an American education online . A student named Hendra has written to us from Indonesia asking about a good online university . Finding the right online program requires research . Talking to advisers and recruiters can help . Keep in mind , though , that they might have a financial interest to direct you to certain programs .   The Council on Higher Education Accreditation ( CHEA ) recognizes a group in Washington , D.C. , to accredit schools that offer distance learning . One hundred and ten programs in the United States and six other countries are accredited by the Distance Education and Training Council .   [A]We[/A] asked the executive director , Michael Lambert , for advice on choosing a distance learning program . He says the first thing is to go on the CHEA website to find if a school is accredited . The address is c-h-e-a dot o-r-g. Next , make sure the school offers what you need . Do you need a degree , or will a certificate or license be enough ?   Another consideration is cost . Often the published price does not include all the costs-like books . Technology requirements can also add to the costs . Will you need to get new software or a high-speed Internet connection or even a new computer to take the classes you want ?   Also , consider the level of interaction that an online program offers . You might never meet the teacher or other students in person .   Finally , and this is [B]our[/B] own advice , find out what others say on the Internet for comments or news stories about schools that interest you . Just remember that what people say is not always fair or true .",
+        "instructions": "Do marked mentions [A] and [B] refer to the same entity in this document?",
+        "gold": [
+          "yes"
+        ],
+        "recast_sha256": "ed1395683d1ba67ac6432a8934931f18bead3858ae18871a6e27312f966cd4a6"
+      },
+      "provenance": {
+        "dataset": "coref-data/preco_raw",
+        "revision": "02c8ffedb9d0b49168809a572ff553c2f6f9f7ca"
+      }
+    },
+    {
+      "task": "redial/preference",
+      "verdict": "retain_with_native_annotation_caveat",
+      "findings": "The seeker explicitly says they liked the recommendations, including The Break-Up, consistent with liked. Movie IDs are resolved to names; both participants agree on the preference label. The judgment can concern a recommendation rather than having watched the movie.",
+      "reviewer": {
+        "kind": "model",
+        "model": "gpt-6.1-sol",
+        "model_id_source": "user-provided"
+      },
+      "sample": {
+        "id": "redial:train:3807:157758:redial-preference-abcdfcb676",
+        "split": "train",
+        "state": "text_A: Seeker: Hello\nRecommender: Hi, what genre can I suggest?\nSeeker: I think maybe something funny.\nSeeker: If you know any of those.\nRecommender: Sure have you seen Bad Words  (2013) ? It's a good one with Jason Bateman\nSeeker: I have not.\nRecommender: Another one with him in it is Switch  (2013)\nSeeker: I seen that one, with Rachel from Friends.\nRecommender: Yes\nRecommender: He is also in Juno (2007). I thought that one was pretty funny. Have you seen it?\nSeeker: I have seen that too. I liked it.\nSeeker: You have good ones so far.\nRecommender: If you like Jennifer Aniston you may like The Break-Up (2006)\nSeeker: I have not seen that one in some time.\nRecommender: Or Horrible Bosses (2011) and Horrible Bosses 2 (2014)\nSeeker: I have not seen either.\nSeeker: Well, I am all set to watch and laugh. Thank you so much!\nRecommender: You should! Did you liked my suggestions?\nSeeker: Good bye!\nSeeker: I did like them!\ntext_B: Movie: The Break-Up (2006)",
+        "instructions": "Does the seeker express liking or disliking the movie or its recommendation in text_B, or do they not say?",
+        "gold": [
+          "liked"
+        ],
+        "recast_sha256": "2b4f46f8bc688a9a92b1e1d57442b4fa18babff916f536aa5c1c0c3607953916"
+      },
+      "provenance": {
+        "dataset": "community-datasets/re_dial",
+        "revision": "eb588549012bdebd7283d5cb0ca86057f62d6832"
+      }
+    },
+    {
+      "task": "sst5",
+      "verdict": "retain_with_native_annotation_caveat",
+      "findings": "Long, slow and dreary conveys negative sentiment. The five native ordered labels are preserved and emitted as score decisions; adjacent intensity grades remain subjective.",
+      "reviewer": {
+        "kind": "model",
+        "model": "gpt-6.1-sol",
+        "model_id_source": "user-provided"
+      },
+      "sample": {
+        "id": "sst5:train:e6a5aebf1977e160ab177a0740deff54f8bda1d9d897c39feb12f78088ce3c4d:sst5-8c7f913277",
+        "split": "train",
+        "state": "it takes a really long , slow and dreary time to dope out what tuck everlasting is about .",
+        "instructions": "How negative or positive is the sentiment expressed by this movie review?",
+        "gold": [
+          "negative"
+        ],
+        "recast_sha256": "dfc05941a5e58700ac941ee74474353e8d21e3a7e2cc7ce92e620eb05dd78dfd"
+      },
+      "provenance": {
+        "dataset": "SetFit/sst5",
+        "revision": "e51bdcd8cd3a30da231967c1a249ba59361279a3"
+      }
+    },
+    {
+      "task": "spider/aggregation",
+      "verdict": "retain_with_native_annotation_caveat",
+      "findings": "Listing product names sorted by price does not aggregate the selected output, consistent with none. Only a single SQL output is used; query text is excluded from input.",
+      "reviewer": {
+        "kind": "model",
+        "model": "gpt-6.1-sol",
+        "model_id_source": "user-provided"
+      },
+      "sample": {
+        "id": "spider:train:ed6650e152e77953f2c326af2ffe3a63e73abc92dc9fde397fffd9e5d812d0ce:spider-aggregation-2d9a2a92e0",
+        "split": "train",
+        "state": "Question: List the name of products in ascending order of price.\nDatabase columns:\nall rows (*) (text)\nAddresses.Address_ID (number)\nAddresses.address_details (text)\nLocations.Location_ID (number)\nLocations.Other_Details (text)\nProducts.Product_ID (number)\nProducts.Product_Type_Code (text)\nProducts.Product_Name (text)\nProducts.Product_Price (number)\nParties.Party_ID (number)\nParties.Party_Details (text)\nAssets.Asset_ID (number)\nAssets.Other_Details (text)\nChannels.Channel_ID (number)\nChannels.Other_Details (text)\nFinances.Finance_ID (number)\nFinances.Other_Details (text)\nEvents.Event_ID (number)\nEvents.Address_ID (number)\nEvents.Channel_ID (number)\nEvents.Event_Type_Code (text)\nEvents.Finance_ID (number)\nEvents.Location_ID (number)\nProducts_in_Events.Product_in_Event_ID (number)\nProducts_in_Events.Event_ID (number)\nProducts_in_Events.Product_ID (number)\nParties_in_Events.Party_ID (number)\nParties_in_Events.Event_ID (number)\nParties_in_Events.Role_Code (text)\nAgreements.Document_ID (number)\nAgreements.Event_ID (number)\nAssets_in_Events.Asset_ID (number)\nAssets_in_Events.Event_ID (number)",
+        "instructions": "Which SQL aggregation is required for the single output requested by this question?",
+        "gold": [
+          "none"
+        ],
+        "recast_sha256": "76b0e991bc1a92e1c027855065c0f44668b2c670fc12db118084af782397860e"
+      },
+      "provenance": {
+        "dataset": "tasksource/spider",
+        "config": "aggregation",
+        "revision": "0bbb0290a7e97815766e71b78444bf98af9636fe",
+        "originals": [
+          "minktn/spider-data"
+        ]
+      }
+    },
+    {
+      "task": "spider/column",
+      "verdict": "retain_with_native_annotation_caveat",
+      "findings": "The question explicitly requests aircraft names, consistent with aircraft.name after option permutation. Equivalent foreign-key target columns are excluded; native schema column names and types remain visible.",
+      "reviewer": {
+        "kind": "model",
+        "model": "gpt-6.1-sol",
+        "model_id_source": "user-provided"
+      },
+      "sample": {
+        "id": "spider:train:28421f439c69a8e10e8b7b8cbcb48f758fabad0405b65007df744571a2b2b3cc:spider-column-f91d3c3c69",
+        "split": "train",
+        "state": "Question: Show the name of aircraft which fewest people have its certificate.\nDatabase columns:\nall rows (*) (text)\nflight.flno (number)\nflight.origin (text)\nflight.destination (text)\nflight.distance (number)\nflight.departure_date (time)\nflight.arrival_date (time)\nflight.price (number)\nflight.aid (number)\naircraft.aid (number)\naircraft.name (text)\naircraft.distance (number)\nemployee.eid (number)\nemployee.name (text)\nemployee.salary (number)\ncertificate.eid (number)\ncertificate.aid (number)",
+        "instructions": "Which database column supplies the single output requested by this question?",
+        "gold": [
+          "aircraft.name"
+        ],
+        "recast_sha256": "f9e15008ab1fb161cfca64ef6f3528a5b593f5fb2cf9853956d9b3e050a4d0d6"
+      },
+      "provenance": {
+        "dataset": "tasksource/spider",
+        "config": "column",
+        "revision": "0bbb0290a7e97815766e71b78444bf98af9636fe",
+        "originals": [
+          "minktn/spider-data"
+        ]
+      }
+    },
+    {
+      "task": "semcor",
+      "verdict": "retain_with_native_annotation_caveat",
+      "findings": "The marked mathematical results retain the original SemCor sense key and matching WordNet 1.6 gloss. This source example has a debatable consequence-vs-statement sense distinction; the Mr. Addison smoke example clearly selects person. Native fine-grained sense judgments are not independently relabeled. All alternative definitions come from the matching original lemma/POS inventory.",
+      "reviewer": {
+        "kind": "model",
+        "model": "gpt-6.1-sol",
+        "model_id_source": "user-provided"
+      },
+      "sample": {
+        "id": "semcor:train:br-j18:78:2:semcor-39cd8fe67a",
+        "split": "train",
+        "state": "From these [TARGET] results [/TARGET] , one sees that the study of linear operators on vector spaces over an algebraically closed field is essentially reduced to the study of nilpotent operators .",
+        "instructions": "Which WordNet definition matches the marked [TARGET] expression in context?",
+        "gold": [
+          "a phenomenon that follows and is caused by some previous phenomenon; \"the magnetic effect was greater when the rod was lengthwise\"; \"his decision had depressing consequences for business\""
+        ],
+        "recast_sha256": "9af5244d3c1baff61809c8d99bc46b5149930a74fb8e90d1bc60968ef23661c4"
+      },
+      "provenance": {
+        "dataset": "tasksource/semcor",
+        "revision": "467423dd3742924c97489d95bdb48b9cd8161267",
+        "originals": [
+          "thesofakillers/SemCor"
+        ]
+      }
+    },
+    {
+      "task": "streusle/noun",
+      "verdict": "retain_with_native_annotation_caveat",
+      "findings": "Travels the world uses world as a location, consistent with n.LOCATION. Marked multiword expressions may be discontinuous; noun/verb views exclude adposition role/function annotations.",
+      "reviewer": {
+        "kind": "model",
+        "model": "gpt-6.1-sol",
+        "model_id_source": "user-provided"
+      },
+      "sample": {
+        "id": "streusle:train:reviews-187266-0002:21:streusle-noun-52b85e0624",
+        "split": "train",
+        "state": "We were introduced to Bistro Tallulah by traveler - professional diner who happens to own the Adelphi Hotel and travels the [TARGET] world [/TARGET] -- and residing in Paris , London , New York the rest of the year .",
+        "instructions": "Which noun semantic supersense describes the marked [TARGET] expression?",
+        "gold": [
+          "n.LOCATION"
+        ],
+        "recast_sha256": "201212d626b08462fe66e125b1fde86b4b7bbf997daa0f95504bf8cb5a52492d"
+      },
+      "provenance": {
+        "dataset": "tasksource/streusle",
+        "revision": "12db34cd5f2ece8e64a7b39a37243d378dd1a906"
+      }
+    },
+    {
+      "task": "streusle/verb",
+      "verdict": "retain_with_native_annotation_caveat",
+      "findings": "Copular is expresses a state, consistent with v.stative. Native supersenses and review-level partitions are preserved.",
+      "reviewer": {
+        "kind": "model",
+        "model": "gpt-6.1-sol",
+        "model_id_source": "user-provided"
+      },
+      "sample": {
+        "id": "streusle:train:reviews-191666-0007:8:streusle-verb-a0c3451407",
+        "split": "train",
+        "state": "The invoice is not detailed , so it [TARGET] is [/TARGET] difficult to see what you are paying for .",
+        "instructions": "Which verb semantic supersense describes the marked [TARGET] expression?",
+        "gold": [
+          "v.stative"
+        ],
+        "recast_sha256": "530e261089b26ba1ec1896c7f4e7bfbab2b606477543677239da2fc8eb554057"
+      },
+      "provenance": {
+        "dataset": "tasksource/streusle",
+        "revision": "12db34cd5f2ece8e64a7b39a37243d378dd1a906"
+      }
+    }
+  ],
+  "deferred": [
+    "SemEval 2023 Task 3: vetted source access and faithful paragraph multilabel annotations required.",
+    "OLID targeted/target: observed fine-grained native annotation ambiguities.",
+    "FEVEROUS (earlier batch): available joins omit necessary table/evidence context."
+  ],
+  "export": {
+    "configs": [
+      "default",
+      "full"
+    ],
+    "splits": {
+      "train": 14000,
+      "validation": 1000,
+      "test": 800
+    },
+    "manifest": "additions/a9a3d118186b/manifest.json"
+  }
+}

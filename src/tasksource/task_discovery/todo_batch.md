@@ -12,7 +12,7 @@ MAUD (six views), ACORD, Evidence Inference, DDI, Hallmarks of Cancer, Patent Cl
 
 | Source | Requested views | Status / remaining checks |
 |---|---|---|
-| FEVEROUS | Evidence-conditioned supports/refutes/NEI | Pending faithful evidence/table join and native split verification; heavy preparation may need a mirror |
+| FEVEROUS | Evidence-conditioned supports/refutes/NEI | Deferred: available Hub evidence joins omit necessary table columns/context; concrete examples and reconsideration condition recorded in `decisions.json` |
 | HateXplain | Majority classification; optional votes | Majority view published; existing vote view retained |
 | QuAC | Answerability, yes/no/neither, follow-up | Answerability published; yes/no and follow-up deferred after ambiguous native labels in coarse review |
 | SLURP | Intent; possible slot tagging | Text-only mirror and 60-class scenario/action intent published; slots pending |
@@ -40,23 +40,27 @@ Eleven views across batches 2–3 were added to Jev `default` and `full` in [Hub
 
 Five further views were published to Jev `default` and `full` in [Hub commit 71f31c69](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/commit/71f31c69db4325a92f8639093362578b696ba62f): FNC-1 stance, PERSPECTRUM stance, UKPConvArg convincingness, DiscoGeM relation votes and PubMed RCT role. Added 4,998 train / 300 validation / 500 test rows; previous Parquet blobs were preserved. [Source and final-export review](../../../docs/jev/stance-expansion-audit.json) records examples, native label caveats, source revisions and reviewer identity. Git implementation: `c4d35fb`; regression checks: 205 passed, 44 skipped. VAST and UKP Sentential are deferred with source-indexed reasons in `decisions.json`; they were not added to training.
 
-## Batch 4 — queued after the earlier batches
+## Batch 4 — reviewed; accepted views staged for publication
 
-| Source | Requested views | Checks before integration |
+12 accepted sources, 14 training views. Nine sources load directly from existing Hub repositories; only Spider (schema join), SemCor (matching WordNet 1.6 inventory) and STREUSLE (original JSON) require repackaging. [Source and exact-export audit](../../../docs/jev/linguistic-expansion-audit.json) records native annotation caveats, sampled rows, pins, reviewer identity and split checks.
+
+| Source | Requested views | Status / remaining checks |
 |---|---|---|
-| MAVEN | Sentence + marked trigger → event type | Prioritize; verify trigger spans, native document splits and ontology |
-| EmpatheticDialogues | Speaker situation → emotion | Verify situation labels; group by conversation |
-| Spider | SQL aggregation/structure; native column selection | Prioritize; join original schemas without exposing gold SQL in inputs |
-| OLID | Offensive, targeted, target type | Preserve hierarchical eligibility and native available labels |
-| iSarcasmEval | Author-intended sarcasm | Verify original English train CSV and terms |
-| SemCor | WordNet sense-definition selection | Repackage pinned sense inventory; verify spans and native alternatives |
-| MAGPIE | Idiomatic/literal use | Verify native filtered train/dev/test; likely mirror |
-| PreCo | Mention-pair coreference | Verify native mentions/clusters; do not infer negatives from missing annotation |
-| ReDial | Movie-conditioned human judgments | Join native movie annotations; preserve dialogue splits |
-| MAVEN-Arg | Event-conditioned argument role | Direct `mneb/maven-arg` mapping implemented; all 3,623 documents and 466,720 expanded argument spans match the original, native splits are document-disjoint. No mirror needed; Jev publication pending. [Audit](../../../docs/jev/maven-arg-source-audit.json) |
-| SemEval 2023 Task 3 | Annotated persuasion techniques | Verify span/multilabel projection and original article partitions |
-| STREUSLE | Marked expression → supersense | Verify multiword spans, inventory and native splits |
-| SST-5 | Five-level sentence sentiment | Check existing coverage and faithful sentence-level native partitions |
+| MAVEN | Sentence + marked trigger → event type | Direct `mneb/maven`; all 96,897 native event mentions verified by sentence/type; original document partitions match MAVEN-Arg |
+| EmpatheticDialogues | Speaker situation → emotion | Direct canonical Parquet export; one unique situation, speaker-reported label; duplicate/conflicting prompts excluded |
+| Spider | SQL aggregation and column selection | Native parsed-SQL/schema join; two views; no gold SQL in input; multi-output/arithmetic/set operations and equivalent foreign-key column targets excluded |
+| OLID | Offensive, targeted, target type | Direct canonical Parquet export; offensive view retained; targeted/target parked after ambiguous native rows 88918 and 27540 |
+| iSarcasmEval | Author-intended sarcasm | Direct English Hub copy with explicit files restoring original train/test; excludes custom test file and one empty post converted to nan |
+| SemCor | WordNet sense-definition selection | Native keys joined to WordNet 1.6; 190,865 eligible training examples; no fabricated evaluation partitions |
+| MAGPIE | Idiomatic/literal use | Direct filtered Hub source; native offsets/context/confidence; shared documents assigned to holdouts; original CC BY 4.0 evidence recorded |
+| PreCo | Mention-pair coreference | Direct native clusters; bounded deterministic positive/negative pairs from explicit annotations; five train copies of validation documents removed |
+| ReDial | Movie-conditioned human judgments | Direct native dialogues; movie names resolved; seeker preference labels require agreement by both participants |
+| MAVEN-Arg | Event-conditioned argument role | Direct `mneb/maven-arg`; all 3,623 documents and 466,720 expanded argument spans match the original. [Detailed audit](../../../docs/jev/maven-arg-source-audit.json) |
+| SemEval 2023 Task 3 | Annotated persuasion techniques | Deferred: vetted source access required; native task is paragraph-level multilabel. Source-indexed reason recorded in `decisions.json` |
+| STREUSLE | Marked expression → supersense | Original versioned JSON; noun and verb views, including discontinuous expressions; native review partitions |
+| SST-5 | Five-level sentence sentiment | Direct `SetFit/sst5`; native splits with duplicate/conflicting texts excluded; ordered score-only decisions |
+
+The staged pilot contains 14,000 train, 1,000 validation and 800 test rows for Jev `default` and `full` (up to 1,000 train and 100 per existing evaluation split per task). Publication status is updated after the Hub commit is verified.
 
 ## Selection rules
 

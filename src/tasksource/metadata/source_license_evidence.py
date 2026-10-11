@@ -5,6 +5,8 @@ Keys are task families, shared by their visual classification/MC views.
 """
 
 SOURCE_LICENSE_EVIDENCE = {
+    'magpie': {'license': 'cc-by-4.0', 'scope': 'original MAGPIE corpus; Hub card incorrectly says MIT',
+               'url': 'https://github.com/hslh/magpie-corpus/blob/master/LICENSE'},
     'ukpconvarg': {'license': 'cc-by-4.0', 'scope': 'original Strict argument-pair distribution',
                    'url': 'https://github.com/UKPLab/acl2016-convincing-arguments/blob/master/data/readme.txt'},
     'perspectrum': {'license': 'cc-by-sa-4.0', 'scope': 'original dataset distribution',
@@ -24,6 +26,12 @@ SOURCE_LICENSE_EVIDENCE = {
 # Scoped review: a permissive annotation/repository license cannot clear photos.
 # ``license_use`` applies conservatively to the complete image + annotation row.
 SOURCE_LICENSE_REVIEWS = {
+    'preco': {
+        'checked': '2026-10-11', 'license_use': 'non-commercial', 'status': 'partial',
+        'annotations': {'license': 'research purposes', 'scope': 'original dataset distribution'},
+        'url': 'https://preschool-lab.github.io/PreCo/',
+        'unresolved': 'Research-use statement is not a standard redistribution license.',
+    },
     'aokvqa': {
         'license_use': 'unspecified', 'status': 'partial',
         'annotations': {'license': 'apache-2.0', 'scope': 'original dataset repository',

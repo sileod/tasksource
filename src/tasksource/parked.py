@@ -14,6 +14,23 @@ from .access import parse_var_name
 from .metadata.configs import UNIVERSAL_DEPENDENCIES
 from .preprocess import Preprocessing, VisualClassification, constant, get, Classification, TokenClassification, MultipleChoice
 
+from .metadata.source_revisions import SOURCE_REVISIONS
+from .tasks import _document_holdouts, _unique_text_splits, _decision_metadata
+import hashlib
+
+olid__targeted = Classification('tweet',labels='subtask_b',dataset_name='christophsonntag/OLID',task_id='olid/targeted',
+    pre_process=lambda d:_unique_text_splits(_document_holdouts(d,'tweet').filter(lambda r:r['subtask_a']=='OFF' and r['subtask_b'] in ('TIN','UNT')),lambda r:r['tweet'],'subtask_b'),
+    complete_splits=False,label_values={'TIN':'targeted insult or threat','UNT':'untargeted profanity'},
+    metadata=lambda r:_decision_metadata(r['id'],hashlib.sha256(r['sentence1'].encode()).hexdigest()),
+    question='Is the offensive language a targeted insult or threat, or untargeted profanity?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['christophsonntag/OLID'],'data_dir':'1.0.0'})
+olid__target = Classification('tweet',labels='subtask_c',dataset_name='christophsonntag/OLID',task_id='olid/target',
+    pre_process=lambda d:_unique_text_splits(_document_holdouts(d,'tweet').filter(lambda r:r['subtask_b']=='TIN' and r['subtask_c'] in ('IND','GRP','OTH')),lambda r:r['tweet'],'subtask_c'),
+    complete_splits=False,label_values={'IND':'individual','GRP':'group','OTH':'other target'},
+    metadata=lambda r:_decision_metadata(r['id'],hashlib.sha256(r['sentence1'].encode()).hexdigest()),
+    question='Does the targeted offensive language attack an individual, a group, or another target such as an organization?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['christophsonntag/OLID'],'data_dir':'1.0.0'})
+
 # duplicate of glue/rte
 super_glue___rte = Classification(sentence1="premise", sentence2="hypothesis", labels="label")
 
@@ -166,6 +183,8 @@ KINDS = {
 }
 
 PARKED = {
+    'olid__targeted': ('unsound', 'native fine-grained label ambiguity; see task_discovery/decisions.json'),
+    'olid__target': ('unsound', 'native fine-grained label ambiguity; see task_discovery/decisions.json'),
     "snli_ve": ("unsound", "caption-derived SNLI labels are not image-grounded; neutral evaluation pairs were reannotated, but this training source is uncorrected; hypothesis-only artifacts remain"),
     'xglue__ner': ('duplicate', 'repackages CoNLL-2002/2003 NER, which conll2002 (es, nl) and conll2003 (en) cover; the German part is not openly licensed; script-only'),
     'xglue__pos': ('duplicate', 'repackages Universal Dependencies POS, which udep__pos covers; script-only'),

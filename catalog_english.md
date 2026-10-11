@@ -1,4 +1,4 @@
-551 English tasks. Load one with `load_task(id)`; the annotations are in [tasks.py](src/tasksource/tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
+564 English tasks. Load one with `load_task(id)`; the annotations are in [tasks.py](src/tasksource/tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
 
 | # | id | type | dataset | question |
 |--:|---|---|---|:-:|
@@ -508,51 +508,64 @@
 | 504 | [sentfin](src/tasksource/tasks.py#L2510) | Classification | [tasksource/sentfin](https://hf.co/datasets/tasksource/sentfin) | ✓ |
 | 505 | [wands](src/tasksource/tasks.py#L2514) | Classification | [tasksource/wands](https://hf.co/datasets/tasksource/wands) | ✓ |
 | 506 | [scirepeval/search](src/tasksource/tasks.py#L2518) | Classification | [tasksource/scirepeval-search](https://hf.co/datasets/tasksource/scirepeval-search) | ✓ |
-| 507 | [maud/consideration](src/tasksource/tasks.py#L2569) | Classification | [theatticusproject/maud](https://hf.co/datasets/theatticusproject/maud) | ✓ |
-| 508 | [maud/bringdown-timing](src/tasksource/tasks.py#L2573) | Classification | [theatticusproject/maud](https://hf.co/datasets/theatticusproject/maud) | ✓ |
-| 509 | [maud/ordinary-course-consent](src/tasksource/tasks.py#L2577) | Classification | [theatticusproject/maud](https://hf.co/datasets/theatticusproject/maud) | ✓ |
-| 510 | [maud/ordinary-course-efforts](src/tasksource/tasks.py#L2581) | Classification | [theatticusproject/maud](https://hf.co/datasets/theatticusproject/maud) | ✓ |
-| 511 | [maud/antitrust-efforts](src/tasksource/tasks.py#L2585) | Classification | [theatticusproject/maud](https://hf.co/datasets/theatticusproject/maud) | ✓ |
-| 512 | [maud/specific-performance](src/tasksource/tasks.py#L2589) | Classification | [theatticusproject/maud](https://hf.co/datasets/theatticusproject/maud) | ✓ |
-| 513 | [ddi/relation](src/tasksource/tasks.py#L2594) | Classification | [OpenMed/DDI-Corpus-Processed](https://hf.co/datasets/OpenMed/DDI-Corpus-Processed) | ✓ |
-| 514 | [patent-classification/abstract](src/tasksource/tasks.py#L2601) | Classification | [ccdv/patent-classification](https://hf.co/datasets/ccdv/patent-classification) | ✓ |
-| 515 | [tabfact](src/tasksource/tasks.py#L2608) | Classification | [wenhu/tab_fact](https://hf.co/datasets/wenhu/tab_fact) | ✓ |
-| 516 | [infotabs](src/tasksource/tasks.py#L2616) | Classification | [table-benchmark/infotabs](https://hf.co/datasets/table-benchmark/infotabs) | ✓ |
-| 517 | [squad-v2/answerability](src/tasksource/tasks.py#L2628) | Classification | [rajpurkar/squad_v2](https://hf.co/datasets/rajpurkar/squad_v2) | ✓ |
-| 518 | [cuad/answerability](src/tasksource/tasks.py#L2633) | Classification | [theatticusproject/cuad-qa](https://hf.co/datasets/theatticusproject/cuad-qa) | ✓ |
-| 519 | [hallmarks-of-cancer/yesno](src/tasksource/tasks.py#L2652) | Classification | [bigbio/hallmarks_of_cancer](https://hf.co/datasets/bigbio/hallmarks_of_cancer) | ✓ |
-| 520 | [semeval2014-absa/restaurants](src/tasksource/tasks.py#L2674) | Classification | [alexcadillon/SemEval2014Task4](https://hf.co/datasets/alexcadillon/SemEval2014Task4) | ✓ |
-| 521 | [semeval2014-absa/laptops](src/tasksource/tasks.py#L2674) | Classification | [alexcadillon/SemEval2014Task4](https://hf.co/datasets/alexcadillon/SemEval2014Task4) | ✓ |
-| 522 | [record/candidate](src/tasksource/tasks.py#L2696) | Classification | [aps/super_glue](https://hf.co/datasets/aps/super_glue) | ✓ |
-| 523 | [multidogo/finance/intent](src/tasksource/tasks.py#L2719) | Classification | [jpcorb20/multidogo](https://hf.co/datasets/jpcorb20/multidogo) | ✓ |
-| 524 | [multidogo/fastfood/intent](src/tasksource/tasks.py#L2719) | Classification | [jpcorb20/multidogo](https://hf.co/datasets/jpcorb20/multidogo) | ✓ |
-| 525 | [multidogo/software/intent](src/tasksource/tasks.py#L2719) | Classification | [jpcorb20/multidogo](https://hf.co/datasets/jpcorb20/multidogo) | ✓ |
-| 526 | [multidogo/airline/intent](src/tasksource/tasks.py#L2719) | Classification | [jpcorb20/multidogo](https://hf.co/datasets/jpcorb20/multidogo) | ✓ |
-| 527 | [multidogo/insurance/intent](src/tasksource/tasks.py#L2719) | Classification | [jpcorb20/multidogo](https://hf.co/datasets/jpcorb20/multidogo) | ✓ |
-| 528 | [multidogo/media/intent](src/tasksource/tasks.py#L2719) | Classification | [jpcorb20/multidogo](https://hf.co/datasets/jpcorb20/multidogo) | ✓ |
-| 529 | [wikisql/aggregation](src/tasksource/tasks.py#L2747) | Classification | [Salesforce/wikisql](https://hf.co/datasets/Salesforce/wikisql) | ✓ |
-| 530 | [wikisql/column](src/tasksource/tasks.py#L2752) | MultipleChoice | [Salesforce/wikisql](https://hf.co/datasets/Salesforce/wikisql) | ✓ |
-| 531 | [wikisql/operator](src/tasksource/tasks.py#L2757) | Classification | [Salesforce/wikisql](https://hf.co/datasets/Salesforce/wikisql) | ✓ |
-| 532 | [acord](src/tasksource/tasks.py#L2762) | Classification | [tasksource/acord](https://hf.co/datasets/tasksource/acord) | ✓ |
-| 533 | [edos](src/tasksource/tasks.py#L2766) | Classification | [tasksource/edos](https://hf.co/datasets/tasksource/edos) | ✓ |
-| 534 | [evidence-inference](src/tasksource/tasks.py#L2769) | Classification | [tasksource/evidence-inference](https://hf.co/datasets/tasksource/evidence-inference) | ✓ |
-| 535 | [quac/answerability](src/tasksource/tasks.py#L2791) | Classification | [allenai/quac](https://hf.co/datasets/allenai/quac) | ✓ |
-| 536 | [hatexplain/majority](src/tasksource/tasks.py#L2799) | Classification | [Hate-speech-CNERG/hatexplain](https://hf.co/datasets/Hate-speech-CNERG/hatexplain) | ✓ |
-| 537 | [hotpotqa/supporting-fact](src/tasksource/tasks.py#L2816) | Classification | [hotpotqa/hotpot_qa](https://hf.co/datasets/hotpotqa/hotpot_qa) | ✓ |
-| 538 | [multiwoz22/dialogue-act](src/tasksource/tasks.py#L2860) | Classification | [pfb30/multi_woz_v22](https://hf.co/datasets/pfb30/multi_woz_v22) | ✓ |
-| 539 | [multiwoz22/categorical-slot](src/tasksource/tasks.py#L2863) | Classification | [pfb30/multi_woz_v22](https://hf.co/datasets/pfb30/multi_woz_v22) | ✓ |
-| 540 | [schema-guided/intent](src/tasksource/tasks.py#L2866) | Classification | [google-research-datasets/schema_guided_dstc8](https://hf.co/datasets/google-research-datasets/schema_guided_dstc8) | ✓ |
-| 541 | [coqa/yesno](src/tasksource/tasks.py#L2883) | Classification | [stanfordnlp/coqa](https://hf.co/datasets/stanfordnlp/coqa) | ✓ |
-| 542 | [qasper/yesno](src/tasksource/tasks.py#L2904) | Classification | [allenai/qasper](https://hf.co/datasets/allenai/qasper) | ✓ |
-| 543 | [topv2/intent](src/tasksource/tasks.py#L2916) | Classification | [WillHeld/top_v2](https://hf.co/datasets/WillHeld/top_v2) | ✓ |
-| 544 | [slurp/intent](src/tasksource/tasks.py#L2924) | Classification | [tasksource/slurp](https://hf.co/datasets/tasksource/slurp) | ✓ |
-| 545 | [mcscript2](src/tasksource/tasks.py#L2928) | MultipleChoice | [tasksource/mcscript2](https://hf.co/datasets/tasksource/mcscript2) |  |
-| 546 | [fnc1/stance](src/tasksource/tasks.py#L2933) | Classification | [tasksource/fnc1](https://hf.co/datasets/tasksource/fnc1) | ✓ |
-| 547 | [perspectrum/stance](src/tasksource/tasks.py#L2938) | Classification | [tasksource/perspectrum](https://hf.co/datasets/tasksource/perspectrum) | ✓ |
-| 548 | [ukpconvarg/convincingness](src/tasksource/tasks.py#L2943) | MultipleChoice | [tasksource/ukpconvarg](https://hf.co/datasets/tasksource/ukpconvarg) | ✓ |
-| 549 | [discogem/relation](src/tasksource/tasks.py#L2948) | Classification | [tasksource/discogem](https://hf.co/datasets/tasksource/discogem) | ✓ |
-| 550 | [pubmed-rct/role](src/tasksource/tasks.py#L2956) | Classification | [tasksource/pubmed-rct](https://hf.co/datasets/tasksource/pubmed-rct) | ✓ |
-| 551 | [maven-arg/role](src/tasksource/tasks.py#L2990) | Classification | [mneb/maven-arg](https://hf.co/datasets/mneb/maven-arg) | ✓ |
+| 507 | [maud/consideration](src/tasksource/tasks.py#L2570) | Classification | [theatticusproject/maud](https://hf.co/datasets/theatticusproject/maud) | ✓ |
+| 508 | [maud/bringdown-timing](src/tasksource/tasks.py#L2574) | Classification | [theatticusproject/maud](https://hf.co/datasets/theatticusproject/maud) | ✓ |
+| 509 | [maud/ordinary-course-consent](src/tasksource/tasks.py#L2578) | Classification | [theatticusproject/maud](https://hf.co/datasets/theatticusproject/maud) | ✓ |
+| 510 | [maud/ordinary-course-efforts](src/tasksource/tasks.py#L2582) | Classification | [theatticusproject/maud](https://hf.co/datasets/theatticusproject/maud) | ✓ |
+| 511 | [maud/antitrust-efforts](src/tasksource/tasks.py#L2586) | Classification | [theatticusproject/maud](https://hf.co/datasets/theatticusproject/maud) | ✓ |
+| 512 | [maud/specific-performance](src/tasksource/tasks.py#L2590) | Classification | [theatticusproject/maud](https://hf.co/datasets/theatticusproject/maud) | ✓ |
+| 513 | [ddi/relation](src/tasksource/tasks.py#L2595) | Classification | [OpenMed/DDI-Corpus-Processed](https://hf.co/datasets/OpenMed/DDI-Corpus-Processed) | ✓ |
+| 514 | [patent-classification/abstract](src/tasksource/tasks.py#L2602) | Classification | [ccdv/patent-classification](https://hf.co/datasets/ccdv/patent-classification) | ✓ |
+| 515 | [tabfact](src/tasksource/tasks.py#L2609) | Classification | [wenhu/tab_fact](https://hf.co/datasets/wenhu/tab_fact) | ✓ |
+| 516 | [infotabs](src/tasksource/tasks.py#L2617) | Classification | [table-benchmark/infotabs](https://hf.co/datasets/table-benchmark/infotabs) | ✓ |
+| 517 | [squad-v2/answerability](src/tasksource/tasks.py#L2629) | Classification | [rajpurkar/squad_v2](https://hf.co/datasets/rajpurkar/squad_v2) | ✓ |
+| 518 | [cuad/answerability](src/tasksource/tasks.py#L2634) | Classification | [theatticusproject/cuad-qa](https://hf.co/datasets/theatticusproject/cuad-qa) | ✓ |
+| 519 | [hallmarks-of-cancer/yesno](src/tasksource/tasks.py#L2653) | Classification | [bigbio/hallmarks_of_cancer](https://hf.co/datasets/bigbio/hallmarks_of_cancer) | ✓ |
+| 520 | [semeval2014-absa/restaurants](src/tasksource/tasks.py#L2675) | Classification | [alexcadillon/SemEval2014Task4](https://hf.co/datasets/alexcadillon/SemEval2014Task4) | ✓ |
+| 521 | [semeval2014-absa/laptops](src/tasksource/tasks.py#L2675) | Classification | [alexcadillon/SemEval2014Task4](https://hf.co/datasets/alexcadillon/SemEval2014Task4) | ✓ |
+| 522 | [record/candidate](src/tasksource/tasks.py#L2697) | Classification | [aps/super_glue](https://hf.co/datasets/aps/super_glue) | ✓ |
+| 523 | [multidogo/finance/intent](src/tasksource/tasks.py#L2720) | Classification | [jpcorb20/multidogo](https://hf.co/datasets/jpcorb20/multidogo) | ✓ |
+| 524 | [multidogo/fastfood/intent](src/tasksource/tasks.py#L2720) | Classification | [jpcorb20/multidogo](https://hf.co/datasets/jpcorb20/multidogo) | ✓ |
+| 525 | [multidogo/software/intent](src/tasksource/tasks.py#L2720) | Classification | [jpcorb20/multidogo](https://hf.co/datasets/jpcorb20/multidogo) | ✓ |
+| 526 | [multidogo/airline/intent](src/tasksource/tasks.py#L2720) | Classification | [jpcorb20/multidogo](https://hf.co/datasets/jpcorb20/multidogo) | ✓ |
+| 527 | [multidogo/insurance/intent](src/tasksource/tasks.py#L2720) | Classification | [jpcorb20/multidogo](https://hf.co/datasets/jpcorb20/multidogo) | ✓ |
+| 528 | [multidogo/media/intent](src/tasksource/tasks.py#L2720) | Classification | [jpcorb20/multidogo](https://hf.co/datasets/jpcorb20/multidogo) | ✓ |
+| 529 | [wikisql/aggregation](src/tasksource/tasks.py#L2748) | Classification | [Salesforce/wikisql](https://hf.co/datasets/Salesforce/wikisql) | ✓ |
+| 530 | [wikisql/column](src/tasksource/tasks.py#L2753) | MultipleChoice | [Salesforce/wikisql](https://hf.co/datasets/Salesforce/wikisql) | ✓ |
+| 531 | [wikisql/operator](src/tasksource/tasks.py#L2758) | Classification | [Salesforce/wikisql](https://hf.co/datasets/Salesforce/wikisql) | ✓ |
+| 532 | [acord](src/tasksource/tasks.py#L2763) | Classification | [tasksource/acord](https://hf.co/datasets/tasksource/acord) | ✓ |
+| 533 | [edos](src/tasksource/tasks.py#L2767) | Classification | [tasksource/edos](https://hf.co/datasets/tasksource/edos) | ✓ |
+| 534 | [evidence-inference](src/tasksource/tasks.py#L2770) | Classification | [tasksource/evidence-inference](https://hf.co/datasets/tasksource/evidence-inference) | ✓ |
+| 535 | [quac/answerability](src/tasksource/tasks.py#L2792) | Classification | [allenai/quac](https://hf.co/datasets/allenai/quac) | ✓ |
+| 536 | [hatexplain/majority](src/tasksource/tasks.py#L2800) | Classification | [Hate-speech-CNERG/hatexplain](https://hf.co/datasets/Hate-speech-CNERG/hatexplain) | ✓ |
+| 537 | [hotpotqa/supporting-fact](src/tasksource/tasks.py#L2817) | Classification | [hotpotqa/hotpot_qa](https://hf.co/datasets/hotpotqa/hotpot_qa) | ✓ |
+| 538 | [multiwoz22/dialogue-act](src/tasksource/tasks.py#L2861) | Classification | [pfb30/multi_woz_v22](https://hf.co/datasets/pfb30/multi_woz_v22) | ✓ |
+| 539 | [multiwoz22/categorical-slot](src/tasksource/tasks.py#L2864) | Classification | [pfb30/multi_woz_v22](https://hf.co/datasets/pfb30/multi_woz_v22) | ✓ |
+| 540 | [schema-guided/intent](src/tasksource/tasks.py#L2867) | Classification | [google-research-datasets/schema_guided_dstc8](https://hf.co/datasets/google-research-datasets/schema_guided_dstc8) | ✓ |
+| 541 | [coqa/yesno](src/tasksource/tasks.py#L2884) | Classification | [stanfordnlp/coqa](https://hf.co/datasets/stanfordnlp/coqa) | ✓ |
+| 542 | [qasper/yesno](src/tasksource/tasks.py#L2905) | Classification | [allenai/qasper](https://hf.co/datasets/allenai/qasper) | ✓ |
+| 543 | [topv2/intent](src/tasksource/tasks.py#L2917) | Classification | [WillHeld/top_v2](https://hf.co/datasets/WillHeld/top_v2) | ✓ |
+| 544 | [slurp/intent](src/tasksource/tasks.py#L2925) | Classification | [tasksource/slurp](https://hf.co/datasets/tasksource/slurp) | ✓ |
+| 545 | [mcscript2](src/tasksource/tasks.py#L2929) | MultipleChoice | [tasksource/mcscript2](https://hf.co/datasets/tasksource/mcscript2) |  |
+| 546 | [fnc1/stance](src/tasksource/tasks.py#L2934) | Classification | [tasksource/fnc1](https://hf.co/datasets/tasksource/fnc1) | ✓ |
+| 547 | [perspectrum/stance](src/tasksource/tasks.py#L2939) | Classification | [tasksource/perspectrum](https://hf.co/datasets/tasksource/perspectrum) | ✓ |
+| 548 | [ukpconvarg/convincingness](src/tasksource/tasks.py#L2944) | MultipleChoice | [tasksource/ukpconvarg](https://hf.co/datasets/tasksource/ukpconvarg) | ✓ |
+| 549 | [discogem/relation](src/tasksource/tasks.py#L2949) | Classification | [tasksource/discogem](https://hf.co/datasets/tasksource/discogem) | ✓ |
+| 550 | [pubmed-rct/role](src/tasksource/tasks.py#L2957) | Classification | [tasksource/pubmed-rct](https://hf.co/datasets/tasksource/pubmed-rct) | ✓ |
+| 551 | [maven-arg/role](src/tasksource/tasks.py#L2985) | Classification | [mneb/maven-arg](https://hf.co/datasets/mneb/maven-arg) | ✓ |
+| 552 | [maven/event](src/tasksource/tasks.py#L3016) | Classification | [mneb/maven](https://hf.co/datasets/mneb/maven) | ✓ |
+| 553 | [empathetic-dialogues/emotion](src/tasksource/tasks.py#L3020) | Classification | [facebook/empathetic_dialogues](https://hf.co/datasets/facebook/empathetic_dialogues) | ✓ |
+| 554 | [olid/offensive](src/tasksource/tasks.py#L3028) | Classification | [christophsonntag/OLID](https://hf.co/datasets/christophsonntag/OLID) | ✓ |
+| 555 | [isarcasm/intended](src/tasksource/tasks.py#L3034) | Classification | [viethq1906/isarcasm_2022_taskA_En](https://hf.co/datasets/viethq1906/isarcasm_2022_taskA_En) | ✓ |
+| 556 | [magpie/idiomatic](src/tasksource/tasks.py#L3059) | Classification | [idioms-collaboration/magpie](https://hf.co/datasets/idioms-collaboration/magpie) | ✓ |
+| 557 | [preco/coreference](src/tasksource/tasks.py#L3095) | Classification | [coref-data/preco_raw](https://hf.co/datasets/coref-data/preco_raw) | ✓ |
+| 558 | [redial/preference](src/tasksource/tasks.py#L3115) | Classification | [community-datasets/re_dial](https://hf.co/datasets/community-datasets/re_dial) | ✓ |
+| 559 | [sst5](src/tasksource/tasks.py#L3120) | Classification | [SetFit/sst5](https://hf.co/datasets/SetFit/sst5) | ✓ |
+| 560 | [spider/aggregation](src/tasksource/tasks.py#L3128) | Classification | [tasksource/spider](https://hf.co/datasets/tasksource/spider) | ✓ |
+| 561 | [spider/column](src/tasksource/tasks.py#L3133) | MultipleChoice | [tasksource/spider](https://hf.co/datasets/tasksource/spider) | ✓ |
+| 562 | [semcor](src/tasksource/tasks.py#L3137) | MultipleChoice | [tasksource/semcor](https://hf.co/datasets/tasksource/semcor) | ✓ |
+| 563 | [streusle/noun](src/tasksource/tasks.py#L3140) | Classification | [tasksource/streusle](https://hf.co/datasets/tasksource/streusle) | ✓ |
+| 564 | [streusle/verb](src/tasksource/tasks.py#L3144) | Classification | [tasksource/streusle](https://hf.co/datasets/tasksource/streusle) | ✓ |
 
 ## Soft labels
 
@@ -623,4 +636,4 @@ Annotations whose label is a distribution (annotator votes, rater shares, survey
 | [oasst2/pii](src/tasksource/tasks.py#L2414) | noul | votes | 3 |  | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) |
 | [oasst2/lang_mismatch](src/tasksource/tasks.py#L2415) | noul | votes | 3 |  | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) |
 | [scirepeval/search](src/tasksource/tasks.py#L2518) | score | mean |  | regression | [tasksource/scirepeval-search](https://hf.co/datasets/tasksource/scirepeval-search) |
-| [discogem/relation](src/tasksource/tasks.py#L2948) | choice | votes | 10 | Classification | [tasksource/discogem](https://hf.co/datasets/tasksource/discogem) |
+| [discogem/relation](src/tasksource/tasks.py#L2949) | choice | votes | 10 | Classification | [tasksource/discogem](https://hf.co/datasets/tasksource/discogem) |

@@ -1,6 +1,18 @@
 """Reviewed source snapshots; keep opaque revision IDs out of task annotations."""
 
 SOURCE_REVISIONS = {
+    "mneb/maven": "c66136ce40fd2fa2efc245bbdbcf45f148d0c2bc",
+    "facebook/empathetic_dialogues": "d5b57ae707b0b9a384af8ed50c043c608d597ca7",
+    "christophsonntag/OLID": "738a82a7b014ff63cb7b830544081daefd0c27aa",
+    "viethq1906/isarcasm_2022_taskA_En": "5f0b1c17c4f023b9bd7ea2159d12879a46b02d90",
+    "idioms-collaboration/magpie": "57bbec065c99f38e33a138427bc66a2f04db9fbd",
+    "coref-data/preco_raw": "02c8ffedb9d0b49168809a572ff553c2f6f9f7ca",
+    "community-datasets/re_dial": "eb588549012bdebd7283d5cb0ca86057f62d6832",
+    "SetFit/sst5": "e51bdcd8cd3a30da231967c1a249ba59361279a3",
+    "tasksource/spider": "0bbb0290a7e97815766e71b78444bf98af9636fe",
+    "tasksource/semcor": "467423dd3742924c97489d95bdb48b9cd8161267",
+    "tasksource/streusle": "12db34cd5f2ece8e64a7b39a37243d378dd1a906",
+
     "mneb/maven-arg": "f7f8764f69c13d2dc823a92e0dfd2649b207f3db",
     "tasksource/pubmed-rct": "bc06b7e877baa17e239b0a197146b77c976e1097",
     "tasksource/vast": "9748982e719f065af00a41c774776590a3acac3e",
