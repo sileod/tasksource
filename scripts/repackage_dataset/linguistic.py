@@ -137,6 +137,8 @@ def spider_rows(row,schema,projection,excluded):
         if aggregation not in range(6):raise ValueError('Unknown Spider aggregation')
         yield _row(context,('none','maximum','minimum','count','sum','average')[aggregation],identity,row['db_id'],**meta)
     elif not aggregation and column[1]>0 and len(choices)==len(set(choices)):
+        if any(column[1] in pair for pair in schema.get('foreign_keys',[])):
+            excluded['foreign_key_equivalent_column']+=1;return
         # Only unaggregated, single-column outputs; COUNT(*) has equivalent column implementations.
         yield dict(inputs=context,choices_list=choices[1:],labels=column[1]-1,
                    metadata=json.dumps(dict(id=identity,split_group_id=row['db_id'],**meta),sort_keys=True))
@@ -149,8 +151,8 @@ def spider():
     Source: https://huggingface.co/datasets/minktn/spider-data, original distribution
     https://github.com/taoyds/spider. Native 7,000-question train and database-disjoint
     dev are retained. No hidden test or WikiSQL-derived train_others is included.
-    Gold SQL never enters inputs. Arithmetic/set operations and multi-output
-    queries are excluded rather than choosing an arbitrary label. CC BY-SA 4.0.
+    Gold SQL never enters inputs. Arithmetic/set operations, multi-output queries
+    and foreign-key-equivalent target columns are excluded. CC BY-SA 4.0.
     """
     repo='minktn/spider-data';files={};hashes={}
     for file in ('tables','train_spider','dev'):
