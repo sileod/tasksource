@@ -6,6 +6,11 @@ def normalized(name):
     return re.sub(r'[^\w]', '', name.casefold()).replace('_', '')
 
 
+def repository_links(text):
+    return dict(github=sorted({u.rstrip('.') for u in re.findall(r'https?://github\.com/[\w.-]+/[\w.-]+', text)}),
+                huggingface=sorted({u.rstrip('.') for u in re.findall(r'https?://huggingface\.co/datasets/[\w.-]+/[\w.-]+', text)}))
+
+
 def source_id(value, kind):
     value = value.casefold().removeprefix('https://').removeprefix('http://').rstrip('/')
     if kind == 'huggingface':
@@ -28,6 +33,7 @@ def paper_ids(papers):
             values.append(paper)
         else:
             values.append(paper.get('url', ''))
+            values.append(paper.get('openalex_id', ''))
             if paper.get('semantic_scholar_id'):
                 values.append('s2:'+paper['semantic_scholar_id'])
             for kind, value in paper.get('external_ids', {}).items():

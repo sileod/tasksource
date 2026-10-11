@@ -2,10 +2,11 @@
 import gzip
 import hashlib
 import json
-import re
 from pathlib import Path
 
 from huggingface_hub import hf_hub_download
+
+from .identifiers import repository_links
 
 REPO = "pwc-archive/files"
 REVISION = "1af3a546770f9b98665523ccba4b22b4f3e18c1f"
@@ -31,16 +32,15 @@ def candidates(rows, decision_only=True):
         yield dict(name=row["name"], aliases=[row["full_name"]] if row.get("full_name") else [],
             sources=[dict(source="paperswithcode", url=row["url"])],
             dataset_urls=[row["homepage"]] if row.get("homepage") else [],
-            github=sorted(set(re.findall(r"https?://github\.com/[\w.-]+/[\w.-]+", text))),
-            huggingface=sorted({url.rstrip(".") for url in re.findall(r"https?://huggingface\.co/datasets/[\w.-]+/[\w.-]+", text)}),
+            **repository_links(text),
             papers=[paper] if paper else [], tasks=tasks, decision_tasks=decision_tasks,
             languages=row.get("languages") or [], modalities=row.get("modalities") or [],
             description=row.get("short_description") or row.get("description") or "",
             train_status="unchecked")
 
 
-def retrieve(decision_only=True, snapshot=None):
-    path = Path(snapshot or hf_hub_download(REPO, FILENAME, repo_type="dataset", revision=REVISION))
+def retrieve(decision_only=True, snapshot=None, offline=False):
+    path = Path(snapshot or hf_hub_download(REPO, FILENAME, repo_type="dataset", revision=REVISION, local_files_only=offline))
     digest = hashlib.sha256(path.read_bytes()).hexdigest()
     if digest != SHA256:
         raise ValueError("PWC snapshot checksum mismatch")

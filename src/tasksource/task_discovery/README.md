@@ -19,6 +19,28 @@ Matching uses exact names after case/punctuation normalization, plus explicit Hu
 
 Every output has a `.manifest.json` recording source or input hashes, selection settings, catalog fingerprint and output hash. For another discovery source, emit the same candidate JSONL and reuse `match`; no provider framework is needed.
 
+## Interchangeable retrieval sources
+
+Use `--source paperswithcode`, `--source hf_hub`, or `--source openalex`. Repeat `--source` to combine retrievals into one deduplicated JSONL; all outputs feed the same `match` and `link` commands.
+
+```bash
+python -m tasksource.task_discovery retrieve --source hf_hub --source openalex \
+  --query 'event detection dataset' --limit 100 \
+  --cache build/discovery/cache --output build/discovery/combined.jsonl
+python -m tasksource.task_discovery match build/discovery/combined.jsonl \
+  --unreviewed-only --output build/discovery/new-candidates.jsonl
+# Replay the captured searches, without querying either service:
+python -m tasksource.task_discovery retrieve --source hf_hub --source openalex \
+  --query 'event detection dataset' --limit 100 --offline \
+  --cache build/discovery/cache --output build/discovery/replayed.jsonl
+```
+
+[`hf_hub.py`](hf_hub.py) uses [`HfApi.list_datasets()`](https://huggingface.co/docs/huggingface_hub/package_reference/hf_api#huggingface_hub.HfApi.list_datasets). Without queries it searches text/token/image classification and question-answering categories. `--task` selects exact Hub task categories; with `--query` alone it searches repository names, including untagged sources. Captured metadata includes repository revision, task tags, paper links, declared license and popularity. Names use full repository IDs, with basename aliases, so unrelated uploads sharing a basename are not merged. License tags are evidence, not a completed original-source license review.
+
+[`openalex.py`](openalex.py) uses the [OpenAlex works search API](https://help.openalex.org/api/) with bounded pagination. Defaults search classification datasets, multiple-choice datasets and decision benchmarks. Results carry `candidate_kind: paper`, paper title, OpenAlex ID, DOI when available, publication year and explicit repository links found in locations/abstract metadata. Search results can include papers that use datasets rather than introduce them. We do not invent a dataset name from a title or assume the absence of a Hub mirror. Dataset identification and linking remain a later step. OpenAlex's CC0 metadata terms do not establish the underlying dataset's license.
+
+`--query` is repeatable: scholarly search for OpenAlex, repository-name search for HF Hub, and local metadata screening for the pinned PWC export. `--task` screens PWC tags or selects Hub categories; OpenAlex uses the query text. `--limit` bounds each API query/category (PWC still uses its pinned export). API results are cached with timestamps and hashes; `--offline` replays them, and a fresh cache directory captures updated searches. PWC can replay its local snapshot or cached pinned Hub file. These are candidate retrievals: train status stays `unchecked`, quality is not inferred from popularity, and the human queue is never edited automatically.
+
 The [human-curated queue](todo_batch.md) is authoritative. Generated candidates live in separate output files and never rewrite it. Promote suggestions to that queue only after review; retrieval alone does not approve a training source.
 
 ## Recorded decisions

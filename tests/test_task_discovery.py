@@ -109,3 +109,68 @@ def test_link_cache_replays_without_network_or_storing_headers(tmp_path,monkeypa
     assert len(calls)==1 and 'secret' not in next(tmp_path.iterdir()).read_text()
     with pytest.raises(FileNotFoundError):
         linker.cached_json('https://example.org/other',tmp_path,offline=True)
+
+
+def test_hub_retrieval_snapshots_metadata_and_replays_without_api(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+    from tasksource.task_discovery import hf_hub as hub
+    calls=[]
+    info=SimpleNamespace(id='org/Example',sha='source-revision',tags=['task_categories:text-classification','arxiv:1234.56789'],
+        card_data=SimpleNamespace(to_dict=lambda:dict(license='cc-by-4.0',language=['en'])),
+        downloads=42,likes=3,last_modified=None)
+    def search(**kwargs):
+        calls.append(kwargs)
+        return iter([info])
+    monkeypatch.setattr(hub,'HfApi',lambda:SimpleNamespace(list_datasets=search))
+    rows,manifest=hub.retrieve(tmp_path,queries=['Example','alternate'],limit=2)
+    assert len(rows)==1 and len(calls)==2
+    row=rows[0]
+    assert row['huggingface']==['org/Example'] and row['train_status']=='unchecked'
+    assert row['hub_metadata']['revision']=='source-revision' and row['hub_metadata']['license']=='cc-by-4.0'
+    assert row['papers'][0]['url']=='https://arxiv.org/abs/1234.56789'
+    assert all(c['limit']==2 and c['full'] and c['task_categories'] is None for c in calls)
+    monkeypatch.setattr(hub,'HfApi',lambda:pytest.fail('Offline replay called Hub'))
+    assert hub.retrieve(tmp_path,queries=['Example','alternate'],limit=2,offline=True)==(rows,manifest)
+    with pytest.raises(FileNotFoundError):hub.retrieve(tmp_path,queries=['uncached'],offline=True)
+
+
+def test_openalex_bounded_pages_preserve_paper_identity_without_inventing_dataset(tmp_path,monkeypatch):
+    from urllib.parse import parse_qs,urlsplit
+    from tasksource.task_discovery import openalex
+    calls=[]
+    def query(url,*args):
+        params=parse_qs(urlsplit(url).query);page=int(params['page'][0]);size=int(params['per_page'][0])
+        calls.append((page,size))
+        return dict(url=url,sha256='hash',data=dict(results=[dict(id=f'https://openalex.org/W{page*100+i}',
+            title=f'Classification dataset paper {page*100+i}',doi=f'https://doi.org/10.1234/{page*100+i}',
+            publication_year=2024,locations=[dict(landing_page_url='https://github.com/org/data',pdf_url=None)],
+            abstract_inverted_index={'https://huggingface.co/datasets/org/data':[0]}) for i in range(size)]))
+    monkeypatch.setattr(openalex,'cached_json',query)
+    rows,manifest=openalex.retrieve(tmp_path,queries=['classification dataset'],limit=101)
+    assert calls==[(1,100),(2,1)] and len(rows)==101
+    assert rows[0]['candidate_kind']=='paper' and rows[0]['train_status']=='unchecked'
+    assert rows[0]['github']==['https://github.com/org/data']
+    assert rows[0]['huggingface']==['https://huggingface.co/datasets/org/data']
+    assert rows[0]['papers'][0]['openalex_id']=='https://openalex.org/W100'
+    assert len(manifest['requests'])==2
+    from tasksource.task_discovery.identifiers import paper_ids
+    assert 'openalex.org/w100' in paper_ids(rows[0]['papers'])
+
+
+def test_retrieve_combines_sources_through_same_cli_and_preserves_evidence(tmp_path,monkeypatch):
+    import sys
+    from tasksource.task_discovery import __main__ as cli,hf_hub,openalex
+    def retrieve(source):
+        return lambda *a,**k:([dict(name='Shared',sources=[dict(source=source,url=source)],
+                                    train_status='unchecked')],dict(source=source))
+    monkeypatch.setattr(hf_hub,'retrieve',retrieve('hf_hub'))
+    monkeypatch.setattr(openalex,'retrieve',retrieve('openalex'))
+    output=tmp_path/'candidates.jsonl'
+    monkeypatch.setattr(sys,'argv',['discovery','retrieve','--source','hf_hub','--source','openalex',
+                                  '--query','classification dataset','--output',str(output)])
+    cli.main()
+    rows=[json.loads(line) for line in output.read_text().splitlines()]
+    assert len(rows)==1 and [s['source'] for s in rows[0]['sources']]==['hf_hub','openalex']
+    assert rows[0]['train_status']=='unchecked'
+    manifest=json.loads(output.with_suffix('.manifest.json').read_text())
+    assert [s['source'] for s in manifest['sources']]==['hf_hub','openalex']

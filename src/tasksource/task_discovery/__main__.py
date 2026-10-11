@@ -4,7 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 
-from .match import catalog_hash, catalog_index, match, previous_decisions
+from .match import catalog_hash, catalog_index, deduplicate, match, previous_decisions
 from .paperswithcode import retrieve
 from .link import link
 
@@ -12,7 +12,13 @@ from .link import link
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest='command', required=True)
-    fetch = commands.add_parser('retrieve', help='Retrieve Papers with Code candidates')
+    fetch = commands.add_parser('retrieve', help='Retrieve dataset or dataset-paper candidates')
+    fetch.add_argument('--source', action='append', choices=('paperswithcode','hf_hub','openalex'),
+                       help='Repeat to combine sources; defaults to paperswithcode')
+    fetch.add_argument('--query', action='append', default=[], help='Hub name or OpenAlex scholarly search; repeat for OR')
+    fetch.add_argument('--limit', type=int, default=100, help='Maximum results per query/category (default 100)')
+    fetch.add_argument('--cache', type=Path, default=Path('build/discovery/cache'))
+    fetch.add_argument('--offline', action='store_true', help='Replay cached Hub/OpenAlex responses')
     fetch.add_argument('--snapshot', type=Path, help='Local copy of the pinned .json.gz export')
     fetch.add_argument('--all', action='store_true', help='Include datasets without decision-oriented task tags')
     fetch.add_argument('--task', action='append', default=[], help='Case-insensitive task-tag substring; repeat for OR')
@@ -30,10 +36,28 @@ def main():
         command.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     if args.command == 'retrieve':
-        rows, manifest = retrieve(decision_only=not args.all, snapshot=args.snapshot)
-        if args.task:
-            rows = [r for r in rows if any(q.casefold() in t.casefold() for q in args.task for t in r['tasks'])]
-        manifest.update(task_queries=args.task, output_rows=len(rows))
+        if args.limit < 1:
+            parser.error('--limit must be positive')
+        rows, runs = [], []
+        for source in dict.fromkeys(args.source or ['paperswithcode']):
+            if source == 'paperswithcode':
+                found, report = retrieve(decision_only=not args.all, snapshot=args.snapshot, offline=args.offline)
+                if args.task:
+                    found = [r for r in found if any(q.casefold() in t.casefold() for q in args.task for t in r['tasks'])]
+                if args.query:
+                    found = [r for r in found if any(q.casefold() in json.dumps(r).casefold() for q in args.query)]
+                report.update(task_queries=args.task, queries=args.query)
+            elif source == 'hf_hub':
+                from .hf_hub import retrieve as fetch_source
+                found, report = fetch_source(args.cache, args.query, args.task, args.limit, args.offline)
+            else:
+                from .openalex import retrieve as fetch_source
+                found, report = fetch_source(args.cache, args.query, args.limit, args.offline)
+            rows.extend(found)
+            runs.append(report)
+        rows = deduplicate(rows)
+        manifest = runs[0] if len(runs)==1 else dict(sources=runs)
+        manifest['output_rows'] = len(rows)
     elif args.command == 'match':
         raw = args.input.read_bytes()
         names, repos = catalog_index()
