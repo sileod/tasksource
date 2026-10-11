@@ -31,6 +31,11 @@ source problems, or unsound supervision remain in
 Use `from tasksource import eval_only` to access a benchmark annotation directly;
 these annotations are excluded from the training catalogs.
 
+The [discovery tools](src/tasksource/task_discovery/README.md) retrieve and deduplicate
+dataset candidates, link source and paper identities, and retain structured review
+history. The [human-curated queue](src/tasksource/task_discovery/todo_batch.md)
+stays separate from generated suggestions.
+
 Visual annotations are in [vision_tasks.py](src/tasksource/vision_tasks.py).
 Discover them with `list_tasks(vision=True)` and load them with
 `load_task(id, vision=True)`. Use `recast="jev"` or `recast="instruct"` to keep

@@ -1,0 +1,284 @@
+{
+  "reviews": [
+    {
+      "task": "quac/answerability",
+      "reviewer": {
+        "kind": "model",
+        "model": "gpt-6.1-sol",
+        "model_id_source": "user-provided"
+      },
+      "checked_on": "2026-10-11",
+      "scope": "coarse source/recast inspection",
+      "verdict": "retain_with_source_caveat",
+      "sampled_examples": [
+        {
+          "id": "C_324c6c1e2e9d4d4984218d84afacf704_1_q#8",
+          "split": "train",
+          "recast_sha256": "43808c6eac2bdaf4f589768316aa0f92dea2bf4a1982b70bc901277093b432d1"
+        }
+      ],
+      "findings": "The inspected question about tour companions is answerable from the complete passage. Earlier teacher answers remain source-native and can be noisy.",
+      "provenance": {
+        "dataset": "allenai/quac",
+        "config": "plain_text",
+        "revision": "768addbf2099da8efabd67d3a669f6483b813c1b"
+      },
+      "limitations": "Small sample; not an estimate of corpus-wide label accuracy."
+    },
+    {
+      "task": "hatexplain/majority",
+      "reviewer": {
+        "kind": "model",
+        "model": "gpt-6.1-sol",
+        "model_id_source": "user-provided"
+      },
+      "checked_on": "2026-10-11",
+      "scope": "coarse source/recast inspection",
+      "verdict": "retain_with_source_caveat",
+      "sampled_examples": [
+        {
+          "id": "1179082934357118976_twitter",
+          "split": "train",
+          "recast_sha256": "d49ad7c8cfcce14b3f9f404c58bd3054afcb55e4e8ff4c4f933255e7308cdfbc"
+        }
+      ],
+      "findings": "Majority votes are preserved, ties excluded. The inspected abusive narrative was labeled normal by source annotators: labels concern hate/offense judgments, not all disturbing content.",
+      "provenance": {
+        "dataset": "Hate-speech-CNERG/hatexplain",
+        "revision": "b0e5676acc1d0dcb31d6ce8e93e7e94109044ed6"
+      },
+      "limitations": "Small sample; not an estimate of corpus-wide label accuracy."
+    },
+    {
+      "task": "hotpotqa/supporting-fact",
+      "reviewer": {
+        "kind": "model",
+        "model": "gpt-6.1-sol",
+        "model_id_source": "user-provided"
+      },
+      "checked_on": "2026-10-11",
+      "scope": "coarse source/recast inspection",
+      "verdict": "retain",
+      "sampled_examples": [
+        {
+          "id": "5a890ba1554299669944a47f:Eastern Hills Mall:0",
+          "split": "train",
+          "recast_sha256": "67c57cea8d7ad643e1f5c354f298274b08fff5dbc7e6362f60d1974a056ac280"
+        }
+      ],
+      "findings": "The inspected distractor sentence is not a native supporting fact. Membership uses question/title/sentence identity, not text matching.",
+      "provenance": {
+        "dataset": "hotpotqa/hotpot_qa",
+        "config": "distractor",
+        "revision": "1908d6afbbead072334abe2965f91bd2709910ab"
+      },
+      "limitations": "Small sample; not an estimate of corpus-wide label accuracy."
+    },
+    {
+      "task": "multiwoz22/dialogue-act",
+      "reviewer": {
+        "kind": "model",
+        "model": "gpt-6.1-sol",
+        "model_id_source": "user-provided"
+      },
+      "checked_on": "2026-10-11",
+      "scope": "coarse source/recast inspection",
+      "verdict": "retain",
+      "sampled_examples": [
+        {
+          "id": "PMUL3854.json:10",
+          "split": "train",
+          "recast_sha256": "6f6003cf657c3c1d0e39bfad284caa52b2a34c0d5a07ccfd58ac9c94487ad19e"
+        }
+      ],
+      "findings": "The inspected Hotel-Inform turn supplies booking parameters. Only rows with one unique native dialogue-act type are emitted.",
+      "provenance": {
+        "dataset": "pfb30/multi_woz_v22",
+        "config": "v2.2",
+        "revision": "a65d2d3261c42a309b634179c186628bf35d9298"
+      },
+      "limitations": "Small sample; not an estimate of corpus-wide label accuracy."
+    },
+    {
+      "task": "multiwoz22/categorical-slot",
+      "reviewer": {
+        "kind": "model",
+        "model": "gpt-6.1-sol",
+        "model_id_source": "user-provided"
+      },
+      "checked_on": "2026-10-11",
+      "scope": "coarse source/recast inspection",
+      "verdict": "retain",
+      "sampled_examples": [
+        {
+          "id": "PMUL3922.json:2:hotel-stars",
+          "split": "train",
+          "recast_sha256": "a7c0849bb28b8e2869516d88ff93440ba1a2c364290ba57efec614ddbe3371b5"
+        }
+      ],
+      "findings": "The inspected hotel-stars=3 value is grounded in the earlier user request; current state is not shown in inputs.",
+      "provenance": {
+        "dataset": "pfb30/multi_woz_v22",
+        "config": "v2.2",
+        "revision": "a65d2d3261c42a309b634179c186628bf35d9298"
+      },
+      "limitations": "Small sample; not an estimate of corpus-wide label accuracy."
+    },
+    {
+      "task": "schema-guided/intent",
+      "reviewer": {
+        "kind": "model",
+        "model": "gpt-6.1-sol",
+        "model_id_source": "user-provided"
+      },
+      "checked_on": "2026-10-11",
+      "scope": "coarse source/recast inspection",
+      "verdict": "retain",
+      "sampled_examples": [
+        {
+          "id": "99_00115:2:Media_1",
+          "split": "train",
+          "recast_sha256": "ac910b0d66e94147cbdfca658adb6d7011b89b8d46aa41f7a6bc96b7310ccf62"
+        }
+      ],
+      "findings": "The inspected Media_1 intent remains FindMovies while another service is introduced. Instructions ask for the named service state, not a single global utterance intent.",
+      "provenance": {
+        "dataset": "google-research-datasets/schema_guided_dstc8",
+        "config": "dialogues",
+        "revision": "a8029ad8c12e13cdbfefc2f649e245fa135bc98a"
+      },
+      "limitations": "Small sample; not an estimate of corpus-wide label accuracy."
+    },
+    {
+      "task": "coqa/yesno",
+      "reviewer": {
+        "kind": "model",
+        "model": "gpt-6.1-sol",
+        "model_id_source": "user-provided"
+      },
+      "checked_on": "2026-10-11",
+      "scope": "coarse source/recast inspection",
+      "verdict": "retain",
+      "sampled_examples": [
+        {
+          "id": "df8754b3ef108c1950e9c4bef451f5c2232f3b59a8e29546032c4ecb153b72b0:3",
+          "split": "train",
+          "recast_sha256": "281d6da4ef27054297f703051b1177f18acf2fad82e26dd2a260b437afc5f081"
+        }
+      ],
+      "findings": "The inspected no answer about wealth is supported by the passage describing Guizhou as one of the poorest provinces. Only exact native binary answers are retained.",
+      "provenance": {
+        "dataset": "stanfordnlp/coqa",
+        "revision": "0d9e9952f1ef6e5415492d3d84b5873259137e3c"
+      },
+      "limitations": "Small sample; not an estimate of corpus-wide label accuracy."
+    },
+    {
+      "task": "qasper/yesno",
+      "reviewer": {
+        "kind": "model",
+        "model": "gpt-6.1-sol",
+        "model_id_source": "user-provided"
+      },
+      "checked_on": "2026-10-11",
+      "scope": "coarse source/recast inspection",
+      "verdict": "retain_with_source_caveat",
+      "sampled_examples": [
+        {
+          "id": "05238d1fad2128403577822aa4822ef8ca9570ac",
+          "split": "train",
+          "recast_sha256": "d8c267b9a1e02c758057e1af2018d4b100f30966df540d3bfbf6cc696b01ec8c"
+        },
+        {
+          "id": "2a1069ae3629ae8ecc19d2305f23445c0231dc39",
+          "split": "train",
+          "recast_sha256": "a24d5a5f7959d01ae32fd1aea57c785f2e5adea5950f3304e72d5794b368d497"
+        },
+        {
+          "id": "061682beb3dbd7c76cfa26f7ae650e548503d977",
+          "split": "train",
+          "recast_sha256": "d288739434c145be019a651a90e9d46d333720995059f2cb8a352262dc2fd00d"
+        }
+      ],
+      "findings": "Three inspected binary cases retain text evidence and consistent native annotations. Computation-time and non-neural WSD cases are supported; a rationale-timing question is less explicit in its cited evidence and remains a source-quality caveat.",
+      "provenance": {
+        "dataset": "allenai/qasper",
+        "config": "qasper",
+        "revision": "06806e4608976fc2fac0a090ac425d5b2b29caf4"
+      },
+      "limitations": "Small sample; not an estimate of corpus-wide label accuracy."
+    },
+    {
+      "task": "topv2/intent",
+      "reviewer": {
+        "kind": "model",
+        "model": "gpt-6.1-sol",
+        "model_id_source": "user-provided"
+      },
+      "checked_on": "2026-10-11",
+      "scope": "coarse source/recast inspection",
+      "verdict": "retain",
+      "sampled_examples": [
+        {
+          "id": "c64fdd72d7b496fbe227586eb22d051df615cdf2ce5653ed5d2415135757b138",
+          "split": "train",
+          "recast_sha256": "45a5622f351fc2392caa24ebc5efa4acf95b7221e85c8241ab087e595325caea"
+        }
+      ],
+      "findings": "The inspected remaining-time question maps to the native get_timer root intent. Nested slots and gold parse are excluded from inputs.",
+      "provenance": {
+        "dataset": "WillHeld/top_v2",
+        "revision": "5e382a8497d4dd28842cc0bfa85387f965ac9d8d"
+      },
+      "limitations": "Small sample; not an estimate of corpus-wide label accuracy."
+    },
+    {
+      "task": "slurp/intent",
+      "reviewer": {
+        "kind": "model",
+        "model": "gpt-6.1-sol",
+        "model_id_source": "user-provided"
+      },
+      "checked_on": "2026-10-11",
+      "scope": "coarse source/recast inspection",
+      "verdict": "retain_with_source_caveat",
+      "sampled_examples": [
+        {
+          "id": "9900",
+          "split": "train",
+          "recast_sha256": "cfeb385ccb1238b4030ea3ae548800894d73fe382841a6785d1147759f76a345"
+        }
+      ],
+      "findings": "The inspected resume-Battle-Royale utterance has native play_audiobook intent, but text alone does not explicitly distinguish media type. Native intent supervision has underspecified cases despite duplicate/short-transcript filtering.",
+      "provenance": {
+        "dataset": "tasksource/slurp",
+        "revision": "2e033e72af1d7df94523d5053b31a30130b7f877"
+      },
+      "limitations": "Small sample; not an estimate of corpus-wide label accuracy."
+    },
+    {
+      "task": "mcscript2",
+      "reviewer": {
+        "kind": "model",
+        "model": "gpt-6.1-sol",
+        "model_id_source": "user-provided"
+      },
+      "checked_on": "2026-10-11",
+      "scope": "coarse source/recast inspection",
+      "verdict": "retain",
+      "sampled_examples": [
+        {
+          "id": "1044:8",
+          "split": "train",
+          "recast_sha256": "99df8ad69a57a48105de627fe31c9208e62945da616e5bd843482b8ee820f2ed"
+        }
+      ],
+      "findings": "The inspected story explicitly names yellow daisies, matching the gold native option. XML choice order and gold index are retained before Jev permutation.",
+      "provenance": {
+        "dataset": "tasksource/mcscript2",
+        "revision": "3b9c261f28c82ba15e6073990c0d70f05db60c4a"
+      },
+      "limitations": "Small sample; not an estimate of corpus-wide label accuracy."
+    }
+  ]
+}

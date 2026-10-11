@@ -1,0 +1,1565 @@
+[
+  {
+    "name": "QuAC",
+    "scope": "task",
+    "tasks": [
+      "quac/yesno",
+      "quac/followup"
+    ],
+    "status": "deferred",
+    "reason_code": "ambiguous_supervision",
+    "reason": "Coarse recast review found a non-binary tour-location question labeled no; follow-up recommendations are subjective. Answerability remains a separate usable view.",
+    "evidence": [
+      "Native dialogue C_2b11935313374c1cbec20d5955085bc0_0, turn q#5",
+      "https://huggingface.co/datasets/allenai/quac"
+    ],
+    "checked_on": "2026-10-11",
+    "reconsider_if": "Native judgment semantics are clarified and recast examples support those criteria.",
+    "huggingface": [
+      "allenai/quac"
+    ],
+    "github": [],
+    "papers": [
+      "arxiv:1808.07036",
+      "https://paperswithcode.com/paper/quac-question-answering-in-context-1"
+    ],
+    "source_revisions": {
+      "allenai/quac": "768addbf2099da8efabd67d3a669f6483b813c1b"
+    },
+    "reviews": [
+      {
+        "reviewer": {
+          "kind": "model",
+          "model": "gpt-6.1-sol",
+          "model_id_source": "user-provided"
+        },
+        "checked_on": "2026-10-11",
+        "verdict": "defer",
+        "findings": "Coarse recast review found a non-binary tour-location question labeled no; follow-up recommendations are subjective. Answerability remains a separate usable view.",
+        "evidence": [
+          "Native dialogue C_2b11935313374c1cbec20d5955085bc0_0, turn q#5",
+          "https://huggingface.co/datasets/allenai/quac"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "MultiWOZ 2.2",
+    "aliases": [
+      "multiwoz22"
+    ],
+    "scope": "task",
+    "tasks": [
+      "multiwoz22/intent"
+    ],
+    "status": "deferred",
+    "reason_code": "stale_annotation",
+    "reason": "An explicit hotel-booking request retained find_hotel as its active intent; do not equate carried dialogue-state intent with current-user intent. Dialogue acts and categorical slots remain separate views.",
+    "evidence": [
+      "Native dialogue MUL0645.json, user turn 6",
+      "https://huggingface.co/datasets/pfb30/multi_woz_v22"
+    ],
+    "checked_on": "2026-10-11",
+    "reconsider_if": "A faithful utterance-intent projection can be verified without guessing replacement labels.",
+    "huggingface": [
+      "pfb30/multi_woz_v22"
+    ],
+    "github": [
+      "budzianowski/multiwoz"
+    ],
+    "papers": [
+      "arxiv:2007.12720"
+    ],
+    "source_revisions": {
+      "pfb30/multi_woz_v22": "a65d2d3261c42a309b634179c186628bf35d9298"
+    },
+    "reviews": [
+      {
+        "reviewer": {
+          "kind": "model",
+          "model": "gpt-6.1-sol",
+          "model_id_source": "user-provided"
+        },
+        "checked_on": "2026-10-11",
+        "verdict": "defer",
+        "findings": "An explicit hotel-booking request retained find_hotel as its active intent; do not equate carried dialogue-state intent with current-user intent. Dialogue acts and categorical slots remain separate views.",
+        "evidence": [
+          "Native dialogue MUL0645.json, user turn 6",
+          "https://huggingface.co/datasets/pfb30/multi_woz_v22"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "snli_ve",
+    "annotation": "tasksource.parked.snli_ve",
+    "scope": "task",
+    "tasks": [
+      "snli-ve"
+    ],
+    "huggingface": [
+      "HuggingFaceM4/SNLI-VE",
+      "pingzhili/snli-ve"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "unsound",
+    "reason": "caption-derived SNLI labels are not image-grounded; neutral evaluation pairs were reannotated, but this training source is uncorrected; hypothesis-only artifacts remain",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "xglue__ner",
+    "annotation": "tasksource.parked.xglue__ner",
+    "scope": "task",
+    "tasks": [
+      "xglue__ner"
+    ],
+    "huggingface": [
+      "microsoft/xglue"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "duplicate",
+    "reason": "repackages CoNLL-2002/2003 NER, which conll2002 (es, nl) and conll2003 (en) cover; the German part is not openly licensed; script-only",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "xglue__pos",
+    "annotation": "tasksource.parked.xglue__pos",
+    "scope": "task",
+    "tasks": [
+      "xglue__pos"
+    ],
+    "huggingface": [
+      "microsoft/xglue"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "duplicate",
+    "reason": "repackages Universal Dependencies POS, which udep__pos covers; script-only",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "udep__deprel_multilingual",
+    "annotation": "tasksource.parked.udep__deprel_multilingual",
+    "scope": "task",
+    "tasks": [
+      "udep__deprel_multilingual"
+    ],
+    "huggingface": [
+      "universal-dependencies/universal_dependencies"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "unsound",
+    "reason": "all-language variant of udep__deprel; relation labels depend on the head word, which the task does not show",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "has_part",
+    "annotation": "tasksource.parked.has_part",
+    "scope": "task",
+    "tasks": [
+      "has_part"
+    ],
+    "huggingface": [],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "unsound",
+    "reason": "labels are model confidence scores, nearly all above 0.99",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "recast___recast_kg_relations",
+    "annotation": "tasksource.parked.recast___recast_kg_relations",
+    "scope": "task",
+    "tasks": [
+      "recast___recast_kg_relations"
+    ],
+    "huggingface": [
+      "tasksource/recast"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "unsound",
+    "reason": "label semantics (1-6) are undocumented",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "super_glue___rte",
+    "annotation": "tasksource.parked.super_glue___rte",
+    "scope": "task",
+    "tasks": [
+      "super_glue___rte"
+    ],
+    "huggingface": [
+      "aps/super_glue"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "duplicate",
+    "reason": "duplicate of glue/rte",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "sick__entailment_BA",
+    "annotation": "tasksource.parked.sick__entailment_BA",
+    "scope": "task",
+    "tasks": [
+      "sick__entailment_BA"
+    ],
+    "huggingface": [],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "duplicate",
+    "reason": "restates sick/label as B-to-A entailment",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "gpt3_nli",
+    "annotation": "tasksource.parked.gpt3_nli",
+    "scope": "task",
+    "tasks": [
+      "gpt3_nli"
+    ],
+    "huggingface": [
+      "pietrolesci/gpt3_nli"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "unsound",
+    "reason": "generated labels not sound enough",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "enfever_nli",
+    "annotation": "tasksource.parked.enfever_nli",
+    "scope": "task",
+    "tasks": [
+      "enfever_nli"
+    ],
+    "huggingface": [
+      "ctu-aic/enfever_nli"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "duplicate",
+    "reason": "overlaps FEVER-based NLI tasks",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "paws___unlabeled_final",
+    "annotation": "tasksource.parked.paws___unlabeled_final",
+    "scope": "task",
+    "tasks": [
+      "paws___unlabeled_final"
+    ],
+    "huggingface": [
+      "google-research-datasets/paws"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "unsound",
+    "reason": "silver labels; paws/labeled_final is used",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "quora",
+    "annotation": "tasksource.parked.quora",
+    "scope": "task",
+    "tasks": [
+      "quora"
+    ],
+    "huggingface": [],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "duplicate",
+    "reason": "duplicate of glue/qqp",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "tner___tweebank_ner",
+    "annotation": "tasksource.parked.tner___tweebank_ner",
+    "scope": "task",
+    "tasks": [
+      "tner___tweebank_ner"
+    ],
+    "huggingface": [],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "unavailable",
+    "reason": "not loadable",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "aqua_rat___tokenized",
+    "annotation": "tasksource.parked.aqua_rat___tokenized",
+    "scope": "task",
+    "tasks": [
+      "aqua_rat___tokenized"
+    ],
+    "huggingface": [],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "duplicate",
+    "reason": "covered by math_qa",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "fever___v1_0",
+    "annotation": "tasksource.parked.fever___v1_0",
+    "scope": "task",
+    "tasks": [
+      "fever___v1_0"
+    ],
+    "huggingface": [],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "unsound",
+    "reason": "claim-only FEVER; the verdict needs evidence",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "fever___v2_0",
+    "annotation": "tasksource.parked.fever___v2_0",
+    "scope": "task",
+    "tasks": [
+      "fever___v2_0"
+    ],
+    "huggingface": [],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "unsound",
+    "reason": "claim-only FEVER; the verdict needs evidence",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "multi_nli",
+    "annotation": "tasksource.parked.multi_nli",
+    "scope": "task",
+    "tasks": [
+      "multi_nli"
+    ],
+    "huggingface": [],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "duplicate",
+    "reason": "duplicate of glue/mnli",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "hyperpartisan_news_detection___byarticle",
+    "annotation": "tasksource.parked.hyperpartisan_news_detection___byarticle",
+    "scope": "task",
+    "tasks": [
+      "hyperpartisan_news_detection___byarticle"
+    ],
+    "huggingface": [],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "duplicate",
+    "reason": "covered by hyperpartisan_news",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "hyperpartisan_news_detection___bypublisher",
+    "annotation": "tasksource.parked.hyperpartisan_news_detection___bypublisher",
+    "scope": "task",
+    "tasks": [
+      "hyperpartisan_news_detection___bypublisher"
+    ],
+    "huggingface": [],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "duplicate",
+    "reason": "covered by hyperpartisan_news",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "go_emotions___raw",
+    "annotation": "tasksource.parked.go_emotions___raw",
+    "scope": "task",
+    "tasks": [
+      "go_emotions___raw"
+    ],
+    "huggingface": [
+      "google-research-datasets/go_emotions"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "duplicate",
+    "reason": "covered by go_emotions/simplified",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "boolq",
+    "annotation": "tasksource.parked.boolq",
+    "scope": "task",
+    "tasks": [
+      "boolq"
+    ],
+    "huggingface": [],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "duplicate",
+    "reason": "duplicate of super_glue/boolq",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "species_800",
+    "annotation": "tasksource.parked.species_800",
+    "scope": "task",
+    "tasks": [
+      "species_800"
+    ],
+    "huggingface": [],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "unavailable",
+    "reason": "missing files",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "blog_authorship_corpus__horoscope",
+    "annotation": "tasksource.parked.blog_authorship_corpus__horoscope",
+    "scope": "task",
+    "tasks": [
+      "blog_authorship_corpus__horoscope"
+    ],
+    "huggingface": [],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "unsound",
+    "reason": "horoscope is not predictable from text",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "code_x_glue_cc_clone_detection_big_clone_bench",
+    "annotation": "tasksource.parked.code_x_glue_cc_clone_detection_big_clone_bench",
+    "scope": "task",
+    "tasks": [
+      "code_x_glue_cc_clone_detection_big_clone_bench"
+    ],
+    "huggingface": [],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "impractical",
+    "reason": "in bigbench, too heavy (100GB)",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "code_x_glue_cc_code_refinement",
+    "annotation": "tasksource.parked.code_x_glue_cc_code_refinement",
+    "scope": "task",
+    "tasks": [
+      "code_x_glue_cc_code_refinement"
+    ],
+    "huggingface": [],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "unsound",
+    "reason": "constant label, not a real task",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "chatgpt_detection",
+    "annotation": "tasksource.parked.chatgpt_detection",
+    "scope": "task",
+    "tasks": [
+      "chatgpt_detection"
+    ],
+    "huggingface": [
+      "Hello-SimpleAI/HC3"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "unsound",
+    "reason": "HC3 human answers are PTB-tokenized (a trivial shortcut); script-only loader",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "attempto_nli",
+    "annotation": "tasksource.parked.attempto_nli",
+    "scope": "task",
+    "tasks": [
+      "attempto_nli"
+    ],
+    "huggingface": [
+      "sileod/attempto-nli"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "unsound",
+    "reason": "unclear label semantics",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "mega_acceptability",
+    "annotation": "tasksource.parked.mega_acceptability",
+    "scope": "task",
+    "tasks": [
+      "mega_acceptability"
+    ],
+    "huggingface": [
+      "tasksource/mega-acceptability-v2"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "duplicate",
+    "reason": "regression target; acceptability is covered by other tasks",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "xsum_factuality",
+    "annotation": "tasksource.parked.xsum_factuality",
+    "scope": "task",
+    "tasks": [
+      "xsum_factuality"
+    ],
+    "huggingface": [],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "unsound",
+    "reason": "summary-only, the source document is missing; script-only loader",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "lex_glue___ecthr_a",
+    "annotation": "tasksource.parked.lex_glue___ecthr_a",
+    "scope": "task",
+    "tasks": [
+      "lex_glue___ecthr_a"
+    ],
+    "huggingface": [
+      "coastalcph/lex_glue"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "impractical",
+    "reason": "too long",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "lex_glue___ecthr_b",
+    "annotation": "tasksource.parked.lex_glue___ecthr_b",
+    "scope": "task",
+    "tasks": [
+      "lex_glue___ecthr_b"
+    ],
+    "huggingface": [
+      "coastalcph/lex_glue"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "impractical",
+    "reason": "too long",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "nli_l2",
+    "annotation": "tasksource.parked.nli_l2",
+    "scope": "task",
+    "tasks": [
+      "nli_l2"
+    ],
+    "huggingface": [
+      "tasksource/merged-2l-nli"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "duplicate",
+    "reason": "merges of NLI tasks already included",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "nli_l3",
+    "annotation": "tasksource.parked.nli_l3",
+    "scope": "task",
+    "tasks": [
+      "nli_l3"
+    ],
+    "huggingface": [
+      "tasksource/merged-3l-nli"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "duplicate",
+    "reason": "merges of NLI tasks already included",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "ecthr_cases___alleged_violation_prediction",
+    "annotation": "tasksource.parked.ecthr_cases___alleged_violation_prediction",
+    "scope": "task",
+    "tasks": [
+      "ecthr_cases___alleged_violation_prediction"
+    ],
+    "huggingface": [],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "impractical",
+    "reason": "too long",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "ecthr_cases___violation_prediction",
+    "annotation": "tasksource.parked.ecthr_cases___violation_prediction",
+    "scope": "task",
+    "tasks": [
+      "ecthr_cases___violation_prediction"
+    ],
+    "huggingface": [],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "impractical",
+    "reason": "too long",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "sick__entailment_AB",
+    "annotation": "tasksource.parked.sick__entailment_AB",
+    "scope": "task",
+    "tasks": [
+      "sick__entailment_AB"
+    ],
+    "huggingface": [
+      "RobZamp/sick",
+      "tasksource/sick"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "duplicate",
+    "reason": "restates sick/label as A-to-B entailment",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "effective_feedback_student_writing",
+    "annotation": "tasksource.parked.effective_feedback_student_writing",
+    "scope": "task",
+    "tasks": [
+      "effective_feedback_student_writing"
+    ],
+    "huggingface": [
+      "YaHi/EffectiveFeedbackStudentWriting"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "unavailable",
+    "reason": "source discontinued; see argument_feedback in tasks.py",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "prompt_injection_threat_matrix",
+    "annotation": "tasksource.parked.prompt_injection_threat_matrix",
+    "scope": "task",
+    "tasks": [
+      "prompt_injection_threat_matrix"
+    ],
+    "huggingface": [
+      "neuralchemy/prompt-injection-Threat-Matrix"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "unavailable",
+    "reason": "gated or removed: the Hub reports the dataset missing",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "prompt_injection_geekyrakshit",
+    "annotation": "tasksource.parked.prompt_injection_geekyrakshit",
+    "scope": "task",
+    "tasks": [
+      "prompt_injection_geekyrakshit"
+    ],
+    "huggingface": [
+      "geekyrakshit/prompt-injection-dataset"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "duplicate",
+    "reason": "aggregate of deepset/prompt-injections and xTRam1 (listed); 90% of its test rows are in its own train",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "clue/clue cmnli",
+    "scope": "dataset",
+    "huggingface": [],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "duplicate",
+    "reason": "machine-translated MNLI; XNLI covers Chinese",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded issue is resolved and a suitable training source is verified."
+  },
+  {
+    "name": "dbarbedillo/SMS_Spam_Multilingual_Collection_Dataset",
+    "scope": "dataset",
+    "huggingface": [
+      "dbarbedillo/SMS_Spam_Multilingual_Collection_Dataset"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "unsound",
+    "reason": "machine-translated; many translations degenerate",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded issue is resolved and a suitable training source is verified."
+  },
+  {
+    "name": "ylacombe/xsum_factuality",
+    "scope": "dataset",
+    "huggingface": [
+      "ylacombe/xsum_factuality"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "unavailable",
+    "reason": "no longer on the Hub",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/parked.py"
+    ],
+    "reconsider_if": "The recorded issue is resolved and a suitable training source is verified."
+  },
+  {
+    "name": "cladder",
+    "annotation": "tasksource.eval_only.cladder",
+    "scope": "task",
+    "tasks": [
+      "cladder"
+    ],
+    "huggingface": [
+      "tasksource/cladder"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "CLadder is a causal-reasoning evaluation benchmark, not a training source",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/eval_only.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "mmlu",
+    "annotation": "tasksource.eval_only.mmlu",
+    "scope": "task",
+    "tasks": [
+      "mmlu"
+    ],
+    "huggingface": [
+      "tasksource/mmlu"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "MMLU is an evaluation benchmark; no train split",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/eval_only.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "blimp_hard",
+    "annotation": "tasksource.eval_only.blimp_hard",
+    "scope": "task",
+    "tasks": [
+      "blimp_hard"
+    ],
+    "huggingface": [],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "BLiMP is an evaluation benchmark (test-only minimal pairs)",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/eval_only.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "bigbench",
+    "annotation": "tasksource.eval_only.bigbench",
+    "scope": "task",
+    "tasks": [
+      "bigbench"
+    ],
+    "huggingface": [
+      "tasksource/bigbench"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "BIG-bench is an evaluation suite",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/eval_only.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "glue___ax",
+    "annotation": "tasksource.eval_only.glue___ax",
+    "scope": "task",
+    "tasks": [
+      "glue___ax"
+    ],
+    "huggingface": [
+      "nyu-mll/glue"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "test-only diagnostic set, labels masked",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/eval_only.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "glue__diagnostics",
+    "annotation": "tasksource.eval_only.glue__diagnostics",
+    "scope": "task",
+    "tasks": [
+      "glue__diagnostics"
+    ],
+    "huggingface": [
+      "pietrolesci/glue_diagnostics"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "diagnostic benchmark",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/eval_only.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "adv_glue___adv_sst2",
+    "annotation": "tasksource.eval_only.adv_glue___adv_sst2",
+    "scope": "task",
+    "tasks": [
+      "adv_glue___adv_sst2"
+    ],
+    "huggingface": [],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "adversarial evaluation benchmark, validation only",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/eval_only.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "adv_glue___adv_qqp",
+    "annotation": "tasksource.eval_only.adv_glue___adv_qqp",
+    "scope": "task",
+    "tasks": [
+      "adv_glue___adv_qqp"
+    ],
+    "huggingface": [],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "adversarial evaluation benchmark, validation only",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/eval_only.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "adv_glue___adv_mnli",
+    "annotation": "tasksource.eval_only.adv_glue___adv_mnli",
+    "scope": "task",
+    "tasks": [
+      "adv_glue___adv_mnli"
+    ],
+    "huggingface": [],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "adversarial evaluation benchmark, validation only",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/eval_only.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "adv_glue___adv_mnli_mismatched",
+    "annotation": "tasksource.eval_only.adv_glue___adv_mnli_mismatched",
+    "scope": "task",
+    "tasks": [
+      "adv_glue___adv_mnli_mismatched"
+    ],
+    "huggingface": [],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "adversarial evaluation benchmark, validation only",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/eval_only.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "adv_glue___adv_qnli",
+    "annotation": "tasksource.eval_only.adv_glue___adv_qnli",
+    "scope": "task",
+    "tasks": [
+      "adv_glue___adv_qnli"
+    ],
+    "huggingface": [],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "adversarial evaluation benchmark, validation only",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/eval_only.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "adv_glue___adv_rte",
+    "annotation": "tasksource.eval_only.adv_glue___adv_rte",
+    "scope": "task",
+    "tasks": [
+      "adv_glue___adv_rte"
+    ],
+    "huggingface": [],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "adversarial evaluation benchmark, validation only",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/eval_only.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "mbib_cognitive_bias",
+    "annotation": "tasksource.eval_only.mbib_cognitive_bias",
+    "scope": "task",
+    "tasks": [
+      "mbib_cognitive_bias"
+    ],
+    "huggingface": [
+      "mediabiasgroup/mbib-base"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "MBIB is an evaluation benchmark",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/eval_only.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "mbib_fake_news",
+    "annotation": "tasksource.eval_only.mbib_fake_news",
+    "scope": "task",
+    "tasks": [
+      "mbib_fake_news"
+    ],
+    "huggingface": [
+      "mediabiasgroup/mbib-base"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "MBIB is an evaluation benchmark",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/eval_only.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "mbib_gender_bias",
+    "annotation": "tasksource.eval_only.mbib_gender_bias",
+    "scope": "task",
+    "tasks": [
+      "mbib_gender_bias"
+    ],
+    "huggingface": [
+      "mediabiasgroup/mbib-base"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "MBIB is an evaluation benchmark",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/eval_only.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "mbib_hate_speech",
+    "annotation": "tasksource.eval_only.mbib_hate_speech",
+    "scope": "task",
+    "tasks": [
+      "mbib_hate_speech"
+    ],
+    "huggingface": [
+      "mediabiasgroup/mbib-base"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "MBIB is an evaluation benchmark",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/eval_only.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "mbib_linguistic_bias",
+    "annotation": "tasksource.eval_only.mbib_linguistic_bias",
+    "scope": "task",
+    "tasks": [
+      "mbib_linguistic_bias"
+    ],
+    "huggingface": [
+      "mediabiasgroup/mbib-base"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "MBIB is an evaluation benchmark",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/eval_only.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "mbib_political_bias",
+    "annotation": "tasksource.eval_only.mbib_political_bias",
+    "scope": "task",
+    "tasks": [
+      "mbib_political_bias"
+    ],
+    "huggingface": [
+      "mediabiasgroup/mbib-base"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "MBIB is an evaluation benchmark",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/eval_only.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "mbib_racial_bias",
+    "annotation": "tasksource.eval_only.mbib_racial_bias",
+    "scope": "task",
+    "tasks": [
+      "mbib_racial_bias"
+    ],
+    "huggingface": [
+      "mediabiasgroup/mbib-base"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "MBIB is an evaluation benchmark",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/eval_only.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "mbib_text_level_bias",
+    "annotation": "tasksource.eval_only.mbib_text_level_bias",
+    "scope": "task",
+    "tasks": [
+      "mbib_text_level_bias"
+    ],
+    "huggingface": [
+      "mediabiasgroup/mbib-base"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "MBIB is an evaluation benchmark",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/eval_only.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "ste_wic",
+    "annotation": "tasksource.eval_only.ste_wic",
+    "scope": "task",
+    "tasks": [
+      "ste_wic"
+    ],
+    "huggingface": [
+      "cardiffnlp/super_tweeteval"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "SuperTweetEval is an evaluation benchmark",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/eval_only.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "ste_nerd",
+    "annotation": "tasksource.eval_only.ste_nerd",
+    "scope": "task",
+    "tasks": [
+      "ste_nerd"
+    ],
+    "huggingface": [
+      "cardiffnlp/super_tweeteval"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "SuperTweetEval is an evaluation benchmark",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/eval_only.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "ste_sim",
+    "annotation": "tasksource.eval_only.ste_sim",
+    "scope": "task",
+    "tasks": [
+      "ste_sim"
+    ],
+    "huggingface": [
+      "cardiffnlp/super_tweeteval"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "SuperTweetEval is an evaluation benchmark",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/eval_only.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "ste_intimacy",
+    "annotation": "tasksource.eval_only.ste_intimacy",
+    "scope": "task",
+    "tasks": [
+      "ste_intimacy"
+    ],
+    "huggingface": [
+      "cardiffnlp/super_tweeteval"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "SuperTweetEval is an evaluation benchmark",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/eval_only.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "model_written_evals",
+    "annotation": "tasksource.eval_only.model_written_evals",
+    "scope": "task",
+    "tasks": [
+      "model_written_evals"
+    ],
+    "huggingface": [
+      "Anthropic/model-written-evals"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "persona evaluations; the gold 'matching behavior' is often the undesired one (power-seeking, sycophancy)",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/eval_only.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "truthful_qa___multiple_choice",
+    "annotation": "tasksource.eval_only.truthful_qa___multiple_choice",
+    "scope": "task",
+    "tasks": [
+      "truthful_qa___multiple_choice"
+    ],
+    "huggingface": [],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "TruthfulQA is an evaluation benchmark; validation split only",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/eval_only.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "neqa",
+    "annotation": "tasksource.eval_only.neqa",
+    "scope": "task",
+    "tasks": [
+      "neqa"
+    ],
+    "huggingface": [
+      "inverse-scaling/NeQA"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "Inverse Scaling Prize evaluation probe; few-shot prompt baked into the inputs",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/eval_only.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "quote_repetition",
+    "annotation": "tasksource.eval_only.quote_repetition",
+    "scope": "task",
+    "tasks": [
+      "quote_repetition"
+    ],
+    "huggingface": [
+      "inverse-scaling/quote-repetition"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "Inverse Scaling Prize evaluation probe; few-shot prompt baked into the inputs",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/eval_only.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "redefine_math",
+    "annotation": "tasksource.eval_only.redefine_math",
+    "scope": "task",
+    "tasks": [
+      "redefine_math"
+    ],
+    "huggingface": [
+      "inverse-scaling/redefine-math"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "Inverse Scaling Prize evaluation probe; \"Q: ... A:\" prompt baked into the inputs",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/eval_only.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "aces_ranking",
+    "annotation": "tasksource.eval_only.aces_ranking",
+    "scope": "task",
+    "tasks": [
+      "ACES/ranking"
+    ],
+    "huggingface": [
+      "nikitam/ACES"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "ACES is a challenge set for evaluating translation metrics",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/eval_only.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "aces_phenomena",
+    "annotation": "tasksource.eval_only.aces_phenomena",
+    "scope": "task",
+    "tasks": [
+      "ACES/phenomena"
+    ],
+    "huggingface": [
+      "nikitam/ACES"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "ACES is a challenge set for evaluating translation metrics",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/eval_only.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "imppres__presupposition",
+    "annotation": "tasksource.eval_only.imppres__presupposition",
+    "scope": "task",
+    "tasks": [
+      "imppres__presupposition"
+    ],
+    "huggingface": [
+      "tasksource/imppres"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "IMPPRES is a diagnostic set for NLI pragmatics, not training data",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/eval_only.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "imppres__prag",
+    "annotation": "tasksource.eval_only.imppres__prag",
+    "scope": "task",
+    "tasks": [
+      "imppres__prag"
+    ],
+    "huggingface": [
+      "tasksource/imppres"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "IMPPRES is a diagnostic set for NLI pragmatics, not training data",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/eval_only.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "imppres__log",
+    "annotation": "tasksource.eval_only.imppres__log",
+    "scope": "task",
+    "tasks": [
+      "imppres__log"
+    ],
+    "huggingface": [
+      "tasksource/imppres"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "IMPPRES is a diagnostic set for NLI pragmatics, not training data",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/eval_only.py"
+    ],
+    "reconsider_if": "The recorded source or supervision issue is resolved; reassess this annotation explicitly."
+  },
+  {
+    "name": "demelin/wino_x",
+    "scope": "dataset",
+    "huggingface": [
+      "demelin/wino_x"
+    ],
+    "github": [],
+    "papers": [],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "machine translation evaluation set; script-only loader",
+    "evidence": [
+      "https://github.com/sileod/tasksource/blob/main/src/tasksource/eval_only.py"
+    ],
+    "reconsider_if": "The recorded issue is resolved and a suitable training source is verified."
+  }
+]
