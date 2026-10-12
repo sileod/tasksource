@@ -106,3 +106,5 @@ Published these three completion views to Jev `default` and `full` in [Hub commi
 | Causal Reasoning Benchmarks (2026, 100k train) | Native yes/no causal classification | Transitivity implemented directly with native holdouts; cyclic graphs/self-queries excluded. D-separation deferred: 2,069/50,000 labels disagree with standard graph checks. |
 
 Batch 6 source/recast review: [audit](../../../docs/jev/retrieval-expansion-audit.json). Batch 7 graph-label review: [audit](../../../docs/jev/causal-reasoning-audit.json). Accepted views use existing templates; 23 focused regression checks pass.
+
+Batch 6/7 source and exact-export audits: [relevance](../../../docs/jev/retrieval-expansion-audit.json), [causal reasoning](../../../docs/jev/causal-reasoning-audit.json). Three actual export examples reviewed per accepted view; 23 focused regression checks passed.

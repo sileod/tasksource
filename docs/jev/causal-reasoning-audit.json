@@ -128,7 +128,7 @@
   },
   "methods": {
     "transitivity": "Independent directed reachability; excluded self-queries and cyclic graphs before comparing native labels. Zero remaining mismatches in all five included files. Native labels are never corrected or generated.",
-    "d_separation": "Ancestor closure of queried and conditioned nodes; moralize induced ancestral graph, remove conditioned nodes, then test undirected connectivity. All 2,069 mismatches include unsupported graph cases; 2,057 confirmed independently on valid DAGs."
+    "d_separation": "Ancestor closure of queried and conditioned nodes; moralize induced ancestral graph, remove conditioned nodes, then test undirected connectivity. Across all rows, 2,069 mismatches; 2,057 independently confirmed on valid DAGs with distinct unconditioned endpoints."
   },
   "canonical_counts": {
     "train": 49404,
@@ -182,7 +182,12 @@
       "5r -> W correctly no: 5r and W share parent Ig but no directed path.",
       "Yeq -> T is an explicit edge, correctly yes."
     ],
-    "scope": "Three actual recast training examples, plus independent exhaustive graph-label checks; synthetic graph supervision, not human causal judgments."
+    "scope": "Three actual recast training examples, plus independent exhaustive graph-label checks; synthetic graph supervision, not human causal judgments.",
+    "exact_staged_ids": [
+      "causal-reasoning:train:419acfcd97bf9534d7bb549eec8142f9571453d5beec63178b641e034bc237ba:causal-reasoning-transitivity-09db96cbf3",
+      "causal-reasoning:train:f77772beff0c1219ebedbbe65264f6db519f05378e796d26d3492198801f37cc:causal-reasoning-transitivity-09db96cbf3",
+      "causal-reasoning:train:247e23e0ab67eddbd250e7fe8d5231e82a96ec9d23621ae38dfb0b14f2ee3777:causal-reasoning-transitivity-09db96cbf3"
+    ]
   },
   "repackaged": false
 }

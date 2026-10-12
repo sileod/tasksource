@@ -18,10 +18,9 @@ from scripts.repackage_dataset.text import (
 from scripts.repackage_dataset.vision import view2space, ai2d, iconqa_text, mind2web
 from scripts.repackage_dataset.browser import websrc
 from scripts.repackage_dataset.mind2web import mind2web_dom
-from scripts.repackage_dataset.relevance import sentfin, wands, scirepeval_search
+from scripts.repackage_dataset.relevance import antique, sentfin, wands, scirepeval_search
 from scripts.repackage_dataset.specialized_text import acord, edos, evidence_inference
 from scripts.repackage_dataset.dialogue import slurp, mcscript2
-from scripts.repackage_dataset.relevance import antique
 from scripts.repackage_dataset.stance import vast, fnc1, perspectrum, ukpconvarg, discogem
 from scripts.repackage_dataset.specialized_text import pubmed_rct
 from scripts.repackage_dataset.linguistic import semcor, streusle, spider
