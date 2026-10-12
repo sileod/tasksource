@@ -19,6 +19,10 @@ Matching uses exact names after case/punctuation normalization, plus explicit Hu
 
 Every output has a `.manifest.json` recording source or input hashes, selection settings, catalog fingerprint and output hash. For another discovery source, emit the same candidate JSONL and reuse `match`; no provider framework is needed.
 
+The public [prospects list](../../../docs/prospects.md) summarizes screened sources
+and outstanding checks. `todo_batch.md` is an internal maintainer work queue,
+not the public discovery results. Discovery never rewrites it.
+
 ## Interchangeable retrieval sources
 
 Use `--source paperswithcode`, `--source hf_hub`, or `--source openalex`. Repeat `--source` to combine retrievals into one deduplicated JSONL; all outputs feed the same `match` and `link` commands.
@@ -41,7 +45,7 @@ python -m tasksource.task_discovery retrieve --source hf_hub --source openalex \
 
 `--query` is repeatable: scholarly search for OpenAlex, repository-name search for HF Hub, and local metadata screening for the pinned PWC export. `--task` screens PWC tags or selects Hub categories; OpenAlex uses the query text. `--limit` bounds each API query/category (PWC still uses its pinned export). API results are cached with timestamps and hashes; `--offline` replays them, and a fresh cache directory captures updated searches. PWC can replay its local snapshot or cached pinned Hub file. These are candidate retrievals: train status stays `unchecked`, quality is not inferred from popularity, and the human queue is never edited automatically.
 
-The [human-curated queue](todo_batch.md) is authoritative. Generated candidates live in separate output files and never rewrite it. Promote suggestions to that queue only after review; retrieval alone does not approve a training source. Novelty is a screening step, not a reason to integrate: require sound supervision, enough evidence in the input, usable labeled training data and a worthwhile contribution to existing coverage. A small useful shortlist is preferable to more weak datasets.
+The internal human-curated queue is authoritative for requested implementation work. Generated candidates live in separate output files and never rewrite it. Promote suggestions to that queue only after review; retrieval alone does not approve a training source. Novelty is a screening step, not a reason to integrate: require sound supervision, enough evidence in the input, usable labeled training data and a worthwhile contribution to existing coverage. A small useful shortlist is preferable to more weak datasets.
 
 For now, novelty against the catalog and queue relies mainly on names and explicit Hub repository links. A durable cross-source identity index should eventually connect verified Hub, GitHub, PWC and paper identifiers. Existing links and review identities are retained for that work, but unresolved aliases and search suggestions do not establish a new dataset.
 

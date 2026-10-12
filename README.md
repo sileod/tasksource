@@ -35,8 +35,8 @@ these annotations are excluded from the training catalogs.
 
 The [discovery tools](src/tasksource/task_discovery/README.md) retrieve and deduplicate
 dataset candidates, link source and paper identities, and retain structured review
-history. The [human-curated queue](src/tasksource/task_discovery/todo_batch.md)
-stays separate from generated suggestions.
+history. Browse the [dataset prospects](docs/prospects.md) for screened sources
+awaiting deeper checks; these are separate from the implemented task catalogs.
 
 Visual annotations are in [vision_tasks.py](src/tasksource/vision_tasks.py).
 Discover them with `list_tasks(vision=True)` and load them with
