@@ -154,3 +154,35 @@ def test_downloaded_row_establishes_resource_without_changing_training_or_fit_ga
     assert discovery.prospect_status(row)=='promising'
     for r in row['reviews']:r['data']['answers']['decision_fit']['probabilities']={'no':0.99,'yes':0.01}
     assert discovery.prospect_status(row)=='not_suitable'
+
+
+def test_verified_synthetic_filter_requires_independent_checks_and_full_coverage():
+    row=reviewed('yes','yes')
+    for review in row['reviews']:
+        answers=review['data']['answers']
+        answers.update(annotation_origin={'probabilities':{'model':0.95}},
+                       annotation_checks={'probabilities':{'executable':0.95}},
+                       verification_scope={'probabilities':{'all':0.95}})
+    assert not discovery.origin_matches(row,['human','procedural'])
+    assert discovery.origin_matches(row,['human','procedural'],allow_verified_synthetic=True)
+    answers['verification_scope']={'probabilities':{'sample':0.95}}
+    assert not discovery.origin_matches(row,['human','procedural'],allow_verified_synthetic=True)
+    answers['verification_scope']={'probabilities':{'all':0.95}}
+    answers['annotation_checks']={'probabilities':{'model_review':0.95}}
+    assert not discovery.origin_matches(row,['human','procedural'],allow_verified_synthetic=True)
+    answers.pop('annotation_checks')
+    assert not discovery.origin_matches(row,['human','procedural'],allow_verified_synthetic=True)
+
+
+def test_allow_verified_synthetic_alone_filters_unverified_model_labels(tmp_path,monkeypatch):
+    verified=reviewed('yes');unverified=reviewed('yes')
+    for row in (verified,unverified):
+        row['reviews'][0]['data']['answers'].update(annotation_origin={'probabilities':{'model':0.95}},
+            annotation_checks={'probabilities':{'executable':0.95}},verification_scope={'probabilities':{'all':0.95}})
+    unverified['reviews'][0]['data']['answers']['annotation_checks']={'probabilities':{'model_review':0.95}}
+    source=tmp_path/'reviews.jsonl';source.write_text(''.join(json.dumps(r)+'\n' for r in (verified,unverified)))
+    monkeypatch.setattr(sys,'argv',['discovery',str(source),'--from-reviews','--allow-verified-synthetic','--output',str(tmp_path/'filtered')])
+    discovery.main()
+    manifest=json.loads((tmp_path/'filtered/manifest.json').read_text())
+    assert manifest['annotation_origins']==['human','procedural'] and manifest['handoff_count']==1
+    assert manifest['annotation_filtered']==1

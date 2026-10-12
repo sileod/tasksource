@@ -72,23 +72,29 @@ def prospect_status(row):
     return 'needs_evidence'
 
 
-def origin_matches(row,allowed):
-    """All current reviewers must assign >=0.8 mass to the allowed label origins."""
+def origin_matches(row,allowed,allow_verified_synthetic=False):
+    """Keep allowed origins, optionally admitting independently verified synthetic labels."""
     if not allowed:return True
     answers=current_answers(row)
-    return bool(answers) and all(sum(a.get('annotation_origin',{}).get('probabilities',{}).get(k,0)
-                                    for k in set(allowed))>=0.8 for a in answers)
+    for answer in answers:
+        origin=answer.get('annotation_origin',{}).get('probabilities',{})
+        checks=answer.get('annotation_checks',{}).get('probabilities',{})
+        covered=answer.get('verification_scope',{}).get('probabilities',{}).get('all',0)>=0.8
+        verified=sum(checks.get(k,0) for k in ('independent_review','agreement','executable','multiple'))>=0.8
+        if sum(origin.get(k,0) for k in set(allowed))<0.8 and not (allow_verified_synthetic
+                and origin.get('model',0)+origin.get('mixed',0)>=0.8 and covered and verified):return False
+    return bool(answers)
 
 
-def save_prospects(rows,output,origins=()):
+def save_prospects(rows,output,origins=(),allow_verified_synthetic=False):
     prospects=[dict(row,resource_observed=bool(observed_resource(row)),prospect_status=prospect_status(row)) for row in rows]
     promising=[r for r in prospects if r['prospect_status']=='promising']
-    handoff=[r for r in promising if origin_matches(r,origins)]
+    handoff=[r for r in promising if origin_matches(r,origins,allow_verified_synthetic)]
     write_rows(output/'prospects.jsonl',prospects)
     write_rows(output/'handoff.jsonl',handoff)
     return dict(status_counts={s:sum(r['prospect_status']==s for r in prospects)
                                for s in ('promising','needs_evidence','not_suitable')},
-                annotation_origins=origins,handoff_count=len(handoff),annotation_filtered=len(promising)-len(handoff))
+                annotation_origins=origins,allow_verified_synthetic=allow_verified_synthetic,handoff_count=len(handoff),annotation_filtered=len(promising)-len(handoff))
 
 
 def language_priority(row, requested):
@@ -121,15 +127,17 @@ def main():
     parser.add_argument('--language',action='append',default=[],help='Prefer this dataset language; retain unknown, exclude known mismatches')
     parser.add_argument('--exclude',action='append',type=Path,default=[],help='Prior screened JSONL; repeat to avoid spending on the same candidates')
     parser.add_argument('--annotation-origin',action='append',default=[],choices=('human','procedural','model','mixed','unknown'),help='Allowed label origins in handoff; repeat for OR, all reviewers must support them')
+    parser.add_argument('--allow-verified-synthetic',action='store_true',help='With an origin filter, also admit model/mixed labels with independent checks covering all retained labels')
     parser.add_argument('--from-reviews',action='store_true',help='Filter saved reviews without network or model calls')
     parser.add_argument('--include-known',action='store_true',help='Bypass catalog/history/queue exclusion for calibration')
     parser.add_argument('--model',action='append');parser.add_argument('--offline-evidence',action='store_true')
     args=parser.parse_args()
+    if args.allow_verified_synthetic and not args.annotation_origin:args.annotation_origin=['human','procedural']
     if args.limit<1:parser.error('--limit must be positive')
     args.output.mkdir(parents=True,exist_ok=True)
     rows=[json.loads(line) for path in args.inputs for line in path.read_text().splitlines() if line.strip()]
     if args.from_reviews:
-        manifest=save_prospects(rows,args.output,args.annotation_origin)
+        manifest=save_prospects(rows,args.output,args.annotation_origin,args.allow_verified_synthetic)
         manifest.update(input_hashes={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in args.inputs},from_reviews=True)
         (args.output/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
         print(json.dumps(manifest));return
@@ -160,7 +168,7 @@ def main():
     print('Training metadata saved; collecting evidence and reviewing',flush=True)
     manifest=run(checked,args.output/'review',args.cache,args.model or [MODEL],args.offline_evidence) if checked else {}
     reviewed=[json.loads(l) for l in (args.output/'review/reviews.jsonl').read_text().splitlines()] if checked else []
-    manifest.update(save_prospects(reviewed,args.output,args.annotation_origin))
+    manifest.update(save_prospects(reviewed,args.output,args.annotation_origin,args.allow_verified_synthetic))
     manifest.update(input_hashes={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in args.inputs},
         catalog_sha256=catalog_hash(names,repos),
         reference_sha256=hashlib.sha256(json.dumps({k:sorted(v) for k,v in references.items()},sort_keys=True).encode()).hexdigest(),
