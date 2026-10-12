@@ -3,7 +3,7 @@
   "revision": "d4529cf8f123010f243424486ff6527952d94b2a",
   "examples_per_task": 3,
   "seed": 0,
-  "generator_sha256": "87125f245405a5777fa8a4fc50b75619f486068483da4473c395c9ee44e18337",
+  "generator_sha256": "655134210e6ab75766df087c4265b07af1b8bd98d9124fab0d1e7736b9045005",
   "tasks": [
     {
       "id": "glue/mnli",
@@ -3209,49 +3209,73 @@
       "dataset": "pietrolesci/dialogue_nli",
       "examples": [
         {
+          "id": "dialogue-nli-83a239d75f:train:0",
+          "kind": "choice",
+          "options": [
+            "entailment",
+            "neutral",
+            "contradiction"
+          ],
+          "target": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "state": "text_A: i like usc and traveling .\ntext_B: i have been around the world .",
+          "question": "Does text_A entail text_B, contradict it, or neither?",
           "source": "dialogue_nli",
-          "id": "dialogue_nli:canonical:sample:0",
+          "variant": "direct",
           "split": "train",
-          "canonical": {
-            "labels": "entailment",
-            "sentence1": "i like usc and traveling .",
-            "sentence2": "i have been around the world ."
-          },
-          "question": "",
-          "origin": "canonical preprocessing (not a published Jev row)",
           "provenance": {
             "dataset": "pietrolesci/dialogue_nli"
-          }
+          },
+          "origin": "current local Jev recast (not yet published)"
         },
         {
+          "id": "dialogue-nli-83a239d75f:train:1",
+          "kind": "choice",
+          "options": [
+            "entailment",
+            "neutral",
+            "contradiction"
+          ],
+          "target": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "state": "text_A: i am a competitive dancer ! but i am too short to be a ballerina .\ntext_B: i am 6 feet tall .",
+          "question": "Does text_A entail text_B, contradict it, or neither?",
           "source": "dialogue_nli",
-          "id": "dialogue_nli:canonical:sample:1",
+          "variant": "direct",
           "split": "train",
-          "canonical": {
-            "labels": "contradiction",
-            "sentence1": "i am a competitive dancer ! but i am too short to be a ballerina .",
-            "sentence2": "i am 6 feet tall ."
-          },
-          "question": "",
-          "origin": "canonical preprocessing (not a published Jev row)",
           "provenance": {
             "dataset": "pietrolesci/dialogue_nli"
-          }
+          },
+          "origin": "current local Jev recast (not yet published)"
         },
         {
+          "id": "dialogue-nli-83a239d75f:train:2",
+          "kind": "choice",
+          "options": [
+            "entailment",
+            "neutral",
+            "contradiction"
+          ],
+          "target": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "state": "text_A: i have a dog with a lot of hair .\ntext_B: the pitbull i have weighs twice as much as the kitten in the house .",
+          "question": "Does text_A entail text_B, contradict it, or neither?",
           "source": "dialogue_nli",
-          "id": "dialogue_nli:canonical:sample:2",
+          "variant": "direct",
           "split": "train",
-          "canonical": {
-            "labels": "entailment",
-            "sentence1": "i have a dog with a lot of hair .",
-            "sentence2": "the pitbull i have weighs twice as much as the kitten in the house ."
-          },
-          "question": "",
-          "origin": "canonical preprocessing (not a published Jev row)",
           "provenance": {
             "dataset": "pietrolesci/dialogue_nli"
-          }
+          },
+          "origin": "current local Jev recast (not yet published)"
         }
       ],
       "error": null
@@ -4857,14 +4881,64 @@
               "."
             ]
           },
-          "question": "",
-          "origin": "canonical preprocessing (not a published Jev row)",
+          "question": "Assign each token its Penn Treebank part-of-speech tag.",
+          "criteria": [
+            "\"",
+            "''",
+            "#",
+            "$",
+            "(",
+            ")",
+            ",",
+            ".",
+            ":",
+            "``",
+            "CC",
+            "CD",
+            "DT",
+            "EX",
+            "FW",
+            "IN",
+            "JJ",
+            "JJR",
+            "JJS",
+            "LS",
+            "MD",
+            "NN",
+            "NNP",
+            "NNPS",
+            "NNS",
+            "NN|SYM",
+            "PDT",
+            "POS",
+            "PRP",
+            "PRP$",
+            "RB",
+            "RBR",
+            "RBS",
+            "RP",
+            "SYM",
+            "TO",
+            "UH",
+            "VB",
+            "VBD",
+            "VBG",
+            "VBN",
+            "VBP",
+            "VBZ",
+            "WDT",
+            "WP",
+            "WP$",
+            "WRB"
+          ],
           "provenance": {
             "dataset": "tomaarsen/conll2003",
             "originals": [
               "eriktks/conll2003"
             ]
-          }
+          },
+          "row_metadata": null,
+          "origin": "canonical preprocessing (not a published Jev row)"
         },
         {
           "source": "conll2003/pos_tags",
@@ -4934,14 +5008,64 @@
               "."
             ]
           },
-          "question": "",
-          "origin": "canonical preprocessing (not a published Jev row)",
+          "question": "Assign each token its Penn Treebank part-of-speech tag.",
+          "criteria": [
+            "\"",
+            "''",
+            "#",
+            "$",
+            "(",
+            ")",
+            ",",
+            ".",
+            ":",
+            "``",
+            "CC",
+            "CD",
+            "DT",
+            "EX",
+            "FW",
+            "IN",
+            "JJ",
+            "JJR",
+            "JJS",
+            "LS",
+            "MD",
+            "NN",
+            "NNP",
+            "NNPS",
+            "NNS",
+            "NN|SYM",
+            "PDT",
+            "POS",
+            "PRP",
+            "PRP$",
+            "RB",
+            "RBR",
+            "RBS",
+            "RP",
+            "SYM",
+            "TO",
+            "UH",
+            "VB",
+            "VBD",
+            "VBG",
+            "VBN",
+            "VBP",
+            "VBZ",
+            "WDT",
+            "WP",
+            "WP$",
+            "WRB"
+          ],
           "provenance": {
             "dataset": "tomaarsen/conll2003",
             "originals": [
               "eriktks/conll2003"
             ]
-          }
+          },
+          "row_metadata": null,
+          "origin": "canonical preprocessing (not a published Jev row)"
         },
         {
           "source": "conll2003/pos_tags",
@@ -4973,14 +5097,64 @@
               "."
             ]
           },
-          "question": "",
-          "origin": "canonical preprocessing (not a published Jev row)",
+          "question": "Assign each token its Penn Treebank part-of-speech tag.",
+          "criteria": [
+            "\"",
+            "''",
+            "#",
+            "$",
+            "(",
+            ")",
+            ",",
+            ".",
+            ":",
+            "``",
+            "CC",
+            "CD",
+            "DT",
+            "EX",
+            "FW",
+            "IN",
+            "JJ",
+            "JJR",
+            "JJS",
+            "LS",
+            "MD",
+            "NN",
+            "NNP",
+            "NNPS",
+            "NNS",
+            "NN|SYM",
+            "PDT",
+            "POS",
+            "PRP",
+            "PRP$",
+            "RB",
+            "RBR",
+            "RBS",
+            "RP",
+            "SYM",
+            "TO",
+            "UH",
+            "VB",
+            "VBD",
+            "VBG",
+            "VBN",
+            "VBP",
+            "VBZ",
+            "WDT",
+            "WP",
+            "WP$",
+            "WRB"
+          ],
           "provenance": {
             "dataset": "tomaarsen/conll2003",
             "originals": [
               "eriktks/conll2003"
             ]
-          }
+          },
+          "row_metadata": null,
+          "origin": "canonical preprocessing (not a published Jev row)"
         }
       ],
       "error": null
@@ -5026,14 +5200,40 @@
               "O"
             ]
           },
-          "question": "",
-          "origin": "canonical preprocessing (not a published Jev row)",
+          "question": "Assign each token its phrase chunk tag: B starts a chunk, I continues it, O is outside.",
+          "criteria": [
+            "O",
+            "B-ADJP",
+            "I-ADJP",
+            "B-ADVP",
+            "I-ADVP",
+            "B-CONJP",
+            "I-CONJP",
+            "B-INTJ",
+            "I-INTJ",
+            "B-LST",
+            "I-LST",
+            "B-NP",
+            "I-NP",
+            "B-PP",
+            "I-PP",
+            "B-PRT",
+            "I-PRT",
+            "B-SBAR",
+            "I-SBAR",
+            "B-UCP",
+            "I-UCP",
+            "B-VP",
+            "I-VP"
+          ],
           "provenance": {
             "dataset": "tomaarsen/conll2003",
             "originals": [
               "eriktks/conll2003"
             ]
-          }
+          },
+          "row_metadata": null,
+          "origin": "canonical preprocessing (not a published Jev row)"
         },
         {
           "source": "conll2003/chunk_tags",
@@ -5103,14 +5303,40 @@
               "O"
             ]
           },
-          "question": "",
-          "origin": "canonical preprocessing (not a published Jev row)",
+          "question": "Assign each token its phrase chunk tag: B starts a chunk, I continues it, O is outside.",
+          "criteria": [
+            "O",
+            "B-ADJP",
+            "I-ADJP",
+            "B-ADVP",
+            "I-ADVP",
+            "B-CONJP",
+            "I-CONJP",
+            "B-INTJ",
+            "I-INTJ",
+            "B-LST",
+            "I-LST",
+            "B-NP",
+            "I-NP",
+            "B-PP",
+            "I-PP",
+            "B-PRT",
+            "I-PRT",
+            "B-SBAR",
+            "I-SBAR",
+            "B-UCP",
+            "I-UCP",
+            "B-VP",
+            "I-VP"
+          ],
           "provenance": {
             "dataset": "tomaarsen/conll2003",
             "originals": [
               "eriktks/conll2003"
             ]
-          }
+          },
+          "row_metadata": null,
+          "origin": "canonical preprocessing (not a published Jev row)"
         },
         {
           "source": "conll2003/chunk_tags",
@@ -5142,14 +5368,40 @@
               "O"
             ]
           },
-          "question": "",
-          "origin": "canonical preprocessing (not a published Jev row)",
+          "question": "Assign each token its phrase chunk tag: B starts a chunk, I continues it, O is outside.",
+          "criteria": [
+            "O",
+            "B-ADJP",
+            "I-ADJP",
+            "B-ADVP",
+            "I-ADVP",
+            "B-CONJP",
+            "I-CONJP",
+            "B-INTJ",
+            "I-INTJ",
+            "B-LST",
+            "I-LST",
+            "B-NP",
+            "I-NP",
+            "B-PP",
+            "I-PP",
+            "B-PRT",
+            "I-PRT",
+            "B-SBAR",
+            "I-SBAR",
+            "B-UCP",
+            "I-UCP",
+            "B-VP",
+            "I-VP"
+          ],
           "provenance": {
             "dataset": "tomaarsen/conll2003",
             "originals": [
               "eriktks/conll2003"
             ]
-          }
+          },
+          "row_metadata": null,
+          "origin": "canonical preprocessing (not a published Jev row)"
         }
       ],
       "error": null
@@ -11430,58 +11682,109 @@
       "dataset": "tasksource/silicone",
       "examples": [
         {
+          "id": "silicone-dyda-e-f4ea112d17:train:0",
+          "kind": "choice",
+          "options": [
+            "anger",
+            "disgust",
+            "fear",
+            "happiness",
+            "no emotion",
+            "sadness",
+            "surprise"
+          ],
+          "target": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0
+          ],
+          "state": "yeah ! but french is not easy to learn .",
+          "question": "What emotion does this utterance express?",
           "source": "silicone/dyda_e",
-          "id": "silicone/dyda_e:canonical:sample:0",
+          "variant": "direct",
           "split": "train",
-          "canonical": {
-            "sentence1": "yeah ! but french is not easy to learn .",
-            "labels": "no emotion"
-          },
-          "question": "",
-          "origin": "canonical preprocessing (not a published Jev row)",
           "provenance": {
             "dataset": "tasksource/silicone",
             "config": "dyda_e",
             "originals": [
               "eusip/silicone"
             ]
-          }
+          },
+          "origin": "current local Jev recast (not yet published)"
         },
         {
+          "id": "silicone-dyda-e-f4ea112d17:train:1",
+          "kind": "choice",
+          "options": [
+            "anger",
+            "disgust",
+            "fear",
+            "happiness",
+            "no emotion",
+            "sadness",
+            "surprise"
+          ],
+          "target": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0
+          ],
+          "state": "what's the matter ?",
+          "question": "What emotion does this utterance express?",
           "source": "silicone/dyda_e",
-          "id": "silicone/dyda_e:canonical:sample:1",
+          "variant": "direct",
           "split": "train",
-          "canonical": {
-            "sentence1": "what's the matter ?",
-            "labels": "no emotion"
-          },
-          "question": "",
-          "origin": "canonical preprocessing (not a published Jev row)",
           "provenance": {
             "dataset": "tasksource/silicone",
             "config": "dyda_e",
             "originals": [
               "eusip/silicone"
             ]
-          }
+          },
+          "origin": "current local Jev recast (not yet published)"
         },
         {
+          "id": "silicone-dyda-e-f4ea112d17:train:2",
+          "kind": "choice",
+          "options": [
+            "anger",
+            "disgust",
+            "fear",
+            "happiness",
+            "no emotion",
+            "sadness",
+            "surprise"
+          ],
+          "target": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0
+          ],
+          "state": "of course . it's common too that we wear something special for our chinese new year .",
+          "question": "What emotion does this utterance express?",
           "source": "silicone/dyda_e",
-          "id": "silicone/dyda_e:canonical:sample:2",
+          "variant": "direct",
           "split": "train",
-          "canonical": {
-            "sentence1": "of course . it's common too that we wear something special for our chinese new year .",
-            "labels": "no emotion"
-          },
-          "question": "",
-          "origin": "canonical preprocessing (not a published Jev row)",
           "provenance": {
             "dataset": "tasksource/silicone",
             "config": "dyda_e",
             "originals": [
               "eusip/silicone"
             ]
-          }
+          },
+          "origin": "current local Jev recast (not yet published)"
         }
       ],
       "error": null
@@ -11744,58 +12047,85 @@
       "dataset": "tasksource/silicone",
       "examples": [
         {
+          "id": "silicone-meld-s-d1ca4885d7:train:0",
+          "kind": "choice",
+          "options": [
+            "negative",
+            "neutral",
+            "positive"
+          ],
+          "target": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "state": "You got it going on !",
+          "question": "What sentiment does this utterance express?",
           "source": "silicone/meld_s",
-          "id": "silicone/meld_s:canonical:sample:0",
+          "variant": "direct",
           "split": "train",
-          "canonical": {
-            "sentence1": "You got it going on !",
-            "labels": "positive"
-          },
-          "question": "",
-          "origin": "canonical preprocessing (not a published Jev row)",
           "provenance": {
             "dataset": "tasksource/silicone",
             "config": "meld_s",
             "originals": [
               "eusip/silicone"
             ]
-          }
+          },
+          "origin": "current local Jev recast (not yet published)"
         },
         {
+          "id": "silicone-meld-s-d1ca4885d7:train:1",
+          "kind": "score",
+          "options": [
+            "negative",
+            "neutral",
+            "positive"
+          ],
+          "target": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "state": "Do you wanna come in for some lemonade ?",
+          "question": "What sentiment does this utterance express?",
           "source": "silicone/meld_s",
-          "id": "silicone/meld_s:canonical:sample:1",
+          "variant": "direct",
           "split": "train",
-          "canonical": {
-            "sentence1": "Do you wanna come in for some lemonade ?",
-            "labels": "neutral"
-          },
-          "question": "",
-          "origin": "canonical preprocessing (not a published Jev row)",
           "provenance": {
             "dataset": "tasksource/silicone",
             "config": "meld_s",
             "originals": [
               "eusip/silicone"
             ]
-          }
+          },
+          "origin": "current local Jev recast (not yet published)"
         },
         {
+          "id": "silicone-meld-s-d1ca4885d7:train:2",
+          "kind": "choice",
+          "options": [
+            "negative",
+            "neutral",
+            "positive"
+          ],
+          "target": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "state": "Hi Mom , it 's Jill .",
+          "question": "What sentiment does this utterance express?",
           "source": "silicone/meld_s",
-          "id": "silicone/meld_s:canonical:sample:2",
+          "variant": "direct",
           "split": "train",
-          "canonical": {
-            "sentence1": "Hi Mom , it 's Jill .",
-            "labels": "neutral"
-          },
-          "question": "",
-          "origin": "canonical preprocessing (not a published Jev row)",
           "provenance": {
             "dataset": "tasksource/silicone",
             "config": "meld_s",
             "originals": [
               "eusip/silicone"
             ]
-          }
+          },
+          "origin": "current local Jev recast (not yet published)"
         }
       ],
       "error": null
@@ -11806,58 +12136,109 @@
       "dataset": "tasksource/silicone",
       "examples": [
         {
+          "id": "silicone-meld-e-10012c5f7a:train:0",
+          "kind": "choice",
+          "options": [
+            "anger",
+            "disgust",
+            "fear",
+            "joy",
+            "neutral",
+            "sadness",
+            "surprise"
+          ],
+          "target": [
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "state": "You got it going on !",
+          "question": "What emotion does this utterance express?",
           "source": "silicone/meld_e",
-          "id": "silicone/meld_e:canonical:sample:0",
+          "variant": "direct",
           "split": "train",
-          "canonical": {
-            "sentence1": "You got it going on !",
-            "labels": "joy"
-          },
-          "question": "",
-          "origin": "canonical preprocessing (not a published Jev row)",
           "provenance": {
             "dataset": "tasksource/silicone",
             "config": "meld_e",
             "originals": [
               "eusip/silicone"
             ]
-          }
+          },
+          "origin": "current local Jev recast (not yet published)"
         },
         {
+          "id": "silicone-meld-e-10012c5f7a:train:1",
+          "kind": "choice",
+          "options": [
+            "anger",
+            "disgust",
+            "fear",
+            "joy",
+            "neutral",
+            "sadness",
+            "surprise"
+          ],
+          "target": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0
+          ],
+          "state": "Do you wanna come in for some lemonade ?",
+          "question": "What emotion does this utterance express?",
           "source": "silicone/meld_e",
-          "id": "silicone/meld_e:canonical:sample:1",
+          "variant": "direct",
           "split": "train",
-          "canonical": {
-            "sentence1": "Do you wanna come in for some lemonade ?",
-            "labels": "neutral"
-          },
-          "question": "",
-          "origin": "canonical preprocessing (not a published Jev row)",
           "provenance": {
             "dataset": "tasksource/silicone",
             "config": "meld_e",
             "originals": [
               "eusip/silicone"
             ]
-          }
+          },
+          "origin": "current local Jev recast (not yet published)"
         },
         {
+          "id": "silicone-meld-e-10012c5f7a:train:2",
+          "kind": "choice",
+          "options": [
+            "anger",
+            "disgust",
+            "fear",
+            "joy",
+            "neutral",
+            "sadness",
+            "surprise"
+          ],
+          "target": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0
+          ],
+          "state": "Hi Mom , it 's Jill .",
+          "question": "What emotion does this utterance express?",
           "source": "silicone/meld_e",
-          "id": "silicone/meld_e:canonical:sample:2",
+          "variant": "direct",
           "split": "train",
-          "canonical": {
-            "sentence1": "Hi Mom , it 's Jill .",
-            "labels": "neutral"
-          },
-          "question": "",
-          "origin": "canonical preprocessing (not a published Jev row)",
           "provenance": {
             "dataset": "tasksource/silicone",
             "config": "meld_e",
             "originals": [
               "eusip/silicone"
             ]
-          }
+          },
+          "origin": "current local Jev recast (not yet published)"
         }
       ],
       "error": null
@@ -11868,58 +12249,91 @@
       "dataset": "tasksource/silicone",
       "examples": [
         {
+          "id": "silicone-iemocap-9b982d0754:train:0",
+          "kind": "choice",
+          "options": [
+            "anger",
+            "excitement",
+            "neutral",
+            "sadness"
+          ],
+          "target": [
+            0.0,
+            1.0,
+            0.0,
+            0.0
+          ],
+          "state": "And tonight my parents want to take me out to sushi and they said I could bring you.",
+          "question": "What emotion does this utterance express?",
           "source": "silicone/iemocap",
-          "id": "silicone/iemocap:canonical:sample:0",
+          "variant": "direct",
           "split": "train",
-          "canonical": {
-            "sentence1": "And tonight my parents want to take me out to sushi and they said I could bring you.",
-            "labels": "excitement"
-          },
-          "question": "",
-          "origin": "canonical preprocessing (not a published Jev row)",
           "provenance": {
             "dataset": "tasksource/silicone",
             "config": "iemocap",
             "originals": [
               "eusip/silicone"
             ]
-          }
+          },
+          "origin": "current local Jev recast (not yet published)"
         },
         {
+          "id": "silicone-iemocap-9b982d0754:train:1",
+          "kind": "choice",
+          "options": [
+            "anger",
+            "excitement",
+            "neutral",
+            "sadness"
+          ],
+          "target": [
+            1.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "state": "What about me?",
+          "question": "What emotion does this utterance express?",
           "source": "silicone/iemocap",
-          "id": "silicone/iemocap:canonical:sample:1",
+          "variant": "direct",
           "split": "train",
-          "canonical": {
-            "sentence1": "What about me?",
-            "labels": "anger"
-          },
-          "question": "",
-          "origin": "canonical preprocessing (not a published Jev row)",
           "provenance": {
             "dataset": "tasksource/silicone",
             "config": "iemocap",
             "originals": [
               "eusip/silicone"
             ]
-          }
+          },
+          "origin": "current local Jev recast (not yet published)"
         },
         {
+          "id": "silicone-iemocap-9b982d0754:train:2",
+          "kind": "choice",
+          "options": [
+            "anger",
+            "excitement",
+            "neutral",
+            "sadness"
+          ],
+          "target": [
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ],
+          "state": "What I can",
+          "question": "What emotion does this utterance express?",
           "source": "silicone/iemocap",
-          "id": "silicone/iemocap:canonical:sample:2",
+          "variant": "direct",
           "split": "train",
-          "canonical": {
-            "sentence1": "What I can",
-            "labels": "neutral"
-          },
-          "question": "",
-          "origin": "canonical preprocessing (not a published Jev row)",
           "provenance": {
             "dataset": "tasksource/silicone",
             "config": "iemocap",
             "originals": [
               "eusip/silicone"
             ]
-          }
+          },
+          "origin": "current local Jev recast (not yet published)"
         }
       ],
       "error": null
@@ -16789,12 +17203,18 @@
               "O"
             ]
           },
-          "question": "",
-          "origin": "canonical preprocessing (not a published Jev row)",
+          "question": "Tag disease mentions in the tokens: B-Disease starts a mention, I-Disease continues it, O is outside.",
+          "criteria": [
+            "O",
+            "B-Disease",
+            "I-Disease"
+          ],
           "provenance": {
             "dataset": "ncbi/ncbi_disease",
             "revision": "refs/convert/parquet"
-          }
+          },
+          "row_metadata": null,
+          "origin": "canonical preprocessing (not a published Jev row)"
         },
         {
           "source": "ncbi_disease/ncbi_disease",
@@ -16878,12 +17298,18 @@
               "O"
             ]
           },
-          "question": "",
-          "origin": "canonical preprocessing (not a published Jev row)",
+          "question": "Tag disease mentions in the tokens: B-Disease starts a mention, I-Disease continues it, O is outside.",
+          "criteria": [
+            "O",
+            "B-Disease",
+            "I-Disease"
+          ],
           "provenance": {
             "dataset": "ncbi/ncbi_disease",
             "revision": "refs/convert/parquet"
-          }
+          },
+          "row_metadata": null,
+          "origin": "canonical preprocessing (not a published Jev row)"
         },
         {
           "source": "ncbi_disease/ncbi_disease",
@@ -16927,12 +17353,18 @@
               "O"
             ]
           },
-          "question": "",
-          "origin": "canonical preprocessing (not a published Jev row)",
+          "question": "Tag disease mentions in the tokens: B-Disease starts a mention, I-Disease continues it, O is outside.",
+          "criteria": [
+            "O",
+            "B-Disease",
+            "I-Disease"
+          ],
           "provenance": {
             "dataset": "ncbi/ncbi_disease",
             "revision": "refs/convert/parquet"
-          }
+          },
+          "row_metadata": null,
+          "origin": "canonical preprocessing (not a published Jev row)"
         }
       ],
       "error": null
@@ -16996,7 +17428,14 @@
               "O"
             ]
           },
-          "question": "",
+          "question": "Tag acronym short forms and their expanded long forms: B starts a span, I continues it, O is outside.",
+          "criteria": [
+            "B-long",
+            "B-short",
+            "I-long",
+            "I-short",
+            "O"
+          ],
           "provenance": {
             "dataset": "amirveyseh/acronym_identification"
           },
@@ -17087,7 +17526,14 @@
               "O"
             ]
           },
-          "question": "",
+          "question": "Tag acronym short forms and their expanded long forms: B starts a span, I continues it, O is outside.",
+          "criteria": [
+            "B-long",
+            "B-short",
+            "I-long",
+            "I-short",
+            "O"
+          ],
           "provenance": {
             "dataset": "amirveyseh/acronym_identification"
           },
@@ -17182,7 +17628,14 @@
               "O"
             ]
           },
-          "question": "",
+          "question": "Tag acronym short forms and their expanded long forms: B starts a span, I continues it, O is outside.",
+          "criteria": [
+            "B-long",
+            "B-short",
+            "I-long",
+            "I-short",
+            "O"
+          ],
           "provenance": {
             "dataset": "amirveyseh/acronym_identification"
           },
@@ -17241,7 +17694,20 @@
               "O"
             ]
           },
-          "question": "",
+          "question": "Tag DNA, RNA, proteins, cell types and cell lines: B starts a mention, I continues it, O is outside.",
+          "criteria": [
+            "O",
+            "B-DNA",
+            "I-DNA",
+            "B-RNA",
+            "I-RNA",
+            "B-cell_line",
+            "I-cell_line",
+            "B-cell_type",
+            "I-cell_type",
+            "B-protein",
+            "I-protein"
+          ],
           "provenance": {
             "dataset": "jnlpba/jnlpba",
             "revision": "refs/convert/parquet"
@@ -17317,7 +17783,20 @@
               "O"
             ]
           },
-          "question": "",
+          "question": "Tag DNA, RNA, proteins, cell types and cell lines: B starts a mention, I continues it, O is outside.",
+          "criteria": [
+            "O",
+            "B-DNA",
+            "I-DNA",
+            "B-RNA",
+            "I-RNA",
+            "B-cell_line",
+            "I-cell_line",
+            "B-cell_type",
+            "I-cell_type",
+            "B-protein",
+            "I-protein"
+          ],
           "provenance": {
             "dataset": "jnlpba/jnlpba",
             "revision": "refs/convert/parquet"
@@ -17423,7 +17902,20 @@
               "O"
             ]
           },
-          "question": "",
+          "question": "Tag DNA, RNA, proteins, cell types and cell lines: B starts a mention, I continues it, O is outside.",
+          "criteria": [
+            "O",
+            "B-DNA",
+            "I-DNA",
+            "B-RNA",
+            "I-RNA",
+            "B-cell_line",
+            "I-cell_line",
+            "B-cell_type",
+            "I-cell_type",
+            "B-protein",
+            "I-protein"
+          ],
           "provenance": {
             "dataset": "jnlpba/jnlpba",
             "revision": "refs/convert/parquet"
@@ -17467,7 +17959,46 @@
               "O"
             ]
           },
-          "question": "",
+          "question": "Assign each token its OntoNotes named-entity tag: B starts a mention, I continues it, O is outside.",
+          "criteria": [
+            "O",
+            "B-PERSON",
+            "I-PERSON",
+            "B-NORP",
+            "I-NORP",
+            "B-FAC",
+            "I-FAC",
+            "B-ORG",
+            "I-ORG",
+            "B-GPE",
+            "I-GPE",
+            "B-LOC",
+            "I-LOC",
+            "B-PRODUCT",
+            "I-PRODUCT",
+            "B-DATE",
+            "I-DATE",
+            "B-TIME",
+            "I-TIME",
+            "B-PERCENT",
+            "I-PERCENT",
+            "B-MONEY",
+            "I-MONEY",
+            "B-QUANTITY",
+            "I-QUANTITY",
+            "B-ORDINAL",
+            "I-ORDINAL",
+            "B-CARDINAL",
+            "I-CARDINAL",
+            "B-EVENT",
+            "I-EVENT",
+            "B-WORK_OF_ART",
+            "I-WORK_OF_ART",
+            "B-LAW",
+            "I-LAW",
+            "B-LANGUAGE",
+            "I-LANGUAGE"
+          ],
           "provenance": {
             "dataset": "SpeedOfMagic/ontonotes_english",
             "revision": "refs/convert/parquet"
@@ -17557,7 +18088,46 @@
               "O"
             ]
           },
-          "question": "",
+          "question": "Assign each token its OntoNotes named-entity tag: B starts a mention, I continues it, O is outside.",
+          "criteria": [
+            "O",
+            "B-PERSON",
+            "I-PERSON",
+            "B-NORP",
+            "I-NORP",
+            "B-FAC",
+            "I-FAC",
+            "B-ORG",
+            "I-ORG",
+            "B-GPE",
+            "I-GPE",
+            "B-LOC",
+            "I-LOC",
+            "B-PRODUCT",
+            "I-PRODUCT",
+            "B-DATE",
+            "I-DATE",
+            "B-TIME",
+            "I-TIME",
+            "B-PERCENT",
+            "I-PERCENT",
+            "B-MONEY",
+            "I-MONEY",
+            "B-QUANTITY",
+            "I-QUANTITY",
+            "B-ORDINAL",
+            "I-ORDINAL",
+            "B-CARDINAL",
+            "I-CARDINAL",
+            "B-EVENT",
+            "I-EVENT",
+            "B-WORK_OF_ART",
+            "I-WORK_OF_ART",
+            "B-LAW",
+            "I-LAW",
+            "B-LANGUAGE",
+            "I-LANGUAGE"
+          ],
           "provenance": {
             "dataset": "SpeedOfMagic/ontonotes_english",
             "revision": "refs/convert/parquet"
@@ -17591,7 +18161,46 @@
               "O"
             ]
           },
-          "question": "",
+          "question": "Assign each token its OntoNotes named-entity tag: B starts a mention, I continues it, O is outside.",
+          "criteria": [
+            "O",
+            "B-PERSON",
+            "I-PERSON",
+            "B-NORP",
+            "I-NORP",
+            "B-FAC",
+            "I-FAC",
+            "B-ORG",
+            "I-ORG",
+            "B-GPE",
+            "I-GPE",
+            "B-LOC",
+            "I-LOC",
+            "B-PRODUCT",
+            "I-PRODUCT",
+            "B-DATE",
+            "I-DATE",
+            "B-TIME",
+            "I-TIME",
+            "B-PERCENT",
+            "I-PERCENT",
+            "B-MONEY",
+            "I-MONEY",
+            "B-QUANTITY",
+            "I-QUANTITY",
+            "B-ORDINAL",
+            "I-ORDINAL",
+            "B-CARDINAL",
+            "I-CARDINAL",
+            "B-EVENT",
+            "I-EVENT",
+            "B-WORK_OF_ART",
+            "I-WORK_OF_ART",
+            "B-LAW",
+            "I-LAW",
+            "B-LANGUAGE",
+            "I-LANGUAGE"
+          ],
           "provenance": {
             "dataset": "SpeedOfMagic/ontonotes_english",
             "revision": "refs/convert/parquet"
@@ -18722,52 +19331,76 @@
       "dataset": "tasksource/dynasent",
       "examples": [
         {
+          "id": "dynasent-dynabench-dynasent-r1-all-r1-010e3d960d:train:0",
+          "kind": "choice",
+          "options": [
+            "negative",
+            "neutral",
+            "positive"
+          ],
+          "target": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "state": "I Was recommended by many friends that live near by .",
+          "question": "What sentiment does this sentence express?",
           "source": "dynasent/dynabench.dynasent.r1.all/r1",
-          "id": "dynasent/dynabench.dynasent.r1.all/r1:canonical:sample:0",
+          "variant": "direct",
           "split": "train",
-          "canonical": {
-            "sentence1": "I Was recommended by many friends that live near by .",
-            "labels": "positive"
-          },
-          "question": "",
           "provenance": {
             "dataset": "tasksource/dynasent",
             "config": "r1"
           },
-          "row_metadata": null,
-          "origin": "canonical preprocessing (not a published Jev row)"
+          "origin": "current local Jev recast (not yet published)"
         },
         {
+          "id": "dynasent-dynabench-dynasent-r1-all-r1-010e3d960d:train:1",
+          "kind": "choice",
+          "options": [
+            "negative",
+            "neutral",
+            "positive"
+          ],
+          "target": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "state": "Another server with colored braids came behind bar and spoke to us while he poured her ice in the cooler.",
+          "question": "What sentiment does this sentence express?",
           "source": "dynasent/dynabench.dynasent.r1.all/r1",
-          "id": "dynasent/dynabench.dynasent.r1.all/r1:canonical:sample:1",
+          "variant": "direct",
           "split": "train",
-          "canonical": {
-            "sentence1": "Another server with colored braids came behind bar and spoke to us while he poured her ice in the cooler.",
-            "labels": "neutral"
-          },
-          "question": "",
           "provenance": {
             "dataset": "tasksource/dynasent",
             "config": "r1"
           },
-          "row_metadata": null,
-          "origin": "canonical preprocessing (not a published Jev row)"
+          "origin": "current local Jev recast (not yet published)"
         },
         {
+          "id": "dynasent-dynabench-dynasent-r1-all-r1-010e3d960d:train:2",
+          "kind": "choice",
+          "options": [
+            "negative",
+            "neutral",
+            "positive"
+          ],
+          "target": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "state": "The night before check out my husband went down to there shop to purchase some milk for our 2 kids.",
+          "question": "What sentiment does this sentence express?",
           "source": "dynasent/dynabench.dynasent.r1.all/r1",
-          "id": "dynasent/dynabench.dynasent.r1.all/r1:canonical:sample:2",
+          "variant": "direct",
           "split": "train",
-          "canonical": {
-            "sentence1": "The night before check out my husband went down to there shop to purchase some milk for our 2 kids.",
-            "labels": "neutral"
-          },
-          "question": "",
           "provenance": {
             "dataset": "tasksource/dynasent",
             "config": "r1"
           },
-          "row_metadata": null,
-          "origin": "canonical preprocessing (not a published Jev row)"
+          "origin": "current local Jev recast (not yet published)"
         }
       ],
       "error": null
@@ -18778,52 +19411,76 @@
       "dataset": "tasksource/dynasent",
       "examples": [
         {
+          "id": "dynasent-dynabench-dynasent-r2-all-r2-5efc8c6c1c:train:0",
+          "kind": "score",
+          "options": [
+            "negative",
+            "neutral",
+            "positive"
+          ],
+          "target": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "state": "She was really beautiful and I had a good time to meet her.",
+          "question": "What sentiment does this sentence express?",
           "source": "dynasent/dynabench.dynasent.r2.all/r2",
-          "id": "dynasent/dynabench.dynasent.r2.all/r2:canonical:sample:0",
+          "variant": "direct",
           "split": "train",
-          "canonical": {
-            "sentence1": "She was really beautiful and I had a good time to meet her.",
-            "labels": "positive"
-          },
-          "question": "",
           "provenance": {
             "dataset": "tasksource/dynasent",
             "config": "r2"
           },
-          "row_metadata": null,
-          "origin": "canonical preprocessing (not a published Jev row)"
+          "origin": "current local Jev recast (not yet published)"
         },
         {
+          "id": "dynasent-dynabench-dynasent-r2-all-r2-5efc8c6c1c:train:1",
+          "kind": "score",
+          "options": [
+            "negative",
+            "neutral",
+            "positive"
+          ],
+          "target": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "state": "The school was subpar at best.",
+          "question": "What sentiment does this sentence express?",
           "source": "dynasent/dynabench.dynasent.r2.all/r2",
-          "id": "dynasent/dynabench.dynasent.r2.all/r2:canonical:sample:1",
+          "variant": "direct",
           "split": "train",
-          "canonical": {
-            "sentence1": "The school was subpar at best.",
-            "labels": "positive"
-          },
-          "question": "",
           "provenance": {
             "dataset": "tasksource/dynasent",
             "config": "r2"
           },
-          "row_metadata": null,
-          "origin": "canonical preprocessing (not a published Jev row)"
+          "origin": "current local Jev recast (not yet published)"
         },
         {
+          "id": "dynasent-dynabench-dynasent-r2-all-r2-5efc8c6c1c:train:2",
+          "kind": "choice",
+          "options": [
+            "negative",
+            "neutral",
+            "positive"
+          ],
+          "target": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "state": "There's so much MSG in their ingredients that after leaving the restaurant I can feel my tongue is mediocre.",
+          "question": "What sentiment does this sentence express?",
           "source": "dynasent/dynabench.dynasent.r2.all/r2",
-          "id": "dynasent/dynabench.dynasent.r2.all/r2:canonical:sample:2",
+          "variant": "direct",
           "split": "train",
-          "canonical": {
-            "sentence1": "There's so much MSG in their ingredients that after leaving the restaurant I can feel my tongue is mediocre.",
-            "labels": "negative"
-          },
-          "question": "",
           "provenance": {
             "dataset": "tasksource/dynasent",
             "config": "r2"
           },
-          "row_metadata": null,
-          "origin": "canonical preprocessing (not a published Jev row)"
+          "origin": "current local Jev recast (not yet published)"
         }
       ],
       "error": null
@@ -23557,7 +24214,53 @@
               "punct"
             ]
           },
-          "question": "",
+          "question": "Assign each token its Universal Dependencies relation to its syntactic head; root marks the sentence root.",
+          "criteria": [
+            "acl",
+            "acl:relcl",
+            "advcl",
+            "advmod",
+            "amod",
+            "appos",
+            "aux",
+            "aux:pass",
+            "case",
+            "cc",
+            "ccomp",
+            "compound",
+            "compound:prt",
+            "conj",
+            "cop",
+            "csubj",
+            "csubj:pass",
+            "dep",
+            "det",
+            "det:predet",
+            "discourse",
+            "dislocated",
+            "expl",
+            "fixed",
+            "flat",
+            "flat:foreign",
+            "iobj",
+            "mark",
+            "nmod",
+            "nmod:desc",
+            "nmod:poss",
+            "nmod:unmarked",
+            "nsubj",
+            "nsubj:pass",
+            "nummod",
+            "obj",
+            "obl",
+            "obl:unmarked",
+            "orphan",
+            "parataxis",
+            "punct",
+            "root",
+            "vocative",
+            "xcomp"
+          ],
           "provenance": {
             "dataset": "universal-dependencies/universal_dependencies",
             "config": "en_partut"
@@ -23653,7 +24356,53 @@
               "punct"
             ]
           },
-          "question": "",
+          "question": "Assign each token its Universal Dependencies relation to its syntactic head; root marks the sentence root.",
+          "criteria": [
+            "acl",
+            "acl:relcl",
+            "advcl",
+            "advmod",
+            "amod",
+            "appos",
+            "aux",
+            "aux:pass",
+            "case",
+            "cc",
+            "ccomp",
+            "compound",
+            "compound:prt",
+            "conj",
+            "cop",
+            "csubj",
+            "csubj:pass",
+            "dep",
+            "det",
+            "det:predet",
+            "discourse",
+            "dislocated",
+            "expl",
+            "fixed",
+            "flat",
+            "flat:foreign",
+            "iobj",
+            "mark",
+            "nmod",
+            "nmod:desc",
+            "nmod:poss",
+            "nmod:unmarked",
+            "nsubj",
+            "nsubj:pass",
+            "nummod",
+            "obj",
+            "obl",
+            "obl:unmarked",
+            "orphan",
+            "parataxis",
+            "punct",
+            "root",
+            "vocative",
+            "xcomp"
+          ],
           "provenance": {
             "dataset": "universal-dependencies/universal_dependencies",
             "config": "en_partut"
@@ -23711,7 +24460,53 @@
               "punct"
             ]
           },
-          "question": "",
+          "question": "Assign each token its Universal Dependencies relation to its syntactic head; root marks the sentence root.",
+          "criteria": [
+            "acl",
+            "acl:relcl",
+            "advcl",
+            "advmod",
+            "amod",
+            "appos",
+            "aux",
+            "aux:pass",
+            "case",
+            "cc",
+            "ccomp",
+            "compound",
+            "compound:prt",
+            "conj",
+            "cop",
+            "csubj",
+            "csubj:pass",
+            "dep",
+            "det",
+            "det:predet",
+            "discourse",
+            "dislocated",
+            "expl",
+            "fixed",
+            "flat",
+            "flat:foreign",
+            "iobj",
+            "mark",
+            "nmod",
+            "nmod:desc",
+            "nmod:poss",
+            "nmod:unmarked",
+            "nsubj",
+            "nsubj:pass",
+            "nummod",
+            "obj",
+            "obl",
+            "obl:unmarked",
+            "orphan",
+            "parataxis",
+            "punct",
+            "root",
+            "vocative",
+            "xcomp"
+          ],
           "provenance": {
             "dataset": "universal-dependencies/universal_dependencies",
             "config": "en_partut"
@@ -23751,7 +24546,55 @@
               "punct"
             ]
           },
-          "question": "",
+          "question": "Assign each token its Universal Dependencies relation to its syntactic head; root marks the sentence root.",
+          "criteria": [
+            "acl",
+            "acl:relcl",
+            "advcl",
+            "advmod",
+            "amod",
+            "appos",
+            "aux",
+            "aux:pass",
+            "case",
+            "cc",
+            "ccomp",
+            "compound",
+            "compound:prt",
+            "conj",
+            "cop",
+            "csubj",
+            "csubj:outer",
+            "csubj:pass",
+            "dep",
+            "det",
+            "discourse",
+            "dislocated",
+            "expl",
+            "fixed",
+            "flat",
+            "iobj",
+            "mark",
+            "nmod",
+            "nmod:desc",
+            "nmod:poss",
+            "nmod:unmarked",
+            "nsubj",
+            "nsubj:outer",
+            "nsubj:pass",
+            "nummod",
+            "obj",
+            "obl",
+            "obl:agent",
+            "obl:unmarked",
+            "orphan",
+            "parataxis",
+            "punct",
+            "reparandum",
+            "root",
+            "vocative",
+            "xcomp"
+          ],
           "provenance": {
             "dataset": "universal-dependencies/universal_dependencies",
             "config": "en_lines"
@@ -23793,7 +24636,55 @@
               "punct"
             ]
           },
-          "question": "",
+          "question": "Assign each token its Universal Dependencies relation to its syntactic head; root marks the sentence root.",
+          "criteria": [
+            "acl",
+            "acl:relcl",
+            "advcl",
+            "advmod",
+            "amod",
+            "appos",
+            "aux",
+            "aux:pass",
+            "case",
+            "cc",
+            "ccomp",
+            "compound",
+            "compound:prt",
+            "conj",
+            "cop",
+            "csubj",
+            "csubj:outer",
+            "csubj:pass",
+            "dep",
+            "det",
+            "discourse",
+            "dislocated",
+            "expl",
+            "fixed",
+            "flat",
+            "iobj",
+            "mark",
+            "nmod",
+            "nmod:desc",
+            "nmod:poss",
+            "nmod:unmarked",
+            "nsubj",
+            "nsubj:outer",
+            "nsubj:pass",
+            "nummod",
+            "obj",
+            "obl",
+            "obl:agent",
+            "obl:unmarked",
+            "orphan",
+            "parataxis",
+            "punct",
+            "reparandum",
+            "root",
+            "vocative",
+            "xcomp"
+          ],
           "provenance": {
             "dataset": "universal-dependencies/universal_dependencies",
             "config": "en_lines"
@@ -23831,7 +24722,55 @@
               "punct"
             ]
           },
-          "question": "",
+          "question": "Assign each token its Universal Dependencies relation to its syntactic head; root marks the sentence root.",
+          "criteria": [
+            "acl",
+            "acl:relcl",
+            "advcl",
+            "advmod",
+            "amod",
+            "appos",
+            "aux",
+            "aux:pass",
+            "case",
+            "cc",
+            "ccomp",
+            "compound",
+            "compound:prt",
+            "conj",
+            "cop",
+            "csubj",
+            "csubj:outer",
+            "csubj:pass",
+            "dep",
+            "det",
+            "discourse",
+            "dislocated",
+            "expl",
+            "fixed",
+            "flat",
+            "iobj",
+            "mark",
+            "nmod",
+            "nmod:desc",
+            "nmod:poss",
+            "nmod:unmarked",
+            "nsubj",
+            "nsubj:outer",
+            "nsubj:pass",
+            "nummod",
+            "obj",
+            "obl",
+            "obl:agent",
+            "obl:unmarked",
+            "orphan",
+            "parataxis",
+            "punct",
+            "reparandum",
+            "root",
+            "vocative",
+            "xcomp"
+          ],
           "provenance": {
             "dataset": "universal-dependencies/universal_dependencies",
             "config": "en_lines"
@@ -23873,7 +24812,60 @@
               "punct"
             ]
           },
-          "question": "",
+          "question": "Assign each token its Universal Dependencies relation to its syntactic head; root marks the sentence root.",
+          "criteria": [
+            "acl",
+            "acl:relcl",
+            "advcl",
+            "advcl:relcl",
+            "advmod",
+            "amod",
+            "appos",
+            "aux",
+            "aux:pass",
+            "case",
+            "cc",
+            "cc:preconj",
+            "ccomp",
+            "compound",
+            "compound:prt",
+            "conj",
+            "cop",
+            "csubj",
+            "csubj:outer",
+            "csubj:pass",
+            "dep",
+            "det",
+            "det:predet",
+            "discourse",
+            "dislocated",
+            "expl",
+            "fixed",
+            "flat",
+            "goeswith",
+            "iobj",
+            "list",
+            "mark",
+            "nmod",
+            "nmod:desc",
+            "nmod:poss",
+            "nmod:unmarked",
+            "nsubj",
+            "nsubj:outer",
+            "nsubj:pass",
+            "nummod",
+            "obj",
+            "obl",
+            "obl:agent",
+            "obl:unmarked",
+            "orphan",
+            "parataxis",
+            "punct",
+            "reparandum",
+            "root",
+            "vocative",
+            "xcomp"
+          ],
           "provenance": {
             "dataset": "universal-dependencies/universal_dependencies",
             "config": "en_gum"
@@ -23975,7 +24967,60 @@
               "punct"
             ]
           },
-          "question": "",
+          "question": "Assign each token its Universal Dependencies relation to its syntactic head; root marks the sentence root.",
+          "criteria": [
+            "acl",
+            "acl:relcl",
+            "advcl",
+            "advcl:relcl",
+            "advmod",
+            "amod",
+            "appos",
+            "aux",
+            "aux:pass",
+            "case",
+            "cc",
+            "cc:preconj",
+            "ccomp",
+            "compound",
+            "compound:prt",
+            "conj",
+            "cop",
+            "csubj",
+            "csubj:outer",
+            "csubj:pass",
+            "dep",
+            "det",
+            "det:predet",
+            "discourse",
+            "dislocated",
+            "expl",
+            "fixed",
+            "flat",
+            "goeswith",
+            "iobj",
+            "list",
+            "mark",
+            "nmod",
+            "nmod:desc",
+            "nmod:poss",
+            "nmod:unmarked",
+            "nsubj",
+            "nsubj:outer",
+            "nsubj:pass",
+            "nummod",
+            "obj",
+            "obl",
+            "obl:agent",
+            "obl:unmarked",
+            "orphan",
+            "parataxis",
+            "punct",
+            "reparandum",
+            "root",
+            "vocative",
+            "xcomp"
+          ],
           "provenance": {
             "dataset": "universal-dependencies/universal_dependencies",
             "config": "en_gum"
@@ -24027,7 +25072,60 @@
               "punct"
             ]
           },
-          "question": "",
+          "question": "Assign each token its Universal Dependencies relation to its syntactic head; root marks the sentence root.",
+          "criteria": [
+            "acl",
+            "acl:relcl",
+            "advcl",
+            "advcl:relcl",
+            "advmod",
+            "amod",
+            "appos",
+            "aux",
+            "aux:pass",
+            "case",
+            "cc",
+            "cc:preconj",
+            "ccomp",
+            "compound",
+            "compound:prt",
+            "conj",
+            "cop",
+            "csubj",
+            "csubj:outer",
+            "csubj:pass",
+            "dep",
+            "det",
+            "det:predet",
+            "discourse",
+            "dislocated",
+            "expl",
+            "fixed",
+            "flat",
+            "goeswith",
+            "iobj",
+            "list",
+            "mark",
+            "nmod",
+            "nmod:desc",
+            "nmod:poss",
+            "nmod:unmarked",
+            "nsubj",
+            "nsubj:outer",
+            "nsubj:pass",
+            "nummod",
+            "obj",
+            "obl",
+            "obl:agent",
+            "obl:unmarked",
+            "orphan",
+            "parataxis",
+            "punct",
+            "reparandum",
+            "root",
+            "vocative",
+            "xcomp"
+          ],
           "provenance": {
             "dataset": "universal-dependencies/universal_dependencies",
             "config": "en_gum"
@@ -24083,7 +25181,60 @@
               "punct"
             ]
           },
-          "question": "",
+          "question": "Assign each token its Universal Dependencies relation to its syntactic head; root marks the sentence root.",
+          "criteria": [
+            "acl",
+            "acl:relcl",
+            "advcl",
+            "advcl:relcl",
+            "advmod",
+            "amod",
+            "appos",
+            "aux",
+            "aux:pass",
+            "case",
+            "cc",
+            "cc:preconj",
+            "ccomp",
+            "compound",
+            "compound:prt",
+            "conj",
+            "cop",
+            "csubj",
+            "csubj:outer",
+            "csubj:pass",
+            "dep",
+            "det",
+            "det:predet",
+            "discourse",
+            "dislocated",
+            "expl",
+            "fixed",
+            "flat",
+            "goeswith",
+            "iobj",
+            "list",
+            "mark",
+            "nmod",
+            "nmod:desc",
+            "nmod:poss",
+            "nmod:unmarked",
+            "nsubj",
+            "nsubj:outer",
+            "nsubj:pass",
+            "nummod",
+            "obj",
+            "obl",
+            "obl:agent",
+            "obl:unmarked",
+            "orphan",
+            "parataxis",
+            "punct",
+            "reparandum",
+            "root",
+            "vocative",
+            "xcomp"
+          ],
           "provenance": {
             "dataset": "universal-dependencies/universal_dependencies",
             "config": "en_ewt"
@@ -24119,7 +25270,60 @@
               "punct"
             ]
           },
-          "question": "",
+          "question": "Assign each token its Universal Dependencies relation to its syntactic head; root marks the sentence root.",
+          "criteria": [
+            "acl",
+            "acl:relcl",
+            "advcl",
+            "advcl:relcl",
+            "advmod",
+            "amod",
+            "appos",
+            "aux",
+            "aux:pass",
+            "case",
+            "cc",
+            "cc:preconj",
+            "ccomp",
+            "compound",
+            "compound:prt",
+            "conj",
+            "cop",
+            "csubj",
+            "csubj:outer",
+            "csubj:pass",
+            "dep",
+            "det",
+            "det:predet",
+            "discourse",
+            "dislocated",
+            "expl",
+            "fixed",
+            "flat",
+            "goeswith",
+            "iobj",
+            "list",
+            "mark",
+            "nmod",
+            "nmod:desc",
+            "nmod:poss",
+            "nmod:unmarked",
+            "nsubj",
+            "nsubj:outer",
+            "nsubj:pass",
+            "nummod",
+            "obj",
+            "obl",
+            "obl:agent",
+            "obl:unmarked",
+            "orphan",
+            "parataxis",
+            "punct",
+            "reparandum",
+            "root",
+            "vocative",
+            "xcomp"
+          ],
           "provenance": {
             "dataset": "universal-dependencies/universal_dependencies",
             "config": "en_ewt"
@@ -24165,7 +25369,60 @@
               "punct"
             ]
           },
-          "question": "",
+          "question": "Assign each token its Universal Dependencies relation to its syntactic head; root marks the sentence root.",
+          "criteria": [
+            "acl",
+            "acl:relcl",
+            "advcl",
+            "advcl:relcl",
+            "advmod",
+            "amod",
+            "appos",
+            "aux",
+            "aux:pass",
+            "case",
+            "cc",
+            "cc:preconj",
+            "ccomp",
+            "compound",
+            "compound:prt",
+            "conj",
+            "cop",
+            "csubj",
+            "csubj:outer",
+            "csubj:pass",
+            "dep",
+            "det",
+            "det:predet",
+            "discourse",
+            "dislocated",
+            "expl",
+            "fixed",
+            "flat",
+            "goeswith",
+            "iobj",
+            "list",
+            "mark",
+            "nmod",
+            "nmod:desc",
+            "nmod:poss",
+            "nmod:unmarked",
+            "nsubj",
+            "nsubj:outer",
+            "nsubj:pass",
+            "nummod",
+            "obj",
+            "obl",
+            "obl:agent",
+            "obl:unmarked",
+            "orphan",
+            "parataxis",
+            "punct",
+            "reparandum",
+            "root",
+            "vocative",
+            "xcomp"
+          ],
           "provenance": {
             "dataset": "universal-dependencies/universal_dependencies",
             "config": "en_ewt"
@@ -27355,52 +28612,73 @@
       "dataset": "tasksource/zero-shot-label-nli",
       "examples": [
         {
+          "id": "zero-shot-label-nli-eb601fa5e1:train:0",
+          "kind": "choice",
+          "options": [
+            "entailment",
+            "neutral",
+            "contradiction"
+          ],
+          "target": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "state": "text_A: Jarrah was intimately familiar with , and adept at using the intercom and radio . \nJarrah , like Atta earlier , may have inadvertently broadcast the message because he did not know how to operate the radio and the intercom .\ntext_B: This example is non-contradiction.",
+          "question": "Does text_A entail text_B, contradict it, or neither?",
           "source": "zero-shot-label-nli",
-          "id": "zero-shot-label-nli:canonical:sample:0",
+          "variant": "direct",
           "split": "train",
-          "canonical": {
-            "labels": "contradiction",
-            "sentence1": "Jarrah was intimately familiar with , and adept at using the intercom and radio . \nJarrah , like Atta earlier , may have inadvertently broadcast the message because he did not know how to operate the radio and the intercom .",
-            "sentence2": "This example is non-contradiction."
-          },
-          "question": "",
           "provenance": {
             "dataset": "tasksource/zero-shot-label-nli"
           },
-          "row_metadata": null,
-          "origin": "canonical preprocessing (not a published Jev row)"
+          "origin": "current local Jev recast (not yet published)"
         },
         {
+          "id": "zero-shot-label-nli-eb601fa5e1:train:1",
+          "kind": "choice",
+          "options": [
+            "entailment",
+            "neutral",
+            "contradiction"
+          ],
+          "target": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "state": "text_A: @user Am Eye See Kay He Why Am Oh You Ass He\ntext_B: This example is non-offensive.",
+          "question": "Does text_A entail text_B, contradict it, or neither?",
           "source": "zero-shot-label-nli",
-          "id": "zero-shot-label-nli:canonical:sample:1",
+          "variant": "direct",
           "split": "train",
-          "canonical": {
-            "labels": "contradiction",
-            "sentence1": "@user Am Eye See Kay He Why Am Oh You Ass He",
-            "sentence2": "This example is non-offensive."
-          },
-          "question": "",
           "provenance": {
             "dataset": "tasksource/zero-shot-label-nli"
           },
-          "row_metadata": null,
-          "origin": "canonical preprocessing (not a published Jev row)"
+          "origin": "current local Jev recast (not yet published)"
         },
         {
+          "id": "zero-shot-label-nli-eb601fa5e1:train:2",
+          "kind": "choice",
+          "options": [
+            "entailment",
+            "neutral",
+            "contradiction"
+          ],
+          "target": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "state": "text_A: elm\nwood\ntext_B: This example is attri.",
+          "question": "Does text_A entail text_B, contradict it, or neither?",
           "source": "zero-shot-label-nli",
-          "id": "zero-shot-label-nli:canonical:sample:2",
+          "variant": "direct",
           "split": "train",
-          "canonical": {
-            "labels": "contradiction",
-            "sentence1": "elm\nwood",
-            "sentence2": "This example is attri."
-          },
-          "question": "",
           "provenance": {
             "dataset": "tasksource/zero-shot-label-nli"
           },
-          "row_metadata": null,
-          "origin": "canonical preprocessing (not a published Jev row)"
+          "origin": "current local Jev recast (not yet published)"
         }
       ],
       "error": null
@@ -30599,52 +31877,73 @@
       "dataset": "tasksource/SIGA-nli",
       "examples": [
         {
+          "id": "SIGA-nli-3d58c7ad3f:train:0",
+          "kind": "choice",
+          "options": [
+            "entailment",
+            "neutral",
+            "contradiction"
+          ],
+          "target": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "state": "text_A: I think at worse, if he doesn’t reach his full potential, you might have a Kris Versteeg type of player which wouldn’t be half bad. I could see teams being all over the board with this player depending on how much they like him. Bipolar disorder (BD) is an uncommon psychiatric disorder, that often has its onset during adolescence\ntext_B: Bipolar disorder (BD) is an rare psychiatric disorder, that often has its onset during adolescence",
+          "question": "Does text_A entail text_B, contradict it, or neither?",
           "source": "SIGA-nli",
-          "id": "SIGA-nli:canonical:sample:0",
+          "variant": "direct",
           "split": "train",
-          "canonical": {
-            "sentence1": "I think at worse, if he doesn’t reach his full potential, you might have a Kris Versteeg type of player which wouldn’t be half bad. I could see teams being all over the board with this player depending on how much they like him. Bipolar disorder (BD) is an uncommon psychiatric disorder, that often has its onset during adolescence",
-            "sentence2": "Bipolar disorder (BD) is an rare psychiatric disorder, that often has its onset during adolescence",
-            "labels": "contradiction"
-          },
-          "question": "",
           "provenance": {
             "dataset": "tasksource/SIGA-nli"
           },
-          "row_metadata": null,
-          "origin": "canonical preprocessing (not a published Jev row)"
+          "origin": "current local Jev recast (not yet published)"
         },
         {
+          "id": "SIGA-nli-3d58c7ad3f:train:1",
+          "kind": "choice",
+          "options": [
+            "entailment",
+            "neutral",
+            "contradiction"
+          ],
+          "target": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "state": "text_A: Love the staff. Excellent food. Greatest service! Thank you! We love this wonderful place! Endocarditis is known as an infection of the endocardial area of the heart, which is an uncommon disease\ntext_B: Greatest service! Thank you! We love this wonderful place! Endocarditis is known as an infection of the endocardial area of the heart, which is an rare disease",
+          "question": "Does text_A entail text_B, contradict it, or neither?",
           "source": "SIGA-nli",
-          "id": "SIGA-nli:canonical:sample:1",
+          "variant": "direct",
           "split": "train",
-          "canonical": {
-            "sentence1": "Love the staff. Excellent food. Greatest service! Thank you! We love this wonderful place! Endocarditis is known as an infection of the endocardial area of the heart, which is an uncommon disease",
-            "sentence2": "Greatest service! Thank you! We love this wonderful place! Endocarditis is known as an infection of the endocardial area of the heart, which is an rare disease",
-            "labels": "contradiction"
-          },
-          "question": "",
           "provenance": {
             "dataset": "tasksource/SIGA-nli"
           },
-          "row_metadata": null,
-          "origin": "canonical preprocessing (not a published Jev row)"
+          "origin": "current local Jev recast (not yet published)"
         },
         {
+          "id": "SIGA-nli-3d58c7ad3f:train:2",
+          "kind": "choice",
+          "options": [
+            "entailment",
+            "neutral",
+            "contradiction"
+          ],
+          "target": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "state": "text_A: The culprit? A Level 3 error. Primary internet service providers (ISPs) such as Comcast, Verizon, and AT&T all appeared to have issues, and that’s no surprise as Level 3 is a network “backbone” of sorts to these ISPs. These events are uncommon, as it should be remembered that over a year ago on October 2016, a critical DDOS attack on Dyn, an Internet performance management company, crippled the U\ntext_B: These events are rare, as it should be remembered that over a year ago on October 2016, a critical DDOS attack on Dyn, an Internet performance management company, crippled the U",
+          "question": "Does text_A entail text_B, contradict it, or neither?",
           "source": "SIGA-nli",
-          "id": "SIGA-nli:canonical:sample:2",
+          "variant": "direct",
           "split": "train",
-          "canonical": {
-            "sentence1": "The culprit? A Level 3 error. Primary internet service providers (ISPs) such as Comcast, Verizon, and AT&T all appeared to have issues, and that’s no surprise as Level 3 is a network “backbone” of sorts to these ISPs. These events are uncommon, as it should be remembered that over a year ago on October 2016, a critical DDOS attack on Dyn, an Internet performance management company, crippled the U",
-            "sentence2": "These events are rare, as it should be remembered that over a year ago on October 2016, a critical DDOS attack on Dyn, an Internet performance management company, crippled the U",
-            "labels": "entailment"
-          },
-          "question": "",
           "provenance": {
             "dataset": "tasksource/SIGA-nli"
           },
-          "row_metadata": null,
-          "origin": "canonical preprocessing (not a published Jev row)"
+          "origin": "current local Jev recast (not yet published)"
         }
       ],
       "error": null
@@ -35703,52 +37002,73 @@
       "dataset": "Dzeniks/hover-3way",
       "examples": [
         {
+          "id": "hover-3way-nli-b0c10b4148:train:0",
+          "kind": "choice",
+          "options": [
+            "entailment",
+            "neutral",
+            "contradiction"
+          ],
+          "target": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "state": "text_A: Archie (also known as Archie Comics) is an ongoing comic book series featuring the Archie Comics character Archie Andrews. \nArchie Andrews, created in 1941 by publisher John L. Goldwater and artist Bob Montana in collaboration with writer Vic Bloom, is the main character in an American comic book series published by Archie Comics, as well as the long-running \"Archie Andrews\" radio series, a syndicated comic strip, \"The Archie Show\", and \"Archie's Weird Mysteries\". \nFiona Staples is a Canadian comic book artist known for her work on books such as \"North 40\", \"DV8: Gods and Monsters\", \"T.H.U.N.D.E.R. Agents\", \"Archie\", and \"Saga\". \n\ntext_B: The creation of Canadian artist Fiona Staples is the comic book character originally written by Vic Bloom before appearing in \"Pep Comics\".",
+          "question": "Does text_A entail text_B, contradict it, or neither?",
           "source": "hover-3way/nli",
-          "id": "hover-3way/nli:canonical:sample:0",
+          "variant": "direct",
           "split": "train",
-          "canonical": {
-            "sentence2": "The creation of Canadian artist Fiona Staples is the comic book character originally written by Vic Bloom before appearing in \"Pep Comics\".",
-            "sentence1": "Archie (also known as Archie Comics) is an ongoing comic book series featuring the Archie Comics character Archie Andrews. \nArchie Andrews, created in 1941 by publisher John L. Goldwater and artist Bob Montana in collaboration with writer Vic Bloom, is the main character in an American comic book series published by Archie Comics, as well as the long-running \"Archie Andrews\" radio series, a syndicated comic strip, \"The Archie Show\", and \"Archie's Weird Mysteries\". \nFiona Staples is a Canadian comic book artist known for her work on books such as \"North 40\", \"DV8: Gods and Monsters\", \"T.H.U.N.D.E.R. Agents\", \"Archie\", and \"Saga\". \n",
-            "labels": "neutral"
-          },
-          "question": "",
           "provenance": {
             "dataset": "Dzeniks/hover-3way"
           },
-          "row_metadata": null,
-          "origin": "canonical preprocessing (not a published Jev row)"
+          "origin": "current local Jev recast (not yet published)"
         },
         {
+          "id": "hover-3way-nli-b0c10b4148:train:1",
+          "kind": "choice",
+          "options": [
+            "entailment",
+            "neutral",
+            "contradiction"
+          ],
+          "target": [
+            0.0,
+            0.0,
+            1.0
+          ],
+          "state": "text_A: On some projects, work on-site will not start until design work is largely complete; on others, some design work may be undertaken concurrently with the early stages of on-site activity (for example, work on a building's foundations may commence while designers are still working on the detailed designs of the building's internal spaces)\n Typically, a project is instigated by or with the owner of the property (who may be an individual or an organisation); occasionally, land may be compulsorily purchased from the owner for public use\n\n\ntext_B: Christopher Nolan worked on a construction site.",
+          "question": "Does text_A entail text_B, contradict it, or neither?",
           "source": "hover-3way/nli",
-          "id": "hover-3way/nli:canonical:sample:1",
+          "variant": "direct",
           "split": "train",
-          "canonical": {
-            "sentence2": "Christopher Nolan worked on a construction site.",
-            "sentence1": "On some projects, work on-site will not start until design work is largely complete; on others, some design work may be undertaken concurrently with the early stages of on-site activity (for example, work on a building's foundations may commence while designers are still working on the detailed designs of the building's internal spaces)\n Typically, a project is instigated by or with the owner of the property (who may be an individual or an organisation); occasionally, land may be compulsorily purchased from the owner for public use\n\n",
-            "labels": "contradiction"
-          },
-          "question": "",
           "provenance": {
             "dataset": "Dzeniks/hover-3way"
           },
-          "row_metadata": null,
-          "origin": "canonical preprocessing (not a published Jev row)"
+          "origin": "current local Jev recast (not yet published)"
         },
         {
+          "id": "hover-3way-nli-b0c10b4148:train:2",
+          "kind": "choice",
+          "options": [
+            "entailment",
+            "neutral",
+            "contradiction"
+          ],
+          "target": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "state": "text_A: Rivermaya is a Filipino rock band. \nKodaline ( ) are an Irish band. \n He began his career as one of the founding members, and served as the chief songwriter, vocalist, guitarist, and keyboardist of the Filipino rock band Rivermaya from 1994 until 2007, and has been a solo artist since 2008. \nGalactik Fiestamatik is the second studio album of Filipino singer, Rico Blanco. \n\ntext_B: Kodaline was formed in a country closer to England than the band that this singer was in from December 1994 until 2007. Galactik Fiestamatik was the second album of this singer.",
+          "question": "Does text_A entail text_B, contradict it, or neither?",
           "source": "hover-3way/nli",
-          "id": "hover-3way/nli:canonical:sample:2",
+          "variant": "direct",
           "split": "train",
-          "canonical": {
-            "sentence2": "Kodaline was formed in a country closer to England than the band that this singer was in from December 1994 until 2007. Galactik Fiestamatik was the second album of this singer.",
-            "sentence1": "Rivermaya is a Filipino rock band. \nKodaline ( ) are an Irish band. \n He began his career as one of the founding members, and served as the chief songwriter, vocalist, guitarist, and keyboardist of the Filipino rock band Rivermaya from 1994 until 2007, and has been a solo artist since 2008. \nGalactik Fiestamatik is the second studio album of Filipino singer, Rico Blanco. \n",
-            "labels": "neutral"
-          },
-          "question": "",
           "provenance": {
             "dataset": "Dzeniks/hover-3way"
           },
-          "row_metadata": null,
-          "origin": "canonical preprocessing (not a published Jev row)"
+          "origin": "current local Jev recast (not yet published)"
         }
       ],
       "error": null
@@ -38583,56 +39903,44 @@
       "dataset": "jpcorb20/multidogo",
       "examples": [
         {
-          "source": "multidogo/airline/intent",
-          "id": "multidogo:train:<CONV>dad66e07-94c3-4e0c-be13-688c2d1e88f1<TURN>2<SENT>0:multidogo-airline-intent-b02020c0b4",
-          "state": "text_A: Turn 0: hai\ntext_B: i need to check my seat assignment",
-          "question": "What intent does the current utterance in text_B express, given earlier dialogue text_A?",
+          "metadata": "{\"id\": \"<CONV>dc417fa5-cd49-4986-9497-349ca2428c9f<TURN>4<SENT>0\", \"split_group_id\": \"dc417fa5-cd49-4986-9497-349ca2428c9f\"}",
+          "id": "multidogo-airline-intent-b02020c0b4:train:0",
           "kind": "choice",
           "options": [
             "bookflight",
-            "changeseatassignment",
-            "closinggreeting",
             "confirmation",
             "contentonly",
-            "getboardingpass",
-            "getseatinfo",
             "openinggreeting",
-            "outofdomain",
-            "rejection",
             "thankyou"
           ],
           "target": [
             0.0,
+            0.0,
             1.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
             0.0,
             0.0
           ],
-          "split": "train"
+          "state": "text_A: Turn 0: hai\nTurn 2: check my seat assignment\ntext_B: df 3 s 22",
+          "question": "What intent does the current (last) utterance express? Use earlier dialogue when available.",
+          "source": "multidogo/airline/intent",
+          "variant": "direct",
+          "split": "train",
+          "provenance": {
+            "dataset": "jpcorb20/multidogo",
+            "config": "airline",
+            "revision": "503eee0894f308dbd1d74c1b4ecf4cfc99dd43f9"
+          },
+          "origin": "current local Jev recast (not yet published)"
         },
         {
-          "source": "multidogo/airline/intent",
-          "id": "multidogo:train:<CONV>d40f040d-aac1-4ab9-973c-42853ddc982e<TURN>6<SENT>0:multidogo-airline-intent-b02020c0b4",
-          "state": "text_A: Turn 0: hai\nTurn 4: kumar 968 ukl\ntext_B: yes please continue",
-          "question": "What intent does the current utterance in text_B express, given earlier dialogue text_A?",
+          "metadata": "{\"id\": \"<CONV>cb1047ea-0ffa-4c78-8023-0ccbe102ab11<TURN>0<SENT>0\", \"split_group_id\": \"cb1047ea-0ffa-4c78-8023-0ccbe102ab11\"}",
+          "id": "multidogo-airline-intent-b02020c0b4:train:1",
           "kind": "choice",
           "options": [
             "bookflight",
-            "changeseatassignment",
-            "closinggreeting",
             "confirmation",
             "contentonly",
-            "getboardingpass",
-            "getseatinfo",
             "openinggreeting",
-            "outofdomain",
-            "rejection",
             "thankyou"
           ],
           "target": [
@@ -38640,33 +39948,29 @@
             0.0,
             0.0,
             1.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
             0.0
           ],
-          "split": "train"
+          "state": "hi",
+          "question": "What intent does the current (last) utterance express? Use earlier dialogue when available.",
+          "source": "multidogo/airline/intent",
+          "variant": "direct",
+          "split": "train",
+          "provenance": {
+            "dataset": "jpcorb20/multidogo",
+            "config": "airline",
+            "revision": "503eee0894f308dbd1d74c1b4ecf4cfc99dd43f9"
+          },
+          "origin": "current local Jev recast (not yet published)"
         },
         {
-          "source": "multidogo/airline/intent",
-          "id": "multidogo:train:<CONV>71048671-e044-4092-9a8c-ecb119ee33b2<TURN>1<SENT>1:multidogo-airline-intent-b02020c0b4",
-          "state": "text_A: Turn 1: hi\ntext_B: id like to get my boarding pass sent to me please",
-          "question": "What intent does the current utterance in text_B express, given earlier dialogue text_A?",
+          "metadata": "{\"id\": \"<CONV>8b263721-c036-4a12-943f-82ca5ad646d1<TURN>12<SENT>0\", \"split_group_id\": \"8b263721-c036-4a12-943f-82ca5ad646d1\"}",
+          "id": "multidogo-airline-intent-b02020c0b4:train:2",
           "kind": "choice",
           "options": [
             "bookflight",
-            "changeseatassignment",
-            "closinggreeting",
             "confirmation",
             "contentonly",
-            "getboardingpass",
-            "getseatinfo",
             "openinggreeting",
-            "outofdomain",
-            "rejection",
             "thankyou"
           ],
           "target": [
@@ -38674,15 +39978,19 @@
             0.0,
             0.0,
             0.0,
-            0.0,
-            1.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0
+            1.0
           ],
-          "split": "train"
+          "state": "text_A: Turn 1: hii\nTurn 2: i need to change my seat assignment\nTurn 4: subramani\nTurn 6: rvt 458\nTurn 8: window seat\nTurn 10: ok thanks\ntext_B: ok thanks",
+          "question": "What intent does the current (last) utterance express? Use earlier dialogue when available.",
+          "source": "multidogo/airline/intent",
+          "variant": "direct",
+          "split": "train",
+          "provenance": {
+            "dataset": "jpcorb20/multidogo",
+            "config": "airline",
+            "revision": "503eee0894f308dbd1d74c1b4ecf4cfc99dd43f9"
+          },
+          "origin": "current local Jev recast (not yet published)"
         }
       ],
       "error": null
@@ -38693,142 +40001,94 @@
       "dataset": "jpcorb20/multidogo",
       "examples": [
         {
-          "source": "multidogo/finance/intent",
-          "id": "multidogo:train:<CONV>f7e56996-685f-43c2-becc-28e04caa0618<TURN>0<SENT>0:multidogo-finance-intent-a41a37a775",
-          "state": "text_A: \ntext_B: hi",
-          "question": "What intent does the current utterance in text_B express, given earlier dialogue text_A?",
+          "metadata": "{\"id\": \"<CONV>3c04b087-6978-42c4-843b-c3f8958d541e<TURN>19<SENT>0\", \"split_group_id\": \"3c04b087-6978-42c4-843b-c3f8958d541e\"}",
+          "id": "multidogo-finance-intent-a41a37a775:train:0",
           "kind": "choice",
           "options": [
-            "checkbalance",
-            "checkoffereligibility",
-            "closeaccount",
-            "closinggreeting",
             "confirmation",
             "contentonly",
-            "disputecharge",
-            "getroutingnumber",
             "openinggreeting",
-            "orderchecks",
-            "outofdomain",
             "rejection",
-            "replacecard",
-            "reportlostcard",
-            "thankyou",
-            "transfermoney",
             "updateaddress"
           ],
           "target": [
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
             1.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
             0.0,
             0.0,
             0.0,
             0.0
           ],
-          "split": "train"
+          "state": "text_A: Turn 1: hi\nTurn 2: i am prabu\nTurn 5: please check my balance\nTurn 7: my ssn number is 4009\nTurn 9: transfer money from 3789 to 5639\nTurn 10: transfer amount of 6000\nTurn 12: yes\nTurn 14: ok\nTurn 16: my account number 3789 and my ssn number is 4009 please close my account\ntext_B: yes",
+          "question": "What intent does the current (last) utterance express? Use earlier dialogue when available.",
+          "source": "multidogo/finance/intent",
+          "variant": "direct",
+          "split": "train",
+          "provenance": {
+            "dataset": "jpcorb20/multidogo",
+            "config": "finance",
+            "revision": "503eee0894f308dbd1d74c1b4ecf4cfc99dd43f9"
+          },
+          "origin": "current local Jev recast (not yet published)"
         },
         {
-          "source": "multidogo/finance/intent",
-          "id": "multidogo:train:<CONV>d3f9d5dc-6b2b-41e7-b717-1e1d7113b163<TURN>5<SENT>0:multidogo-finance-intent-a41a37a775",
-          "state": "text_A: Turn 4: how can i change my personal banking password\ntext_B: could you tell the guide",
-          "question": "What intent does the current utterance in text_B express, given earlier dialogue text_A?",
+          "metadata": "{\"id\": \"<CONV>63ff1025-ae18-46b2-ad67-32a3c717c664<TURN>5<SENT>0\", \"split_group_id\": \"63ff1025-ae18-46b2-ad67-32a3c717c664\"}",
+          "id": "multidogo-finance-intent-a41a37a775:train:1",
           "kind": "choice",
           "options": [
-            "checkbalance",
-            "checkoffereligibility",
-            "closeaccount",
-            "closinggreeting",
             "confirmation",
             "contentonly",
-            "disputecharge",
-            "getroutingnumber",
             "openinggreeting",
-            "orderchecks",
-            "outofdomain",
             "rejection",
-            "replacecard",
-            "reportlostcard",
-            "thankyou",
-            "transfermoney",
             "updateaddress"
           ],
           "target": [
             0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
             1.0,
-            0.0,
-            0.0,
-            0.0,
             0.0,
             0.0,
             0.0
           ],
-          "split": "train"
+          "state": "text_A: Turn 3: andrews vijayan\ntext_B: ssn 0200",
+          "question": "What intent does the current (last) utterance express? Use earlier dialogue when available.",
+          "source": "multidogo/finance/intent",
+          "variant": "direct",
+          "split": "train",
+          "provenance": {
+            "dataset": "jpcorb20/multidogo",
+            "config": "finance",
+            "revision": "503eee0894f308dbd1d74c1b4ecf4cfc99dd43f9"
+          },
+          "origin": "current local Jev recast (not yet published)"
         },
         {
-          "source": "multidogo/finance/intent",
-          "id": "multidogo:train:<CONV>7d2f10c3-c89d-4674-ae00-c6c121090282<TURN>4<SENT>0:multidogo-finance-intent-a41a37a775",
-          "state": "text_A: Turn 1: hi need your help to remove the unwanted charges for my credit card and i am got error report for my credit card bill\ntext_B: my full name is prince joel",
-          "question": "What intent does the current utterance in text_B express, given earlier dialogue text_A?",
+          "metadata": "{\"id\": \"<CONV>62f4d1f7-22d3-4d94-92bb-2e358179d850<TURN>6<SENT>0\", \"split_group_id\": \"62f4d1f7-22d3-4d94-92bb-2e358179d850\"}",
+          "id": "multidogo-finance-intent-a41a37a775:train:2",
           "kind": "choice",
           "options": [
-            "checkbalance",
-            "checkoffereligibility",
-            "closeaccount",
-            "closinggreeting",
             "confirmation",
             "contentonly",
-            "disputecharge",
-            "getroutingnumber",
             "openinggreeting",
-            "orderchecks",
-            "outofdomain",
             "rejection",
-            "replacecard",
-            "reportlostcard",
-            "thankyou",
-            "transfermoney",
             "updateaddress"
           ],
           "target": [
             0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
             1.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
             0.0,
             0.0,
             0.0
           ],
-          "split": "train"
+          "state": "text_A: Turn 1: i need change my credit card address\nTurn 3: dalton mcintyre\nTurn 4: 5578\ntext_B: 678 e 15",
+          "question": "What intent does the current (last) utterance express? Use earlier dialogue when available.",
+          "source": "multidogo/finance/intent",
+          "variant": "direct",
+          "split": "train",
+          "provenance": {
+            "dataset": "jpcorb20/multidogo",
+            "config": "finance",
+            "revision": "503eee0894f308dbd1d74c1b4ecf4cfc99dd43f9"
+          },
+          "origin": "current local Jev recast (not yet published)"
         }
       ],
       "error": null
@@ -38839,100 +40099,94 @@
       "dataset": "jpcorb20/multidogo",
       "examples": [
         {
-          "source": "multidogo/insurance/intent",
-          "id": "multidogo:train:<CONV>7e94d0ea-aa7f-411f-aec9-f535d774092d<TURN>13<SENT>1:multidogo-insurance-intent-09d2298d74",
-          "state": "text_A: Turn 0: hello\nTurn 2: hi i want to know about my claim status can you help me\nTurn 4: christine smith claim number kdi 215\nTurn 7: kdi 253962185\nTurn 11: ok sure\nTurn 13: ok thats great\ntext_B: thanks",
-          "question": "What intent does the current utterance in text_B express, given earlier dialogue text_A?",
+          "metadata": "{\"id\": \"<CONV>c4e1f18e-ccfa-48a4-9607-d5012ef98a0f<TURN>0<SENT>0\", \"split_group_id\": \"c4e1f18e-ccfa-48a4-9607-d5012ef98a0f\"}",
+          "id": "multidogo-insurance-intent-09d2298d74:train:0",
           "kind": "choice",
           "options": [
             "checkclaimstatus",
-            "closinggreeting",
             "confirmation",
             "contentonly",
-            "getproofofinsurance",
             "openinggreeting",
-            "outofdomain",
-            "rejection",
-            "reportbrokenphone",
-            "thankyou"
+            "reportbrokenphone"
           ],
           "target": [
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            1.0
-          ],
-          "split": "train"
-        },
-        {
-          "source": "multidogo/insurance/intent",
-          "id": "multidogo:train:<CONV>e1289f73-e0e7-4159-90a9-cc10241a5012<TURN>0<SENT>0:multidogo-insurance-intent-09d2298d74",
-          "state": "text_A: \ntext_B: i want insurance proof copy",
-          "question": "What intent does the current utterance in text_B express, given earlier dialogue text_A?",
-          "kind": "choice",
-          "options": [
-            "checkclaimstatus",
-            "closinggreeting",
-            "confirmation",
-            "contentonly",
-            "getproofofinsurance",
-            "openinggreeting",
-            "outofdomain",
-            "rejection",
-            "reportbrokenphone",
-            "thankyou"
-          ],
-          "target": [
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            1.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0
-          ],
-          "split": "train"
-        },
-        {
-          "source": "multidogo/insurance/intent",
-          "id": "multidogo:train:<CONV>80772078-52e5-4e34-a16b-78adb0f7ccce<TURN>17<SENT>0:multidogo-insurance-intent-09d2298d74",
-          "state": "text_A: Turn 0: hi\nTurn 2: i need proof insurance on my bmw car\nTurn 4: peter\nTurn 6: peter john\nTurn 7: 975\nTurn 9: bmwx 1\nTurn 10: 2007\nTurn 12: peter 540 gmail\nTurn 13: peter 540 gmailcom\nTurn 15: ok thank you so much have a nice day and i liked you service\ntext_B: no thanks have a great day",
-          "question": "What intent does the current utterance in text_B express, given earlier dialogue text_A?",
-          "kind": "choice",
-          "options": [
-            "checkclaimstatus",
-            "closinggreeting",
-            "confirmation",
-            "contentonly",
-            "getproofofinsurance",
-            "openinggreeting",
-            "outofdomain",
-            "rejection",
-            "reportbrokenphone",
-            "thankyou"
-          ],
-          "target": [
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
             0.0,
             0.0,
             1.0,
             0.0,
             0.0
           ],
-          "split": "train"
+          "state": "hi",
+          "question": "What intent does the current (last) utterance express? Use earlier dialogue when available.",
+          "source": "multidogo/insurance/intent",
+          "variant": "direct",
+          "split": "train",
+          "provenance": {
+            "dataset": "jpcorb20/multidogo",
+            "config": "insurance",
+            "revision": "503eee0894f308dbd1d74c1b4ecf4cfc99dd43f9"
+          },
+          "origin": "current local Jev recast (not yet published)"
+        },
+        {
+          "metadata": "{\"id\": \"<CONV>36f7bce1-deed-48b4-907e-85f713981b0f<TURN>0<SENT>0\", \"split_group_id\": \"36f7bce1-deed-48b4-907e-85f713981b0f\"}",
+          "id": "multidogo-insurance-intent-09d2298d74:train:1",
+          "kind": "choice",
+          "options": [
+            "checkclaimstatus",
+            "confirmation",
+            "contentonly",
+            "openinggreeting",
+            "reportbrokenphone"
+          ],
+          "target": [
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0
+          ],
+          "state": "hai sam",
+          "question": "What intent does the current (last) utterance express? Use earlier dialogue when available.",
+          "source": "multidogo/insurance/intent",
+          "variant": "direct",
+          "split": "train",
+          "provenance": {
+            "dataset": "jpcorb20/multidogo",
+            "config": "insurance",
+            "revision": "503eee0894f308dbd1d74c1b4ecf4cfc99dd43f9"
+          },
+          "origin": "current local Jev recast (not yet published)"
+        },
+        {
+          "metadata": "{\"id\": \"<CONV>50c99a47-3bee-40e5-8180-cd46ff570d2e<TURN>2<SENT>0\", \"split_group_id\": \"50c99a47-3bee-40e5-8180-cd46ff570d2e\"}",
+          "id": "multidogo-insurance-intent-09d2298d74:train:2",
+          "kind": "choice",
+          "options": [
+            "checkclaimstatus",
+            "confirmation",
+            "contentonly",
+            "openinggreeting",
+            "reportbrokenphone"
+          ],
+          "target": [
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "state": "text_A: Turn 0: hi\ntext_B: please guide me i need want to status of claim",
+          "question": "What intent does the current (last) utterance express? Use earlier dialogue when available.",
+          "source": "multidogo/insurance/intent",
+          "variant": "direct",
+          "split": "train",
+          "provenance": {
+            "dataset": "jpcorb20/multidogo",
+            "config": "insurance",
+            "revision": "503eee0894f308dbd1d74c1b4ecf4cfc99dd43f9"
+          },
+          "origin": "current local Jev recast (not yet published)"
         }
       ],
       "error": null
@@ -38943,124 +40197,88 @@
       "dataset": "jpcorb20/multidogo",
       "examples": [
         {
-          "source": "multidogo/media/intent",
-          "id": "multidogo:train:<CONV>56f77209-d26c-4148-875b-25daf0bd0cd1<TURN>11<SENT>0:multidogo-media-intent-732728fc7e",
-          "state": "text_A: Turn 0: hi\nTurn 2: i want to purchase internet\nTurn 3: mumbai and 460391\nTurn 5: 5 gb\nTurn 7: no\nTurn 9: no\ntext_B: yes ok",
-          "question": "What intent does the current utterance in text_B express, given earlier dialogue text_A?",
+          "metadata": "{\"id\": \"<CONV>69d71e57-94ea-4892-8e19-a38e58495e4d<TURN>15<SENT>1\", \"split_group_id\": \"69d71e57-94ea-4892-8e19-a38e58495e4d\"}",
+          "id": "multidogo-media-intent-732728fc7e:train:0",
           "kind": "choice",
           "options": [
-            "cancelserviceintent",
-            "closinggreeting",
             "confirmation",
             "contentonly",
-            "getinformationintent",
             "openinggreeting",
-            "outofdomain",
-            "rejection",
-            "startserviceintent",
-            "thankyou",
-            "transferserviceintent",
-            "upgradeserviceintent",
-            "viewbillsintent",
-            "viewdatausageintent"
+            "rejection"
           ],
           "target": [
-            0.0,
-            0.0,
             1.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
             0.0,
             0.0,
             0.0
           ],
-          "split": "train"
+          "state": "text_A: Turn 0: hi\nTurn 2: i want to sign up for your new service can you help me\nTurn 4: california city 2548752\nTurn 6: i like to purchase cable services\nTurn 7: hello\nTurn 9: i like to have a 5 gb data plan\nTurn 11: okay\nTurn 13: may i know the price of the data plan which i have purchased\nTurn 15: okay\ntext_B: good",
+          "question": "What intent does the current (last) utterance express? Use earlier dialogue when available.",
+          "source": "multidogo/media/intent",
+          "variant": "direct",
+          "split": "train",
+          "provenance": {
+            "dataset": "jpcorb20/multidogo",
+            "config": "media",
+            "revision": "503eee0894f308dbd1d74c1b4ecf4cfc99dd43f9"
+          },
+          "origin": "current local Jev recast (not yet published)"
         },
         {
-          "source": "multidogo/media/intent",
-          "id": "multidogo:train:<CONV>18d45fb9-aa17-4f09-b312-20a3d833c282<TURN>4<SENT>0:multidogo-media-intent-732728fc7e",
-          "state": "text_A: Turn 0: hi\nTurn 2: i want a new service\ntext_B: montgomery",
-          "question": "What intent does the current utterance in text_B express, given earlier dialogue text_A?",
+          "metadata": "{\"id\": \"<CONV>5d073db5-4b3e-481f-8ab2-1f79b0a0469d<TURN>8<SENT>0\", \"split_group_id\": \"5d073db5-4b3e-481f-8ab2-1f79b0a0469d\"}",
+          "id": "multidogo-media-intent-732728fc7e:train:1",
           "kind": "choice",
           "options": [
-            "cancelserviceintent",
-            "closinggreeting",
             "confirmation",
             "contentonly",
-            "getinformationintent",
             "openinggreeting",
-            "outofdomain",
-            "rejection",
-            "startserviceintent",
-            "thankyou",
-            "transferserviceintent",
-            "upgradeserviceintent",
-            "viewbillsintent",
-            "viewdatausageintent"
+            "rejection"
           ],
           "target": [
-            0.0,
-            0.0,
-            0.0,
             1.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
             0.0,
             0.0,
             0.0
           ],
-          "split": "train"
+          "state": "text_A: Turn 0: hi\nTurn 4: city madurai zip code 4569\nTurn 6: 5 gb\ntext_B: ok",
+          "question": "What intent does the current (last) utterance express? Use earlier dialogue when available.",
+          "source": "multidogo/media/intent",
+          "variant": "direct",
+          "split": "train",
+          "provenance": {
+            "dataset": "jpcorb20/multidogo",
+            "config": "media",
+            "revision": "503eee0894f308dbd1d74c1b4ecf4cfc99dd43f9"
+          },
+          "origin": "current local Jev recast (not yet published)"
         },
         {
-          "source": "multidogo/media/intent",
-          "id": "multidogo:train:<CONV>38d374a2-2fe9-4d13-898d-77dd44fd6362<TURN>13<SENT>0:multidogo-media-intent-732728fc7e",
-          "state": "text_A: Turn 0: hai\nTurn 2: i want a new cable service\nTurn 4: texes\nTurn 5: 52145\nTurn 7: 10 gb\nTurn 9: ok\nTurn 11: no thanks\ntext_B: bye",
-          "question": "What intent does the current utterance in text_B express, given earlier dialogue text_A?",
+          "metadata": "{\"id\": \"<CONV>7a4e8758-1072-441d-a35f-12d4eebb265e<TURN>4<SENT>0\", \"split_group_id\": \"7a4e8758-1072-441d-a35f-12d4eebb265e\"}",
+          "id": "multidogo-media-intent-732728fc7e:train:2",
           "kind": "choice",
           "options": [
-            "cancelserviceintent",
-            "closinggreeting",
             "confirmation",
             "contentonly",
-            "getinformationintent",
             "openinggreeting",
-            "outofdomain",
-            "rejection",
-            "startserviceintent",
-            "thankyou",
-            "transferserviceintent",
-            "upgradeserviceintent",
-            "viewbillsintent",
-            "viewdatausageintent"
+            "rejection"
           ],
           "target": [
             0.0,
             1.0,
             0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
             0.0
           ],
-          "split": "train"
+          "state": "text_A: Turn 0: hai\nTurn 2: i would like to sign up for new cable service\ntext_B: city name hastings",
+          "question": "What intent does the current (last) utterance express? Use earlier dialogue when available.",
+          "source": "multidogo/media/intent",
+          "variant": "direct",
+          "split": "train",
+          "provenance": {
+            "dataset": "jpcorb20/multidogo",
+            "config": "media",
+            "revision": "503eee0894f308dbd1d74c1b4ecf4cfc99dd43f9"
+          },
+          "origin": "current local Jev recast (not yet published)"
         }
       ],
       "error": null
@@ -39071,106 +40289,80 @@
       "dataset": "jpcorb20/multidogo",
       "examples": [
         {
-          "source": "multidogo/fastfood/intent",
-          "id": "multidogo:train:<CONV>303fd72e-83ea-4b4b-8763-82e74307e61d<TURN>0<SENT>0:multidogo-fastfood-intent-d2b6b4653e",
-          "state": "text_A: \ntext_B: hai",
-          "question": "What intent does the current utterance in text_B express, given earlier dialogue text_A?",
+          "metadata": "{\"id\": \"<CONV>6fd211aa-53fc-4302-a15f-7d6e8c30bfcf<TURN>2<SENT>0\", \"split_group_id\": \"6fd211aa-53fc-4302-a15f-7d6e8c30bfcf\"}",
+          "id": "multidogo-fastfood-intent-d2b6b4653e:train:0",
           "kind": "choice",
           "options": [
-            "closinggreeting",
             "confirmation",
             "contentonly",
             "openinggreeting",
-            "orderbreakfastintent",
-            "orderburgerintent",
-            "orderdessertintent",
             "orderdrinkintent",
             "orderpizzaintent",
-            "ordersaladintent",
-            "ordersideintent",
-            "outofdomain",
-            "rejection",
-            "thankyou"
+            "rejection"
           ],
           "target": [
             0.0,
             0.0,
             0.0,
+            0.0,
             1.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
             0.0
           ],
-          "split": "train"
+          "state": "text_A: Turn 0: hi good morning\ntext_B: i need 2 red vine",
+          "question": "What intent does the current (last) utterance express? Use earlier dialogue when available.",
+          "source": "multidogo/fastfood/intent",
+          "variant": "direct",
+          "split": "train",
+          "provenance": {
+            "dataset": "jpcorb20/multidogo",
+            "config": "fastfood",
+            "revision": "503eee0894f308dbd1d74c1b4ecf4cfc99dd43f9"
+          },
+          "origin": "current local Jev recast (not yet published)"
         },
         {
-          "source": "multidogo/fastfood/intent",
-          "id": "multidogo:train:<CONV>c916db4e-adb4-42a8-8301-d808e8539fc0<TURN>13<SENT>0:multidogo-fastfood-intent-d2b6b4653e",
-          "state": "text_A: Turn 1: i want one red vine with arugula fresh fruit\nTurn 3: 1 pizza and 1 salad\nTurn 4: and 1 lemonade\nTurn 9: okay\nTurn 11: yes\ntext_B: yes",
-          "question": "What intent does the current utterance in text_B express, given earlier dialogue text_A?",
+          "metadata": "{\"id\": \"<CONV>3274e648-381d-46a7-802e-de07207b13db<TURN>0<SENT>0\", \"split_group_id\": \"3274e648-381d-46a7-802e-de07207b13db\"}",
+          "id": "multidogo-fastfood-intent-d2b6b4653e:train:1",
           "kind": "choice",
           "options": [
-            "closinggreeting",
             "confirmation",
             "contentonly",
             "openinggreeting",
-            "orderbreakfastintent",
-            "orderburgerintent",
-            "orderdessertintent",
             "orderdrinkintent",
             "orderpizzaintent",
-            "ordersaladintent",
-            "ordersideintent",
-            "outofdomain",
-            "rejection",
-            "thankyou"
+            "rejection"
           ],
           "target": [
+            0.0,
             0.0,
             1.0,
             0.0,
             0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
             0.0
           ],
-          "split": "train"
+          "state": "hi",
+          "question": "What intent does the current (last) utterance express? Use earlier dialogue when available.",
+          "source": "multidogo/fastfood/intent",
+          "variant": "direct",
+          "split": "train",
+          "provenance": {
+            "dataset": "jpcorb20/multidogo",
+            "config": "fastfood",
+            "revision": "503eee0894f308dbd1d74c1b4ecf4cfc99dd43f9"
+          },
+          "origin": "current local Jev recast (not yet published)"
         },
         {
-          "source": "multidogo/fastfood/intent",
-          "id": "multidogo:train:<CONV>a820f8c4-2b54-46a0-91d8-47def828fec9<TURN>11<SENT>0:multidogo-fastfood-intent-d2b6b4653e",
-          "state": "text_A: Turn 0: hi\nTurn 3: yes\nTurn 6: yes\nTurn 7: i need toppings the pizza with sauce\nTurn 9: i like to crust of the pizza with thin\ntext_B: yes i like to 1 lemonade",
-          "question": "What intent does the current utterance in text_B express, given earlier dialogue text_A?",
+          "metadata": "{\"id\": \"<CONV>9f8d562f-ab36-40e7-ab7d-ccf8bd4c1826<TURN>10<SENT>0\", \"split_group_id\": \"9f8d562f-ab36-40e7-ab7d-ccf8bd4c1826\"}",
+          "id": "multidogo-fastfood-intent-d2b6b4653e:train:2",
           "kind": "choice",
           "options": [
-            "closinggreeting",
             "confirmation",
             "contentonly",
             "openinggreeting",
-            "orderbreakfastintent",
-            "orderburgerintent",
-            "orderdessertintent",
             "orderdrinkintent",
             "orderpizzaintent",
-            "ordersaladintent",
-            "ordersideintent",
-            "outofdomain",
-            "rejection",
-            "thankyou"
+            "rejection"
           ],
           "target": [
             0.0,
@@ -39178,17 +40370,19 @@
             0.0,
             0.0,
             0.0,
-            0.0,
-            0.0,
-            1.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0
+            1.0
           ],
-          "split": "train"
+          "state": "text_A: Turn 1: yes id like to get a pepperoni red onion and bell pepper pizza with mozzarella and classic sauce\nTurn 1: please\nTurn 3: what kind of soda do you have\nTurn 5: i would like to get the mountain dew thanks\nTurn 7: no thanks\ntext_B: no thanks thats it",
+          "question": "What intent does the current (last) utterance express? Use earlier dialogue when available.",
+          "source": "multidogo/fastfood/intent",
+          "variant": "direct",
+          "split": "train",
+          "provenance": {
+            "dataset": "jpcorb20/multidogo",
+            "config": "fastfood",
+            "revision": "503eee0894f308dbd1d74c1b4ecf4cfc99dd43f9"
+          },
+          "origin": "current local Jev recast (not yet published)"
         }
       ],
       "error": null
@@ -39199,115 +40393,79 @@
       "dataset": "jpcorb20/multidogo",
       "examples": [
         {
-          "source": "multidogo/software/intent",
-          "id": "multidogo:train:<CONV>8955f4e2-93f4-4d6c-9d63-f4eb3fb3ee73<TURN>15<SENT>0:multidogo-software-intent-7b749275b2",
-          "state": "text_A: Turn 0: hai\nTurn 2: i want to reimbursed hotel room\nTurn 4: camile 5465\nTurn 6: 120\nTurn 8: okay\nTurn 10: okay conform\nTurn 11: yes\nTurn 13: okay\ntext_B: thankyou",
-          "question": "What intent does the current utterance in text_B express, given earlier dialogue text_A?",
+          "metadata": "{\"id\": \"<CONV>dea4731e-7e02-4196-9a83-1b3b390978ca<TURN>14<SENT>0\", \"split_group_id\": \"dea4731e-7e02-4196-9a83-1b3b390978ca\"}",
+          "id": "multidogo-software-intent-7b749275b2:train:0",
           "kind": "choice",
           "options": [
-            "changeorder",
-            "checkserverstatus",
-            "closinggreeting",
             "confirmation",
             "contentonly",
             "expensereport",
-            "getpromotions",
-            "openinggreeting",
-            "outofdomain",
-            "providereceipt",
             "rejection",
-            "reportbrokensoftware",
             "softwareupdate",
-            "startorder",
-            "stoporder",
             "thankyou"
           ],
           "target": [
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            1.0
-          ],
-          "split": "train"
-        },
-        {
-          "source": "multidogo/software/intent",
-          "id": "multidogo:train:<CONV>82836b6f-7558-45de-9aae-9c2a53294630<TURN>13<SENT>0:multidogo-software-intent-7b749275b2",
-          "state": "text_A: Turn 0: hi\nTurn 2: checking the global status of servers\nTurn 4: lilly\nTurn 5: 6985\nTurn 7: samsung\nTurn 9: ok\nTurn 11: ok\ntext_B: no",
-          "question": "What intent does the current utterance in text_B express, given earlier dialogue text_A?",
-          "kind": "choice",
-          "options": [
-            "changeorder",
-            "checkserverstatus",
-            "closinggreeting",
-            "confirmation",
-            "contentonly",
-            "expensereport",
-            "getpromotions",
-            "openinggreeting",
-            "outofdomain",
-            "providereceipt",
-            "rejection",
-            "reportbrokensoftware",
-            "softwareupdate",
-            "startorder",
-            "stoporder",
-            "thankyou"
-          ],
-          "target": [
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
             0.0,
             0.0,
             0.0,
             1.0,
             0.0,
+            0.0
+          ],
+          "state": "text_A: Turn 1: hello good morning\nTurn 2: my skpye not working\nTurn 4: prakash\nTurn 5: 2583\nTurn 7: prakash info\nTurn 9: okay\nTurn 11: yes\ntext_B: no thank you",
+          "question": "What intent does the current (last) utterance express? Use earlier dialogue when available.",
+          "source": "multidogo/software/intent",
+          "variant": "direct",
+          "split": "train",
+          "provenance": {
+            "dataset": "jpcorb20/multidogo",
+            "config": "software",
+            "revision": "503eee0894f308dbd1d74c1b4ecf4cfc99dd43f9"
+          },
+          "origin": "current local Jev recast (not yet published)"
+        },
+        {
+          "metadata": "{\"id\": \"<CONV>a9d74b4a-63d2-4c2d-8428-ee36954c0e4b<TURN>4<SENT>0\", \"split_group_id\": \"a9d74b4a-63d2-4c2d-8428-ee36954c0e4b\"}",
+          "id": "multidogo-software-intent-7b749275b2:train:1",
+          "kind": "choice",
+          "options": [
+            "confirmation",
+            "contentonly",
+            "expensereport",
+            "rejection",
+            "softwareupdate",
+            "thankyou"
+          ],
+          "target": [
+            0.0,
+            1.0,
             0.0,
             0.0,
             0.0,
             0.0
           ],
-          "split": "train"
+          "state": "text_A: Turn 0: hai\nTurn 2: i want new software update\ntext_B: camile 8787",
+          "question": "What intent does the current (last) utterance express? Use earlier dialogue when available.",
+          "source": "multidogo/software/intent",
+          "variant": "direct",
+          "split": "train",
+          "provenance": {
+            "dataset": "jpcorb20/multidogo",
+            "config": "software",
+            "revision": "503eee0894f308dbd1d74c1b4ecf4cfc99dd43f9"
+          },
+          "origin": "current local Jev recast (not yet published)"
         },
         {
-          "source": "multidogo/software/intent",
-          "id": "multidogo:train:<CONV>920087d2-0e1c-4335-8d15-7e8b141bff85<TURN>3<SENT>0:multidogo-software-intent-7b749275b2",
-          "state": "text_A: Turn 0: hello\nTurn 2: i need to file a claim for my flight last week\ntext_B: oklahoma city 573",
-          "question": "What intent does the current utterance in text_B express, given earlier dialogue text_A?",
+          "metadata": "{\"id\": \"<CONV>1a5fe913-41a3-435c-9b84-e8bb591dcbd9<TURN>2<SENT>0\", \"split_group_id\": \"1a5fe913-41a3-435c-9b84-e8bb591dcbd9\"}",
+          "id": "multidogo-software-intent-7b749275b2:train:2",
           "kind": "choice",
           "options": [
-            "changeorder",
-            "checkserverstatus",
-            "closinggreeting",
             "confirmation",
             "contentonly",
             "expensereport",
-            "getpromotions",
-            "openinggreeting",
-            "outofdomain",
-            "providereceipt",
             "rejection",
-            "reportbrokensoftware",
             "softwareupdate",
-            "startorder",
-            "stoporder",
             "thankyou"
           ],
           "target": [
@@ -39316,19 +40474,19 @@
             0.0,
             0.0,
             1.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
             0.0
           ],
-          "split": "train"
+          "state": "text_A: Turn 0: hi\ntext_B: i want to update my skype",
+          "question": "What intent does the current (last) utterance express? Use earlier dialogue when available.",
+          "source": "multidogo/software/intent",
+          "variant": "direct",
+          "split": "train",
+          "provenance": {
+            "dataset": "jpcorb20/multidogo",
+            "config": "software",
+            "revision": "503eee0894f308dbd1d74c1b4ecf4cfc99dd43f9"
+          },
+          "origin": "current local Jev recast (not yet published)"
         }
       ],
       "error": null

@@ -4,54 +4,75 @@ Classification · `tasksource/silicone`
 
 <details><summary>Example 1</summary>
 
-canonical preprocessing (not a published Jev row) · train · silicone/iemocap:canonical:sample:0
+current local Jev recast (not yet published) · train · silicone-iemocap-9b982d0754:train:0
 
-**Question**
-
-<pre></pre>
-
-**sentence1**
+**State**
 
 <pre>And tonight my parents want to take me out to sushi and they said I could bring you.</pre>
 
-**Gold labels**
+**Question**
 
-<pre>excitement</pre>
+<pre>What emotion does this utterance express?</pre>
+
+**Criteria (choice)**
+
+<pre>1. anger
+2. excitement
+3. neutral
+4. sadness</pre>
+
+**Gold target (weight)**
+
+<pre>2. excitement — 1</pre>
 
 </details>
 
 <details><summary>Example 2</summary>
 
-canonical preprocessing (not a published Jev row) · train · silicone/iemocap:canonical:sample:1
+current local Jev recast (not yet published) · train · silicone-iemocap-9b982d0754:train:1
 
-**Question**
-
-<pre></pre>
-
-**sentence1**
+**State**
 
 <pre>What about me?</pre>
 
-**Gold labels**
+**Question**
 
-<pre>anger</pre>
+<pre>What emotion does this utterance express?</pre>
+
+**Criteria (choice)**
+
+<pre>1. anger
+2. excitement
+3. neutral
+4. sadness</pre>
+
+**Gold target (weight)**
+
+<pre>1. anger — 1</pre>
 
 </details>
 
 <details><summary>Example 3</summary>
 
-canonical preprocessing (not a published Jev row) · train · silicone/iemocap:canonical:sample:2
+current local Jev recast (not yet published) · train · silicone-iemocap-9b982d0754:train:2
 
-**Question**
-
-<pre></pre>
-
-**sentence1**
+**State**
 
 <pre>What I can</pre>
 
-**Gold labels**
+**Question**
 
-<pre>neutral</pre>
+<pre>What emotion does this utterance express?</pre>
+
+**Criteria (choice)**
+
+<pre>1. anger
+2. excitement
+3. neutral
+4. sadness</pre>
+
+**Gold target (weight)**
+
+<pre>3. neutral — 1</pre>
 
 </details>

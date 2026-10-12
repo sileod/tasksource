@@ -8,7 +8,57 @@ canonical preprocessing (not a published Jev row) · train · conll2003/pos_tags
 
 **Question**
 
-<pre></pre>
+<pre>Assign each token its Penn Treebank part-of-speech tag.</pre>
+
+**Criteria (label vocabulary)**
+
+<pre>&quot;
+&#x27;&#x27;
+#
+$
+(
+)
+,
+.
+:
+``
+CC
+CD
+DT
+EX
+FW
+IN
+JJ
+JJR
+JJS
+LS
+MD
+NN
+NNP
+NNPS
+NNS
+NN|SYM
+PDT
+POS
+PRP
+PRP$
+RB
+RBR
+RBS
+RP
+SYM
+TO
+UH
+VB
+VBD
+VBG
+VBN
+VBP
+VBZ
+WDT
+WP
+WP$
+WRB</pre>
 
 **Tokens / gold tags**
 
@@ -34,7 +84,57 @@ canonical preprocessing (not a published Jev row) · train · conll2003/pos_tags
 
 **Question**
 
-<pre></pre>
+<pre>Assign each token its Penn Treebank part-of-speech tag.</pre>
+
+**Criteria (label vocabulary)**
+
+<pre>&quot;
+&#x27;&#x27;
+#
+$
+(
+)
+,
+.
+:
+``
+CC
+CD
+DT
+EX
+FW
+IN
+JJ
+JJR
+JJS
+LS
+MD
+NN
+NNP
+NNPS
+NNS
+NN|SYM
+PDT
+POS
+PRP
+PRP$
+RB
+RBR
+RBS
+RP
+SYM
+TO
+UH
+VB
+VBD
+VBG
+VBN
+VBP
+VBZ
+WDT
+WP
+WP$
+WRB</pre>
 
 **Tokens / gold tags**
 
@@ -76,7 +176,57 @@ canonical preprocessing (not a published Jev row) · train · conll2003/pos_tags
 
 **Question**
 
-<pre></pre>
+<pre>Assign each token its Penn Treebank part-of-speech tag.</pre>
+
+**Criteria (label vocabulary)**
+
+<pre>&quot;
+&#x27;&#x27;
+#
+$
+(
+)
+,
+.
+:
+``
+CC
+CD
+DT
+EX
+FW
+IN
+JJ
+JJR
+JJS
+LS
+MD
+NN
+NNP
+NNPS
+NNS
+NN|SYM
+PDT
+POS
+PRP
+PRP$
+RB
+RBR
+RBS
+RP
+SYM
+TO
+UH
+VB
+VBD
+VBG
+VBN
+VBP
+VBZ
+WDT
+WP
+WP$
+WRB</pre>
 
 **Tokens / gold tags**
 

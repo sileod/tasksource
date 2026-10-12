@@ -638,6 +638,8 @@ def classification_prompt(row, question=None):
         if not second or not second.strip():
             raise ValueError('Question template requires nonempty sentence2')
         return first, question.replace('{sentence2}', second)
+    if not first or not first.strip():
+        return second, question
     return (f'text_A: {first}\ntext_B: {second}' if second and second.strip() else first), question
 
 

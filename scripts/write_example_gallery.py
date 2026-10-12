@@ -57,6 +57,13 @@ def source_examples(task, count, current_recast=False):
             return [decode(v, feature.feature) for v in value]
         return value
     question = getattr(data, 'question', None)
+    label_feature = split.features.get('labels')
+    if hasattr(label_feature, 'feature'):
+        label_feature = label_feature.feature
+    criteria = list(label_feature.names) if isinstance(label_feature, ClassLabel) else []
+    if not question and 'tokens' not in split.features:
+        from tasksource.jev.questions import default_question
+        question = default_question(criteria, 'sentence2' in split.features)
     if current_recast and (isinstance(split.features.get('labels'), ClassLabel) or 'inputs' in split.features):
         from tasksource.recast import recast_jev
         from scripts.build_jev_dataset import to_training_row
@@ -66,7 +73,7 @@ def source_examples(task, count, current_recast=False):
                 for i, row in enumerate(recast.select(range(min(count, len(recast)))))]
     return [dict(source=task, id=f'{task}:canonical:sample:{i}', split='train',
                  canonical={k: decode(v, split.features[k]) for k, v in row.items() if k != 'metadata'},
-                 question=question or '', provenance=task_provenance(task), row_metadata=row.get('metadata'), origin='canonical preprocessing (not a published Jev row)')
+                 question=question or '', criteria=criteria, provenance=task_provenance(task), row_metadata=row.get('metadata'), origin='canonical preprocessing (not a published Jev row)')
             for i, row in enumerate(split.select(range(min(count, len(split)))))]
 
 
@@ -74,8 +81,8 @@ def load_missing(tasks, examples, count, timeout, current_recast=False):
     """Bound each source load in its own process; retain errors rather than guessing."""
     def load(task):
         try:
-            result = subprocess.run([sys.executable, __file__, '--source-task', task,
-                                     '--examples', str(count)] + (['--current-recast'] if current_recast else []), capture_output=True, text=True, timeout=timeout)
+            result = subprocess.run([sys.executable, '-m', 'scripts.write_example_gallery', '--source-task', task,
+                                     '--examples', str(count)] + (['--current-recast'] if current_recast else []), capture_output=True, text=True, timeout=timeout, cwd=ROOT)
             if result.returncode:
                 raise ValueError(result.stderr.strip().splitlines()[-1])
             return task, json.loads(result.stdout.split('GALLERY_RESULT=')[-1]), None
@@ -94,13 +101,17 @@ def load_missing(tasks, examples, count, timeout, current_recast=False):
 def format_example(row):
     """Keep criteria order and the complete gold distribution, including soft labels."""
     if 'canonical' in row:
+        from tasksource.preprocess import classification_prompt
         values = row['canonical']
-        fields = [('Question', row['question'])]
+        state, question = classification_prompt(values, row['question']) if 'sentence1' in values else (None, row['question'])
+        fields = ([('State', state)] if state is not None else []) + [('Question', question)]
+        if row.get('criteria'):
+            fields.append(('Criteria (label vocabulary)', '\n'.join(row['criteria'])))
         if 'tokens' in values and isinstance(values.get('labels'), list) and len(values['tokens']) == len(values['labels']):
             return fields + [('Tokens / gold tags', '\n'.join(f'{token} → {label}' for token, label in zip(values['tokens'], values['labels'])))]
         return fields + [('Gold labels' if key == 'labels' else key,
                           value if isinstance(value, str) else json.dumps(value, ensure_ascii=False, indent=2))
-                         for key, value in values.items()]
+                         for key, value in values.items() if key not in ('sentence1', 'sentence2')]
     if row['kind'] == 'noul' and not row['options'] and len(row['target']) == 1:
         return [('State', row['state']), ('Question', row['question']),
                 ('Decision', 'Boolean (noul)'), ('Gold target', f"Probability of true: {row['target'][0]:g}")]

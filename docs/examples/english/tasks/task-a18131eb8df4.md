@@ -8,7 +8,33 @@ canonical preprocessing (not a published Jev row) · train · conll2003/chunk_ta
 
 **Question**
 
-<pre></pre>
+<pre>Assign each token its phrase chunk tag: B starts a chunk, I continues it, O is outside.</pre>
+
+**Criteria (label vocabulary)**
+
+<pre>O
+B-ADJP
+I-ADJP
+B-ADVP
+I-ADVP
+B-CONJP
+I-CONJP
+B-INTJ
+I-INTJ
+B-LST
+I-LST
+B-NP
+I-NP
+B-PP
+I-PP
+B-PRT
+I-PRT
+B-SBAR
+I-SBAR
+B-UCP
+I-UCP
+B-VP
+I-VP</pre>
 
 **Tokens / gold tags**
 
@@ -34,7 +60,33 @@ canonical preprocessing (not a published Jev row) · train · conll2003/chunk_ta
 
 **Question**
 
-<pre></pre>
+<pre>Assign each token its phrase chunk tag: B starts a chunk, I continues it, O is outside.</pre>
+
+**Criteria (label vocabulary)**
+
+<pre>O
+B-ADJP
+I-ADJP
+B-ADVP
+I-ADVP
+B-CONJP
+I-CONJP
+B-INTJ
+I-INTJ
+B-LST
+I-LST
+B-NP
+I-NP
+B-PP
+I-PP
+B-PRT
+I-PRT
+B-SBAR
+I-SBAR
+B-UCP
+I-UCP
+B-VP
+I-VP</pre>
 
 **Tokens / gold tags**
 
@@ -76,7 +128,33 @@ canonical preprocessing (not a published Jev row) · train · conll2003/chunk_ta
 
 **Question**
 
-<pre></pre>
+<pre>Assign each token its phrase chunk tag: B starts a chunk, I continues it, O is outside.</pre>
+
+**Criteria (label vocabulary)**
+
+<pre>O
+B-ADJP
+I-ADJP
+B-ADVP
+I-ADVP
+B-CONJP
+I-CONJP
+B-INTJ
+I-INTJ
+B-LST
+I-LST
+B-NP
+I-NP
+B-PP
+I-PP
+B-PRT
+I-PRT
+B-SBAR
+I-SBAR
+B-UCP
+I-UCP
+B-VP
+I-VP</pre>
 
 **Tokens / gold tags**
 

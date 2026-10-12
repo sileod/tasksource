@@ -27,6 +27,7 @@ def _single_label(dataset, column, empty=None):
 # Integer encodings documented by the corresponding source dataset cards.
 NLI_LABEL_VALUES = {0: "entailment", 1: "neutral", 2: "contradiction"}
 ENTAILMENT_LABEL_VALUES = {0: "not-entailed", 1: "entailed"}
+NLI_QUESTION = "Does text_A entail text_B, contradict it, or neither?"
 
 # variable name: dataset___config__task
 
@@ -180,7 +181,7 @@ fracas = Classification("premise","hypothesis","label",
     dataset_name="pietrolesci/fracas", label_values=NLI_LABEL_VALUES)
 
 dialogue_nli = Classification("sentence1","sentence2","label",
-    dataset_name="pietrolesci/dialogue_nli", label_values=NLI_LABEL_VALUES)
+    dataset_name="pietrolesci/dialogue_nli", label_values=NLI_LABEL_VALUES, question=NLI_QUESTION)
 
 mpe_nli = Classification("premise","hypothesis","label",
     dataset_name="pietrolesci/mpe",
@@ -260,8 +261,10 @@ medical_questions_pairs = Classification("question_1","question_2", name("label"
 ###################### Token Classification #########################
 
 # data-only mirror with the original columns, ClassLabel names and splits
-conll2003__pos_tags   = TokenClassification(tokens="tokens", labels='pos_tags', dataset_name="tomaarsen/conll2003")
-conll2003__chunk_tags = TokenClassification(tokens="tokens", labels='chunk_tags', dataset_name="tomaarsen/conll2003")
+conll2003__pos_tags   = TokenClassification(tokens="tokens", labels='pos_tags', dataset_name="tomaarsen/conll2003",
+    question="Assign each token its Penn Treebank part-of-speech tag.")
+conll2003__chunk_tags = TokenClassification(tokens="tokens", labels='chunk_tags', dataset_name="tomaarsen/conll2003",
+    question="Assign each token its phrase chunk tag: B starts a chunk, I continues it, O is outside.")
 conll2003__ner_tags   = TokenClassification(tokens="tokens", labels='ner_tags', dataset_name="tomaarsen/conll2003")
 
 
@@ -581,7 +584,10 @@ pragmeval__persuasiveness_strength = _pragmeval_scale("persuasiveness-strength",
 
 silicone = Classification("Utterance",labels="Label",
     dataset_name="tasksource/silicone",
-    config_name=['dyda_da', 'dyda_e', 'maptask', 'meld_e', 'meld_s', 'oasis', 'sem'] # +['swda', 'mrda'] # in pragmeval
+    config_name=['dyda_da', 'dyda_e', 'maptask', 'meld_e', 'meld_s', 'oasis', 'sem'],
+    question={**{c: 'What emotion does this utterance express?' for c in ('dyda_e', 'meld_e')},
+              **{c: 'What sentiment does this utterance express?' for c in ('meld_s', 'sem')},
+              **{c: 'What dialogue act does this utterance perform?' for c in ('dyda_da', 'maptask', 'oasis')}}
 )
 
 _IEMOCAP = dict(ang='anger', dis='disgust', exc='excitement', fea='fear', fru='frustration', hap='happiness',
@@ -589,7 +595,8 @@ _IEMOCAP = dict(ang='anger', dis='disgust', exc='excitement', fea='fear', fru='f
 silicone___iemocap = Classification("Utterance", labels=lambda x: _IEMOCAP[x['Emotion']],
     dataset_name="tasksource/silicone",
     # xxx marks utterances without annotator agreement (24% of train)
-    pre_process=lambda ds: ds.filter(lambda x: x['Emotion'] in _IEMOCAP))
+    pre_process=lambda ds: ds.filter(lambda x: x['Emotion'] in _IEMOCAP),
+    question='What emotion does this utterance express?')
 
 def _eurlex_descriptors(dataset):
     codes = dataset['train'].features['labels'].feature.names
@@ -864,20 +871,27 @@ wnut_17 = TokenClassification(tokens="tokens", labels="ner_tags", dataset_name="
     task_id="wnut_17/wnut_17")  # data-only mirror
 
 ncbi_disease = TokenClassification(tokens="tokens", labels="ner_tags", dataset_name="ncbi/ncbi_disease",
-    task_id="ncbi_disease/ncbi_disease", load_dataset_kwargs=dict(revision=PARQUET, data_dir="ncbi_disease"))
+    task_id="ncbi_disease/ncbi_disease",
+    question="Tag disease mentions in the tokens: B-Disease starts a mention, I-Disease continues it, O is outside.",
+    load_dataset_kwargs=dict(revision=PARQUET, data_dir="ncbi_disease"))
 
 acronym_identification = TokenClassification(labels="labels", tokens="tokens",
-    dataset_name="amirveyseh/acronym_identification", task_id="acronym_identification")
+    dataset_name="amirveyseh/acronym_identification", task_id="acronym_identification",
+    question="Tag acronym short forms and their expanded long forms: B starts a span, I continues it, O is outside.")
 
 jnlpba = TokenClassification(tokens="tokens", labels="ner_tags", splits=["train", "validation", None],
-    dataset_name="jnlpba/jnlpba", task_id="jnlpba/jnlpba", load_dataset_kwargs=dict(revision=PARQUET, data_dir="jnlpba"))
+    dataset_name="jnlpba/jnlpba", task_id="jnlpba/jnlpba",
+    question="Tag DNA, RNA, proteins, cell types and cell lines: B starts a mention, I continues it, O is outside.",
+    load_dataset_kwargs=dict(revision=PARQUET, data_dir="jnlpba"))
 
 
 # the parquet export lost the tag names; these are the ones the dataset card documents
 _ONTONOTES_TAGS = ["O"] + [f"{p}-{t}" for t in ["PERSON", "NORP", "FAC", "ORG", "GPE", "LOC", "PRODUCT", "DATE", "TIME",
     "PERCENT", "MONEY", "QUANTITY", "ORDINAL", "CARDINAL", "EVENT", "WORK_OF_ART", "LAW", "LANGUAGE"] for p in "BI"]
 SpeedOfMagic_ontonotes_english = TokenClassification(tokens="tokens", labels="ner_tags", dataset_name="SpeedOfMagic/ontonotes_english",
-    task_id="ontonotes_english/SpeedOfMagic--ontonotes_english", load_dataset_kwargs=dict(revision=PARQUET),
+    task_id="ontonotes_english/SpeedOfMagic--ontonotes_english",
+    question="Assign each token its OntoNotes named-entity tag: B starts a mention, I continues it, O is outside.",
+    load_dataset_kwargs=dict(revision=PARQUET),
     pre_process=lambda ds: ds.cast_column("ner_tags", Sequence(ClassLabel(names=_ONTONOTES_TAGS))))
 
 blog_authorship_corpus__gender    = Classification(sentence1="text",labels="gender", question="What is the blogger's gender?",
@@ -977,11 +991,11 @@ def _dynasent_ternary(dataset):
 dynasent___r1 = Classification(
     "sentence", labels="gold_label", dataset_name="tasksource/dynasent",
     config_name="r1", task_id="dynasent/dynabench.dynasent.{config_name}.all/{config_name}",
-    pre_process=_dynasent_ternary)
+    pre_process=_dynasent_ternary, question="What sentiment does this sentence express?")
 dynasent___r2 = Classification(
     "sentence", labels="gold_label", dataset_name="tasksource/dynasent",
     config_name="r2", task_id="dynasent/dynabench.dynasent.{config_name}.all/{config_name}",
-    pre_process=_dynasent_ternary)
+    pre_process=_dynasent_ternary, question="What sentiment does this sentence express?")
 
 sarcasm_news = Classification("headline", labels=name("is_sarcastic", ["not sarcastic", "sarcastic"]),
     dataset_name="raquiba/Sarcasm_News_Headline")
@@ -1341,7 +1355,8 @@ udep__deprel = TokenClassification(
     "tokens", "deprel",
     config_name=udep_en_configs,
     dataset_name="universal-dependencies/universal_dependencies",
-    pre_process=_udep_deprel_pre_process)
+    pre_process=_udep_deprel_pre_process,
+    question="Assign each token its Universal Dependencies relation to its syntactic head; root marks the sentence root.")
 
 ambient= Classification("premise","hypothesis","hypothesis_ambiguous",dataset_name="tasksource/ambient",
     question="Is the hypothesis ambiguous?")
@@ -1457,7 +1472,7 @@ few_nerd = TokenClassification("tokens","fine_ner_tags",dataset_name="DFKI-SLT/f
 finer = TokenClassification('tokens','ner_tags',dataset_name='nlpaueb/finer-139',
     load_dataset_kwargs=dict(revision=PARQUET, data_dir="finer-139"))
 
-label_nli = Classification("premise","hypothesis","labels",dataset_name='tasksource/zero-shot-label-nli')
+label_nli = Classification("premise","hypothesis","labels",dataset_name='tasksource/zero-shot-label-nli', question=NLI_QUESTION)
 
 com2sense = Classification("sent",labels="label",dataset_name="tasksource/com2sense",splits=['train',"validation",None])
 
@@ -1680,7 +1695,7 @@ ambigNQ = Classification(
     question="Is the question ambiguous?",
     dataset_name="erbacher/AmbigNQ-clarifying-question")
 
-siga_nli = Classification("premise","statement","label",dataset_name="tasksource/SIGA-nli")
+siga_nli = Classification("premise","statement","label",dataset_name="tasksource/SIGA-nli", question=NLI_QUESTION)
 
 unigram_fol = Classification("premise","hypothesis","label",dataset_name='unigram/FOL-nli')
 
@@ -2168,7 +2183,7 @@ hover = Classification("evidence","claim","label",
     label_values={0: "supports the claim", 1: "refutes the claim"})
 
 hover__nli = Classification("evidence","claim",name("label",["entailment","neutral","contradiction"]),
-    dataset_name="Dzeniks/hover-3way")
+    dataset_name="Dzeniks/hover-3way", question=NLI_QUESTION)
 
 tasksource_dpo = MultipleChoice("prompt",choices=['chosen','rejected'],labels=constant(0), question="Which response is better?",
     dataset_name="tasksource/tasksource_dpo_pairs")
@@ -2716,7 +2731,7 @@ def _multidogo_context(dataset):
 multidogo__intent = Classification('sentence1','sentence2','intent',dataset_name='jpcorb20/multidogo',
     config_name=['airline','fastfood','finance','insurance','media','software'],task_id='multidogo/{config_name}/intent',
     pre_process=_multidogo_context,metadata='metadata',complete_splits=False,
-    question='What intent does the current utterance in text_B express, given earlier dialogue text_A?',
+    question='What intent does the current (last) utterance express? Use earlier dialogue when available.',
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['jpcorb20/multidogo'],'name':'default','data_dir':'splits_annotated_at_sentence_level/{config_name}'})
 
 

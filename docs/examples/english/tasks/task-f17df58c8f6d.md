@@ -8,7 +8,15 @@ canonical preprocessing (not a published Jev row) · train · acronym_identifica
 
 **Question**
 
-<pre></pre>
+<pre>Tag acronym short forms and their expanded long forms: B starts a span, I continues it, O is outside.</pre>
+
+**Criteria (label vocabulary)**
+
+<pre>B-long
+B-short
+I-long
+I-short
+O</pre>
 
 **Tokens / gold tags**
 
@@ -43,7 +51,15 @@ canonical preprocessing (not a published Jev row) · train · acronym_identifica
 
 **Question**
 
-<pre></pre>
+<pre>Tag acronym short forms and their expanded long forms: B starts a span, I continues it, O is outside.</pre>
+
+**Criteria (label vocabulary)**
+
+<pre>B-long
+B-short
+I-long
+I-short
+O</pre>
 
 **Tokens / gold tags**
 
@@ -93,7 +109,15 @@ canonical preprocessing (not a published Jev row) · train · acronym_identifica
 
 **Question**
 
-<pre></pre>
+<pre>Tag acronym short forms and their expanded long forms: B starts a span, I continues it, O is outside.</pre>
+
+**Criteria (label vocabulary)**
+
+<pre>B-long
+B-short
+I-long
+I-short
+O</pre>
 
 **Tokens / gold tags**
 

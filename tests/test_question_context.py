@@ -82,3 +82,20 @@ def test_soft_question_context_preserves_vote_distribution():
     assert row['state'] == 'Evidence'
     assert row['instructions'] == 'Assess this query: Per-example query'
     assert row['target'] == [.25, .75]
+
+
+@pytest.mark.parametrize('recast', ['jev', 'instruct'])
+def test_no_history_intent_has_no_empty_field_or_dangling_variable(recast):
+    from tasksource.tasks import multidogo__intent
+    source = DatasetDict(train=Dataset.from_dict({'sentence1': ['', 'Customer: Hello.'],
+        'sentence2': ['Order pizza.', 'Order pizza.'], 'labels': [0, 0]},
+        features=Features({'sentence1': Value('string'), 'sentence2': Value('string'),
+                           'labels': ClassLabel(names=['order', 'greet'])})))
+    result = (recast_jev if recast == 'jev' else recast_instruct)(source, question=multidogo__intent.question)['train']
+    first = result[0]['state' if recast == 'jev' else 'inputs']
+    second = result[1]['state' if recast == 'jev' else 'inputs']
+    assert 'Order pizza.' in first and 'text_A:' not in first and 'text_B:' not in first
+    assert 'Customer: Hello.' in second and 'Order pizza.' in second
+    assert 'text_A' not in multidogo__intent.question and 'text_B' not in multidogo__intent.question
+    if recast == 'jev':
+        assert result['answer'] == ['order', 'order']

@@ -59,3 +59,16 @@ def test_cladder_is_evaluation_only_and_cached_exports_exclude_it():
     assert 'cladder' in eval_only.REASONS
     rows = Dataset.from_dict({'source': ['cladder', 'cladder/variant', 'quarel']})
     assert exclude_publish_sources(rows)['source'] == ['quarel']
+
+
+@pytest.mark.parametrize('task', [
+    'dialogue_nli', 'conll2003/pos_tags', 'conll2003/chunk_tags', 'jnlpba/jnlpba',
+    'ontonotes_english/SpeedOfMagic--ontonotes_english', 'acronym_identification',
+    'ncbi_disease/ncbi_disease', *[f'universal_dependencies/{c}/deprel' for c in ('en_gum','en_partut','en_ewt','en_lines')],
+    'silicone/dyda_e', 'silicone/meld_s', 'silicone/meld_e', 'silicone/iemocap',
+    'dynasent/dynabench.dynasent.r1.all/r1', 'dynasent/dynabench.dynasent.r2.all/r2',
+    'SIGA-nli', 'zero-shot-label-nli', 'hover-3way/nli',
+])
+def test_reviewed_annotations_have_task_specific_questions(task):
+    from tasksource.access import load_preprocessing
+    assert load_preprocessing(id=task).question

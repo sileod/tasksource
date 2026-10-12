@@ -4,54 +4,84 @@ Classification · `tasksource/silicone`
 
 <details><summary>Example 1</summary>
 
-canonical preprocessing (not a published Jev row) · train · silicone/meld_e:canonical:sample:0
+current local Jev recast (not yet published) · train · silicone-meld-e-10012c5f7a:train:0
 
-**Question**
-
-<pre></pre>
-
-**sentence1**
+**State**
 
 <pre>You got it going on !</pre>
 
-**Gold labels**
+**Question**
 
-<pre>joy</pre>
+<pre>What emotion does this utterance express?</pre>
+
+**Criteria (choice)**
+
+<pre>1. anger
+2. disgust
+3. fear
+4. joy
+5. neutral
+6. sadness
+7. surprise</pre>
+
+**Gold target (weight)**
+
+<pre>4. joy — 1</pre>
 
 </details>
 
 <details><summary>Example 2</summary>
 
-canonical preprocessing (not a published Jev row) · train · silicone/meld_e:canonical:sample:1
+current local Jev recast (not yet published) · train · silicone-meld-e-10012c5f7a:train:1
 
-**Question**
-
-<pre></pre>
-
-**sentence1**
+**State**
 
 <pre>Do you wanna come in for some lemonade ?</pre>
 
-**Gold labels**
+**Question**
 
-<pre>neutral</pre>
+<pre>What emotion does this utterance express?</pre>
+
+**Criteria (choice)**
+
+<pre>1. anger
+2. disgust
+3. fear
+4. joy
+5. neutral
+6. sadness
+7. surprise</pre>
+
+**Gold target (weight)**
+
+<pre>5. neutral — 1</pre>
 
 </details>
 
 <details><summary>Example 3</summary>
 
-canonical preprocessing (not a published Jev row) · train · silicone/meld_e:canonical:sample:2
+current local Jev recast (not yet published) · train · silicone-meld-e-10012c5f7a:train:2
 
-**Question**
-
-<pre></pre>
-
-**sentence1**
+**State**
 
 <pre>Hi Mom , it &#x27;s Jill .</pre>
 
-**Gold labels**
+**Question**
 
-<pre>neutral</pre>
+<pre>What emotion does this utterance express?</pre>
+
+**Criteria (choice)**
+
+<pre>1. anger
+2. disgust
+3. fear
+4. joy
+5. neutral
+6. sadness
+7. surprise</pre>
+
+**Gold target (weight)**
+
+<pre>5. neutral — 1</pre>
 
 </details>

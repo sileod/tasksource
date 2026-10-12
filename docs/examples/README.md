@@ -4,7 +4,7 @@
 
 The English gallery lists every task in `list_tasks()`. It shows up to three real training examples per task, retaining the published Jev state, question, criterion order and gold distribution. Boolean decisions show the probability of true. The HTML shows the first example immediately, with input and decision side by side. Long fields show the beginning and end; expand “Full text” for the complete content. Two more examples are folded below each task. The Markdown and JSON retain full texts.
 
-For tasks absent from the published `full` config, optional source loads show canonical preprocessed fields with decoded class labels instead. These are labeled separately, with provenance in `examples.json`. Failed or timed-out loads are reported, not replaced by fabricated examples. These samples illustrate the transformations; they are not a comprehensive quality audit.
+For tasks absent from the published `full` config, optional source loads show canonical preprocessed examples with a task question, decoded gold labels and the complete source label vocabulary instead. Token tasks show the sequence and its gold tags; they are not presented as single-choice Jev rows. These are labeled separately, with provenance in `examples.json`. Failed or timed-out loads are reported, not replaced by fabricated examples. These samples illustrate the transformations; they are not a comprehensive quality audit.
 
 Regenerate with [write_example_gallery.py](../../scripts/write_example_gallery.py):
 

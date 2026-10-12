@@ -8,7 +8,47 @@ canonical preprocessing (not a published Jev row) · train · ontonotes_english/
 
 **Question**
 
-<pre></pre>
+<pre>Assign each token its OntoNotes named-entity tag: B starts a mention, I continues it, O is outside.</pre>
+
+**Criteria (label vocabulary)**
+
+<pre>O
+B-PERSON
+I-PERSON
+B-NORP
+I-NORP
+B-FAC
+I-FAC
+B-ORG
+I-ORG
+B-GPE
+I-GPE
+B-LOC
+I-LOC
+B-PRODUCT
+I-PRODUCT
+B-DATE
+I-DATE
+B-TIME
+I-TIME
+B-PERCENT
+I-PERCENT
+B-MONEY
+I-MONEY
+B-QUANTITY
+I-QUANTITY
+B-ORDINAL
+I-ORDINAL
+B-CARDINAL
+I-CARDINAL
+B-EVENT
+I-EVENT
+B-WORK_OF_ART
+I-WORK_OF_ART
+B-LAW
+I-LAW
+B-LANGUAGE
+I-LANGUAGE</pre>
 
 **Tokens / gold tags**
 
@@ -30,7 +70,47 @@ canonical preprocessing (not a published Jev row) · train · ontonotes_english/
 
 **Question**
 
-<pre></pre>
+<pre>Assign each token its OntoNotes named-entity tag: B starts a mention, I continues it, O is outside.</pre>
+
+**Criteria (label vocabulary)**
+
+<pre>O
+B-PERSON
+I-PERSON
+B-NORP
+I-NORP
+B-FAC
+I-FAC
+B-ORG
+I-ORG
+B-GPE
+I-GPE
+B-LOC
+I-LOC
+B-PRODUCT
+I-PRODUCT
+B-DATE
+I-DATE
+B-TIME
+I-TIME
+B-PERCENT
+I-PERCENT
+B-MONEY
+I-MONEY
+B-QUANTITY
+I-QUANTITY
+B-ORDINAL
+I-ORDINAL
+B-CARDINAL
+I-CARDINAL
+B-EVENT
+I-EVENT
+B-WORK_OF_ART
+I-WORK_OF_ART
+B-LAW
+I-LAW
+B-LANGUAGE
+I-LANGUAGE</pre>
 
 **Tokens / gold tags**
 
@@ -79,7 +159,47 @@ canonical preprocessing (not a published Jev row) · train · ontonotes_english/
 
 **Question**
 
-<pre></pre>
+<pre>Assign each token its OntoNotes named-entity tag: B starts a mention, I continues it, O is outside.</pre>
+
+**Criteria (label vocabulary)**
+
+<pre>O
+B-PERSON
+I-PERSON
+B-NORP
+I-NORP
+B-FAC
+I-FAC
+B-ORG
+I-ORG
+B-GPE
+I-GPE
+B-LOC
+I-LOC
+B-PRODUCT
+I-PRODUCT
+B-DATE
+I-DATE
+B-TIME
+I-TIME
+B-PERCENT
+I-PERCENT
+B-MONEY
+I-MONEY
+B-QUANTITY
+I-QUANTITY
+B-ORDINAL
+I-ORDINAL
+B-CARDINAL
+I-CARDINAL
+B-EVENT
+I-EVENT
+B-WORK_OF_ART
+I-WORK_OF_ART
+B-LAW
+I-LAW
+B-LANGUAGE
+I-LANGUAGE</pre>
 
 **Tokens / gold tags**
 

@@ -4,54 +4,72 @@ Classification · `tasksource/silicone`
 
 <details><summary>Example 1</summary>
 
-canonical preprocessing (not a published Jev row) · train · silicone/meld_s:canonical:sample:0
+current local Jev recast (not yet published) · train · silicone-meld-s-d1ca4885d7:train:0
 
-**Question**
-
-<pre></pre>
-
-**sentence1**
+**State**
 
 <pre>You got it going on !</pre>
 
-**Gold labels**
+**Question**
 
-<pre>positive</pre>
+<pre>What sentiment does this utterance express?</pre>
+
+**Criteria (choice)**
+
+<pre>1. negative
+2. neutral
+3. positive</pre>
+
+**Gold target (weight)**
+
+<pre>3. positive — 1</pre>
 
 </details>
 
 <details><summary>Example 2</summary>
 
-canonical preprocessing (not a published Jev row) · train · silicone/meld_s:canonical:sample:1
+current local Jev recast (not yet published) · train · silicone-meld-s-d1ca4885d7:train:1
 
-**Question**
-
-<pre></pre>
-
-**sentence1**
+**State**
 
 <pre>Do you wanna come in for some lemonade ?</pre>
 
-**Gold labels**
+**Question**
 
-<pre>neutral</pre>
+<pre>What sentiment does this utterance express?</pre>
+
+**Criteria (score)**
+
+<pre>1. negative
+2. neutral
+3. positive</pre>
+
+**Gold target (weight)**
+
+<pre>2. neutral — 1</pre>
 
 </details>
 
 <details><summary>Example 3</summary>
 
-canonical preprocessing (not a published Jev row) · train · silicone/meld_s:canonical:sample:2
+current local Jev recast (not yet published) · train · silicone-meld-s-d1ca4885d7:train:2
 
-**Question**
-
-<pre></pre>
-
-**sentence1**
+**State**
 
 <pre>Hi Mom , it &#x27;s Jill .</pre>
 
-**Gold labels**
+**Question**
 
-<pre>neutral</pre>
+<pre>What sentiment does this utterance express?</pre>
+
+**Criteria (choice)**
+
+<pre>1. negative
+2. neutral
+3. positive</pre>
+
+**Gold target (weight)**
+
+<pre>2. neutral — 1</pre>
 
 </details>

@@ -4,54 +4,72 @@ Classification · `tasksource/dynasent`
 
 <details><summary>Example 1</summary>
 
-canonical preprocessing (not a published Jev row) · train · dynasent/dynabench.dynasent.r2.all/r2:canonical:sample:0
+current local Jev recast (not yet published) · train · dynasent-dynabench-dynasent-r2-all-r2-5efc8c6c1c:train:0
 
-**Question**
-
-<pre></pre>
-
-**sentence1**
+**State**
 
 <pre>She was really beautiful and I had a good time to meet her.</pre>
 
-**Gold labels**
+**Question**
 
-<pre>positive</pre>
+<pre>What sentiment does this sentence express?</pre>
+
+**Criteria (score)**
+
+<pre>1. negative
+2. neutral
+3. positive</pre>
+
+**Gold target (weight)**
+
+<pre>3. positive — 1</pre>
 
 </details>
 
 <details><summary>Example 2</summary>
 
-canonical preprocessing (not a published Jev row) · train · dynasent/dynabench.dynasent.r2.all/r2:canonical:sample:1
+current local Jev recast (not yet published) · train · dynasent-dynabench-dynasent-r2-all-r2-5efc8c6c1c:train:1
 
-**Question**
-
-<pre></pre>
-
-**sentence1**
+**State**
 
 <pre>The school was subpar at best.</pre>
 
-**Gold labels**
+**Question**
 
-<pre>positive</pre>
+<pre>What sentiment does this sentence express?</pre>
+
+**Criteria (score)**
+
+<pre>1. negative
+2. neutral
+3. positive</pre>
+
+**Gold target (weight)**
+
+<pre>3. positive — 1</pre>
 
 </details>
 
 <details><summary>Example 3</summary>
 
-canonical preprocessing (not a published Jev row) · train · dynasent/dynabench.dynasent.r2.all/r2:canonical:sample:2
+current local Jev recast (not yet published) · train · dynasent-dynabench-dynasent-r2-all-r2-5efc8c6c1c:train:2
 
-**Question**
-
-<pre></pre>
-
-**sentence1**
+**State**
 
 <pre>There&#x27;s so much MSG in their ingredients that after leaving the restaurant I can feel my tongue is mediocre.</pre>
 
-**Gold labels**
+**Question**
 
-<pre>negative</pre>
+<pre>What sentiment does this sentence express?</pre>
+
+**Criteria (choice)**
+
+<pre>1. negative
+2. neutral
+3. positive</pre>
+
+**Gold target (weight)**
+
+<pre>1. negative — 1</pre>
 
 </details>

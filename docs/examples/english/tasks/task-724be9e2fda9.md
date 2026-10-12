@@ -4,100 +4,86 @@ Classification · `jpcorb20/multidogo`
 
 <details><summary>Example 1</summary>
 
-published Jev · train · multidogo:train:<CONV>dad66e07-94c3-4e0c-be13-688c2d1e88f1<TURN>2<SENT>0:multidogo-airline-intent-b02020c0b4
+current local Jev recast (not yet published) · train · multidogo-airline-intent-b02020c0b4:train:0
 
 **State**
 
 <pre>text_A: Turn 0: hai
-text_B: i need to check my seat assignment</pre>
+Turn 2: check my seat assignment
+text_B: df 3 s 22</pre>
 
 **Question**
 
-<pre>What intent does the current utterance in text_B express, given earlier dialogue text_A?</pre>
+<pre>What intent does the current (last) utterance express? Use earlier dialogue when available.</pre>
 
 **Criteria (choice)**
 
 <pre>1. bookflight
-2. changeseatassignment
-3. closinggreeting
-4. confirmation
-5. contentonly
-6. getboardingpass
-7. getseatinfo
-8. openinggreeting
-9. outofdomain
-10. rejection
-11. thankyou</pre>
+2. confirmation
+3. contentonly
+4. openinggreeting
+5. thankyou</pre>
 
 **Gold target (weight)**
 
-<pre>2. changeseatassignment — 1</pre>
+<pre>3. contentonly — 1</pre>
 
 </details>
 
 <details><summary>Example 2</summary>
 
-published Jev · train · multidogo:train:<CONV>d40f040d-aac1-4ab9-973c-42853ddc982e<TURN>6<SENT>0:multidogo-airline-intent-b02020c0b4
+current local Jev recast (not yet published) · train · multidogo-airline-intent-b02020c0b4:train:1
 
 **State**
 
-<pre>text_A: Turn 0: hai
-Turn 4: kumar 968 ukl
-text_B: yes please continue</pre>
+<pre>hi</pre>
 
 **Question**
 
-<pre>What intent does the current utterance in text_B express, given earlier dialogue text_A?</pre>
+<pre>What intent does the current (last) utterance express? Use earlier dialogue when available.</pre>
 
 **Criteria (choice)**
 
 <pre>1. bookflight
-2. changeseatassignment
-3. closinggreeting
-4. confirmation
-5. contentonly
-6. getboardingpass
-7. getseatinfo
-8. openinggreeting
-9. outofdomain
-10. rejection
-11. thankyou</pre>
+2. confirmation
+3. contentonly
+4. openinggreeting
+5. thankyou</pre>
 
 **Gold target (weight)**
 
-<pre>4. confirmation — 1</pre>
+<pre>4. openinggreeting — 1</pre>
 
 </details>
 
 <details><summary>Example 3</summary>
 
-published Jev · train · multidogo:train:<CONV>71048671-e044-4092-9a8c-ecb119ee33b2<TURN>1<SENT>1:multidogo-airline-intent-b02020c0b4
+current local Jev recast (not yet published) · train · multidogo-airline-intent-b02020c0b4:train:2
 
 **State**
 
-<pre>text_A: Turn 1: hi
-text_B: id like to get my boarding pass sent to me please</pre>
+<pre>text_A: Turn 1: hii
+Turn 2: i need to change my seat assignment
+Turn 4: subramani
+Turn 6: rvt 458
+Turn 8: window seat
+Turn 10: ok thanks
+text_B: ok thanks</pre>
 
 **Question**
 
-<pre>What intent does the current utterance in text_B express, given earlier dialogue text_A?</pre>
+<pre>What intent does the current (last) utterance express? Use earlier dialogue when available.</pre>
 
 **Criteria (choice)**
 
 <pre>1. bookflight
-2. changeseatassignment
-3. closinggreeting
-4. confirmation
-5. contentonly
-6. getboardingpass
-7. getseatinfo
-8. openinggreeting
-9. outofdomain
-10. rejection
-11. thankyou</pre>
+2. confirmation
+3. contentonly
+4. openinggreeting
+5. thankyou</pre>
 
 **Gold target (weight)**
 
-<pre>6. getboardingpass — 1</pre>
+<pre>5. thankyou — 1</pre>
 
 </details>
