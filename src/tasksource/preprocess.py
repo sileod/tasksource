@@ -774,3 +774,11 @@ def concatenate_dataset_dict(l):
     """Concatenate a list of DatastDict objects sharing same splits and columns."""
     keys=l[0].keys()
     return datasets.DatasetDict({k: datasets.concatenate_datasets([x[k] for x in l]) for k in keys})
+
+
+def dataset_from_rows(rows, features=None):
+    """Build bounded Arrow chunks; image bytes can exceed a single array's 2 GiB limit."""
+    if not rows:
+        return datasets.Dataset.from_dict({key: [] for key in features or {}}, features=features)
+    return datasets.concatenate_datasets([datasets.Dataset.from_list(rows[start:start + 100], features=features)
+                                         for start in range(0, len(rows), 100)])

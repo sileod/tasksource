@@ -749,3 +749,21 @@ def test_vision_publish_documents_its_config_without_appending_root_card(tmp_pat
     assert [u['path_in_repo'] for u in uploads] == ['vision/README.md']
     assert b'1 train' in uploads[0]['path_or_fileobj']
     assert b'(sources.yaml)' in uploads[0]['path_or_fileobj']
+
+
+def test_image_materialization_keeps_bounded_arrow_chunks_and_order(monkeypatch):
+    from tasksource.preprocess import dataset_from_rows
+    features = Features({'images': Sequence(Image(decode=False)), 'id': Value('int64')})
+    rows = [{'images': [png('red'), png('blue')], 'id': i} for i in range(205)]
+    original = Dataset.from_list
+    batches = []
+    def bounded(batch, **kwargs):
+        batches.append(len(batch))
+        assert len(batch) <= 100
+        return original(batch, **kwargs)
+    monkeypatch.setattr(Dataset, 'from_list', bounded)
+    result = dataset_from_rows(rows, features)
+    assert batches == [100, 100, 5]
+    assert result.features == features
+    assert list(result) == rows
+    assert dataset_from_rows([], features).features == features

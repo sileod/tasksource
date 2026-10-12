@@ -1,4 +1,4 @@
-from .preprocess import Preprocessing, MultipleChoiceFields, SoftLabeling, add_question, disable_image_decoding, reservoir_sample
+from .preprocess import Preprocessing, MultipleChoiceFields, SoftLabeling, add_question, disable_image_decoding, reservoir_sample, dataset_from_rows
 from .jev.options import JEV_MAX_MC_OPTIONS
 import re
 import ast
@@ -358,7 +358,7 @@ def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preproc
                 selected = list(rows)
             else:
                 selected = list(rows)
-            materialized[split] = Dataset.from_list(selected, **({"features": rows.features} if vision else {}))
+            materialized[split] = dataset_from_rows(selected, features=rows.features) if vision else Dataset.from_list(selected)
         dataset = DatasetDict(materialized)
     options = {}
     if recast == "jev" and not vision and isinstance(preprocessing, MultipleChoiceFields):

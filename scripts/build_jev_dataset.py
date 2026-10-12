@@ -27,7 +27,7 @@ import pyarrow.compute as pc
 import yaml
 from tasksource import list_tasks, load_task, task_provenance, tasks
 from tasksource.access import lmtasks, load_preprocessing
-from tasksource.preprocess import sample_dataset, disable_image_decoding
+from tasksource.preprocess import sample_dataset, disable_image_decoding, dataset_from_rows
 from tasksource.metadata.weights import task_weight
 from tasksource.metadata.jev_mixes import length_factor, source_quotas
 from tasksource.licenses import LICENSE_USES, fetch_card_licenses, provenance_repos, source_license
@@ -1287,7 +1287,7 @@ def build_vision(args):
                 converted.append(row)
             if not converted:
                 continue
-            training = Dataset.from_list(converted, features=features)
+            training = dataset_from_rows(converted, features=features)
             training = merge_identical_inputs(training)
             training = training.map(lambda row: {'example_id': hashlib.sha256(('\x1f'.join(
                 image_keys(row['images'])) + example_key(source, row['state'], row['options'], row['target'])).encode()).hexdigest()[:24]})
