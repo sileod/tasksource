@@ -83,3 +83,15 @@ python -m tasksource.task_discovery match build/discovery/hf_candidates.jsonl \
 GitHub repository and paper identifiers (arXiv, DOI, Semantic Scholar, ACL Anthology) appear as `related_matches` with the associated task IDs. They flag possible mirrors or new views of a known source. They do not silently discard candidates or merge datasets: a card may cite related work, and a repository or paper may introduce several datasets. Exact name/Hub matches remain separate. Common dataset-loader infrastructure links are ignored. This index records card claims, not a verification of authorship, license or annotation quality.
 
 The initial snapshot scans 510 source repositories: 496 readable cards, 14 recorded failures, 246 distinct GitHub identities and 330 paper identities. The discovery regression suite passes 15 checks; the cached PWC run reports 63 related-source records alongside 149 direct catalog matches. Related-source records are review hints and remain eligible when unmatched by name/repository.
+
+To standardize catalog paper references through Semantic Scholar, reuse the same linker:
+
+```bash
+python -m tasksource.task_discovery link src/tasksource/task_discovery/catalog_links.jsonl \
+  --cache build/discovery/link-cache --no-hub-search --limit 1000 \
+  --output build/discovery/catalog-links-s2.jsonl
+python -m tasksource.task_discovery match build/discovery/hf_candidates.jsonl \
+  --index build/discovery/catalog-links-s2.jsonl --output build/discovery/matched.jsonl
+```
+
+Resolved references retain original URLs and add Semantic Scholar IDs and external arXiv/DOI IDs. Unresolved references and request failures remain explicit. Authentication uses `SEMANTIC_SCHOLAR_API_KEY`, falling back to `~/.config/tasksource/semantic_scholar_api_key` (keep it private, mode 0600). Neither credentials nor request headers enter snapshots. Rate-limited requests get bounded backoff; cached successes are reused.

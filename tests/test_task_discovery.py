@@ -235,3 +235,53 @@ def test_catalog_reference_matches_flag_shared_sources_without_discarding_new_da
     assert rows[0]['status']=='candidate' and rows[0]['matches']==[]
     assert {m['by'] for m in rows[0]['related_matches']}=={'github_repository','paper'}
     assert all(m['tasks']==['known/view'] for m in rows[0]['related_matches'])
+
+
+def test_semantic_scholar_rate_limit_retries_then_caches(tmp_path,monkeypatch):
+    from importlib import import_module
+    from urllib.error import HTTPError
+    import io
+    linker=import_module('tasksource.task_discovery.link');calls=[]
+    monkeypatch.setattr(linker.time,'sleep',lambda delay:None)
+    def fetch(request,**kwargs):
+        calls.append(request.full_url)
+        if len(calls)<3:raise HTTPError(request.full_url,429,'Rate limited',{},None)
+        return io.BytesIO(b'{"paperId":"canonical-id"}')
+    monkeypatch.setattr(linker,'urlopen',fetch)
+    url=linker.S2+'/paper/arxiv:1808.07036'
+    result=linker.cached_json(url,tmp_path)
+    assert len(calls)==3 and result['data']['paperId']=='canonical-id'
+    assert linker.cached_json(url,tmp_path,offline=True)==result and len(calls)==3
+
+
+def test_semantic_scholar_private_key_fallback_and_environment_precedence(tmp_path,monkeypatch):
+    from importlib import import_module
+    linker=import_module('tasksource.task_discovery.link')
+    monkeypatch.setattr(linker.Path,'home',lambda:tmp_path)
+    path=tmp_path/'.config/tasksource/semantic_scholar_api_key';path.parent.mkdir(parents=True)
+    path.write_text('private-test-key');monkeypatch.delenv('SEMANTIC_SCHOLAR_API_KEY',raising=False)
+    headers=[]
+    def cached(url,cache,offline,header):
+        headers.append(header)
+        return dict(url=url,sha256='hash',data=dict(paperId='id',url='paper',externalIds={'DOI':'10.1234/test'}))
+    monkeypatch.setattr(linker,'cached_json',cached)
+    candidate=dict(name='Dataset',papers=[dict(url='arxiv:1808.07036')])
+    row=linker.link(candidate,tmp_path,search_hub=False)
+    monkeypatch.setenv('SEMANTIC_SCHOLAR_API_KEY','environment-test-key')
+    linker.link(candidate,tmp_path,search_hub=False)
+    assert headers==[{'x-api-key':'private-test-key'},{'x-api-key':'environment-test-key'}]
+    assert 'private-test-key' not in json.dumps(row)
+    assert row['papers'][0]['external_ids']['DOI']=='10.1234/test'
+
+
+def test_semantic_scholar_accepts_acl_anthology_identifiers(monkeypatch):
+    from importlib import import_module
+    linker=import_module('tasksource.task_discovery.link');urls=[]
+    def cached(url,*args):
+        urls.append(url)
+        return dict(url=url,sha256='hash',data=dict(paperId='canonical-id',url='paper',externalIds={}))
+    monkeypatch.setattr(linker,'cached_json',cached)
+    row=linker.link(dict(name='Dataset',papers=[dict(url='https://aclanthology.org/P19-1474.pdf')]),
+        'unused',search_hub=False)
+    assert '/paper/ACL:P19-1474?' in urls[0]
+    assert row['papers'][0]['semantic_scholar_id']=='canonical-id'

@@ -19,10 +19,14 @@ def cached_json(url, directory, offline=False, headers=None):
     if not path.exists():
         if offline:
             raise FileNotFoundError(f'No cached response for {url}')
-        if url.startswith(S2):
-            time.sleep(1)
-        with urlopen(Request(url, headers=headers or {}), timeout=20) as response:
-            raw = response.read()
+        for attempt in range(3):
+            if url.startswith(S2):time.sleep(1.1 * 2**attempt)
+            try:
+                with urlopen(Request(url, headers=headers or {}), timeout=20) as response:
+                    raw = response.read()
+                break
+            except HTTPError as error:
+                if not url.startswith(S2) or error.code != 429 or attempt == 2:raise
         payload = dict(url=url, retrieved_at=datetime.now(timezone.utc).isoformat(),
                        sha256=hashlib.sha256(raw).hexdigest(), data=json.loads(raw))
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -50,15 +54,19 @@ def link(candidate, cache, offline=False, search_hub=True):
                 suggestions.append(dict(kind='huggingface', id=item['id'],
                     url='https://huggingface.co/datasets/'+item['id'], method='exact_name', verified=False))
     papers = []
-    key = os.environ.get('SEMANTIC_SCHOLAR_API_KEY')
+    key_path = Path.home()/'.config/tasksource/semantic_scholar_api_key'
+    key = os.environ.get('SEMANTIC_SCHOLAR_API_KEY') or (key_path.read_text().strip() if key_path.is_file() else None)
     headers = {'x-api-key':key} if key else {}
     fields = 'paperId,title,url,externalIds'
     for original in row.get('papers', []):
         paper = dict(original) if isinstance(original, dict) else dict(url=original)
-        identities = sorted(v for v in paper_ids([paper]) if v.startswith(('arxiv:', 'doi:', 's2:')))
+        identities = sorted(v for v in paper_ids([paper]) if v.startswith(('arxiv:', 'doi:', 's2:', 'aclanthology.org/')))
         identity = identities[0] if identities else None
         if identity:
             identity = identity.removeprefix('s2:')
+            if identity.startswith('aclanthology.org/'):
+                identifier = identity.split('/',1)[1]
+                identity = 'ACL:'+(identifier.upper() if identifier[:1].isalpha() else identifier)
             url = S2+'/paper/'+quote(identity, safe=':')+'?'+urlencode(dict(fields=fields))
             found = query(url, headers)
         elif paper.get('title'):
