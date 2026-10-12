@@ -1,8 +1,18 @@
 {
+  "canonical_titles": 416,
+  "card_snapshot_sha256": "84d07c750bca6242e91b072649abf1ce0ce1625a98b63cd53156d764970d1012",
   "cards": 510,
   "catalog_sha256": "0c69e824e28e01eb7493274ec5615746bae61a8c8249afd8d8b61ab7d9376168",
   "errors": 14,
   "limit": null,
   "offline": true,
-  "output_sha256": "84d07c750bca6242e91b072649abf1ce0ce1625a98b63cd53156d764970d1012"
+  "output_sha256": "4497ec6f6c3e11ed37b3913b13ad3e066097ff27b5c5276d36af7bd006836ce4",
+  "paper_standardization": {
+    "input_sha256": "84d07c750bca6242e91b072649abf1ce0ce1625a98b63cd53156d764970d1012",
+    "linked_candidates": 510,
+    "offline": false,
+    "output_rows": 510,
+    "output_sha256": "5d2ab82990149c2d9d1041a409c982dd54e89efaff8ef78cb5bd12ae695bd6e5",
+    "search_hub": false
+  }
 }

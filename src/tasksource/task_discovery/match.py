@@ -48,6 +48,9 @@ def catalog_references(path=None):
             references['github:'+identity].update(row['tasks'])
         for identity in paper_ids(row.get('papers',[])):
             references['paper:'+identity].update(row['tasks'])
+        for paper in row.get('papers',[]):
+            if isinstance(paper,dict) and paper.get('canonical_title'):
+                references['paper_title:'+normalized(paper['canonical_title'])].update(row['tasks'])
     return references
 
 
@@ -97,6 +100,8 @@ def match(candidates, names, repos, decisions=(), queue=None, references=None):
         related=[]
         identities=[('github_repository','github:'+source_id(v,'github')) for v in row.get('github',[])]
         identities += [('paper','paper:'+v) for v in sorted(paper_ids(row.get('papers',[])))]
+        identities += [('paper_title','paper_title:'+normalized(p.get('canonical_title') or p.get('title')))
+                       for p in row.get('papers',[]) if isinstance(p,dict) and (p.get('canonical_title') or p.get('title'))]
         for kind,identity in identities:
             if identity in references:
                 related.append(dict(by=kind,value=identity.split(':',1)[1],tasks=sorted(references[identity])))

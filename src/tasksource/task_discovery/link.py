@@ -77,7 +77,7 @@ def link(candidate, cache, offline=False, search_hub=True):
         else:
             found = None
         if found and found.get('paperId'):
-            paper.update(semantic_scholar_id=found['paperId'], external_ids=found.get('externalIds') or {},
+            paper.update(semantic_scholar_id=found['paperId'], canonical_title=found.get('title',''), external_ids=found.get('externalIds') or {},
                          semantic_scholar_url=found['url'], link_method='identifier' if identity else 'exact_title')
         papers.append(paper)
     row.update(papers=papers, link_candidates=suggestions, link_requests=requests, link_errors=errors)

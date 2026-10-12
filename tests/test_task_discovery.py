@@ -150,6 +150,10 @@ def test_hub_retrieval_snapshots_metadata_and_replays_without_api(tmp_path, monk
     assert 'multiple-choice' in {c['task_categories'] for c in calls}
     assert defaults['default_tasks']==list(hub.TASKS)
     assert defaults['snapshot']!=manifest['snapshot']
+    info.card_data=None;info.tags.append('language:en')
+    english,filtered=hub.retrieve(tmp_path,queries=['Example','alternate'],limit=2,languages=['en'])
+    assert english[0]['languages']==['en']
+    assert calls[-1]['language']==['en'] and filtered['snapshot']!=manifest['snapshot']
     monkeypatch.setattr(hub,'HfApi',lambda:pytest.fail('Offline replay called Hub'))
     assert hub.retrieve(tmp_path,queries=['Example','alternate'],limit=2,offline=True)==(rows,manifest)
     with pytest.raises(FileNotFoundError):hub.retrieve(tmp_path,queries=['uncached'],offline=True)
@@ -285,3 +289,13 @@ def test_semantic_scholar_accepts_acl_anthology_identifiers(monkeypatch):
         'unused',search_hub=False)
     assert '/paper/ACL:P19-1474?' in urls[0]
     assert row['papers'][0]['semantic_scholar_id']=='canonical-id'
+
+
+def test_canonical_paper_titles_link_pwc_candidates_without_discarding_them(tmp_path):
+    from tasksource.task_discovery.match import catalog_references
+    path=tmp_path/'links.jsonl';path.write_text(json.dumps(dict(tasks=['known/view'],papers=[
+        dict(url='arxiv:1808.07036',semantic_scholar_id='canonical-id',canonical_title='Dataset: A New Benchmark')]))+'\n')
+    result=list(match([dict(name='New dataset view',papers=[dict(title='Dataset - A New Benchmark')])],
+                      {},{},references=catalog_references(path)))[0]
+    assert result['status']=='candidate'
+    assert result['related_matches']==[dict(by='paper_title',value='datasetanewbenchmark',tasks=['known/view'])]
