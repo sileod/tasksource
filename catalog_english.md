@@ -1,4 +1,4 @@
-563 English tasks. Load one with `load_task(id)`; the annotations are in [tasks.py](src/tasksource/tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
+566 English tasks. Load one with `load_task(id)`; the annotations are in [tasks.py](src/tasksource/tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
 
 Browse the [English example gallery](docs/examples/english/README.md) for formatted inputs, questions and gold answers.
 
@@ -567,6 +567,10 @@ Browse the [English example gallery](docs/examples/english/README.md) for format
 | 561 | [maven-ere/causal](src/tasksource/tasks.py#L3193) | Classification | [Nofing/Maven-ERE-span](https://hf.co/datasets/Nofing/Maven-ERE-span) | ✓ |
 | 562 | [biored/relation](src/tasksource/tasks.py#L3215) | Classification | [gyorilab/BioRED](https://hf.co/datasets/gyorilab/BioRED) | ✓ |
 | 563 | [matres/temporal](src/tasksource/tasks.py#L3222) | Classification | [tasksource/matres](https://hf.co/datasets/tasksource/matres) | ✓ |
+
+| 564 | [causal-news](src/tasksource/tasks.py#L3231) | Classification | [thagen/CNCv2](https://hf.co/datasets/thagen/CNCv2) | ✓ |
+| 565 | [slurp/slot-type](src/tasksource/tasks.py#L3278) | Classification | [tasksource/slurp](https://hf.co/datasets/tasksource/slurp) | ✓ |
+| 566 | [topv2/slot-type](src/tasksource/tasks.py#L3283) | Classification | [WillHeld/top_v2](https://hf.co/datasets/WillHeld/top_v2) | ✓ |
 
 ## Soft labels
 

@@ -1,6 +1,7 @@
 """Reviewed source snapshots; keep opaque revision IDs out of task annotations."""
 
 SOURCE_REVISIONS = {
+    "thagen/CNCv2": "467414788436d05da02d17188a3c0e30b0f41b4c",
     "gyorilab/BioRED": "a61e98e5d360fadfa5a4aaeb9fb44bf8b4f06a94",
     "Nofing/Maven-ERE-span": "4dc3ead8e8d90fdee3fbef71727f159b2fc48236",
     "tasksource/matres": "ca3d16c3b7a971c1a4dfa3483fb87b21d9b6c21e",
@@ -47,7 +48,7 @@ SOURCE_REVISIONS = {
     "tasksource/mcscript2": "3b9c261f28c82ba15e6073990c0d70f05db60c4a",
     "tasksource/scirepeval-search": "7ff532ab52c10274a818d812c8d47f63b3af7af4",
     "tasksource/sentfin": "dbd1d5665ff8d64254459a89a3a542c7728a3268",
-    "tasksource/slurp": "a21c5fbc1b0821a04f0ee9cb6de927f96dbd5338",
+    "tasksource/slurp": "6192bea66efc90860640842d5478504982826164",
     "tasksource/wands": "96a856e9d45eb0e5847a07a026d07f2b13092733",
     "theatticusproject/cuad-qa": "d9c4ee0250ae2eb97bdb5b50773ab14ea62d0631",
     "theatticusproject/maud": "37d5c3b95d18dcd8404cc5ce3fd5069be062392f",

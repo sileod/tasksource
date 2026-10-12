@@ -2051,7 +2051,7 @@
     ],
     "status": "deferred",
     "reason_code": "incorrect_labels",
-    "reason": "Coarse final-export review found a native BEFORE label placing the 1487 Battle of Stoke Field defeat before the outbreak of the Wars of the Roses. The Hub copy faithfully preserves this source error; do not patch individual gold labels by guessing.",
+    "reason": "Native BEFORE annotation places a 1487 defeat before the war outbreak; source d026ad27155a13c00d9b9812c98f4fc9, pair 26:2.",
     "evidence": [
       "Native document d026ad27155a13c00d9b9812c98f4fc9, events EVENT_4008b41ae339a64de922897ae5175949 -> EVENT_eeba90138ffda87817c15b03f5868b39, BEFORE; Hub mention indices 26 -> 2",
       "https://github.com/THU-KEG/MAVEN-ERE"
@@ -2066,6 +2066,46 @@
     ],
     "papers": [
       "arxiv:2211.07342"
+    ],
+    "annotation": "tasksource.parked.maven_ere__temporal",
+    "review_findings": "Coarse final-export review found a native BEFORE label placing the 1487 Battle of Stoke Field defeat before the outbreak of the Wars of the Roses. The Hub copy faithfully preserves this source error; do not patch individual gold labels by guessing."
+  },
+  {
+    "name": "QASPER evidence selection",
+    "scope": "task",
+    "tasks": [
+      "qasper/evidence"
+    ],
+    "status": "deferred",
+    "reason_code": "unverified_negative_supervision",
+    "reason": "Native evidence is positive paragraph selection, without explicit negative paragraph judgments. Inferring that every unselected paragraph is irrelevant risks unsupported negative labels; this optional projection is deferred, while the existing consensus yes/no view remains active.",
+    "evidence": [
+      "https://aclanthology.org/2021.naacl-main.365/",
+      "https://huggingface.co/datasets/allenai/qasper",
+      "Paper 1909.00694, question: How are relations used to propagate polarity? Multiple annotators select different evidence sets. This motivates caution; it does not establish that their union is incomplete."
+    ],
+    "checked_on": "2026-10-12",
+    "reconsider_if": "Define and audit a faithful evidence-selection objective without assuming unannotated paragraphs are semantic negatives.",
+    "huggingface": [
+      "allenai/qasper"
+    ],
+    "github": [
+      "allenai/qasper-led-baseline"
+    ],
+    "papers": [
+      "arxiv:2105.03011"
+    ],
+    "reviews": [
+      {
+        "reviewer": {
+          "kind": "model",
+          "family": "GPT-6",
+          "exact_variant": "not exposed in session"
+        },
+        "checked_on": "2026-10-12",
+        "verdict": "defer",
+        "findings": "Native evidence is positive paragraph selection, without explicit negative paragraph judgments. Inferring that every unselected paragraph is irrelevant risks unsupported negative labels; this optional projection is deferred, while the existing consensus yes/no view remains active."
+      }
     ]
   }
 ]

@@ -3225,3 +3225,64 @@ matres__temporal = Classification('sentence1',labels='labels',dataset_name='task
                   'EQUAL':'A and B start at the same time','VAGUE':'the ordering of their start times is unclear'},
     question='How does the start time of event [A] compare with that of event [B]? Judge event starts, not their durations.',
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/matres']})
+
+
+# The source card lists a missing test file; native labeled files are train/dev.
+causal_news = Classification('text',labels='label',dataset_name='thagen/CNCv2',config_name='causality detection',
+    task_id='causal-news',complete_splits=False,label_values={0:'no',1:'yes'},
+    pre_process=lambda d:_unique_text_splits(d,lambda r:r['text'],'label'),
+    metadata=lambda r:_decision_metadata(r['index'],r['index'].rsplit('_',3)[0]),
+    question='Does this news text express a causal relation between events?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['thagen/CNCv2'],
+        'data_files':{'train':'causality-detection/train.parquet','validation':'causality-detection/dev.parquet'}})
+
+
+def _slot_decisions(text, entities, metadata):
+    tokens=list(re.finditer(r'\S+',text))
+    for index,entity in enumerate(entities):
+        span=entity['span']
+        if not span or span!=list(range(span[0],span[-1]+1)):continue
+        if span[0]<0 or span[-1]>=len(tokens):raise ValueError('Slot span lies outside the utterance')
+        start,end=tokens[span[0]].start(),tokens[span[-1]].end()
+        meta={**metadata,'id':f"{metadata['id']}:{index}",'slot_span':[start,end]}
+        yield dict(sentence1=_marked_spans(text,[('TARGET',start,end)]),
+            labels=entity['type'].lower().replace('_',' '),metadata=json.dumps(meta,sort_keys=True))
+
+
+def _slurp_slots(row):
+    meta=json.loads(row['metadata'])
+    text=' '.join(meta['tokens'])
+    if ''.join(text.casefold().split())!=''.join(row['sentence1'].casefold().split()):return []
+    return _slot_decisions(text,meta['entities'],meta)
+
+
+def _top_slots(row):
+    words=[];stack=[];entities=[]
+    for token in re.findall(r'\[(?:IN|SL):[A-Z_]+|\]|[^\s\[\]]+',row['semantic_parse']):
+        if token.startswith('['):
+            if stack:stack[-1]['nested']=True
+            stack.append(dict(type=token[1:],start=len(words),nested=False))
+        elif token==']':
+            if not stack:raise ValueError('Unbalanced TOPv2 parse')
+            node=stack.pop()
+            if node['type'].startswith('SL:') and not node['nested']:
+                entities.append(dict(type=node['type'][3:],span=list(range(node['start'],len(words)))))
+        else:words.append(token)
+    if stack:raise ValueError('Unbalanced TOPv2 parse')
+    text=' '.join(words)
+    if ''.join(text.casefold().split())!=''.join(row['utterance'].casefold().split()):return
+    group=hashlib.sha256(row['utterance'].encode()).hexdigest()
+    yield from _slot_decisions(text,entities,json.loads(_decision_metadata(group,group,domain=row['domain'])))
+
+
+slurp__slot_type = Classification('sentence1',labels='labels',dataset_name='tasksource/slurp',
+    task_id='slurp/slot-type',metadata='metadata',complete_splits=False,
+    pre_process=lambda d:_unique_text_splits(_flatten_text(d,_slurp_slots,paired=False),lambda r:r['sentence1'],'labels'),
+    question='What semantic slot does the marked [TARGET] expression fill in this utterance?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/slurp']})
+topv2__slot_type = Classification('sentence1',labels='labels',dataset_name='WillHeld/top_v2',
+    task_id='topv2/slot-type',metadata='metadata',complete_splits=False,splits=['train','eval','test'],
+    pre_process=lambda d:_unique_text_splits(_flatten_text(
+        _unique_text_splits(d,lambda r:r['utterance'],'semantic_parse'),_top_slots,paired=False),lambda r:r['sentence1'],'labels'),
+    question='What semantic slot does the marked [TARGET] expression fill in this utterance?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['WillHeld/top_v2']})

@@ -8,14 +8,14 @@ This is the user-approved queue, in batch order. Keep it separate from machine-d
 
 MAUD (six views), ACORD, Evidence Inference, DDI, Hallmarks of Cancer, Patent Classification (abstract), CUAD answerability, TabFact, SQuAD v2 answerability, MultiDoGO intent (six domains), InfoTabS, WikiSQL (aggregation/column/operator), EDOS, SemEval 2014 ABSA (laptops/restaurants).
 
-## Batch 2 — first views published; remaining projections queued
+## Batch 2 — reviewed; accepted views implemented
 
 | Source | Requested views | Status / remaining checks |
 |---|---|---|
 | FEVEROUS | Evidence-conditioned supports/refutes/NEI | Deferred: available Hub evidence joins omit necessary table columns/context; concrete examples and reconsideration condition recorded in `decisions.json` |
 | HateXplain | Majority classification; optional votes | Majority view published; existing vote view retained |
 | QuAC | Answerability, yes/no/neither, follow-up | Answerability published; yes/no and follow-up deferred after ambiguous native labels in coarse review |
-| SLURP | Intent; possible slot tagging | Text-only mirror and 60-class scenario/action intent published; slots pending |
+| SLURP | Intent; possible slot tagging | Text-only mirror and 60-class scenario/action intent published; native-token-aligned slot types implemented and reviewed |
 | MultiWOZ 2.2 | Intent, dialogue act, categorical slots | Dialogue act and categorical slots published; intent deferred after stale active-intent labels in coarse review; single-act rows only |
 | Schema-Guided Dialogue | Intent and categorical slot values | Intent published; categorical-slot projection deferred after ambiguous economical → moderate state in native dialogue 1_00000, turn 12 |
 | HotpotQA | Native supporting-fact membership | Published; explicit native sentence identities |
@@ -23,7 +23,7 @@ MAUD (six views), ACORD, Evidence Inference, DDI, Hallmarks of Cancer, Patent Cl
 
 Eleven views across batches 2–3 were added to Jev `default` and `full` in [Hub commit f2529310](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/commit/f2529310ce099771d5d6911e94ba24f4b1ce3ec4): 10,272 train, 1,060 validation and 795 test rows. One exact exported training row per task was inspected, alongside source/recast samples; [review findings](../../../docs/jev/dialogue-expansion-audit.json) preserve the model identifier, sample IDs, revisions and limitations. Existing Parquet shards were preserved.
 
-## Batch 3 — eight views published; two sources deferred
+## Batch 3 — reviewed; accepted views implemented
 
 | Source | Requested views | Status / remaining checks |
 |---|---|---|
@@ -33,8 +33,8 @@ Eleven views across batches 2–3 were added to Jev `default` and `full` in [Hub
 | DiscoGeM | Discourse relation / annotator votes | Implemented native annotator votes; 1,282 train / 1,288 test after removing paragraph overlap; no validation |
 | UKP Sentential Argument Mining | Topic-conditioned pro/con/no argument | Deferred: official archive requires authentication; sentence reconstruction and separate text rights must be verified |
 | CoQA | Native exact yes/no with prior dialogue | Published to Jev default/full |
-| QASPER | Native scientific yes/no; possible evidence selection | Binary consensus view published; all cited evidence must occur in supplied text; answer style is not used as a target |
-| TOPv2 | Root intent; possible slot types | Root intent published to Jev default/full |
+| QASPER | Native scientific yes/no; possible evidence selection | Binary consensus view published; all cited evidence must occur in supplied text; answer style is not used as a target; optional evidence projection deferred because nonselected paragraphs lack explicit negative judgments |
+| TOPv2 | Root intent; possible slot types | Root intent published to Jev default/full; leaf slot-type projection implemented and reviewed |
 | PERSPECTRUM | Claim/perspective supports/opposes | Implemented primary native perspectives and official claim partitions; 2,939/910/1,204 rows |
 | PubMed 200k RCT | Sentence rhetorical role | Implemented pinned plaintext mirror; 2,211,861/28,932/29,493 sentences, native PMID-disjoint partitions; original eval files repair a malformed Hub dev copy |
 
@@ -68,7 +68,7 @@ Use genuine labeled training data, existing templates and modest declarative map
 
 Spider aggregation was subsequently withdrawn at user request in [Hub commit d4529cf8](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/commit/d4529cf8f123010f243424486ff6527952d94b2a): 1,000 train and 100 validation rows removed from both `default` and `full`. Column selection and all unrelated Parquet shards are unchanged. The original publication counts above remain historical.
 
-## Batch 5 — approved, in progress
+## Batch 5 — reviewed; accepted views implemented
 
 | Source | Requested decision views | Status / remaining checks |
 |---|---|---|
@@ -76,9 +76,13 @@ Spider aggregation was subsequently withdrawn at user request in [Hub commit d45
 | REFinD | Financial relation classification | Deferred: competition terms prohibit redistribution/modification despite naming CC BY-NC; structured reason in `decisions.json` |
 | BioRED | Biomedical relation classification | Direct `gyorilab/BioRED`; 3,828 / 1,113 / 990 eligible entity-pair relations, native document splits; full abstracts and grounded mentions preserved. |
 | MATRES | Event start-point temporal relation | Implemented reproducible original TimeML join: 12,736 train / 837 test, 4 missing event instances excluded. [Mirror](https://huggingface.co/datasets/tasksource/matres), [recipe](../../../scripts/repackage_dataset/relations.py). |
-| Causal News Corpus | Native binary event-causality classification | User-added todo; inspect original V2 labeled train/dev files and existing Hub copies before integration |
+| Causal News Corpus | Native binary event-causality classification | Direct thagen/CNCv2; all 3,075 train / 340 dev texts and labels match original V2 files. Native labeled splits only; no fabricated test. |
 
 These are human-approved additions, not automatic promotions from discovery.
 Training availability does not replace a source/recast example audit.
 
-Published the three accepted relation views to Jev `default` and `full` in [Hub commit 07526e54](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/commit/07526e54ee01c52d144cae72500bd8b84360fcf3): 3,000 train / 200 validation / 200 test rows appended, all previous Parquet blobs preserved. [Source and final-export audit](../../../docs/jev/relation-expansion-audit.json) records 2–3 reviewed examples per view and the two deferrals. Causal News Corpus remains on the human-curated todo.
+Published the three accepted relation views to Jev `default` and `full` in [Hub commit 07526e54](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/commit/07526e54ee01c52d144cae72500bd8b84360fcf3): 3,000 train / 200 validation / 200 test rows appended, all previous Parquet blobs preserved. [Source and final-export audit](../../../docs/jev/relation-expansion-audit.json) records 2–3 reviewed examples per view and the two deferrals. Causal News Corpus was subsequently verified and implemented, as recorded below.
+
+## Queue completion review — 2026-10-12
+
+Every source in these five human-curated batches now has an implemented view or an explicit, source-indexed deferral. Optional projections are not silently promoted: QASPER evidence selection remains deferred; its binary view stays active. The last three accepted views are `causal-news`, `slurp/slot-type` and `topv2/slot-type`. Their [source and exact-export audit](../../../docs/jev/remaining-queue-audit.json) records counts, reviewed rows and limitations. SLURP’s existing mirror now retains original tokens in metadata for accurate slot alignment; all existing utterances, intent labels and splits were verified unchanged.

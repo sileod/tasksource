@@ -46,7 +46,7 @@ def slurp():
             if reason:counts[split+'/'+reason]+=1;continue
             seen.add(key)
             meta=dict(id=str(row['slurp_id']),split_group_id=key,scenario=row['scenario'],action=row['action'],
-                native_intent=row['intent'],entities=row['entities'],source_revision=SLURP_REVISION)
+                native_intent=row['intent'],entities=row['entities'],tokens=[t['surface'] for t in row['tokens']],source_revision=SLURP_REVISION)
             output[split].append(dict(sentence1=row['sentence'],sentence2='',labels=_slurp_intent(row),metadata=json.dumps(meta,sort_keys=True)))
     return write_mirror('slurp',output,'string',dict(source='https://github.com/pswietojanski/slurp',revision=SLURP_REVISION,
         source_hashes=hashes,excluded=dict(counts),split_policy='native splits; exact transcript conflicts and overlap removed',
