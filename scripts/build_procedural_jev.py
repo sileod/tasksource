@@ -20,10 +20,34 @@ from huggingface_hub import HfApi
 from tasksource.jev.procedural import REPO_ID, TASKS
 
 MAX_CLASS_NAMES = 100
+# No label of a yes/no or choice question goes above this share of its answers: a state
+# drops the question when its label would; states left without questions are skipped.
+MAX_LABEL_SHARE = 0.6
+BALANCE_WARMUP = 20
+
+
+def balance_label(answer):
+    if answer["type"] == "noul":
+        return answer["noul"] >= 0.5
+    return answer.get("choice")  # graded scores keep their natural distribution
+
+
+def balanced_questions(problem, counts, max_share=MAX_LABEL_SHARE, warmup=BALANCE_WARMUP):
+    """The problem's questions whose label is not already over-represented; updates ``counts``."""
+    kept = {}
+    for qid, spec in problem.questions.items():
+        label = balance_label(problem.answers[qid])
+        seen = counts.setdefault(qid, Counter())
+        total = sum(seen.values())
+        if label is not None and total >= warmup and seen[label] + 1 > max_share * (total + 1):
+            continue
+        seen[label] += 1
+        kept[qid] = spec
+    return kept
 
 
 def generate_split(task, split, rows, levels, exclude, max_attempts=50):
-    module, seen, out = TASKS[task], set(exclude), []
+    module, seen, out, counts = TASKS[task], set(exclude), [], {}
     for index in range(rows * max_attempts):
         if len(out) == rows:
             break
@@ -36,12 +60,16 @@ def generate_split(task, split, rows, levels, exclude, max_attempts=50):
         if key in seen:
             continue
         seen.add(key)
+        questions = balanced_questions(problem, counts)
+        if not questions:
+            continue
+        answers = {qid: problem.answers[qid] for qid in questions}
         out.append({
             "id": f"{task}:{split}:{len(out)}",
             "level": level,
             "state": state,
-            "questions": json.dumps(problem.questions, ensure_ascii=False),
-            "answers": json.dumps(problem.answers, ensure_ascii=False),
+            "questions": json.dumps(questions, ensure_ascii=False),
+            "answers": json.dumps(answers, ensure_ascii=False),
         })
     return out, seen
 

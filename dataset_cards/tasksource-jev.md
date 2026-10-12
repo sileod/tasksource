@@ -74,7 +74,7 @@ Rows sharing `group_id` can be assembled into a multi-question request. Vision i
 
 ## Construction and evaluation
 
-Tasksource standardizes native labels and choices, adds task-specific questions where needed, and applies deterministic option permutations and low-frequency text variants. Some text rows pack related decisions over a shared state. The visual config contains direct decisions and shares sampling budgets across related task views.
+Tasksource standardizes native labels and choices, adds task-specific questions where needed, and applies deterministic option permutations and low-frequency text variants. Some text rows pack related decisions over a shared state. A decision's majority label keeps at most three rows per row of its other labels (never fewer than 250), so skewed binary sources such as answer selection or toxicity no longer reward always answering the common label; procedural questions keep each label under 60%. The visual config contains direct decisions and shares sampling budgets across related task views.
 
 Native source partitions are retained where available; derived group-based holdouts and overlap exclusions are documented per source. These checks do not establish absence of all cross-dataset or benchmark contamination. For example, Mind2Web text tasks use derived holdouts from public training trajectories, not official benchmark tests; alignment with private Decision Index evaluation rows is unverified. Mind2Web is excluded from the visual config.
 

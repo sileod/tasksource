@@ -14,7 +14,7 @@ from tasksource.jev.length import LengthBudget, render_request
 from tasksource.jev.options import choice_permutation, gold_position_violations, permute_choices
 from scripts.build_jev_dataset import (
     TRAINING_FEATURES, add_question_groups, diverse_cap, drop_train_overlap,
-    add_example_ids, content_keys, merge_identical_inputs, to_training_row, validate_decisions,
+    add_example_ids, balance_labels, content_keys, merge_identical_inputs, to_training_row, validate_decisions,
 )
 from datasets import ClassLabel, Features, Value
 from tasksource.tasks import _copa_input, _esci_product
@@ -364,10 +364,6 @@ class MergeIdenticalInputsTest(unittest.TestCase):
         self.assertEqual(merged["target"][1], [1.0, 0.0])
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 class ExampleIdsTest(unittest.TestCase):
     def test_variants_share_the_direct_rows_id_and_a_new_gold_changes_it(self):
         def row(id, variant, state, target):
@@ -383,3 +379,21 @@ class ExampleIdsTest(unittest.TestCase):
         self.assertNotEqual(ids[1], ids[2])
         relabeled = add_example_ids(Dataset.from_list([row("s-1:train:0", "direct", "a", [0.0, 1.0])]))
         self.assertNotEqual(relabeled["example_id"][0], ids[1])
+
+
+class BalanceLabelsTest(unittest.TestCase):
+    def test_majority_label_is_capped_with_its_variants(self):
+        rows = [{"id": f"s-1:train:{i}", "variant": "direct", "source": "s", "kind": "choice",
+                 "options": ["yes", "no"], "target": [1.0, 0.0] if i < 10 else [0.0, 1.0]}
+                for i in range(100)]
+        rows.append({**rows[50], "id": "s-1:train:50:label-check", "variant": "label_verification"})
+        kept = balance_labels(Dataset.from_list(rows), ratio=3, floor=5)
+        direct = [r for r in kept if r["variant"] == "direct"]
+        self.assertEqual(sum(r["target"][1] == 1.0 for r in direct), 30)
+        self.assertEqual(sum(r["target"][0] == 1.0 for r in direct), 10)
+        groups = {r["id"] for r in direct}
+        self.assertEqual("s-1:train:50" in groups, any(r["variant"] == "label_verification" for r in kept))
+
+
+if __name__ == "__main__":
+    unittest.main()

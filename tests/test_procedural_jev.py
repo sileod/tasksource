@@ -13,7 +13,7 @@ from tasksource.jev.procedural import TASKS, jev_rows
 from tasksource.jev.procedural.policy_applicability import SENSITIVITY
 from tasksource.jev.recast import render_typed_decision_group
 from scripts.build_jev_dataset import TRAINING_FEATURES, share_cap, source_row_group
-from scripts.build_procedural_jev import build_task
+from scripts.build_procedural_jev import MAX_LABEL_SHARE, build_task, generate_split
 
 
 def _intent(state):
@@ -179,9 +179,10 @@ class ProceduralJevTest(unittest.TestCase):
         capped = share_cap(Dataset.from_list(other + procedural, features=TRAINING_FEATURES), 100, 0.3)
         ids = [row["id"] for row in capped if row["source"].startswith("procedural-typed-decisions/")]
         self.assertEqual(len(capped), 100)
-        self.assertEqual(len(ids), 30)
+        self.assertLessEqual(len(ids), 30)
         groups = Counter(source_row_group(i) for i in ids)
-        self.assertEqual(set(groups.values()), {3})
+        sizes = Counter(source_row_group(row["id"]) for row in procedural)
+        self.assertTrue(groups and all(sizes[group] == n for group, n in groups.items()))
 
     def test_share_cap_balances_formats(self):
         row = {"kind": "choice", "options": ["a", "b"], "target": [1.0, 0.0], "state": "s", "question": "q",
@@ -417,6 +418,22 @@ class ProceduralJevTest(unittest.TestCase):
             dataset = build_task(task, {"train": 300, "validation": 30, "test": 30}, [0, 1, 2])
             self.assertIsInstance(dataset["test"][0]["state"], str)
             self.assertFalse(dataset["test"][0]["state"].startswith('"'))
+
+
+class LabelBalanceTest(unittest.TestCase):
+    def test_no_yes_no_or_choice_label_dominates_a_question(self):
+        for task in ("event_triggered_execution", "instruction_execution", "graph_navigation"):
+            rows, _ = generate_split(task, "train", 400, [0, 1, 2, 3, 4], set())
+            counts = {}
+            for row in rows:
+                for qid, answer in json.loads(row["answers"]).items():
+                    if answer["type"] == "noul":
+                        counts.setdefault(qid, Counter())[answer["noul"] >= 0.5] += 1
+                    elif answer["type"] == "choice":
+                        counts.setdefault(qid, Counter())[answer["choice"]] += 1
+            for qid, labels in counts.items():
+                share = labels.most_common(1)[0][1] / sum(labels.values())
+                self.assertLessEqual(share, MAX_LABEL_SHARE + 0.01, (task, qid))
 
 
 if __name__ == "__main__":

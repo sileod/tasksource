@@ -865,6 +865,43 @@ def add_example_ids(dataset):
         input_columns="group_id", batched=True, batch_size=50_000, desc="Example ids")
 
 
+# Majority label: at most this many rows per row of the other labels, but never cut below
+# the floor. Procedural generators balance their own questions.
+MAX_MAJORITY_RATIO = 3
+MAJORITY_FLOOR = 250
+
+
+def direct_label(kind, options, target):
+    if kind == "noul":
+        return target[0] >= 0.5
+    return options[max(range(len(target)), key=target.__getitem__)]
+
+
+def balance_labels(dataset, ratio=MAX_MAJORITY_RATIO, floor=MAJORITY_FLOOR):
+    """Drop source rows (with their variants) of a decision's majority label beyond ``ratio``
+    times the other labels. Kept rows are a stable random sample of the majority."""
+    groups = {}  # (source, label) -> source-row groups
+    columns = dataset.select_columns(["id", "source", "variant", "kind", "options", "target"])
+    for batch in columns.with_format("arrow").iter(batch_size=100_000):
+        for identifier, source, variant, kind, options, target in zip(*(batch[c].to_pylist() for c in batch.column_names)):
+            if (variant == "direct" and kind in ("choice", "noul") and identifier.count(":") == 2
+                    and not source.startswith(procedural.SOURCE_PREFIX)):
+                groups.setdefault(source, {}).setdefault(direct_label(kind, options, target), []).append(identifier)
+    dropped = set()
+    for source, labels in groups.items():
+        if len(labels) < 2:
+            continue
+        label, rows = max(labels.items(), key=lambda item: len(item[1]))
+        keep = max(floor, ratio * (sum(map(len, labels.values())) - len(rows)))
+        if len(rows) > keep:
+            rows = sorted(rows, key=lambda group: stable_fraction(group, "label-balance"))
+            dropped.update(rows[keep:])
+    if not dropped:
+        return dataset
+    return dataset.filter(lambda ids: [source_row_group(i) not in dropped for i in ids],
+                          input_columns="id", batched=True, batch_size=50_000, desc="Label balance")
+
+
 def bad_examples(path=BAD_EXAMPLES):
     """Example ids flagged as wrong, ambiguous or malformed (scripts/jev_error_pass.py)."""
     if not path.exists():
@@ -894,6 +931,7 @@ def publish_dataset(
             lambda key: key not in bad, input_columns="example_id", desc="Bad examples")
         for split, rows in dataset.items()
     })
+    dataset = DatasetDict({split: balance_labels(rows) for split, rows in dataset.items()})
     overlap_dropped = {}
     formats = {task: record.get("task_type") for task, record in latest_records(output / "build-report.jsonl").items()}
     if publish_rows:
