@@ -4,6 +4,8 @@ import hashlib
 import json
 import os
 import time
+from threading import Lock
+import uuid
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlencode
@@ -12,6 +14,8 @@ from urllib.request import Request, urlopen
 from .identifiers import normalized, paper_ids
 
 S2 = 'https://api.semanticscholar.org/graph/v1'
+_VIEWER_LOCK=Lock()
+_VIEWER_LAST=0.0
 
 
 def cached_json(url, directory, offline=False, headers=None):
@@ -20,17 +24,27 @@ def cached_json(url, directory, offline=False, headers=None):
         if offline:
             raise FileNotFoundError(f'No cached response for {url}')
         for attempt in range(3):
+            if url.startswith('https://datasets-server.huggingface.co/'):
+                global _VIEWER_LAST
+                with _VIEWER_LOCK:
+                    time.sleep(max(0,1-(time.monotonic()-_VIEWER_LAST)))
+                    _VIEWER_LAST=time.monotonic()
             if url.startswith(S2):time.sleep(1.1 * 2**attempt)
             try:
                 with urlopen(Request(url, headers=headers or {}), timeout=20) as response:
                     raw = response.read()
                 break
             except HTTPError as error:
-                if not url.startswith(S2) or error.code != 429 or attempt == 2:raise
+                if error.code!=429 or attempt==2:raise
+                if url.startswith('https://datasets-server.huggingface.co/'):
+                    delay=error.headers.get('Retry-After','') if error.headers else ''
+                    time.sleep(min(30,float(delay) if delay.isdigit() else 2**attempt))
+                elif not url.startswith(S2):raise
         payload = dict(url=url, retrieved_at=datetime.now(timezone.utc).isoformat(),
                        sha256=hashlib.sha256(raw).hexdigest(), data=json.loads(raw))
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(payload, sort_keys=True)+'\n')
+        temporary=path.with_suffix('.'+uuid.uuid4().hex+'.tmp')
+        temporary.write_text(json.dumps(payload, sort_keys=True)+'\n');temporary.replace(path)
     return json.loads(path.read_text())
 
 

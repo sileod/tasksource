@@ -89,13 +89,17 @@ def evidence(row,cache,offline=False):
                 evidence=documents,evidence_errors=errors)
 
 
+def configure_key():
+    key_path=Path.home()/'.config/tasksource/jev_openrouter_api_key'
+    if not os.environ.get('JEV_OPENROUTER_API_KEY') and key_path.is_file():
+        os.environ['JEV_OPENROUTER_API_KEY']=key_path.read_text().strip()
+
+
 def run(rows,output,cache,models,offline=False):
     from litlm import complete,ensemble
     from litlm_cli import _record
     output.mkdir(parents=True,exist_ok=True)
-    key_path=Path.home()/'.config/tasksource/jev_openrouter_api_key'
-    if not os.environ.get('JEV_OPENROUTER_API_KEY') and key_path.is_file():
-        os.environ['JEV_OPENROUTER_API_KEY']=key_path.read_text().strip()
+    configure_key()
     with ThreadPoolExecutor(max_workers=8) as pool:
         states=list(pool.map(lambda row:json.dumps(evidence(row,cache,offline),sort_keys=True,ensure_ascii=False),rows))
     (output/'inputs.jsonl').write_text(''.join(json.dumps(s,ensure_ascii=False)+'\n' for s in states))

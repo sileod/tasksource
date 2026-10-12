@@ -163,3 +163,19 @@ python -m tasksource.task_discovery.discover_task_prospects \
 ```
 
 Used alone, `--allow-verified-synthetic` defaults to human/procedural origins plus the verified model/mixed exception; it does not silently admit unverified model labels. The 30-source calibration improved from 8 initial passes to 22 after the targeted fixes and a cached recheck of failed requests; the remaining eight need evidence or stronger reviewer support, and none is classified unsuitable. This is a deliberately chosen diagnostic sample, not an unbiased recall estimate.
+
+## Exhaustive scheduled queue
+
+```bash
+python -m tasksource.task_discovery.scheduled \
+  --output build/discovery/exhaustive-queue \
+  --exclude build/discovery/prospects-en-5000/checked.jsonl
+```
+
+The fixed order is **classification → zero-shot classification → sentence similarity → ranking**. Classification searches `text-classification` and `token-classification`; ranking searches `text-ranking` and `text-retrieval`. Every search uses the Hub's `en` language filter and consumes the complete paginated listing (`limit=None`). Coverage is exhaustive for these tags at retrieval time; untagged sources are outside that inventory. Inventories, retrieval hashes and matching reports are saved independently of screening.
+
+The queue processes 128-source batches, excludes implemented/parked/curated sources plus repeated `--exclude` inputs, and deduplicates sources across stages. Its default reviewer is Jev. Before each unfinished batch, a fresh true/false/unknown control must pass at 0.8 for each retained reviewer; repeat `--model` to request additional reviewers. Failed controls are recorded and excluded. If no reviewer passes, the queue stops with `reviewer_unavailable`. Perplexity is not a default reviewer because its route failed this control during the latest MC runs.
+
+A lock prevents duplicate runners. Rerunning the exact command skips completed stages and batches; cached successful model calls survive an interrupted batch. Fatal batch processes get one retry, then stop with `batch_failed`. Source-level uncertainty, inaccessible/gated sources and request failures remain explicit in batch artifacts. Viewer requests are paced to one uncached request per second per process, with bounded 429 backoff and atomic cache writes. This is separate from litlm's adaptive model concurrency.
+
+`status.json` and `report.md` track stage progress; the root `handoff.jsonl` accumulates the shortlist after each completed batch. All judgments remain in each batch's `prospects.jsonl`, with inputs, prompts, controls and logs beside them. The human/procedural plus independently verified-synthetic policy is enabled. The queue does not implement datasets or modify the human-curated queue. Closing the interactive session does not stop a detached runner; machine/process termination requires rerunning the saved command.

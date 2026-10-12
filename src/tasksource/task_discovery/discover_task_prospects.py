@@ -116,7 +116,8 @@ def unseen_candidates(rows,previous):
 
 
 def write_rows(path,rows):
-    path.write_text(''.join(json.dumps(r,sort_keys=True,ensure_ascii=False)+'\n' for r in rows))
+    temporary=path.with_suffix('.tmp')
+    temporary.write_text(''.join(json.dumps(r,sort_keys=True,ensure_ascii=False)+'\n' for r in rows));temporary.replace(path)
 
 
 def main():
