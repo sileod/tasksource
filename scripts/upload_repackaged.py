@@ -24,11 +24,13 @@ from scripts.repackage_dataset.dialogue import slurp, mcscript2
 from scripts.repackage_dataset.stance import vast, fnc1, perspectrum, ukpconvarg, discogem
 from scripts.repackage_dataset.specialized_text import pubmed_rct
 from scripts.repackage_dataset.linguistic import semcor, streusle, spider
+from scripts.repackage_dataset.relations import matres
 from scripts.repackage_dataset.superclevr import superclevr
 from scripts.repackage_dataset.regions import coco_regions, doclaynet_region, bapps, spair71k_grid
 
 
-BUILDERS = {"semcor": ("tasksource/semcor", semcor),
+BUILDERS = {"matres": ("tasksource/matres", matres),
+            "semcor": ("tasksource/semcor", semcor),
             "streusle": ("tasksource/streusle", streusle),
             "spider": ("tasksource/spider", spider, "per-config"),
             "slurp": ("tasksource/slurp", slurp),

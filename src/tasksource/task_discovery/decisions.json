@@ -2022,5 +2022,50 @@
       }
     ],
     "annotation": "tasksource.parked.linguisticprobing___sentence_length"
+  },
+  {
+    "name": "REFinD",
+    "scope": "dataset",
+    "status": "deferred",
+    "reason_code": "license_conflict",
+    "reason": "The competition rules name CC BY-NC 4.0 but also explicitly prohibit redistribution and modification. Do not mirror or export until the authors clarify the conflict.",
+    "evidence": [
+      "https://refind-re.github.io/",
+      "https://codalab.lisn.upsaclay.fr/competitions/11770"
+    ],
+    "checked_on": "2026-10-12",
+    "reconsider_if": "Authors clarify redistribution/modification rights or provide a training distribution with unambiguous usable terms.",
+    "huggingface": [],
+    "github": [
+      "refind-re/refind-re.github.io"
+    ],
+    "papers": [
+      "arxiv:2305.18322"
+    ]
+  },
+  {
+    "name": "MAVEN-ERE",
+    "scope": "task",
+    "tasks": [
+      "maven-ere/temporal"
+    ],
+    "status": "deferred",
+    "reason_code": "incorrect_labels",
+    "reason": "Coarse final-export review found a native BEFORE label placing the 1487 Battle of Stoke Field defeat before the outbreak of the Wars of the Roses. The Hub copy faithfully preserves this source error; do not patch individual gold labels by guessing.",
+    "evidence": [
+      "Native document d026ad27155a13c00d9b9812c98f4fc9, events EVENT_4008b41ae339a64de922897ae5175949 -> EVENT_eeba90138ffda87817c15b03f5868b39, BEFORE; Hub mention indices 26 -> 2",
+      "https://github.com/THU-KEG/MAVEN-ERE"
+    ],
+    "checked_on": "2026-10-12",
+    "reconsider_if": "A corrected temporal annotation release or systematic source-level quality audit supports reliable labels.",
+    "huggingface": [
+      "Nofing/Maven-ERE-span"
+    ],
+    "github": [
+      "THU-KEG/MAVEN-ERE"
+    ],
+    "papers": [
+      "arxiv:2211.07342"
+    ]
   }
 ]

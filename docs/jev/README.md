@@ -708,3 +708,9 @@ evaluation images and duplicate option permutations are excluded from additions.
 Source build manifests, exclusions and the baseline revision accompany each append.
 FigureQA is retained as-is and excluded from expansion because its recorded original
 terms prohibit redistribution.
+
+The [relation-source audit](relation-expansion-audit.json) reviews direct MAVEN-ERE
+causal and BioRED relation views plus the reproducible MATRES TimeML join. Native
+document partitions and full evidence are retained. MAVEN-ERE temporal is parked
+after a confirmed native chronological error; REFinD is deferred due to conflicting
+redistribution terms. Neither is included in the new training export.

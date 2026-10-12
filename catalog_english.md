@@ -1,4 +1,4 @@
-560 English tasks. Load one with `load_task(id)`; the annotations are in [tasks.py](src/tasksource/tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
+563 English tasks. Load one with `load_task(id)`; the annotations are in [tasks.py](src/tasksource/tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
 
 Browse the [English example gallery](docs/examples/english/README.md) for formatted inputs, questions and gold answers.
 
@@ -564,6 +564,9 @@ Browse the [English example gallery](docs/examples/english/README.md) for format
 | 558 | [semcor](src/tasksource/tasks.py#L3143) | MultipleChoice | [tasksource/semcor](https://hf.co/datasets/tasksource/semcor) | ✓ |
 | 559 | [streusle/noun](src/tasksource/tasks.py#L3146) | Classification | [tasksource/streusle](https://hf.co/datasets/tasksource/streusle) | ✓ |
 | 560 | [streusle/verb](src/tasksource/tasks.py#L3150) | Classification | [tasksource/streusle](https://hf.co/datasets/tasksource/streusle) | ✓ |
+| 561 | [maven-ere/causal](src/tasksource/tasks.py#L3193) | Classification | [Nofing/Maven-ERE-span](https://hf.co/datasets/Nofing/Maven-ERE-span) | ✓ |
+| 562 | [biored/relation](src/tasksource/tasks.py#L3215) | Classification | [gyorilab/BioRED](https://hf.co/datasets/gyorilab/BioRED) | ✓ |
+| 563 | [matres/temporal](src/tasksource/tasks.py#L3222) | Classification | [tasksource/matres](https://hf.co/datasets/tasksource/matres) | ✓ |
 
 ## Soft labels
 

@@ -1,6 +1,9 @@
 """Reviewed source snapshots; keep opaque revision IDs out of task annotations."""
 
 SOURCE_REVISIONS = {
+    "gyorilab/BioRED": "a61e98e5d360fadfa5a4aaeb9fb44bf8b4f06a94",
+    "Nofing/Maven-ERE-span": "4dc3ead8e8d90fdee3fbef71727f159b2fc48236",
+    "tasksource/matres": "ca3d16c3b7a971c1a4dfa3483fb87b21d9b6c21e",
     "mneb/maven": "c66136ce40fd2fa2efc245bbdbcf45f148d0c2bc",
     "facebook/empathetic_dialogues": "d5b57ae707b0b9a384af8ed50c043c608d597ca7",
     "christophsonntag/OLID": "738a82a7b014ff63cb7b830544081daefd0c27aa",

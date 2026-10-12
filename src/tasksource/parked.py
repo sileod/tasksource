@@ -16,7 +16,12 @@ from .preprocess import SoftLabeling, Preprocessing, VisualClassification, const
 
 from .metadata.source_revisions import SOURCE_REVISIONS
 from .tasks import _document_holdouts, _unique_text_splits, _decision_metadata, _probing, _SENTENCE_LENGTH
+from .tasks import _MAVEN_ERE, _MAVEN_ERE_TEMPORAL, _maven_ere_splits, _maven_ere_records, _flatten_text
 import hashlib
+
+maven_ere__temporal = Classification('sentence1',labels='labels',**_MAVEN_ERE,task_id='maven-ere/temporal',
+    pre_process=lambda d:_flatten_text(_maven_ere_splits(d),lambda r:_maven_ere_records(r,_MAVEN_ERE_TEMPORAL),paired=False),
+    label_values=_MAVEN_ERE_TEMPORAL,question='What temporal relation connects the marked events [A] and [B]?')
 
 wouldyourather = SoftLabeling(constant(''), labels=lambda x: [x['votes_a'], x['votes_b']],
     options=lambda x: [x['option_a'], x['option_b']], hard=2/3, annotators=1000,
@@ -204,6 +209,7 @@ KINDS = {
 }
 
 PARKED = {
+    'maven_ere__temporal': ('unsound', 'Native BEFORE annotation places a 1487 defeat before the war outbreak; source d026ad27155a13c00d9b9812c98f4fc9, pair 26:2.'),
     "wouldyourather": ("unsound", "subjective poll preferences depend on an unspecified respondent population; unsuitable as an unqualified decision target"),
     "puzzte": ("unsound", "user-reported annotation errors; filtering overlapping non-entailment labels does not establish puzzle-answer correctness"),
     "linguisticprobing___sentence_length": ("unsound", "word-count labels depend on opaque tokenization and can disagree with displayed sentences"),

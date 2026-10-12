@@ -3151,3 +3151,77 @@ streusle__verb = Classification('sentence1',labels='labels',dataset_name='taskso
     pre_process=lambda d:d.filter(lambda r:r['labels'].startswith('v.')),metadata='metadata',complete_splits=False,
     question='Which verb semantic supersense describes the marked [TARGET] expression?',
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/streusle']})
+
+
+# Human-annotated relation decisions; absent annotations are not synthetic negatives.
+def _maven_ere_splits(dataset):
+    # Nofing divides original train into train/dev; its test is original labeled validation.
+    return _document_holdouts(DatasetDict(train=concatenate_datasets([dataset['train'],dataset['dev']]),
+        validation=dataset['test']), 'id')
+
+
+def _maven_ere_records(row, labels):
+    tokens=row['tokens'];text=' '.join(tokens);starts=[];position=0
+    for token in tokens:starts.append(position);position+=len(token)+1
+    spans=[]
+    for indices in row['spans']:
+        if not indices or min(indices)<0 or max(indices)>=len(tokens) or indices!=list(range(indices[0],indices[-1]+1)):
+            raise ValueError('MAVEN-ERE trigger must be a contiguous token span')
+        spans.append((starts[indices[0]],starts[indices[-1]]+len(tokens[indices[-1]])))
+    relations=json.loads(row['relations']) if isinstance(row['relations'],str) else row['relations']
+    pairs={}
+    for label in labels:
+        for a,b in relations[label]:
+            if not 0<=a<len(spans) or not 0<=b<len(spans):raise ValueError('Invalid MAVEN-ERE event index')
+            pairs.setdefault((a,b),set()).add(label)
+    for (a,b),gold in pairs.items():
+        if len(gold)!=1 or a==b:continue
+        if not all(row['mentions'][i].startswith('e') for i in (a,b)):continue
+        selected=[spans[a],spans[b]]
+        if max(v[0] for v in selected)<min(v[1] for v in selected):continue
+        yield dict(sentence1=_marked_spans(text,[(mark,*span) for mark,span in zip(('A','B'),selected)]),
+            labels=next(iter(gold)), metadata=_decision_metadata(f"{row['id']}:{a}:{b}",row['id'],
+                event_ids=[row['mentions'][a],row['mentions'][b]],event_spans=selected))
+
+
+_MAVEN_ERE_TEMPORAL = {'BEFORE':'A occurs before B','OVERLAP':'A and B overlap',
+    'CONTAINS':'A contains B in time','SIMULTANEOUS':'A and B are simultaneous',
+    'BEGINS-ON':'A and B begin together','ENDS-ON':'A ends on B'}
+_MAVEN_ERE_CAUSAL = {'CAUSE':'A causes B','PRECONDITION':'A is a precondition for B'}
+_MAVEN_ERE = dict(dataset_name='Nofing/Maven-ERE-span',metadata='metadata',complete_splits=False,
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['Nofing/Maven-ERE-span']})
+maven_ere__causal = Classification('sentence1',labels='labels',**_MAVEN_ERE,task_id='maven-ere/causal',
+    pre_process=lambda d:_flatten_text(_maven_ere_splits(d),lambda r:_maven_ere_records(r,_MAVEN_ERE_CAUSAL),paired=False),
+    label_values=_MAVEN_ERE_CAUSAL,question='Which annotated causal relation connects the marked events [A] and [B]?')
+
+
+def _biored_records(row):
+    text=row['document_text'];entities={};pairs={}
+    for name,start,length,identity in zip(row['annotation_texts'],row['annotation_offsets'],
+                                        row['annotation_lengths'],row['annotation_groundings']):
+        if text[start:start+length]!=name:raise ValueError('BioRED entity span does not match document')
+        entities.setdefault(identity.strip(),set()).add((start,start+length))
+    for a,b,label in zip(row['relation_entity1'],row['relation_entity2'],row['relation_type']):
+        pairs.setdefault(tuple(sorted((a.strip(),b.strip()))),set()).add(label)
+    for (a,b),gold in pairs.items():
+        if len(gold)!=1 or a==b or a not in entities or b not in entities:continue
+        spans=[(mark,*span) for mark,key in [('A',a),('B',b)] for span in sorted(entities[key])]
+        ordered=sorted(spans,key=lambda v:v[1:])
+        if any(x[2]>y[1] for x,y in zip(ordered,ordered[1:])):continue
+        yield dict(sentence1=_marked_spans(text,spans),labels=next(iter(gold)),
+            metadata=_decision_metadata(f"{row['document_id']}:{a}:{b}",row['document_id'],entity_ids=[a,b]))
+
+
+biored__relation = Classification('sentence1',labels='labels',dataset_name='gyorilab/BioRED',task_id='biored/relation',
+    pre_process=lambda d:_flatten_text(_document_holdouts(d,'document_id'),_biored_records,paired=False),
+    metadata='metadata',complete_splits=False,
+    label_values={s:s.replace('_',' ').lower() for s in ('Association','Positive_Correlation','Negative_Correlation',
+        'Bind','Comparison','Conversion','Cotreatment','Drug_Interaction')},
+    question='What biomedical relation connects the entities marked [A] and [B] in this abstract?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['gyorilab/BioRED']})
+matres__temporal = Classification('sentence1',labels='labels',dataset_name='tasksource/matres',task_id='matres/temporal',
+    metadata='metadata',complete_splits=False,
+    label_values={'BEFORE':'A starts before B','AFTER':'A starts after B',
+                  'EQUAL':'A and B start at the same time','VAGUE':'the ordering of their start times is unclear'},
+    question='How does the start time of event [A] compare with that of event [B]? Judge event starts, not their durations.',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/matres']})

@@ -67,3 +67,16 @@ Published 14,000 train, 1,000 validation and 800 test rows to Jev `default` and 
 Use genuine labeled training data, existing templates and modest declarative mappings. Preserve native choices, complete evidence and source identities; do not fabricate distractors. Keep evaluation-only sources out of training. Prefer directly usable Hugging Face sources; archive joins, loader repairs and expensive transformations justify a reproducible data-only mirror. Record source terms even when unspecified. Reject or defer sources whose supervision cannot be mapped faithfully, recording the reason here.
 
 Spider aggregation was subsequently withdrawn at user request in [Hub commit d4529cf8](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/commit/d4529cf8f123010f243424486ff6527952d94b2a): 1,000 train and 100 validation rows removed from both `default` and `full`. Column selection and all unrelated Parquet shards are unchanged. The original publication counts above remain historical.
+
+## Batch 5 — approved, in progress
+
+| Source | Requested decision views | Status / remaining checks |
+|---|---|---|
+| MAVEN-ERE | Temporal and causal relations between marked events | Causal view implemented directly from Nofing; 53,358 native train / 13,624 labeled validation pairs. Entire Hub copy verified against original. Temporal view parked after a confirmed native chronological error. |
+| REFinD | Financial relation classification | Deferred: competition terms prohibit redistribution/modification despite naming CC BY-NC; structured reason in `decisions.json` |
+| BioRED | Biomedical relation classification | Direct `gyorilab/BioRED`; 3,828 / 1,113 / 990 eligible entity-pair relations, native document splits; full abstracts and grounded mentions preserved. |
+| MATRES | Event start-point temporal relation | Implemented reproducible original TimeML join: 12,736 train / 837 test, 4 missing event instances excluded. [Mirror](https://huggingface.co/datasets/tasksource/matres), [recipe](../../../scripts/repackage_dataset/relations.py). |
+| Causal News Corpus | Native binary event-causality classification | User-added todo; inspect original V2 labeled train/dev files and existing Hub copies before integration |
+
+These are human-approved additions, not automatic promotions from discovery.
+Training availability does not replace a source/recast example audit.
