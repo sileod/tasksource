@@ -23,6 +23,8 @@ for id in df[df.task_type=="MultipleChoice"].id:
 
 Browse the [English](catalog_english.md), [multilingual](catalog_multilingual.md),
 and [vision](catalog_vision.md) catalogs, and feel free to request a new task.
+The [English example gallery](docs/examples/english/README.md) shows formatted
+inputs, questions and gold answers, with a searchable HTML version.
 The English catalog includes 200+ MultipleChoice tasks and 200+ Classification
 tasks. Evaluation benchmarks are kept separate in
 [eval_only.py](src/tasksource/eval_only.py). Annotations excluded for duplicates,

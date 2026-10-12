@@ -42,13 +42,13 @@ Five further views were published to Jev `default` and `full` in [Hub commit 71f
 
 ## Batch 4 — reviewed and published
 
-12 accepted sources, 14 training views. Nine sources load directly from existing Hub repositories; only Spider (schema join), SemCor (matching WordNet 1.6 inventory) and STREUSLE (original JSON) require repackaging. [Source and exact-export audit](../../../docs/jev/linguistic-expansion-audit.json) records native annotation caveats, sampled rows, pins, reviewer identity and split checks.
+12 accepted sources, 13 active training views (Spider aggregation subsequently withdrawn). Nine sources load directly from existing Hub repositories; only Spider (schema join), SemCor (matching WordNet 1.6 inventory) and STREUSLE (original JSON) require repackaging. [Source and exact-export audit](../../../docs/jev/linguistic-expansion-audit.json) records native annotation caveats, sampled rows, pins, reviewer identity and split checks.
 
 | Source | Requested views | Status / remaining checks |
 |---|---|---|
 | MAVEN | Sentence + marked trigger → event type | Direct `mneb/maven`; all 96,897 native event mentions verified by sentence/type; original document partitions match MAVEN-Arg |
 | EmpatheticDialogues | Speaker situation → emotion | Direct canonical Parquet export; one unique situation, speaker-reported label; duplicate/conflicting prompts excluded |
-| Spider | SQL aggregation and column selection | Native parsed-SQL/schema join; two views; no gold SQL in input; multi-output/arithmetic/set operations and equivalent foreign-key column targets excluded |
+| Spider | Column selection; aggregation parked as low value | Native parsed-SQL/schema join; no gold SQL in input; multi-output/arithmetic/set operations and equivalent foreign-key column targets excluded |
 | OLID | Offensive, targeted, target type | Direct canonical Parquet export; offensive view retained; targeted/target parked after ambiguous native rows 88918 and 27540 |
 | iSarcasmEval | Author-intended sarcasm | Direct English Hub copy with explicit files restoring original train/test; excludes custom test file and one empty post converted to nan |
 | SemCor | WordNet sense-definition selection | Native keys joined to WordNet 1.6; 190,865 eligible training examples; no fabricated evaluation partitions |
@@ -65,3 +65,5 @@ Published 14,000 train, 1,000 validation and 800 test rows to Jev `default` and 
 ## Selection rules
 
 Use genuine labeled training data, existing templates and modest declarative mappings. Preserve native choices, complete evidence and source identities; do not fabricate distractors. Keep evaluation-only sources out of training. Prefer directly usable Hugging Face sources; archive joins, loader repairs and expensive transformations justify a reproducible data-only mirror. Record source terms even when unspecified. Reject or defer sources whose supervision cannot be mapped faithfully, recording the reason here.
+
+Spider aggregation was subsequently withdrawn at user request in [Hub commit d4529cf8](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/commit/d4529cf8f123010f243424486ff6527952d94b2a): 1,000 train and 100 validation rows removed from both `default` and `full`. Column selection and all unrelated Parquet shards are unchanged. The original publication counts above remain historical.

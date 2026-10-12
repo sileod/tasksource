@@ -1893,5 +1893,35 @@
       }
     ],
     "annotation": "tasksource.parked.olid__target"
+  },
+  {
+    "name": "Spider aggregation",
+    "scope": "task",
+    "tasks": [
+      "spider/aggregation"
+    ],
+    "annotation": "tasksource.parked.spider__aggregation",
+    "status": "deferred",
+    "reason_code": "low_value",
+    "reason": "weak standalone SQL aggregation projection; retain spider/column instead",
+    "reviews": [
+      {
+        "reviewer": {
+          "kind": "human"
+        },
+        "checked_on": "2026-10-12",
+        "verdict": "defer",
+        "findings": "User considers the aggregation projection weak; column selection remains useful."
+      }
+    ],
+    "huggingface": [
+      "tasksource/spider",
+      "xlangai/spider"
+    ],
+    "github": [
+      "https://github.com/taoyds/spider"
+    ],
+    "papers": [],
+    "reconsider_if": "A stronger SQL-derived view supplies substantial reasoning beyond aggregation keyword prediction."
   }
 ]

@@ -18,6 +18,12 @@ from .metadata.source_revisions import SOURCE_REVISIONS
 from .tasks import _document_holdouts, _unique_text_splits, _decision_metadata
 import hashlib
 
+spider__aggregation = Classification('sentence1',labels='labels',dataset_name='tasksource/spider',config_name='aggregation',
+    task_id='spider/aggregation',metadata='metadata',complete_splits=False,
+    label_values={x:x for x in ('none','maximum','minimum','count','sum','average')},
+    question='Which SQL aggregation is required for the single output requested by this question?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/spider']})
+
 olid__targeted = Classification('tweet',labels='subtask_b',dataset_name='christophsonntag/OLID',task_id='olid/targeted',
     pre_process=lambda d:_unique_text_splits(_document_holdouts(d,'tweet').filter(lambda r:r['subtask_a']=='OFF' and r['subtask_b'] in ('TIN','UNT')),lambda r:r['tweet'],'subtask_b'),
     complete_splits=False,label_values={'TIN':'targeted insult or threat','UNT':'untargeted profanity'},
@@ -175,6 +181,7 @@ snli_ve = VisualClassification(
 )
 
 KINDS = {
+    "low_value": "valid supervision with limited standalone training value",
     "duplicate": "duplicates or is covered by a listed task",
     "unsound": "labels or inputs do not support the task as annotated",
     "impractical": "inputs too long or data too heavy",
@@ -183,6 +190,7 @@ KINDS = {
 }
 
 PARKED = {
+    "spider__aggregation": ("low_value", "weak standalone SQL aggregation projection; retain spider/column instead"),
     'olid__targeted': ('unsound', 'native fine-grained label ambiguity; see task_discovery/decisions.json'),
     'olid__target': ('unsound', 'native fine-grained label ambiguity; see task_discovery/decisions.json'),
     "snli_ve": ("unsound", "caption-derived SNLI labels are not image-grounded; neutral evaluation pairs were reannotated, but this training source is uncorrected; hypothesis-only artifacts remain"),

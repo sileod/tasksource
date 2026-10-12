@@ -1,0 +1,193 @@
+"""Render real published Jev examples, indexed by the complete English catalog.
+
+PYTHONPATH=src python scripts/write_example_gallery.py --examples 3
+The snapshot is pinned in examples.json; rerun with --revision to reproduce it.
+Use --load-missing for bounded canonical source loads; failures stay visible.
+"""
+import argparse
+import hashlib
+import html
+import json
+import subprocess
+import sys
+from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
+
+import pyarrow.parquet as pq
+from huggingface_hub import HfApi, hf_hub_download
+from tasksource import list_tasks
+
+REPO = 'tasksource/tasksource-jev-typed-decisions'
+ROOT = Path(__file__).resolve().parents[1]
+FIELDS = ['source', 'id', 'state', 'question', 'kind', 'options', 'target', 'split']
+
+
+def collect(revision, count):
+    info = HfApi().dataset_info(REPO, revision=revision)
+    examples = {}
+    files = sorted(s.rfilename for s in info.siblings
+                   if s.rfilename.startswith('full/train') and s.rfilename.endswith('.parquet'))
+    for name in files:
+        path = hf_hub_download(REPO, name, repo_type='dataset', revision=info.sha)
+        for batch in pq.ParquetFile(path).iter_batches(columns=FIELDS):
+            # Avoid materializing large text columns once a batch's tasks are filled.
+            sources = batch.column('source').to_pylist()
+            for index, source in enumerate(sources):
+                selected = examples.setdefault(source, [])
+                if len(selected) < count:
+                    row = batch.slice(index, 1).to_pylist()[0]
+                    if all(row['id'] != previous['id'] for previous in selected):
+                        selected.append(row)
+        print(name, len(examples), 'sources', flush=True)
+    return info.sha, examples
+
+
+def source_examples(task, count):
+    """Canonical fallback for tasks absent from the exported snapshot."""
+    from datasets import ClassLabel
+    from tasksource import load_task, task_provenance
+    data = load_task(task, max_rows=count, max_rows_eval=count)
+    if 'train' not in data or not len(data['train']):
+        raise ValueError('No labeled training rows')
+    split = data['train']
+    def decode(value, feature):
+        if isinstance(feature, ClassLabel):
+            return feature.int2str(value) if value >= 0 else value
+        if hasattr(feature, 'feature') and isinstance(value, list):
+            return [decode(v, feature.feature) for v in value]
+        return value
+    question = getattr(data, 'question', None)
+    return [dict(source=task, id=f'{task}:canonical:sample:{i}', split='train',
+                 canonical={k: decode(v, split.features[k]) for k, v in row.items() if k != 'metadata'},
+                 question=question or '', provenance=task_provenance(task), row_metadata=row.get('metadata'), origin='canonical preprocessing (not a published Jev row)')
+            for i, row in enumerate(split.select(range(min(count, len(split)))))]
+
+
+def load_missing(tasks, examples, count, timeout):
+    """Bound each source load in its own process; retain errors rather than guessing."""
+    def load(task):
+        try:
+            result = subprocess.run([sys.executable, __file__, '--source-task', task,
+                                     '--examples', str(count)], capture_output=True, text=True, timeout=timeout)
+            if result.returncode:
+                raise ValueError(result.stderr.strip().splitlines()[-1])
+            return task, json.loads(result.stdout.split('GALLERY_RESULT=')[-1]), None
+        except (subprocess.TimeoutExpired, ValueError) as error:
+            return task, [], str(error) if not isinstance(error, subprocess.TimeoutExpired) else f'Source load exceeded {timeout}s'
+    errors = {}
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        for task, rows, error in pool.map(load, [t for t in tasks if not examples.get(t)]):
+            examples[task] = rows
+            if error:
+                errors[task] = error
+            print(task, error or f'{len(rows)} canonical examples', flush=True)
+    return errors
+
+
+def format_example(row):
+    """Keep criteria order and the complete gold distribution, including soft labels."""
+    if 'canonical' in row:
+        values = row['canonical']
+        fields = [('Question', row['question'])]
+        if 'tokens' in values and isinstance(values.get('labels'), list) and len(values['tokens']) == len(values['labels']):
+            return fields + [('Tokens / gold tags', '\n'.join(f'{token} → {label}' for token, label in zip(values['tokens'], values['labels'])))]
+        return fields + [('Gold labels' if key == 'labels' else key,
+                          value if isinstance(value, str) else json.dumps(value, ensure_ascii=False, indent=2))
+                         for key, value in values.items()]
+    if row['kind'] == 'noul' and not row['options'] and len(row['target']) == 1:
+        return [('State', row['state']), ('Question', row['question']),
+                ('Decision', 'Boolean (noul)'), ('Gold target', f"Probability of true: {row['target'][0]:g}")]
+    if len(row['options']) != len(row['target']):
+        raise ValueError(f"Misaligned target: {row['id']}")
+    options = '\n'.join(f'{i + 1}. {option}' for i, option in enumerate(row['options']))
+    gold = '\n'.join(f'{i + 1}. {option} — {weight:g}'
+                     for i, (option, weight) in enumerate(zip(row['options'], row['target'])) if weight)
+    return [('State', row['state']), ('Question', row['question']),
+            (f"Criteria ({row['kind']})", options), ('Gold target (weight)', gold)]
+
+
+def write(output, revision, examples, count, errors=None):
+    output.mkdir(parents=True, exist_ok=True)
+    catalog = list_tasks()
+    tasks = [dict(id=r.id, type=r.task_type, dataset=r.dataset_name,
+                  examples=examples.get(r.id, [])[:count], error=(errors or {}).get(r.id)) for r in catalog.itertuples()]
+    covered = sum(bool(t['examples']) for t in tasks)
+    summary = f'{covered} of {len(tasks)} English catalog tasks have examples.'
+    note = ('Real examples from the published full Jev training config. Criteria stay in exported order; '
+            'gold weights are shown exactly. Source-loaded canonical fallbacks are explicitly labeled. These examples illustrate preprocessing, not a quality guarantee. '
+            'Tasks without an exported example remain listed; this does not imply their source is unavailable.')
+    payload = dict(repo=REPO, revision=revision, examples_per_task=count, seed=0,
+                   generator_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(), tasks=tasks)
+    (output / 'examples.json').write_text(json.dumps(payload, ensure_ascii=False, indent=2) + '\n')
+    md = ['# English example gallery', '', summary, '', note, '',
+          '[Searchable HTML](index.html) · [Machine-readable examples](examples.json)', '',
+          f'[Published snapshot](https://huggingface.co/datasets/{REPO}/tree/{revision})', '']
+    index = md + ['| Task | Type | Examples |', '|---|---|--:|']
+    (output / 'tasks').mkdir(exist_ok=True)
+    articles = []
+    esc = html.escape
+    for task in tasks:
+        task_id = task['id']
+        anchor = 'task-' + hashlib.sha256(task_id.encode()).hexdigest()[:12]
+        header = f"{task_id} · {task['type']} · {task['dataset']}"
+        md = [f'# {task_id}', '', f"{task['type']} · `{task['dataset']}`", '']
+        body = []
+        for i, row in enumerate(task['examples'], 1):
+            provenance = f"{row.get('origin', 'published Jev')} · {row['split']} · {row['id']}"
+            md += [f'<details><summary>Example {i}</summary>', '', provenance, '']
+            fields = []
+            for label, value in format_example(row):
+                # HTML pre handles arbitrary source text, including Markdown fences/HTML.
+                md += [f'**{label}**', '', f'<pre>{esc(value)}</pre>', '']
+                fields.append(f'<h4>{esc(label)}</h4><pre>{esc(value)}</pre>')
+            md += ['</details>', '']
+            body.append(f'<details><summary>Example {i}</summary><p>{esc(provenance)}</p>' + ''.join(fields) + '</details>')
+        if not body:
+            message = 'No training example in this published Jev snapshot.' + (' Source load: ' + task['error'] if task['error'] else '')
+            md += [message, '']
+            body.append(f'<p class="missing">{message}</p>')
+        (output / 'tasks' / f'{anchor}.md').write_text('\n'.join(md))
+        index.append(f"| [{task_id}](tasks/{anchor}.md) | {task['type']} | {len(task['examples'])} |")
+        articles.append(f'<article id="{anchor}" data-search="{esc(header.lower(), quote=True)}" '
+                        f'data-covered="{bool(task["examples"])}"><h2><a href="#{anchor}">{esc(task_id)}</a></h2>'
+                        f'<p>{esc(task["type"])} · {esc(task["dataset"])}</p>' + ''.join(body) + '</article>')
+    (output / 'README.md').write_text('\n'.join(index) + '\n')
+    page = '''<!doctype html><html lang="en"><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tasksource English examples</title><style>
+body{font:16px/1.5 system-ui;max-width:1000px;margin:2rem auto;padding:0 1rem;color:#17212b;background:#fafafa}
+a{color:#175fa8}article{border-top:1px solid #ccd3db;padding:1rem 0}h2{font-size:1.2rem}
+pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f0f2f5;padding:1rem;font:14px/1.5 monospace}
+summary{cursor:pointer;padding:.5rem 0}input{font:inherit;padding:.5rem;max-width:90%}
+nav{position:sticky;top:0;background:#fafafa;padding:1rem 0}.missing{color:#666}
+</style><h1>English example gallery</h1>'''
+    page += f'<p>{esc(summary)}</p><p>{esc(note)}</p><p><a href="README.md">Markdown</a> · <a href="examples.json">JSON</a> · <a href="https://huggingface.co/datasets/{REPO}/tree/{revision}">Published snapshot</a></p>'
+    page += '''<nav><input id="search" type="search" placeholder="Filter task name, type or source" aria-label="Filter tasks">
+<label><input id="missing" type="checkbox"> Missing examples only</label> <span id="count"></span></nav>'''
+    page += '\n'.join(articles)
+    page += '''<script>
+const search=document.querySelector('#search'), missing=document.querySelector('#missing');
+function filter(){let count=0;for(const task of document.querySelectorAll('article')){
+ task.hidden=!task.dataset.search.includes(search.value.toLowerCase())||(missing.checked&&task.dataset.covered==='True');
+ if(!task.hidden)count++;}document.querySelector('#count').textContent=count+' tasks';}
+search.addEventListener('input',filter);missing.addEventListener('change',filter);filter();
+</script></html>'''
+    (output / 'index.html').write_text(page)
+    print(summary, flush=True)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--examples', type=int, choices=range(1, 6), default=3)
+    parser.add_argument('--source-task', help=argparse.SUPPRESS)
+    parser.add_argument('--load-missing', action='store_true', help='Try canonical source loads for missing exports')
+    parser.add_argument('--timeout', type=int, default=90, help='Seconds per fallback source load')
+    parser.add_argument('--revision', default='main')
+    parser.add_argument('--output', type=Path, default=ROOT / 'docs/examples/english')
+    args = parser.parse_args()
+    if args.source_task:
+        print('GALLERY_RESULT=' + json.dumps(source_examples(args.source_task, args.examples)))
+    else:
+        revision, examples = collect(args.revision, args.examples)
+        errors = load_missing(list_tasks().id, examples, args.examples, args.timeout) if args.load_missing else {}
+        write(args.output, revision, examples, args.examples, errors)

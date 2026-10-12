@@ -3125,11 +3125,6 @@ sst5 = Classification('text',labels='label',dataset_name='SetFit/sst5',complete_
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['SetFit/sst5']})
 
 
-spider__aggregation = Classification('sentence1',labels='labels',dataset_name='tasksource/spider',config_name='aggregation',
-    task_id='spider/aggregation',metadata='metadata',complete_splits=False,
-    label_values={x:x for x in ('none','maximum','minimum','count','sum','average')},
-    question='Which SQL aggregation is required for the single output requested by this question?',
-    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/spider']})
 spider__column = MultipleChoice(inputs='inputs',choices_list='choices_list',labels='labels',dataset_name='tasksource/spider',config_name='column',
     task_id='spider/column',metadata='metadata',complete_splits=False,
     question='Which database column supplies the single output requested by this question?',
