@@ -15,6 +15,7 @@ def test_training_check_records_native_split_and_labeled_preview(monkeypatch):
     monkeypatch.setattr(discovery,'cached_json',cached)
     result=discovery.training_evidence({'name':'Source','huggingface':['org/data']},'unused')
     assert result['train_status']=='present' and len(result['evidence'])==2
+    assert result['split_policy']=='train_only' and result['source_splits']==['train']
     assert 'length=1' in calls[1] and result['evidence'][1]['metadata']['rows'][0]['row']['label']==1
 
 
@@ -76,3 +77,11 @@ def test_language_filter_prefers_english_and_keeps_unknown():
     assert discovery.language_priority({'languages':[]},['en'])==1
     assert discovery.language_priority({'languages':['tr']},['en'])==2
     assert discovery.language_priority({'languages':['tr']},[])==0
+
+
+def test_multiple_splits_do_not_claim_disjointness(monkeypatch):
+    monkeypatch.setattr(discovery,'cached_json',lambda *a:dict(sha256='hash',data={
+        'splits':[{'config':'main','split':'train'},{'config':'main','split':'test'}]}))
+    result=discovery.training_evidence({'name':'Source','huggingface':['org/data']},'unused')
+    assert result['source_splits']==['test','train'] and result['split_policy']=='multiple_splits'
+    assert 'disjoint' not in result

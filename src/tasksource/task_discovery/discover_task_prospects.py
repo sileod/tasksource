@@ -34,7 +34,9 @@ def training_evidence(row,cache,offline=False):
         except (OSError,ValueError) as error:errors.append(dict(url=url,error=str(error)))
     has_train=any(s['split'].casefold() in ('train','training') for s in splits)
     status='present' if has_train else 'not_listed' if splits and complete and not errors else 'unknown'
-    return dict(row,train_status=status,evidence=row.get('evidence',[])+evidence,training_check_errors=errors)
+    split_names=sorted({s['split'] for s in splits})
+    policy='train_only' if has_train and complete and not errors and all(s.casefold() in ('train','training') for s in split_names) else 'multiple_splits' if has_train and len(split_names)>1 else 'unknown'
+    return dict(row,train_status=status,source_splits=split_names,split_policy=policy,evidence=row.get('evidence',[])+evidence,training_check_errors=errors)
 
 
 def prospect_status(row):
