@@ -221,7 +221,7 @@ class ProceduralExecutionTest(unittest.TestCase):
             self.skipTest("dataset building dependencies not installed")
         for module in MODULES:
             task = module.__name__.rsplit(".", 1)[-1]
-            ds = build_task(task, {"train": 30, "validation": 5, "test": 5}, list(range(5)))
+            ds = build_task(task, {"train": 300, "validation": 5, "test": 5}, list(range(5)))
             self.assertFalse(set(ds["train"]["state"]) & set(ds["test"]["state"]))
             for example in ds["train"].select(range(3)):
                 self.assertEqual(set(json.loads(example["questions"])), set(json.loads(example["answers"])))
