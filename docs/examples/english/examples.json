@@ -3,7 +3,7 @@
   "revision": "d4529cf8f123010f243424486ff6527952d94b2a",
   "examples_per_task": 3,
   "seed": 0,
-  "generator_sha256": "655134210e6ab75766df087c4265b07af1b8bd98d9124fab0d1e7736b9045005",
+  "generator_sha256": "e230fa692dc92d5bc75bb3551a774d455b741aaffbbf0e5a2fa3d97e4c1b7406",
   "tasks": [
     {
       "id": "glue/mnli",

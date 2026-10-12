@@ -8,13 +8,13 @@ published Jev · train · summarize-from-feedback-comparisons-da0aa4b65b:train:6
 
 **State**
 
-<pre>So yesterday I was out with my girlfriend and we were just talking. I asked her to tell me something new and she goes silent and says, &quot;I actually do have to tell you something.&quot; 
+<pre>So yesterday I was out with my girlfriend and we were just talking. I asked her to tell me something new and she goes silent and says, &quot;I actually do have to tell you something.&quot;&#32;
 
 *long pause*
 
 She tells me she&#x27;s breaking up with me. Now, we have never had a fight, we are pretty relaxed, and know each other well so I thought this would last a while longer.
 
-I ask why (because of aforementioned reason) and she says, &quot;We aren&#x27;t right for each other. I love you and I don&#x27;t want to do this but I don&#x27;t want to be in a relationship right now.&quot; 
+I ask why (because of aforementioned reason) and she says, &quot;We aren&#x27;t right for each other. I love you and I don&#x27;t want to do this but I don&#x27;t want to be in a relationship right now.&quot;&#32;
 
 I didn&#x27;t want to be the guy who begs and pleads so I play it cool and let her leave. I don&#x27;t know why this happen and I&#x27;m wondering if I screwed something up.</pre>
 
@@ -43,7 +43,7 @@ published Jev · train · summarize-from-feedback-comparisons-da0aa4b65b:train:1
 
 I know what the problem is. I could be described as petite, skinny even, where as he is quite husky. He&#x27;s a little over 300 pounds. This really isn&#x27;t a problem for me. In fact, I&#x27;m quite turned on by his body. I&#x27;ve never gone out with bigger guys, even though that&#x27;s the body type I&#x27;m most attracted to, I guess out of fear what people would think. However, I got over that, and I&#x27;m really proud to be with my wonderful boyfriend and I&#x27;m having the best sex of my life!
 
-However, because of my track record, he thinks that he&#x27;s not my &quot;type&quot;. He thinks that he&#x27;s the least attractive guy I&#x27;ve ever gone out with, while he thinks I&#x27;m the most attractive girl he&#x27;s gone out with. I&#x27;m concerned because he&#x27;s started eating a lot less recently (if he wants to eat healthier that&#x27;s fine but this is concerning), and he constantly tells me that he&#x27;s not good enough for me. 
+However, because of my track record, he thinks that he&#x27;s not my &quot;type&quot;. He thinks that he&#x27;s the least attractive guy I&#x27;ve ever gone out with, while he thinks I&#x27;m the most attractive girl he&#x27;s gone out with. I&#x27;m concerned because he&#x27;s started eating a lot less recently (if he wants to eat healthier that&#x27;s fine but this is concerning), and he constantly tells me that he&#x27;s not good enough for me.&#32;
 
 I don&#x27;t know what to do! He&#x27;s really the best boyfriend I&#x27;ve ever had and I&#x27;m more attracted to him than I have been to anybody!</pre>
 
@@ -70,9 +70,9 @@ published Jev · train · summarize-from-feedback-comparisons-da0aa4b65b:train:8
 
 <pre>A couple weeks ago a friend of my girlfriend alerted her to a nude picture online. She was absolutely devastated. The picture is tied to her name and her hometown and a google search of her name very quickly leads to the page with the picture.
 
-We have attempted contacting the police to have it taken down. The police seem to be on our side on the case but have not had success yet. She is not 100% positive who she sent the picture to, so we can&#x27;t go after them unless the police went in and did a IP search on where the picture was uploaded from. 
+We have attempted contacting the police to have it taken down. The police seem to be on our side on the case but have not had success yet. She is not 100% positive who she sent the picture to, so we can&#x27;t go after them unless the police went in and did a IP search on where the picture was uploaded from.&#32;
 
-She&#x27;s been, understandably, very emotional about the whole ordeal and I don&#x27;t know how to handle it anymore. It&#x27;s been tough because for about a day or so the picture appeared to be off the website after contacting the police but it appears that the page is still online after being offline for a couple hours to a day. 
+She&#x27;s been, understandably, very emotional about the whole ordeal and I don&#x27;t know how to handle it anymore. It&#x27;s been tough because for about a day or so the picture appeared to be off the website after contacting the police but it appears that the page is still online after being offline for a couple hours to a day.&#32;
 
 I don&#x27;t know how to continue to be supportive and helpful in finding a way to cope with the stress and emotions that are running through her life right now. It&#x27;s also very difficult for me because now my girlfriend and her body are online for the whole world to see and it upsets me too.
 

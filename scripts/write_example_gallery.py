@@ -178,7 +178,7 @@ def write(output, revision, examples, count, errors=None):
             message = 'No training example in this published Jev snapshot.' + (' Source load: ' + task['error'] if task['error'] else '')
             md += [message, '']
             body.append(f'<p class="missing">{message}</p>')
-        (output / 'tasks' / f'{anchor}.md').write_text('\n'.join(md))
+        (output / 'tasks' / f'{anchor}.md').write_text('\n'.join(md).replace('\r', '&#13;').replace(' \n', '&#32;\n').replace('\t\n', '&#9;\n'))
         index.append(f"| [{task_id}](tasks/{anchor}.md) | {task['type']} | {len(task['examples'])} |")
         articles.append(f'<article id="{anchor}" data-search="{esc(header.lower(), quote=True)}" '
                         f'data-covered="{bool(task["examples"])}"><h2><a href="#{anchor}">{esc(task_id)}</a></h2>'

@@ -17,8 +17,8 @@ Fake reviews User-generated content BIBREF5 is an integral part of the contempor
 Due to monetary impact of user-generated content, some businesses have relied on so-called crowd-turfing agents BIBREF7 that promise to deliver positive ratings written by workers to a customer in exchange for a monetary compensation. Crowd-turfing ethics are complicated. For example, Amazon community guidelines prohibit buying content relating to promotions, but the act of writing fabricated content is not considered illegal, nor is matching workers to customers BIBREF8 . Year 2015, approximately 20% of online reviews on yelp.com were suspected of being fake BIBREF9 .
 Nowadays, user-generated review sites like yelp.com use filters and fraudulent review detection techniques. These factors have resulted in an increase in the requirements of crowd-turfed reviews provided to review sites, which in turn has led to an increase in the cost of high-quality review. Due to the cost increase, researchers hypothesize the existence of neural network-generated fake reviews. These neural-network-based fake reviews are statistically different from human-written fake reviews, and are not caught by classifiers trained on these BIBREF0 .
 Detecting fake reviews can either be done on an individual level or as a system-wide detection tool (i.e. regulation). Detecting fake online content on a personal level requires knowledge and skills in critical reading. In 2017, the National Literacy Trust assessed that young people in the UK do not have the skillset to differentiate fake news from real news BIBREF10 . For example, 20% of children that use online news sites in age group 12-15 believe that all information on news sites are true.
-Neural Networks Neural networks are function compositions that map input data through INLINEFORM0 subsequent layers: DISPLAYFORM0 
-where the functions INLINEFORM0 are typically non-linear and chosen by experts partly for known good performance on datasets and partly for simplicity of computational evaluation. Language models (LMs) BIBREF11 are generative probability distributions that assign probabilities to sequences of tokens ( INLINEFORM1 ): DISPLAYFORM0 
+Neural Networks Neural networks are function compositions that map input data through INLINEFORM0 subsequent layers: DISPLAYFORM0&#32;
+where the functions INLINEFORM0 are typically non-linear and chosen by experts partly for known good performance on datasets and partly for simplicity of computational evaluation. Language models (LMs) BIBREF11 are generative probability distributions that assign probabilities to sequences of tokens ( INLINEFORM1 ): DISPLAYFORM0&#32;
 such that the language model can be used to predict how likely a specific token at time step INLINEFORM0 is, based on the INLINEFORM1 previous tokens. Tokens are typically either words or characters.
 For decades, deep neural networks were thought to be computationally too difficult to train. However, advances in optimization, hardware and the availability of frameworks have shown otherwise BIBREF1 , BIBREF12 . Neural language models (NLMs) have been one of the promising application areas. NLMs are typically various forms of recurrent neural networks (RNNs), which pass through the data sequentially and maintain a memory representation of the past tokens with a hidden context vector. There are many RNN architectures that focus on different ways of updating and maintaining context vectors: Long Short-Term Memory units (LSTM) and Gated Recurrent Units (GRUs) are perhaps most popular. Neural LMs have been used for free-form text generation. In certain application areas, the quality has been high enough to sometimes fool human readers BIBREF0 . Encoder-decoder (seq2seq) models BIBREF13 are architectures of stacked RNNs, which have the ability to generate output sequences based on input sequences. The encoder network reads in a sequence of tokens, and passes it to a decoder network (a LM). In contrast to simpler NLMs, encoder-decoder networks have the ability to use additional context for generating text, which enables more accurate generation of text. Encoder-decoder models are integral in Neural Machine Translation (NMT) BIBREF14 , where the task is to translate a source text from one language to another language. NMT models additionally use beam search strategies to heuristically search the set of possible translations. Training datasets are parallel corpora; large sets of paired sentences in the source and target languages. The application of NMT techniques for online machine translation has significantly improved the quality of translations, bringing it closer to human performance BIBREF15 .
 Neural machine translation models are efficient at mapping one expression to another (one-to-one mapping). Researchers have evaluated these models for conversation generation BIBREF16 , with mixed results. Some researchers attribute poor performance to the use of the negative log likelihood cost function during training, which emphasizes generation of high-confidence phrases rather than diverse phrases BIBREF17 . The results are often generic text, which lacks variation. Li et al. have suggested various augmentations to this, among others suppressing typical responses in the decoder language model to promote response diversity BIBREF17 .
@@ -35,18 +35,18 @@ The Yelp Challenge dataset includes metadata about restaurants, including their 
 5 Public House Las Vegas NV Gastropubs Restaurants &gt; Excellent
 food and service . Pricey , but well worth it . I would recommend
 the bone marrow and sampler platter for appetizers . \end{verbatim}
- 
- 
+&#32;
+&#32;
 \noindent The order {\textbf{[rating name city state tags]}} is kept constant.
 Training the model conditions it to associate certain sequences of words in the input sentence with others in the output.
- 
+&#32;
 \subsubsection{Training Settings}
- 
+&#32;
 We train our NMT model on a commodity PC with a i7-4790k CPU (4.00GHz), with 32GB RAM and one NVidia GeForce GTX 980 GPU. Our system can process approximately 1,300 \textendash 1,500 source tokens/s and approximately 5,730 \textendash 5,830 output tokens/s. Training one epoch takes in average 72 minutes. The model is trained for 8 epochs, i.e. over night. We call fake review generated by this model \emph{NMT-Fake reviews}. We only need to train one model to produce reviews of different ratings.
 We use the training settings: adam optimizer \cite{kingma2014adam} with the suggested learning rate 0.001 \cite{klein2017opennmt}. For most parts, parameters are at their default values. Notably, the maximum sentence length of input and output is 50 tokens by default.
 We leverage the framework openNMT-py \cite{klein2017opennmt} to teach the our NMT model.
 We list used openNMT-py commands in Appendix Table~\ref{table:openNMT-py_commands}.
- 
+&#32;
 \begin{figure}[t]
 \begin{center}
  \begin{tabular}{ | l | }
@@ -67,14 +67,14 @@ it for the \textit{quality} of the \textit{beer} and atmosphere you can see in \
 \caption{Na\&quot;{i}ve text generation with NMT vs. generation using our NTM model. Repetitive patterns are \underline{underlined}. Contextual words are \emph{italicized}. Both examples here are generated based on the context given in Example~1.}
 \label{fig:comparison}
 \end{figure}
- 
+&#32;
 \subsection{Controlling generation of fake reviews}
 \label{sec:generating}
- 
+&#32;
 Greedy NMT beam searches are practical in many NMT cases. However, the results are simply repetitive, when naively applied to fake review generation (See Example~2 in Figure~\ref{fig:comparison}).
 The NMT model produces many \emph{high-confidence} word predictions, which are repetitive and obviously fake. We calculated that in fact, 43\% of the generated sentences started with the phrase ``Great food&#x27;&#x27;. The lack of diversity in greedy use of NMTs for text generation is clear.
- 
- 
+&#32;
+&#32;
 \begin{algorithm}[!b]
  \KwData{Desired review context $C_\mathrm{input}$ (given as cleartext), NMT model}
  \KwResult{Generated review $out$ for input context $C_\mathrm{input}$}
@@ -92,47 +92,47 @@ $i \leftarrow i+1$
 \caption{Generation of NMT-Fake* reviews.}
 \label{alg:base}
 \end{algorithm}
- 
+&#32;
 In this work, we describe how we succeeded in creating more diverse and less repetitive generated reviews, such as Example 3 in Figure~\ref{fig:comparison}.
 We outline pseudocode for our methodology of generating fake reviews in Algorithm~\ref{alg:base}. There are several parameters in our algorithm.
 The details of the algorithm will be shown later.
 We modify the openNMT-py translation phase by changing log-probabilities before passing them to the beam search.
 We notice that reviews generated with openNMT-py contain almost no language errors. As an optional post-processing step, we obfuscate reviews by introducing natural typos/misspellings randomly. In the next sections, we describe how we succeeded in generating more natural sentences from our NMT model, i.e. generating reviews like Example~3 instead of reviews like Example~2.
- 
+&#32;
 \subsubsection{Variation in word content}
- 
+&#32;
 Example 2 in Figure~\ref{fig:comparison} repeats commonly occurring words given for a specific context (e.g. \textit{great, food, service, beer, selection, burger} for Example~1). Generic review generation can be avoided by decreasing probabilities (log-likelihoods \cite{murphy2012machine}) of the generators LM, the decoder.
 We constrain the generation of sentences by randomly \emph{imposing penalties to words}.
 We tried several forms of added randomness, and found that adding constant penalties to a \emph{random subset} of the target words resulted in the most natural sentence flow. We call these penalties \emph{Bernoulli penalties}, since the random variables are chosen as either 1 or 0 (on or off).
- 
- 
+&#32;
+&#32;
 \paragraph{Bernoulli penalties to language model}
 To avoid generic sentences components, we augment the default language model $p(\cdot)$ of the decoder by
- 
+&#32;
 \begin{equation}
 \log \Tilde{p}(t_k) = \log p(t_k | t_i, \dots, t_1) + \lambda q,
 \end{equation}
- 
+&#32;
 where $q \in R^{V}$ is a vector of Bernoulli-distributed random values that obtain values $1$ with probability $b$ and value $0$ with probability $1-b_i$, and $\lambda &lt; 0$. Parameter $b$ controls how much of the vocabulary is forgotten and $\lambda$ is a soft penalty of including ``forgotten&#x27;&#x27; words in a review.
 $\lambda q_k$ emphasizes sentence forming with non-penalized words. The randomness is reset at the start of generating a new review.
 Using Bernoulli penalties in the language model, we can ``forget&#x27;&#x27; a certain proportion of words and essentially ``force&#x27;&#x27; the creation of less typical sentences. We will test the effect of these two parameters, the Bernoulli probability $b$ and log-likelihood penalty of including ``forgotten&#x27;&#x27; words $\lambda$, with a user study in Section~\ref{sec:varying}.
- 
+&#32;
 \paragraph{Start penalty}
 We introduce start penalties to avoid generic sentence starts (e.g. ``Great food, great service&#x27;&#x27;). Inspired by \cite{li2016diversity}, we add a random start penalty $\lambda s^\mathrm{i}$, to our language model, which decreases monotonically for each generated token. We set $\alpha \leftarrow 0.66$ as it&#x27;s effect decreases by 90\% every 5 words generated.
- 
+&#32;
 \paragraph{Penalty for reusing words}
 Bernoulli penalties do not prevent excessive use of certain words in a sentence (such as \textit{great} in Example~2).
 To avoid excessive reuse of words, we included a memory penalty for previously used words in each translation.
 Concretely, we add the penalty $\lambda$ to each word that has been generated by the greedy search.
- 
+&#32;
 \subsubsection{Improving sentence coherence}
 \label{sec:grammar}
 We visually analyzed reviews after applying these penalties to our NMT model. While the models were clearly diverse, they were \emph{incoherent}: the introduction of random penalties had degraded the grammaticality of the sentences. Amongst others, the use of punctuation was erratic, and pronouns were used semantically wrongly (e.g. \emph{he}, \emph{she} might be replaced, as could ``and&#x27;&#x27;/``but&#x27;&#x27;). To improve the authenticity of our reviews, we added several \emph{grammar-based rules}.
- 
+&#32;
 English language has several classes of words which are important for the natural flow of sentences.
 We built a list of common pronouns (e.g. I, them, our), conjunctions (e.g. and, thus, if), punctuation (e.g. ,/.,..), and apply only half memory penalties for these words. We found that this change made the reviews more coherent. The pseudocode for this and the previous step is shown in Algorithm~\ref{alg:aug}.
 The combined effect of grammar-based rules and LM augmentation is visible in Example~3, Figure~\ref{fig:comparison}.
- 
+&#32;
 \begin{algorithm}[!t]
  \KwData{Initial log LM $\log p$, Bernoulli probability $b$, soft-penalty $\lambda$, monotonic factor $\alpha$, last generated token $o_i$, grammar rules set $G$}
  \KwResult{Augmented log LM $\log \Tilde{p}$}
@@ -159,7 +159,7 @@ $\log p_{i} \leftarrow \log p_{i} + \lambda$}
 \caption{Pseudocode for augmenting language model. }
 \label{alg:aug}
 \end{algorithm}
- 
+&#32;
 \subsubsection{Human-like errors}
 \label{sec:obfuscation}
 We notice that our NMT model produces reviews without grammar mistakes.
@@ -168,18 +168,18 @@ We scraped a list of common English language spelling mistakes from Oxford dicti
 Similarly, typos are randomly reintroduced based on the weighted edit distance\footnote{\url{https://pypi.python.org/pypi/weighted-levenshtein/0.1}}, such that typos resulting in real English words with small perturbations are emphasized.
 We use autocorrection tools\footnote{\url{https://pypi.python.org/pypi/autocorrect/0.1.0}} for finding these words.
 We call these augmentations \emph{obfuscations}, since they aim to confound the reader to think a human has written them. We omit the pseudocode description for brevity.
- 
+&#32;
 \subsection{Experiment: Varying generation parameters in our NMT model}
 \label{sec:varying}
- 
+&#32;
 Parameters $b$ and $\lambda$ control different aspects in fake reviews.
 We show six different examples of generated fake reviews in Table~\ref{table:categories}.
 Here, the largest differences occur with increasing values of $b$: visibly, the restaurant reviews become more extreme.
 This occurs because a large portion of vocabulary is ``forgotten&#x27;&#x27;. Reviews with $b \geq 0.7$ contain more rare word combinations, e.g. ``!!!!!&#x27;&#x27; as punctuation, and they occasionally break grammaticality (&#x27;&#x27;experience was awesome&#x27;&#x27;).
 Reviews with lower $b$ are more generic: they contain safe word combinations like ``Great place, good service&#x27;&#x27; that occur in many reviews. Parameter $\lambda$&#x27;s is more subtle: it affects how random review starts are and to a degree, the discontinuation between statements within the review.
 We conducted an Amazon Mechanical Turk (MTurk) survey in order to determine what kind of NMT-Fake reviews are convincing to native English speakers. We describe the survey and results in the next section.
- 
- 
+&#32;
+&#32;
 \begin{table}[!b]
 \caption{Six different parametrizations of our NMT reviews and one example for each. The context is ``5 P~.~F~.~Chang &#x27; s Scottsdale AZ&#x27;&#x27; in all examples.}
 \begin{center}
@@ -204,16 +204,16 @@ We conducted an Amazon Mechanical Turk (MTurk) survey in order to determine what
  \label{table:categories}
 \end{center}
 \end{table}
- 
+&#32;
 \subsubsection{MTurk study}
 \label{sec:amt}
 We created 20 jobs, each with 100 questions, and requested master workers in MTurk to complete the jobs.
 We randomly generated each survey for the participants. Each review had a 50\% chance to be real or fake. The fake ones further were chosen among six (6) categories of fake reviews (Table~\ref{table:categories}).
 The restaurant and the city was given as contextual information to the participants. Our aim was to use this survey to understand how well English-speakers react to different parametrizations of NMT-Fake reviews.
 Table~\ref{table:amt_pop} in Appendix summarizes the statistics for respondents in the survey. All participants were native English speakers from America. The base rate (50\%) was revealed to the participants prior to the study.
- 
+&#32;
 We first investigated overall detection of any NMT-Fake reviews (1,006 fake reviews and 994 real reviews). We found that the participants had big difficulties in detecting our fake reviews. In average, the reviews were detected with class-averaged \emph{F-score of only 56\%}, with 53\% F-score for fake review detection and 59\% F-score for real review detection. The results are very close to \emph{random detection}, where precision, recall and F-score would each be 50\%. Results are recorded in Table~\ref{table:MTurk_super}. Overall, the fake review generation is very successful, since human detection rate across categories is close to random.
- 
+&#32;
 \begin{table}[t]
 \caption{Effectiveness of Mechanical Turkers in distinguishing human-written reviews from fake reviews generated by our NMT model (all variants).}
 \begin{center}
@@ -230,33 +230,33 @@ We first investigated overall detection of any NMT-Fake reviews (1,006 fake revi
  \label{table:MTurk_super}
 \end{center}
 \end{table}
- 
+&#32;
 We noticed some variation in the detection of different fake review categories. The respondents in our MTurk survey had most difficulties recognizing reviews of category $(b=0.3, \lambda=-5)$, where true positive rate was $40.4\%$, while the true negative rate of the real class was $62.7\%$. The precision were $16\%$ and $86\%$, respectively. The class-averaged F-score is $47.6\%$, which is close to random. Detailed classification reports are shown in Table~\ref{table:MTurk_sub} in Appendix. Our MTurk-study shows that \emph{our NMT-Fake reviews pose a significant threat to review systems}, since \emph{ordinary native English-speakers have very big difficulties in separating real reviews from fake reviews}. We use the review category $(b=0.3, \lambda=-5)$ for future user tests in this paper, since MTurk participants had most difficulties detecting these reviews. We refer to this category as NMT-Fake* in this paper.
- 
+&#32;
 \section{Evaluation}
 \graphicspath{ {figures/}}
- 
+&#32;
 We evaluate our fake reviews by first comparing them statistically to previously proposed types of fake reviews, and proceed with a user study with experienced participants. We demonstrate the statistical difference to existing fake review types \cite{yao2017automated,mukherjee2013yelp,rayana2015collective} by training classifiers to detect previous types and investigate classification performance.
- 
+&#32;
 \subsection{Replication of state-of-the-art model: LSTM}
 \label{sec:repl}
- 
+&#32;
 Yao et al. \cite{yao2017automated} presented the current state-of-the-art generative model for fake reviews. The model is trained over the Yelp Challenge dataset using a two-layer character-based LSTM model.
 We requested the authors of \cite{yao2017automated} for access to their LSTM model or a fake review dataset generated by their model. Unfortunately they were not able to share either of these with us. We therefore replicated their model as closely as we could, based on their paper and e-mail correspondence\footnote{We are committed to sharing our code with bonafide researchers for the sake of reproducibility.}.
- 
+&#32;
 We used the same graphics card (GeForce GTX) and trained using the same framework (torch-RNN in lua). We downloaded the reviews from Yelp Challenge and preprocessed the data to only contain printable ASCII characters, and filtered out non-restaurant reviews. We trained the model for approximately 72 hours. We post-processed the reviews using the customization methodology described in \cite{yao2017automated} and email correspondence. We call fake reviews generated by this model LSTM-Fake reviews.
- 
+&#32;
 \subsection{Similarity to existing fake reviews}
 \label{sec:automated}
- 
+&#32;
 We now want to understand how NMT-Fake* reviews compare to a) LSTM fake reviews and b) human-generated fake reviews. We do this by comparing the statistical similarity between these classes.
- 
+&#32;
 For `a&#x27; (Figure~\ref{fig:lstm}), we use the Yelp Challenge dataset. We trained a classifier using 5,000 random reviews from the Yelp Challenge dataset (``human&#x27;&#x27;) and 5,000 fake reviews generated by LSTM-Fake. Yao et al. \cite{yao2017automated} found that character features are essential in identifying LSTM-Fake reviews. Consequently, we use character features (n-grams up to 3).
- 
+&#32;
 For `b&#x27; (Figure~\ref{fig:shill}),we the ``Yelp Shills&#x27;&#x27; dataset (combination of YelpZip \cite{mukherjee2013yelp}, YelpNYC \cite{mukherjee2013yelp}, YelpChi \cite{rayana2015collective}). This dataset labels entries that are identified as fraudulent by Yelp&#x27;s filtering mechanism (&#x27;&#x27;shill reviews&#x27;&#x27;)\footnote{Note that shill reviews are probably generated by human shills \cite{zhao2017news}.}. The rest are treated as genuine reviews from human users (&#x27;&#x27;genuine&#x27;&#x27;). We use 100,000 reviews from each category to train a classifier. We use features from the commercial psychometric tool LIWC2015 \cite{pennebaker2015development} to generated features.
- 
+&#32;
 In both cases, we use AdaBoost (with 200 shallow decision trees) for training. For testing each classifier, we use a held out test set of 1,000 reviews from both classes in each case. In addition, we test 1,000 NMT-Fake* reviews. Figures~\ref{fig:lstm} and~\ref{fig:shill} show the results. The classification threshold of 50\% is marked with a dashed line.
- 
+&#32;
 \begin{figure}
  \begin{subfigure}[b]{0.5\columnwidth}
  \includegraphics[width=\columnwidth]{figures/lstm.png}
@@ -273,45 +273,45 @@ In both cases, we use AdaBoost (with 200 shallow decision trees) for training. F
  }
  \label{fig:statistical_similarity}
 \end{figure}
- 
+&#32;
 We can see that our new generated reviews do not share strong attributes with previous known categories of fake reviews. If anything, our fake reviews are more similar to genuine reviews than previous fake reviews. We thus conjecture that our NMT-Fake* fake reviews present a category of fake reviews that may go undetected on online review sites.
- 
- 
+&#32;
+&#32;
 \subsection{Comparative user study}
 \label{sec:comparison}
 We wanted to evaluate the effectiveness of fake reviews againsttech-savvy users who understand and know to expect machine-generated fake reviews. We conducted a user study with 20 participants, all with computer science education and at least one university degree. Participant demographics are shown in Table~\ref{table:amt_pop} in the Appendix. Each participant first attended a training session where they were asked to label reviews (fake and genuine) and could later compare them to the correct answers -- we call these participants \emph{experienced participants}.
 No personal data was collected during the user study.
- 
+&#32;
 Each person was given two randomly selected sets of 30 of reviews (a total of 60 reviews per person) with reviews containing 10 \textendash 50 words each.
 Each set contained 26 (87\%) real reviews from Yelp and 4 (13\%) machine-generated reviews,
 numbers chosen based on suspicious review prevalence on Yelp~\cite{mukherjee2013yelp,rayana2015collective}.
 One set contained machine-generated reviews from one of the two models (NMT ($b=0.3, \lambda=-5$) or LSTM),
 and the other set reviews from the other in randomized order. The number of fake reviews was revealed to each participant in the study description. Each participant was requested to mark four (4) reviews as fake.
- 
+&#32;
 Each review targeted a real restaurant. A screenshot of that restaurant&#x27;s Yelp page was shown to each participant prior to the study. Each participant evaluated reviews for one specific, randomly selected, restaurant. An example of the first page of the user study is shown in Figure~\ref{fig:screenshot} in Appendix.
- 
+&#32;
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=.7\columnwidth]{detection2.png}
 \caption{Violin plots of detection rate in comparative study. Mean and standard deviations for number of detected fakes are $0.8\pm0.7$ for NMT-Fake* and $2.5\pm1.0$ for LSTM-Fake. $n=20$. A sample of random detection is shown as comparison.}
 \label{fig:aalto}
 \end{figure}
- 
- 
+&#32;
+&#32;
 Figure~\ref{fig:aalto} shows the distribution of detected reviews of both types. A hypothetical random detector is shown for comparison.
 NMT-Fake* reviews are significantly more difficult to detect for our experienced participants. In average, detection rate (recall) is $20\%$ for NMT-Fake* reviews, compared to $61\%$ for LSTM-based reviews.
 The precision (and F-score) is the same as the recall in our study, since participants labeled 4 fakes in each set of 30 reviews \cite{murphy2012machine}.
 The distribution of the detection across participants is shown in Figure~\ref{fig:aalto}. \emph{The difference is statistically significant with confidence level $99\%$} (Welch&#x27;s t-test).
 We compared the detection rate of NMT-Fake* reviews to a random detector, and find that \emph{our participants detection rate of NMT-Fake* reviews is not statistically different from random predictions with 95\% confidence level} (Welch&#x27;s t-test).
- 
- 
+&#32;
+&#32;
 \section{Defenses}
- 
+&#32;
 \label{sec:detection}
- 
+&#32;
 We developed an AdaBoost-based classifier to detect our new fake reviews, consisting of 200 shallow decision trees (depth 2). The features we used are recorded in Table~\ref{table:features_adaboost} (Appendix).
 We used word-level features based on spaCy-tokenization \cite{honnibal-johnson:2015:EMNLP} and constructed n-gram representation of POS-tags and dependency tree tags. We added readability features from NLTK~\cite{bird2004nltk}.
- 
+&#32;
 \begin{figure}[ht]
 \centering
 \includegraphics[width=.7\columnwidth]{obf_score_fair_2.png}
@@ -321,133 +321,133 @@ Effect of varying $b$ and $\lambda$ in fake review generation.
 The variant native speakers had most difficulties detecting is well detectable by AdaBoost (97\%).}
 \label{fig:adaboost_matrix_b_lambda}
 \end{figure}
- 
- 
+&#32;
+&#32;
 Figure~\ref{fig:adaboost_matrix_b_lambda} shows our AdaBoost classifier&#x27;s class-averaged F-score at detecting different kind of fake reviews. The classifier is very effective in detecting reviews that humans have difficulties detecting. For example, the fake reviews MTurk users had most difficulty detecting ($b=0.3, \lambda=-5$) are detected with an excellent 97\% F-score.
 The most important features for the classification were counts for frequently occurring words in fake reviews (such as punctuation, pronouns, articles) as well as the readability feature ``Automated Readability Index&#x27;&#x27;. We thus conclude that while NMT-Fake reviews are difficult to detect for humans, they can be well detected with the right tools.
- 
+&#32;
 \section{Related Work}
- 
+&#32;
 Kumar and Shah~\cite{kumar2018false} survey and categorize false information research. Automatically generated fake reviews are a form of \emph{opinion-based false information}, where the creator of the review may influence reader&#x27;s opinions or decisions.
 Yao et al. \cite{yao2017automated} presented their study on machine-generated fake reviews. Contrary to us, they investigated character-level language models, without specifying a specific context before generation. We leverage existing NMT tools to encode a specific context to the restaurant before generating reviews.
 Supporting our study, Everett et al~\cite{Everett2016Automated} found that security researchers were less likely to be fooled by Markov chain-generated Reddit comments compared to ordinary Internet users.
- 
+&#32;
 Diversification of NMT model outputs has been studied in \cite{li2016diversity}. The authors proposed the use of a penalty to commonly occurring sentences (\emph{n-grams}) in order to emphasize maximum mutual information-based generation.
 The authors investigated the use of NMT models in chatbot systems.
 We found that unigram penalties to random tokens (Algorithm~\ref{alg:aug}) was easy to implement and produced sufficiently diverse responses.
- 
+&#32;
 \section {Discussion and Future Work}
- 
+&#32;
 \paragraph{What makes NMT-Fake* reviews difficult to detect?} First, NMT models allow the encoding of a relevant context for each review, which narrows down the possible choices of words that the model has to choose from. Our NMT model had a perplexity of approximately $25$, while the model of \cite{yao2017automated} had a perplexity of approximately $90$ \footnote{Personal communication with the authors}. Second, the beam search in NMT models narrows down choices to natural-looking sentences. Third, we observed that the NMT model produced \emph{better structure} in the generated sentences (i.e. a more coherent story).
- 
+&#32;
 \paragraph{Cost of generating reviews} With our setup, generating one review took less than one second. The cost of generation stems mainly from the overnight training. Assuming an electricity cost of 16 cents / kWh (California) and 8 hours of training, training the NMT model requires approximately 1.30 USD. This is a 90\% reduction in time compared to the state-of-the-art \cite{yao2017automated}. Furthermore, it is possible to generate both positive and negative reviews with the same model.
- 
+&#32;
 \paragraph{Ease of customization} We experimented with inserting specific words into the text by increasing their log likelihoods in the beam search. We noticed that the success depended on the prevalence of the word in the training set. For example, adding a +5 to \emph{Mike} in the log-likelihood resulted in approximately 10\% prevalence of this word in the reviews. An attacker can therefore easily insert specific keywords to reviews, which can increase evasion probability.
- 
+&#32;
 \paragraph{Ease of testing} Our diversification scheme is applicable during \emph{generation phase}, and does not affect the training setup of the network in any way. Once the NMT model is obtained, it is easy to obtain several different variants of NMT-Fake reviews by varying parameters $b$ and $\lambda$.
- 
- 
- 
+&#32;
+&#32;
+&#32;
 \paragraph{Languages} The generation methodology is not per-se language-dependent. The requirement for successful generation is that sufficiently much data exists in the targeted language. However, our language model modifications require some knowledge of that target language&#x27;s grammar to produce high-quality reviews.
- 
+&#32;
 \paragraph{Generalizability of detection techniques} Currently, fake reviews are not universally detectable. Our results highlight that it is difficult to claim detection performance on unseen types of fake reviews (Section~\ref{sec:automated}). We see this an open problem that deserves more attention in fake reviews research.
- 
+&#32;
 \paragraph{Generalizability to other types of datasets} Our technique can be applied to any dataset, as long as there is sufficient training data for the NMT model. We used approximately 2.9 million reviews for this work.
- 
+&#32;
 \section{Conclusion}
- 
+&#32;
 In this paper, we showed that neural machine translation models can be used to generate fake reviews that are very effective in deceiving even experienced, tech-savvy users.
 This supports anecdotal evidence \cite{national2017commission}.
 Our technique is more effective than state-of-the-art \cite{yao2017automated}.
 We conclude that machine-aided fake review detection is necessary since human users are ineffective in identifying fake reviews.
 We also showed that detectors trained using one type of fake reviews are not effective in identifying other types of fake reviews.
 Robust detection of fake reviews is thus still an open problem.
- 
- 
+&#32;
+&#32;
 \section*{Acknowledgments}
 We thank Tommi Gr\&quot;{o}ndahl for assistance in planning user studies and the
 participants of the user study for their time and feedback. We also thank
 Luiza Sayfullina for comments that improved the manuscript.
 We thank the authors of \cite{yao2017automated} for answering questions about
 their work.
- 
- 
+&#32;
+&#32;
 \bibliographystyle{splncs}
 \begin{thebibliography}{10}
- 
+&#32;
 \bibitem{yao2017automated}
 Yao, Y., Viswanath, B., Cryan, J., Zheng, H., Zhao, B.Y.:
 \newblock Automated crowdturfing attacks and defenses in online review systems.
 \newblock In: Proceedings of the 2017 ACM SIGSAC Conference on Computer and
  Communications Security, ACM (2017)
- 
+&#32;
 \bibitem{murphy2012machine}
 Murphy, K.:
 \newblock Machine learning: a probabilistic approach.
 \newblock Massachusetts Institute of Technology (2012)
- 
+&#32;
 \bibitem{challenge2013yelp}
 Yelp:
 \newblock {Yelp Challenge Dataset} (2013)
- 
+&#32;
 \bibitem{mukherjee2013yelp}
 Mukherjee, A., Venkataraman, V., Liu, B., Glance, N.:
 \newblock What yelp fake review filter might be doing?
 \newblock In: Seventh International AAAI Conference on Weblogs and Social Media
  (ICWSM). (2013)
- 
+&#32;
 \bibitem{rayana2015collective}
 Rayana, S., Akoglu, L.:
 \newblock Collective opinion spam detection: Bridging review networks and
  metadata.
 \newblock In: {}Proceedings of the 21th ACM SIGKDD International Conference on
  Knowledge Discovery and Data Mining
- 
+&#32;
 \bibitem{o2008user}
 {O&#x27;Connor}, P.:
 \newblock {User-generated content and travel: A case study on Tripadvisor.com}.
 \newblock Information and communication technologies in tourism 2008 (2008)
- 
+&#32;
 \bibitem{luca2010reviews}
 Luca, M.:
 \newblock {Reviews, Reputation, and Revenue: The Case of Yelp. com}.
 \newblock {Harvard Business School} (2010)
- 
+&#32;
 \bibitem{wang2012serf}
 Wang, G., Wilson, C., Zhao, X., Zhu, Y., Mohanlal, M., Zheng, H., Zhao, B.Y.:
 \newblock Serf and turf: crowdturfing for fun and profit.
 \newblock In: Proceedings of the 21st international conference on World Wide
  Web (WWW), ACM (2012)
- 
+&#32;
 \bibitem{rinta2017understanding}
 Rinta-Kahila, T., Soliman, W.:
 \newblock Understanding crowdturfing: The different ethical logics behind the
  clandestine industry of deception.
 \newblock In: ECIS 2017: Proceedings of the 25th European Conference on
  Information Systems. (2017)
- 
+&#32;
 \bibitem{luca2016fake}
 Luca, M., Zervas, G.:
 \newblock Fake it till you make it: Reputation, competition, and yelp review
  fraud.
 \newblock Management Science (2016)
- 
+&#32;
 \bibitem{national2017commission}
 {National Literacy Trust}:
 \newblock Commission on fake news and the teaching of critical literacy skills
  in schools URL:
  \url{https://literacytrust.org.uk/policy-and-campaigns/all-party-parliamentary-group-literacy/fakenews/}.
- 
+&#32;
 \bibitem{jurafsky2014speech}
 Jurafsky, D., Martin, J.H.:
 \newblock Speech and language processing. Volume~3.
 \newblock Pearson London: (2014)
- 
+&#32;
 \bibitem{kingma2014adam}
 Kingma, D.P., Ba, J.:
 \newblock Adam: A method for stochastic optimization.
 \newblock arXiv preprint arXiv:1412.6980 (2014)
- 
+&#32;
 \bibitem{cho2014learning}
 Cho, K., van Merrienboer, B., Gulcehre, C., Bahdanau, D., Bougares, F.,
  Schwenk, H., Bengio, Y.:
@@ -455,79 +455,79 @@ Cho, K., van Merrienboer, B., Gulcehre, C., Bahdanau, D., Bougares, F.,
  statistical machine translation.
 \newblock In: Proceedings of the 2014 Conference on Empirical Methods in
  Natural Language Processing (EMNLP). (2014)
- 
+&#32;
 \bibitem{klein2017opennmt}
 Klein, G., Kim, Y., Deng, Y., Senellart, J., Rush, A.:
 \newblock Opennmt: Open-source toolkit for neural machine translation.
 \newblock Proceedings of ACL, System Demonstrations (2017)
- 
+&#32;
 \bibitem{wu2016google}
 Wu, Y., Schuster, M., Chen, Z., Le, Q.V., Norouzi, M., Macherey, W., Krikun,
  M., Cao, Y., Gao, Q., Macherey, K., et~al.:
 \newblock Google&#x27;s neural machine translation system: Bridging the gap between
  human and machine translation.
 \newblock arXiv preprint arXiv:1609.08144 (2016)
- 
+&#32;
 \bibitem{mei2017coherent}
 Mei, H., Bansal, M., Walter, M.R.:
 \newblock Coherent dialogue with attention-based language models.
 \newblock In: AAAI. (2017) 3252--3258
- 
+&#32;
 \bibitem{li2016diversity}
 Li, J., Galley, M., Brockett, C., Gao, J., Dolan, B.:
 \newblock A diversity-promoting objective function for neural conversation
  models.
 \newblock In: Proceedings of NAACL-HLT. (2016)
- 
+&#32;
 \bibitem{rubin2006assessing}
 Rubin, V.L., Liddy, E.D.:
 \newblock Assessing credibility of weblogs.
 \newblock In: AAAI Spring Symposium: Computational Approaches to Analyzing
  Weblogs. (2006)
- 
+&#32;
 \bibitem{zhao2017news}
 news.com.au:
 \newblock {The potential of AI generated &#x27;crowdturfing&#x27; could undermine online
  reviews and dramatically erode public trust} URL:
  \url{http://www.news.com.au/technology/online/security/the-potential-of-ai-generated-crowdturfing-could-undermine-online-reviews-and-dramatically-erode-public-trust/news-story/e1c84ad909b586f8a08238d5f80b6982}.
- 
+&#32;
 \bibitem{pennebaker2015development}
 Pennebaker, J.W., Boyd, R.L., Jordan, K., Blackburn, K.:
 \newblock {The development and psychometric properties of LIWC2015}.
 \newblock Technical report (2015)
- 
+&#32;
 \bibitem{honnibal-johnson:2015:EMNLP}
 Honnibal, M., Johnson, M.:
 \newblock An improved non-monotonic transition system for dependency parsing.
 \newblock In: Proceedings of the 2015 Conference on Empirical Methods in
  Natural Language Processing (EMNLP), ACM (2015)
- 
+&#32;
 \bibitem{bird2004nltk}
 Bird, S., Loper, E.:
 \newblock {NLTK: the natural language toolkit}.
 \newblock In: Proceedings of the ACL 2004 on Interactive poster and
  demonstration sessions, Association for Computational Linguistics (2004)
- 
+&#32;
 \bibitem{kumar2018false}
 Kumar, S., Shah, N.:
 \newblock False information on web and social media: A survey.
 \newblock arXiv preprint arXiv:1804.08559 (2018)
- 
+&#32;
 \bibitem{Everett2016Automated}
 Everett, R.M., Nurse, J.R.C., Erola, A.:
 \newblock The anatomy of online deception: What makes automated text
  convincing?
 \newblock In: Proceedings of the 31st Annual ACM Symposium on Applied
  Computing. SAC &#x27;16, ACM (2016)
- 
+&#32;
 \end{thebibliography}
- 
- 
- 
+&#32;
+&#32;
+&#32;
 \section*{Appendix}
- 
+&#32;
 We present basic demographics of our MTurk study and the comparative study with experienced users in Table~\ref{table:amt_pop}.
- 
+&#32;
 \begin{table}
 \caption{User study statistics.}
 \begin{center}
@@ -545,10 +545,10 @@ We present basic demographics of our MTurk study and the comparative study with 
  \label{table:amt_pop}
 \end{center}
 \end{table}
- 
- 
+&#32;
+&#32;
 Table~\ref{table:openNMT-py_commands} shows a listing of the openNMT-py commands we used to create our NMT model and to generate fake reviews.
- 
+&#32;
 \begin{table}[t]
 \caption{Listing of used openNMT-py commands.}
 \begin{center}
@@ -578,10 +578,10 @@ python translate.py -model model_acc_35.54_ppl_25.68_e8.pt
  \label{table:openNMT-py_commands}
 \end{center}
 \end{table}
- 
- 
+&#32;
+&#32;
 Table~\ref{table:MTurk_sub} shows the classification performance of Amazon Mechanical Turkers, separated across different categories of NMT-Fake reviews. The category with best performance ($b=0.3, \lambda=-5$) is denoted as NMT-Fake*.
- 
+&#32;
 \begin{table}[b]
 \caption{MTurk study subclass classification reports. Classes are imbalanced in ratio 1:6. Random predictions are $p_\mathrm{human} = 86\%$ and $p_\mathrm{machine} = 14\%$, with $r_\mathrm{human} = r_\mathrm{machine} = 50\%$. Class-averaged F-scores for random predictions are $42\%$.}
 \begin{center}
@@ -620,9 +620,9 @@ Table~\ref{table:MTurk_sub} shows the classification performance of Amazon Mecha
  \label{table:MTurk_sub}
 \end{center}
 \end{table}
- 
+&#32;
 Figure~\ref{fig:screenshot} shows screenshots of the first two pages of our user study with experienced participants.
- 
+&#32;
 \begin{figure}[ht]
 \centering
 \includegraphics[width=1.\columnwidth]{figures/screenshot_7-3.png}
@@ -631,9 +631,9 @@ Screenshots of the first two pages in the user study. Example 1 is a NMT-Fake* r
 }
 \label{fig:screenshot}
 \end{figure}
- 
+&#32;
 Table~\ref{table:features_adaboost} shows the features used to detect NMT-Fake reviews using the AdaBoost classifier.
- 
+&#32;
 \begin{table}
 \caption{Features used in NMT-Fake review detector.}
 \begin{center}
@@ -651,7 +651,7 @@ Table~\ref{table:features_adaboost} shows the features used to detect NMT-Fake r
  \label{table:features_adaboost}
 \end{center}
 \end{table}
- 
+&#32;
 \end{document}
 
 text_B: Does their detection tool work better than human detection?</pre>
@@ -689,11 +689,11 @@ The baseline model is a deep sequence-to-sequence encoder/decoder model with att
 We train the 21 350 992 parameters of the network for about 60 epochs until we achieve results that are qualitatively equivalent to the results of See et al. See2017. We obtain summaries that are broadly relevant to the text but do not match the target summaries very well. We observe the same problems such as wrong reproduction of factual details, replacing rare words with more common alternatives or repeating non-sense after the third sentence. We can see in Figure 1 an example of summary obtained compared to the target one.
 The “summaries&quot; we generate are far from being valid summaries of the information in the texts but are sufficient to look at the attribution that LRP will give us. They pick up the general subject of the original text.
 We present in this section the Layer-Wise Relevance Propagation (LRP) BIBREF2 technique that we used to attribute importance to the input features, together with how we adapted it to our model and how we generated the saliency maps. LRP redistributes the output of the model from the output layer to the input by transmitting information backwards through the layers. We call this propagated backwards importance the relevance. LRP has the particularity to attribute negative and positive relevance: a positive relevance is supposed to represent evidence that led to the classifier&#x27;s result while negative relevance represents evidence that participated negatively in the prediction.
-We initialize the relevance of the output layer to the value of the predicted class before softmax and we then describe locally the propagation backwards of the relevance from layer to layer. For normal neural network layers we use the form of LRP with epsilon stabilizer BIBREF2 . We write down $R_{i\leftarrow j}^{(l, l+1)}$ the relevance received by the neuron $i$ of layer $l$ from the neuron $j$ of layer $l+1$ : 
+We initialize the relevance of the output layer to the value of the predicted class before softmax and we then describe locally the propagation backwards of the relevance from layer to layer. For normal neural network layers we use the form of LRP with epsilon stabilizer BIBREF2 . We write down $R_{i\leftarrow j}^{(l, l+1)}$ the relevance received by the neuron $i$ of layer $l$ from the neuron $j$ of layer $l+1$ :&#32;
 $$\begin{split}
 
 R_{i\leftarrow j}^{(l, l+1)} &amp;= \dfrac{w_{i\rightarrow j}^{l,l+1}\textbf {z}^l_i + \dfrac{\epsilon \textrm { sign}(\textbf {z}^{l+1}_j) + \textbf {b}^{l+1}_j}{D_l}}{\textbf {z}^{l+1}_j + \epsilon * \textrm { sign}(\textbf {z}^{l+1}_j)} * R_j^{l+1} \\
-\end{split}$$   (Eq. 7) 
+\end{split}$$   (Eq. 7)&#32;
 where $w_{i\rightarrow j}^{l,l+1}$ is the network&#x27;s weight parameter set during training, $\textbf {b}^{l+1}_j$ is the bias for neuron $j$ of layer $l+1$ , $\textbf {z}^{l}_i$ is the activation of neuron $i$ on layer $l$ , $\epsilon $ is the stabilizing term set to 0.00001 and $D_l$ is the dimension of the $l$ -th layer.
 The relevance of a neuron is then computed as the sum of the relevance he received from the above layer(s).
 For LSTM cells we use the method from Arras et al.Arras2017 to solve the problem posed by the element-wise multiplications of vectors. Arras et al. noted that when such computation happened inside an LSTM cell, it always involved a “gate&quot; vector and another vector containing information. The gate vector containing only value between 0 and 1 is essentially filtering the second vector to allow the passing of “relevant&quot; information. Considering this, when we propagate relevance through an element-wise multiplication operation, we give all the upper-layer&#x27;s relevance to the “information&quot; vector and none to the “gate&quot; vector.

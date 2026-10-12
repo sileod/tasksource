@@ -32,7 +32,7 @@ published Jev · train · maud:train:266eaace8eb734579bdc123440658e19bfb6ccf1148
 
 **State**
 
-<pre>Section 8.1 Regulatory Authorizations and Consents. 
+<pre>Section 8.1 Regulatory Authorizations and Consents.&#32;
 
 (a) Subject to the terms and conditions of this Agreement (including Section 8.2(b)), the Company and Parent shall use their commercially reasonable efforts to take, or cause to be taken, all actions and to do, or cause to be done, all things necessary, proper or advisable under Applicable Law to consummate the Transactions, including (i) preparing and filing as promptly as practicable with any Governmental Authority or other Third Party all documentation to effect all necessary filings, notices, petitions, statements, registrations, submissions of information, applications and other documents and (ii) obtaining and maintaining all approvals, consents, registrations, permits, authorizations and other confirmations required to be obtained from any Governmental Authority or other Third Party that are necessary, proper or advisable to consummate the Transactions. (Page 56)</pre>
 

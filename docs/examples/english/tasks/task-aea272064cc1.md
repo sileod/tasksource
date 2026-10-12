@@ -22,7 +22,7 @@ The Shrek franchise has been dormant for a decade, but 20 years after Shrek’s 
 “Shrek was the first animated picture to have, in its dialogue and in its music, pop references,” says Marylata Elton, Shrek’s music supervisor. “What ended up [happening] is that Shrek became pop culture itself.”
 ###
 
-Imagine you&#x27;re trying to promote the movie Shrek. Using the article above, create a script for a radio ad. Your goal is to convince people to come and watch Shrek. 
+Imagine you&#x27;re trying to promote the movie Shrek. Using the article above, create a script for a radio ad. Your goal is to convince people to come and watch Shrek.&#32;
 As part of the script, include a 4-line stanza rewrite of the popular smash mouth song with the lyrics being from the POV of Shrek.
 
 Passage B:
@@ -88,7 +88,7 @@ The Shrek franchise has been dormant for a decade, but 20 years after Shrek’s 
 “Shrek was the first animated picture to have, in its dialogue and in its music, pop references,” says Marylata Elton, Shrek’s music supervisor. “What ended up [happening] is that Shrek became pop culture itself.”
 ###
 
-Imagine you&#x27;re trying to promote the movie Shrek. Using the article above, create a script for a radio ad. Your goal is to convince people to come and watch Shrek. 
+Imagine you&#x27;re trying to promote the movie Shrek. Using the article above, create a script for a radio ad. Your goal is to convince people to come and watch Shrek.&#32;
 As part of the script, include a 4-line stanza rewrite of the popular smash mouth song with the lyrics being from the POV of Shrek.
 B: Welcome to another exciting film premier of Shrek!
 The most loved ogre of all time!

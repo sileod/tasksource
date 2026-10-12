@@ -9,7 +9,7 @@ published Jev · train · nli4ct-semeval2024-4a16101db5:train:0
 **State**
 
 <pre>Passage A:
-INTERVENTION 1: 
+INTERVENTION 1:&#32;
   Diagnostic (FLT PET)
   Patients with early stage, ER positive primary breast cancer undergo FLT PET scan at baseline and 1-6 weeks after the start of standard endocrine treatment. The surgery follows 1-7 days after the second FLT PET scan.
   Tracer used in the FLT PET (positron emission tomography) scanning procedure: [F18] fluorothymidine.
@@ -41,7 +41,7 @@ published Jev · train · nli4ct-semeval2024-4a16101db5:train:0:choice-paired-te
 **State**
 
 <pre>Passage A:
-INTERVENTION 1: 
+INTERVENTION 1:&#32;
   Diagnostic (FLT PET)
   Patients with early stage, ER positive primary breast cancer undergo FLT PET scan at baseline and 1-6 weeks after the start of standard endocrine treatment. The surgery follows 1-7 days after the second FLT PET scan.
   Tracer used in the FLT PET (positron emission tomography) scanning procedure: [F18] fluorothymidine.

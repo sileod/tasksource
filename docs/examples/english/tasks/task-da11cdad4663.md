@@ -8,7 +8,7 @@ published Jev · train · wice-a788fdf753:train:1092
 
 **State**
 
-<pre>text_A: (meta data) TITLE: The Bath House Story - Rotorua Museum 
+<pre>text_A: (meta data) TITLE: The Bath House Story - Rotorua Museum&#32;
 (meta data) PUBLISHER: https://www.facebook.com/RotoruaMuseum/
 # The Bath House Story
 ##### The Bath House Story

@@ -8,7 +8,7 @@ current local Jev recast (not yet published) · train · zero-shot-label-nli-eb6
 
 **State**
 
-<pre>text_A: Jarrah was intimately familiar with , and adept at using the intercom and radio . 
+<pre>text_A: Jarrah was intimately familiar with , and adept at using the intercom and radio .&#32;
 Jarrah , like Atta earlier , may have inadvertently broadcast the message because he did not know how to operate the radio and the intercom .
 text_B: This example is non-contradiction.</pre>
 

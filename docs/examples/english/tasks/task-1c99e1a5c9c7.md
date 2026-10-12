@@ -8,7 +8,7 @@ published Jev · train · maud:train:3107096b89f0d632bd8db6fff4a4ea1c4a72cb6a9c6
 
 **State**
 
-<pre>Section 11.12 Specific Performance. 
+<pre>Section 11.12 Specific Performance.&#32;
 
 (a) The parties hereto agree that irreparable damage would occur in the event any provision of this Agreement were not performed in accordance with the terms hereof and that any breach of this Agreement would not be adequately compensated by monetary damages, and that the parties shall be entitled to seek an injunction or injunctions to prevent breaches of this Agreement or to enforce specifically the performance of the terms and provisions hereof, without proof of actual damages or inadequacy of legal remedy (Page 75)</pre>
 
