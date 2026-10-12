@@ -1,12 +1,12 @@
 # English example gallery
 
-563 of 563 English catalog tasks have examples.
+566 of 566 English catalog tasks have examples.
 
 Real examples from the published full Jev training config. Criteria stay in exported order; gold weights are shown exactly. Source-loaded canonical fallbacks and current local recast previews are explicitly labeled. These examples illustrate preprocessing, not a quality guarantee. Tasks without an exported example remain listed; this does not imply their source is unavailable.
 
 [Searchable HTML](index.html) · [Machine-readable examples](examples.json)
 
-[Published snapshot](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/tree/07526e54ee01c52d144cae72500bd8b84360fcf3)
+[Published snapshot](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/tree/2a17dec8035da914f2e8b05712402d702216045d)
 
 | Task | Type | Examples |
 |---|---|--:|
@@ -573,3 +573,6 @@ Real examples from the published full Jev training config. Criteria stay in expo
 | [maven-ere/causal](tasks/task-056639f873d8.md) | Classification | 3 |
 | [biored/relation](tasks/task-53d38a2485df.md) | Classification | 3 |
 | [matres/temporal](tasks/task-0a4286cc6b62.md) | Classification | 3 |
+| [causal-news](tasks/task-a78d2e7acb9e.md) | Classification | 3 |
+| [slurp/slot-type](tasks/task-f014bcbf50df.md) | Classification | 3 |
+| [topv2/slot-type](tasks/task-80f7d9f78699.md) | Classification | 3 |

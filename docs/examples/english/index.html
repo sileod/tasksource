@@ -14,7 +14,7 @@ input{font:inherit;padding:.45rem;border:1px solid #ccd3db;border-radius:5px;max
 nav{position:sticky;top:0;background:#fafafaf5;padding:.7rem 0;z-index:1;border-bottom:1px solid #dbe0e7;display:flex;gap:.8rem;align-items:center;flex-wrap:wrap}
 nav label{font-size:.8rem}#search{width:350px}#count,.missing{color:#667085;font-size:.8rem}
 @media(max-width:700px){.example-grid{grid-template-columns:1fr;gap:0}body{padding:0 .6rem}article{padding:.75rem}}
-</style><h1>English example gallery</h1><p>563 of 563 English catalog tasks have examples. First example visible; two more available below each task.</p><details><summary>About these examples</summary><p>Real examples from the published full Jev training config. Criteria stay in exported order; gold weights are shown exactly. Source-loaded canonical fallbacks and current local recast previews are explicitly labeled. These examples illustrate preprocessing, not a quality guarantee. Tasks without an exported example remain listed; this does not imply their source is unavailable.</p></details><p><a href="README.md">Markdown</a> · <a href="examples.json">JSON</a> · <a href="https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/tree/07526e54ee01c52d144cae72500bd8b84360fcf3">Published snapshot</a></p><nav><input id="search" type="search" placeholder="Filter task name, type or source" aria-label="Filter tasks">
+</style><h1>English example gallery</h1><p>566 of 566 English catalog tasks have examples. First example visible; two more available below each task.</p><details><summary>About these examples</summary><p>Real examples from the published full Jev training config. Criteria stay in exported order; gold weights are shown exactly. Source-loaded canonical fallbacks and current local recast previews are explicitly labeled. These examples illustrate preprocessing, not a quality guarantee. Tasks without an exported example remain listed; this does not imply their source is unavailable.</p></details><p><a href="README.md">Markdown</a> · <a href="examples.json">JSON</a> · <a href="https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/tree/2a17dec8035da914f2e8b05712402d702216045d">Published snapshot</a></p><nav><input id="search" type="search" placeholder="Filter task name, type or source" aria-label="Filter tasks">
 <label><input id="missing" type="checkbox"> Missing examples only</label> <span id="count"></span></nav><article id="task-57703917eaeb" data-search="glue/mnli · classification · nyu-mll/glue" data-covered="True"><h2><a href="#task-57703917eaeb">glue/mnli</a></h2><p class="task-meta">Classification · nyu-mll/glue</p><section class="primary-example"><div class="example-grid"><div><div class="field"><h4>State</h4><pre>text_A: In Tampopo , when the incredibly attractive couple in white are not actually in a gourmet frenzy, sex is simply food carried on by other means.
 text_B: The couple wearing white were ugly.</pre></div></div><div><div class="field"><h4>Question</h4><pre>Does text_A entail text_B, contradict it, or neither?</pre></div><div class="field"><h4>Criteria (choice)</h4><pre>1. entailment
 2. neutral
@@ -25894,7 +25894,583 @@ Eric Rudolph has been on the run since the January 1998 bombing of a Birmingham,
 </pre></details></div></div><div><div class="field"><h4>Question</h4><pre>How does the start time of event [A] compare with that of event [B]? Judge event starts, not their durations.</pre></div><div class="field"><h4>Criteria (choice)</h4><pre>1. A starts before B
 2. A starts after B
 3. A and B start at the same time
-4. the ordering of their start times is unclear</pre></div><div class="field gold"><h4>Gold target (weight)</h4><pre>2. A starts after B — 1</pre></div></div></div><details class="provenance"><summary>Source and row ID</summary>published Jev · train · matres:train:APW19990507.0207:50:55:matres-temporal-203312ab87</details></details></article><script>
+4. the ordering of their start times is unclear</pre></div><div class="field gold"><h4>Gold target (weight)</h4><pre>2. A starts after B — 1</pre></div></div></div><details class="provenance"><summary>Source and row ID</summary>published Jev · train · matres:train:APW19990507.0207:50:55:matres-temporal-203312ab87</details></details></article>
+<article id="task-a78d2e7acb9e" data-search="causal-news · classification · thagen/cncv2" data-covered="True"><h2><a href="#task-a78d2e7acb9e">causal-news</a></h2><p class="task-meta">Classification · thagen/CNCv2</p><section class="primary-example"><div class="example-grid"><div><div class="field"><h4>State</h4><pre>Thus we too joined the sloganeering .</pre></div></div><div><div class="field"><h4>Question</h4><pre>Does this news text express a causal relation between events?</pre></div><div class="field"><h4>Criteria (choice)</h4><pre>1. no
+2. yes</pre></div><div class="field gold"><h4>Gold target (weight)</h4><pre>1. no — 1</pre></div></div></div><details class="provenance"><summary>Source and row ID</summary>published Jev · train · causal-news:train:cnc_train_01_112_916_0:causal-news-e3ac0e2fe6</details></section><details class="extra-example"><summary>Example 2</summary><div class="example-grid"><div><div class="field"><h4>State</h4><pre>Meanwhile , 307 lawyers associated with &#x27; Centre for paralegal services and legal aid &#x27; are supporting Hazare &#x27;s strike .</pre></div></div><div><div class="field"><h4>Question</h4><pre>Does this news text express a causal relation between events?</pre></div><div class="field"><h4>Criteria (choice)</h4><pre>1. no
+2. yes</pre></div><div class="field gold"><h4>Gold target (weight)</h4><pre>1. no — 1</pre></div></div></div><details class="provenance"><summary>Source and row ID</summary>published Jev · train · causal-news:train:cnc_train_02_262_640_0:causal-news-e3ac0e2fe6</details></details><details class="extra-example"><summary>Example 3</summary><div class="example-grid"><div><div class="field"><h4>State</h4><pre>He was also booked by the Central Bureau of Investigation ( CBI ) as one of the 17 accused in the 2007 ‘ Dinakaran ’ newspaper office attack case .</pre></div></div><div><div class="field"><h4>Question</h4><pre>Does this news text express a causal relation between events?</pre></div><div class="field"><h4>Criteria (choice)</h4><pre>1. no
+2. yes</pre></div><div class="field gold"><h4>Gold target (weight)</h4><pre>2. yes — 1</pre></div></div></div><details class="provenance"><summary>Source and row ID</summary>published Jev · train · causal-news:train:cnc_train_03_30_1921_0:causal-news-e3ac0e2fe6</details></details></article>
+<article id="task-f014bcbf50df" data-search="slurp/slot-type · classification · tasksource/slurp" data-covered="True"><h2><a href="#task-f014bcbf50df">slurp/slot-type</a></h2><p class="task-meta">Classification · tasksource/slurp</p><section class="primary-example"><div class="example-grid"><div><div class="field"><h4>State</h4><pre>what are the headlines on the [TARGET]new york times[/TARGET]</pre></div></div><div><div class="field"><h4>Question</h4><pre>What semantic slot does the marked [TARGET] expression fill in this utterance?</pre></div><div class="field"><h4>Criteria (choice)</h4><pre>1. alarm type
+2. app name
+3. artist name
+4. audiobook author
+5. audiobook name
+6. business name
+7. business type
+8. change amount
+9. color type
+10. currency name
+11. date
+12. definition word
+13. device type
+14. drink type
+15. email address
+16. email folder
+17. event name
+18. food type
+19. game name
+20. general frequency
+21. house place
+22. ingredient
+23. joke type
+24. list name
+25. meal type
+26. media type
+27. movie type
+28. music descriptor
+29. music genre
+30. news topic
+31. order type
+32. person
+33. personal info
+34.&#32;
+… [middle omitted] …
+ast name
+39. radio name
+40. relation
+41. song name
+42. time
+43. time zone
+44. timeofday
+45. transport agency
+46. transport descriptor
+47. transport type
+48. weather descriptor</pre><details><summary>Full text (779 characters)</summary><pre>1. alarm type
+2. app name
+3. artist name
+4. audiobook author
+5. audiobook name
+6. business name
+7. business type
+8. change amount
+9. color type
+10. currency name
+11. date
+12. definition word
+13. device type
+14. drink type
+15. email address
+16. email folder
+17. event name
+18. food type
+19. game name
+20. general frequency
+21. house place
+22. ingredient
+23. joke type
+24. list name
+25. meal type
+26. media type
+27. movie type
+28. music descriptor
+29. music genre
+30. news topic
+31. order type
+32. person
+33. personal info
+34. place name
+35. player setting
+36. playlist name
+37. podcast descriptor
+38. podcast name
+39. radio name
+40. relation
+41. song name
+42. time
+43. time zone
+44. timeofday
+45. transport agency
+46. transport descriptor
+47. transport type
+48. weather descriptor</pre></details></div><div class="field gold"><h4>Gold target (weight)</h4><pre>26. media type — 1</pre></div></div></div><details class="provenance"><summary>Source and row ID</summary>published Jev · train · slurp:train:5437:0:slurp-slot-type-d11764a7bd</details></section><details class="extra-example"><summary>Example 2</summary><div class="example-grid"><div><div class="field"><h4>State</h4><pre>could you tell me who &#x27;s [TARGET]birthdays[/TARGET] are there in february</pre></div></div><div><div class="field"><h4>Question</h4><pre>What semantic slot does the marked [TARGET] expression fill in this utterance?</pre></div><div class="field"><h4>Criteria (choice)</h4><pre>1. alarm type
+2. app name
+3. artist name
+4. audiobook author
+5. audiobook name
+6. business name
+7. business type
+8. change amount
+9. color type
+10. currency name
+11. date
+12. definition word
+13. device type
+14. drink type
+15. email address
+16. email folder
+17. event name
+18. food type
+19. game name
+20. general frequency
+21. house place
+22. ingredient
+23. joke type
+24. list name
+25. meal type
+26. media type
+27. movie type
+28. music descriptor
+29. music genre
+30. news topic
+31. order type
+32. person
+33. personal info
+34.&#32;
+… [middle omitted] …
+ast name
+39. radio name
+40. relation
+41. song name
+42. time
+43. time zone
+44. timeofday
+45. transport agency
+46. transport descriptor
+47. transport type
+48. weather descriptor</pre><details><summary>Full text (779 characters)</summary><pre>1. alarm type
+2. app name
+3. artist name
+4. audiobook author
+5. audiobook name
+6. business name
+7. business type
+8. change amount
+9. color type
+10. currency name
+11. date
+12. definition word
+13. device type
+14. drink type
+15. email address
+16. email folder
+17. event name
+18. food type
+19. game name
+20. general frequency
+21. house place
+22. ingredient
+23. joke type
+24. list name
+25. meal type
+26. media type
+27. movie type
+28. music descriptor
+29. music genre
+30. news topic
+31. order type
+32. person
+33. personal info
+34. place name
+35. player setting
+36. playlist name
+37. podcast descriptor
+38. podcast name
+39. radio name
+40. relation
+41. song name
+42. time
+43. time zone
+44. timeofday
+45. transport agency
+46. transport descriptor
+47. transport type
+48. weather descriptor</pre></details></div><div class="field gold"><h4>Gold target (weight)</h4><pre>17. event name — 1</pre></div></div></div><details class="provenance"><summary>Source and row ID</summary>published Jev · train · slurp:train:7722:0:slurp-slot-type-d11764a7bd</details></details><details class="extra-example"><summary>Example 3</summary><div class="example-grid"><div><div class="field"><h4>State</h4><pre>are there any alarms for [TARGET]today[/TARGET]</pre></div></div><div><div class="field"><h4>Question</h4><pre>What semantic slot does the marked [TARGET] expression fill in this utterance?</pre></div><div class="field"><h4>Criteria (choice)</h4><pre>1. alarm type
+2. app name
+3. artist name
+4. audiobook author
+5. audiobook name
+6. business name
+7. business type
+8. change amount
+9. color type
+10. currency name
+11. date
+12. definition word
+13. device type
+14. drink type
+15. email address
+16. email folder
+17. event name
+18. food type
+19. game name
+20. general frequency
+21. house place
+22. ingredient
+23. joke type
+24. list name
+25. meal type
+26. media type
+27. movie type
+28. music descriptor
+29. music genre
+30. news topic
+31. order type
+32. person
+33. personal info
+34.&#32;
+… [middle omitted] …
+ast name
+39. radio name
+40. relation
+41. song name
+42. time
+43. time zone
+44. timeofday
+45. transport agency
+46. transport descriptor
+47. transport type
+48. weather descriptor</pre><details><summary>Full text (779 characters)</summary><pre>1. alarm type
+2. app name
+3. artist name
+4. audiobook author
+5. audiobook name
+6. business name
+7. business type
+8. change amount
+9. color type
+10. currency name
+11. date
+12. definition word
+13. device type
+14. drink type
+15. email address
+16. email folder
+17. event name
+18. food type
+19. game name
+20. general frequency
+21. house place
+22. ingredient
+23. joke type
+24. list name
+25. meal type
+26. media type
+27. movie type
+28. music descriptor
+29. music genre
+30. news topic
+31. order type
+32. person
+33. personal info
+34. place name
+35. player setting
+36. playlist name
+37. podcast descriptor
+38. podcast name
+39. radio name
+40. relation
+41. song name
+42. time
+43. time zone
+44. timeofday
+45. transport agency
+46. transport descriptor
+47. transport type
+48. weather descriptor</pre></details></div><div class="field gold"><h4>Gold target (weight)</h4><pre>11. date — 1</pre></div></div></div><details class="provenance"><summary>Source and row ID</summary>published Jev · train · slurp:train:3963:0:slurp-slot-type-d11764a7bd</details></details></article>
+<article id="task-80f7d9f78699" data-search="topv2/slot-type · classification · willheld/top_v2" data-covered="True"><h2><a href="#task-80f7d9f78699">topv2/slot-type</a></h2><p class="task-meta">Classification · WillHeld/top_v2</p><section class="primary-example"><div class="example-grid"><div><div class="field"><h4>State</h4><pre>Show me Shreena &#x27;s apartment movement reminder [TARGET]for next week[/TARGET] .</pre></div></div><div><div class="field"><h4>Question</h4><pre>What semantic slot does the marked [TARGET] expression fill in this utterance?</pre></div><div class="field"><h4>Criteria (choice)</h4><pre>1. alarm name
+2. amount
+3. attendee
+4. attendee event
+5. attribute event
+6. category event
+7. category location
+8. contact
+9. contact related
+10. content exact
+11. date time
+12. date time arrival
+13. date time departure
+14. date time new
+15. date time recurring
+16. destination
+17. duration
+18. frequency
+19. group
+20. location
+21. location modifier
+22. location user
+23. method retrieval reminder
+24. method timer
+25. method travel
+26. music album title
+27. music artist name
+28. music genre
+29. music playlist title
+30. mus
+… [middle omitted] …
+
+49. tag message
+50. timer name
+51. todo
+52. todo new
+53. type content
+54. type reaction
+55. type relation
+56. unit distance
+57. weather attribute
+58. weather temperature unit</pre><details><summary>Full text (1,012 characters)</summary><pre>1. alarm name
+2. amount
+3. attendee
+4. attendee event
+5. attribute event
+6. category event
+7. category location
+8. contact
+9. contact related
+10. content exact
+11. date time
+12. date time arrival
+13. date time departure
+14. date time new
+15. date time recurring
+16. destination
+17. duration
+18. frequency
+19. group
+20. location
+21. location modifier
+22. location user
+23. method retrieval reminder
+24. method timer
+25. method travel
+26. music album title
+27. music artist name
+28. music genre
+29. music playlist title
+30. music provider name
+31. music radio id
+32. music track title
+33. music type
+34. name event
+35. obstruction avoid
+36. ordinal
+37. organizer event
+38. path
+39. period
+40. person reminded
+41. person reminded removed
+42. point on map
+43. recipient
+44. resource
+45. road condition
+46. search radius
+47. sender
+48. source
+49. tag message
+50. timer name
+51. todo
+52. todo new
+53. type content
+54. type reaction
+55. type relation
+56. unit distance
+57. weather attribute
+58. weather temperature unit</pre></details></div><div class="field gold"><h4>Gold target (weight)</h4><pre>11. date time — 1</pre></div></div></div><details class="provenance"><summary>Source and row ID</summary>published Jev · train · topv2:train:01273d6f0b91fd533c97f3b745a049951b71e7dad4a90ee221442e97432b883d:4:topv2-slot-type-24a12d44c0</details></section><details class="extra-example"><summary>Example 2</summary><div class="example-grid"><div><div class="field"><h4>State</h4><pre>Send Katherine message [TARGET]video[/TARGET]</pre></div></div><div><div class="field"><h4>Question</h4><pre>What semantic slot does the marked [TARGET] expression fill in this utterance?</pre></div><div class="field"><h4>Criteria (choice)</h4><pre>1. alarm name
+2. amount
+3. attendee
+4. attendee event
+5. attribute event
+6. category event
+7. category location
+8. contact
+9. contact related
+10. content exact
+11. date time
+12. date time arrival
+13. date time departure
+14. date time new
+15. date time recurring
+16. destination
+17. duration
+18. frequency
+19. group
+20. location
+21. location modifier
+22. location user
+23. method retrieval reminder
+24. method timer
+25. method travel
+26. music album title
+27. music artist name
+28. music genre
+29. music playlist title
+30. mus
+… [middle omitted] …
+
+49. tag message
+50. timer name
+51. todo
+52. todo new
+53. type content
+54. type reaction
+55. type relation
+56. unit distance
+57. weather attribute
+58. weather temperature unit</pre><details><summary>Full text (1,012 characters)</summary><pre>1. alarm name
+2. amount
+3. attendee
+4. attendee event
+5. attribute event
+6. category event
+7. category location
+8. contact
+9. contact related
+10. content exact
+11. date time
+12. date time arrival
+13. date time departure
+14. date time new
+15. date time recurring
+16. destination
+17. duration
+18. frequency
+19. group
+20. location
+21. location modifier
+22. location user
+23. method retrieval reminder
+24. method timer
+25. method travel
+26. music album title
+27. music artist name
+28. music genre
+29. music playlist title
+30. music provider name
+31. music radio id
+32. music track title
+33. music type
+34. name event
+35. obstruction avoid
+36. ordinal
+37. organizer event
+38. path
+39. period
+40. person reminded
+41. person reminded removed
+42. point on map
+43. recipient
+44. resource
+45. road condition
+46. search radius
+47. sender
+48. source
+49. tag message
+50. timer name
+51. todo
+52. todo new
+53. type content
+54. type reaction
+55. type relation
+56. unit distance
+57. weather attribute
+58. weather temperature unit</pre></details></div><div class="field gold"><h4>Gold target (weight)</h4><pre>53. type content — 1</pre></div></div></div><details class="provenance"><summary>Source and row ID</summary>published Jev · train · topv2:train:0d5959a5e4038c631ed2592a6f079a8336e2d9d43ba0cc1b3215511645288928:1:topv2-slot-type-24a12d44c0</details></details><details class="extra-example"><summary>Example 3</summary><div class="example-grid"><div><div class="field"><h4>State</h4><pre>Remind [TARGET]me[/TARGET] about my doctor appointment on Thursday .</pre></div></div><div><div class="field"><h4>Question</h4><pre>What semantic slot does the marked [TARGET] expression fill in this utterance?</pre></div><div class="field"><h4>Criteria (choice)</h4><pre>1. alarm name
+2. amount
+3. attendee
+4. attendee event
+5. attribute event
+6. category event
+7. category location
+8. contact
+9. contact related
+10. content exact
+11. date time
+12. date time arrival
+13. date time departure
+14. date time new
+15. date time recurring
+16. destination
+17. duration
+18. frequency
+19. group
+20. location
+21. location modifier
+22. location user
+23. method retrieval reminder
+24. method timer
+25. method travel
+26. music album title
+27. music artist name
+28. music genre
+29. music playlist title
+30. mus
+… [middle omitted] …
+
+49. tag message
+50. timer name
+51. todo
+52. todo new
+53. type content
+54. type reaction
+55. type relation
+56. unit distance
+57. weather attribute
+58. weather temperature unit</pre><details><summary>Full text (1,012 characters)</summary><pre>1. alarm name
+2. amount
+3. attendee
+4. attendee event
+5. attribute event
+6. category event
+7. category location
+8. contact
+9. contact related
+10. content exact
+11. date time
+12. date time arrival
+13. date time departure
+14. date time new
+15. date time recurring
+16. destination
+17. duration
+18. frequency
+19. group
+20. location
+21. location modifier
+22. location user
+23. method retrieval reminder
+24. method timer
+25. method travel
+26. music album title
+27. music artist name
+28. music genre
+29. music playlist title
+30. music provider name
+31. music radio id
+32. music track title
+33. music type
+34. name event
+35. obstruction avoid
+36. ordinal
+37. organizer event
+38. path
+39. period
+40. person reminded
+41. person reminded removed
+42. point on map
+43. recipient
+44. resource
+45. road condition
+46. search radius
+47. sender
+48. source
+49. tag message
+50. timer name
+51. todo
+52. todo new
+53. type content
+54. type reaction
+55. type relation
+56. unit distance
+57. weather attribute
+58. weather temperature unit</pre></details></div><div class="field gold"><h4>Gold target (weight)</h4><pre>40. person reminded — 1</pre></div></div></div><details class="provenance"><summary>Source and row ID</summary>published Jev · train · topv2:train:6c72e792eadef97fa384f5e1452359b0f89460f62fc846cb210e172e318c4b3d:0:topv2-slot-type-24a12d44c0</details></details></article><script>
 const search=document.querySelector('#search'), missing=document.querySelector('#missing');
 function filter(){let count=0;for(const task of document.querySelectorAll('article')){
  task.hidden=!task.dataset.search.includes(search.value.toLowerCase())||(missing.checked&&task.dataset.covered==='True');
