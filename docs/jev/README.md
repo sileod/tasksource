@@ -694,3 +694,17 @@ The [verification receipt](https://huggingface.co/datasets/tasksource/tasksource
 checks all six hosted shards and preservation of all 97 pre-existing Parquet blobs.
 
 Legal, biomedical and structured-text annotations: [source mappings and preparation](specialized-text.md).
+
+Vision training can be expanded without resampling the published rows:
+
+```bash
+python -m scripts.append_jev_vision --cap 20000 --output build/vision-append-20k --push
+```
+
+This resumable operation reuses the standard builder, appends unseen training requests,
+and preserves existing training and evaluation Parquet files byte-for-byte. Task views
+share a dataset-family cap; sources with fewer eligible rows remain below it. Published
+evaluation images and duplicate option permutations are excluded from additions.
+Source build manifests, exclusions and the baseline revision accompany each append.
+FigureQA is retained as-is and excluded from expansion because its recorded original
+terms prohibit redistribution.
