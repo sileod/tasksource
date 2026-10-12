@@ -918,7 +918,10 @@ def publish_dataset(
         files = sorted((output / "data").glob(f"{split}-*.parquet"))
         if files:
             data_files[split] = [str(path) for path in files]
-    dataset = load_dataset("parquet", data_files=data_files)
+    # text shards only: tasks shared with the vision config may also carry image metadata
+    columns = ["state", "kind", "id", "options", "target", "question", "source", "variant", "split"]
+    dataset = load_dataset("parquet", data_files=data_files, columns=columns,
+                           features=Features({name: TRAINING_FEATURES[name] for name in columns}))
     dataset = DatasetDict({
         split: exclude_publish_sources(
             split_dataset, allowed_sources=allowed_sources
