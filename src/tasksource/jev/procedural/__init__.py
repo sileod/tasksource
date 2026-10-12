@@ -18,7 +18,8 @@ from . import (
 TASKS = {
     module.__name__.rsplit(".", 1)[-1]: module
     for module in (
-        arithmetic, entity_belief_tracking, event_state_reconstruction, evidence_sufficiency,
+        arithmetic, entity_belief_tracking, event_state_reconstruction, event_triggered_execution,
+        evidence_sufficiency, goal_directed_planning, graph_navigation, instruction_execution,
         multi_view_adjudication, needle_retrieval, partial_observation_calibration,
         policy_applicability, policy_under_uncertainty, record_aggregation, state_perturbation, table_lookup,
         taxonomy_routing,
