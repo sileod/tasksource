@@ -46,6 +46,14 @@ configs:
     path: event_state_reconstruction/validation-*.parquet
   - split: test
     path: event_state_reconstruction/test-*.parquet
+- config_name: event_triggered_execution
+  data_files:
+  - split: train
+    path: event_triggered_execution/train-*.parquet
+  - split: validation
+    path: event_triggered_execution/validation-*.parquet
+  - split: test
+    path: event_triggered_execution/test-*.parquet
 - config_name: evidence_sufficiency
   data_files:
   - split: train
@@ -54,6 +62,30 @@ configs:
     path: evidence_sufficiency/validation-*.parquet
   - split: test
     path: evidence_sufficiency/test-*.parquet
+- config_name: goal_directed_planning
+  data_files:
+  - split: train
+    path: goal_directed_planning/train-*.parquet
+  - split: validation
+    path: goal_directed_planning/validation-*.parquet
+  - split: test
+    path: goal_directed_planning/test-*.parquet
+- config_name: graph_navigation
+  data_files:
+  - split: train
+    path: graph_navigation/train-*.parquet
+  - split: validation
+    path: graph_navigation/validation-*.parquet
+  - split: test
+    path: graph_navigation/test-*.parquet
+- config_name: instruction_execution
+  data_files:
+  - split: train
+    path: instruction_execution/train-*.parquet
+  - split: validation
+    path: instruction_execution/validation-*.parquet
+  - split: test
+    path: instruction_execution/test-*.parquet
 - config_name: multi_view_adjudication
   data_files:
   - split: train
@@ -150,7 +182,11 @@ is not produced by or affiliated with TypeSafe or OpenJev.
 | `arithmetic` | An order with a discount/shipping rule, an account ledger, or a schedule; each state asks 2–5 of: `amount_due` / `final_balance` / `finish_time` (choice among the result and typical slips), `within_budget`, `went_negative`, `done_by_deadline` (noul), `random_line_bulk`, `random_is_deposit`, `random_is_long` (noul, exact probability k/n), `budget_use`, `net_change` (score, descriptive levels), `lines_above`, `withdrawal_count`, `starts_before_noon` (score), `largest_line`, `lowest_day`, `longest_task` (choice) |
 | `entity_belief_tracking` | `world_location` (choice), `agent_belief_location` (choice), `belief_matches_world` (noul), from level 2 `nested_belief_location` (choice: where A thinks B believes an object is); 4 to 16 locations |
 | `event_state_reconstruction` | `current_owner` (choice), `is_open` (noul), `current_severity` (score); the log is shuffled from level 2 and has voided entries from level 3 |
+| `event_triggered_execution` | `rule_on_signal` (choice), `object_final_state`, `rule_enabled_at_end`, `object_ever_targeted` (noul), `total_firings` (score); 1–8 competing rules over 3–18 timestamped events, with priorities, event guards, cooldowns, enable/disable controls, and unsorted presentation |
 | `evidence_sufficiency` | `claim_supported` (noul), `has_conflict` (noul), `strongest_support_origin` (choice); retractions from level 2, mirrored (non-independent) origins from level 3, validity by collection day at level 4 |
+| `goal_directed_planning` | `goal_reachable`, `probe_applicable`, `probe_optimal_first`, `probe_required` (noul), `minimal_actions` (score), `first_legal_action` (choice); 3–12 steps with conjunctive and alternative prerequisites, unavailable actions, and exact shortest-plan labels |
+| `graph_navigation` | `reachable`, `within_budget`, `edge_essential` (noul), `shortest_cost`, `first_hop` (choice); 4–18 directed nodes with edge costs, closures, mandatory waypoints, and optimal-route alternatives |
+| `instruction_execution` | `resolution` and `deferred_registration` (choice), `target_count`, `changed_count` (score), `probe_selected`, `probe_final_state` (noul); natural-language selection, exceptions, immediate/deferred updates, ambiguity, and atomic/best-effort/ordered execution across 3–26 entities |
 | `multi_view_adjudication` | `intent` (choice), `is_urgent` (noul), `workflow_impact` (score); near-threshold signals from level 2, auth failures counted from login events from level 3, deadlines as clock times at level 4 |
 | `needle_retrieval` | `value_of_id` (choice), `id_has_value` (noul), `id_listed` (noul); up to ~300 records whose ids differ from the target by one or two digits, and from level 2 a chain of one to three id reissues to follow; 6 to 20 options |
 | `partial_observation_calibration` | `incident_real` (noul, exact Bayesian posterior); 1 to 6 sensors |
@@ -177,6 +213,8 @@ train. In each config, the first 1,000 train rows cycle through the levels
 (easiest first) for browsing; the rest of the split is shuffled.
 
 ## Difficulty by level
+
+The four new configurations are structurally scaled from level 0 to 4 like the existing tasks: entity/step/rule/node counts grow, and additional constraints (set exceptions, unavailability, OR prerequisites, rule cooldowns, or graph closures/waypoints) appear at higher levels. Their generated labels are independently checked by state replay, shortest-path, and exhaustive planning tests in \`tests/test_procedural_execution.py\`. **They do not yet have empirical Jev kappa calibration**; the table below reports only the previously calibrated configurations.
 
 Level 0 is meant to be easy for a strong decision model and level 4 hard. The
 table gives Jev's chance-adjusted accuracy, kappa = (accuracy − chance) /
