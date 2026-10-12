@@ -7,3 +7,7 @@ For sources that require archive extraction, joins, broken-loader repairs, expen
 Keep visual mirrors consistent: ordered `images` plus canonical `inputs`, `choices_list` (for MC), `labels`, and JSON-string `metadata`. When many QAs share images, group those canonical QA records in `qa` and store the images once. Keep rationales and provenance in metadata, separate from model inputs.
 
 Each repackaged dataset README must link to the original data distribution and the specific reproducible packaging script, with source revisions, hashes and conversion settings recorded in linked provenance. A link to the packaging directory alone is insufficient.
+
+# Dataset documentation
+
+Keep Hub root dataset cards focused on current usage, configs, schema and license scope. Put release notes in CHANGELOG.md or addition manifests, and config-specific details in that config’s README. Incremental publication scripts must preserve the root card body rather than append batch summaries.

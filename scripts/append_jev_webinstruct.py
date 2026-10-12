@@ -130,7 +130,7 @@ def build(output):
         preserved_parquets={s.rfilename:s.blob_id for s in base.siblings if s.rfilename.endswith('.parquet')})
     audit.setdefault('incremental_additions',[]).append(dict(source=WEB,revision=WEB_REVISION,
         manifest='webinstruct-addition.json',rows={split:stat['rows'] for split,stat in stats.items()}))
-    card.text += ('\n\n## Incremental filtered WebInstruct addition\n\n'
+    manifest['release_note'] = ('\n\n## Incremental filtered WebInstruct addition\n\n'
         'Filtered `tasksource/webinstruct` configs `mc` and `binary`, pinned at '
         f'`{WEB_REVISION}`, are appended as standalone shards to both `default` and `full`. '
         'The original train/test split assignment is preserved; validation is unchanged. '

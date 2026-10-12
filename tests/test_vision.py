@@ -734,3 +734,18 @@ def test_vision_builder_distinguishes_option_permutations(tmp_path, monkeypatch)
     assert len(result) == len(set(result['id'])) == 2
     assert len(set(result['group_id'])) == 1
     assert all(row['options'][row['target'].index(1.)] == 'yes' for row in result)
+
+
+def test_vision_publish_documents_its_config_without_appending_root_card(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+    import scripts.build_jev_dataset as builder
+    ds = DatasetDict(train=Dataset.from_list([{'source': 'vision/example', 'metadata': '{}'}]))
+    uploads = []
+    monkeypatch.setattr(DatasetDict, 'push_to_hub', lambda *args, **kwargs: None)
+    monkeypatch.setattr(builder, 'HfApi', lambda: SimpleNamespace(
+        dataset_info=lambda *a, **kw: SimpleNamespace(sha='parent'),
+        upload_file=lambda **kw: uploads.append(kw)))
+    builder.publish_vision(ds, tmp_path, 'test/repo')
+    assert [u['path_in_repo'] for u in uploads] == ['vision/README.md']
+    assert b'1 train' in uploads[0]['path_or_fileobj']
+    assert b'(sources.yaml)' in uploads[0]['path_or_fileobj']

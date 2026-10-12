@@ -146,7 +146,7 @@ def build(output, max_rows=1000, max_rows_eval=100, tasks=None, description=None
         preserved_parquets={s.rfilename:s.blob_id for s in before.siblings if s.rfilename.endswith('.parquet')})
     audit.setdefault('incremental_additions', []).append(dict(tasks=tasks,
         manifest=f'additions/{stamp}/manifest.json', rows={s:v['rows'] for s,v in stats.items()}))
-    card.text += (description + f'\n\nSource-row metadata: additions/{stamp}/rows.json.\n') if description else ('\n\n## HTML/browser text additions\n\n'
+    manifest['release_note'] = (description + f'\n\nSource-row metadata: additions/{stamp}/rows.json.\n') if description else ('\n\n## HTML/browser text additions\n\n'
         'WebLINX action/DOM-element and WebSRC yes/no/element tasks retain their source partitions. '
         'WebLINX named test subsets are combined into the hosted test split, with native split names in row provenance. '
         '`mind2web/action` and `mind2web/dom-element` use only the original public training trajectories. '
@@ -183,7 +183,7 @@ if __name__ == '__main__':
     parser.add_argument('--max-rows', type=int, default=1000)
     parser.add_argument('--max-rows-eval', type=int, default=100)
     parser.add_argument('--tasks', nargs='+', help='New task IDs (defaults to browser tasks)')
-    parser.add_argument('--description', help='Dataset-card note for this addition')
+    parser.add_argument('--description', help='Manifest note for this addition')
     parser.add_argument('--push', action='store_true')
     args = parser.parse_args()
     manifest, additions = build(args.output,args.max_rows,args.max_rows_eval,args.tasks,args.description)

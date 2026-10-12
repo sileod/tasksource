@@ -115,7 +115,7 @@ def main():
     vision['dataset_size'] = sum(s['num_bytes'] for s in vision['splits'])
     vision['download_size'] += sum(f['size_change'] for f in files)
     uses = splits['train']
-    card.text += f'''
+    (root / 'license-review.md').write_text(f'''
 ### Component-level license review (2026-10-09)
 
 This review supersedes earlier license-use counts. All sources remain included.
@@ -143,13 +143,13 @@ and image terms, evidence URLs, review status and unresolved reasons. See
 [license-review.json](vision/license-review.json), [sources.yaml](vision/sources.yaml)
 and [the reproducible update script](vision/update_vision_license_metadata.py).
 Images, questions, choices, targets, IDs and source splits are unchanged.
-'''
+'''.replace('(vision/', '('))
     card.save(root / 'README.md')
     dump(root / 'staged.json', {'files': files, 'report': report})
     print(json.dumps(report['splits'], indent=2), flush=True)
     if args.publish:
         operations = [CommitOperationAdd(path_in_repo=f['path'], path_or_fileobj=f['local']) for f in files]
-        for name in ('sources.yaml', 'release-audit.json', 'license-review.json', 'build-manifest.json', 'quality-audit.json'):
+        for name in ('sources.yaml', 'release-audit.json', 'license-review.json', 'license-review.md', 'build-manifest.json', 'quality-audit.json'):
             operations.append(CommitOperationAdd(path_in_repo='vision/' + name, path_or_fileobj=str(root / name)))
         operations += [CommitOperationAdd(path_in_repo='README.md', path_or_fileobj=str(root / 'README.md')),
                        CommitOperationAdd(path_in_repo='vision/update_vision_license_metadata.py', path_or_fileobj=__file__)]

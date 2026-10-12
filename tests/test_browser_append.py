@@ -42,6 +42,8 @@ def test_incremental_browser_patch_keeps_unrelated_configs_and_native_ids(tmp_pa
     monkeypatch.setattr(release,'load_task',load)
     output = tmp_path/'patch'
     manifest, additions = release.build(output)
+    assert DatasetCard.load(str(output/'README.md')).text == card.text
+    assert 'HTML/browser' in manifest['release_note']
     updated = DatasetCard.load(str(output/'README.md')).data.dataset_info
     assert [i['splits'][0]['num_examples'] for i in updated] == [16,16,10,10]
     assert manifest['preserved_parquets'] == {'vision/old.parquet':'preserved'}

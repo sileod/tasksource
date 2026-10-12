@@ -1334,10 +1334,7 @@ def publish_vision(dataset, output, repo_id):
         api.upload_file(path_or_fileobj=str(output / name), path_in_repo='vision/' + name,
                         repo_id=repo_id, repo_type='dataset',
                         commit_message=f'Add vision {name}')
-    from huggingface_hub import hf_hub_download
     head = api.dataset_info(repo_id).sha
-    card_path = hf_hub_download(repo_id, 'README.md', repo_type='dataset', revision=head)
-    card = Path(card_path).read_text()
     counts = ', '.join(f'{len(rows):,} {split}' for split, rows in dataset.items())
     sources = ', '.join(sorted({source.removeprefix('vision/') for rows in dataset.values() for source in rows['source']}))
     manifest_path = output / 'build-manifest.json'
@@ -1370,16 +1367,11 @@ Evaluation rows sharing any image with training are excluded.
 This initial config contains direct decisions; text packing and derived variants are disabled.
 Typed request renderers preserve images; model-specific image transport remains the caller's responsibility.
 '''
-    marker = '\n## Vision config\n'
-    if marker in card:
-        before, after = card.split(marker, 1)
-        following = after.find('\n## ')
-        card = before.rstrip() + '\n\n' + section + (after[following:] if following >= 0 else '')
-    else:
-        card = card.rstrip() + '\n\n' + section
-    api.upload_file(path_or_fileobj=card.encode(), path_in_repo='README.md', repo_id=repo_id,
+    api.upload_file(path_or_fileobj=section.replace('(vision/', '(').encode(),
+                    path_in_repo='vision/README.md', repo_id=repo_id,
                     repo_type='dataset', parent_commit=head,
-                    commit_message='Document the multimodal vision config')
+                    commit_message='Update vision config documentation')
+
 
 
 def build(args):
