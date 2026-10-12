@@ -117,7 +117,7 @@ The pass matches implemented catalogs, mirrors, structured prior decisions and t
 
 `jev_review` uses native Decisions requests through optional tool dependency [litlm](https://github.com/sileod/litlm) (`c3340b1` or newer). All eligibility questions share one evidence state. Repeat `--model` for an ensemble; native probabilities, returned model versions, member disagreements and failures are preserved. Raw requests/results are separate from the final handoff, successful requests are cached, and credentials stay outside artifacts.
 
-The output directory retains `matched.jsonl`, `checked.jsonl`, per-model review artifacts, `prospects.jsonl` and a `handoff.jsonl` of promising candidates. A promising source needs explicit evidence and all configured reviewers assigning at least 0.8 to each eligibility criterion; HF sources additionally need observed training-split metadata and no failed training checks. Missing evidence or reviewer disagreement stays `needs_evidence`. These are screening judgments, not verified annotation quality. The manifest records input/catalog hashes, seed, model routes and prompt/code hashes. The human-curated queue remains separate.
+The output directory retains `matched.jsonl`, `checked.jsonl`, per-model review artifacts, `prospects.jsonl` and a `handoff.jsonl` of promising candidates. A promising source needs explicit evidence and all configured reviewers assigning at least 0.8 to training and decision fit; resources must be demonstrated by a fetched Viewer row or supported at 0.8 by all reviewers; HF sources additionally need observed training-split metadata and no failed training checks. Missing evidence or reviewer disagreement stays `needs_evidence`. These are screening judgments, not verified annotation quality. The manifest records input/catalog hashes, seed, model routes and prompt/code hashes. The human-curated queue remains separate.
 
 For English-focused discovery, HF retrieval passes `--language en` directly to the Hub API, including multilingual datasets tagged English. The screening command also accepts `--language en`: declared English is preferred within each source sample, known non-English sources are excluded, and missing language metadata remains eligible for evidence review. PWC language names such as `English` are normalized. OpenAlex paper language is not treated as dataset language. Filters are recorded in cache keys and run manifests; metadata tags do not establish example-level language quality.
 
@@ -128,3 +128,26 @@ Annotation provenance is reviewed through three additional native Jev choice que
 For another screening batch, increase `--limit` and repeat `--exclude path/to/previous/checked.jsonl` for prior runs. Exclusions compare normalized names and exact Hub identities, preserve shared-paper/GitHub hints, and record input hashes. `selected.jsonl` is saved before metadata checks; evidence collection uses eight workers, while litlm retains the bounded model request schedule. Progress and raw per-model results are saved throughout the review.
 
 Model review uses litlm adaptive concurrency with a ceiling of 32 and no imposed RPM cap. It starts conservatively and backs off on congestion; returned request failures stay explicit for cached reruns. This tunes concurrency rather than discovering a guaranteed provider RPM allowance. Scheduling settings are recorded in the review manifest.
+
+
+## Filter annotation origins and check screening recall
+
+```bash
+# Re-filter saved results without new metadata requests or model calls:
+python -m tasksource.task_discovery.discover_task_prospects \
+  build/discovery/prospects-en-1000/prospects.jsonl --from-reviews \
+  --annotation-origin human --annotation-origin procedural \
+  --output build/discovery/prospects-en-1000/non-model
+# Run the same screening on canonical records for implemented sources:
+python -m tasksource.task_discovery.discover_task_prospects \
+  build/discovery/calibration/input.jsonl --include-known --limit 30 \
+  --model openrouter/perplexity/pplx-decider-v1.1-27b \
+  --model openrouter/~typesafe/jev-latest \
+  --output build/discovery/calibration/baseline
+```
+
+`--annotation-origin` restricts only the handoff: every current reviewer must assign at least 0.8 total probability to the allowed origins. Repeat it for a union. Human + procedural excludes model-derived, mixed and unresolved provenance; explicitly add `unknown` to retain uncertain origins. Mixed provenance is withheld conservatively because it can contain model labels. This describes label origin, not whether inputs are synthetic or annotations are correct. All records and original judgments remain in `prospects.jsonl`; the manifest records the filter and withheld count.
+
+`--include-known` bypasses implemented/parked/queued matching exclusions for an explicit calibration input; it does not change eligibility thresholds, source evidence or model prompts. Avoid interpreting this as proof that every implemented task is sound. Compare criterion confidence, missing evidence, native split names and request failures before deciding whether a gate is too strict. The model is not told that a source is an expected positive.
+
+Calibration identified three targeted recall fixes: recognize separated training split names such as `train_r1`; respect an explicitly supplied config when fetching a preview; and treat a successfully fetched, checksummed Viewer row as direct evidence of an available resource rather than requiring a model to rediscover it. The decision-fit prompt explicitly allows deterministic projections of native structured annotations (such as span presence → answerability). Training and decision-fit thresholds remain unchanged, missing resources still require evidence, and multiple splits do not prove leakage safety.

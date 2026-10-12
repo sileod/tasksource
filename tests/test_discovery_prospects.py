@@ -103,3 +103,54 @@ def test_prior_screening_excludes_names_and_hub_copies_but_not_shared_papers():
     candidates=[dict(name='OLD-source'),dict(name='Copy',huggingface=['org/data']),
                 dict(name='New subset',papers=[{'url':'arxiv:1234.5678'}])]
     assert discovery.unseen_candidates(candidates,previous)==[candidates[2]]
+
+
+def test_origin_filter_keeps_procedural_and_requires_current_consensus(tmp_path):
+    row=reviewed('yes','yes')
+    for review in row['reviews']:
+        review['data']['answers']['annotation_origin']={'probabilities':{'human':0.1,'procedural':0.85,'model':0.05}}
+    assert discovery.origin_matches(row,['human','procedural'])
+    row['reviews'][1]['data']['answers']['annotation_origin']={'probabilities':{'model':0.9,'unknown':0.1}}
+    assert not discovery.origin_matches(row,['human','procedural'])
+    assert discovery.origin_matches(row,[])
+    manifest=discovery.save_prospects([row],tmp_path,['human','procedural'])
+    assert manifest['annotation_filtered']==1 and manifest['handoff_count']==0
+    assert json.loads((tmp_path/'prospects.jsonl').read_text())['prospect_status']=='promising'
+    assert (tmp_path/'handoff.jsonl').read_text()==''
+    for review in row['reviews']:review['data']['answers'].pop('annotation_origin')
+    assert not discovery.origin_matches(row,['human','procedural'])
+
+
+def test_saved_reviews_filter_never_calls_catalog_or_models(tmp_path,monkeypatch):
+    from tasksource.task_discovery import discover_task_prospects as cli
+    source=tmp_path/'reviews.jsonl';source.write_text(json.dumps(reviewed('yes'))+'\n')
+    monkeypatch.setattr(cli,'catalog_index',lambda:(_ for _ in ()).throw(AssertionError('catalog called')))
+    monkeypatch.setattr(cli,'run',lambda *a:(_ for _ in ()).throw(AssertionError('model called')))
+    monkeypatch.setattr(sys,'argv',['discovery',str(source),'--from-reviews','--annotation-origin','human','--output',str(tmp_path/'filtered')])
+    cli.main()
+    manifest=json.loads((tmp_path/'filtered/manifest.json').read_text())
+    assert manifest['from_reviews'] and manifest['annotation_filtered']==1
+
+
+def test_training_round_splits_and_config_are_respected(monkeypatch):
+    data={'splits':[{'config':'wrong','split':'train'}, {'config':'right','split':'train_r1'}, {'config':'right','split':'test_r1'}]}
+    calls=[]
+    def cached(url,*a):
+        calls.append(url)
+        return dict(sha256='hash',data=data if '/splits?' in url else {'rows':[{'row':{'label':1}}]})
+    monkeypatch.setattr(discovery,'cached_json',cached)
+    result=discovery.training_evidence({'huggingface':['org/data'],'config_name':'right'},'unused')
+    assert result['train_status']=='present' and result['source_splits']==['test_r1','train_r1']
+    assert 'config=right' in calls[1] and 'split=train_r1' in calls[1]
+    assert discovery.observed_resource(result)
+    assert not discovery.is_train_split('untrained') and not discovery.is_train_split('trainval')
+
+
+def test_downloaded_row_establishes_resource_without_changing_training_or_fit_gates():
+    row=reviewed('yes','yes')
+    for r in row['reviews']:r['data']['answers']['resources']['probabilities']={'no':0.99,'yes':0.01}
+    assert discovery.prospect_status(row)=='not_suitable'
+    row['evidence']=[{'url':'https://datasets-server.huggingface.co/rows?dataset=org/data','sha256':'hash','metadata':{'rows':[{'row':{'label':1}}]}}]
+    assert discovery.prospect_status(row)=='promising'
+    for r in row['reviews']:r['data']['answers']['decision_fit']['probabilities']={'no':0.99,'yes':0.01}
+    assert discovery.prospect_status(row)=='not_suitable'

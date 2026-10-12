@@ -7,6 +7,7 @@ import argparse
 from concurrent.futures import ThreadPoolExecutor
 import hashlib
 import json
+import re
 from pathlib import Path
 from urllib.parse import urlencode
 
@@ -14,6 +15,10 @@ from .identifiers import normalized,source_id
 from .link import cached_json
 from .match import catalog_hash,catalog_index,catalog_references,match,previous_decisions,queued_sources
 from .jev_review import MODEL,run
+
+
+def is_train_split(name):
+    return bool(re.match(r'^(train|training)($|[_/-])',name.casefold()))
 
 
 def training_evidence(row,cache,offline=False):
@@ -24,37 +29,66 @@ def training_evidence(row,cache,offline=False):
         try:
             response=cached_json(url,cache,offline);data=response['data']
             evidence.append(dict(url=url,sha256=response['sha256'],metadata=data))
-            splits.extend(data.get('splits',[]));complete &= not data.get('pending') and not data.get('failed')
-            train=next((s for s in data.get('splits',[]) if s['split'].casefold() in ('train','training')),None)
+            source_splits=[s for s in data.get('splits',[]) if not row.get('config_name') or s['config']==row['config_name']]
+            splits.extend(source_splits);complete &= not data.get('pending') and not data.get('failed')
+            train=next((s for s in source_splits if is_train_split(s['split'])),None)
             if train:
                 url='https://datasets-server.huggingface.co/rows?'+urlencode(dict(
                     dataset=repo,config=train['config'],split=train['split'],offset=0,length=1))
                 preview=cached_json(url,cache,offline)
                 evidence.append(dict(url=url,sha256=preview['sha256'],metadata=preview['data']))
         except (OSError,ValueError) as error:errors.append(dict(url=url,error=str(error)))
-    has_train=any(s['split'].casefold() in ('train','training') for s in splits)
+    has_train=any(is_train_split(s['split']) for s in splits)
     status='present' if has_train else 'not_listed' if splits and complete and not errors else 'unknown'
     split_names=sorted({s['split'] for s in splits})
-    policy='train_only' if has_train and complete and not errors and all(s.casefold() in ('train','training') for s in split_names) else 'multiple_splits' if has_train and len(split_names)>1 else 'unknown'
+    policy='train_only' if has_train and complete and not errors and all(is_train_split(s) for s in split_names) else 'multiple_splits' if has_train and len(split_names)>1 else 'unknown'
     return dict(row,train_status=status,source_splits=split_names,split_policy=policy,evidence=row.get('evidence',[])+evidence,training_check_errors=errors)
 
 
+def current_answers(row):
+    return [r.get('data',{}).get('answers',{}) for r in row.get('reviews',[]) if r.get('reviewer')=='jev_review'
+            and not r.get('failed') and r.get('state_sha256')==row.get('review_state_sha256')
+            and r.get('questions_sha256')==row.get('review_questions_sha256')]
+
+
+def observed_resource(row):
+    return any(d.get('url','').startswith('https://datasets-server.huggingface.co/rows?')
+               and d.get('sha256') and d.get('metadata',{}).get('rows') for d in row.get('evidence',[]))
+
+
 def prospect_status(row):
-    reviews=row.get('reviews',[])
-    if row.get('review_status')=='failed' or not reviews or not row.get('review_evidence_count'):return 'needs_evidence'
-    answers=[r.get('data',{}).get('answers',{}) for r in reviews if r.get('reviewer')=='jev_review'
-             and r.get('state_sha256')==row.get('review_state_sha256')
-             and r.get('questions_sha256')==row.get('review_questions_sha256')]
+    if row.get('review_status')=='failed' or not row.get('review_evidence_count'):return 'needs_evidence'
+    answers=current_answers(row)
     if not answers:return 'needs_evidence'
     # Keep each model's decision: the average alone cannot erase disagreement.
-    for question in ('train','resources','decision_fit'):
+    questions=('train','decision_fit') if observed_resource(row) else ('train','resources','decision_fit')
+    for question in questions:
         if all(a.get(question,{}).get('probabilities',{}).get('no',0)>=0.8 for a in answers):return 'not_suitable'
     if row.get('train_status')=='not_listed' or (row.get('huggingface') and row.get('train_status')!='present'):
         return 'needs_evidence'
     if row.get('training_check_errors'):return 'needs_evidence'
     if all(a.get(q,{}).get('probabilities',{}).get('yes',0)>=0.8 for a in answers
-           for q in ('train','resources','decision_fit')):return 'promising'
+           for q in questions):return 'promising'
     return 'needs_evidence'
+
+
+def origin_matches(row,allowed):
+    """All current reviewers must assign >=0.8 mass to the allowed label origins."""
+    if not allowed:return True
+    answers=current_answers(row)
+    return bool(answers) and all(sum(a.get('annotation_origin',{}).get('probabilities',{}).get(k,0)
+                                    for k in set(allowed))>=0.8 for a in answers)
+
+
+def save_prospects(rows,output,origins=()):
+    prospects=[dict(row,resource_observed=bool(observed_resource(row)),prospect_status=prospect_status(row)) for row in rows]
+    promising=[r for r in prospects if r['prospect_status']=='promising']
+    handoff=[r for r in promising if origin_matches(r,origins)]
+    write_rows(output/'prospects.jsonl',prospects)
+    write_rows(output/'handoff.jsonl',handoff)
+    return dict(status_counts={s:sum(r['prospect_status']==s for r in prospects)
+                               for s in ('promising','needs_evidence','not_suitable')},
+                annotation_origins=origins,handoff_count=len(handoff),annotation_filtered=len(promising)-len(handoff))
 
 
 def language_priority(row, requested):
@@ -86,15 +120,23 @@ def main():
     parser.add_argument('--cache',type=Path,default=Path('build/discovery/review-cache'))
     parser.add_argument('--language',action='append',default=[],help='Prefer this dataset language; retain unknown, exclude known mismatches')
     parser.add_argument('--exclude',action='append',type=Path,default=[],help='Prior screened JSONL; repeat to avoid spending on the same candidates')
+    parser.add_argument('--annotation-origin',action='append',default=[],choices=('human','procedural','model','mixed','unknown'),help='Allowed label origins in handoff; repeat for OR, all reviewers must support them')
+    parser.add_argument('--from-reviews',action='store_true',help='Filter saved reviews without network or model calls')
+    parser.add_argument('--include-known',action='store_true',help='Bypass catalog/history/queue exclusion for calibration')
     parser.add_argument('--model',action='append');parser.add_argument('--offline-evidence',action='store_true')
     args=parser.parse_args()
     if args.limit<1:parser.error('--limit must be positive')
     args.output.mkdir(parents=True,exist_ok=True)
     rows=[json.loads(line) for path in args.inputs for line in path.read_text().splitlines() if line.strip()]
+    if args.from_reviews:
+        manifest=save_prospects(rows,args.output,args.annotation_origin)
+        manifest.update(input_hashes={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in args.inputs},from_reviews=True)
+        (args.output/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
+        print(json.dumps(manifest));return
     names,repos=catalog_index();references=catalog_references();history=previous_decisions();queue=queued_sources()
     matched=list(match(rows,names,repos,history,queue,references))
     write_rows(args.output/'matched.jsonl',matched)
-    candidates=[r for r in matched if r['status']=='candidate']
+    candidates=[r for r in matched if args.include_known or r['status']=='candidate']
     previous=[json.loads(line) for p in args.exclude for line in p.read_text().splitlines() if line.strip()]
     unseen=unseen_candidates(candidates,previous)
     eligible=[r for r in unseen if language_priority(r,args.language)<2]
@@ -118,9 +160,7 @@ def main():
     print('Training metadata saved; collecting evidence and reviewing',flush=True)
     manifest=run(checked,args.output/'review',args.cache,args.model or [MODEL],args.offline_evidence) if checked else {}
     reviewed=[json.loads(l) for l in (args.output/'review/reviews.jsonl').read_text().splitlines()] if checked else []
-    prospects=[dict(row,prospect_status=prospect_status(row)) for row in reviewed]
-    write_rows(args.output/'prospects.jsonl',prospects)
-    write_rows(args.output/'handoff.jsonl',[r for r in prospects if r['prospect_status']=='promising'])
+    manifest.update(save_prospects(reviewed,args.output,args.annotation_origin))
     manifest.update(input_hashes={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in args.inputs},
         catalog_sha256=catalog_hash(names,repos),
         reference_sha256=hashlib.sha256(json.dumps({k:sorted(v) for k,v in references.items()},sort_keys=True).encode()).hexdigest(),
@@ -129,9 +169,8 @@ def main():
         discovery_code_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         exclusion_hashes={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in args.exclude},
         previously_screened=len(candidates)-len(unseen),
-        retrieved=len(rows),unique=len(matched),novel=len(candidates),
-        selected=len(selected),seed=args.seed,languages=args.language,language_eligible=len(eligible),status_counts={s:sum(r['prospect_status']==s for r in prospects)
-            for s in ('promising','needs_evidence','not_suitable')})
+        retrieved=len(rows),unique=len(matched),novel=sum(r['status']=='candidate' for r in matched),
+        selected=len(selected),seed=args.seed,languages=args.language,language_eligible=len(eligible),include_known=args.include_known)
     (args.output/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
     print(json.dumps(manifest))
 
