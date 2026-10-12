@@ -122,7 +122,7 @@ def build(output, revision):
             if updated is None:
                 removed.append(row)
                 continue
-            if row['variant'] != 'packed_derived':
+            if row['variant'] != 'packed_derived' and 'example_id' in row:
                 updated['example_id'] = aliases[(row['source'], row['example_id'])]
             replacements.append(updated)
             if updated != row:
@@ -133,7 +133,7 @@ def build(output, revision):
                         options=row['options'], target=row['target'], variant=row['variant']))
         after = before.filter(pc.invert(pc.is_in(before['source'], value_set=pa.array(sorted(REMOVED)))))
         replacement_mask = pc.is_in(after['source'], value_set=pa.array(sorted(affected - REMOVED)))
-        for column in ['state', 'question', 'example_id']:
+        for column in [c for c in ('state', 'question', 'example_id') if c in after.column_names]:
             values = pa.array([r[column] for r in replacements], type=after.schema.field(column).type)
             after = after.set_column(after.schema.get_field_index(column), after.schema.field(column),
                                      pc.replace_with_mask(after[column], replacement_mask.combine_chunks(), values))
