@@ -5,6 +5,7 @@ or writes review judgments into the authoritative parked/implemented index.
 """
 import argparse
 import base64
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 import hashlib
 import json
@@ -89,16 +90,22 @@ def run(rows,output,cache,models,offline=False):
     key_path=Path.home()/'.config/tasksource/jev_openrouter_api_key'
     if not os.environ.get('JEV_OPENROUTER_API_KEY') and key_path.is_file():
         os.environ['JEV_OPENROUTER_API_KEY']=key_path.read_text().strip()
-    states=[json.dumps(evidence(row,cache,offline),sort_keys=True,ensure_ascii=False) for row in rows]
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        states=list(pool.map(lambda row:json.dumps(evidence(row,cache,offline),sort_keys=True,ensure_ascii=False),rows))
     (output/'inputs.jsonl').write_text(''.join(json.dumps(s,ensure_ascii=False)+'\n' for s in states))
     (output/'questions.json').write_text(json.dumps(QUESTIONS,indent=2)+'\n')
     hashes=[hashlib.sha256(s.encode()).hexdigest() for s in states]
     questions_hash=hashlib.sha256((output/'questions.json').read_bytes()).hexdigest()
+    print(f'Evidence saved; reviewing {len(states)} candidates with {len(models)} models',flush=True)
+    completed=0
     with (output/'raw.jsonl').open('a') as raw:
         def save(index,result):
+            nonlocal completed
+            completed+=1
+            if completed%100==0:print(f'Model reviews completed: {completed}/{len(states)*len(models)}',flush=True)
             raw.write(json.dumps(dict(index=index,state_sha256=hashes[index],**_record(result)))+'\n');raw.flush()
-        options=dict(decisions=QUESTIONS,api_key_envs=['JEV_OPENROUTER_API_KEY'],per_key_rpm=30,
-                     max_concurrency=4,num_retries=0,caching=True,show_progress=False,on_result=save)
+        options=dict(decisions=QUESTIONS,api_key_envs=['JEV_OPENROUTER_API_KEY'],adaptive_concurrency=True,
+                     max_concurrency=32,num_retries=0,caching=True,show_progress=False,on_result=save)
         results=ensemble(states,models,**options) if len(models)>1 else complete(states,model=models[0],**options)
     records=[]
     for i,(row,result) in enumerate(zip(rows,results)):
@@ -111,7 +118,7 @@ def run(rows,output,cache,models,offline=False):
             review_state_sha256=hashes[i],review_questions_sha256=questions_hash,
             review_status='failed' if result.failed else 'reviewed',requires_processing=True))
     (output/'reviews.jsonl').write_text(''.join(json.dumps(r,ensure_ascii=False)+'\n' for r in records))
-    manifest=dict(models=models,records=len(rows),failed=sum(r['review_status']=='failed' for r in records),
+    manifest=dict(scheduling=dict(adaptive_concurrency=True,max_concurrency=32,num_retries=0),models=models,records=len(rows),failed=sum(r['review_status']=='failed' for r in records),
         inputs_sha256=hashlib.sha256((output/'inputs.jsonl').read_bytes()).hexdigest(),
         questions_sha256=hashlib.sha256((output/'questions.json').read_bytes()).hexdigest(),
         code_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest())

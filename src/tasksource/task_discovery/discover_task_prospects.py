@@ -10,7 +10,7 @@ import json
 from pathlib import Path
 from urllib.parse import urlencode
 
-from .identifiers import normalized
+from .identifiers import normalized,source_id
 from .link import cached_json
 from .match import catalog_hash,catalog_index,catalog_references,match,previous_decisions,queued_sources
 from .jev_review import MODEL,run
@@ -67,6 +67,14 @@ def language_priority(row, requested):
     return 0 if not wanted or known & wanted else 1 if not known else 2
 
 
+def unseen_candidates(rows,previous):
+    """Exclude already screened identities, without merging shared papers/GitHub repos."""
+    names={normalized(r['name']) for r in previous}
+    repos={source_id(v,'huggingface') for r in previous for v in r.get('huggingface',[])}
+    return [r for r in rows if normalized(r['name']) not in names
+            and not repos.intersection(source_id(v,'huggingface') for v in r.get('huggingface',[]))]
+
+
 def write_rows(path,rows):
     path.write_text(''.join(json.dumps(r,sort_keys=True,ensure_ascii=False)+'\n' for r in rows))
 
@@ -77,6 +85,7 @@ def main():
     parser.add_argument('--limit',type=int,default=100);parser.add_argument('--seed',type=int,default=0)
     parser.add_argument('--cache',type=Path,default=Path('build/discovery/review-cache'))
     parser.add_argument('--language',action='append',default=[],help='Prefer this dataset language; retain unknown, exclude known mismatches')
+    parser.add_argument('--exclude',action='append',type=Path,default=[],help='Prior screened JSONL; repeat to avoid spending on the same candidates')
     parser.add_argument('--model',action='append');parser.add_argument('--offline-evidence',action='store_true')
     args=parser.parse_args()
     if args.limit<1:parser.error('--limit must be positive')
@@ -86,7 +95,9 @@ def main():
     matched=list(match(rows,names,repos,history,queue,references))
     write_rows(args.output/'matched.jsonl',matched)
     candidates=[r for r in matched if r['status']=='candidate']
-    eligible=[r for r in candidates if language_priority(r,args.language)<2]
+    previous=[json.loads(line) for p in args.exclude for line in p.read_text().splitlines() if line.strip()]
+    unseen=unseen_candidates(candidates,previous)
+    eligible=[r for r in unseen if language_priority(r,args.language)<2]
     # Reproducible source-stratified sample, not just the highest-download sources.
     groups={}
     for row in eligible:
@@ -99,9 +110,12 @@ def main():
             if len(selected)==args.limit:break
             selected.append(groups[source].pop(0))
             if not groups[source]:del groups[source]
+    write_rows(args.output/'selected.jsonl',selected)
+    print(f'Selected {len(selected)} candidates; checking training metadata',flush=True)
     with ThreadPoolExecutor(max_workers=8) as pool:
         checked=list(pool.map(lambda r:training_evidence(r,args.cache,args.offline_evidence),selected))
     write_rows(args.output/'checked.jsonl',checked)
+    print('Training metadata saved; collecting evidence and reviewing',flush=True)
     manifest=run(checked,args.output/'review',args.cache,args.model or [MODEL],args.offline_evidence) if checked else {}
     reviewed=[json.loads(l) for l in (args.output/'review/reviews.jsonl').read_text().splitlines()] if checked else []
     prospects=[dict(row,prospect_status=prospect_status(row)) for row in reviewed]
@@ -113,6 +127,8 @@ def main():
         decisions_sha256=hashlib.sha256(json.dumps(history,sort_keys=True).encode()).hexdigest(),
         queue_sha256=hashlib.sha256(json.dumps(queue,sort_keys=True).encode()).hexdigest(),
         discovery_code_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+        exclusion_hashes={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in args.exclude},
+        previously_screened=len(candidates)-len(unseen),
         retrieved=len(rows),unique=len(matched),novel=len(candidates),
         selected=len(selected),seed=args.seed,languages=args.language,language_eligible=len(eligible),status_counts={s:sum(r['prospect_status']==s for r in prospects)
             for s in ('promising','needs_evidence','not_suitable')})

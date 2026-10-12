@@ -58,6 +58,8 @@ def test_review_preserves_history_model_answers_and_evidence_without_promoting(t
     assert output['reviews'][1]['data']['model']=='dated-model'
     assert output['requires_processing'] and output['review_evidence_count']==1
     assert manifest['records']==1 and calls[0]['decisions']==jev_review.QUESTIONS
+    assert calls[0]['adaptive_concurrency'] and calls[0]['max_concurrency']==32
+    assert 'per_key_rpm' not in calls[0]
     assert 'private-test-key' not in ''.join(p.read_text() for p in (tmp_path/'review').glob('*'))
 
 
@@ -94,3 +96,10 @@ def test_annotation_provenance_is_preserved_without_becoming_an_eligibility_vote
     assert discovery.prospect_status(row)=='promising'
     assert set(jev_review.PROVENANCE).isdisjoint(jev_review.CHECKS)
     assert all('unknown' in jev_review.QUESTIONS[q]['criteria'] for q in jev_review.PROVENANCE)
+
+
+def test_prior_screening_excludes_names_and_hub_copies_but_not_shared_papers():
+    previous=[dict(name='Old source',huggingface=['https://huggingface.co/datasets/Org/Data'],papers=[{'url':'arxiv:1234.5678'}])]
+    candidates=[dict(name='OLD-source'),dict(name='Copy',huggingface=['org/data']),
+                dict(name='New subset',papers=[{'url':'arxiv:1234.5678'}])]
+    assert discovery.unseen_candidates(candidates,previous)==[candidates[2]]
