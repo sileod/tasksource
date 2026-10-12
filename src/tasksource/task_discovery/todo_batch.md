@@ -80,3 +80,5 @@ Spider aggregation was subsequently withdrawn at user request in [Hub commit d45
 
 These are human-approved additions, not automatic promotions from discovery.
 Training availability does not replace a source/recast example audit.
+
+Published the three accepted relation views to Jev `default` and `full` in [Hub commit 07526e54](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/commit/07526e54ee01c52d144cae72500bd8b84360fcf3): 3,000 train / 200 validation / 200 test rows appended, all previous Parquet blobs preserved. [Source and final-export audit](../../../docs/jev/relation-expansion-audit.json) records 2–3 reviewed examples per view and the two deferrals. Causal News Corpus remains on the human-curated todo.
