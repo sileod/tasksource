@@ -66,7 +66,7 @@ def build(output, max_rows=1000, max_rows_eval=100, tasks=None, description=None
                 if len(render_request(row['state'], [row]).encode()) > 131_072:
                     exclusions.append(dict(id=row['id'], source=task, split=split, reason='request_exceeds_131072_bytes'))
                     continue
-                row['example_id'] = example_key(task, row['state'], row['options'], row['target'])
+                row['example_id'] = example_key(task, row['state'], row['options'], row['target'], row['question'])
                 evidence[row['id']] = meta
                 rows[split].append({key: row[key] for key in schema.names})
                 if meta.get('split_group_id'):

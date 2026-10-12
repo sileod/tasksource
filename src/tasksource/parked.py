@@ -12,11 +12,25 @@ annotation, move it back to its task catalog and remove its PARKED entry.
 """
 from .access import parse_var_name
 from .metadata.configs import UNIVERSAL_DEPENDENCIES
-from .preprocess import Preprocessing, VisualClassification, constant, get, Classification, TokenClassification, MultipleChoice
+from .preprocess import SoftLabeling, Preprocessing, VisualClassification, constant, get, Classification, TokenClassification, MultipleChoice
 
 from .metadata.source_revisions import SOURCE_REVISIONS
-from .tasks import _document_holdouts, _unique_text_splits, _decision_metadata
+from .tasks import _document_holdouts, _unique_text_splits, _decision_metadata, _probing, _SENTENCE_LENGTH
 import hashlib
+
+wouldyourather = SoftLabeling(constant(''), labels=lambda x: [x['votes_a'], x['votes_b']],
+    options=lambda x: [x['option_a'], x['option_b']], hard=2/3, annotators=1000,
+    question="Which would most people rather do?",
+    soft_question="A poll asked people which they would rather do. Which option would a randomly chosen respondent pick?",
+    pre_process=lambda ds: ds.filter(lambda x: x['votes_a'] + x['votes_b'] >= 100),
+    dataset_name="tasksource/wouldyourather")
+
+puzzte = Classification("puzzle_text","question","answer",
+    dataset_name="tasksource/puzzte",
+    # "non-entailment" overlaps the specific contradiction/unknown labels
+    pre_process=lambda ds: ds.filter(lambda x: x["answer"] != "non-entailment"))
+
+linguisticprobing___sentence_length = _probing("sentence_length", lambda code: _SENTENCE_LENGTH[int(code)])
 
 spider__aggregation = Classification('sentence1',labels='labels',dataset_name='tasksource/spider',config_name='aggregation',
     task_id='spider/aggregation',metadata='metadata',complete_splits=False,
@@ -190,6 +204,9 @@ KINDS = {
 }
 
 PARKED = {
+    "wouldyourather": ("unsound", "subjective poll preferences depend on an unspecified respondent population; unsuitable as an unqualified decision target"),
+    "puzzte": ("unsound", "user-reported annotation errors; filtering overlapping non-entailment labels does not establish puzzle-answer correctness"),
+    "linguisticprobing___sentence_length": ("unsound", "word-count labels depend on opaque tokenization and can disagree with displayed sentences"),
     "spider__aggregation": ("low_value", "weak standalone SQL aggregation projection; retain spider/column instead"),
     'olid__targeted': ('unsound', 'native fine-grained label ambiguity; see task_discovery/decisions.json'),
     'olid__target': ('unsound', 'native fine-grained label ambiguity; see task_discovery/decisions.json'),

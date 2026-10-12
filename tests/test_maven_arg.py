@@ -46,3 +46,6 @@ def test_native_partitions_and_jev_preserve_argument_question():
     result=recast_jev(processed,task='maven-arg/role',question=maven_arg__role.question)
     row=result['train'][0]
     assert '[ARGUMENT]Alice[/ARGUMENT]' in str(row)
+    assert 'text_B' not in row['state']
+    assert row['instructions'].endswith('Event type: Opening')
+    assert '{sentence2}' not in row['instructions']

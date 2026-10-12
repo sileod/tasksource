@@ -357,7 +357,8 @@ class SharedFields:
     # ("Is this search query a well-formed question?"). It is metadata, not a
     # column: raw loading leaves the inputs untouched, load_task(prompted=True)
     # appends it, and the instruct and Jev recasts use it as their instruction.
-    # Questions that vary per row belong in sentence2 or the MC inputs instead.
+    # Classification questions may use {sentence2}; recasts move that field
+    # into the question and keep sentence1 as the state. Raw columns stay unchanged.
     question: str = None
     metadata: object = None  # optional source provenance, normalized to a JSON string
     ordinal: bool = False  # labels are an ordered scale, listed in order (Jev asks part as score)
@@ -629,6 +630,17 @@ def name(label_name, classes):
     # a negative label is a hidden answer (e.g. an obfuscated test split), not the last class
     return lambda x: classes[x[label_name]] if x[label_name] is not None and x[label_name] >= 0 else None
 
+def classification_prompt(row, question=None):
+    """Render a pair, or consume sentence2 in an explicitly templated question."""
+    first = row.get('sentence1', row.get('inputs'))
+    second = row.get('sentence2')
+    if question and '{sentence2}' in question:
+        if not second or not second.strip():
+            raise ValueError('Question template requires nonempty sentence2')
+        return first, question.replace('{sentence2}', second)
+    return (f'text_A: {first}\ntext_B: {second}' if second and second.strip() else first), question
+
+
 def add_question(dataset, question):
     """Append a task question to the inputs (``load_task(prompted=True)``)."""
     if not question:
@@ -641,6 +653,8 @@ def add_question(dataset, question):
     else:  # TokenClassification labels each token; there is no text field to extend
         return dataset
     def prompt(x):
+        if field == 'sentence2' and '{sentence2}' in question:
+            return {field: classification_prompt(x, question)[1]}
         text = x.get(field)
         return {field: f"{text}\n\n{question}" if text else question}
     if 'images' in features:

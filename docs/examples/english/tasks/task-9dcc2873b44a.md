@@ -4,16 +4,16 @@ Classification · `sileod/probability_words_nli`
 
 <details><summary>Example 1</summary>
 
-published Jev · train · probability-words-nli-reasoning-1hop-4241424585:train:3378
+current local Jev recast (not yet published) · train · probability-words-nli-reasoning-1hop-4241424585:train:0
 
 **State**
 
-<pre>text_A: It is certain that Mary got the milk. There is a very good chance that Greg is a rhino. We doubt that Lily is white.
-text_B: It is probable that &#x27;Lily is white and Greg is a rhino&#x27;.</pre>
+<pre>It is likely that Sumit is thirsty. It is almost certain that John moved to the office. There is a very good chance that Mary left the apple.</pre>
 
 **Question**
 
-<pre>Given the probabilities stated in text_A, is concluding text_B valid?</pre>
+<pre>Given the context, is the following conclusion valid?
+It is probably the case that &#x27;John moved to the office and Sumit is thirsty&#x27;.</pre>
 
 **Criteria (choice)**
 
@@ -22,22 +22,22 @@ text_B: It is probable that &#x27;Lily is white and Greg is a rhino&#x27;.</pre>
 
 **Gold target (weight)**
 
-<pre>1. invalid — 1</pre>
+<pre>2. valid — 1</pre>
 
 </details>
 
 <details><summary>Example 2</summary>
 
-published Jev · train · probability-words-nli-reasoning-1hop-4241424585:train:2521
+current local Jev recast (not yet published) · train · probability-words-nli-reasoning-1hop-4241424585:train:1
 
 **State**
 
-<pre>text_A: There is little chance that Bernhard is yellow. There is almost no chance that John dropped the milk. It is probably the case that Julius is a swan.
-text_B: We believe that &#x27;John dropped the milk&#x27; or &#x27;Bernhard is yellow&#x27; or both.</pre>
+<pre>It is highly likely that Julius is gray. It is impossible that Jeff went to the bedroom. It is likely that Lily is white.</pre>
 
 **Question**
 
-<pre>Given the probabilities stated in text_A, is concluding text_B valid?</pre>
+<pre>Given the context, is the following conclusion valid?
+It is highly likely that &#x27;Julius is gray&#x27; or &#x27;Jeff went to the bedroom&#x27; or both.</pre>
 
 **Criteria (choice)**
 
@@ -46,22 +46,22 @@ text_B: We believe that &#x27;John dropped the milk&#x27; or &#x27;Bernhard is y
 
 **Gold target (weight)**
 
-<pre>1. invalid — 1</pre>
+<pre>2. valid — 1</pre>
 
 </details>
 
 <details><summary>Example 3</summary>
 
-published Jev · train · probability-words-nli-reasoning-1hop-4241424585:train:2431
+current local Jev recast (not yet published) · train · probability-words-nli-reasoning-1hop-4241424585:train:2
 
 **State**
 
-<pre>text_A: Chances are slight that Daniel left the apple. There is a very good chance that Brian is yellow. It is highly unlikely that Mary moved to the garden.
-text_B: It is probably the case that &#x27;Mary moved to the garden and Brian is yellow&#x27;.</pre>
+<pre>It is probable that Gertrude is a mouse. There is a very good chance that Bill went to the garden. It is probably not the case that Daniel dropped the milk.</pre>
 
 **Question**
 
-<pre>Given the probabilities stated in text_A, is concluding text_B valid?</pre>
+<pre>Given the context, is the following conclusion valid?
+Chances are about even that either &#x27;Bill went to the garden&#x27; or &#x27;Gertrude is a mouse&#x27; but not both.</pre>
 
 **Criteria (choice)**
 
@@ -70,6 +70,6 @@ text_B: It is probably the case that &#x27;Mary moved to the garden and Brian is
 
 **Gold target (weight)**
 
-<pre>1. invalid — 1</pre>
+<pre>2. valid — 1</pre>
 
 </details>

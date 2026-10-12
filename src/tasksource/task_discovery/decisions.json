@@ -1923,5 +1923,104 @@
     ],
     "papers": [],
     "reconsider_if": "A stronger SQL-derived view supplies substantial reasoning beyond aggregation keyword prediction."
+  },
+  {
+    "name": "Would You Rather",
+    "scope": "task",
+    "tasks": [
+      "wouldyourather"
+    ],
+    "status": "parked",
+    "reason_code": "ambiguous_supervision",
+    "reason": "subjective poll preferences depend on an unspecified respondent population; unsuitable as an unqualified decision target",
+    "evidence": [
+      "User review on 2026-10-12",
+      "https://huggingface.co/datasets/tasksource/wouldyourather"
+    ],
+    "checked_on": "2026-10-12",
+    "reconsider_if": "A clearly specified population and a useful probabilistic prediction objective justify reinstatement.",
+    "huggingface": [
+      "tasksource/wouldyourather"
+    ],
+    "github": [],
+    "papers": [],
+    "reviews": [
+      {
+        "reviewer": {
+          "kind": "human",
+          "name": "user"
+        },
+        "checked_on": "2026-10-12",
+        "verdict": "park",
+        "findings": "Subjective poll preferences depend on an unspecified respondent population."
+      }
+    ],
+    "annotation": "tasksource.parked.wouldyourather"
+  },
+  {
+    "name": "PUZZTE",
+    "scope": "task",
+    "tasks": [
+      "puzzte"
+    ],
+    "status": "parked",
+    "reason_code": "annotation_quality",
+    "reason": "user-reported annotation errors; filtering overlapping non-entailment labels does not establish puzzle-answer correctness",
+    "evidence": [
+      "User review on 2026-10-12",
+      "https://huggingface.co/datasets/tasksource/puzzte"
+    ],
+    "checked_on": "2026-10-12",
+    "reconsider_if": "An independent answer audit or corrected source establishes trustworthy puzzle labels.",
+    "huggingface": [
+      "tasksource/puzzte"
+    ],
+    "github": [],
+    "papers": [],
+    "reviews": [
+      {
+        "reviewer": {
+          "kind": "human",
+          "name": "user"
+        },
+        "checked_on": "2026-10-12",
+        "verdict": "park",
+        "findings": "User reports annotation errors; prior removal of overlapping non-entailment labels is insufficient."
+      }
+    ],
+    "annotation": "tasksource.parked.puzzte"
+  },
+  {
+    "name": "SentEval sentence length",
+    "scope": "task",
+    "tasks": [
+      "linguisticprobing/sentence_length"
+    ],
+    "status": "parked",
+    "reason_code": "annotation_quality",
+    "reason": "word-count labels depend on opaque tokenization and can disagree with displayed sentences",
+    "evidence": [
+      "User review on 2026-10-12",
+      "https://huggingface.co/datasets/tasksource/linguisticprobing"
+    ],
+    "checked_on": "2026-10-12",
+    "reconsider_if": "Source tokenization is documented and the displayed input reproduces the count.",
+    "huggingface": [
+      "tasksource/linguisticprobing"
+    ],
+    "github": [],
+    "papers": [],
+    "reviews": [
+      {
+        "reviewer": {
+          "kind": "human",
+          "name": "user"
+        },
+        "checked_on": "2026-10-12",
+        "verdict": "park",
+        "findings": "Opaque word-count tokenization produces labels inconsistent with displayed sentence lengths."
+      }
+    ],
+    "annotation": "tasksource.parked.linguisticprobing___sentence_length"
   }
 ]

@@ -1,8 +1,8 @@
 # English example gallery
 
-563 of 563 English catalog tasks have examples.
+560 of 560 English catalog tasks have examples.
 
-Real examples from the published full Jev training config. Criteria stay in exported order; gold weights are shown exactly. Source-loaded canonical fallbacks are explicitly labeled. These examples illustrate preprocessing, not a quality guarantee. Tasks without an exported example remain listed; this does not imply their source is unavailable.
+Real examples from the published full Jev training config. Criteria stay in exported order; gold weights are shown exactly. Source-loaded canonical fallbacks and current local recast previews are explicitly labeled. These examples illustrate preprocessing, not a quality guarantee. Tasks without an exported example remain listed; this does not imply their source is unavailable.
 
 [Searchable HTML](index.html) · [Machine-readable examples](examples.json)
 
@@ -138,18 +138,18 @@ Real examples from the published full Jev training config. Criteria stay in expo
 | [ethos/multilabel](tasks/task-888b58f0e0eb.md) | Classification | 3 |
 | [tweet_eval/offensive](tasks/task-db2724cc9c3c.md) | Classification | 3 |
 | [tweet_eval/irony](tasks/task-be5d3e4f8a59.md) | Classification | 3 |
-| [tweet_eval/emoji](tasks/task-5735a8c9b04e.md) | Classification | 3 |
 | [tweet_eval/hate](tasks/task-a73604491c7b.md) | Classification | 3 |
-| [tweet_eval/sentiment](tasks/task-279cda429260.md) | Classification | 3 |
 | [tweet_eval/emotion](tasks/task-7904c5df0516.md) | Classification | 3 |
+| [tweet_eval/sentiment](tasks/task-279cda429260.md) | Classification | 3 |
+| [tweet_eval/emoji](tasks/task-5735a8c9b04e.md) | Classification | 3 |
 | [tweet_eval/stance_abortion](tasks/task-f93c0b0285ec.md) | Classification | 3 |
 | [tweet_eval/stance_atheism](tasks/task-91d82cf6416b.md) | Classification | 3 |
 | [tweet_eval/stance_climate](tasks/task-fbe08be2bf2b.md) | Classification | 3 |
 | [tweet_eval/stance_feminist](tasks/task-38ee049909ff.md) | Classification | 3 |
 | [tweet_eval/stance_hillary](tasks/task-eeab7bfdb76a.md) | Classification | 3 |
 | [discovery/discovery](tasks/task-a1e2fbdf69c6.md) | Classification | 3 |
-| [pragmeval/switchboard](tasks/task-431ce659458e.md) | Classification | 3 |
 | [pragmeval/mrda](tasks/task-f0426788d575.md) | Classification | 3 |
+| [pragmeval/switchboard](tasks/task-431ce659458e.md) | Classification | 3 |
 | [pragmeval/verifiability](tasks/task-22b182fd05a9.md) | Classification | 3 |
 | [pragmeval/persuasiveness-premisetype](tasks/task-10123ea92b6d.md) | Classification | 3 |
 | [pragmeval/sarcasm](tasks/task-52417f72271e.md) | Classification | 3 |
@@ -214,7 +214,6 @@ Real examples from the published full Jev training config. Criteria stay in expo
 | [linguisticprobing/subj_number](tasks/task-8be7583f5fb1.md) | Classification | 3 |
 | [linguisticprobing/obj_number](tasks/task-fcf8dd3a59ba.md) | Classification | 3 |
 | [linguisticprobing/past_present](tasks/task-828a8870bfba.md) | Classification | 3 |
-| [linguisticprobing/sentence_length](tasks/task-e7c50e05faed.md) | Classification | 3 |
 | [linguisticprobing/top_constituents](tasks/task-6ecb5b391406.md) | Classification | 3 |
 | [linguisticprobing/tree_depth](tasks/task-fc06d34262c5.md) | Classification | 3 |
 | [linguisticprobing/coordination_inversion](tasks/task-b9705c65e986.md) | Classification | 3 |
@@ -289,9 +288,8 @@ Real examples from the published full Jev training config. Criteria stay in expo
 | [webgpt_comparisons](tasks/task-4b24fdefb6dc.md) | MultipleChoice | 3 |
 | [synthetic-instruct-gptj-pairwise](tasks/task-61e7b7084d60.md) | MultipleChoice | 3 |
 | [scruples](tasks/task-2ef43afc1e47.md) | Classification | 3 |
-| [wouldyourather](tasks/task-113448bf9f8a.md) | MultipleChoice | 3 |
-| [defeasible-nli/snli](tasks/task-1f9f35973b80.md) | Classification | 3 |
 | [defeasible-nli/atomic](tasks/task-53d47f620620.md) | Classification | 3 |
+| [defeasible-nli/snli](tasks/task-1f9f35973b80.md) | Classification | 3 |
 | [defeasible-nli/social](tasks/task-b0f0aaacc988.md) | Classification | 3 |
 | [help-nli](tasks/task-121c2e8acac3.md) | Classification | 3 |
 | [nli-veridicality-transitivity](tasks/task-07e4db5cd009.md) | Classification | 3 |
@@ -309,7 +307,6 @@ Real examples from the published full Jev training config. Criteria stay in expo
 | [cicero](tasks/task-13a3714f3ff1.md) | MultipleChoice | 3 |
 | [CREAK](tasks/task-086b8476d574.md) | Classification | 3 |
 | [mutual](tasks/task-8d8752e36fab.md) | MultipleChoice | 3 |
-| [puzzte](tasks/task-b5ed3d686cbd.md) | Classification | 3 |
 | [implicatures](tasks/task-40636626b8c7.md) | MultipleChoice | 3 |
 | [race/high](tasks/task-2a4915a21c41.md) | MultipleChoice | 3 |
 | [race/middle](tasks/task-339c61d46d08.md) | MultipleChoice | 3 |
@@ -337,10 +334,10 @@ Real examples from the published full Jev training config. Criteria stay in expo
 | [oasst2_dense_flat/toxicity](tasks/task-b5f585e5ce01.md) | Classification | 3 |
 | [oasst2_dense_flat/helpfulness](tasks/task-41d198c7cf4a.md) | Classification | 3 |
 | [mindgames](tasks/task-fac245d2b5e2.md) | Classification | 3 |
-| [universal_dependencies/en_gum/deprel](tasks/task-140d66f946ef.md) | TokenClassification | 3 |
 | [universal_dependencies/en_partut/deprel](tasks/task-051c45889b2c.md) | TokenClassification | 3 |
-| [universal_dependencies/en_ewt/deprel](tasks/task-3190fb136c06.md) | TokenClassification | 3 |
 | [universal_dependencies/en_lines/deprel](tasks/task-36708325f1cc.md) | TokenClassification | 3 |
+| [universal_dependencies/en_gum/deprel](tasks/task-140d66f946ef.md) | TokenClassification | 3 |
+| [universal_dependencies/en_ewt/deprel](tasks/task-3190fb136c06.md) | TokenClassification | 3 |
 | [ambient](tasks/task-31d18c0defdc.md) | Classification | 3 |
 | [path-naturalness-prediction](tasks/task-0ce175698470.md) | MultipleChoice | 3 |
 | [civil_comments/toxicity](tasks/task-76149bbe07d4.md) | Classification | 3 |
@@ -411,9 +408,9 @@ Real examples from the published full Jev training config. Criteria stay in expo
 | [stepgame](tasks/task-e7221791bafb.md) | Classification | 3 |
 | [nlgraph](tasks/task-0fd7f57cf63a.md) | Classification | 3 |
 | [oasst2_pairwise_rlhf_reward](tasks/task-65e78f8c9c01.md) | MultipleChoice | 3 |
-| [hh-rlhf/helpful-online](tasks/task-fb7927707e7d.md) | MultipleChoice | 3 |
-| [hh-rlhf/helpful-base](tasks/task-33f0b4a5d67a.md) | MultipleChoice | 3 |
 | [hh-rlhf/helpful-rejection-sampled](tasks/task-7734637ddd87.md) | MultipleChoice | 3 |
+| [hh-rlhf/helpful-base](tasks/task-33f0b4a5d67a.md) | MultipleChoice | 3 |
+| [hh-rlhf/helpful-online](tasks/task-fb7927707e7d.md) | MultipleChoice | 3 |
 | [hh-rlhf/harmless-base](tasks/task-d8eb9a9a4bae.md) | MultipleChoice | 3 |
 | [ruletaker](tasks/task-7d254873842f.md) | Classification | 3 |
 | [PARARULE-Plus](tasks/task-002f033c029a.md) | Classification | 3 |
@@ -501,9 +498,9 @@ Real examples from the published full Jev training config. Criteria stay in expo
 | [missing-item-prediction/contrastive](tasks/task-2616f1337b30.md) | Classification | 3 |
 | [jigsaw_toxicity](tasks/task-53ed46de6376.md) | Classification | 3 |
 | [Pol_NLI](tasks/task-89b8e79db6df.md) | Classification | 3 |
-| [synthetic-retrieval-NLI/binary](tasks/task-c1e2dc1045ae.md) | Classification | 3 |
-| [synthetic-retrieval-NLI/count](tasks/task-64ae3f0198cc.md) | Classification | 3 |
 | [synthetic-retrieval-NLI/position](tasks/task-e4e28a94b617.md) | Classification | 3 |
+| [synthetic-retrieval-NLI/count](tasks/task-64ae3f0198cc.md) | Classification | 3 |
+| [synthetic-retrieval-NLI/binary](tasks/task-c1e2dc1045ae.md) | Classification | 3 |
 | [github-issue-similarity](tasks/task-e883c59cb2e2.md) | Classification | 3 |
 | [webinstruct/mc](tasks/task-5e1e96f92ade.md) | MultipleChoice | 3 |
 | [webinstruct/binary](tasks/task-f2a1b6d5d5b0.md) | Classification | 3 |
@@ -532,12 +529,12 @@ Real examples from the published full Jev training config. Criteria stay in expo
 | [semeval2014-absa/restaurants](tasks/task-d8f0f8288293.md) | Classification | 3 |
 | [semeval2014-absa/laptops](tasks/task-ec0a31e30356.md) | Classification | 3 |
 | [record/candidate](tasks/task-8124c425bf0e.md) | Classification | 3 |
-| [multidogo/insurance/intent](tasks/task-117b4e1d6716.md) | Classification | 3 |
-| [multidogo/software/intent](tasks/task-38ceaaec3c75.md) | Classification | 3 |
-| [multidogo/finance/intent](tasks/task-a48a7654a581.md) | Classification | 3 |
 | [multidogo/airline/intent](tasks/task-724be9e2fda9.md) | Classification | 3 |
-| [multidogo/fastfood/intent](tasks/task-4f86d529f07c.md) | Classification | 3 |
+| [multidogo/finance/intent](tasks/task-a48a7654a581.md) | Classification | 3 |
+| [multidogo/insurance/intent](tasks/task-117b4e1d6716.md) | Classification | 3 |
 | [multidogo/media/intent](tasks/task-3b188243edb9.md) | Classification | 3 |
+| [multidogo/fastfood/intent](tasks/task-4f86d529f07c.md) | Classification | 3 |
+| [multidogo/software/intent](tasks/task-38ceaaec3c75.md) | Classification | 3 |
 | [wikisql/aggregation](tasks/task-90aeb2e4689e.md) | Classification | 3 |
 | [wikisql/column](tasks/task-681cacff2ca5.md) | MultipleChoice | 3 |
 | [wikisql/operator](tasks/task-7072c75ff0cd.md) | Classification | 3 |

@@ -32,6 +32,20 @@ class RecastJevTest(unittest.TestCase):
         self.assertEqual(row["task"], "demo")
         self.assertIn("text_A: A", row["state"])
 
+    def test_empty_second_text_is_single_input_for_hard_and_soft_labels(self):
+        source = DatasetDict(train=Dataset.from_dict({
+            'sentence1': ['A'] * 4, 'sentence2': ['', None, '  \t', 'B'], 'labels': [0] * 4,
+        }, features=Features({'sentence1': Value('string'), 'sentence2': Value('string'),
+                              'labels': ClassLabel(names=['no', 'yes'])})))
+        rows = recast_jev(source, question='Choose.')['train']
+        self.assertEqual(list(rows['state']), ['A', 'A', 'A', 'text_A: A\ntext_B: B'])
+        soft = DatasetDict(train=Dataset.from_dict({'sentence1': ['A', 'C'],
+            'sentence2': ['', 'B'], 'options': [['no', 'yes']] * 2, 'labels': [[.25, .75]] * 2}))
+        from tasksource.jev.recast import _recast_soft
+        converted = _recast_soft(soft, 'demo', 'Choose.', 'choice', False, 'demo')['train']
+        self.assertEqual(list(converted['state']), ['A', 'text_A: C\ntext_B: B'])
+        self.assertEqual(converted[0]['target'], [.25, .75])
+
     def test_states_undo_html_escaping(self):
         features = Features({"sentence1": Value("string"), "labels": ClassLabel(names=["a", "b"])})
         source = DatasetDict({"train": Dataset.from_dict({

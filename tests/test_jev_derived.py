@@ -141,6 +141,17 @@ class PackedClassificationTest(unittest.TestCase):
             self.assertEqual(keys, {(record["source"], record["split"])})
         self.assertEqual(len({(r["source"], r["split"]) for r in audit}), 3)
 
+    def test_never_packs_different_per_example_questions(self):
+        dataset = classification_rows(200).map(lambda row, i: {
+            'question': 'Does this describe angiogenesis?' if i % 2 else 'Does this describe metastasis?'
+        }, with_indices=True)
+        _, _, audit = packed(dataset, rate=0.2)
+        self.assertTrue(audit)
+        by_id = {row['id']: row for row in dataset}
+        for record in audit:
+            questions = {by_id[m['id']]['question'] for m in record['members']}
+            self.assertEqual(len(questions), 1)
+
     def test_label_patterns_cover_mixed_and_uniform_packs(self):
         _, _, audit = packed(classification_rows(600), rate=0.10)
         patterns = Counter(

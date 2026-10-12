@@ -4,16 +4,16 @@ Classification · `sileod/probability_words_nli`
 
 <details><summary>Example 1</summary>
 
-published Jev · train · probability-words-nli-reasoning-2hop-e10bbfbc39:train:2158
+current local Jev recast (not yet published) · train · probability-words-nli-reasoning-2hop-e10bbfbc39:train:0
 
 **State**
 
-<pre>text_A: It is unlikely that Brian is a lion. It is unlikely that Bernhard is a rhino. It is probably the case that Daniel left the football. There is a very good chance that if either &#x27;Bernhard is a rhino&#x27; or &#x27;Daniel left the football&#x27; but not both then Mary went to the bedroom. We doubt that if &#x27;Bernhard is a rhino&#x27; or &#x27;Daniel left the football&#x27; or both then Julius is white. It is probably not the case that if &#x27;Brian is a lion and Bernhard is a rhino&#x27; then John moved to the office.
-text_B: It is likely that &#x27;John moved to the office&#x27; or &#x27;Daniel left the football&#x27; or both.</pre>
+<pre>There is a better than even chance that Gertrude is a sheep. It is highly unlikely that Lily is yellow. There is a better than even chance that Julius is a frog. There is a very good chance that if &#x27;Julius is a frog and Lily is yellow&#x27; then Bernhard is gray. We doubt that if either &#x27;Gertrude is a sheep&#x27; or &#x27;Julius is a frog&#x27; but not both then Brian is yellow. It is almost certain that if &#x27;Julius is a frog and Gertrude is a sheep&#x27; then John went to the garden.</pre>
 
 **Question**
 
-<pre>Given the probabilities stated in text_A, is concluding text_B valid?</pre>
+<pre>Given the context, is the following conclusion valid?
+There is a better than even chance that &#x27;Bernhard is gray&#x27; or &#x27;Gertrude is a sheep&#x27; or both.</pre>
 
 **Criteria (choice)**
 
@@ -28,16 +28,16 @@ text_B: It is likely that &#x27;John moved to the office&#x27; or &#x27;Daniel l
 
 <details><summary>Example 2</summary>
 
-published Jev · train · probability-words-nli-reasoning-2hop-e10bbfbc39:train:2235
+current local Jev recast (not yet published) · train · probability-words-nli-reasoning-2hop-e10bbfbc39:train:1
 
 **State**
 
-<pre>text_A: There is little chance that Greg is a swan. It is improbable that Mary dropped the milk. It is almost certain that Jessica is a mouse. It is likely that if either &#x27;Jessica is a mouse&#x27; or &#x27;Greg is a swan&#x27; but not both then Emily is a sheep. We doubt that if either &#x27;Jessica is a mouse&#x27; or &#x27;Greg is a swan&#x27; but not both then Sandra took the football. It is highly unlikely that if &#x27;Jessica is a mouse&#x27; or &#x27;Greg is a swan&#x27; or both then Julius is a rhino.
-text_B: We doubt that either &#x27;Mary dropped the milk&#x27; or &#x27;Greg is a swan&#x27; but not both.</pre>
+<pre>It is probably the case that Julius is green. We believe that Lily is gray. Chances are slight that Jeff discarded the milk. It is probably the case that if &#x27;Jeff discarded the milk&#x27; or &#x27;Julius is green&#x27; or both then Greg is a swan. Chances are slight that if &#x27;Lily is gray and Julius is green&#x27; then John moved to the garden. It is highly unlikely that if either &#x27;Jeff discarded the milk&#x27; or &#x27;Julius is green&#x27; but not both then Mary left the milk.</pre>
 
 **Question**
 
-<pre>Given the probabilities stated in text_A, is concluding text_B valid?</pre>
+<pre>Given the context, is the following conclusion valid?
+It is improbable that &#x27;Mary left the milk&#x27; or &#x27;Jeff discarded the milk&#x27; or both.</pre>
 
 **Criteria (choice)**
 
@@ -52,16 +52,16 @@ text_B: We doubt that either &#x27;Mary dropped the milk&#x27; or &#x27;Greg is 
 
 <details><summary>Example 3</summary>
 
-published Jev · train · probability-words-nli-reasoning-2hop-e10bbfbc39:train:1790
+current local Jev recast (not yet published) · train · probability-words-nli-reasoning-2hop-e10bbfbc39:train:2
 
 **State**
 
-<pre>text_A: There is a very good chance that Brian is white. It is highly likely that Mary got the apple. It is probably not the case that Greg is a swan. It is highly unlikely that if either &#x27;Mary got the apple&#x27; or &#x27;Greg is a swan&#x27; but not both then Jason is tired. It is certain that if &#x27;Mary got the apple&#x27; or &#x27;Brian is white&#x27; or both then Bernhard is yellow. It is probable that if either &#x27;Brian is white&#x27; or &#x27;Mary got the apple&#x27; but not both then John moved to the garden.
-text_B: It is likely that &#x27;Jason is tired and Mary got the apple&#x27;.</pre>
+<pre>It is highly likely that Sandra is in the kitchen. It is probably the case that Winona is a wolf. It is improbable that Greg is white. It is highly likely that if &#x27;Sandra is in the kitchen&#x27; or &#x27;Winona is a wolf&#x27; or both then Bill moved to the office. We believe that if &#x27;Greg is white and Sandra is in the kitchen&#x27; then Fred left the football. It is highly unlikely that if &#x27;Sandra is in the kitchen&#x27; or &#x27;Greg is white&#x27; or both then Bernhard is a rhino.</pre>
 
 **Question**
 
-<pre>Given the probabilities stated in text_A, is concluding text_B valid?</pre>
+<pre>Given the context, is the following conclusion valid?
+It is probably the case that &#x27;Fred left the football&#x27; or &#x27;Winona is a wolf&#x27; or both.</pre>
 
 **Criteria (choice)**
 
@@ -70,6 +70,6 @@ text_B: It is likely that &#x27;Jason is tired and Mary got the apple&#x27;.</pr
 
 **Gold target (weight)**
 
-<pre>1. invalid — 1</pre>
+<pre>2. valid — 1</pre>
 
 </details>

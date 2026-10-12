@@ -3,6 +3,7 @@ from .metadata import udep_en_configs
 from .metadata.configs import BABI_NLI
 from .metadata.source_revisions import SOURCE_REVISIONS
 from .metadata.discourse import DISCO_RELATIONS
+from .metadata.eurovoc import EUROVOC
 from datasets import Sequence, ClassLabel, Dataset, DatasetDict, Features, Value, concatenate_datasets
 import ast
 import hashlib
@@ -157,7 +158,7 @@ recast_nli = Classification(sentence1="context", sentence2="hypothesis", labels=
 
 
 probability_words_nli = Classification(sentence1="context", sentence2="hypothesis", labels="label",
-    question="Given the probabilities stated in text_A, is concluding text_B valid?",
+    question="Given the context, is the following conclusion valid?\n{sentence2}",
     dataset_name="sileod/probability_words_nli", 
     config_name=["reasoning_1hop","reasoning_2hop","usnli"])
 
@@ -590,7 +591,13 @@ silicone___iemocap = Classification("Utterance", labels=lambda x: _IEMOCAP[x['Em
     # xxx marks utterances without annotator agreement (24% of train)
     pre_process=lambda ds: ds.filter(lambda x: x['Emotion'] in _IEMOCAP))
 
-lex_glue___eurlex = Classification(sentence1="text", labels="labels") 
+def _eurlex_descriptors(dataset):
+    codes = dataset['train'].features['labels'].feature.names
+    return dataset.cast_column('labels', Sequence(ClassLabel(names=[EUROVOC[code] for code in codes])))
+
+lex_glue___eurlex = Classification(sentence1="text", labels="labels",
+    post_process=_eurlex_descriptors,
+    question="Which EuroVoc topics apply to this EU legal document? Select all applicable topics.")
 # Supreme Court Database issue areas 1-13 (14, private action, is absent)
 lex_glue___scotus = Classification(sentence1="text", labels="label", label_values=dict(enumerate([
     "criminal procedure", "civil rights", "first amendment", "due process", "privacy", "attorneys", "unions",
@@ -759,7 +766,6 @@ _SENTENCE_LENGTH = ["5-8 words", "9-12 words", "13-16 words", "17-20 words", "21
 linguisticprobing___subj_number = _probing("subj_number", {"NN": "singular subject", "NNS": "plural subject"}.get)
 linguisticprobing___obj_number = _probing("obj_number", {"NN": "singular object", "NNS": "plural object"}.get)
 linguisticprobing___past_present = _probing("past_present", {"PAST": "past tense", "PRES": "present tense"}.get)
-linguisticprobing___sentence_length = _probing("sentence_length", lambda code: _SENTENCE_LENGTH[int(code)])
 linguisticprobing___top_constituents = _probing("top_constituents",
     lambda code: "other constituents" if code == "OTHER" else "constituents " + code.replace("_", " "))
 linguisticprobing___tree_depth = _probing("tree_depth", lambda code: code.replace("depth_", "parse tree depth "))
@@ -1097,12 +1103,6 @@ synthetic_instruct = MultipleChoice('prompt', choices=['chosen', 'rejected'],
 scruples = Classification("text",labels="binarized_label", question="Was the author in the right or in the wrong?",dataset_name="tasksource/scruples")
 
 # poll vote shares; at least 100 votes, and the hard view keeps two-to-one majorities
-wouldyourather = SoftLabeling(constant(''), labels=lambda x: [x['votes_a'], x['votes_b']],
-    options=lambda x: [x['option_a'], x['option_b']], hard=2/3, annotators=1000,
-    question="Which would most people rather do?",
-    soft_question="A poll asked people which they would rather do. Which option would a randomly chosen respondent pick?",
-    pre_process=lambda ds: ds.filter(lambda x: x['votes_a'] + x['votes_b'] >= 100),
-    dataset_name="tasksource/wouldyourather")
 
 
 defeasible_nli = Classification(cat(["Premise","Hypothesis"]),"Update",labels="UpdateType",
@@ -1201,10 +1201,6 @@ mutual = MultipleChoice("article",choices_list="options",
     labels=lambda x: "ABCD".index(x['answers']),
     dataset_name="tasksource/mutual",splits=["train",None,None])
 
-puzzte = Classification("puzzle_text","question","answer",
-    dataset_name="tasksource/puzzte",
-    # "non-entailment" overlaps the specific contradiction/unknown labels
-    pre_process=lambda ds: ds.filter(lambda x: x["answer"] != "non-entailment"))
 
 implicatures = MultipleChoice(cat(['context','response'],"\n"),
     choices=['correct_implicature','incorrect_implicature'],
@@ -2629,12 +2625,12 @@ def _answerability_metadata(row):
 squad_v2__answerability = Classification('context','question',lambda r:'yes' if r['answers']['text'] else 'no',
     dataset_name='rajpurkar/squad_v2',task_id='squad-v2/answerability',complete_splits=False,
     metadata=_answerability_metadata,label_values={'no':'no','yes':'yes'},
-    question='Can question text_B be answered using only passage text_A?',
+    question='Can the following question be answered using only the passage?\n{sentence2}',
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['rajpurkar/squad_v2']})
 cuad__answerability = Classification('context','question',lambda r:'yes' if r['answers']['text'] else 'no',
     dataset_name='theatticusproject/cuad-qa',task_id='cuad/answerability',complete_splits=False,
     metadata=_answerability_metadata,label_values={'no':'no','yes':'yes'},
-    question='Does contract text_A contain an answer to the extraction request in text_B?',
+    question='Does the contract contain an answer to the following extraction request?\n{sentence2}',
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['theatticusproject/cuad-qa'],'name':'default','data_dir':'default'})
 
 
@@ -2653,7 +2649,7 @@ def _hoc_records(row):
 hallmarks_of_cancer = Classification('sentence1','sentence2','labels',dataset_name='bigbio/hallmarks_of_cancer',config_name='hallmarks_of_cancer_bigbio_text',
     task_id='hallmarks-of-cancer/yesno',pre_process=lambda d:_flatten_text(d,_hoc_records),
     metadata='metadata',complete_splits=False,label_values={'no':'no','yes':'yes'},
-    question='Answer the hallmark question in text_B using sentence text_A.',
+    question='{sentence2}',
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['bigbio/hallmarks_of_cancer'],'name':'default','data_dir':'{config_name}'})
 
 
@@ -2676,7 +2672,7 @@ semeval2014_absa = Classification('sentence1','sentence2','labels',dataset_name=
     config_name=['laptops','restaurants'],task_id='semeval2014-absa/{config_name}',metadata='metadata',
     pre_process=_absa_rows,complete_splits=False,
     splits=['train',None,'test'],label_values={v:v for v in ('negative','neutral','positive','conflict')},
-    question='What sentiment does sentence text_A express toward the specified aspect in text_B?',
+    question='What sentiment does the sentence express toward the specified aspect?\n{sentence2}',
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['alexcadillon/SemEval2014Task4'],'name':'default','data_dir':'{config_name}'})
 
 
@@ -2791,7 +2787,7 @@ _QUAC = dict(dataset_name='allenai/quac',config_name='plain_text',metadata='meta
 
 quac__answerability = Classification('sentence1','sentence2','labels',**_QUAC,task_id='quac/answerability',
     pre_process=lambda d:_flatten_text(d,_quac_records),
-    label_values={'no':'no','yes':'yes'},question='Can the current question in text_B be answered from passage and earlier dialogue text_A?')
+    label_values={'no':'no','yes':'yes'},question='Can the following question be answered from the passage and earlier dialogue?\n{sentence2}')
 def _hatexplain_majority(row):
     votes=[row['annotators']['label'].count(i) for i in range(3)]
     return votes.index(max(votes)) if votes.count(max(votes))==1 else None
@@ -2985,7 +2981,7 @@ def _maven_arg_records(row):
 maven_arg__role = Classification('sentence1','sentence2','labels',dataset_name='mneb/maven-arg',
     task_id='maven-arg/role',pre_process=lambda d:_flatten_text(d,_maven_arg_records),
     metadata='metadata',complete_splits=False,
-    question='What semantic role does [ARGUMENT] play in the event marked [TRIGGER], given the event type in text_B?',
+    question='What semantic role does [ARGUMENT] play in the event marked [TRIGGER]?\n{sentence2}',
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['mneb/maven-arg']})
 
 
@@ -3059,7 +3055,7 @@ def _document_holdouts(dataset, column):
 magpie__idiomatic = Classification('sentence1','sentence2','labels',dataset_name='idioms-collaboration/magpie',
     task_id='magpie/idiomatic',complete_splits=False,metadata='metadata',label_values={'i':'idiomatic','l':'literal'},
     pre_process=lambda d:_flatten_text(_document_holdouts(d,'document_id'),_magpie_records),
-    question='Is the marked expression used idiomatically or literally in this context?',
+    question='Is the marked expression used idiomatically or literally in this context?\n{sentence2}',
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['idioms-collaboration/magpie']})
 
 
@@ -3115,7 +3111,7 @@ def _redial_preferences(row):
 redial__preference = Classification('sentence1','sentence2','labels',dataset_name='community-datasets/re_dial',
     task_id='redial/preference',pre_process=lambda d:_flatten_text(d,_redial_preferences),metadata='metadata',complete_splits=False,
     label_values={'0':'disliked','1':'liked','2':'did not say'},
-    question='Does the seeker express liking or disliking the movie or its recommendation in text_B, or do they not say?',
+    question='Does the seeker express liking or disliking this movie or its recommendation, or do they not say?\n{sentence2}',
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['community-datasets/re_dial']})
 sst5 = Classification('text',labels='label',dataset_name='SetFit/sst5',complete_splits=False,ordinal=True,score_only=True,
     label_values={0:'very negative',1:'negative',2:'neutral',3:'positive',4:'very positive'},

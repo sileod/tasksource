@@ -16,6 +16,7 @@ import subprocess
 import sys
 import time
 from collections import Counter, deque
+from functools import cache
 from pathlib import Path
 
 from datasets import Dataset, DatasetDict, Features, Image, Sequence, List, Value, concatenate_datasets, load_dataset
@@ -828,12 +829,20 @@ def steered_mix(dataset, mix_rows, pretty_rows=1_000):
 BAD_EXAMPLES = Path(__file__).resolve().parent.parent / "src" / "tasksource" / "metadata" / "jev_bad_examples.csv"
 
 
-def example_key(source, state, options, target):
+@cache
+def question_context_sources():
+    return {row.id for row in list_tasks().itertuples()
+            if isinstance(row.mapping.question, str) and '{sentence2}' in row.mapping.question}
+
+
+def example_key(source, state, options, target, question=None):
     """Stable id of a source example: its input and gold, so a fixed label gets a new id."""
     gold = options[int(np.argmax(target))] if options else f"{target[0]:.3f}"
     if len(options) and max(target) < 1:  # soft labels: the whole distribution
         gold = ",".join(f"{value:.3f}" for value in target)
     payload = "\x1f".join([source, state, *options, gold])
+    if question is not None and source in question_context_sources():
+        payload += "\x1f" + question  # per-example context moved out of state
     return hashlib.sha1(payload.encode("utf-8")).hexdigest()[:16]
 
 
@@ -841,12 +850,14 @@ def add_example_ids(dataset):
     """``example_id`` on every row: the key of its group's direct row (variants and label checks of
     one source example share it), or of the row itself when the group has no direct row."""
     dataset = add_question_groups(dataset)
-    columns = dataset.select_columns(["group_id", "variant", "source", "state", "options", "target"])
+    columns = dataset.select_columns(["group_id", "variant", "source", "state", "options", "target"]
+                                     + (["question"] if "question" in dataset.column_names else []))
     keys = {}
     for start in range(0, len(columns), 50_000):
         batch = columns[start:start + 50_000]
         for group, variant, *content in zip(batch["group_id"], batch["variant"], batch["source"],
-                                            batch["state"], batch["options"], batch["target"]):
+                                            batch["state"], batch["options"], batch["target"],
+                                            batch.get("question", [None] * len(batch["state"]))):
             if variant == "direct" or group not in keys:  # the direct row wins over a fallback
                 keys[group] = example_key(*content)
     return dataset.map(

@@ -2,6 +2,7 @@ import random
 from datasets import DatasetDict, Dataset
 from sorcery import dict_of
 import string
+from .preprocess import classification_prompt
 
 # Tasks whose labels do not work as named classes: regression scores, multi-label
 # lists, or opaque label sets. Their soft views (SoftLabeling) are fine.
@@ -129,14 +130,10 @@ def recast_instruct(dataset, question=None, seed=0, options=False):
         return {**render_token_classification(x['tokens'],options,x_labels), 'options': []}
 
     def recast_Classification(x, rng):
-        if 'sentence2' in x:
-            text=f"text_A: {x['sentence1']}\ntext_B: {x['sentence2']}"
-        else:
-            text=x['inputs'] if visual else x['sentence1']
-            
+        text, row_question = classification_prompt(x, question)
         answer=labels.int2str(x['labels']).strip()
         options= negative_sample_options(answer, labels._int2str, rng=rng)
-        return {**render_classification(text, options, answer, question), 'options': [f"{o}." for o in options]}
+        return {**render_classification(text, options, answer, row_question), 'options': [f"{o}." for o in options]}
         
     recast = eval(f"recast_{task_type}")
     # same repair of mojibake and escaped HTML as the Jev recast

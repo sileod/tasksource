@@ -12,7 +12,11 @@ def test_gallery_preserves_order_soft_gold_and_escapes_source_html(tmp_path, mon
     row=dict(source='known', id='source:1', state='<script>alert(1)</script>\n```',
              question='Which?', kind='choice', options=['second', 'first'], target=[.25, .75], split='train')
     rows = [dict(row, id=f'source:{i}') for i in range(3)]
+    (tmp_path / 'tasks').mkdir()
+    orphan = tmp_path / 'tasks/task-retired.md'
+    orphan.write_text('Retired task')
     gallery.write(tmp_path, 'pinned', {'known': rows}, 3)
+    assert not orphan.exists()
     page=(tmp_path/'index.html').read_text()
     assert '<script>alert(1)' not in page and '&lt;script&gt;alert(1)' in page
     assert '1. second — 0.25' in page and '2. first — 0.75' in page

@@ -42,7 +42,7 @@ def collect(revision, count):
     return info.sha, examples
 
 
-def source_examples(task, count):
+def source_examples(task, count, current_recast=False):
     """Canonical fallback for tasks absent from the exported snapshot."""
     from datasets import ClassLabel
     from tasksource import load_task, task_provenance
@@ -57,18 +57,25 @@ def source_examples(task, count):
             return [decode(v, feature.feature) for v in value]
         return value
     question = getattr(data, 'question', None)
+    if current_recast and (isinstance(split.features.get('labels'), ClassLabel) or 'inputs' in split.features):
+        from tasksource.recast import recast_jev
+        from scripts.build_jev_dataset import to_training_row
+        recast = recast_jev(data, task=task, question=question)['train']
+        return [dict(to_training_row(row, i, task, 'train'),
+                     provenance=task_provenance(task), origin='current local Jev recast (not yet published)')
+                for i, row in enumerate(recast.select(range(min(count, len(recast)))))]
     return [dict(source=task, id=f'{task}:canonical:sample:{i}', split='train',
                  canonical={k: decode(v, split.features[k]) for k, v in row.items() if k != 'metadata'},
                  question=question or '', provenance=task_provenance(task), row_metadata=row.get('metadata'), origin='canonical preprocessing (not a published Jev row)')
             for i, row in enumerate(split.select(range(min(count, len(split)))))]
 
 
-def load_missing(tasks, examples, count, timeout):
+def load_missing(tasks, examples, count, timeout, current_recast=False):
     """Bound each source load in its own process; retain errors rather than guessing."""
     def load(task):
         try:
             result = subprocess.run([sys.executable, __file__, '--source-task', task,
-                                     '--examples', str(count)], capture_output=True, text=True, timeout=timeout)
+                                     '--examples', str(count)] + (['--current-recast'] if current_recast else []), capture_output=True, text=True, timeout=timeout)
             if result.returncode:
                 raise ValueError(result.stderr.strip().splitlines()[-1])
             return task, json.loads(result.stdout.split('GALLERY_RESULT=')[-1]), None
@@ -80,7 +87,7 @@ def load_missing(tasks, examples, count, timeout):
             examples[task] = rows
             if error:
                 errors[task] = error
-            print(task, error or f'{len(rows)} canonical examples', flush=True)
+            print(task, error or f'{len(rows)} examples', flush=True)
     return errors
 
 
@@ -123,7 +130,7 @@ def write(output, revision, examples, count, errors=None):
     covered = sum(bool(t['examples']) for t in tasks)
     summary = f'{covered} of {len(tasks)} English catalog tasks have examples.'
     note = ('Real examples from the published full Jev training config. Criteria stay in exported order; '
-            'gold weights are shown exactly. Source-loaded canonical fallbacks are explicitly labeled. These examples illustrate preprocessing, not a quality guarantee. '
+            'gold weights are shown exactly. Source-loaded canonical fallbacks and current local recast previews are explicitly labeled. These examples illustrate preprocessing, not a quality guarantee. '
             'Tasks without an exported example remain listed; this does not imply their source is unavailable.')
     payload = dict(repo=REPO, revision=revision, examples_per_task=count, seed=0,
                    generator_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(), tasks=tasks)
@@ -165,6 +172,10 @@ def write(output, revision, examples, count, errors=None):
         articles.append(f'<article id="{anchor}" data-search="{esc(header.lower(), quote=True)}" '
                         f'data-covered="{bool(task["examples"])}"><h2><a href="#{anchor}">{esc(task_id)}</a></h2>'
                         f'<p class="task-meta">{esc(task["type"])} · {esc(task["dataset"])}</p>' + ''.join(body) + '</article>')
+    active = {'task-' + hashlib.sha256(t['id'].encode()).hexdigest()[:12] + '.md' for t in tasks}
+    for old in (output / 'tasks').glob('task-*.md'):
+        if old.name not in active:
+            old.unlink()
     (output / 'README.md').write_text('\n'.join(index) + '\n')
     page = '''<!doctype html><html lang="en"><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -194,7 +205,7 @@ function filter(){let count=0;for(const task of document.querySelectorAll('artic
  if(!task.hidden)count++;}document.querySelector('#count').textContent=count+' tasks';}
 search.addEventListener('input',filter);missing.addEventListener('change',filter);filter();
 </script></html>'''
-    (output / 'index.html').write_text(page.replace(' \n', '&#32;\n').replace('\t\n', '&#9;\n'))
+    (output / 'index.html').write_text(page.replace('\r', '&#13;').replace(' \n', '&#32;\n').replace('\t\n', '&#9;\n'))
     print(summary, flush=True)
 
 
@@ -202,13 +213,26 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--examples', type=int, choices=range(1, 6), default=3)
     parser.add_argument('--source-task', help=argparse.SUPPRESS)
+    parser.add_argument('--current-recast', action='store_true', help=argparse.SUPPRESS)
+    parser.add_argument('--refresh-task', action='append', default=[], help='Refresh a task from its source into the existing snapshot; label local previews')
     parser.add_argument('--load-missing', action='store_true', help='Try canonical source loads for missing exports')
     parser.add_argument('--timeout', type=int, default=90, help='Seconds per fallback source load')
     parser.add_argument('--revision', default='main')
     parser.add_argument('--output', type=Path, default=ROOT / 'docs/examples/english')
     args = parser.parse_args()
     if args.source_task:
-        print('GALLERY_RESULT=' + json.dumps(source_examples(args.source_task, args.examples)))
+        print('GALLERY_RESULT=' + json.dumps(source_examples(args.source_task, args.examples, args.current_recast)))
+    elif args.refresh_task:
+        snapshot = json.loads((args.output / 'examples.json').read_text())
+        examples = {t['id']: t['examples'] for t in snapshot['tasks']}
+        errors = {t['id']: t['error'] for t in snapshot['tasks'] if t.get('error')}
+        for task in args.refresh_task:
+            if task not in examples:
+                parser.error(f'Unknown task: {task}')
+            examples[task] = []
+            errors.pop(task, None)
+        errors.update(load_missing(args.refresh_task, examples, args.examples, args.timeout, current_recast=True))
+        write(args.output, snapshot['revision'], examples, args.examples, errors)
     else:
         revision, examples = collect(args.revision, args.examples)
         errors = load_missing(list_tasks().id, examples, args.examples, args.timeout) if args.load_missing else {}

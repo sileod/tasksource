@@ -13,6 +13,7 @@ from .augmentations import stable_fraction
 from .options import choice_permutation, normalize_all_none, permute_choices
 from .ordinal import asks_score, scale_order
 from .questions import default_question
+from ..preprocess import classification_prompt
 from .prompt_augmentations import TOKEN_INSTRUCTION
 from .token_labels import (
     MAX_JEV_TOKENS_PER_SEQUENCE,
@@ -142,15 +143,13 @@ def _recast_soft(dataset, task, question, kind, row_options, group):
     inputs within one task keep their first row."""
     if kind not in ("noul", "score", "choice"):
         raise ValueError(f"soft labels need a kind (noul, score or choice), got {kind!r}")
-    paired = "sentence2" in dataset["train"].features
 
     def convert(example, index, split):
         inputs = [example["sentence1"], example.get("sentence2"), *(example["options"] if row_options else [])]
         key = hashlib.sha256("\x1f".join(map(str, inputs)).encode()).hexdigest()[:16]
         raw = _keeps_raw_text(group, split, key)
-        state = clean_text(example["sentence1"], raw)
-        if paired:
-            state = f"text_A: {state}\ntext_B: {clean_text(example['sentence2'], raw)}"
+        state, instructions = classification_prompt(example, question or JEV_CLASSIFICATION_INSTRUCTIONS)
+        state, instructions = clean_text(state, raw), clean_text(instructions, raw)
         criteria, target = [_strip(clean_text(o, raw)) for o in example["options"]], list(example["labels"])
         identifier = f"{task or ''}:{split}:{key}"
         if row_options:
@@ -158,7 +157,7 @@ def _recast_soft(dataset, task, question, kind, row_options, group):
             order = choice_permutation(reworded, identifier)
             if order is not None:
                 criteria, target = [reworded[i] for i in order], [target[i] for i in order]
-        return {"state": state, "instructions": question or JEV_CLASSIFICATION_INSTRUCTIONS,
+        return {"state": state, "instructions": instructions,
                 "criteria": criteria, "target": target, "task": task or "", "kind": kind,
                 "group": group or task or "", "source_row": key, "question_id": _question_id(task)}
 
@@ -184,7 +183,9 @@ def recast_jev(dataset, task=None, question=None, ordinal=False, kind=None, row_
     the matching criterion. Multiple-choice criteria are permuted
     deterministically per source row so the gold slot carries no signal;
     augmentation is otherwise deliberately separate. The annotation's
-    ``question``, when set, replaces the generic choice instruction.
+    ``question``, when set, replaces the generic choice instruction. An explicit
+    ``{sentence2}`` placeholder moves that field into the question, leaving
+    sentence1 as the state; otherwise nonempty pairs keep paired rendering.
     Ordinal label sets (``ordinal=True`` or a known scale) are put in scale
     order and about half their rows get ``kind="score"``; ``score_only=True``
     requests scores on every row of an ordered 2–10-level classification. Soft labels
@@ -230,14 +231,13 @@ def recast_jev(dataset, task=None, question=None, ordinal=False, kind=None, row_
 
         def convert(example, index, split):
             raw = keeps_raw_text(example, index, split)
-            state = clean_text(example["inputs" if visual else "sentence1"], raw)
-            if "sentence2" in example:
-                state = f"text_A: {state}\ntext_B: {clean_text(example['sentence2'], raw)}"
+            state, row_question = classification_prompt(example, instructions)
+            state, row_question = clean_text(state, raw), clean_text(row_question, raw)
             label = position[int(example["labels"])]
             identifier = f"{task or ''}:{split}:{index}"
             return {
                 "state": state,
-                "instructions": instructions,
+                "instructions": row_question,
                 "criteria": criteria,
                 "label": label,
                 "answer": criteria[label],

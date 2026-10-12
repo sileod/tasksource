@@ -12,6 +12,8 @@ Regenerate with [write_example_gallery.py](../../scripts/write_example_gallery.p
 PYTHONPATH=src python scripts/write_example_gallery.py --examples 3 --load-missing
 # One to five examples; pin the published snapshot to reproduce its rows:
 PYTHONPATH=src python scripts/write_example_gallery.py --examples 5 --revision COMMIT
+# Refresh selected tasks from current preprocessing (explicitly labeled local previews):
+PYTHONPATH=src python scripts/write_example_gallery.py --refresh-task maven-arg/role --refresh-task lex_glue/eurlex
 # Serve the searchable gallery locally:
 python -m http.server 8000 --directory docs/examples/english
 ```

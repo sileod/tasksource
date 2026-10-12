@@ -4,20 +4,20 @@ Classification · `idioms-collaboration/magpie`
 
 <details><summary>Example 1</summary>
 
-published Jev · train · magpie:train:27942:magpie-idiomatic-9964397cb2
+current local Jev recast (not yet published) · train · magpie-idiomatic-9964397cb2:train:0
 
 **State**
 
-<pre>text_A: While temporarily unloaded from any of the said vehicles in the course of a journey for a period of up to 72 hours ( not counting Sunday or any Public Holiday ) anywhere in England Scotland or Wales .
-A haulier can make it a condition that he incurs no liability under these circumstances :
-[TARGET]act[/TARGET] [TARGET]of[/TARGET] [TARGET]God[/TARGET]
-act of war or civil war
-seizure under legal process
-text_B: Expression: act of God</pre>
+<pre>Professional Institution &#x27;s Code of Conduct
+All major Institutions publish Codes of Conduct for their members , setting out the expected standards of professional conduct .
+These codes apply to conduct which may involve risk issues as well as other situations , and members may be held to account for behaviour which [TARGET]falls[/TARGET] [TARGET]short[/TARGET] of the required standard .
+Engineers should therefore be conversant with any Codes of Conduct and Rules produced by their Institution(s ) , and act accordingly .
+The Engineering Council &#x27;s Code of Conduct</pre>
 
 **Question**
 
-<pre>Is the marked expression used idiomatically or literally in this context?</pre>
+<pre>Is the marked expression used idiomatically or literally in this context?
+Expression: fall short</pre>
 
 **Criteria (choice)**
 
@@ -32,20 +32,20 @@ text_B: Expression: act of God</pre>
 
 <details><summary>Example 2</summary>
 
-published Jev · train · magpie:train:4717:magpie-idiomatic-9964397cb2
+current local Jev recast (not yet published) · train · magpie-idiomatic-9964397cb2:train:1
 
 **State**
 
-<pre>text_A: France &#x27;s two environmental parties , Les Verts and Génération Ecologie , ratified their agreement to co - operate in the forthcoming elections in mid - January [ see ED65/66 ] .
-Lists of candidates for 547 of the 551 constituencies have been drawn up , of which 278 will be fought by Les Verts and 269 by GE .
-Opinion polls predict that the Green alliance could win at least 15 - 17 per cent of the vote in the elections ; an 18 per cent share would give it a chance of holding the balance of power between [TARGET]left[/TARGET] [TARGET]and[/TARGET] [TARGET]right[/TARGET] in the national assembly .
-Le Monde 8 , 12 January European 21 - 24 January
-Environmental Politics
-text_B: Expression: left and right</pre>
+<pre>
+
+Thanks to this , in future it will be possible to offer solutions in which [TARGET]one[/TARGET] [TARGET]and[/TARGET] the [TARGET]same[/TARGET] card can be used as an access card , a credit ~ card at cash dispensers or point - of - sale terminals in trade and commerce , or even as an electronic signature .
+
+</pre>
 
 **Question**
 
-<pre>Is the marked expression used idiomatically or literally in this context?</pre>
+<pre>Is the marked expression used idiomatically or literally in this context?
+Expression: one and the same</pre>
 
 **Criteria (choice)**
 
@@ -54,26 +54,26 @@ text_B: Expression: left and right</pre>
 
 **Gold target (weight)**
 
-<pre>2. literal — 1</pre>
+<pre>1. idiomatic — 1</pre>
 
 </details>
 
 <details><summary>Example 3</summary>
 
-published Jev · train · magpie:train:41753:magpie-idiomatic-9964397cb2
+current local Jev recast (not yet published) · train · magpie-idiomatic-9964397cb2:train:2
 
 **State**
 
-<pre>text_A: This easy - money policy , backed by regulators who failed to regulate , created unprecedented housing and consumer credit bubbles in the US and other countries , notably those that shared America ’s policy orientation .
-The bubble has now burst , and these economies are heading into a steep recession .
-At the core of the crisis was the run - up in housing and stock prices , which were way [TARGET]out[/TARGET] [TARGET]of[/TARGET] [TARGET]line[/TARGET] with historical benchmarks .
-Greenspan stoked two bubbles – the Internet bubble of 1998 - 2001 and the subsequent housing bubble that is now bursting .
-In both cases , increases in asset values led US households to think that they had become vastly wealthier , tempting them into a massive increase in their borrowing and spending – for houses , automobiles , and other consumer durables .
-text_B: Expression: out of line</pre>
+<pre>The failure of expansionary austerity in Britain should give all of its advocates around the world reason to reflect on and rethink their policy calculations .
+Britain is a highly open economy with a flexible exchange rate and some room for further monetary easing .
+There is no risk or default premium baked into British interest rates to indicate that fear of political - economic chaos [TARGET]down[/TARGET] the [TARGET]road[/TARGET] is discouraging investment .
+There is an argument – not necessarily true , but an argument nonetheless – that , while in office from 1997 to May 2010 , the Labour governments of Tony ~ Blair and Gordon ~ Brown overshot long - term sustainable government spending as a share of GDP .
+Their actions stand in contrast to countries that reduced their debt - to - GDP levels in the 2000s , and to the United ~ States , where the problem was not excessive spending but insufficient taxation under the Bush administration .</pre>
 
 **Question**
 
-<pre>Is the marked expression used idiomatically or literally in this context?</pre>
+<pre>Is the marked expression used idiomatically or literally in this context?
+Expression: down the road</pre>
 
 **Criteria (choice)**
 

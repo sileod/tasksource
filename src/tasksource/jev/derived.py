@@ -369,7 +369,7 @@ def add_packed_classification(
     for index, row in enumerate(rows):
         if (row["kind"] == "choice" and row["variant"] == "direct"
                 and not row["source"].startswith(procedural.SOURCE_PREFIX)):
-            groups.setdefault((row["source"], row["split"]), []).append(index)
+            groups.setdefault((row["source"], row["split"], row["question"]), []).append(index)
     derived, audits = [], []
     for key in sorted(groups):
         group_rows, group_audits = _pack_group(
@@ -459,6 +459,8 @@ def verify_packed_rows(direct_rows, derived_rows, audits, rate, budget):
         for member in members:
             if (member["source"], member["split"]) != (record["source"], record["split"]):
                 raise ValueError(f"Pack {group_id} crosses sources or splits")
+            if member["question"] != members[0]["question"]:
+                raise ValueError(f"Pack {group_id} mixes questions")
             if member["options"] != names or len(set(names)) != len(names):
                 raise ValueError(f"Pack {group_id} mixes ontologies")
             if sorted(member["target"]) != [0.0] * (len(names) - 1) + [1.0]:

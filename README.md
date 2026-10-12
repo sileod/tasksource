@@ -53,7 +53,11 @@ an annotation carries a `question` ("Is this search query a well-formed question
 exposed as `dataset.question`.
 
 `load_task(id, prompted=True)` appends the question to the inputs. The instruct
-and typed-decision recasts use it as their instruction.
+and typed-decision recasts use it as their instruction. For a per-example question
+or query context, annotations can use `{sentence2}` in the question string:
+`question="Which role does the marked argument play?\n{sentence2}"`. Recasts put
+`sentence1` in the state and substitute `sentence2` into the question; raw fields
+stay unchanged. Ordinary paired-text tasks retain both texts in the state.
 
 #### Soft labels
 
