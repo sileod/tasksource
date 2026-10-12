@@ -2539,9 +2539,9 @@ def _decision_metadata(identifier, group, **extra):
     return json.dumps(dict(id=str(identifier), split_group_id=str(group), **extra), sort_keys=True)
 
 
-def _flatten_text(dataset, records, paired=True):
+def _flatten_text(dataset, records, paired=True, features=None):
     fields = ('sentence1','sentence2','labels','metadata') if paired else ('sentence1','labels','metadata')
-    features = Features({k:Value('string') for k in fields})
+    features = features or Features({k:Value('string') for k in fields})
     def flatten(batch):
         rows = [item for values in zip(*batch.values()) for item in records(dict(zip(batch,values)))]
         return {k:[r[k] for r in rows] for k in features}
@@ -3286,3 +3286,68 @@ topv2__slot_type = Classification('sentence1',labels='labels',dataset_name='Will
         _unique_text_splits(d,lambda r:r['utterance'],'semantic_parse'),_top_slots,paired=False),lambda r:r['sentence1'],'labels'),
     question='What semantic slot does the marked [TARGET] expression fill in this utterance?',
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['WillHeld/top_v2']})
+
+
+def _wikiqa_rows(dataset):
+    return _document_holdouts(dataset,'question_id').map(lambda r,i:dict(metadata=
+        _decision_metadata(f"{r['question_id']}:{i}",r['question_id'],candidate_index=i)),with_indices=True)
+
+
+wikiqa = Classification(lambda r:f"Question: {r['question']}\nArticle: {r['document_title']}\nCandidate answer: {r['answer']}", labels='label',
+    dataset_name='microsoft/wiki_qa', task_id='wikiqa', complete_splits=False,
+    pre_process=_wikiqa_rows, label_values={0:'no',1:'yes'}, metadata='metadata',
+    question='Is the candidate sentence relevant as an answer to the question?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['microsoft/wiki_qa']})
+
+
+def _nevir_records(row):
+    choices=[row['doc1'],row['doc2']]
+    if len(set(choices))!=2 or not all(c.strip() for c in choices):raise ValueError('NevIR requires two distinct passages')
+    for index in range(2):
+        yield dict(inputs=row[f'q{index+1}'],choices_list=choices,labels=index,
+            metadata=_decision_metadata(f"{row['id']}:q{index+1}",row['id'].split('-')[0],pair_id=row['id']))
+
+
+nevir = MultipleChoice(inputs='inputs', choices_list='choices_list', labels='labels',
+    dataset_name='orionweller/NevIR', task_id='nevir', complete_splits=False, metadata='metadata',
+    pre_process=lambda d:_flatten_text(_document_holdouts(d,lambda r:r['id'].split('-')[0]),_nevir_records,
+        features=Features(dict(inputs=Value('string'),choices_list=Sequence(Value('string')),labels=Value('int64'),metadata=Value('string')))),
+    question='Which passage answers the query? Pay attention to negation.',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['orionweller/NevIR']})
+
+
+antique = Classification('sentence1',labels='labels',dataset_name='tasksource/antique',task_id='antique',
+    complete_splits=False,metadata='metadata',ordinal=True,score_only=True,
+    label_values={1:'1: unrelated or nonsensical',2:'2: on topic but not an acceptable answer',
+                  3:'3: plausible answer but insufficiently convincing',4:'4: reasonable and convincing answer'},
+    question='How good is the candidate answer to the question? Use the four ordered relevance grades, from unrelated to convincing.',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/antique']})
+
+
+def _causal_transitivity_records(row):
+    edges=sorted(set(re.findall(r'(\w+) causes (\w+)',row['premise'])))
+    match=re.fullmatch(r'Does (\w+) cause (\w+)\?',row['hypothesis'])
+    if not edges or not match or row['label'] not in ('Yes','No'):
+        raise ValueError('Unexpected causal transitivity format')
+    if match[1]==match[2]:return  # Self-causation queries are ambiguous.
+    parents={v:set() for edge in edges for v in edge}
+    for a,b in edges:parents[b].add(a)
+    while parents:
+        roots={v for v,ps in parents.items() if not ps}
+        if not roots:return  # Node-name collisions sometimes create cyclic graphs.
+        parents={v:ps-roots for v,ps in parents.items() if v not in roots}
+    graph=hashlib.sha256(json.dumps(edges).encode()).hexdigest()
+    identity=hashlib.sha256((graph+row['hypothesis']).encode()).hexdigest()
+    yield dict(sentence1=f"Directed causal graph: {row['premise']}\nQuestion: {row['hypothesis']}",labels=row['label'],
+        metadata=_decision_metadata(identity,graph))
+
+
+causal_reasoning__transitivity = Classification('sentence1',labels='labels',
+    dataset_name='ludwigw/causal-reasoning-benchmarks',task_id='causal-reasoning/transitivity',
+    metadata='metadata',complete_splits=False,label_values={'No':'no','Yes':'yes'},
+    pre_process=lambda d:_document_holdouts(_flatten_text(d,_causal_transitivity_records,paired=False),
+        lambda r:json.loads(r['metadata'])['split_group_id']),
+    question='Answer the displayed question. A causes B if a directed path leads from A to B in the given graph.',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['ludwigw/causal-reasoning-benchmarks'],
+        'data_files':{'train':'train/transitivity_train.jsonl',
+                      'test':[f'eval/{name}_eval.jsonl' for name in ('length','long_names','reversed','shuffled')]}})

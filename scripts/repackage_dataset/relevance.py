@@ -200,3 +200,51 @@ def scirepeval_search(max_rows=5000, max_rows_eval=500, seed=42):
         revision=SEARCH_REVISION,config='search',counts=dict(counts),source_score_counts=dict(scores),
         selection=dict(max_rows=max_rows,max_rows_eval=max_rows_eval,seed=seed,method='full-source hash sample'),
         split_policy='native train/validation; validation queries in train excluded',license='unspecified'))
+
+
+ANTIQUE_HASHES = {
+    "antique-collection.txt": "68b6688f5f2668c93f0e8e43384f66def768c4da46da4e9f7e2629c1c47a0c36",
+    "antique-train-queries.txt": "ced8c5d03883aba18524bd679a2e2f529284d58b224f4b9749ea6e1e1bfcac4d",
+    "antique-test-queries.txt": "72e52d256534a0d5ca6ef8b6a745231317b28025e842a3f1fc6a90260213b4f1",
+    "antique-train.qrel": "9a07e782666628d3317f0039d682075d800959dc42e97f494c5d7f1d8faef821",
+    "antique-test.qrel": "d5585c6812e69ce86c81c406e3688d2cbbe55cf0a079924e894afa4fd62bdbcd",
+    "readme.txt": "88ed48a6c84ebb46513cf97f80d24a053d801a696c7a6e8f9a754d7911e6d551"
+}
+
+
+def antique():
+    """All native ANTIQUE judged pairs, retaining relevance grades 1–4.
+
+    Join the original query, answer-collection and qrel files without generated
+    negatives or filtering grades. Preserve native query-disjoint train/test.
+    Q0/E0/U0 judgment provenance stays in metadata. The original readme permits
+    research use; Yahoo answer rights are not replaced by a software license.
+    Original distribution: https://ciir.cs.umass.edu/downloads/Antique/
+    """
+    base='https://ciir.cs.umass.edu/downloads/Antique/'
+    directory=Path('build/retrieval-expansion');directory.mkdir(parents=True,exist_ok=True)
+    files={}
+    for name,expected in ANTIQUE_HASHES.items():
+        path=directory/name
+        if not path.exists():path.write_bytes(urllib.request.urlopen(base+name,timeout=120).read())
+        raw=path.read_bytes()
+        if hashlib.sha256(raw).hexdigest()!=expected:raise ValueError(f'ANTIQUE source changed: {name}')
+        files[name]=raw.decode('utf-8')
+    documents=dict(line.split('\t',1) for line in files['antique-collection.txt'].splitlines())
+    output={};groups={}
+    for split in ('train','test'):
+        queries=dict(line.split('\t',1) for line in files[f'antique-{split}-queries.txt'].splitlines())
+        output[split]=[];groups[split]=set(queries);seen=set()
+        for line in files[f'antique-{split}.qrel'].splitlines():
+            query,judgment,document,grade=line.split();grade=int(grade)
+            if grade not in (1,2,3,4) or (query,document) in seen:raise ValueError('Invalid or duplicate ANTIQUE judgment')
+            seen.add((query,document))
+            meta=dict(id=query+':'+document,split_group_id=query,query_id=query,document_id=document,judgment_type=judgment)
+            output[split].append(dict(sentence1=f"Question: {queries[query]}\nCandidate answer: {documents[document]}",
+                sentence2='',labels=grade,metadata=json.dumps(meta,sort_keys=True)))
+    assert not groups['train']&groups['test'],'ANTIQUE query overlap'
+    assert len(output['train'])==27422 and len(output['test'])==6589
+    return write_mirror('antique',output,'int64',dict(source_url=base,source_hashes=ANTIQUE_HASHES,
+        split_policy='native query-disjoint train/test; no fabricated validation',excluded={},
+        judgment_types={s:dict(Counter(json.loads(r['metadata'])['judgment_type'] for r in rows)) for s,rows in output.items()},
+        conversion_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),license='research-only; original ANTIQUE distribution'))

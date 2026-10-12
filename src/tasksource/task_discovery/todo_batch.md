@@ -88,3 +88,21 @@ Published the three accepted relation views to Jev `default` and `full` in [Hub 
 Every source in these five human-curated batches now has an implemented view or an explicit, source-indexed deferral. Optional projections are not silently promoted: QASPER evidence selection remains deferred; its binary view stays active. The last three accepted views are `causal-news`, `slurp/slot-type` and `topv2/slot-type`. Their [source and exact-export audit](../../../docs/jev/remaining-queue-audit.json) records counts, reviewed rows and limitations. SLURP’s existing mirror now retains original tokens in metadata for accurate slot alignment; all existing utterances, intent labels and splits were verified unchanged.
 
 Published these three completion views to Jev `default` and `full` in [Hub commit 2a17dec8](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/commit/2a17dec8035da914f2e8b05712402d702216045d): 3,000 train / 300 validation / 200 test rows appended, all previous Parquet blobs preserved. Implementation Git `b39953c`; 39 focused regression checks passed. The English gallery now includes three actual published examples for each new view.
+
+## Batch 6 — native relevance decisions (user-approved)
+
+| Source | Requested view | Status |
+|---|---|---|
+| ANTIQUE | Four native relevance grades; all ~27k judged training pairs | Original qrel/query/answer join implemented and mirrored; all 27,422 train / 6,589 native test judgments retained, four ordered grades; original research-use terms recorded |
+| WikiQA | Binary question/candidate relevance; include all-negative questions | Direct microsoft/wiki_qa; all 20,360 training pairs, including 1,245 all-negative questions; unique IDs preserve duplicate native judgments; original custom terms recorded |
+| NevIR | Native contrastive training pairs sensitive to negation | Direct orionweller/NevIR; 948 native train pairs → 1,896 two-query MC decisions; original-document partitions are disjoint |
+| MuSiQue | Optional supporting-paragraph selection; 5k–10k training questions | Deferred after coarse final-export review: question 2hop__512807_69291 asks when Puerto Rico became independent from Spain, a false premise. No MuSiQue rows published; optional projection requires further source-quality filtering. |
+
+## Batch 7 — causal reasoning sources (user-approved)
+
+| Source | Requested view | Status |
+|---|---|---|
+| COLD (2024, ~9M total) | Native causal MCQs | Excluded at user request: Exploration-Lab/COLD is gated; recorded in decisions.json |
+| Causal Reasoning Benchmarks (2026, 100k train) | Native yes/no causal classification | Transitivity implemented directly with native holdouts; cyclic graphs/self-queries excluded. D-separation deferred: 2,069/50,000 labels disagree with standard graph checks. |
+
+Batch 6 source/recast review: [audit](../../../docs/jev/retrieval-expansion-audit.json). Batch 7 graph-label review: [audit](../../../docs/jev/causal-reasoning-audit.json). Accepted views use existing templates; 23 focused regression checks pass.

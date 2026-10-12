@@ -2107,5 +2107,73 @@
         "findings": "Native evidence is positive paragraph selection, without explicit negative paragraph judgments. Inferring that every unselected paragraph is irrelevant risks unsupported negative labels; this optional projection is deferred, while the existing consensus yes/no view remains active."
       }
     ]
+  },
+  {
+    "name": "COLD",
+    "scope": "dataset",
+    "status": "deferred",
+    "reason_code": "gated_source",
+    "reason": "User explicitly requested skipping this gated source.",
+    "evidence": [
+      "https://huggingface.co/datasets/Exploration-Lab/COLD"
+    ],
+    "checked_on": "2026-10-12",
+    "reconsider_if": "User requests integration and authorized source access is available.",
+    "huggingface": [
+      "Exploration-Lab/COLD"
+    ],
+    "github": [],
+    "papers": [
+      "arxiv:2411.19500"
+    ]
+  },
+  {
+    "name": "Causal Reasoning Benchmarks: d-separation",
+    "scope": "task",
+    "tasks": [
+      "causal-reasoning/d-separation"
+    ],
+    "status": "deferred",
+    "reason_code": "incorrect_labels",
+    "reason": "2,069 of 50,000 native d-separation training labels disagree with ancestral moral-graph separation. Simple blocked chains are mislabeled No; transitivity is separately retained after structural filtering.",
+    "evidence": [
+      "https://huggingface.co/datasets/ludwigw/causal-reasoning-benchmarks",
+      "docs/jev/causal-reasoning-audit.json"
+    ],
+    "checked_on": "2026-10-12",
+    "reconsider_if": "An upstream corrected d-separation release passes an independent graph-label audit.",
+    "huggingface": [
+      "ludwigw/causal-reasoning-benchmarks"
+    ],
+    "github": [],
+    "papers": [
+      "arxiv:2605.05438"
+    ]
+  },
+  {
+    "name": "MuSiQue supporting paragraphs",
+    "scope": "task",
+    "tasks": [
+      "musique/support"
+    ],
+    "status": "deferred",
+    "reason_code": "annotation_quality",
+    "reason": "Optional view deferred after final-export review found a false-premise native question: 2hop__512807_69291 asks when Puerto Rico became independent from Spain; the cited paragraph describes transfer to US possession in 1898. No MuSiQue rows published.",
+    "evidence": [
+      "https://huggingface.co/datasets/bdsaglam/musique",
+      "https://github.com/StonyBrookNLP/musique",
+      "docs/jev/retrieval-expansion-audit.json"
+    ],
+    "checked_on": "2026-10-12",
+    "reconsider_if": "A source audit and reproducible quality filter support answerable, factually sound multi-hop questions.",
+    "huggingface": [
+      "bdsaglam/musique"
+    ],
+    "github": [
+      "StonyBrookNLP/musique"
+    ],
+    "papers": [
+      "arxiv:2108.00573"
+    ]
   }
 ]

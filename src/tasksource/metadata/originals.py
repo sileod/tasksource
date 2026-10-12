@@ -11,6 +11,7 @@ by scripts/upload_repackaged.py) or a task switches to a mirror.
 """
 
 ORIGINALS = {
+    "tasksource/antique": ["irds/antique", "irds/antique_train", "irds/antique_test"],
     "tasksource/matres": [],  # native MATRES/TempEval3 GitHub distributions
 
     "tasksource/semcor": ["thesofakillers/SemCor"],

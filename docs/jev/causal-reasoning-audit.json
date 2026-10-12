@@ -1,0 +1,188 @@
+{
+  "checked_on": "2026-10-12",
+  "reviewer": {
+    "kind": "model",
+    "family": "GPT-6",
+    "exact_variant": "not exposed in session"
+  },
+  "source": {
+    "repo": "ludwigw/causal-reasoning-benchmarks",
+    "revision": "128b00ada5ee94a8e9262d7b0c4836c6edebd5cc"
+  },
+  "license": {
+    "license": "mit",
+    "url": "https://huggingface.co/datasets/ludwigw/causal-reasoning-benchmarks"
+  },
+  "accepted_task": "causal-reasoning/transitivity",
+  "excluded_sources": {
+    "Exploration-Lab/COLD": "Gated; user explicitly requested skipping."
+  },
+  "label_checks": {
+    "train-transitivity_train": {
+      "rows": 50000,
+      "counts": {
+        "No": 18417,
+        "Yes": 31583,
+        "mismatches": 14
+      },
+      "examples": [
+        {
+          "index": 5369,
+          "premise": "W causes UHt. W causes UHt. Z causes W.",
+          "hypothesis": "Does W cause W?",
+          "label": "Yes",
+          "expected": "No"
+        },
+        {
+          "index": 5881,
+          "premise": "Fw causes d. Fw causes d.",
+          "hypothesis": "Does d cause d?",
+          "label": "Yes",
+          "expected": "No"
+        },
+        {
+          "index": 5912,
+          "premise": "o causes ht5. u causes ht5. Zz causes u. o causes Zz.",
+          "hypothesis": "Does o cause o?",
+          "label": "Yes",
+          "expected": "No"
+        }
+      ]
+    },
+    "train-dsep_train": {
+      "rows": 50000,
+      "counts": {
+        "No": 44136,
+        "Yes": 5864,
+        "mismatches": 2069
+      },
+      "examples": [
+        {
+          "index": 22,
+          "premise": "Juw causes G. G causes y7. y7 causes o.",
+          "hypothesis": "Are o and G d-separated given {Juw, y7}?",
+          "label": "No",
+          "expected": "Yes"
+        },
+        {
+          "index": 27,
+          "premise": "4 causes TC. TC causes e.",
+          "hypothesis": "Are e and 4 d-separated given {TC}?",
+          "label": "No",
+          "expected": "Yes"
+        },
+        {
+          "index": 33,
+          "premise": "1vs causes 2. 2 causes b.",
+          "hypothesis": "Are b and 1vs d-separated given {2}?",
+          "label": "No",
+          "expected": "Yes"
+        }
+      ]
+    }
+  },
+  "structural_filter_audit": {
+    "train-transitivity_train.jsonl": {
+      "counts": {
+        "eligible": 49404,
+        "cyclic_graph": 582,
+        "self_query": 105
+      },
+      "examples": []
+    },
+    "eval-length.json": {
+      "counts": {
+        "cyclic_graph": 1044,
+        "eligible": 8956,
+        "self_query": 17
+      },
+      "examples": []
+    },
+    "eval-long_names.json": {
+      "counts": {
+        "eligible": 10000
+      },
+      "examples": []
+    },
+    "eval-reversed.json": {
+      "counts": {
+        "eligible": 8976,
+        "cyclic_graph": 1024,
+        "self_query": 15
+      },
+      "examples": []
+    },
+    "eval-shuffled.json": {
+      "counts": {
+        "eligible": 9675,
+        "cyclic_graph": 314,
+        "self_query": 15
+      },
+      "examples": []
+    }
+  },
+  "independent_confirmation": {
+    "method": "NetworkX d-separation on valid DAGs with distinct unconditioned endpoints",
+    "mismatches": 2057,
+    "cyclic_graphs": 631
+  },
+  "methods": {
+    "transitivity": "Independent directed reachability; excluded self-queries and cyclic graphs before comparing native labels. Zero remaining mismatches in all five included files. Native labels are never corrected or generated.",
+    "d_separation": "Ancestor closure of queried and conditioned nodes; moralize induced ancestral graph, remove conditioned nodes, then test undirected connectivity. All 2,069 mismatches include unsupported graph cases; 2,057 confirmed independently on valid DAGs."
+  },
+  "canonical_counts": {
+    "train": 49404,
+    "test": 37607
+  },
+  "split_policy": "Native transitivity training file; native length/long_names/reversed/shuffled eval files combined as test. Branching is d-separation and excluded. Identical sorted-edge graphs assigned to holdouts; no fabricated validation split.",
+  "manual_review": {
+    "examples": [
+      {
+        "metadata": "{\"id\": \"419acfcd97bf9534d7bb549eec8142f9571453d5beec63178b641e034bc237ba\", \"split_group_id\": \"f2ec88456f09c4c18ff14d76ccdf46b85fecee5f1d07268159ad50f5a65f3666\"}",
+        "state": "Directed causal graph: MU causes Hk. MU causes fz.\nQuestion: Does Hk cause MU?",
+        "instructions": "Answer the displayed question. A causes B if a directed path leads from A to B in the given graph.",
+        "criteria": [
+          "no",
+          "yes"
+        ],
+        "label": 0,
+        "answer": "no",
+        "task": "causal-reasoning/transitivity",
+        "kind": "choice"
+      },
+      {
+        "metadata": "{\"id\": \"f77772beff0c1219ebedbbe65264f6db519f05378e796d26d3492198801f37cc\", \"split_group_id\": \"d01a81423e9df9bfac40d760f661531935039cf7b7993b3f0ae43ccf0bb62cda\"}",
+        "state": "Directed causal graph: hn causes 5r. Ig causes 5r. Ig causes W. tx causes W.\nQuestion: Does 5r cause W?",
+        "instructions": "Answer the displayed question. A causes B if a directed path leads from A to B in the given graph.",
+        "criteria": [
+          "no",
+          "yes"
+        ],
+        "label": 0,
+        "answer": "no",
+        "task": "causal-reasoning/transitivity",
+        "kind": "choice"
+      },
+      {
+        "metadata": "{\"id\": \"247e23e0ab67eddbd250e7fe8d5231e82a96ec9d23621ae38dfb0b14f2ee3777\", \"split_group_id\": \"c07ed6aae065e9340ac11e9935b3c6abe762d78a0ce5a308e4f0524a447aa623\"}",
+        "state": "Directed causal graph: HfW causes Fj7. qf causes Fj7. qf causes Yeq. Yeq causes T.\nQuestion: Does Yeq cause T?",
+        "instructions": "Answer the displayed question. A causes B if a directed path leads from A to B in the given graph.",
+        "criteria": [
+          "no",
+          "yes"
+        ],
+        "label": 1,
+        "answer": "yes",
+        "task": "causal-reasoning/transitivity",
+        "kind": "choice"
+      }
+    ],
+    "findings": [
+      "Reversed query Hk -> MU correctly no; edges only MU -> Hk and MU -> fz.",
+      "5r -> W correctly no: 5r and W share parent Ig but no directed path.",
+      "Yeq -> T is an explicit edge, correctly yes."
+    ],
+    "scope": "Three actual recast training examples, plus independent exhaustive graph-label checks; synthetic graph supervision, not human causal judgments."
+  },
+  "repackaged": false
+}

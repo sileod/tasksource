@@ -1,6 +1,11 @@
 """Reviewed source snapshots; keep opaque revision IDs out of task annotations."""
 
 SOURCE_REVISIONS = {
+    "ludwigw/causal-reasoning-benchmarks": "128b00ada5ee94a8e9262d7b0c4836c6edebd5cc",
+    "tasksource/antique": "64ee082b79eef22a6c8f80b76e10b4d88c4308b0",
+    "microsoft/wiki_qa": "3f104672b5de699878fe7907afc486f0de325eb5",
+    "orionweller/NevIR": "6263585072ce3b435ed09658613553fbf4e74184",
+
     "thagen/CNCv2": "467414788436d05da02d17188a3c0e30b0f41b4c",
     "gyorilab/BioRED": "a61e98e5d360fadfa5a4aaeb9fb44bf8b4f06a94",
     "Nofing/Maven-ERE-span": "4dc3ead8e8d90fdee3fbef71727f159b2fc48236",

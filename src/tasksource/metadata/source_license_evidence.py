@@ -5,6 +5,12 @@ Keys are task families, shared by their visual classification/MC views.
 """
 
 SOURCE_LICENSE_EVIDENCE = {
+    'antique': {'license': 'research-only (original ANTIQUE distribution)',
+                'scope': 'original Yahoo answer collection and relevance judgments; no inferred software license',
+                'url': 'https://ciir.cs.umass.edu/downloads/Antique/readme.txt'},
+    'wikiqa': {'license': 'Microsoft Research WikiQA license (research and technology development only)',
+               'scope': 'dataset and derivatives; retain original terms and modification notices',
+               'url': 'https://huggingface.co/datasets/microsoft/wiki_qa#licensing-information'},
     'magpie': {'license': 'cc-by-4.0', 'scope': 'original MAGPIE corpus; Hub card incorrectly says MIT',
                'url': 'https://github.com/hslh/magpie-corpus/blob/master/LICENSE'},
     'ukpconvarg': {'license': 'cc-by-4.0', 'scope': 'original Strict argument-pair distribution',

@@ -21,6 +21,7 @@ from scripts.repackage_dataset.mind2web import mind2web_dom
 from scripts.repackage_dataset.relevance import sentfin, wands, scirepeval_search
 from scripts.repackage_dataset.specialized_text import acord, edos, evidence_inference
 from scripts.repackage_dataset.dialogue import slurp, mcscript2
+from scripts.repackage_dataset.relevance import antique
 from scripts.repackage_dataset.stance import vast, fnc1, perspectrum, ukpconvarg, discogem
 from scripts.repackage_dataset.specialized_text import pubmed_rct
 from scripts.repackage_dataset.linguistic import semcor, streusle, spider
@@ -34,6 +35,7 @@ BUILDERS = {"matres": ("tasksource/matres", matres),
             "streusle": ("tasksource/streusle", streusle),
             "spider": ("tasksource/spider", spider, "per-config"),
             "slurp": ("tasksource/slurp", slurp),
+            "antique": ("tasksource/antique", antique),
             "pubmed-rct": ("tasksource/pubmed-rct", pubmed_rct),
             "vast": ("tasksource/vast", vast), "fnc1": ("tasksource/fnc1", fnc1),
             "perspectrum": ("tasksource/perspectrum", perspectrum),
@@ -69,7 +71,7 @@ BUILDERS = {"matres": ("tasksource/matres", matres),
 
 
 # license metadata for repackaged sets, as the originals state it
-LICENSES = {"tasksource/semcor": "other", "tasksource/streusle": "cc-by-sa-4.0",
+LICENSES = {"tasksource/antique": "other", "tasksource/semcor": "other", "tasksource/streusle": "cc-by-sa-4.0",
             "tasksource/spider": "cc-by-sa-4.0", "tasksource/slurp": "cc-by-4.0", "tasksource/mcscript2": "other",
             "tasksource/pubmed-rct": "other",
             "tasksource/vast": "other", "tasksource/fnc1": "other", "tasksource/perspectrum": "cc-by-sa-4.0",
