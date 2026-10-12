@@ -1,10 +1,10 @@
-"""python -m tasksource.task_discovery {retrieve,match,link} --help"""
+"""python -m tasksource.task_discovery {retrieve,match,link,index} --help"""
 import argparse
 import hashlib
 import json
 from pathlib import Path
 
-from .match import catalog_hash, catalog_index, deduplicate, match, previous_decisions, queued_sources
+from .match import catalog_hash, catalog_index, deduplicate, match, previous_decisions, queued_sources, catalog_references
 from .paperswithcode import retrieve
 from .link import link
 
@@ -24,15 +24,19 @@ def main():
     fetch.add_argument('--task', action='append', default=[], help='Case-insensitive task-tag substring; repeat for OR')
     compare = commands.add_parser('match', help='Deduplicate and compare any canonical candidate JSONL')
     compare.add_argument('input', type=Path)
+    compare.add_argument('--index',type=Path,help='External catalog links JSONL; defaults to bundled index')
     compare.add_argument('--unmatched-only', action='store_true')
     compare.add_argument('--unreviewed-only', action='store_true', help='Exclude catalog matches, previously assessed sources and the human queue')
+    index=commands.add_parser('index',help='Mine implemented datasets’ Hub cards for GitHub/paper identifiers')
+    index.add_argument('--limit',type=int,help='Maximum source cards; default all catalog repositories')
+    index.add_argument('--offline',action='store_true',help='Read locally cached cards only')
     enrich = commands.add_parser('link', help='Link papers and suggest Hub mirrors using cached metadata')
     enrich.add_argument('input', type=Path)
     enrich.add_argument('--cache', type=Path, required=True)
     enrich.add_argument('--offline', action='store_true', help='Replay saved API responses without network access')
     enrich.add_argument('--limit', type=int, default=20, help='Maximum candidate records to enrich (default 20)')
     enrich.add_argument('--no-hub-search', action='store_true')
-    for command in (fetch, compare, enrich):
+    for command in (fetch, compare, enrich, index):
         command.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
     if args.command == 'retrieve':
@@ -58,13 +62,23 @@ def main():
         rows = deduplicate(rows)
         manifest = runs[0] if len(runs)==1 else dict(sources=runs)
         manifest['output_rows'] = len(rows)
+    elif args.command == 'index':
+        from .cards import mine_cards
+        if args.limit is not None and args.limit < 1:parser.error('--limit must be positive')
+        names,repos=catalog_index(normalize_repos=False)
+        rows=mine_cards(repos,args.limit,args.offline)
+        manifest=dict(catalog_sha256=catalog_hash(names,repos),offline=args.offline,limit=args.limit,
+                      cards=len(rows),errors=sum('error' in row for row in rows))
     elif args.command == 'match':
         raw = args.input.read_bytes()
         names, repos = catalog_index()
+        references=catalog_references(args.index)
         decisions = previous_decisions()
         queue = queued_sources()
-        rows = list(match([json.loads(line) for line in raw.splitlines() if line.strip()], names, repos, decisions, queue))
+        rows = list(match([json.loads(line) for line in raw.splitlines() if line.strip()], names, repos, decisions, queue,references))
         manifest = dict(input_sha256=hashlib.sha256(raw).hexdigest(), catalog_sha256=catalog_hash(names, repos),
+                        reference_index_sha256=hashlib.sha256(json.dumps({k:sorted(v) for k,v in references.items()},sort_keys=True).encode()).hexdigest(),
+                        related_sources=sum(bool(r['related_matches']) for r in rows),
                         unique_candidates=len(rows), catalog_matches=sum(bool(r['matches']) for r in rows),
                         previous_decisions_sha256=hashlib.sha256(json.dumps(decisions,sort_keys=True).encode()).hexdigest(),
                         previously_reviewed=sum(r['status']=='previously_reviewed' for r in rows),

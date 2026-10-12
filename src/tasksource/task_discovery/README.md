@@ -67,3 +67,19 @@ python -m tasksource.task_discovery link build/discovery/candidates.jsonl \
 `identifiers.py` normalizes Hub/GitHub repos, arXiv/DOI identifiers and Semantic Scholar paper IDs; `link.py` queries the [Semantic Scholar Graph API](https://api.semanticscholar.org/api-docs/graph) and [Hub metadata API](https://huggingface.co/docs/hub/api). These functions accept the same candidate records regardless of discovery source. Paper resolution uses an explicit identifier or a unique exact normalized title; approximate matches remain unresolved. Hub name matches are recorded separately in `link_candidates` with `verified: false`; they are not treated as established dataset identities. Existing GitHub links are retained, not inferred from paper titles.
 
 Each saved response records its request URL, retrieval time and checksum. Headers and API keys are never written to the cache. The first `--limit` records are enriched; other records are preserved. Requests have bounded timeouts, Semantic Scholar requests are paced, and failures remain explicit in `link_errors`. Reuse the cache on subsequent runs. Linking does not perform quality review or automatically edit the human queue.
+
+## Catalog link index
+
+Mine README cards of all implemented source repositories (including originals behind mirrors), without downloading dataset contents:
+
+```bash
+python -m tasksource.task_discovery index --output src/tasksource/task_discovery/catalog_links.jsonl
+python -m tasksource.task_discovery match build/discovery/hf_candidates.jsonl \
+  --unreviewed-only --output build/discovery/new_candidates.jsonl
+```
+
+`index --limit 20` bounds the scan; `--offline` replays locally cached cards. Each record retains existing task IDs, resolved card revision, SHA-256 and a pinned card URL; failed or inaccessible cards are recorded explicitly. The bundled index is partial and can be refreshed independently. `match --index path.jsonl` uses another snapshot. Its manifest fingerprints the effective reference index.
+
+GitHub repository and paper identifiers (arXiv, DOI, Semantic Scholar, ACL Anthology) appear as `related_matches` with the associated task IDs. They flag possible mirrors or new views of a known source. They do not silently discard candidates or merge datasets: a card may cite related work, and a repository or paper may introduce several datasets. Exact name/Hub matches remain separate. Common dataset-loader infrastructure links are ignored. This index records card claims, not a verification of authorship, license or annotation quality.
+
+The initial snapshot scans 510 source repositories: 496 readable cards, 14 recorded failures, 246 distinct GitHub identities and 330 paper identities. The discovery regression suite passes 15 checks; the cached PWC run reports 63 related-source records alongside 149 direct catalog matches. Related-source records are review hints and remain eligible when unmatched by name/repository.

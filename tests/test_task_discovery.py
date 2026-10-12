@@ -195,3 +195,43 @@ def test_retrieve_combines_sources_through_same_cli_and_preserves_evidence(tmp_p
     assert rows[0]['train_status']=='unchecked'
     manifest=json.loads(output.with_suffix('.manifest.json').read_text())
     assert [s['source'] for s in manifest['sources']]==['hf_hub','openalex']
+
+
+def test_card_links_extract_repositories_and_papers_without_infrastructure():
+    from tasksource.task_discovery.cards import card_links
+    from tasksource.task_discovery.identifiers import paper_ids
+    links=card_links('''https://github.com/Org/Data/blob/main/LICENSE
+        https://github.com/huggingface/datasets https://github.com/sileod/tasksource
+        Paper [https://arxiv.org/pdf/1808.07036v2.pdf](https://arxiv.org/pdf/1808.07036v2.pdf)
+        doi https://doi.org/10.1234/example). eprint={2401.12345}''')
+    assert links['github']==['https://github.com/Org/Data']
+    assert paper_ids(links['papers'])=={'arxiv:1808.07036','doi:10.1234/example','arxiv:2401.12345'}
+
+
+def test_mine_cards_records_snapshot_and_failures_without_loading_data(tmp_path,monkeypatch):
+    from tasksource.task_discovery import cards
+    path=tmp_path/'snapshots'/'source-commit'/'README.md';path.parent.mkdir(parents=True)
+    path.write_text('https://github.com/Org/Data')
+    def read(repo,filename,**kwargs):
+        assert filename=='README.md' and kwargs==dict(repo_type='dataset',local_files_only=True)
+        if repo=='org/missing':raise FileNotFoundError('Not cached')
+        return str(path)
+    monkeypatch.setattr(cards,'hf_hub_download',read)
+    rows=cards.mine_cards({'org/known':{'task/view'},'org/missing':{'other/view'}},offline=True)
+    assert rows[0]['revision']=='source-commit' and rows[0]['tasks']==['task/view']
+    assert rows[0]['sha256']==hashlib.sha256(path.read_bytes()).hexdigest()
+    assert '/source-commit/README.md' in rows[0]['sources'][0]['url']
+    assert rows[1]['error']=='Not cached'
+
+
+def test_catalog_reference_matches_flag_shared_sources_without_discarding_new_datasets(tmp_path):
+    from tasksource.task_discovery.match import catalog_references
+    path=tmp_path/'links.jsonl'
+    path.write_text(json.dumps(dict(name='org/known',tasks=['known/view'],github=['https://github.com/Org/Data'],
+        papers=[dict(url='https://arxiv.org/abs/1808.07036')]))+'\n')
+    refs=catalog_references(path)
+    rows=list(match([dict(name='New task',github=['https://github.com/org/data.git'],
+        papers=[dict(url='https://arxiv.org/pdf/1808.07036v2.pdf')])],{},{},references=refs))
+    assert rows[0]['status']=='candidate' and rows[0]['matches']==[]
+    assert {m['by'] for m in rows[0]['related_matches']}=={'github_repository','paper'}
+    assert all(m['tasks']==['known/view'] for m in rows[0]['related_matches'])

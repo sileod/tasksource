@@ -26,7 +26,7 @@ def deduplicate(candidates):
     return [merged[key] for key in sorted(merged)]
 
 
-def catalog_index():
+def catalog_index(normalize_repos=True):
     from tasksource.access import _task_repos, list_tasks
     names, repos = defaultdict(set), defaultdict(set)
     for options in ({}, {'soft': True}, {'multilingual': True}, {'vision': True}):
@@ -34,9 +34,21 @@ def catalog_index():
             for name in (row.id, row.id.split('/')[0]):
                 names[normalized(name)].add(row.id)
             for repo in _task_repos(row.mapping, row.dataset_name, row.id):
-                repos[repo.casefold()].add(row.id)
+                repos[repo.casefold() if normalize_repos else repo].add(row.id)
                 names[normalized(repo.rsplit('/', 1)[-1])].add(row.id)
     return names, repos
+
+
+def catalog_references(path=None):
+    path=Path(path) if path else Path(__file__).with_name('catalog_links.jsonl')
+    references=defaultdict(set)
+    for line in path.read_text().splitlines() if path.exists() else []:
+        row=json.loads(line)
+        for identity in (source_id(v,'github') for v in row.get('github',[])):
+            references['github:'+identity].update(row['tasks'])
+        for identity in paper_ids(row.get('papers',[])):
+            references['paper:'+identity].update(row['tasks'])
+    return references
 
 
 def previous_decisions():
@@ -71,7 +83,8 @@ def decision_matches(row, records):
             yield record
 
 
-def match(candidates, names, repos, decisions=(), queue=None):
+def match(candidates, names, repos, decisions=(), queue=None, references=None):
+    references=catalog_references() if references is None else references
     for row in deduplicate(candidates):
         evidence = []
         for name in [row['name'], *row.get('aliases', [])]:
@@ -81,9 +94,15 @@ def match(candidates, names, repos, decisions=(), queue=None):
             repo = url.split('/datasets/', 1)[-1].strip('/').casefold()
             if repo in repos:
                 evidence.append(dict(by='hub_repository', value=repo, tasks=sorted(repos[repo])))
+        related=[]
+        identities=[('github_repository','github:'+source_id(v,'github')) for v in row.get('github',[])]
+        identities += [('paper','paper:'+v) for v in sorted(paper_ids(row.get('papers',[])))]
+        for kind,identity in identities:
+            if identity in references:
+                related.append(dict(by=kind,value=identity.split(':',1)[1],tasks=sorted(references[identity])))
         history = list(decision_matches(row, decisions))
         queued = {normalized(n) for n in [row['name'], *row.get('aliases', [])]} & (queue or {}).keys()
-        yield dict(row, matches=evidence, previous_decisions=history,
+        yield dict(row, matches=evidence, related_matches=related, previous_decisions=history,
             queue_matches=[queue[n] for n in sorted(queued)],
             status='catalog_match' if evidence else 'previously_reviewed' if history else 'queued' if queued else 'candidate')
 
