@@ -36,6 +36,20 @@ label handling, procedural generators, and augmentations live in
 `tasksource.recast_jev` and `load_task(..., recast="jev")` APIs are unchanged.
 The release card is [`dataset_cards/tasksource-jev.md`](../../dataset_cards/tasksource-jev.md).
 
+## Repairing published question surfaces
+
+[`repair_jev_questions.py`](../../scripts/repair_jev_questions.py) patches the
+existing `default`, `full`, and `filtered-full` rows at a pinned Hub revision.
+It applies explicit task question templates, omits empty input fields, and
+removes parked tasks without resampling. Retained options, targets, source IDs,
+groups and splits must compare exactly; unrelated rows and visual shards are
+preserved. Packed probability questions keep their separate per-item contexts.
+
+The Hub's [`repairs/question-surfaces/`](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/tree/main/repairs/question-surfaces)
+contains the recipe, before/after examples, validation manifest, and old-to-new
+content ID mapping. Publication uses a parent-commit guard to prevent overwriting
+concurrent changes.
+
 ## Browser structure and Super-CLEVR
 
 `weblinx/action` and `weblinx/dom-element` load the pinned cleaned WebLINX

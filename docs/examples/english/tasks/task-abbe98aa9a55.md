@@ -4,162 +4,360 @@ Classification · `theatticusproject/cuad-qa`
 
 <details><summary>Example 1</summary>
 
-current local Jev recast (not yet published) · train · cuad-answerability-b11692cc91:train:0
+published Jev · train · cuad:train:MTITECHNOLOGYCORP_11_16_2004-EX-10.102-Reseller Agreement Premier Addendum__Non-Disparagement_0:cuad-answerability-b11692cc91
 
 **State**
 
-<pre>Exhibit 10.1    STRATEGIC ALLIANCE AGREEMENT    This Strategic Alliance Agreement (this &quot;Agreement&quot;), effective as of 15 April, 2009 (the &quot;Effective Date&quot;), is by and between Information  System Associates, Inc., a Florida Corporation whose registered office is 1151 Southwest 30th Street, Suite E, Palm City FL, 34990 (&quot;ISA&quot;) and  Rubicon Software Group plc, a company registered under the laws of England and Wales (Registered Company No. 5701810) whose registered  office is Rubicon House, Guildford Road, West End, Surrey GU24 9PW (&quot;Rubicon&quot;).    Background    WHEREAS, Rubicon desires to engage ISA as Rubicon&#x27;s exclusive agent in the United States for the purposes of reselling Rubicon&#x27;s  software and services;    WHEREAS, ISA desires to engage Rubicon as its software development partner and to provide various consulting services in Europe;  and    WHEREAS, ISA and Rubicon desire to enter into this Agreement for the purpose of granting ISA the right to distribute such products  and services and Rubicon to supply such services.    NOW, THEREFORE, the parties hereto, intending to be legally bound, hereby agree as hereinafter set forth.    1. DEFINITIONS.      1.1 Confidential Information shall mean all non-public information of a Party, which is disclosed to the other Party hereunder, including,  without limitation, trade secrets, technical information, business information, sales information, marketing information, customer-buying patterns,  algorithms, customer and potential customer lists and identities, product sales plans, sublicense agreements, inventions, developments,  discoveries, software, know-how, methods, techniques, formulae, data, processes and other trade secrets and proprietary ideas, whether or not protectable under patent, trademark, copyright or other areas of law, and any other information marked as &quot;proprietary&quot;  or &quot;confidential&quot; at the  time of disclosure. Notwithstanding the foregoing, &quot;Confidential Information&quot; shall not include any information that (a) was or has become  publicly available without restriction through no fault of the receiving Party or its employees or agents; (b) is received without restriction from a  third party that, to the best knowledge of the receiving Party, did not have an obligation of confidentiality to the disclosing Party; (c) was  rightfully in possession of the receiving Party without restriction prior to its disclosure by the other Party; or (d) was independently developed by  employees of the receiving Party that had no knowledge of or access to such information, as evidenced by written records of the receiving Party.     1.2 Contract Services shall mean various software development and implementation services to be provided by Rubicon as described in  one or more Statement(s) of Work (&quot;SOW&quot;) that reference this Agreement in a form substantially similar to that set forth in Exhibit A.     1.3 Day Rate shall mean the daily rate at which Rubicon will provide services to ISA or ISA Clients. The Day Rate for each type of service  provided will be as per the rate card set out in Exhibit C, such rates to be subject to annual review by the Parties on the anniversary of this  Agreement provided that such rates may be reviewed on an ad hoc basis at any time should the Parties become aware of specific information  which impacts on the validity or feasibility of the Day Rate.     1.4 Commission Rate shall mean the commission rate which will be used to calculate any amount which Rubicon will pay to ISA after the  provision of Rubicon Offerings to ISA Clients as set forth in Exhibit D, such rates to be subject to annual review by the Parties on the anniversary  of this Agreement provided that such rates may be reviewed on an ad hoc basis at any time should the Parties become aware of specific  information which impacts on the validity or feasibility of the Commission Rate.     1.5 Documentation shall mean the printed and/or electronic materials relating to the Rubicon Offerings, including, but not limited to,  user&#x27;s manuals and technical manuals as may be provided by Rubicon to ISA.     1.6 Due Diligence Services shall have the meaning set forth in Section 3.3, below.     1.7 End User shall mean a party that obtains a license to use the Rubicon Offerings from ISA or a customer of ISA under the terms and  conditions set forth herein.     1.8 Intellectual Property shall mean any and all trade secrets, patents, copyrights, trademarks, service marks, trade names, domain names,  trade dress, URLs, brand features, know-how and similar rights of any type under the laws of any applicable governmental authority, including,  without limitation, all applications and registrations relating to any of the foregoing..     1.9  ISA Client shall mean: (i) an entity to which Rubicon provides services pursuant to Section 3, below; and (ii) an entity that ISA has  consulted with before or during the Term regarding the provision of goods or services.     1.10 Notice shall have the meaning ascribed thereto in Section 11.5.     1.11 Parties shall mean ISA and Rubicon.     1.12 Rubicon Offerings shall mean (i) the software programs described in Exhibit B, (as may be updated from time to time) in object code  format, and including all corrections, updates, modifications and enhancements to such software that may be provided to ISA by Rubicon from  time to time; and (ii) software development services.     1.13 Term shall have the meaning ascribed thereto in Section 6.1.     1.14 Share Subscription Agreement shall mean the agreement in the agreed form between ISA and Rubicon whereby ISA shall subscribe  for shares in Rubicon.     2. ISA RESELLER SERVICES.
+<pre>EXHIBIT 10.102
+
+[McDATA LOGO]
+
+RESELLER AGREEMENT
+
+AGREEMENT NUMBER: 200-04-634-00
+
+McDATA CORPORATION (&quot;McDATA)          &quot;RESELLER&quot;  MTI TECHNOLOGY CORPORATION
+
+380 INTERLOCKEN CRESCENT              ADDRESS: 14661 FRANKLIN AVE
+
+BROOMFIELD, CO 80021                  ADDRESS: TUSTIN, CA 92780
+
+ADDRESS:
+
+THE EFFECTIVE DATE OF THIS RESELLER AGREEMENT SHALL BE: Sept 29, 2004
+
+The following documents are incorporated herein by reference:
+
+Reseller Agreement
+
+Premier Addendum
+
+This Agreement, and all Addendums and attachments hereto, identified above, and Channel Notification Documents as issued by McDATA from time to time constitute the entire agreement between McDATA and Reseller with respect to the subject matter hereof, and supersedes all prior and contemporaneous oral or written representations or agreements between the parties regarding the subject matter of this Agreement.
+
+ACCEPTED AND AGREED TO BY:            ACCEPTED AND AGREED TO BY:
+
+McDATA CORPORATION(McDATA)            RESELLER MTI TECHNOLOGY CORPORATION
+
+SIGNED: /s/ Bruce Chumley             SIGNED: /s/ Ron Umagat        ---------------------------           ---------------------------------- NAME: Bruce Chumley                   NAME: Ron Umagat
+
+TITLE: VP Channel Sales               TITLE: VP of Operations
+
+DATE: 9/29/04                         DATE: 9/24/04
+
+This Reseller Agreement (the &quot;Agreement&quot;) is entered into by and between McDATA and Reseller.
+
+1.    SCOPE
+
+This Agreement establishes the terms and conditions under which Reseller will purchase, market, sell, license or incorporate for resale the McDATA Products and End User Customer Services in the Territory and the non-exclusive terms under which McDATA will provide the Products and End-User Customer Services (as defined below).
+
+2.    DEFINITIONS
+
+2.1 &quot;CHANNEL NOTIFICATION DOCUMENT(S)&quot; means McDATA&#x27;s standard form, incorporated herein by reference, for notifying Resellers of price changes, new product announcements, discontinued/obsolete product announcements, engineering change notifications, product information, marketing and sales Incentive programs, and any other business matters affecting pricing, products and services.
+
+2.2 &quot;END USER CUSTOMER SERVICES&quot; means the collective reference to warranty and post warranty (maintenance) services, including standard and enhanced warranty services, made available by McDATA and provided directly to End User Customers.
+
+2.3 &quot;PRODUCT(S)&quot; means McDATA hardware, Software, and related features, conversions, and options, as listed in the Addendum and further provided through Channel Notification Documents.
+
+2.4 &quot;SOFTWARE&quot; means the computer software, In machine executable object code format only, that is delivered and licensed by McDATA with the Product.
+
+2.5 &quot;TERRITORY&quot; means the area designated on the first page of the incorporated Addendum to this Agreement in which Reseller may, on a non-exclusive basis, market and sell the Products and End User Customer Services.
+
+3.    APPOINTMENT/TERRITORY
+
+3.1 Subject to the terms and conditions of this Agreement, McDATA hereby authorizes and appoints Reseller and Reseller accepts the appointment, as a non-exclusive reseller to purchase Products from McDATA and to market, sell, or incorporate for resale McDATA Products to End User Customers in the Territory.
+
+3.2 Reseller&#x27;s authorization from McDATA to resell McDATA Products is limited to the Territory shown on the first page of this Agreement. Additional sales locations must be pre-approved by McDATA. Reseller may request that additional Reseller sales locations are added to this Agreement. Upon Reseller&#x27;s request, McDATA will provide Reseller with the criteria and process for applying for authorization of additional sales locations. Reseller agrees that any additional
 
 
 
 
 
-   2.1 Rubicon hereby grants to ISA during the Term (as defined below) and subject to the exclusions described in 2.4 below an exclusive, non-transferable license in the United States to market, sell, use, display, perform, sublicense and distribute the Rubicon Offerings, the  Documentation and, subject to Section 2.2, any upgrades thereto, subject to the conditions set forth in this Agreement. As used in this Section  2.1, the terms &quot;market,&quot; &quot;sale,&quot; &quot;sell,&quot; &quot;distribute,&quot; and &quot;sublicense&quot; shall mean the sale of a license having a term of at least one year to an End  User pursuant to which the End User may use, perform and display the Rubicon Offerings and the Documentation. This license is granted to ISA  for the marketing, sale and distribution of the Rubicon Offerings and the Documentation to End Users for their internal use only.     2.2 Rubicon hereby grants to ISA during the Term and subject to the exclusions described in 2.4 below an exclusive, non-transferable  license in the United States to grant licenses to use, display, perform and distribute the Rubicon Offerings and the Documentation to other  resellers, including, but not limited to, distributors, Original Equipment Manufacturers, system integrators and Value-Added Resellers, for further  sale and distribution to End Users for their use as described above, subject to the conditions set forth in this Agreement.     2.3 The license grants described in Sections 2.1 and 2.2 shall include all upgrades to the Rubicon Offerings and the Documentation.  Rubicon shall promptly notify ISA of each such upgrade to the Rubicon Offering and the Documentation which will be available to ISA under this  Agreement.     2.4 The exclusive licenses described in Sections 2.1 and 2.2 shall not include customer agreements, sales of Rubicon Offerings and/or  Documentation which arise through customer marketing and distribution arrangements which are in place between Rubicon and third parties at the  date hereof. Rubicon agrees not to enter into any additional agreement to sell Rubicon Offerings or Documentation or additional distribution  arrangements with third parties in the United States from the date hereof without the prior written approval of ISA, which approval shall not be  unreasonably withheld.     3. RUBICON SERVICES.      3.1 Subject to the terms and conditions of this Agreement, Rubicon shall provide the Contract Services, as agreed between ISA to  Rubicon in the relevant SOW, to ISA&#x27;s reasonable satisfaction. The Contract Services shall be performed at the facilities and location reasonably  designated by ISA (with appropriate agreements in place to ensure reasonable reimbursement to Rubicon of out-of-pocket expenses). Upon  written request of ISA, Rubicon shall provide biweekly written reports describing the progress made in performing the Contract Services since the  preceding report, and the progress expected to be made in the next succeeding period.     3.2 ISA may, at any time, request reasonable additions, deletions, or revisions in the Contract Services by delivering a change order to  Rubicon. Upon receipt of a change order from ISA, Rubicon shall notify ISA of any price revisions which are associated with the change order and  if ISA agree to the revised charges, the parties shall proceed with the Contract Services as revised. All such Contract Services shall be executed  under the terms and conditions of this Agreement and the applicable SOW (as revised by the change order). If any change order causes an  increase or decrease in the cost of the Services to be performed or scheduled completion date or expenses incurred or to be incurred by Rubicon,  an equitable adjustment will be made by mutual agreement.     3.3 From time to time and as agreed between ISA and Rubicon, Rubicon shall provide due diligence services regarding the software and  other technology issues of potential merger and acquisition, joint venture or other strategic partner companies (a &quot;Target Company&quot;) that may be  identified by ISA (the &quot;Due Diligence Services&quot;). In connection with any such Due Diligence Services, Rubicon agrees that it shall abide by the  reasonable terms of any third party confidentiality agreement that may be entered into by ISA with any such Target Company on the same terms  as are applicable to ISA. Rubicon&#x27;s fees for such due diligence services (the &quot;Due Diligence Fees&quot;) shall be at agreed upon rates which shall not  exceed the Day Rate. ISA agrees to reimburse Rubicon upon provision of valid receipts for Rubicon&#x27;s reasonable out-of-pocket expenses incurred  in the provision of the Due Diligence Services.     4. COMMERCIAL TERMS.     4.1 ISA Fees. In consideration of the services set forth in Section 2, ISA will sell or market the Rubicon Offerings at pre agreed list prices,  and shall receive a commission on the gross revenues paid for the Rubicon Offerings less VAT if applicable of the Commission Rate; provided,  however, that in the event that Rubicon proposes to charge at other than the Day Rate for the software development the Parties shall use all  reasonable endeavours to agree an equitable adjustment to the Commission Rate.     4.2 Rubicon Fees.     4.2.1 In consideration of the Contract Services, Rubicon will receive payment as set forth in an SOW of its undisputed invoices (or  its pro rata share) that it has submitted to ISA immediately following receipt of payment by ISA from the ISA Client.     4.2.2 In consideration of the Due Diligence Services, ISA shall pay to Rubicon the Due Diligence Fees within 30 days of receipt  from Rubicon of an invoice and any previously requested supporting documentation, including time charges.     4.2.3 In addition to the payments set forth in sections 4.2.1 and 4.2.2, above, ISA will pay Rubicon 30% of ISA&#x27;s profits (defined as  gross revenues less costs directly incurred in the generation of such revenues) on projects for which Rubicon has provided Contract Services  after ISA has recouped any directly attributable start-up costs with respect to such project up to a cumulative maximum of £100,000 of such costs  associated with all such projects from the date of this agreement.     4.3 Target Revenues. ISA confirms that its current intention is to try and procure that Rubicon&#x27;s total gross revenues less VAT if  applicable relating to the provision of services to ISA Clients or to clients referred to Rubicon by ISA will exceed £1million per annum. The Parties  acknowledge that any failure by ISA to procure such revenues for Rubicon will not constitute a breach of this Agreement and ISA will have no  liability for any such failure or otherwise in connection with this clause 4.3.     4.4 Payment terms. Each party shall account to the other on a monthly basis in respect of all sales and revenue received, and payments  shall be made within 30 days of receipt of a properly valid invoice.     4.5 Audits. Each Party shall retain the financial records relating to all payments owed and/or paid under this Agreement for a period of six  years from the date such payment obligation arose.     4.6 Purchase of Rubicon Shares. This Agreement is conditional upon ISA and Rubicon entering into the Share Subscription Agreement.
+McDATA authorized sales locations will be governed by the terms and conditions of this Agreement.
+
+3.3 McDATA reserves the right to revise the list of Products and End User Services at any time during the term of this Agreement. McDATA will notify Reseller of such revisions through a Channel Notification Document(s).
+
+4.    TERM AND TERMINATION
+
+4.1 TERMINATION WITHOUT CAUSE. Either party may terminate this Agreement without cause upon sixty (60) days prior written notice to the other party.
+
+4.2 TERMINATION FOR BREACH. In addition to any other rights or remedies that may be available at law or in equity, either party may terminate this Agreement if the other party is in material breach of this Agreement and has not cured the breach within thirty (30) days of receiving written notice specifying the breach. If the breach is not cured within the thirty (30) day period, termination will become effective on the thirty-first (31st) day following the written notice.
+
+4.3 TERMINATION FOR INSOLVENCY. Either party, upon written notice to the other party, may elect to immediately terminate this Agreement upon the occurrence of any of the following events: (i) a receiver is appointed for either party or its property; (ii) either party makes, or attempts to make, an assignment for the benefit of its creditors; (iii) any proceedings are commenced by or for either party under any bankruptcy, insolvency, or debtor&#x27;s relief law and such proceedings are not set aside within thirty days following their filing; and/or (iv) either party liquidates or dissolves or makes a good faith attempt to liquidate or dissolve.
+
+4.4 EFFECT OF TERMINATION. Termination of this Agreement shall not limit either party from pursuing any other remedies available to it, Inducing injunctive relief. The termination of this Agreement simultaneously terminates all programs and incentives McDATA offered to Reseller through Channel Notification Documents and voids any unused program account balances. Upon cancellation, termination or expiration of this
+
+McDATA Corporation Standard Terms OF Reseller Agreement JUNE 2004
+
+2
+
+Agreement, Reseller agrees to immediately pay all monies due to McDATA under this Agreement.
+
+The parties&#x27; rights and obligations under Sections 8,9 and 10 hereof shall survive termination of this Agreement.
+
+5.    RESELLER OBLIGATIONS/RESPONSIBILITIES
+
+5.1 SALES. Reseller agrees to actively market, promote, demonstrate, sell and provide the Products and End User Customer Services only within the Territory during the term of this Agreement
+
+5.2 REPORTS. For warranty purposes, McDATA may require Reseller to provide McDATA with a written report containing, without limitation, the following information: End User Customer name, Reseller&#x27;s authorization or location Number, End User Customer information, Product serial numbers, number of units, and level of warranty. McDATA will notify Reseller of reporting requirements, including content and format, in a Channel Notification Document.
+
+5.3 EDUCATIONAL REQUIREMENTS. Reseller agrees to participate in McDATA-speciflad educational courses for purposes of training Reseller&#x27;s personnel. Educational course requirements will be provided in a Channel Notification Document and must be satisfied by Reseller to maintain its status as a McDATA authorized Reseller McDATA will provide to Reseller without tuition fee, at a McDATA designated training site, the required educational courses identified on the Addendum.
+
+5.4 END USER CUSTOMER TERMS AND CONDITIONS. Reseller will ensure that the terms of its executed agreements with End User Customers am not in conflict with this Agreement
+
+5.5 POINT OF SALE (POS) REPORTS. Beginning on the first month after the Effective Date, in order to qualify for certain McDATA channel partner program benefits, Reseller will provide McDATA with a written monthly point of sale report (&quot;POS Report&quot;) listing the Products that Reseller has sold, by model and serial number, together with the names and addresses of all End User Customers. Detailed POS requirements will be communicated through Channel Notification Documents.
+
+5.6 FINANCIAL STATEMENTS. Reseller agrees to provide McDATA with its and its ultimate parent company&#x27;s most recent financial statements prior to the Effective Date of the Agreement.
+
+6.    McDATA OBLIGATIONS/RESPONSIBILITIES
+
+6.1 END USER CUSTOMER SERVICES
+
+McDATA will make available, for End User Customers, warranty, enhanced warranty, and post warranty services according to the terms and conditions of the applicable manufacturer&#x27;s warranty and McDATA&#x27;s then-current maintenance policies, McDATA, or an authorized McDATA service provider, will provide technical support and repairs during the warranty and post warranty periods to End User Customers. McDATA reserves the right to revise its technical support program. McDATA will notify Reseller of changes to McDATA&#x27;s warranty and
 
 
 
 
 
-5. INTELLECTUAL PROPERTY.     5.1 ISA&#x27;s Intellectual Property. As between ISA and Rubicon, all right, title and interest in and to Intellectual Property which is created  by or provided by ISA, including, without limitation, as they may be part of or incorporated into any Contract Service or otherwise used by  Rubicon, all goodwill associated therewith and the copyright and all other Intellectual Property rights inherent in or appurtenant to the foregoing  are and shall be and shall remain the sole property of ISA. Rubicon acknowledges that neither it nor any other persons or entities will by virtue of  this Agreement acquire any ownership interest in the Intellectual Property of ISA, or the Intellectual Property rights inherent in or appurtenant to  any of the foregoing, or any associated goodwill and that its rights thereunder are strictly limited to those specifically granted in this Agreement. Rubicon shall not contest ownership by ISA of any of the foregoing. No right, license, release or other right is granted by implication, estoppel or  otherwise by ISA to Rubicon or any of Rubicon&#x27;s affiliates except for the rights and licenses expressly granted under this Agreement. Except for  the rights and licenses expressly granted under this Agreement, ISA reserves all rights to the Intellectual Property of ISA, including, without  limitation, translation rights, rights of modification and rights to source code.     5.2 Works-for-hire.     5.2.1 As regards Intellectual Property created by Rubicon, Rubicon acknowledges and agrees that those Works, as defined below,  shall belong exclusively to ISA subject to payment in accordance with clause 4.2. Works means, collectively, any work product (of any type),  software, developments, processes, improvements, and all works of authorship, in whole or in part, whether patentable or not and whether  copyrightable or not created as services provided directly to ISA or on behalf of ISA by Rubicon, which (i) are conceived or made by Rubicon, its  employees, contractors, consultants or agents during the Term and relate directly to the business in which ISA and Rubicon(during the Term by ISA) are, had been or were proposing to be engaged in; or (ii) are conceived or made by Rubicon, its employees, contractors, consultants or  agents during or after the Term and are made through the use of any ISA Confidential Information, or which result from any work performed by  Rubicon, its employees, contractors, consultants or agents for ISA. It is agreed that the terms under which Rubicon agrees to work with ISA,  including the Day Rate, reflect and will reflect any value or potential value of Intellectual Property created by Rubicon on behalf of ISA.     5.2.2 Rubicon shall make full and prompt disclosure to ISA of all Works as they are made (whether or not conceived or made jointly  with others). To the extent copyrightable, all Works shall be deemed to be &quot;works for hire&quot; and ISA shall be deemed to be the author thereof under  the U.S. Copyright Act. With respect to Works that do not constitute &quot;works for hire,&quot;  Rubicon, its employees, contractors, consultants and  agents do hereby assign to ISA or its designee all of their respective right, title and interest in and to such Works and all related patents, patent  applications, copyrights and copyright applications and does hereby agree that these obligations are binding upon their respective assigns,  executors, administrators and other legal representatives. Rubicon, its employees, contractors, consultants and agents do hereby waive all claims  to moral rights to the Works. During the Term and continuing thereafter, Rubicon does hereby agree to take all such further reasonable actions on  its own behalf and with respect to its employees, contractors, consultants and agents, including without limitation, the execution and delivery of  copyright applications, patent applications, declarations, oaths, formal assignments, assignments of priority rights, and powers of attorney, which  ISA may deem necessary or desirable in order to protect its rights and interests in and to the Works. If ISA is unable, after reasonable effort, to  secure any necessary signature on any such documents, any executive officer of ISA shall be entitled as agent and attorney-in-fact to execute  such documents.     5.3 Rubicon&#x27;s Intellectual Property. As between ISA and Rubicon, all right, title and interest in and to the Rubicon Offerings and, subject  to the provisions of Section 5.2, any other Intellectual Property of Rubicon, including, without limitation, as used by Rubicon or ISA hereunder, all  goodwill associated therewith and the copyright and all other Intellectual Property rights inherent in or appurtenant to the foregoing are and shall  be the sole property of Rubicon. ISA acknowledges that, except as otherwise set forth herein, neither it nor any other persons or entities will by  virtue of this Agreement acquire any ownership interest in such Intellectual Property, or the Intellectual Property rights inherent in or appurtenant  to any of the foregoing, or any associated goodwill and that its rights thereunder are strictly limited to those specifically granted in this  Agreement. ISA shall not contest ownership by Rubicon of any of the foregoing. No license, release or other right is granted by implication,  estoppel or otherwise by Rubicon to ISA or any of ISA&#x27;s affiliates except for the rights and licenses expressly granted under this Agreement.  Except for the rights and licenses expressly granted herein, Rubicon reserves all rights to the Rubicon Service Offerings, including, without  limitation, translation rights, rights of modification and rights to source code.     6. TERM AND TERMINATION; WITHDRAWAL.     6.1 Term. Unless terminated sooner, the term of this Agreement shall begin on the Effective Date and continue for three (3) years  thereafter (the &quot;Initial Term&quot;) and shall automatically renew for additional one (1) year terms on the terms and conditions set forth herein (each a  &quot;Renewal Term&quot; and collectively, the &quot;Term&quot;) unless either party gives the other Party Notice of its intention to terminate this Agreement ninety  (90) days before the end of the Initial Term or Renewal Term, if any.     6.2 Termination.     6.2.1 For Cause. Either Party may serve Notice to the other Party to terminate this Agreement immediately in the event any material  breach of a material provision of this Agreement by such other Party remains uncured 30 days in the case of a breach of a payment obligation, or  45 days for all other material breaches, after notice of such breach was received by such other Party.     6.2.2 For Bankruptcy. Either Party may terminate this Agreement immediately upon Notice to the other Party in the event the other  Party (a) permanently ceases operations, (b) becomes or is declared insolvent or bankrupt, (c) is the subject of any proceeding related to its  liquidation or insolvency (whether voluntary or involuntary) that is not dismissed within 90 calendar days or (d) makes an assignment for the  benefit of creditors.     6.2.3 For Contesting Intellectual Property Rights. Either Party may terminate this Agreement upon ten Business Day&#x27;s Notice to  the other Party in the event the other Party contests or challenges to a material degree any of the other Party&#x27;s Intellectual Property rights referred  to in Sections 5.1, and 5.3, respectively.     7. NON-COMPETITION.     7.1 During the period beginning on the Effective Date and ending on the later of (i) the end of the Initial Term and (ii) the date falling two  years after completion of the most recent services provided by Rubicon under clause 7 (the &quot;Non-Competition Period&quot;) and in the ISA Geographic  Area, as defined below, Rubicon agrees not to in any capacity, engage or have a financial interest in any ISA Competing Business, as defined  below, or provide managerial, supervisory, administrative, or financial services relating to any ISA Competing Business, including making available  any information or funding to any such ISA Competing Business. Further, during the Non-Competition Period, Rubicon shall not solicit any
+technical support and repairs policy through Channel Notification Document(s).
+
+6.2 PRODUCT DISCONTINUATION. McDATA reserves the right to discontinue Products. McDATA will notify Reseller of any Product discontinuance through Channel Notification Document(s).
+
+6.3 PRODUCT AND SERVICE ANNOUNCEMENTS. McDATA will notify Reseller of changes and innovations in performance, serviceability, uses and applications of Products and End User Services through Channel Notification Document(s).
+
+7.    END USER CUSTOMER SOFTWARE LICENSE
+
+Product(s) that embody or include Software will be delivered with a shrink-wrap or click-through software license which shall govern End User Customer&#x27;s use of the Software. McDATA or its suppliers retain title in and to the Software and all intellectual property rights, and no title to the Software or intellectual property rights is transferred to the End User Customers. Such Software is proprietary to, trade secret of, and copyrighted by McDATA or its suppliers.
+
+8.    CONFIDENTIALITY
+
+8.1 As used herein, &quot;CONFIDENTIAL INFORMATION&quot; will mean any and all technical or business information, including third party information, furnished or disclosed, in whatever form or medium (regardless of whether tangible, Intangible, visual or oral), by one party to the other, including but not limited to information regarding patents and patent applications, trade secrets, works of authorship, software programs, software source documents, software architecture, algorithms, formulae, ideas, techniques, know-how, processes, inventions, apparatuses, equipment, models, information related to current, future and proposed products and services, research, experimental work, development, design details, specifications and engineering information, financial information, procurement, purchasing and manufacturing requirements, potential and actual customer lists, investors, employees, business and contractual relationships, business forecasts, sales and merchandising information, marketing plans; information regarding third parties; and any physical manifestations of Confidential Information (such as notes, reports, memoranda, etc.).
+
+McDATA Corporation Standard Terms of Reseller Agreement June 2004
+
+3
+
+8.2 Information will not be deemed Confidential Information hereunder if the receiving party can demonstrate that such Information: (a) is already known to the receiving party prior to disclosure; (b) is independently developed by the receiving party without the use of the disclosing party&#x27;s Confidential Information; (c) is or becomes publicly available through no fault of the receiving party; or (d) is obtained by the receiving party from a third party other than one having an obligation to the disclosing party with respect to the Confidential Information disclosed. A party may disclose Confidential Information pursuant to the requirements of a governmental agency or by operation of law, provided that such party gives the other party reasonable prior written notice sufficient to allow the other party time to contest such disclosure.
+
+8.3 Each party agrees that for a period of three (3) years following the disclosure of Confidential Information, it (a) will not use, directly or indirectly, or reproduce the Confidential Information of the other party for any purpose except in accordance with the terms of the Agreement, (b) will not disclose the Confidential Information of the other party to any third parties except as expressly permitted in this Agreement, and (c) will take all reasonable security measures to maintain the confidentiality of all Confidential Information of the other party in its possession or control, which will in no event be less than the measures it uses to maintain the confidentiality of its own information of similar importance.
+
+8.4 Upon the termination or expiration of this Agreement, or upon any request of a party, all Confidential Information, together with any copies of same as may be authorized herein, will (at the election of the disclosing party) either be returned to the disclosing party or certified destroyed by the receiving party. Notwithstanding the termination or expiration of this Agreement, each party agrees the requirements regarding use, confidentiality and non-disclosure set forth herein will survive the termination or expiration of this Agreement for a period of three (3) years from the date of the disclosure of the Confidential Information.
+
+8.5 Each party acknowledges that its breach of this Section will cause irreparable damage and hereby agrees that the other party shall be entitled to seek injunctive relief under this Agreement, as well as such further relief as may be granted by a court of competent jurisdiction.
+
+9.    TRADEMARKS.
+
+Subject to McDATA&#x27;s prior written approval, McDATA grants Reseller a limited, nonexclusive, non-transferable, revocable license to use McDATA&#x27;s Trademarks (defined as McDATA&#x27;s name or any abbreviation thereof, its acronym, logotype or any other trademarks or trade names of McDATA) for the sole purpose of marketing and selling Products and End User Customer Services in the Territory during the term of this Agreement Reseller agrees to comply with McDATA&#x27;s Logo Usage Guide, which is found at McDATA&#x27;s web site, www.mcdata.com. By using McDATA&#x27;s Trademarks, Reseller does not acquire any proprietary rights to such Trademarks, and Reseller agrees not to obtain or attempt to obtain, by any method, any rights, title or interest in or to any of the Trademarks. Additional provisions relating to the proper usage of the Trademarks are sat forth in Channel
 
 
 
 
 
-employee of ISA or any employee of any ISA Client. If a court determines that the foregoing restrictions are too broad or otherwise unreasonable  under applicable law, including with respect to time or space, the court is hereby requested and authorized by the Parties to revise the foregoing  restrictions to include the maximum restrictions allowable under applicable law. Rubicon acknowledges, however, that the Parties have negotiated  this Section and that the time limitations, the limitation on activities and the geographic limitations are reasonable in light of the circumstances  pertaining to ISA and this transaction. &quot;ISA Competing Business&quot; means any person or entity of any type whatsoever engaged in the business of providing data centre audit and data centre optimization services. &quot;ISA Geographic Area&quot; means worldwide.     7.2 During the period beginning on the Effective Date and ending on the later of (i) the end of the Initial Term and (ii) the date falling two  years after completion of the most recent services provided by Rubicon under clause 7 (the &quot;Non-Competition Period&quot;)  and in the Rubicon  Geographic Area, as defined below, ISA agrees not to in any capacity, engage or have a financial interest in any Rubicon Competing Business, as  defined below, or provide managerial, supervisory, administrative, or financial services relating to any Rubicon Competing Business, including  making available any information or funding to any such Rubicon Competing Business. Further, during the Non-Competition Period, ISA shall not  solicit any employee of Rubicon or any employee of any Rubicon Client. If a court determines that the foregoing restrictions are too broad or  otherwise unreasonable under applicable law, including with respect to time or space, the court is hereby requested and authorized by the Parties  to revise the foregoing restrictions to include the maximum restrictions allowable under applicable law. ISA acknowledges, however, that the Parties have negotiated this Section and that the time limitations, the limitation on activities and the geographic limitations are reasonable in light of the circumstances pertaining to Rubicon and this transaction. &quot;Rubicon Competing Business&quot;  means any person or entity of any type  whatsoever engaged in the business of providing software development services for clients. &quot;Rubicon Geographic Area&quot; means Europe.     7.3 In the event that ISA wishes to carry out any software development work of any nature during the Non-Competition Period, it will  notify Rubicon of the same and allow Rubicon the opportunity to pitch for such work.        8. CONFIDENTIALITY.     8.1 Confidentiality Obligations. Except as permitted elsewhere under this Agreement, each Party agrees (a) to take Reasonable Steps (as  defined below) to receive and maintain the Confidential Information of the other Party in confidence, (b) to take Reasonable Steps (as defined  below) not to disclose such Confidential Information to any third parties other than with the written consent of the disclosing Party and (c) to  promptly notify the other Party upon learning of any law, rule, regulation or court order that purports to compel disclosure of any Confidential  Information of the other Party and to reasonably cooperate with the other Party in the exercise of the other Party&#x27;s right to protect the  confidentiality of such Confidential Information, including, but not limited to, seeking to dispute the cause of such disclosure and/or to receive confidential treatment for the Confidential Information disclosed as a result of such cause. Neither Party shall use all or any part of the Confidential  Information of the other Party for any purpose other than to perform its obligations, or the exercise of such Party&#x27;s rights and licenses, under this  Agreement. Each Party shall (i) limit access to any Confidential Information of the other Party received by it to its employees, contractors,  consultants and agents who have a need-to-know in connection with the performance of such Party&#x27;s obligations, or the exercise of such Party&#x27;s rights, under this Agreement; and (ii) advise such employees, contractors, consultants and agents of the confidential nature thereof and of the  obligations set forth in this Agreement and similarly bind them in writing. Each Party shall be responsible for any breaches of the obligations of  confidentiality and restricted use set forth herein by any employee, contractor, consultant or agent to whom such Party disclosed any Confidential  Information of the other Party. As used herein, &quot;Reasonable Steps&quot; means using at least the same degree of care that the receiving Party uses to  protect its own Confidential Information, and, in any event, no less than reasonable care.      8.2 Exclusions. Nothing contained herein shall prevent a Party from disclosing Confidential Information pursuant to any applicable law or  by a governmental order, decree, regulation, rule, process or court order; provided, however, that such Party complies with the notice provisions  of Section 8.1(c) to the extent permissible under applicable laws, rules, regulations or court orders. Such disclosure shall not of itself alter the  status of such information hereunder for all other purposes as Confidential Information.     8.3 Provisions of this Agreement. Each Party agrees that the provisions of this Agreement shall be treated as Confidential Information  and that no reference shall be made thereto without the prior written consent of the other Party (which consent shall not be unreasonably  withheld) except (a) to its accountants, banks, financing sources, lawyers and other professional advisors, provided that such parties undertake in  writing (or are otherwise bound by rules of professional conduct) to keep such information strictly confidential, (b) in connection with the enforcement of this Agreement, (c) in connection with a merger, acquisition or proposed merger or acquisition, or (d) pursuant to joint press  releases prepared in good faith or (e) as permitted under Section 8.2. The Parties will consult with each other, in advance, with regard to the terms  of all proposed press releases, public announcements and other public statements with respect to the transactions contemplated hereby.     8.4 Termination. Upon termination of this Agreement, all Confidential Information shall be returned to the disclosing Party or destroyed  unless otherwise specified or permitted elsewhere under this Agreement or as otherwise mutually agreed upon by the Parties. The confidentiality  obligations contained in this Section 8 shall survive termination of this Agreement for a period of three years.     8.5 Injunction. Each Party acknowledges and agrees that the provisions of this Section 8 are reasonable and necessary to protect the  other Party&#x27;s interests in its Confidential Information, that any breach of the provisions of this Section 8 may result in irreparable harm to such  other Party, and in such event the exact amount of damages is now and will be difficult to ascertain and the remedies at law for any such failure  would not be reasonable or adequate. Accordingly, in the event of any breach or threatened breach of the provisions of this Section 8 by a Party  hereto, the other Party, in addition to any other relief available to it at law, in equity or otherwise, shall be entitled to seek temporary and permanent  injunctive relief restraining the breaching Party from engaging in and/or continuing such conduct, without the necessity of proving actual  damages or posting a bond or other security. Further, the prevailing Party in any such injunctive action shall be entitled to payment from the other  Party of the reasonable attorneys&#x27; fees and costs incurred in such proceeding.     9. REPRESENTATIONS AND WARRANTIES.     9.1 By ISA. ISA hereby represents, covenants and warrants to Rubicon that:     9.1.1 It has the corporate power to enter into this Agreement;     9.1.2 It has the right to perform its obligations this Agreement;     9.1.3 When executed and delivered by it, this Agreement will constitute a legal, valid and binding obligation of it, enforceable  against it in accordance with this Agreement&#x27;s provisions;
+Notification Documents.
+
+10.   LIMITATION OF LIABILITY AND DISCLAIMER OF WARRANTY
+
+10.1 EXCEPT FOR A BREACH OF SECTION 8 (CONFIDENTIALITY), IN NO EVENT WILL EITHER PARTY BE LIABLE FOR ANY INDIRECT, PUNITIVE, SPECIAL, INCIDENTAL, EXEMPLARY OR CONSEQUENTIAL DAMAGES, NOR FOR ANY DAMAGES RELATING TO LOST DATA, LOST PROFITS, ADVERTISING OR PROMOTIONAL COSTS, TERMINATION OF EMPLOYEES, SALARIES OF EMPLOYEES OR SEVERANCE PAYMENTS, CREATION OF CUSTOMER BASE, OR FUTURE EXPECTATIONS OR OTHER ECONOMIC ADVANTAGE, HOWSOEVER ARISING AND REGARDLESS OF THE FORM OF ACTION, WHETHER IN CONTRACT, WARRANTY OR TORT (INCLUDING NEGLIGENCE) OR UNDER ANY OTHER THEORY OF LIABILITY IN LAW OR IN EQUITY, EVEN IF SUCH PARTY HAS BEEN PREVIOUSLY ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+10.2 Notwithstanding any provision herein to the contrary, McDATA&#x27;s entire liability in any given instance from any cause whatsoever, and regardless of the form of action, whether in contract, warranty or tort (including negligence) or any other theory of liability in law or in equity, will in no event exceed the lease, of (i) the purchase price for the specific Product that is the subject matter of or is directly relative the cause of action; or (ii) Five Hundred Thousand Dollars ($500,000).
+
+10.3 The foregoing limitations will not apply (i) to claims by either party for personal injury or damage to personal property, or (ii) claims by McDATA for negligent or misuse or unauthorized use by Reseller of any of McDATA&#x27;s proprietary rights, including Trademarks and Software.
+
+10.4 THE WARRANTIES, IF ANY, PROVIDED IN THIS AGREEMENT (INCLUDING THE APPENDICES AND CHANNEL NOTIFICATION DOCUMENTS) OR AS PROVIDED WITH THE PRODUCTS ARE GIVEN IN LIEU OF ALL OTHER
+
+McDATA Corporation Standard Terms of Reseller Agreement June 2004
+
+4
+
+WARRANTIES, WHETHER EXPRESS OR IMPLIED, INCLUDING ANY IMPLIED WARRANTY OF MERCHANTABILITY, NONINFRINGEMENT OR FITNESS FOR A PARTICULAR PURPOSE, ALL OF WHICH ARE HEREBY EXPRESSLY DISCLAIMED AND EXCLUDED.
+
+11. MARKETING
+
+McDATA and Reseller may publicly refer to the existence, but not the content, of this Agreement and may reference their business relationship by creating a hyper-link from one party&#x27;s web site to the other party&#x27;s web site. Reseller grants McDATA a license to use Reseller&#x27;s trademarks and corporate logos solely for such marketing and reference purposes. Copies of each party&#x27;s logo and authorized trademark(s) can be obtained from their respective marketing departments and may not be altered or changed by either party, its employees or agents, without prior written permission from an authorized representative of the other.
+
+12. GENERAL
+
+12.1 NO AMENDMENT OR WAIVER. No provision of this Agreement will be deemed waived, amended or modified by either party, unless such waiver, amendment or modification is made in writing and signed by authorized representatives of both parties. No waiver of rights under this Agreement by either party shall constitute a subsequent waiver of&amp;sbsp;such rights or any other rights under this Agreement. Notwithstanding the foregoing, the parties agree to the use of Channel Notification Documents as set forth in this Agreement.
+
+12.2 SEVERABILITY. If any provision of this Agreement is held to be invalid or unenforceable by a proper authority having jurisdiction over this Agreement, the remaining provisions of this Agreement will remain in full force and effect.
+
+12.3 NO AGENCY CREATED. Nothing in this Agreement shall be construed to create a partnership, joint venture, or agency relationship between the parties. Neither party is granted the tight or authority to assume or create any obligation or responsibility, express or implied, on behalf of, or in the name of the other party, or to bind such other party in any manner to anything whatsoever.
+
+12.4 NO THIRD PARTY BENEFICIARIES. The parties agree that there shall be no third party beneficiaries to this Agreement, including but not limited to Reseller&#x27;s End User Customers.
+
+12.5 ASSIGNMENT. Neither party will assign this Agreement or any rights hereunder without the prior written consent of the other party, which consent will not be unreasonably withheld. Notwithstanding the foregoing sentence, McDATA may assign this Agreement to any entity controlled by, controlling, or under common control with McDATA or to any successor by merger, divestiture, consolidation or reorganization, or to any purchasers of all or substantially all of the assets of the business of McDATA without consent of Reseller.
+
+12.6 GOVERNING LAWS. This Agreement shall be governed by and construed in accordance with the laws of the State of Colorado excluding its choice of law provisions. The United Nations Convention on Contracts for the International Sale of Goods (CISG) is specifically excluded and shall not be applicable to any transaction contemplated herein.
+
+12.7 DISPUTE RESOLUTION PROCESS. In case of any dispute between the parties relating to this Agreement, such dispute shall be finally resolved in Denver, Colorado (USA) by arbitration under the Commercial Rules of Arbitration of the American Arbitration Association, using three arbitrators, one selected by each of McDATA and Reseller and the third selected in accordance with such Rules. The
 
 
 
 
 
-9.1.4 ISA shall perform all services required to be performed by ISA under this Agreement in a professional manner and all ISA  personnel assigned to provide such services shall be duly qualified to provide such services; and     9.1.5 While at Rubicon&#x27;s facilities, all ISA employees, contractors, consultants and agents shall observe and follow Rubicon&#x27;s  reasonable work rules, policies and standards as the same are communicated to ISA or such persons in writing, including, without limitation, those  rules, policies and standards of Rubicon relating to security of and access to its facilities and to its telephone systems, electronic mail systems and  computer systems. ISA shall cooperate with Rubicon in promptly removing from the Rubicon premises any of such persons who violates any of  the foregoing work rules, policies or standards of Rubicon.     9.2 By Rubicon. Rubicon hereby represents, covenants and warrants to ISA that:     9.2.1 It has the corporate power to enter into this Agreement;     9.2.2 It has the right to perform its obligations this Agreement;     9.2.3 When executed and delivered by it, this Agreement will constitute a legal, valid and binding obligation of it, enforceable  against it in accordance with this Agreement&#x27;s provisions;     9.2.4 Rubicon shall perform all services required to be performed by Rubicon under this Agreement in a professional manner and all  Rubicon personnel assigned to provide such services shall be duly qualified to provide such services; and     9.2.5 While at ISA&#x27;s facilities, all Rubicon employees, contractors, consultants and agents shall observe and follow ISA&#x27;s  reasonable work rules, policies and standards as the same are communicated to Rubicon or such persons in writing, including, without limitation,  those rules, policies and standards of ISA relating to security of and access to its facilities and to its telephone systems, electronic mail systems  and computer systems. Rubicon shall cooperate with ISA in promptly removing from the ISA premises any of such persons who violates any of  the foregoing work rules, policies or standards of ISA.     10. DISCLAIMER OF WARRANTY, LIMITATION OF LIABILITY AND INDEMNIFICATION.     10.1 Disclaimer of Warranties. EXCEPT AS EXPRESSLY SET FORTH IN THIS AGREEMENT, ISA AND RUBICON HEREBY DISCLAIM  ALL WARRANTIES, EXPRESS, IMPLIED OR STATUTORY, WITH RESPECT TO ANY AND ALL ISA AND RUBICON SERVICES  RESPECTIVELY, INCLUDING BUT NOT LIMITED TO ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR  PURPOSE, TITLE AND NON-INFRINGEMENT.      10.2 Limitation of Liability. EXCEPT IN CONNECTION WITH A BREACH BY EITHER PARTY OF SECTION 8, NEITHER PARTY WILL  BE LIABLE FOR ANY SPECIAL, INDIRECT, CONSEQUENTIAL, EXEMPLARY, PUNITIVE OR INCIDENTAL DAMAGES ARISING OUT OF OR  RELATED TO THIS AGREEMENT, HOWEVER CAUSED AND UNDER ANY THEORY OF LIABILITY (INCLUDING NEGLIGENCE), EVEN IF SUCH PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. ISA SHALL NOT BE LIABLE FOR ANY LOSS OF DATA, OR  ANY INTERRUPTION OF OR DELAY IN PROVIDING THE SERVICES. EXCEPT IN CONNECTION WITH A BREACH BY EITHER PARTY OF SECTION 8, EACH PARTY&#x27;S LIABILITY FOR DAMAGES HEREUNDER (OTHER THAN IN RESPECT OF ANY CLAIM FOR MONIES DUE)  SHALL NOT EXCEED £200,000.     10.3 Indemnification by Rubicon. Rubicon shall indemnify and hold harmless ISA and its officers, directors, employees and agents from  and against any and all losses, claims, damages, liabilities, obligations, judgments, awards, costs, expenses (including reasonable attorneys&#x27; fees)  and disbursements, including without limitation, the costs, expenses and disbursements, as and when incurred, of preparing or defending any  action, suit, proceeding or investigation asserted by a third party (&quot;Losses&quot;), caused by, based upon, arising out of or in connection with a claim  by a third party that the Rubicon Offerings infringe a 3rd party&#x27;s exiting intellectual property rights or due to the gross negligence, recklessness or  intentional misconduct on the part of Rubicon or its affiliates or its officers, directors, employees, agents, consultants or users.     10.4 Indemnification by ISA. ISA shall indemnify and hold harmless Rubicon and its officers, directors, employees and agents from and  against any and all losses, claims, damages, liabilities, obligations, judgments, awards, costs, expenses (including reasonable attorneys&#x27; fees) and  disbursements, including without limitation, the costs, expenses and disbursements, as and when incurred, of preparing or defending any action,  suit, proceeding or investigation asserted by a third party (&quot;Losses&quot;), caused by, based upon, arising out of or in connection with ISA&#x27;s role in the  provision of the Rubicon Offerings or the gross negligence, recklessness or intentional misconduct on the part of ISA or its affiliates or its officers,  directors, employees, agents, consultants or users.     10.5 Indemnitee Obligations. Each person seeking to be reimbursed, indemnified, defended and/or held harmless under Sections 10.3 or  10.4 (each, an &quot;Indemnitee&quot;) shall (a) provide the Party obliged to indemnify such Indemnitee with prompt written notice of any claim, suit,  demand or other action for which such Indemnitee seeks to be reimbursed, indemnified, defended or held harmless (each, a &quot;Claim&quot;), which notice  shall include a reasonable identification of the alleged facts giving rise to such Claim; (b) grant such Party reasonable authority and control over  the defense and settlement of any such Claim; and (c) reasonably cooperate with such Party and its agents in defense of any such Claim, at such  Party&#x27;s cost. Each Indemnitee shall have the right to participate in the defense of any Claim for which such Indemnitee seeks to be reimbursed,  indemnified, defended or held harmless, by using attorneys of such Indemnitee&#x27;s choice, at such Indemnitee&#x27;s expense. Notwithstanding anything  to the contrary herein, any settlement of a Claim for which any Indemnitee seeks to be reimbursed, indemnified, defended or held harmless under this Section 10 shall be subject to the prior written approval of such Indemnitee, such approval not to be unreasonably withheld, conditioned or  delayed.     10.6 Essential Part of Bargain. The Parties acknowledge that the disclaimers and limitations set forth in this Section 10 are an essential  element of this Agreement between the Parties and that the Parties would not have entered into this Agreement without such disclaimers and  limitations.     11. MISCELLANEOUS.     11.1 Governing Law and Jurisdiction. This Agreement shall be governed by and interpreted under the laws of the State of Florida, USA,.  The state and federal courts in the jurisdiction in which Palm City, Florida is located shall have non- exclusive jurisdiction for the purposes of  adjudicating any controversy or claim between the parties concerning any breach or alleged breach of this Agreement or performance or  nonperformance of any obligation under this Agreement, save that the parties agree that any dispute or claim concerning either clause 8  Confidentiality or clause 5 Intellectual Property may be raised in any appropriate jurisdiction where the breach or alleged breach has occurred.
+arbitrators will decide the issues presented to them applying the substantive laws of the Sate of Colorado (USA). The award of the arbitrators may be granted notwithstanding the absence of any party and such award shall be in writing and shall be final and binding upon the parties and shall not be appealed from or contested in any court or tribunal. Any award rendered hereunder may be entered for enforcement, if necessary, in any court of competent jurisdiction.
+
+12.8 INJUNCTIVE RELIEF. Notwithstanding the above provisions relating to arbitration, the parties agree that in respect of any violation of any provision of this Agreement, including without limitation violation of any proprietary or confidential information, for which an award of damages is an inadequate remedy to project the injured party, the injured party is entitled to seek injunctive relief, including a preliminary injunction, in a court of competent jurisdiction, in addition to any other relief available to it under the arbitration procedures specified above in Section 12.7.
+
+12.9 OFFICIAL LANGUAGE. The official language of this Agreement and all transactions conducted under this Agreement is English.
+
+12.10 FORCE MAJEURE. Neither party will be liable for any failure or delay in its performance under this Agreement due to any cause beyond its reasonable control, including but not limited to acts of God, war, riot, embargoes, acts of civil or military authorities, fire, floods, accidents, strikes, delays by suppliers or shortages of transportation, facilities, fuel, energy, labor, or materials.
+
+McDATA Corporation Standard Terms of Reseller Agreement June 2004
+
+5
+
+12.11 COMPLIANCE WITH LAWS. McDATA and Reseller each agree to comply with all applicable laws and each understand and agree that the continuing rights and obligations of the parties hereunder are specifically conditioned upon compliance with such laws. These laws include, without limitation, the following: (i) the U.S. anti-boycott regulations, (ii) the U.S. Foreign Corrupt Practices Act (&quot;FCPA&quot;), (iii) the export control laws of the United States of America, (iv) the prevailing regulations which may be issued from time to time by the U.S. Department of Commerce and the Office of Munitions Control and the U.S. Department of State, and (v) any export or import laws of the agencies of the Territory or of any countries into or through which the Products purchased under this Agreement may be transported.
+
+12.12 NOTICES. Notices required hereunder will be in writing and will be deemed given when transmitted by facsimile (provided such facsimile is subsequently confirmed in writing within five (5) days of the facsimile date) or deposited with an express delivery service with guaranteed third-day delivery, prepaid, addressed as follows:
+
+NOTICES TO: McDATA CORPORATION:         McDATA Corporation         380 Interlocken Crescent         Broomfield, CO 80021         Attn: VP of Sales         With a copy to: VP and General Counsel         Fax:720-558-3235
+
+NOTICES TO: RESELLER             MTI Technology Corp             14661 Franklin Ave             Tustin,CA 92780             Attn: CFO             Fax : 714-481-4136
+
+12.13 ENTIRE AGREEMENT. This Agreement, together with any and all attachments hereto and applicable Appendices, Addendums and Channel Notification Documents as issued from time to time by McDATA constitutes the entire agreement between McDATA and Reseller with respect to the subject matter hereof, and supersedes all prior and contemporaneous oral or written representations or agreements between the parties regarding the subject matter of this Agreement.
+
+12.14 COUNTERPARTS. This Agreement may be executed in counterparts or by facsimile, each of which shall be an original, and all of which together shall constitute one and the same instrument.
+
+12.15 NUCLEAR, AVIATION OR LIFE SUPPORT APPLICATION. McDATA specifically disclaims liability for use of McDATA Software in connection with the design, construction, maintenance, and/or operation of any (i) nuclear facility, (ii) aircraft, aircraft communication or aircraft ground support system, or (iii) life support system by Reseller or its End User Customers. Such use is entirely at the user&#x27;s risk. McDATA shall not be liable to Reseller or its End User Customers, in whole or in part, for any claims arising out of such use. Reseller agrees to defend, indemnify, and hold McDATA harmless from and against any and all claims arising out of use of the Software in such applications by Reseller or its End User Customers.
+
+McDATA Corporation Standard Terms of Reseller Agreement June 2004
+
+6
+
+PREMIER RESELLER ADDENDUM
+
+RESELLER AGREEMENT
 
 
 
 
 
-   11.2 No Assignment. Neither Party shall transfer, assign or cede any rights or delegate any obligations hereunder, in whole or in part,  whether voluntarily or by operation of law, without the prior written consent of the other Party, which consent may be withheld at the other Party&#x27;s  reasonable business discretion; provided, however, that in connection with a merger, sale or transfer of substantially all of the assets or stock of  one of the Parties that Party may provide for the assignee to be bound by the terms hereof. This Agreement shall inure to the benefit of, and shall  be binding upon, the Parties and their respective successors and permitted assigns.     11.3 Good Faith. The Parties undertake to act in good faith, consistent with their respective rights and obligations set forth in this  Agreement.     11.4 Independent Contractors. In connection with this Agreement, each Party is an independent contractor. This Agreement does not,  and shall not be construed to, create an employer-employee, agency, joint venture or partnership relationship between the Parties. Neither Party  shall have any authority to act for or to bind the other Party in any way, to alter any of the provisions of any of the other Party&#x27;s standard forms of  invoices, sales agreements, warranties or otherwise, to warrant or to execute agreements on behalf of the other, or to represent that it is in any way  responsible for the acts, debts, liabilities or omissions of the other Party.     11.5 Notices. All notices, reports, payments and other communications required or permitted to be given under this Agreement (each, a  &quot;Notice&quot;) shall be in writing and shall be given either by personal delivery against a signed receipt, by express delivery using an internationally  recognized express courier, or by email (with confirmation of receipt). All Notices shall be properly addressed as follows, or to such other addresses as may be specified in a Notice given hereunder:     If to ISA: with a copy to:    Attn: Joseph Coschera Attn: Daniel J. Dugan, Esq.
+This addendum applies to a Reseller that will purchase, market, sell license or incorporate Product to any commercial non-United States government entity, instrumentality or agency.
 
-1151 SW 30th St., Spector Gadon &amp; Rosen, P.C.
+TERRITORY: NORTH AMERICA
 
-Palm City, Florida 34990 1635 Market St., 7th Floor
+1. SCOPE
 
-joe_coschera@isa-inc.net Phila., PA 19103  ddugan@lawsgr.com    If to Rubicon: with a copy to:    Attn: Alistair Hancock Attn: Andrew Kirby  Rubicon House Rubicon House  Guildford Road Guildford Road  West End, Surrey GU24 9PW West End, Surrey, GU24 9PW     A Notice shall be deemed to be effective upon personal delivery or, if sent via overnight delivery, upon receipt thereof. A Notice sent via email is  deemed effective on the same day (or if such day is not a Business Day, then on the next succeeding Business Day) if the confirmation that such  email was received by the other Party is received before 5:00 p.m. prevailing Eastern time and on the next day (or if such day is not a Business Day,  then on the next succeeding Business Day) if the confirmation that such email was received by the other Party is received on or after 5:00 p.m.  prevailing Eastern time.    11.6 Amendment or Modification. No subsequent amendment, modification or waiver of any of the provisions of this Agreement shall be  effective unless in writing and signed by the Parties.     11.7 Entire Agreement. This Agreement sets out the entire agreement between the Parties with respect to the subject matter of this  Agreement and supersedes all prior agreements, proposals, arrangements and communications, whether oral or written, with respect to the subject  matter hereof.     11.8 Severability. If any provision of this Agreement is held by a tribunal of competent jurisdiction to be illegal, invalid, or otherwise  unenforceable in any relevant jurisdiction, then to the fullest extent permitted by law (a) the same shall not affect the other provisions of this  Agreement, (b) such provision shall be deemed modified to the extent necessary in the tribunal&#x27;s opinion to render such provision enforceable,  and the rights and obligations of the Parties shall be construed and enforced accordingly, preserving to the fullest extent the intent and agreements of the Parties set forth herein and (c) such finding of invalidity, illegality or unenforceability shall not affect the validity, legality or enforceability of such provision in any other relevant jurisdiction.     11.9 No Waiver. Failure to enforce any provision of this Agreement is not a waiver of future enforcement of that or any other provision. No provision of this Agreement will be deemed waived and no breach excused unless such waiver or excuse is in writing and signed by the Party  against whom enforcement of such waiver or excuse is sought.     11.10 Survival. Sections 5, 7, 8, 10 and 11; any payment obligations of the Parties hereunder accrued prior to the date of termination; and  any other provision herein expressly surviving termination or necessary to interpret the rights and obligations of the Parties in connection with the  termination of this Agreement will survive the termination of this Agreement.     11.11 No Third Party Beneficiaries. Except as set forth in Sections 10.3 and 10.4, nothing in this Agreement is intended to confer  benefits, rights or remedies unto any person or entity other than the Parties and their permitted successors and assigns. Without limiting the  generality of the foregoing, the clients, customers, shareholders or End Users shall not be deemed to be third party beneficiaries of this Agreement  or have any other contractual relationship with ISA by reason of this Agreement.     11.12 Captions and Construction. The headings appearing at the beginning of the Sections contained in this Agreement have been  inserted for identification and reference purposes only and shall not be used to determine the construction or interpretation of this Agreement. The nomenclature of the defined terms in this Agreement shall only be used for the construction of this Agreement, and are not to be used for any  other purpose, including, but not limited to, interpretation for accounting purposes. The parties acknowledge that both ISA and Rubicon  participated in the drafting of this Agreement and agree that any rule of law or legal decision that may or would require interpretation of any  alleged ambiguities in this Agreement against the party that drafted it has no application and is expressly waived.     11.13 Further Assurances. Each Party shall perform such acts, execute and deliver such instruments and documents, and do all such  other things as may be reasonably necessary to accomplish the transactions contemplated in this Agreement.
+1.1 Sales to the US Government are not authorized under this Agreement.
+
+1.2 Reseller is authorized to procure McDATA Products and End User Customer Services through the source defined in Paragraph 2.3, &quot;Product Provider.&quot; Reseller procurement of Product and End User Customer Services from sources other than the Product Provider is a material breach of this Agreement and may result in termination of this Agreement. In the event Reseller procures Product or End User Customer Services from sources other than its Product Provider, such procurements will not be included in any McDATA marketing and promotional programs made available to Reseller by McDATA. McDATA, at its sole discretion, may change this policy through a Channel Notification Document.
+
+2. DEFINITIONS
+
+2.1 &quot;DISTRIBUTOR&quot; means a business entity which is authorized by McDATA through a fully executed distributor agreement to market and sell, or incorporate for resale, the McDATA Products and End User Customer Services to McDATA authorized Resellers in its Territory.
+
+2.2 &quot;END USER CUSTOMER&quot; means any entity which, for its own use and not for resale, (i) purchase McDATA-manufactured Products; and/or (ii) licenses Software associated therewith from McDATA; and/or (iii) receives End User Customer Services from McDATA.
+
+2.3 &quot;PRODUCT PROVIDER&quot; means either a McDATA-authorized OEM and/or Distributor who provides Product(s) to the Reseller, as set forth in Appendix 1.
+
+2.4 &quot;RESELLER&quot; means a business entity which is authorized by McDATA through a fully executed Reseller Agreement to (i) market and resell Products; (ii) purchase McDATA-manufactured Products from a Product Provider, without the intention of purchasing such Products for its own use; and/or (iii) resell End User Customer Services from McDATA.
+
+3. TERM
+
+The initial term of this Agreement shall be for a period of one (1) year from the Effective Date unless sooner terminated pursuant to the termination provisions herein. Thereafter, this Agreement automatically renews for successive terms of one (1) year.
+
+4. RESELLER OBLIGATIONS/RESPONSIBILITIES
+
+For enhanced warranty and post warranty services, Reseller shall refer to McDATA&#x27;s Product Offerings on its website. McDATA will notify Reseller of changes to the Product Offerings through its Channel Notification Documents.
+
+5. END USER CUSTOMER SOFTWARE LICENSE
+
+Product(s) that embody or include Software will be delivered with a shrink-wrap or click-through software license which shall govern End User Customer&#x27;s use of the Software. Such Software is proprietary to, trade secret of, and copyrighted by McDATA or its suppliers. McDATA or its suppliers retain title in and to the Software and all intellectual property rights, and no title to the Software or intellectual property rights is transferred to the End User Customers.
+
+6. MARKETING
+
+Reseller agrees not to publish or advertise any price below Manufacturer&#x27;s Suggested List Price on its web site or by means of any online communications or any other mass communications, including without limitation, catalogues, fax blasts, direct mail pieces, or e-mail blasts.
+
+7. GOVERNMENT FLOWDOWN PROVISIONS.
+
+Reseller agrees that flowdown provisions, including, but not limited to United States Government Federal Acquisition Regulations (&quot;FARs&quot;), Defense FARs or NASA FARs, shall not apply to McDATA and McDATA does not accept such provisions notwithstanding the existence of such provisions. In addition, McDATA is not responsible for fulfilling any contract obligations under any schedule contracts including those obligations under the United States Government General Service Administration (&quot;GSA&quot;) contract and the California Multiple Award Schedule (&quot;CMAS&quot;) contract.
+
+McDATA Corporation Standard Terms of Reseller Agreement June 2004
+
+7
+
+APPENDIX I                                RESELLER AGREEMENT                                  PREMIER PARTNER                  PRODUCTS, PRODUCT PROVIDER AND REVENUE TARGETS
+
+PRODUCTS:
+
+Reseller is eligible to sell the McDATA Products listed below. McDATA will provide Product information including pricing, availability, features,
 
 
 
 
 
-   11.14 Language. This Agreement is in the English language only, which language shall be controlling in all respects, and all versions  hereof in any other language hereof shall be for accommodation only and shall not be binding upon the Parties. All communications and notices to  be made or given pursuant to this Agreement shall be in the English language. All words used in this Agreement will be construed to be of such  gender or number as the circumstances require. Unless otherwise expressly provided, the word &quot;including&quot; does not limit the preceding word or  terms.     11.15 Force Majeure. Neither Party shall be held to be in breach of this Agreement by reason of a force majeure event, including, but not  limited to, act of God, delay in transportation, fire, flood, earthquake, storm, war, act of a public enemy, civil commotion or any law, rule, regulation,  order or other action by any public authority or any other matter reasonably beyond a Party&#x27;s control (a &quot;Force Majeure Event&quot;). To the extent  failure to perform is caused by such a force majeure event, such Party shall be excused from performance hereunder so long as such event  continues to prevent such performance, and provided the non-performing Party takes all reasonable steps to resume full performance.     11.16 Compliance with Laws. Each Party shall comply with all prevailing laws, rules and regulations and obtain all necessary approvals,  consents and permits required by the applicable agencies of the government of the jurisdictions that apply to its activities or obligations under  this Agreement.     11.17 Public Announcements. Any public announcement or similar publicity with respect to this Agreement or the transactions  contemplated hereby shall be issued only after consultation with the other party hereto regarding the content of any such announcement or  publicity. The parties recognize that, as publicly traded companies, such consultations will be constrained by applicable requirements relating to  the disclosure of material information on the part of such party under applicable securities laws.     11.18 Execution in Counterparts, Facsimiles. This Agreement may be executed in one or more counterparts, each of which shall be  deemed an original and all of which together shall constitute one and the same instrument. This Agreement shall become binding when any one or  more counterparts hereof, individually or taken together, bear the signatures of both Parties hereto. For the purposes hereof, a facsimile copy of  this Agreement, including the signature pages hereto, shall be deemed an original.     IN WITNESS WHEREOF, the Parties to this Agreement by their duly authorized representatives have executed this Agreement as of the date first  written above.     Information Systems Associates, Inc. Rubicon Software Group plc  By: /s/ Joseph P. Coschera By /s/ Alistair C. Hancock:  Name: Joseph P. Coschera Name: Alistair C. Hancock  Title: President and CEO Title: CEO</pre>
+accessories, services and support in the Channel Notification Documents. McDATA will update the Product listing from time-to-time through the Channel Notification Documents.
+
+- Fibre Channel Directors
+
+- Switches
+
+- Software
+
+- Fabricenter(TM) Cabinet
+
+004 ANNUALIZED REVENUE TARGET: $500,000
+
+The 2004 Annualized Revenue Target to qualify as a Premier Reseller is $500,000. Reseller is eligible for Premier Reseller program benefits and responsible for the obligations as defined in the Channel Notification Documents.
+
+INITIAL EDUCATION REQUIREMENTS:
+
+Reseller must successfully complete both Sales and Technical Foundation training, for each McDATA authorized sales location, as follows, within ninety (90) days of the effective date of this Agreement.
+
+Sales:      All Sales Reps/sales location     McDATA Solution (web-based) Technical:  3 individuals                     Certified Professional Accelerated                                               Track (CPAT)
+
+McDATA will waive the charges associated with the above listed required technical courses for three (3) individuals at Reseller&#x27;s organization. McDATA may, at its sole discretion, provide additional education incentives to Reseller based upon sales performance. These incentives, if made available, will be communicated via Channel Notification Documents.
+
+McDATA Corporation Reseller Agreement Premier Partner Addendum June 2004
+
+8
+
+PRODUCT PROVIDER:
+
+Reseller will purchase Products directly from one of the Distributors listed on the next page below. Terms and conditions for purchase of Products from the Distributor are as agreed between Distributor and Reseller.
+
+Reseller may elect a new distributor annually by notifying McDATA thirty (30) days prior to renewal of the Agreement. If McDATA does not receive notice of a new distributor election and the Agreement is renewed, Reseller agrees that it will continue to purchase Products through the currently designated distributor.
+
+Under limited circumstances as approved by McDATA in writing, Reseller may purchase from another Product Provider as directed by McDATA. This may include a) critical customer need where Product is not available from Product Provider in the time frame required by End User, but available through another Authorized McDATA Product Provider or b) repeated, documented dissatisfaction with specified Product Provider during the term of the Agreement.
+
+PLEASE INDICATE WHICH ONE OF THE FOLLOWING DISTRIBUTORS YOU CHOOSE TO BUY FROM FOR THE FIRST YEAR OF YOUR AGREEMENT WITH McDATA:
+
+[ ] AVNET
+
+East Coast Sates - Elsa Neves      Phone:   877-286-3879 X5815                                    Fax:     480-794-9324                                    Email:   elsa.neves@avnet.com West Coast Sates - Jan Johnson     Phone:   877-967-3664                                    Fax:     480-794-9324                                    Email:   jan.johnson@avnet.com
+
+[ ] ARROW ESS
+
+Cindie Snell                       Phone:     303-824-3651                                    Fax:       303-824.3646                                    Email:     csnell@arrow.com
+
+[ ] BELL MICROPRODUCTS,INC
+
+Lyle Freemen                       Phone:     952-345-7942 1941 Ringwood Ave                  Email:     lfreerman@bellmicro.com San Jose, California 95131 -1721
+
+[ ] MOCA
+
+
+
+
+
+
+
+Adrienne Hargrove                         Phone:     1 -800-786-3425 5230 Pacific Concourse Dr, 4th Flr,       Fax: Los Angeles, CA 80045                     Email:
+
+[X] TIDAL WIRE
+
+Cherie Vallone                     Phone:     781-332-1104                                    Email:     cvallone@tidalwire.com
+
+McDATA reserves the right to change the Premier Partner criteria each January or upon sixty (60) days advanced notice through a Channel Notification Document. If Reseller fails to comply with any of the above requirements, McDATA reserves the right to change the Reseller Designation and Reseller will become eligible for only those programs applicable to the new Reseller Designation.
+
+McDATA Corporation Reseller Agreement Premier Partner Addendum June 2004
+
+9</pre>
 
 **Question**
 
 <pre>Does the contract contain an answer to the following extraction request?
-Highlight the parts (if any) of this contract related to &quot;Effective Date&quot; that should be reviewed by a lawyer. Details: The date when the contract is effective</pre>
-
-**Criteria (choice)**
-
-<pre>1. no
-2. yes</pre>
-
-**Gold target (weight)**
-
-<pre>2. yes — 1</pre>
-
-</details>
-
-<details><summary>Example 2</summary>
-
-current local Jev recast (not yet published) · train · cuad-answerability-b11692cc91:train:1
-
-**State**
-
-<pre>Exhibit 26
-
-JOINT FILING AGREEMENT
-
-Pursuant to and in accordance with the Securities Exchange Act of 1934, as amended, and the rules and regulations thereunder (the &quot;Exchange Act&quot;) the undersigned hereby agree to the joint filing on behalf of each of them of any filing required by such party under Section 13 of the Exchange Act or any rule or regulation thereunder (including any amendment, restatement, supplement, and/or exhibit thereto) with respect to securities of Tallgrass Energy, LP, a Delaware limited partnership, and further agree to the filing, furnishing, and/or incorporation by reference of this Agreement as an exhibit thereto. Each of them is responsible for the timely filing of such filings and any amendments thereto, and for the completeness and accuracy of the information concerning such person contained therein; but none of them is responsible for the completeness or accuracy of the information concerning the other persons making the filing, unless such person knows or has reason to believe that such information is inaccurate. This Agreement shall remain in full force and effect until revoked by any party hereto in a signed writing provided to each other party hereto, and then only with respect to such revoking party. This Agreement may be executed in any number of counterparts all of which taken together shall constitute one and the same instrument.
-
-IN WITNESS WHEREOF, the undersigned hereby execute this Joint Filing Agreement as of February 19, 2020. PRAIRIE ECI ACQUIROR LP By: BIP Holdings Manager L.L.C., its general partner
-
-By: /s/ Sean Klimczak Name: Sean Klimczak Title: Senior Managing Director
-
-PRAIRIE NON-ECI ACQUIROR LP By: BIP Holdings Manager L.L.C., its general partner
-
-By: /s/ Sean Klimczak Name: Sean Klimczak Title: Senior Managing Director
-
-PRAIRIE VCOC ACQUIROR LP By: BIP Holdings Manager L.L.C., its general partner
-
-By: /s/ Sean Klimczak Name: Sean Klimczak Title: Senior Managing Director
-
-PRAIRIE SECONDARY ACQUIROR LP By: BIP Holdings Manager L.L.C., its general partner
-
-By: /s/ Sean Klimczak Name: Sean Klimczak Title: Senior Managing Director
-
-
-
-
-
-PRAIRIE SECONDARY ACQUIROR E LP By: BIP Holdings Manager L.L.C., its general partner
-
-By: /s/ Sean Klimczak Name: Sean Klimczak Title: Senior Managing Director
-
-BIP HOLDINGS MANAGER L.L.C.
-
-By: /s/ Sean Klimczak Name: Sean Klimczak Title: Senior Managing Director
-
-BLACKSTONE INFRASTRUCTURE ASSOCIATES L.P. By: BIA GP L.P., its general partner By: BIA GP L.L.C., its general partner
-
-By: /s/ Sean Klimczak Name: Sean Klimczak Title: Senior Managing Director
-
-BIA GP L.P. By: BIA GP L.L.C., its general partner
-
-By: /s/ Sean Klimczak Name: Sean Klimczak Title: Senior Managing Director
-
-BIA GP L.L.C.
-
-By: /s/ Sean Klimczak Name: Sean Klimczak Title: Senior Managing Director
-
-BLACKSTONE HOLDINGS III L.P. By: Blackstone Holdings III GP L.P., its general partner By: Blackstone Holdings III GP Management L.L.C., its general partner
-
-By: /s/ John G. Finley Name: John G. Finley Title: Chief Legal Officer
-
-
-
-
-
-BLACKSTONE HOLDINGS III GP L.P. By: Blackstone Holdings III GP Management L.L.C., its general partner
-
-By: /s/ John G. Finley Name: John G. Finley Title: Chief Legal Officer
-
-BLACKSTONE HOLDINGS III GP MANAGEMENT L.L.C.
-
-By: /s/ John G. Finley Name: John G. Finley Title: Chief Legal Officer
-
-BLACKSTONE HOLDINGS II L.P. By: Blackstone Holdings I/II GP L.L.C., its general partner By: The Blackstone Group Inc., its sole member
-
-By: /s/ John G. Finley Name: John G. Finley Title: Chief Legal Officer
-
-BLACKSTONE HOLDINGS I/II GP L.L.C. By: The Blackstone Group Inc., its sole member
-
-By: /s/ John G. Finley Name: John G. Finley Title: Chief Legal Officer
-
-THE BLACKSTONE GROUP INC.
-
-By: /s/ John G. Finley Name: John G. Finley Title: Chief Legal Officer
-
-BLACKSTONE GROUP MANAGEMENT L.L.C.
-
-By: /s/ John G. Finley Name: John G. Finley Title: Chief Legal Officer
-
-STEPHEN A. SCHWARZMAN
-
-By: /s/ Stephen A. Schwarzman By: Stephen A. Schwarzman</pre>
-
-**Question**
-
-<pre>Does the contract contain an answer to the following extraction request?
-Highlight the parts (if any) of this contract related to &quot;Unlimited/All-You-Can-Eat-License&quot; that should be reviewed by a lawyer. Details: Is there a clause granting one party an “enterprise,” “all you can eat” or unlimited usage license?</pre>
+Highlight the parts (if any) of this contract related to &quot;Non-Disparagement&quot; that should be reviewed by a lawyer. Details: Is there a requirement on a party not to disparage the counterparty?</pre>
 
 **Criteria (choice)**
 
@@ -172,200 +370,784 @@ Highlight the parts (if any) of this contract related to &quot;Unlimited/All-You
 
 </details>
 
-<details><summary>Example 3</summary>
+<details><summary>Example 2</summary>
 
-current local Jev recast (not yet published) · train · cuad-answerability-b11692cc91:train:2
+published Jev · train · cuad:train:NUVEEN - REMARKETING AGREEMENT__Agreement Date_0:cuad-answerability-b11692cc91
 
 **State**
 
-<pre>Exhibit 10.18
+<pre>Exhibit s.2
 
-MASTER SUPPLY AGREEMENT
+NUVEEN AMT-FREE MUNICIPAL CREDIT INCOME FUND (NVG)
 
-MASTER SUPPLY AGREEMENT (the &quot;Agreement&quot;) dated November 1, 2019 (the &quot;Effective Date&quot;) between REYNOLDS CONSUMER PRODUCTS LLC, a Delaware limited liability company with its headquarters at 1900 West Field Court, Lake Forest, IL 60045 (&quot;Seller&quot;), and PACTIV LLC, a Delaware limited liability company with its headquarters at 1900 West Field Court, Lake Forest, IL 60045 (&quot;Buyer&quot;). Seller and Buyer are referred to individually at times as a &quot;Party&quot; and collectively at times as the &quot;Parties&quot;.
+AND
 
-BACKGROUND
+NUVEEN FUND ADVISORS, LLC
 
-A. Seller sells various types of products used in the consumer and food service markets.
+AND
 
-B. Buyer sells various types of products, including certain products of the type made by Seller, to its customers.
+[●]
 
-C. The Parties are entering into this Agreement to establish the terms and conditions under which Seller may agree to sell specific products to Buyer, and Buyer may agree to purchase specific products from Seller for later resale by Buyer to its business customers.
+REMARKETING AGREEMENT
 
-AGREEMENT
+Dated as of [●]
 
-1. Term. The &quot;Term&quot; of this Agreement will commence on the Effective Date and will end on the earlier of: (a) the first anniversary of the expiration date of the last Purchase Schedule (as defined in this next Section); (b) a termination date elected by a Party in a written notice delivered to the other Party any time after the expiration of the last Purchase Schedule; or (c) a termination date elected by a Party in a written notice delivered to the other Party as provided in Subsection 11(d) of this Agreement. The rights and obligations of the Parties under this Agreement will survive the expiration or earlier termination of this Agreement with respect to any (i) products purchased and sold under this Agreement during the Term and products sold after the Term for orders accepted during the Term; (ii) Confidential Information (as defined in Section 10 of this Agreement) disclosed or received by a Party during the Term; (iii) breach of this Agreement by a Party; (iv) any other statement, decision, act or omission of a Party concerning or related to this Agreement; (v) any Dispute (as defined in Section 11 of this Agreement) between the Parties concerning or related to this Agreement; (vi) products and other materials manufactured or maintained by Seller in inventory for sale to Buyer that Buyer is obligated to purchase under a Purchase Schedule; and (vii) any provision that expressly states that it will survive the expiration or earlier termination of this Agreement.
+Series [●] MuniFund Preferred Shares
 
-2. Scope. This Agreement will apply to all products sold by Seller to Buyer, and all products purchased by Buyer from Seller, during the Term unless the Parties expressly agree that this Agreement will not apply to a particular type of transaction in a separate written document signed by an officer of each Party. This Agreement will not require Seller to sell any type or quantity of a product to Buyer, nor will this Agreement required Buyer to purchase any type or quantity of a product from Seller, except as expressly provided by the Parties in a Purchase Schedule. The phrase &quot;Purchase Schedule&quot; will mean a written supplement to this Agreement signed by an officer of each Party which references this Agreement and which identities, among other terms and conditions, the specific types and quantities of products that will be purchased and sold by the Parties on terms and conditions in the schedule, the specifications for the identified products, the duration of the commitment period during which the Parties will be obligated to purchase and sell the identified products on the terms and conditions in the schedule, the prices of the identified products, any mechanisms for adjusting the prices of the identified products over the commitment period, and the facilities at which the identified products will be manufactured, stored and delivered by Seller. The Parties may add terms and conditions to, and amend the terms and conditions of, this Agreement in a Purchase Schedule, but any additional and amended terms and conditions in a Purchase Schedule supplementing and modifying this Agreement will only apply the specific products identified in that Purchase Schedule for its duration.
+Variable Rate Remarketed Mode
 
-Source: REYNOLDS CONSUMER PRODUCTS INC., S-1, 11/15/2019
+(NVG - Series [●] MFP)
 
 
 
 
 
-3. Standard Operating Procedures. Over approximately the past eight years, the Parties have been supplying select Products to one another for use in the operation of their respective businesses within the United States of America, Canada and Mexico. The Parties developed and been following certain standard operating procedures in connecting with, among other topics, forecasting, production planning, ordering, delivering and resolving claims on the Products supplied to one another (the &quot;Current SOPs&quot;). The Parties will be updating their respective business systems over the next six months, and the updates to these business systems will require the Parties to modify the Current SOPs. Once the Parties have completed the updates to the business systems and agreed on the necessary modifications to the Current SOPs, the Parties will sign a written amendment to this Agreement appending the updated standard operating procedures (the &quot;Updated SOPs&quot;). Until the Parties have signed a written amendment appending the Updated SOPs, the parties will continue to follow the Current SOPs. The Parties will comply with the applicable SOPs in connection with the purchase and sale of products identified in a Purchase Schedule. The Parties may add terms and conditions to, and amend the terms and conditions of, the SOP in a Purchase Schedule, but any additional and amended terms and conditions in a Purchase Schedule supplementing and modifying the SOP will only apply the specific products identified in that Purchase Schedule for its duration.
+Table of Contents Page Section 1. Definitions 1 Section 2. Appointment and Obligations of the Remarketing Agent 3 Section 3. Representations, Warranties and Covenants of the Remarketing Agent and the Fund 6 Section 4. Fees and Expenses 7 Section 5. Resignation, Suspension and Removal of the Remarketing Agent 7 Section 6. Dealing in the VRRM-MFP Shares 7 Section 7. Information 8 Section 8. Conditions to Obligations of the Remarketing Agent 9 Section 9. Indemnification 9 Section 10. Termination of Remarketing Agreement 12 Section 11. Remarketing Agent&#x27;s Performance; Duty of Care 13 Section 12. Amendment, Supplement or Modification of Agreements 13 Section 13. Books and Records 13 Section 14. Governing Law 13 Section 15. Waiver of Jury Trial 14 Section 16. Certain Provisions to Survive Termination of Agreement 14 Section 17. Successors and Assigns 14 Section 18. Headings 14 Section 19. Severability 14 Section 20. Counterparts 14 Section 21. Remarketing Agent Not Acting as Underwriter 15 Section 22. Amendment 15 i
 
-4. Order and Priority of Interpretation. In the event of any conflict, inconsistency or ambiguity between two or more provisions in this Agreement, including the provisions in its Exhibits and Purchase Schedules, the provisions in the documents will govern, supersede and control over one another in the following order of priority: (1st) a Purchase Schedule with regards to the purchase and sale of the specific products identified in that Purchase Schedule for its duration; (2nd) the SOP; (3rd) any Exhibit to this Agreement but only with regards to specific subject matter of the Exhibit; and (4t h) the main body of this Agreement prior to the signature page.
 
-5. General Representations, Warranties and Covenants. A Party represents, warrant and covenants on the Effective Date and at all times during the Term that: a. The Party is formed, registered, licensed and operating its business in compliance with the laws of the United States of America, its states and territories, and any districts, municipalities and other political subdivisions of the foregoing (&quot;Applicable Laws&quot;). b. The Party is operating its business in compliance with a commercially reasonable code of ethics adopted by such Party. c. The Party may enter into and perform its obligations under this Agreement without being in conflict with, or in breach of, any other agreement of the Party. d. The Party is solvent, is capable of paying its debts as and when they become due and is paying its debts as and when due. e. The Party is not the subject of a criminal investigation nor a defendant in any criminal indictment, petition, complaint or proceeding that carries a potential sentence involving incarceration in excess of one year for any director or executive officer of the Party involved in the alleged criminal misconduct or a fine in excess of $100,000 USD.
 
-A Party will promptly notify the other Party of any change in circumstance during the Term in which the Party is no longer in compliance with the foregoing general representations, warranties and covenants. An incident of actual, alleged or suspected non-compliance by a Party with a warranty under this Section being investigated, contested or corrected in good faith by the Party and which, regardless of outcome, will have no material adverse effect on the Party or its performance under this Agreement or on the other Party, will not be considered a breach of this clause. An incident of actual, alleged or suspected non-compliance by a Party of this Section or any other Section of this Agreement will be grounds for the other Party to demand adequate assurances of performance as provided by Section 2-609 of the Illinois Uniform Commercial Code. A Party will have ten (10) days to provide adequate assurances of performance to the other Party in a form acceptable to the other Party in its good faith discretion.
 
-Source: REYNOLDS CONSUMER PRODUCTS INC., S-1, 11/15/2019
 
+Section 23. Benefits 15 Section 24. Notices and Wire Instructions 15 Section 25. Liability of Officers, Trustees and Shareholders 16 Section 26. Nonpetition Covenant 16
 
+Exhibit A Form of Tender Notice (Optional Tenders)
 
+Exhibit B Form of Remarketing Notice (Optional and Mandatory Tenders, Mode Transition)
 
+Exhibit C Form of Failed Remarketing Notice (Optional and Mandatory Tenders, Mode Transition)
 
-6. Specific Product Warranties. Seller represents and warrants to Buyer that each product sold under this Agreement will at the time of delivery to Buyer: a. Be in new, undamaged and unadulterated condition free of any defects in design, materials and manufacture. Seller is not making any representation or warranty under this clause with regards to the design of a product to the extent the design constitutes, incorporates or otherwise embodies intellectual property that Buyer has represented and warranted to Seller is owned by Buyer and which Buyer has licensed to Seller to manufacture the product for Buyer. b. Have been manufactured and stored by Seller at a plant (and, if applicable under a Purchase Schedule, a warehouse) of Seller approved in the applicable Purchase Schedule prior to its delivery to Buyer. c. Has been manufactured, packaged, labelled, sold and delivered by Seller, and may be sold by Buyer in interstate commerce, in compliance with Applicable Laws, including without limitation with food safety regulations issued by the United States Food and Drug Administration that are applicable to the product. Seller will not be in breach of this warranty because an Applicable Law prohibits, restricts or imposes a charge on a product in a district, municipality or other political subdivision of the United States of America or its states or territories. d. Comply with the written specifications for the product identified in the applicable Purchase Schedule. e. Be fit for the purpose of packaging, selling or use in consuming food subject to qualifications and instructions on the use of the product in the written specifications for the product identified in the applicable Purchase Schedule. f. Be conveyed by Seller to Buyer with good and marketable title free and clear of all liens, encumbrances and claims arising by, through or under Seller. g. Not infringe on any patent, trademark, copyright, trade secret or other the intellectual property of any third-party registered or otherwise recognized and enforceable under Applicable Law. Seller is not making any representation or warranty under this clause with regards to the design of a product to the extent the design constitutes, incorporates or otherwise embodies intellectual property that Buyer has represented and warranted to Seller is owned by Buyer and which Buyer has licensed to Seller to manufacture the product for Buyer. h. Comply with any additional representations and warranties of Seller regarding the product in the applicable Purchase Schedule.
+Exhibit D Form of Retention Notice (Mandatory Tenders) ii
 
-If a Buyer receives a product that fails to conform to these representations and warranties, the sole remedies of Buyer for the breach of warranty will be to: (1) reject and return the non-conforming product to Seller for a refund or credit, or a replacement conforming product, in the manner and time period provided in the SOP; (2) obtain reimbursement from Seller for actual, reasonable, substantiated out-of-pocket expenses incurred by Buyer in the recovery, return or disposal of a non-conforming product that is the subject of a mandatory product recall required under Applicable Laws or a voluntary withdrawal declared by Seller or approved by Seller (such approval not to be unreasonably withheld, conditioned or delayed); and (3) obtain indemnification from Seller for any Indemnified Claim arising from or related to the non-conforming product as provided in Section 7.
 
-Source: REYNOLDS CONSUMER PRODUCTS INC., S-1, 11/15/2019
 
 
 
+REMARKETING AGREEMENT
 
+This REMARKETING AGREEMENT, dated as of [●] (this &quot;Agreement&quot;), by and among Nuveen AMT-Free Municipal Credit Income Fund, a closed-end investment company organized as a Massachusetts business trust (the &quot;Fund&quot;), Nuveen Fund Advisors, LLC, a registered investment adviser and wholly-owned subsidiary of Nuveen Investments, Inc. (the &quot;Investment Adviser&quot;), and [●] (the &quot;Remarketing Agent&quot;).
 
-7. Indemnification. a. A claim that a Party (referred to at times in this Section as an &quot;Indemnifying Party&quot;) is required to defend and indemnify the other Party (referred to at times in this Section as an &quot;Indemnified Party&quot;) under this Agreement is referred to at times in this Section as an &quot;Indemnified Claim&quot;. Defense and indemnification under this Section will include, without limitation, (1) paying or reimbursing the actual, reasonable, substantiated out-of-pocket expenses incurred in connection with the investigation, defense and settlement of any civil, criminal or administrative action, suit, arbitration, mediation, hearing, audit, investigation or other proceeding threatened or commenced against an Indemnified Party on an Indemnified Claim (e.g., fees and expenses of attorneys, accountants, auditors, investigators, consulting experts, testifying experts and other consultants; fees and expenses of an arbitrator or mediator; filing fees and costs imposed by any court, administrative agency or other tribunal; etc.), and (2) satisfying any judgment, award, order, lien, levy, fine, penalty or other sanction imposed against an Indemnified Party on an Indemnified Claim. b. Seller will defend and indemnify Buyer against: (1) any third-party claim for personal injury, damage to tangible property or other loss to the extent caused by any actual or alleged breach of this Agreement by Seller, including, without limitation, any product supplied by Seller which fails to conform to the representations and warranties in this Agreement; (2) any third-party claim for personal injury, damage to tangible property or other loss to the extent caused by any actual or alleged negligence or other legally culpable misconduct of Seller in the design, manufacture, storage, sale or delivery of any product sold by Seller under this Agreement or in the performance of other obligation of Seller under this Agreement; (3) any third-party claim for actual or alleged infringement of a product sold by Seller under this Agreement or its design, manufacture, storage, packaging, sale or delivery by Seller under this Agreement or in the performance of any other obligation of Seller under this Agreement (except to the extent that the infringement is based on intellectual property that that Buyer has represented and warranted to Seller that Buyer owns and that Buyer has licensed to Seller and that Seller has used in compliance with the license terms in supplying the product); (4) the threat or imposition of any fine, penalty or other sanction by a governmental authority on Buyer to the extent caused by any actual or alleged violation by Seller of Applicable Law; or (5) any other matter that Seller has agreed to defend and indemnify Buyer against under a Purchase Schedule. c. Buyer will defend and indemnify Seller against: (1) any third-party claim for personal injury, damage to tangible property or other loss to the extent caused by any actual or alleged breach of this Agreement by Buyer; (2) any third-party claim for personal injury, damage to tangible property or other loss to the extent caused by any actual or alleged negligence or other legally culpable misconduct of Buyer in the purchase, storage, repackaging, resale or delivery of any product purchased from Seller under this Agreement or in the performance of other obligation of Buyer under this Agreement; (3) any third-party claim for actual or alleged infringement of a product sold by Seller under this Agreement or its design, manufacture, storage, sale or delivery by Seller under this Agreement or in the performance of any other obligation of Seller under this Agreement to the extent based on intellectual property that that Buyer has represented and warranted to Seller that Buyer owns and that Buyer has licensed to Seller and that Seller has used in compliance with the license term in supplying the product; (4) the threat or imposition of any fine, penalty or other sanction by governmental authority on Seller to the extent caused by any actual or alleged violation by Buyer of Applicable Law; or (5) any other matter that Buyer has agreed to defend and indemnify Seller against under a Purchase Schedule. d. As a condition of receiving defense and indemnification under this Section for an Indemnified Claim, the Indemnified Party must: (1) notify and tender the defense of an Indemnified Claim to the Indemnifying Party promptly after the Indemnified Party learns of the Indemnified Claim; and
+WITNESSETH:
 
-Source: REYNOLDS CONSUMER PRODUCTS INC., S-1, 11/15/2019
+WHEREAS, the Fund is issuing Series [●] MuniFund Preferred Shares, par value $.01 per share (the &quot;MFP Shares&quot;), with a liquidation preference of $[●] per share, pursuant to and with the preferences, voting powers, restrictions, limitations as to dividends, qualifications, and terms and conditions of redemption assigned to them in the Fund&#x27;s Statement Establishing and Fixing the Rights and Preferences of Series [●] MuniFund Preferred Shares effective [●], as amended, revised or supplemented from time to time (the &quot;Statement&quot;), as modified with respect to the Initial Mode by the Supplement to the Statement Establishing and Fixing the Rights and Preferences of Series [●] MuniFund Preferred Shares Initially Designating the Variable Rate Remarketed Mode for the Series [●] MuniFund Preferred Shares effective [●], as amended, revised or supplemented from time to time (the &quot;Supplement&quot;; references in this Agreement to the Supplement shall be deemed to include the Statement);
 
+WHEREAS, the Fund has requested [●] to act as the Remarketing Agent under this Agreement while the MFP Shares are in the Variable Rate Remarketed Mode in accordance with the provisions of the Supplement (and the Board of Trustees of the Fund has adopted a resolution appointing [●] as the Remarketing Agent) to perform the duties set forth herein and to perform such other duties as are assigned to the Remarketing Agent herein and in the Supplement, all pursuant to the procedures set forth in the Supplement and this Agreement;
 
+WHEREAS, the Remarketing Agent is willing to assume such duties on the terms and conditions expressly set forth herein;
 
+NOW, THEREFORE, in consideration of the premises and mutual covenants herein contained, the parties hereto agree as follows:
 
+Section 1. Definitions. Capitalized terms used herein that are not otherwise defined shall have the meanings assigned to them in the Supplement.
 
-(2) provide information and cooperation reasonably requested by the Indemnifying Party in the investigation, defense, settlement and satisfaction of the Indemnified Claim. An Indemnifying Party will reimburse the Indemnified Party of any reasonable, actual, substantiated out-of-pocket expense incurred in providing the requested information or cooperation. e. If the Indemnifying Party accepts the tender of defense of an Indemnified Claim, with or without reservation, the Indemnifying Party will: (1) promptly notify the Indemnified Party of the acceptance of the tender of defense of the Indemnified Claim. (2) control the investigation, defense, settlement and satisfaction of the Indemnified Claim, including, without limitation, the selection of licensed, qualified and reputable attorneys and expert witnesses and all decisions over settlement and litigation strategy. The Indemnifying Party must act in good faith in exercising control over the investigation, defense, settlement and satisfaction of the Indemnified Claim. (3) Provide information reasonably requested by the Indemnified Party regarding the investigation, defense, settlement and satisfaction of the Indemnified Claim f. An Indemnifying Party, acting in good faith, may settle an Indemnified Claim for which it is responsible under this Agreement involving infringement on the intellectual property of a third-party by: (1) obtaining a license from the third-party allowing the required use of its intellectual property; (2) modifying a product, equipment or process in a manner which avoids infringing on the intellectual property of the third-party; or (3) voluntarily withdrawing the infringing product from the market and either refunding the amount paid by the Indemnified Party for the infringing product or replacing the infringing product with a non-infringing product. g. The Parties may disagree on whether a claim is an Indemnified Claim under this Agreement, which Party should be considered the Indemnifying Party and Indemnified Party for an Indemnified Claim or whether each Party is partially liable for an Indemnified Claim and how liability for such an Indemnified Claim should be allocated between them. In these and other circumstances in which an actual or potential conflict of interest exists or arises between the Parties with regards to an alleged or agreed upon Indemnified Claim that would preclude their joint representation by a single defense counsel, the Parties will endeavor in good faith to attempt to resolve the conflict. If the Parties are able to resolve the actual or potential conflict of interest, the Parties will memorialize the agreed upon resolution in a written joint defense agreement signed by officers of each Party and their joint defense counsel. If the Parties are unable to resolve the actual or potential conflict of interest, each Party may independently and separately investigate, defend, settle and satisfy the claim subject to their right to pursue payment or reimbursement for costs incurred in doing so from the other Party as provided in this Agreement.
+&quot;1933 Act&quot; means the Securities Act of 1933, as amended.
 
-8. Insurance. During the Term of this Agreement, each Party will maintain the following minimum types and amounts of insurance coverage during the Term of this Agreement: a. Commercial General Liability Insurance. Occurrence based coverage with a combined single limit of at least $10,000,000 per occurrence and in the aggregate for premises and operations; products and completed operations; contractual liability coverage for indemnities of a Party contained within this Agreement; broad form property damage (including completed operations); explosion, collapse and underground hazards; and personal injury. Requires additional insured endorsement and waiver of subrogation endorsement.
+&quot;1933 Act Regulations&quot; means the rules and regulations under the 1933 Act.
 
-Source: REYNOLDS CONSUMER PRODUCTS INC., S-1, 11/15/2019
+&quot;1934 Act&quot; means the Securities Exchange Act of 1934, as amended.
 
+&quot;1940 Act&quot; means the Investment Company Act of 1940, as amended.
 
+&quot;1940 Act Documents&quot; has the meaning set forth in Section 3(b) hereof. 1
 
 
 
-b. Automobile Liability Insurance. Occurrence based coverage with a combined single limit of at least $10,000,000 per occurrence and in the aggregate for owned, non-owned, and hired automotive equipment of the Party. Requires additional insured endorsement and waiver of subrogation endorsement. c. Workers&#x27; Compensation Liability Insurance. Occurrence based coverage providing benefits in the minimal amount required by Applicable Law for workplace and work related injuries and illnesses to the employees of a Party, including, without limitation, Workers Compensation Acts of applicable U.S. States, the U.S. Longshoremen&#x27;s and Harbor Workers Compensation Act and the U.S. Jones Act. Requires alternate employer endorsement and waiver of subrogation endorsement. d. Employers&#x27; Liability Insurance. Occurrence based coverage with a limit of at least $10,000,000 per occurrence or any greater limits set by Applicable Law workplace and work related injuries and illnesses to the employees of a Party. Requires waiver of alternate employer endorsement. e. Property Insurance. Coverage providing &quot;all risk&quot; property insurance at the replacement value of the machinery, equipment, fixtures, tools, materials and other property of the Party. &quot;All risk&quot; coverage will include, by way of example and not limitation, loss or damage resulting from earthquakes, floods, wind, fire or other natural or weather-related phenomenon. Requires waiver of subrogation endorsement.
 
-All insurers of a Party on such policies must have at all times an A.M. Best financial rating of at least &quot;A-Minus VII&quot;. An insuring Party may satisfy the required minimum amounts of insurance through a primary policy and one or more excess policies. All insurance of an insuring Party must be &quot;primary and non-contributory&quot; with respect to any insurance that the other Party may maintain, but only with respect to the negligence or other legal liability of the insuring Party.
 
-An insuring Party must deliver the following written evidence of the required insurance coverage to the other Party (Attention: Risk Management), or its designated insurance monitoring service, within ten (10) of written request and at least thirty (30) days in advance of the expiration of a then current policy term (if a declaration or endorsement is not available from an insurer at the time requested or required, an insuring Party will provide them as soon as the declaration or endorsement is available from the insurer): i. Certificate of insurance confirming that the required insurance coverage and minimal limits are met for the extended, renewed or replacement policy term. ii. Declaration pages of insurance policy (or a copy of the binder until the declaration pages are available) confirming that the required insurance coverage and minimal limits are met for the extended, renewed or replacement policy term. iii. Copies of additional insured endorsements required for applicable policies in the name and for the benefit of: &quot;[NAME OF OTHER PARTY], its parent, subsidiaries and affiliates; any lessors of the foregoing and any mortgagees, deed of trust beneficiaries and secured creditors of such lessors; and any successors and assignees of all of the foregoing.&quot; iv. Copies of alternate employer endorsements and waiver of subrogation endorsements required for applicable policies in the name and for the benefit of: &quot;&quot;[NAME OF OTHER PARTY], its parent, subsidiaries and affiliates; any lessors of the foregoing and any mortgagees, deed of trust beneficiaries and secured creditors of such lessors; and any successors and assignees of all of the foregoing.&quot;
+&quot;1940 Act Regulations&quot; means the rules and regulations under the 1940 Act.
 
-Source: REYNOLDS CONSUMER PRODUCTS INC., S-1, 11/15/2019
+&quot;Agreement&quot; has the meaning set forth in the preamble.
 
+&quot;Calculation and Paying Agent&quot; means The Bank of New York Mellon acting pursuant to the Tender and Paying Agent Agreement or any successor thereto.
 
+&quot;Commission&quot; has the meaning set forth in Section 3(d) hereof.
 
+&quot;Fund&quot; has the meaning set forth in the preamble.
 
+&quot;Indemnified Person&quot; has the meaning set forth in Section 9(a) hereof.
 
-A Party may maintain any level of deductible on required insurance coverage allowed by Applicable Law. A Party may also self-insure any of the required insurance coverage, in whole or in part, if allowed by Applicable Law during any period that the Party maintains a tangible net worth in excess of $100 million USD and maintains a professionally managed and adequately reserved for and funded self-insurance program.
+&quot;Indemnifying Person&quot; has the meaning set forth in Section 9(c) hereof.
 
-9. Limitations on Liability. a. Disclaimer of Representations and Warranties. Each Party: (1) disclaims all representations and warranties regarding its products, performance, supplied information or business, whether oral or written, express or implied, arising by operation of law or otherwise, including, without limitation, the implied warranty of merchantability and the implied warranty of fitness for a particular purpose, other than those express representations and warranties of the Party in this Agreement; (2) acknowledges that the Party has not relied on, and will not rely on, any representations and warranties of the other Party regarding its products, performance, supplied information or business, whether oral or written, express or implied, arising by operation of law or otherwise, other than those express representations and warranties of the other Party in this Agreement; and (3) waives any claim that the Party may have based, in whole or in part, on any representations and warranties of the other Party regarding its products, performance, supplied information or business, whether oral or written, express or implied, arising by operation of law or otherwise, other than those express representations and warranties of the other Party in this Agreement. Notwithstanding the foregoing, Buyer is entitled to rely on (i) the descriptive information in transaction documents issued by either Party in the ordinary course of business during the Term identifying the ordered Products (e.g., the type and quantity of ordered products and scheduled date and location for delivery) and (ii) FDA guaranty letters and other similar written assurances in Seller&#x27;s standard forms certifying that a product complies with Applicable Laws issued by Seller to Buyers and other U.S. customers in the ordinance course of business during the Term. b. Exclusion of Indirect Damages; Waiver of Claim for Insured Damage or Loss. A Party that breaches this Agreement will only be liable to the other Party for direct damages arising from the breach. Each Party waives any right to recover consequential, incidental, indirect, exemplary, punitive or any other types of indirect damages from the other Party for a breach of this Agreement. Notwithstanding the preceding sentences, this Subsection will not limit the liability of a Party for any amount or type of damages for: (1) the defense and indemnification of an Indemnified Claim on which the Party is the Indemnifying Party; (2) infringement by the Party on the intellectual property of the other Party; (3) the unauthorized disclosure or use by the Party of the Confidential Information of the other Party; (4) payment or reimbursement of any amount expressly required to be paid or reimbursed by the Party under a provision of this Agreement; or (5) the intentional misconduct of the Party in violation of Applicable Laws. c. Force Majeure. A Party will not be considered in breach of this Agreement or liable to the other Party for any interruption or delay in performance under this Agreement to the extent caused by an event outside of the ability of the performing Party to foresee and avoid with the exercise of commercially reasonable efforts (such an event is referred to at times as an event of &quot;Force Majeure&quot;). Examples of events of Force Majeure include, without limitation: natural disasters; war; acts of terrorism; government action; accident; strikes, slowdowns and other labor disputes; shortages in or inability to obtain material, equipment, transportation or labor; any breach, negligence, criminal misconduct or other act or omission of any third-party; fire or other insured or uninsured casualty. A Party whose performance is interrupted or delayed by an event of Force Majeure will be excused from the interruption or delay in performance during the event of Force Majeure and for a commercially reasonable period of additional time after the event of Force Majeure that the Party needs to recover from the event of Force Majeure and restore performance. Notwithstanding the foregoing, a Party will only be excused for an interruption or delay in performance under this Subsection for an event of Force Majeure only if the Party (1) promptly notifies the other Party of the event of Force Majeure and provides information reasonably requested by the other Party regarding the event of Force Majeure, the efforts undertaken by the
+&quot;Investment Adviser&quot; has the meaning set forth in the preamble.
 
-Source: REYNOLDS CONSUMER PRODUCTS INC., S-1, 11/15/2019
+&quot;Losses&quot; has the meaning set forth in Section 9(b) hereof.
 
+&quot;MFP Shares&quot; has the meaning set forth in the preamble.
 
+&quot;Mode&quot; has the meaning set forth in the Statement.
 
+&quot;Prospectus&quot; means the final prospectus, including the statement of additional information incorporated by reference therein, each dated [●], and the prospectus supplement, dated [●], relating to the initial offering of the VRRM-MFP Shares.
 
+&quot;Registration Statement&quot; means the Fund&#x27;s registration statement (No. 333-226136 and No. 811-09475), relating to the MFP Shares and other securities of the Fund, declared effective by order of the Commission on October [●], 2018, as it may be amended from time to time.
 
-Party to foresee and avoid interruption or delay in its performance before the occurrence of the event, to mitigate interruption or delay in performance during the event, and to recover from and restore performance following the event; and (2) the Party exercises commercially reasonable efforts to mitigate, recover from and restore performance following the event of Force Majeure. During, and while recovering from and restoring performance following, an event of Force Majeure, Seller will act in good faith in allocating its available manufacturing capacity to supply products to Buyer under this Agreement and any products to other customers of Seller. If an event of Force Majeure interrupts or delays Seller from supplying a product to Buyer under this Agreement in the quantities and timetable required by Buyer, Buyer may cancel any unfilled orders for the product with Seller and procure the required quantities of the product from one or more other sources until Seller has recovered from and restored its ability to perform following the event of Force Majeure. If the interruption or delay in the supply of a product to Buyer under this Agreement caused by an event of Force Majeure has exceeded, or is reasonably likely to exceed, thirty (30) days, Buyer may enter into longer term supply agreements or make other arrangements to procure the required quantities of the product from one or more other sources for a duration and on terms acceptable to Buyer in its good faith discretion. In such a circumstance, Buyer will not have to resume purchasing the product from Seller under this Agreement until Seller has recovered from and restored its ability to perform following the event of Force Majeure and the longer term agreements or other arrangements have expired or Buyer is able to end them without liability. This Subsection will not excuse nor extend a deadline by which a Party must pay an amount owed under this Agreement or Applicable Law or by which a Party must exercise any right or remedy under this Agreement or Applicable Law.
+&quot;Remarketing Agent&quot; has the meaning set forth in the preamble.
 
-10. Confidential Information and Other Intellectual Property. a. The Parties anticipate exchanging Confidential Information (as defined in in the next Subsection) over the Term of this Agreement for the purpose of negotiating and entering into Purchase Schedules and amendments to this Agreement, transacting business with one in accordance with this Agreement and exercising their rights and performing their obligations under this Agreement (collectively referred to as the &quot;Authorized Purpose&quot;). b. The phrase &quot;Confidential Information&quot; means information meeting all of the following criteria: 1) The information is a trade secret or other non-public, proprietary information owned by a Party or its direct and indirect subsidiaries under Applicable Law (this Party is referred to at times in this Section as the &quot;Disclosing Party&quot;); and 2) The other Party (referred to at times in this Section as the &quot;Receiving Party&quot;) requests such information from the Disclosing Party for the Authorized Purpose during the Term (i.e., neither Party wants unsolicited Confidential Information from the other Party); and 3) The Disclosing Party discloses such requested information to the Receiving Party during the Term either labelled as &quot;Confidential&quot; or words of similar intent, or describes the disclosed information in reasonable detail in a written notice to the Receiving Party delivered, either at the time of disclosure or within five (5) days of disclosure. If a Disclosing Party neglects to label or deliver timely written notice to the Receiving Party identifying the disclosed information as confidential in nature, the disclosed information will only be treated as Confidential Information under this Agreement if the Disclosing Party is able to demonstrate by clear and convincing evidence that the Receiving Party knew that the disclosed information was a trade secret or other non-public, proprietary information of the Disclosing Party at the time of disclosure.
+&quot;Remarketing Materials&quot; has the meaning set forth in Section 7(b) hereof.
 
-Source: REYNOLDS CONSUMER PRODUCTS INC., S-1, 11/15/2019
+&quot;Remarketing Memorandum&quot; means the Prospectus or any other written communication describing the Fund and/or the terms of the VRRM-MFP Shares, which has been approved by the Fund in writing for use in connection with remarketing prior to its use, which approval shall not be unreasonably withheld or delayed.
 
+&quot;Representation Date&quot; has the meaning set forth in Section 3(b) hereof.
 
+&quot;Statement&quot; has the meaning set forth in the preamble.
 
+&quot;Supplement&quot; has the meaning set forth in the preamble.
 
+&quot;Transition Remarketing&quot; means a remarketing in connection with a Mode change pursuant to Article 3 of the Supplement. 2
 
-The criteria in Clause (2) and Clause (3) will not apply to Confidential Information of a Disclosing Party observed or heard by a Receiving Party in a plant, warehouse, facility or system of the Disclosing Party. The existence and terms of this Agreement, and the existence, nature and extent of the business relationship between the Parties, will be considered the Confidential Information of each Party. c. The phrase &quot;Confidential Information&quot; also means the Know-How of a Disclosing Party and its direct and indirect subsidiaries that a Receiving Party and its direct and indirect subsidiaries learned of, acquired or otherwise used prior to the Effective Date. The phrase &quot;Know-How&quot; means trade secret and other confidential, proprietary information of a Party or its Affiliate concerning the manufacture, storage, packaging, marketing, sale and delivery of its products. Examples of Know-How may be in the form of drawings, equipment specifications, formulae, formulations, guidelines, manuals, methods, plans, policies, procedures, processes, properties and applications of raw materials and products, tools, dies and molds. A Receiving Party and its direct and indirect subsidiaries may continue to use the Know- How of the Disclosing Party and its direct and indirect subsidiaries in the possession of the Receiving Party and its direct and indirect subsidiaries as of the Effective Date for the Authorized Purpose and in connection with the operation of the business of the Receiving Party and its direct and indirect subsidiaries. Nothing in this Subsection or any other provisions of this Agreement will obligate a Party to disclose or license the use of its Know-How of any kind and in any form arising, discovered, acquired or developed after the Effective Date to the other Party. d. The phrase &quot;Confidential Information&quot; does not include, and there will not be any duties of confidentiality or other restrictions under this Agreement for, the following types of information: (1) Information which is or becomes available as part of the public domain through any means other than as a result of a breach of this Agreement by the Receiving Party; or (2) Information, other than Know-How received prior the Effective Date, which is known to the Receiving Party before the disclosure of the same information by the Disclosing Party; or (3) Information which is or becomes available to the Receiving Party from a third-party who is not under any duty to preserve the confidentiality of such information; or (4) Information which is furnished by the Disclosing Party to a third-party without imposing any duty on the third-party to preserve the confidentiality of such information; or (5) Information which is independently developed by the Receiving Party without the use of or reliance on any trade secret or other non-public, proprietary information provided by the Disclosing Party as Confidential Information under this Agreement or under any prior agreement between the Parties; or (6) Information that ceases to be a trade secret or other non-public, proprietary information of the Disclosing Party under applicable law through any means other than those enumerated above that does not involve nor result from a breach of this Agreement by the Receiving Party. e. A Party may request and disclose Confidential Information in any form or medium. Confidential Information may include, without limitation, information concerning the assets, liabilities, financing, financial statements, ownership, goods, services, customers, suppliers, marketing, manufacturing, equipment, software, technology, supply chain, business strategies, plans, models, policies, methods, processes, formulae, specifications, drawings, schematics, software and technical know-how of a Disclosing Party. A Receiving Party will take all commercially reasonable actions required to safeguard the Confidential Information of a Disclosing Party in the possession of such Receiving Party against the unauthorized disclosure or use of the Confidential Information by other persons. A Receiving Party will promptly notify the Disclosing Party if the Receiving Party learns of any unauthorized disclosure or use of the Confidential Information of the Disclosing Party by any
 
-Source: REYNOLDS CONSUMER PRODUCTS INC., S-1, 11/15/2019
 
 
 
+&quot;VRRM-MFP Shares&quot; means the MFP Shares while in the Variable Rate Remarketed Mode pursuant to the Supplement.
 
+Section 2. Appointment and Obligations of the Remarketing Agent.
 
-person. A Receiving Party will cooperate in good faith with the Disclosing Party to prevent any unauthorized disclosure or use of the Confidential Information of the Disclosing Party by any person. f. A Receiving Party will not disclose nor use the Confidential Information of a Disclosing Party except as follows: (1) A Receiving Party may disclose Confidential Information of a Disclosing Party on a &quot;need to know&quot; basis to the Representatives of the Receiving Party who require such information for the Authorized Purpose and in order for the Receiving Party and its Affiliates to comply with Applicable Laws, accounting standards and securities exchange requirements. Before making such a disclosure, the Receiving Party will advise the Representatives of the confidential nature of the information being shared and ensure that duties and restrictions are, or have been, imposed on the Representatives receiving the Confidential Information similar to those imposed on the Receiving Party under this Agreement. A Receiving Party will be liable for any breach of this Agreement by its Representatives. An &quot;Affiliate&quot; of a Party means a legal entity that owns and controls, or is owned and controlled by, or is under common ownership and control with, a Party (other than the other Party or any of its direct and indirect subsidiaries), with ownership and control of a legal entity being determined by the ownership of the majority voting interest in the legal entity. A &quot;Representative&quot; means the Affiliates of a Party and the directors, officers, managers, employees, accountants, attorneys, auditors and other agents and consultants of a Party and its Affiliates. (2) A Receiving Party may disclose Confidential Information of a Disclosing Party to a court, governmental entity or any other person in order for the Receiving Party and its Affiliates to comply with Applicable Laws, accounting standards and securities exchange requirements. If legally permissible and reasonably possible, a Receiving Party will notify the Disclosing Party prior to disclosing its Confidential Information pursuant to this Section and cooperate in good faith with any lawful efforts by the Disclosing Party to avoid or limit the disclosure of its Confidential Information. A Receiving Party will not be obligated to incur any liability, expense or risk in extending such cooperation to a Disclosing Party. Based on legal advice of its attorney, a Receiving Party may disclose the Confidential Information of the Disclosing Party by any deadline established under an Applicable Law, accounting standard and securities exchange requirement. (3) A Receiving Party may disclose and use the Confidential Information of a Disclosing Party to enforce or interpret this Agreement or any other agreement with the Disclosing Party in any arbitration, court or other legal proceeding. A Receiving Party may disclose and use this Confidential Information of a Disclosing Party to defend the Receiving Party or its Affiliates or their respective Representatives in any arbitration, court or other legal proceeding. In either circumstance, the Receiving Party will ensure that a protective order, agreement or other mechanism is in place to preserve the confidentiality of the Confidential Information. (4) A Receiving Party and its Representatives may disclose and use the Confidential Information for any other purpose consented to by a Disclosing Party in a written notice signed by an officer of the Disclosing Party delivered to the Receiving Party. g. In disclosing its Confidential Information to a Receiving Party, a Disclosing Party represents, warrants and covenants to the Receiving Party that: (1) The Disclosing Party owns and has the right to disclose and authorize the use of Confidential Information as provided in this Agreement.
+(a) Appointment. The Fund hereby appoints [●], and [●] hereby accepts such appointment, as the exclusive Remarketing Agent of the VRRM-MFP Shares for the Variable Rate Remarketed Mode for the purpose of establishing on each Business Day the Dividend Rate in respect of the VRRM-MFP Shares and, in connection with a tender, remarketing such VRRM-MFP Shares on behalf of the Beneficial Owners or Holders thereof, as applicable, and calculating the Purchase Price therefor, among other things; and performing such other duties as are assigned to the Remarketing Agent in the Supplement, all pursuant to the procedures set forth in the Supplement and this Agreement.
 
-Source: REYNOLDS CONSUMER PRODUCTS INC., S-1, 11/15/2019
+(b) General Duties. The Remarketing Agent agrees with respect to the VRRM-MFP Shares to:
 
+(i) use its best efforts to remarket Tendered VRRM-MFP Shares in connection with an optional tender or mandatory tender of VRRM-MFP Shares as provided in the Supplement, but shall in no way be liable if no purchasers are found, provided it has otherwise performed its obligations as set forth in this Agreement and the Supplement;
 
+(ii) calculate the Purchase Price to be paid in connection with a remarketing of VRRM-MFP Shares.
 
+(iii) establish the Dividend Rate as provided in the Supplement; provided, that the Dividend Rate may not exceed the Maximum Rate;
 
+(iv) notify the Fund and the Calculation and Paying Agent of the Dividend Rate by Electronic Means and post the Dividend Rate on Bloomberg promptly on each date of determination of the Dividend Rate as provided in the Supplement; in the case of the notice to the Fund and the Calculation and Paying Agent with respect to the Step-Up Dividend Rate, such notice shall set forth in reasonable detail the basis for and calculation of the highest rate as determined by the Remarketing Agent;
 
-(2) The Receiving Party and its Representatives may use the Confidential Information of the Disclosing Party for the Authorized Purpose and other limited purposes provided in this Agreement. (3) The Disclosing Party will indemnify, defend and hold harmless the Receiving Party and its Representatives against any claim of a third-party that the disclosure and use of the Confidential Information of the Disclosing Party as provided in this Agreement infringes on a patent, trademark, copyright, trade secret or other intellectual property of the third-party registered in or otherwise recognized and enforceable under Applicable Laws.
+(v) provide any other notices to be provided by the Remarketing Agent to the Fund, the Calculation and Paying Agent, Holders and Beneficial Owners as set forth in the Supplement;
 
-Except for the limited representations and warranties in this Section, a Disclosing Party disclaims all other representations and warranties of any kind related to its Confidential Information, whether express, implied or arising by operation of law, including the disclaimer, without limitation, of any representation and warranties concerning merchantability, fitness for a particular purpose, truth, accuracy or completeness. h. The rights and obligations of the Parties under this Section with regards to disclosed Confidential Information will continue: (1) Until the earlier of (i) sixty (60) months from the date of disclosure to a Receiving Party or (ii) the date such information ceases to be considered Confidential Information under this Agreement, for Confidential Information that is not a trade secret of a Disclosing Party under Applicable Law; and (2) Until Confidential Information that is a trade secret of a Disclosing Party under Applicable Law ceases to be a trade secret of the Disclosing Party under Applicable Law. i. A Receiving Party will return or destroy all forms of Confidential Information of the Disclosing Party in the custody of the Receiving Party and its Representatives within ten (10) days of receipt of a written request from the Disclosing Party and after the expiration or earlier termination of this Agreement. This will include, without limitation, all copies, records, documents and other information representing, comprising, containing, referencing or created based on Confidential Information of the Disclosing Party. Notwithstanding the foregoing, a Receiving Party and its Representatives may retain copies of Confidential Information of the Disclosing Party which (x) the Receiving Party and its Representatives are required to retain to comply with Applicable Laws, accounting standards and security exchange requirements (but only for the duration and in the manner so required for this limited purpose); or (y) have been archived in electronic form by the Receiving Party and its Representatives and which would be unduly burdensome for the Receiving Party and its Representatives to have to search for and delete the Confidential Information of the Disclosing Party. j. Except for the limited right to disclose and use Confidential Information of a Disclosing Party for the Authorized Purpose and other purposes provided in the this Section and except for any license of intellectual property granted by a Disclosing Party to the Receiving Party in a Purchase Schedule, this Agreement does not grant a Receiving Party or its Representatives any right, title, interest or ownership in the Confidential Information of the Disclosing Party nor in any patent, trademark, copyright or other intellectual property of the Disclosing Party. As between the Parties during the Term, to be effective, the grant of any right, title, interest and ownership in and to any Confidential Information of Party or in an patents, trademarks, copyrights and other intellectual property of the Party must be in writing and signed by the chief executive officers of the Parties. During the Term, a Party will not develop intellectual property for, on behalf of, or in collaboration with, the other Party unless the Parties have entered into a Purchase Schedule or other separate written agreement signed by an officer of each Party.
+(vi) make available to a Beneficial Owner, upon request by such Beneficial Owner in connection with a remarketing, a copy of the Contact Notification Form (as such term is defined in the Tender and Paying Agent Agreement);
 
-Source: REYNOLDS CONSUMER PRODUCTS INC., S-1, 11/15/2019
+(vii) make available to a Beneficial Owner or a former Beneficial Owner, upon request by such Beneficial Owner or former Beneficial Owner (as the case may be) in 3
 
 
 
 
 
-11. Dispute Resolution. a. Negotiation. If a Party believes that the other Party has breached this Agreement or if there is a dispute between the Parties over the interpretation of this Agreement (a &quot;Dispute&quot;), the Parties will endeavor to resolve the Dispute through good faith negotiation for a period of thirty (30) days after a Party notifies the other Party of the Dispute and before either Party requests mediation or files litigation to resolve the Dispute. b. Mediation. If the Parties have been unable to resolve a Dispute through good faith negotiation as provided in the prior Subsection, a Party may request that the Parties attempt to resolve the Dispute through mediation by notifying the other Party with a copy to JAMS. The Parties will attempt to select a mutually acceptable JAMS mediator within ten (10) days of the notice requesting mediation. The mediation will be held in Lake County or Cook County, Illinois within thirty (30) days of the notice requesting mediation before a JAMS mediator and in compliance with JAMS mediation guidelines. Each party will bear its own costs in preparing for and participating in the mediation and one-half of the fees and expenses charged by JAMS for conducting the mediation. c. Litigation. If the Parties have been unable to resolve a Dispute through mediation as provided in the prior Subsection, a Party may file litigation against the other Party in a court of competent jurisdiction in the United States of America. With respect to litigation involving only the Parties or their Affiliates, the Parties irrevocably consent to the exclusive personal jurisdiction and venue of the U.S. federal and Illinois state courts of competent subject matter jurisdiction located in Lake County, Illinois or Cook County, Illinois and their respective higher courts of appeal for the limited purpose of resolving a Dispute, and the Parties waive, to the fullest extent permitted by law, any defense of inconvenient forum. The Parties waive any right to trial by jury as to any Disputes resolved through litigation. Notwithstanding the foregoing, a Party may file litigation to resolve a Dispute without undergoing either negotiation or mediation as provided in the prior Subsections for any Dispute involving: (i) infringement on intellectual property; (ii) the unauthorized use or disclosure of Confidential Information; or (iii) a request for a temporary restraining order, a preliminary or permanent injunction or any other type of equitable relief. d. Remedies. Except as expressly limited in the preceding Subsections and the other provisions in this Agreement, a Party may immediately exercise any rights and remedies available to the Party under Applicable Law upon a breach of this Agreement by the other Party. A Party will not suspend performance under or terminate this Agreement or any accepted purchase order for a product being purchased and sold under this Agreement unless: (1) the other Party is in material breach of this Agreement and has either refused to cure the material breach or has failed to cure the material breach within thirty (30) day of its receipt of written notice of the failure; and (2) the Parties have been unable to resolve the Dispute related to the material breach through negotiation or mediation, or the breaching Party has refused or failed to attempt to resolve the Dispute through negotiation or mediation, as provided in this Section. Notwithstanding the foregoing, a Party may suspend performance or terminate this Agreement or any accepted purchase order for a product being purchase and sold under this Agreement immediately on written notice to the other Party, and without providing the other Party an opportunity to cure the material breach or attempting to resolve a Dispute over the material breach by negotiation or mediation as provided in this Section, for a material breach by the other Party involving substantial harm to the reputation, goodwill and business of the non-breaching Party that cannot reasonably be avoided or fully redressed by providing the other Party an opportunity to cure the material breach. e. Late Fees and Collection Costs. If Buyer fails to pay Seller an amount owed under this Agreement by the invoice due date, then Buyer will owe Seller: (i) the delinquent amount; and (ii) a late payment fee equal to two percent (2%) of the delinquent amount for each full or partial calendar month past the invoice due date that the delinquent amount remains unpaid. In addition, if Seller has to file
+connection with a remarketing, a copy of the Cancellation Form (as such term is defined in the Tender and Paying Agent Agreement); and
 
-Source: REYNOLDS CONSUMER PRODUCTS INC., S-1, 11/15/2019
+(viii) carry out such other duties as are assigned to the Remarketing Agent herein and in the Supplement, or as are reasonably requested by the Fund and agreed to by the Remarketing Agent, all in accordance with the provisions in this Agreement and the Supplement.
 
+(c) Remarketing at Purchase Price; Principal to Principal Basis. It is further understood and agreed by and between the parties that, in connection with any attempted remarketing, all Tendered VRRM-MFP Shares shall be remarketed at the Purchase Price of such VRRM-MFP Shares. With respect to the Remarketing Agent&#x27;s responsibilities, but without affecting the Calculation and Paying Agent&#x27;s role as intermediary (if applicable), the Remarketing Agent hereby agrees that, if the Remarketing Agent obtains a bid at the Purchase Price for any VRRM-MFP Shares being remarketed, which, if accepted, would be binding on the bidder for the consummation of the sale of such VRRM-MFP Shares (an &quot;actionable bid&quot;), and the Remarketing Agent elects in its sole discretion to accept such actionable bid, the Remarketing Agent shall (i) purchase the Tendered VRRM-MFP Shares, as a principal and not as an agent, from the Beneficial Owner or Holder thereof on the Purchase Date at the Purchase Price, (ii) resell such VRRM-MFP Shares, as a principal and not as an agent, to the Person making such actionable bid at the Purchase Price, and (iii) record such purchase and resale on its books and records in accordance with this provision. Any such purchases by the Remarketing Agent from the Beneficial Owner or Holder shall be made with the Remarketing Agent&#x27;s own funds.
 
+(d) Optional Tender for Remarketing Notices. If, in connection with an optional tender for remarketing in accordance with Section 2.2(a) of the Supplement, a Beneficial Owner tendering VRRM-MFP Shares for remarketing delivers to the Remarketing Agent a Tender Notice in substantially the form of and containing the information set forth in Exhibit A hereto and the Remarketing Agent identifies a purchaser for the Tendered VRRM-MFP Shares during the related Remarketing Window, the Remarketing Agent shall deliver a Remarketing Notice in substantially the form of and containing the information set forth in Exhibit B hereto to the Beneficial Owner of the Tendered VRRM-MFP Shares, with a copy to the Fund and the Calculation and Paying Agent as provided in Section 2.2(a) of the Supplement. Upon the occurrence of a Failed Remarketing Event, the Remarketing Agent shall provide a Failed Remarketing Notice in substantially the form of and containing the information set forth in Exhibit C hereto to the Holders, the Fund and the Calculation and Paying Agent as provided in Section 2.2(b) of the Supplement.
 
+(e) Mandatory Tender for Remarketing Notices. In connection with a mandatory tender for remarketing in accordance with Section 2.2(c) of the Supplement, the Remarketing Agent shall provide a Remarketing Notice in substantially the form of and containing the information set forth in Exhibit B hereto to the Holders, the Fund and the Calculation and Paying Agent as provided in Section 2.2(c) of the Supplement. Each Beneficial Owner wishing (and eligible) to retain its VRRM-MFP Shares shall provide a Retention Notice in substantially the form of and containing the information set forth in Exhibit D hereto to the Remarketing Agent 4
 
 
-litigation to collect the amount owed and Seller prevails in the litigation, Buyer will reimburse Seller for actual, reasonable, substantiated out-of-pocket expenses incurred by Seller in collecting the delinquent amount and accrued late payment fees on the delinquent amount. Under no circumstance will the late payment fee payable to Seller exceed the amount that a creditor may lawfully impose on a debtor on a delinquent amount under Applicable Law.
 
-12. Miscellaneous. a. Entire Agreement. This Agreement, including its appended Exhibits and Purchase Schedules entered into during the Term, constitutes the entire agreement between the Parties with respect to the sale of products by Seller to Buyer and the purchase of products by Buyer from Seller. This Agreement supersedes all prior and simultaneous representations, discussions, negotiations, letters, proposals, agreements and understandings, whether written or oral, with respect to this subject matter. This Agreement will not be binding on either Party unless and until signed by the chief executive officers of each Party. No handwritten or other addition, deletion or other modification to the printed portions of this Agreement will be binding upon either Party to this Agreement. b. Amendments. A Party may not amend nor supplement the terms and conditions in this Agreement through the inclusion of additional or different terms and conditions in any quotation, purchase order, invoice, bill of lading, letter, email or other document or communication. This Section does not prevent the reliance on the descriptive information in transaction documents identifying the ordered Products (e.g., the type and quantity of ordered products and scheduled date and location for delivery). No amendment of this Agreement will be valid or effective unless made in writing and signed and exchanged by the chief executive officers of the Parties. A Party may approve or reject a request for an amendment in its sole and absolute discretion. c. Waiver. The failure of either party to insist in any one or more instances upon strict performance of any of the provisions of this Agreement or to take advantage of any of its rights shall not operate as a continuing waiver of such rights. No right or obligation under this Agreement will be considered to have been waived by a Party unless such waiver is in writing and is signed by an officer of the waiving Party and delivered to the other Party. No consent to or waiver of a breach by either Party will constitute a consent to, waiver of, or excuse for any other, different, or subsequent breach by such Party. d. Governing Law. This Agreement and all claims or causes of action arising out of or related to this Agreement shall be governed in all respects, including as to validity, interpretation and effect, by the laws of the State of Illinois and the United States of America, without giving effect to its principles or rules of conflict of laws. The United Nations Convention on Contracts for the International Sale of Goods will not govern or otherwise be applicable to this Agreement. e. Severability. If any term of provision of this Agreement, or the application thereof shall be found invalid, void or unenforceable by any government or governmental organization having jurisdiction over the subject matter, the remaining provisions, and any application thereof, shall nevertheless continue in full force and effect. f. Assignment. This Agreement, its rights and obligations, is not assignable or transferable by either Party, in whole or in part, except with the prior written consent of the other Party, which consent will not be unreasonably withheld, conditioned or delayed. Notwithstanding the foregoing, either Party may transfer and assign this Agreement to any of its affiliates or in connection with any merger, consolidation or sale of assets without the other Party&#x27;s prior consent provided (a) that any such assignment will not result in the assigning Party being released or discharged from any liability under this Agreement, and (b) the purchaser/assignee will expressly assume all obligations of the assigning Party under this Agreement. The assigning Party will provide the other Party with written
 
-Source: REYNOLDS CONSUMER PRODUCTS INC., S-1, 11/15/2019
 
+and the Calculation and Paying Agent as provided in Section 2.2(c) of the Supplement. Upon the occurrence of a Failed Remarketing Event, the Remarketing Agent shall provide a Failed Remarketing Notice in substantially the form of and containing the information set forth in Exhibit C hereto to the Holders, the Fund and the Calculation and Paying Agent as provided in Section 2.2(c) of the Supplement.
 
+(f) Mode Change Notices. In connection with a mandatory tender for remarketing for a transition to a new Mode in accordance with Section 3.2 of the Supplement, the Remarketing Agent shall provide a Remarketing Notice in substantially the form of and containing the information set forth in Exhibit B hereto to the Holders, the Fund and the Calculation and Paying Agent as provided in Section 3.2(c) of the Supplement. Upon the occurrence of a Failed Remarketing Event, the Remarketing Agent shall provide a Failed Remarketing Notice in substantially the form of and containing the information set forth in Exhibit C hereto to the Holders, the Fund and the Calculation and Paying Agent as provided in Section 3.2(c) of the Supplement.
 
+(g) Book-Entry Procedures. Except as otherwise expressly provided for herein, the purchase and delivery of Tendered VRRM-MFP Shares and the remarketing thereof, and payments with respect to the foregoing, will be accomplished in accordance with the applicable procedures of the Securities Depository.
 
+(h) Return of Unsold VRRM-MFP Shares. Any VRRM-MFP Shares unsold in a remarketing will be returned to the relevant tendering Beneficial Owners or their Agent Members, or the relevant tendering Holders, as the case may be, by the Remarketing Agent; provided that such tender will continue until the earlier of the occurrence of a successful remarketing or the Failed Remarketing Mandatory Redemption Date.
 
-notice of such assignment prior to or promptly following the effective date of such assignment. A change of control shall be deemed an assignment requiring consent hereunder provided that any transfer or assignment that results in Seller&#x27;s and Buyer&#x27;s current common parent, Reynolds Group Holdings Limited, ceasing to control either party shall not require consent of the other party. The restrictions in this Section will not preclude a Party for authorizing an Affiliate to purchase or sell a product on behalf of a Party under this Agreement. Subject to the foregoing, all of the terms, conditions and provisions of this Agreement shall be binding upon and shall inure to the benefit of the successors and assignees of the respective Parties. g. Third Party Beneficiaries. Except as otherwise provided in a Purchase Schedule, there are no intended third-party beneficiaries of this Agreement. h. Good Faith and Cooperation. Except where this Agreement states that a Party may expressly exercise a right or render a decision in its &quot;sole and absolute discretion&quot;, a Party will exercise its rights under this Agreement in its good faith business judgment. A Party will perform its obligations under this Agreement in a commercially reasonable manner consistent with industry practices and in compliance with Applicable Law. A Party will promptly take such actions, provide such information and sign such documents as the other Party may reasonably request to obtain the benefits and exercise the rights granted, and to perform the obligations imposed, under this Agreement. i. Notices. Any notice required or permitted to be provided by a Party under this Agreement will be made to the notice address of the receiving Party set forth below or to an alternate notice address later designated by the receiving Party in accordance with this Subsection. Notices will be effective upon actual receipt by the receiving Party. An emailed notice will be effective against a receiving Party only if the Receiving Party acknowledge receipt of the emailed notice in a return notice to the notifying Party. A receiving Party agrees to acknowledge receipt of an email notice in good faith promptly following receipt. A Party may change its address for notice by giving notice to the other party Pursuant to this Subsection.
+(i) Timing Requirements. The Remarketing Agent agrees to the remarketing timing requirements applicable to it in the Supplement. The Remarketing Agent may, in its sole discretion, modify the settlement procedures set forth therein with respect to any Remarketing upon ten (10) days&#x27; prior written notice to the Fund and the Calculation and Paying Agent, provided any such modification does not adversely affect the Holders, the Beneficial Owners, the Calculation and Paying Agent or the Fund.
 
-Address for notice to Buyer:
+(j) Purchases by Remarketing Agent. If the Remarketing Agent in its sole discretion decides to purchase unsold VRRM- MFP Shares for its own account, on each Purchase Date, the Remarketing Agent will settle such purchase through delivery against payment of the Purchase Price for such VRRM-MFP Shares to be received by the Remarketing Agent by 11:00 a.m., New York City time, on such Purchase Date. The Remarketing Agent is not obligated to purchase any VRRM-MFP Shares that would otherwise remain unsold in a remarketing.
 
-Pactiv LLC 1900 West Field Court Lake Forest, IL 60045 Attn: John McGrath, Chief Executive Officer Email: jmcgrath@pactiv.com
+(k) Sales by Remarketing Agent for its Own Account. It is expressly understood and agreed by the parties hereto that VRRM-MFP Shares as to which the Remarketing Agent is the Beneficial Owner may be held by the Remarketing Agent for its own account or for the account of others, and may be sold in a remarketing or otherwise sold by the Remarketing Agent. The Remarketing Agent may sell VRRM-MFP Shares for its own account outside of a remarketing at a price other than the Purchase Price. 5
 
-For any notice concerning default or termination, with a copy to:
 
-Pactiv LLC 1900 West Field Court Lake Forest, IL 60045 Attn: Steven R. Karl, General Counsel Email: skarl@pactiv.com
 
-Address for notices to Seller:
 
-Reynolds Consumer Products LLC 1900 W. Field Court Lake Forest, IL 60045 Attention: Lance Mitchell, Chief Executive Officer Email: Lance.Mitchell@@ReynoldsBrands.com
 
-Source: REYNOLDS CONSUMER PRODUCTS INC., S-1, 11/15/2019
+(l) Notice of Taxable Allocations. Whenever the Fund intends or expects to include any Taxable Allocation in any dividend on VRRM-MFP Shares, the Fund shall provide a Notice of Taxable Allocation in accordance with Section 2.7(a) of the Supplement. Whenever such advance notice is received from the Fund, the Calculation and Paying Agent will notify each Holder and the Remarketing Agent. The Remarketing Agent shall promptly notify each potential Beneficial Owner or its Agent Member after receipt of such advance notice by the Remarketing Agent.
 
+Section 3. Representations, Warranties and Covenants of the Remarketing Agent and the Fund.
 
+(a) The Remarketing Agent hereby represents, warrants and agrees that it has, and during the term of this Agreement shall maintain, all licenses, consents and other rights required for the use of any index or other data in connection with calculation of the Dividend Rate or dissemination thereof.
 
+(b) The Fund represents and warrants to, and agrees with, the Remarketing Agent as as of each Purchase Date, Remarketing Date or New Mode Commencement Date, as applicable (each, a &quot;Representation Date&quot;), that (i) the Fund has made all the filings with the United States Securities and Exchange Commission (the &quot;Commission&quot;) that are required to be made under the 1940 Act and the 1940 Act Regulations (collectively, the &quot;1940 Act Documents&quot;), (ii) each 1940 Act Document complies in all material respects with the requirements of the 1940 Act and the 1940 Act Regulations, and each 1940 Act Document did not at the time of filing with the Commission include an untrue statement of a material fact or omit to state a material fact required to be stated therein or necessary in order to make the statements therein, in light of the circumstances under which they were made, not misleading and (iii) the applicable Remarketing Materials, as amended or supplemented, including by any subsequently filed 1940 Act Document on or prior to such Representation Date (or, if applicable, by any document filed pursuant to the 1933 Act and the 1933 Act Regulations), as provided by the Fund, will not include an untrue statement of a material fact or omit to state a material fact required to be stated therein or necessary in order to make the statements therein, in light of the circumstances under which they were made, not misleading; provided, however, that the Fund makes no representations or warranties with respect to information provided by the Remarketing Agent specifically for use in the Remarketing Materials.
 
+(c) The financial statements included or incorporated by reference in the 1940 Act Documents, together with the related notes and schedules, present fairly the financial position of the Fund as of the dates indicated and the results of operations, cash flows and changes in shareholders&#x27; equity of the Fund for the periods specified and have been prepared in compliance with the requirements of the 1940 Act and the 1940 Act Regulations and in conformity with U.S. generally accepted accounting principles applied on a consistent basis during the periods involved; the other financial and statistical data contained or incorporated by reference in the 1940 Act Documents are accurately and fairly presented and prepared on a basis consistent with the financial statements and books and records of the Fund.
 
-For any notice concerning default or termination, with a copy to:
+(d) The Fund agrees (i) to deliver to the Remarketing Agent, within fifteen (15) calendar days following the last day of each calendar month beginning with [●], a report of 6
 
-Reynolds Consumer Products LLC 1900 W. Field Court Lake Forest, IL 60045 Attention: David Watson, General Counsel Email: David.Watson@ReynoldsBrands.com j. Independent Contractors. The relationship of the Parties established by this Agreement is that of independent contractors, and nothing contained in this Agreement shall be construed to: (a) give either Party the power to direct and control the day-to-day activities of the other Party, (b) establish the Parties as partners, joint ventures, co-owners or otherwise as participants in a joint or common undertaking, or (c) allow a Party to bind the other Party in any manner or otherwise create or assume any obligation on behalf of the other Party for any purpose whatsoever. A Party will not be considered an agent of the other Party. k. Non-Exclusive Supply Relationship. Except as may be provided in a Purchase Schedule, the Agreement is not evidence of, nor does it create, any form of exclusive supply relationship between the Parties concerning the purchase and sale of products. Except as may be provided in a Purchase Schedule and for the types and quantities of products in an accepted purchase order, nothing in the Agreement obligates a Party to sell or purchase any specified volume, market share or other minimum level of products during the Term. l. Construction. Unless the context otherwise requires, the following rules of construction will be applied to in the interpretation of the Agreement: (1) Headings are for convenience only and do not affect interpretation; (2) Singular includes the plural and vice-versa; (3) Gender includes all genders; (4) If a word or phrase is defined, its other grammatical forms have a corresponding meaning; (5) The meaning of general words is not limited by specific examples introduced by &quot;includes&quot;, &quot;including&quot; or &quot;for example&quot; or similar expressions; (6) The word &quot;person&quot; includes an individual, corporation, company, trust, partnership, limited partnership, unincorporated body, joint venture, consortium or other legal entity; (7) A reference in any Purchase Schedule or Exhibit to an Article, Section, Subsection or Clause is a reference to an Article, Section, Subsection or Clause in that Purchase Schedule or Exhibit unless otherwise identified; (8) Reference to a Purchase Schedule or Exhibit is a reference to a Schedule, Exhibit described, appended or otherwise identified in this Agreement; (9) A reference to conduct includes, without limitation, an omission, statement or undertaking, whether or not in writing; (10) A reference to a third-party is a reference to a person who is not a Party to this Agreement; (11) Where a period of time is specified for the performance of any act and dates from a given day or the day of an act or event, the period shall be exclusive of that date; and (12) the Parties agree that the Agreement is the product of negotiation between sophisticated parties and individuals, all of whom were or have been given the opportunity to be represented by counsel, and each of whom had an opportunity to participate in, and did participate in, negotiation of the terms hereof. Accordingly, the Parties acknowledge and agree that the Agreement is not a contract of adhesion and that ambiguities in the Agreement, if any, shall not be construed strictly or in favor of or against either Party, but rather shall be given a fair and reasonable construction. m. Execution. This Agreement may be executed in any number of counterparts, each of which shall be deemed an original as against the Party whose signature appears thereon, but all of which taken together shall constitute but one and the same instrument. Acceptance of this Agreement may be made by e-mail, mail or other commercially reasonable means showing the signatures of the chief executive officers of the Parties.
 
-Source: REYNOLDS CONSUMER PRODUCTS INC., S-1, 11/15/2019
 
 
 
+portfolio holdings of the Fund as of the close of business as of the last Business Day of such calendar month, listing portfolio holdings of the Fund by CUSIP and principal amount, and (ii) that, on or after such fifteenth calendar day (or earlier, with the Fund&#x27;s prior approval) the Remarketing Agent may provide such report and/or the information therein to investors in the VRRM- MFP Shares, upon the investor&#x27;s request.
 
+Section 4. Fees and Expenses. For the performance of its services as Remarketing Agent hereunder, the Fund shall pay to the Remarketing Agent in arrears on the first day of each calendar month (or, if such day is not a Business Day, on the next succeeding Business Day) a monthly fee for each MFP Share Outstanding on the first calendar day of the preceding calendar month (or the date hereof in the case of the first such payment), in an amount, rounded upward to the nearest dollar, equal to (a) the product of (i) the rate of compensation as then in effect, as shall be agreed upon from time to time in writing by the Fund and the Remarketing Agent, times $[●] multiplied by (ii) the actual number of days from and including such first calendar day of the preceding calendar month (or the date hereof in the case of the first such payment) to and including the last calendar day of such preceding calendar month or, if applicable, the date of termination of this Agreement, if earlier, or the date of any prior redemption or liquidation for such share (as the case may be), divided by (b) 360. The obligation of the Fund to make the payments required by this Section shall survive the termination of this Agreement and remain in full force and effect until all such payments shall have been made in full.
 
-In witness whereof, Seller and Buyer have executed this Master Supply Agreement as of the Effective Date. REYNOLDS CONSUMER PRODUCTS LLC, as Seller
+Section 5. Resignation, Suspension and Removal of the Remarketing Agent.
 
-By: //s// Lance Mitchell Lance Mitchell Chief Executive Officer
+(a) The Remarketing Agent may resign and be discharged from its duties and obligations hereunder with respect to the VRRM-MFP Shares by giving 90 days&#x27; prior written notice to the Fund and the Calculation and Paying Agent.
 
-PACTIV LLC, as Buyer
+(b) The Fund may remove the Remarketing Agent with respect to the VRRM-MFP Shares by giving at least 60 days&#x27; prior written notice to the Remarketing Agent (and will provide prior notice also to the Calculation and Paying Agent, if any); provided, however, that no such removal shall become effective for an additional 30 days unless the Fund shall have appointed at least one nationally recognized securities dealer with expertise in remarketing variable rate securities as a successor Remarketing Agent for the VRRM-MFP Shares and the successor Remarketing Agent shall have entered into a remarketing agreement with the Fund, in form and substance satisfactory to the Fund, in which it shall have agreed to, among other duties, conduct remarketings in respect of VRRM-MFP Shares and determine the Dividend Rate on each Business Day for the VRRM-MFP Shares in accordance with the terms and conditions of the Supplement.
 
-By: //s// John McGrath John McGrath Chief Executive Officer
+In each of the occurrences described in clause (a) or (b), the Fund shall use its best efforts to appoint a successor Remarketing Agent for such VRRM-MFP Shares and enter into a remarketing agreement with such Person as soon as reasonably practicable.
 
-Source: REYNOLDS CONSUMER PRODUCTS INC., S-1, 11/15/2019</pre>
+Section 6. Dealing in the VRRM-MFP Shares. The Remarketing Agent in its sole discretion may purchase for its own account VRRM-MFP Shares in a remarketing; however, subject to the last two sentences in Section 2(c) above, the Remarketing Agent shall not be obligated to purchase any VRRM-MFP Shares that would otherwise remain unsold in a 7
+
+
+
+
+
+remarketing. None of the Fund, the Calculation and Paying Agent nor the Remarketing Agent (subject to the last sentence in Section 2(c) above) shall be obligated in any case to provide funds to make payment to a Beneficial Owner or its Agent Member or a Holder upon such Beneficial Owner&#x27;s or Holder&#x27;s tender of its VRRM-MFP Shares in a remarketing unless, in each case, such VRRM-MFP Shares were acquired for the account of the Fund, the Calculation and Paying Agent or the Remarketing Agent, as applicable. The Remarketing Agent may exercise any vote or join in any action which any Holder of VRRM-MFP Shares may be entitled to exercise or take pursuant to the Statement with like effect as if it did not act in any capacity hereunder. The Remarketing Agent, in its individual capacity, either as principal or agent, may also engage in or have an interest in any financial or other transaction with the Fund as freely as if it did not act in any capacity hereunder.
+
+Section 7. Information.
+
+(a) The Fund agrees to furnish to the Remarketing Agent: (i) copies of the Registration Statement, the Prospectus, the Statement, the Supplement and its bylaws and any amendment thereto and each report or other document mailed or made available to Holders (including annual reports to shareholders) or filed by the Fund with the Commission (including any documents incorporated therein by reference) as the Remarketing Agent may reasonably request from time to time; (ii) notice of the creation of any subsidiary by the Fund; (iii) notice of the purchase of VRRM-MFP Shares by a subsidiary or affiliate of the Fund as soon as the Fund shall become aware of such purchase; (iv) notice of any change (including being put on Credit Watch or Watchlist), suspension or termination in or of the ratings on the VRRM-MFP Shares by any NRSRO then rating the VRRM-MFP Shares or any change of an NRSRO rating the VRRM-MFP Shares as promptly as practicable upon the occurrence thereof or the occurrence of any of the events set forth in clause (b)(i) or (b)(ii) of Section 8 hereof (with the occurrence of any of the events described in clause (b)(ii) to be determined without regard to the opinion of the Remarketing Agent referred to therein); and (v) in connection with a remarketing, a Remarketing Memorandum, and such other remarketing information, as the Remarketing Agent may reasonably request from time to time, including but not limited to the financial condition of the Fund. The Fund agrees to provide the Remarketing Agent with as many copies of the foregoing materials and information as the Remarketing Agent may reasonably request for use in connection with a remarketing or Transition Remarketing, as the case may be, of VRRM-MFP Shares and consents to the use thereof for such purpose.
+
+(b) If at any time during the term of this Agreement any event or condition known to the Fund relating to or affecting the Fund or the VRRM-MFP Shares shall occur which might affect the accuracy or completeness of any statement of a material fact contained in any of the reports, documents, materials and information referred to in clause (a)(v) above or any document incorporated therein by reference (collectively, the &quot;Remarketing Materials&quot;) or any other materials or information made publicly available by the Fund, the Fund shall promptly notify the Remarketing Agent in writing of the circumstances and details of such event or condition and the Fund shall promptly prepare or cause to be prepared and delivered to the Remarketing Agent, at the Fund&#x27;s expense, a supplement or amendment to the Remarketing Materials describing the circumstances and details of such event or condition. 8
+
+
+
+
+
+Section 8. Conditions to Obligations of the Remarketing Agent. The obligations of the Remarketing Agent with respect to VRRM-MFP Shares under this Agreement have been undertaken in reliance on, and shall be subject to: (a) the due performance in all material respects by the Fund of its obligations and agreements as set forth in this Agreement (including Sections 3(c) and 7(b) hereof); and (b) the non-occurrence of any of the following events: (i) all of the VRRM-MFP Shares shall have been redeemed by the Fund; (ii) without the prior written consent of the Remarketing Agent, the Supplement, the Statement, the Declaration, the by-laws of the Fund, or the Tender and Paying Agent Agreement shall either not be in full force and effect or have been amended in any manner that in the reasonable opinion of the Remarketing Agent materially changes the nature of the VRRM- MFP Shares or the remarketing procedures; (iii) legislation, or a decision by a court of the United States shall be rendered, or a stop order, ruling, regulation or official statement by, or on behalf of, the Commission or other governmental agency having jurisdiction of the subject matter shall be made, to the effect that the offering or sale of the VRRM-MFP Shares is or would be in violation of any provision of the 1933 Act as then in effect, or the 1934 Act as then in effect, or with the purpose or effect of otherwise prohibiting the offering or sale of the VRRM-MFP Shares, as contemplated hereby, without registration under the 1933 Act; (iv) any legislation, resolution, ordinance, rule or regulation shall be enacted by, any governmental body, department or agency of the United States or the State of New York, or a decision by any court of competent jurisdiction within the United States or the State of New York shall be rendered, which, in the Remarketing Agent&#x27;s reasonable opinion, materially adversely affects the marketability of the VRRM-MFP Shares; (v) additional material restrictions not in force as of the date hereof shall have been imposed upon trading in securities generally by any governmental authority or by any national securities exchange, which, in the Remarketing Agent&#x27;s reasonable opinion, would cause the performance of the Remarketing Agent&#x27;s obligations hereunder to violate applicable law; (vi) any litigation shall be instituted and be outstanding, to restrain or enjoin the sale or remarketing of the VRRM-MFP Shares or in any way protesting or affecting any authority of the Fund with respect to the validity of the VRRM- MFP Shares or this Agreement, or the existence or powers of the Fund to perform its obligations hereunder; (vii) a general banking moratorium has been declared by federal or New York authorities having jurisdiction, a material disruption in commercial banking or securities settlement or clearance services or a force majeure event shall have occurred which in the reasonable opinion of the Remarketing Agent materially adversely affects the settlement or clearance of the VRRM-MFP Shares; or (viii) a material misstatement or omission in the Remarketing Materials has occurred, so that it is not advisable, in the reasonable judgment of the Remarketing Agent, to attempt to remarket the VRRM-MFP Shares, provided that the Remarketing Agent, upon identifying any such material misstatement or omission in the Remarketing Materials, shall promptly notify the Fund. In the event of the failure of any such conditions with respect to the VRMM-MFP Shares, the Remarketing Agent may terminate its obligations under this Agreement with respect to the VRMM-MFP Shares as provided in Section 10(b).
+
+Section 9. Indemnification.
+
+(a) The Fund and the Investment Adviser, jointly and severally, agree to indemnify and hold harmless the Remarketing Agent and its respective officers, directors, employees and control persons within the meaning of the 1934 Act (collectively, the &quot;Indemnified Persons&quot; 9
+
+
+
+
+
+and individually, an &quot;Indemnified Person&quot;) from and against any losses, claims, damages or liabilities to which any Indemnified Person may become subject insofar as such losses, claims, damages or liabilities (or actions in respect thereof) arise out of, or are based upon, any untrue statement or alleged untrue statement of a material fact contained in any of the Remarketing Materials or the omission or alleged omission to state therein a material fact necessary to make the statements therein, in the light of the circumstances in which they were made, not misleading (except with respect to information provided by the Remarketing Agent specifically for use therein), or arise out of, or are based upon, any violation by the Fund or the Investment Adviser of, or any failure by the Fund or the Investment Adviser to perform, any of its obligations under, this Agreement. The Fund and the Investment Adviser agree to promptly reimburse each Indemnified Person for any legal or other expenses reasonably incurred by such Indemnified Person in investigating, defending or preparing to defend any such action or claim; provided, however, that neither the Fund nor the Investment Adviser shall be liable in any such case to the extent that any such loss, claim, damage or liability arises out of the use by the Remarketing Agent of any information that is not contained in the Remarketing Materials (in the form provided for use in connection with the remarketing). The indemnity agreement in this paragraph shall be in addition to any liability or obligation which the Fund or the Investment Adviser may otherwise have to any Indemnified Person and shall extend upon the same terms and conditions to each Person, if any, who controls any Indemnified Person within the meaning of the 1934 Act.
+
+(b) The Fund agrees to indemnify and hold harmless the Indemnified Persons from and against every loss, liability or expense, including without limitation, damages, fines, suits, actions, demands, costs, out-of-pocket expenses, and reasonable legal fees and expenses (collectively, &quot;Losses&quot;), that may be imposed on, incurred by, or asserted against, any Indemnified Person for or in respect of its (1) execution and delivery of this Agreement, (2) compliance or attempted compliance with or reliance upon any instruction or other direction upon which the Remarketing Agent is authorized to rely pursuant to the terms of this Agreement and (3) performance under this Agreement, except to the extent that the Loss resulted from such Indemnified Person&#x27;s gross negligence, willful misconduct, bad faith, violations of law or violations of the terms and conditions of this Agreement. For the avoidance of doubt, the Fund agrees to indemnify and hold harmless the Indemnified Persons from and against any and all Losses that may be imposed on, incurred by, or asserted against, any Indemnified Person for or in respect of the failure of the Remarketing Agent to deliver Remarketing Materials during the course of a remarketing, if such failure is due to the failure by the Fund to provide to the Remarketing Agent such Remarketing Materials for delivery (regardless of whether the Remarketing Agent has requested such Remarketing Materials), notwithstanding that such failure by the Remarketing Agent to deliver Remarketing Materials during the course of a Remarketing could be deemed a violation of law by an Indemnified Person. The indemnity agreement in this paragraph shall be in addition to any liability or obligation which the Fund may otherwise have to any Indemnified Person.
+
+(c) Each Indemnified Person shall give notice as promptly as reasonably practicable to each of the Fund and the Investment Adviser (collectively, the &quot;Indemnifying Persons&quot; and individually, an &quot;Indemnifying Person&quot;) of any action commenced against it in respect of which indemnity may be sought hereunder, but failure to so notify the Indemnifying Persons 10
+
+
+
+
+
+shall not relieve any Indemnifying Person from any liability which it may have otherwise than on account of this indemnity agreement. No settlement or compromise of any such action shall be made without the consent of the Indemnifying Persons, which consent shall not be unreasonably withheld.
+
+(d) In case any such action is brought against any Indemnified Person, and it notifies each Indemnifying Person from which it seeks indemnification of the commencement thereof, such Indemnifying Person (which may be the Fund and/or the Investment Adviser, in the case of notification of either) will be entitled to participate in, and, to the extent that it may wish, jointly with any other Indemnifying Person, similarly notified, to assume the defense thereof so long as its interests are not adverse to those of the Indemnified Person, with counsel reasonably satisfactory to such Indemnified Person, and after notice from each Indemnifying Person to such Indemnified Person of its election to assume the defense thereof, the Indemnifying Person will not be liable to such Indemnified Person under this Section 9 for any legal or other expenses subsequently incurred by such Indemnified Person in connection with the defense thereof other than reasonable costs of investigation. Upon assumption by any Indemnifying Person of the defense of any such action or proceeding, the Indemnified Person shall have the right to participate in such action or proceeding and to retain its own counsel but the Indemnifying Person shall not be liable for any legal expenses of other counsel subsequently incurred by such Indemnified Person in connection with the defense thereof unless (i) the Indemnifying Person has agreed to pay such fees and expenses, (ii) the Indemnifying Person shall have failed to employ counsel reasonably satisfactory to the Indemnified Person in a timely manner, or (iii) the Indemnified Person shall have been advised by counsel that there are actual or potential conflicting interests between the Indemnifying Persons and the Indemnified Person, including situations in which there are one or more legal defenses available to the Indemnified Person that are different from or additional to those available to each of the Fund and the Investment Adviser. If the Indemnifying Person elects not to assume the defense of any such suit, it will reimburse the Indemnified Persons for the reasonable fees and expenses of any counsel retained by them. In the event that the parties to any such action (including impleaded parties) include one or more Indemnifying Persons and one or more Indemnified Persons, and one or more Indemnified Persons shall have been advised by counsel reasonably satisfactory to each Indemnifying Person that there may be one or more legal defenses available to any of the Indemnified Persons, which are different from, additional to, or in conflict with those available to any of the Indemnifying Persons, the Indemnifying Persons will reimburse the Indemnified Persons for the reasonable fees and expenses of any counsel retained by the Indemnified Persons (it being understood that the Indemnifying Persons shall not, in connection with any one action or separate but similar or related actions in the same jurisdiction arising out of the same general allegations or circumstances, be liable for the reasonable fees and expenses of more than one separate firm of attorneys (plus local counsel) for all Indemnified Persons, which firm shall be designated by the Indemnified Persons, the Remarketing Agent or each Indemnifying Person, as the case may be). Each Indemnifying Person agrees promptly to notify each Indemnified Person of the commencement of any litigation or proceedings against it in connection with the remarketing of the VRRM-MFP Shares. No Indemnifying Person shall consent to the terms of any compromise or settlement of any action defended by any Indemnifying Person in accordance with the foregoing without the prior consent of the Indemnified Person. No Indemnifying Person shall be liable under this Section 9 for the amount of any compromise or settlement of any action 11
+
+
+
+
+
+unless such compromise or settlement has been approved in writing by such Indemnifying Person, which approval shall not be unreasonably withheld.
+
+(e) If the indemnification provided for in subparagraph (a) of this Section 9 is unavailable, because of limitations imposed by securities laws or for any other reason, to a party that would otherwise have been an Indemnified Person under subparagraph (a) above in respect of any losses, claims, damages or liabilities (or actions in respect thereof) referred to therein, then the party that would have been an Indemnifying Person thereunder shall, in lieu of indemnifying such Indemnified Person, contribute to the amount paid or payable by such Indemnified Person as a result of such losses, claims, damages or liabilities (or actions in respect thereof) in such proportion so that the Remarketing Agent is responsible for that portion represented by the percentage that the Remarketing Agent&#x27;s fee (calculated for a one year period) with respect to such remarketing bears to the aggregate liquidation preference of such VRRM-MFP Shares being remarketed but will not exceed the amount of such fee (calculated for a one year period) and each of the Fund and the Investment Adviser is responsible for the balance; provided, however, that no person guilty of fraudulent misrepresentation within the meaning of Section 11(f) of the 1933 Act shall be entitled to contribution from any person who was not guilty of such fraudulent misrepresentation within the meaning of Section 11(f) of the 1933 Act. The amount paid or payable by an Indemnified Person as a result of the losses, claims, damages or liabilities (or actions in respect thereon referred to above in this subparagraph (e)) shall be deemed to include any legal or other expenses reasonably incurred by such Indemnified Person in connection with investigating or defending any such action or claims (which shall be limited as provided in this subparagraph (e) above if the Indemnifying Person has assumed the defense of any such action in accordance with the provisions thereof).
+
+(f) The indemnity agreements contained in clauses (a), (b) and (c) of this Section 9 shall remain operative and in full force and effect, regardless of any investigation made by or on behalf of the Remarketing Agent, and shall survive the termination or cancellation of this Agreement and the remarketing of any VRRM-MFP Shares hereunder.
+
+Section 10. Termination of Remarketing Agreement. (a) This Agreement shall terminate as to the Remarketing Agent and its obligations hereunder with respect to VRRM-MFP Shares upon the earliest to occur of (a) the effective date of the resignation or removal of such Remarketing Agent pursuant to Section 5(a) and Section 5(b), respectively, (b) the completion of a successful Transition Remarketing on a New Mode Commencement Date in connection with transition to a new Mode, or (c) the date on which no VRRM-MFP Shares are Outstanding.
+
+(b) In addition, the Remarketing Agent may terminate this Agreement and all of its obligations hereunder with respect to the VRRM-MFP Shares, by notifying the Fund and the Calculation and Paying Agent of its election to do so, if any of the conditions referred to or set forth in Section 8 hereof with respect to the VRRM-MFP Shares have not been met or satisfied in full and such failure shall have continued for a period of 30 days after the Remarketing Agent has given notice thereof to the Fund specifying the condition which has not been met and requiring it to be met; provided, however, that termination of this Agreement with respect to the VRRM-MFP Shares by the Remarketing Agent after giving the required notices with respect to the VRRM- MFP Shares shall be immediate in the event of the occurrence and continuation of 12
+
+
+
+
+
+any event set forth in Section 8(b)(i), (ii), (iii) or (iv) hereof with respect to the VRRM-MFP Shares, or in the event the Remarketing Agent determines, in its sole discretion, that it shall not have received all of the information, whether or not specifically referenced herein, necessary to fulfill its obligations under this Agreement with respect to the VRRM-MFP Shares.
+
+Section 11. Remarketing Agent&#x27;s Performance; Duty of Care.
+
+(a) The duties and obligations of the Remarketing Agent shall be determined solely by the express provisions of this Agreement and the Supplement. No implied covenants or obligations shall be read into this Agreement, or the Supplement. In the absence of bad faith on the part of the Remarketing Agent, the Remarketing Agent may conclusively rely upon any document furnished to it, which purports to conform to the requirements of this Agreement and the Statement, as to the truth of the statements expressed in any of such documents. The Remarketing Agent shall be protected in acting upon any document or communication reasonably believed by it to have been signed, presented or made by the proper party or parties. The Remarketing Agent shall incur no liability to the Fund, the Investment Adviser, the Calculation and Paying Agent or to any Beneficial Owner (or its Agent Member) or any Holder of the VRRM-MFP Shares in its individual capacity or as Remarketing Agent for any action or failure to act, in connection with its duties under this Agreement and the Supplement or otherwise, except as a result of bad faith, gross negligence or willful misconduct on its part.
+
+(b) The Remarketing Agent shall not be responsible or liable for any failure or delay in the performance of its obligations under this Agreement arising out or caused by the failure of any other party (other than an affiliate of the Remarketing Agent) to provide any notice, statement or document required to be delivered pursuant to any Related Document in connection with performance by the Remarketing Agent of the relevant obligation.
+
+Section 12. Amendment, Supplement or Modification of Agreements. Without the prior written consent of the Remarketing Agent, the Fund will not agree or consent to any amendment, supplement or modification of the Tender and Paying Agent Agreement, this Agreement or the Supplement, nor waive any provision thereof, if such amendment, supplement, modification or waiver would materially adversely affect the interests of the Remarketing Agent, in the Remarketing Agent&#x27;s sole discretion; provided, that, for purposes of this Section 12, any changes or amendments to the rating agency criteria provided in the Supplement for the VRRM-MFP Shares shall not be deemed to materially adversely affect the interests of the Remarketing Agent.
+
+Section 13. Books and Records. The Remarketing Agent shall keep such books and records with respect to the performance of its duties hereunder as shall be consistent with prudent industry practice and shall, to the extent permitted by law, make such books and records available for inspection by the Fund on reasonable notice during normal business hours. Any costs and expenses associated with such inspections shall be for the account of the party requesting such inspection.
+
+Section 14. Governing Law. This Agreement shall be construed in accordance with and governed by the laws of the State of New York, except Section 25 below, which shall be construed in accordance with and governed by the laws of the Commonwealth of Massachusetts, 13
+
+
+
+
+
+in each case without regard to conflict of laws principles that would require the application of the laws of another jurisdiction.
+
+THE PARTIES HERETO HEREBY SUBMIT TO THE NON-EXCLUSIVE JURISDICTION OF THE FEDERAL AND NEW YORK STATE COURTS LOCATED IN THE CITY OF NEW YORK IN CONNECTION WITH ANY DISPUTE RELATED TO THIS AGREEMENT OR ANY MATTERS CONTEMPLATED HEREBY.
+
+Section 15. Waiver of Jury Trial. The Fund, the Investment Adviser and the Remarketing Agent hereby waive trial by jury in any action, proceeding or counterclaim brought by any of the parties hereto against the other on any matters whatsoever arising out of or in any way connected with this Agreement.
+
+Section 16. Certain Provisions to Survive Termination of Agreement. Regardless of any termination of this Agreement pursuant to Section 10 hereof, the obligations of the Fund and the Investment Adviser pursuant to Sections 3, 4 and 9 hereof and of the Remarketing Agent pursuant to Section 9 hereof shall remain operative and in full force and effect until fully satisfied.
+
+Section 17. Successors and Assigns. The rights and obligations of the Fund and the Investment Adviser hereunder may not be assigned or delegated to any other person without the prior written consent of the Remarketing Agent. The rights and obligations of the Remarketing Agent hereunder may not be assigned or delegated to any other person without the prior written consent of the Fund. This Agreement shall inure to the benefit of and be binding upon the Fund, the Investment Adviser and the Remarketing Agent and their respective permitted successors and assigns, and, subject to Section 23, will not confer any benefit upon any other person, partnership, association or corporation other than persons, if any, controlling any Remarketing Agent within the meaning of Section 15 of the 1933 Act, or Section 20 of the 1934 Act, or any Indemnified Person to the extent provided in Section 9 hereof. As used in this Section 17, the terms &quot;successors&quot; and &quot;assigns&quot; shall not include any purchaser of VRRM-MFP Shares merely because of such purchase.
+
+Section 18. Headings. The section headings herein are for convenience of reference only, and it is agreed that such section headings are not a part of this Agreement and will not be used in the interpretation of any provisions of this Agreement.
+
+Section 19. Severability. If any provision of this Agreement shall be held or deemed to be or shall, in fact, be invalid, inoperative or unenforceable as applied in any particular case in any or all jurisdiction or jurisdictions, because it conflicts with any provision of any constitution, statute, rule of public policy, or for any other reason, such circumstances shall not have the effect of rendering the provision in question invalid, inoperative or unenforceable in any other case, circumstance or jurisdiction, or of rendering any other provision or provisions of this Agreement invalid, inoperative or unenforceable to any extent whatsoever.
+
+Section 20. Counterparts. This Agreement may be executed in several counterparts, each of which shall be regarded as an original and all of which shall constitute one and the same document. 14
+
+
+
+
+
+Section 21. Remarketing Agent Not Acting as Underwriter. It is understood and agreed by the parties hereto that the only obligations of the Remarketing Agent hereunder are as set forth in Sections 2, 3, 9 and 13 hereof. When engaged in remarketing any properly-Tendered VRRM-MFP Shares, the Remarketing Agent shall act only as agent for and on behalf of each owner of the VRRM-MFP Shares so tendered. The Remarketing Agent shall not act as an underwriter for the Tendered VRRM- MFP Shares and shall in no way be obligated to advance its own funds to purchase any Tendered VRRM-MFP Shares (except as provided in Section 2(c) or to the extent that in its individual capacity as purchaser of those VRRM-MFP Shares it may elect, in accordance with Section 6 hereof, to purchase, in its sole discretion) or to otherwise expend or risk its own funds or incur or become exposed to financial liability in the performance of its duties hereunder.
+
+Section 22. Amendment. This Agreement may be amended by any instrument in writing signed by all of the parties hereto so long as this Agreement as amended is not inconsistent with the Supplement in effect as of the date of any such amendment. The parties acknowledge that amendments to this Agreement (including with respect to Section 2(c)) are subject to prior notice requirements as set forth in the Tender and Paying Agent Agreement.
+
+Section 23. Benefits. Nothing herein, express of implied, shall give to any person, other than the Fund, the Remarketing Agent and their respective permitted successors and assigns, any benefit of any legal or equitable right, remedy or claim hereunder. Without limiting the generality of the foregoing, no Holder or Beneficial Owner (or their Agent Member) of VRRM-MFP Shares shall have or be deemed to have any right in respect of, or shall in any event be entitled to enforce or to seek recourse against any person in respect of, any provision of this Agreement, and any and all rights of holders of VRRM-MFP Shares or obligations of the Fund in respect thereof arise only under and as governed solely by the Declaration, the Supplement and by-laws of the Fund as they are in effect from time to time.
+
+Section 24. Notices and Wire Instructions. Unless otherwise specified, any notices, requests, consents or other communications given or made hereunder or pursuant hereto shall be made in writing and shall be deemed to have been validly given or made upon receipt, if given by mail, or when delivered, if given by prepaid courier service, in each case addressed as follows: if to the Fund or the Investment Adviser, to either of them at 333 West Wacker Drive, Chicago, Illinois 60606, Attention: [●]; if to the Remarketing Agent, to [●], [●], Attention: [●], Telephone: [●], Fax: [●], Email: [●]; and if to the Calculation and Paying Agent, to [●], [●], Attention: [●], Telephone: [●], Fax: [●], Email: [●]; or to such other address as any of the foregoing persons shall specify to the parties hereto in writing.
+
+The Purchase Price of remarketed VRRM-MFP Shares, if paid through the Calculation and Paying Agent, shall be paid by the Remarketing Agent in immediately available funds by wire transfer to the Calculation and Paying Agent in accordance with the following instructions:
+
+[●] ABA# [●] 15
+
+
+
+
+
+For Further Credit to Account # [●] Ref: [●] Attn: [●] Tel: [●]
+
+The remarketing fee shall be paid by the Fund in immediately available funds by wire transfer to the Remarketing Agent in accordance with the following instructions:
+
+[●] ABA# [●] For Further Credit to Account # [●] Ref: [●] Attn: [●] Tel: [●]
+
+Email transmissions shall be deemed to have been validly given or made when sent to the following email addresses; if to the Fund or the Investment Adviser, to [●] and [●]; if to the Remarketing Agent, to [●]; or to such other address as any such parties shall specify to the other party in writing; and, if to the Calculation and Paying Agent, to [●].
+
+Section 25. Liability of Officers, Trustees and Shareholders. A copy of the Declaration is on file with the Secretary of the Commonwealth of Massachusetts. This Agreement has been executed on behalf of the Fund by an officer of the Fund in such capacity and not individually and the obligations of the Fund under this Agreement are not binding upon such officer, any of the trustees or the shareholders individually but are binding only upon the assets and property of the Fund.
+
+Section 26. Nonpetition Covenant. Notwithstanding any prior termination of this Agreement, [●], solely in its capacity as Remarketing Agent, hereby covenants and agrees that it shall not, prior to the date which is one year and one day after the redemption and the payment in full of the VRRM-MFP Shares and all accumulated dividends, petition or otherwise invoke the process of any court or government authority for the purpose of commencing a case against, the Fund under any federal or state bankruptcy, insolvency or similar law or appointing a receiver, liquidator, assignee, trustee, custodian, sequestrator or other similar official of the Fund or any substantial part of the property of the Fund; provided, however, that nothing in this provision shall preclude, or be deemed to stop, the Remarketing Agent from taking any action prior to the expiration of the aforementioned one year and one day period in (x) any case or proceeding voluntarily filed or commenced by the Fund, (y) any involuntary insolvency proceeding filed or commenced against the Fund by a Person other than the Remarketing Agent, or (z) with respect to its rights or preferences as a Beneficial Owner or Holder of VRRM-MFP Shares.
+
+[Signature Page Follows] 16
+
+
+
+
+
+IN WITNESS WHEREOF, each of the parties hereto has caused this Agreement to be executed in its name and on its behalf by one of its duly authorized officers as of the date first above written. NUVEEN AMT-FREE MUNICIPAL CREDIT INCOME FUND
+
+By Name: Title:
+
+NUVEEN FUND ADVISORS, LLC
+
+By Name: Title:
+
+[NAME]
+
+By Name: Title: Signature Page to Remarketing Agreement (NVG Series [●] MFP)
+
+
+
+
+
+Exhibit A - Form of Tender Notice
+
+NUVEEN AMT-FREE QUALITY MUNICIPAL INCOME FUND (NVG) (THE &quot;FUND&quot;) SERIES [●] MUNIFUND PREFERRED SHARES IN THE VARIABLE RATE REMARKETED MODE (&quot;VRRM-MFP SHARES&quot;)
+
+TENDER NOTICE
+
+Note: The substance of this notice must be given by the Beneficial Owner or its Agent Member to [●], as Remarketing Agent (the &quot;Remarketing Agent&quot;), appointed under the Remarketing Agreement, dated as of [●], between Nuveen AMT-Free Municipal Credit Income Fund, Nuveen Fund Advisors, LLC and the Remarketing Agent, in the manner provided in Schedule 1 hereto by Electronic Means prior to 5:00 p.m., New York City time, on any Business Day. Any Tender Notice delivered at or after 5:00 p.m., New York City time, shall be deemed to have been received by the Remarketing Agent on the next succeeding Business Day and the Purchase Date specified in this Tender Notice shall be postponed accordingly by one Business Day. The determination of the Remarketing Agent as to whether a Tender Notice has been properly delivered shall be conclusive and binding upon the Beneficial Owner and its Agent Member.
+
+TO: [●], as Remarketing Agent
+
+1. In accordance with the Fund&#x27;s Statement Establishing and Fixing the Rights and Preferences of Series [●] MuniFund Preferred Shares effective [●] (the &quot;Statement&quot;), as modified with respect to the Variable Rate Remarketed Mode (the Initial Mode) by the Supplement to the Statement Establishing and Fixing the Rights and Preferences of Series [●] MuniFund Preferred Shares Initially Designating the Variable Rate Remarketed Mode for the Series [●] MuniFund Preferred Shares effective [●], as amended, revised or supplemented from time to time (the &quot;Supplement&quot;); the undersigned, [●], [Beneficial Owner] [Agent Member of the Beneficial Owner] of the following VRRM-MFP Shares:
+
+VRRM-MFP Shares Series CUSIP Number
+
+Number of VRRM-MFP Shares tendered for remarketing (the &quot;Designated Amount&quot;)1 [●] [●]
+
+hereby notifies you of the election by the Beneficial Owner of the referenced VRRM-MFP Shares to tender such VRRM-MFP Shares for remarketing of the Designated Amount on the seventh calendar day following the date on which this Tender Notice is delivered to the 1 VRRM-MFP Shares may be tendered only in whole shares.
+
+
+
+
+
+Remarketing Agent, or if such seventh calendar day is not a Business Day, the next succeeding Business Day (the &quot;Purchase Date&quot;).
+
+The name and DTC Participant No. of the Agent Member tendering on behalf of the Beneficial Owner is:
+
+Name of Agent Member:
+
+DTC Participant No. of Agent Member:
+
+Name of Beneficial Owner:
+
+Beneficial Owner&#x27;s account number:
+
+The person to contact at the Beneficial Owner or its Agent Member and the related contact information are as follows:
+
+Name:
+
+Telephone No:
+
+Email address:
+
+The Beneficial Owner or its Agent Member acknowledges and agrees that the Person or Persons to whom or to whose order the Purchase Price of the tendered VRRM-MFP Shares is to be paid is/are the same as identified above.
+
+2. The undersigned acknowledges the obligation of the tendering Beneficial Owner to deliver the VRRM-MFP Shares that are the subject of this Tender Notice on or before 11:00 a.m., New York City time on the Purchase Date, and, in accordance with such obligation, the undersigned hereby undertakes to deliver or to cause to be delivered the VRRM-MFP Shares being sold [directly] or [through an Agent Member] to the Remarketing Agent, through the &quot;funds against delivery&quot; procedures of the Securities Depository, no later than 11:00 a.m., New York City time, on the Purchase Date. The undersigned hereby also assigns and transfers and directs the Securities Depository or its nominee or the Remarketing Agent to transfer the tendered VRRM-MFP Shares to the purchaser in accordance with the procedures described in the Supplement, and otherwise according to the Securities Depository&#x27;s procedures, in exchange for the payment of the Purchase Price thereof on the Purchase Date.
+
+3. The undersigned confirms its agreement that it hereby transfers to the purchaser of the VRRM-MFP Shares tendered pursuant to this Tender Notice the right to receive from the Fund any dividends declared and unpaid for each day prior to the purchaser becoming the Beneficial Owner of the VRRM-MFP Shares in exchange for payment of the Purchase Price for such VRRM-MFP Share by the purchaser.
+
+4. The undersigned hereby represents and warrants for the benefit of the Remarketing Agent, the Fund and the Calculation and Paying Agent, that the undersigned has full power and authority to tender, exchange, assign and transfer the VRRM-MFP Shares to be
+
+
+
+
+
+tendered hereby, and that the transferee will acquire good and unencumbered title thereto, free and clear of all liens, restrictions, charges and encumbrances and not subject to any adverse claim, when the same are tendered.
+
+5. The undersigned acknowledges that this Tender Notice is irrevocable and effective upon the receipt by the Remarketing Agent.
+
+6. Terms used herein and not otherwise defined will have the meanings given to such terms in the Supplement. Dated: [Complete applicable signature block below.] Print name of Beneficial Owner
+
+By: Name: Title: [OR] Print name of Agent Member
+
+By: Name: Title:
+
+
+
+
+
+SCHEDULE 1
+
+TENDER NOTICE DELIVERY INFORMATION FOR THE REMARKETING AGENT
+
+This Tender Notice must be delivered by the Beneficial Owner or its Agent Member to [●] (the &quot;Remarketing Agent&quot;) by email transmission at the email address listed below or such other email address as the Remarketing Agent shall designate (or, if email transmission shall be unavailable, by facsimile transmission to the fax number listed below or such other fax number as the Remarketing Agent will designate) at or prior to 5:00 p.m., New York City time, on any Business Day. If this Tender Notice is delivered after 5:00 p.m., New York City time, it will be deemed to have been received by the Remarketing Agent on the next succeeding Business Day, and the Purchase Date will be postponed accordingly by one Business Day:
+
+Attention: [●] [●]
+
+Phone: [●]
+
+Email: [●]
+
+This Tender Notice will not be deemed to be delivered unless and until the Remarketing Agent actually receives it by the above-described means.
+
+
+
+
+
+Exhibit B - Form of Remarketing Notice
+
+TO [BENEFICAL OWNERS] [HOLDERS] OF SERIES [●] MUNIFUND PREFERRED SHARES IN THE VARIABLE RATE REMARKETED MODE (&quot;VRRM-MFP SHARES&quot;) OF NUVEEN AMT-FREE MUNICIPAL CREDIT INCOME FUND (NVG) (THE &quot;FUND&quot;)
+
+REMARKETING NOTICE
+
+[Date] Re: Nuveen AMT-Free Municipal Credit Income Fund Series [●] MuniFund Preferred Shares (the &quot;VRRM-MFP Shares&quot;)
+
+Pursuant to [Section 2(d)] [Section 2(e)] [Section 2(f)] of the Remarketing Agreement dated [●] (the &quot;Remarketing Agreement&quot;), by and among Nuveen AMT-Free Municipal Credit Income Fund, a closed-end investment company organized as a Massachusetts business trust, Nuveen Fund Advisors, LLC, a registered investment adviser and wholly-owned subsidiary of Nuveen Investments, Inc., and [●] (the &quot;Remarketing Agent&quot;), the undersigned Remarketing Agent hereby notifies you of the following information regarding the remarketing of the VRRM-MFP Shares as of the date hereof:
+
+1. Information regarding the VRRM-MFP Shares is as follows:
+
+VRRM-MFP Shares Series: A
+
+CUSIP number:
+
+2. Remarketing Results:
+
+Populate fields in the applicable section; delete inapplicable sections.
+
+[For Optional Tenders] (i) A purchaser or purchasers have been identified for the purchase of all of the Tendered VRRM-MFP Shares on the Purchase Date. (ii) Number of Tendered VRRM-MFP Shares sold, subject to settlement: . (iii) The Purchase Date will be: .
+
+
+
+
+
+(iv) The Purchase Price per Tendered VRRM-MFP Share is: .
+
+[For Mandatory Tenders] (i) A purchaser or purchasers have been identified for the purchase of all of the VRRM- MFP Shares on the Remarketing Date. (ii) Number of VRRM-MFP Shares sold, subject to settlement: . (iii) The Remarketing Date will be: . (iv) The Regular Dividend Rate to be applicable to the VRRM-MFP Shares on the Remarketing Date will be: . (v) All VRRM-MFP Shares will be subject to mandatory tender for purchase on the Remarketing Date at a Purchase Price per VRRM-MFP Share of: .
+
+[For Transition to a New Mode] (i) A purchaser or purchasers have been identified for the purchase of all of the VRRM- MFP Shares on the New Mode Commencement Date. (ii) Number of VRRM-MFP Shares sold, subject to settlement: . (iii) The New Mode Commencement Date will be: . (iv) The Regular Dividend Rate to be applicable to the VRRM-MFP Shares on the New Mode Commencement Date will be: . (v) All VRRM-MFP Shares will be subject to mandatory tender for purchase on the New Mode Commencement Date at a Purchase Price per share of:
+
+3. Capitalized terms used herein will have the meanings given to them in or by reference to the Remarketing Agreement.
+
+
+
+
+
+[●] as Remarketing Agent
+
+By: Name: Title: Cc: [●] Nuveen AMT-Free Municipal Credit Income Fund
+
+
+
+
+
+Exhibit C - Form of Failed Remarketing Notice
+
+TO HOLDERS OF SERIES [●] MUNIFUND PREFERRED SHARES IN THE VARIABLE RATE REMARKETED MODE (&quot;VRRM-MFP SHARES&quot;) OF NUVEEN AMT-FREE MUNICIPAL CREDIT INCOME FUND (NVG) (THE &quot;FUND&quot;)
+
+CUSIP NO. [●]*
+
+FAILED REMARKETING NOTICE
+
+In accordance with the Fund&#x27;s Statement Establishing and Fixing the Rights and Preferences of Series [●] MuniFund Preferred Shares effective [●] (the &quot;Statement&quot;), as modified with respect to the Variable Rate Remarketed Mode (the Initial Mode) by the Supplement to the Statement Establishing and Fixing the Rights and Preferences of Series [●] MuniFund Preferred Shares Initially Designating the Variable Rate Remarketed Mode for the Series [●] MuniFund Preferred Shares effective [●], as amended, revised or supplemented from time to time (the &quot;Supplement&quot;), the Fund hereby notifies Holders that:
+
+Retain only the applicable section; delete inapplicable sections.
+
+[For Optional Tender]
+
+A Failed Remarketing Event has occurred with respect to Tendered VRRM-MFP Shares optionally tendered for remarketing. All Tendered VRRM-MFP Shares shall be retained by their respective Beneficial Owners.
+
+[For Mandatory Tender]
+
+A Failed Remarketing Event has occurred with respect to a mandatory tender of all Outstanding VRRM-MFP Shares for remarketing. All VRRM-MFP Shares shall be retained by their respective Holders.
+
+[For Transition to New Mode]
+
+A Failed Remarketing Event has occurred with respect to a mandatory tender of all Outstanding VRRM-MFP Shares for transition to a new Mode on the New Mode Commencement Date. All VRRM-MFP Shares shall be retained by their respective Holders. By not later than the Business Day immediately following the occurrence of the Failed Remarketing Event, the Fund will make an election, and provide a Failed Transition Election Notice in writing by Electronic Means to the Holders, the Remarketing Agent and the Calculation and Paying Agent, to either (i) cancel the * NOTE: None of the Fund, the Remarketing Agent or the Calculation and Paying Agent will be responsible for the selection or use of the CUSIP Numbers selected, nor is any representation made as to its correctness indicated in any notice or as printed on any VRRM-MFP Share certificate. It is included solely as a convenience to VRRM-MFP Shareholders.
+
+
+
+
+
+attempted transition to a new Mode or (ii) continue to attempt to transition to a new Mode.
+
+The Failed Remarketing Event [commences] [continues] a Failed Remarketing Period. During the Failed Remarketing Period, the Remarketing Agent will no longer determine the Regular Dividend Rate on a daily basis; dividends on all VRRM-MFP Shares will be payable at the Step-Up Dividend Rate (as determined by the Remarketing Agent commencing on the date of the Failed Remarketing Event); the right of Beneficial Owners to make optional tenders of their MuniFund Preferred Shares for remarketing is suspended; and all of the Outstanding VRRM-MFP Shares is subject to mandatory tender for remarketing. All Outstanding VRRM-MFP Shares are subject to mandatory redemption on [●] (the &quot;Failed Remarketing Mandatory Redemption Date&quot;).
+
+This notice will be conclusively presumed to have been duly given, whether or not the Holders or Beneficial Owners receive this notice.
+
+Terms used herein and not otherwise defined will have the meanings given to such terms in the Supplement. Dated:
+
+[NAME], as Remarketing Agent
+
+By: Name: Title: Cc: [●] Nuveen AMT-Free Municipal Credit Income Fund
+
+
+
+
+
+Exhibit D - Form of Retention Notice
+
+NUVEEN AMT-FREE MUNICIPAL CREDIT INCOME FUND (NVG) (THE &quot;FUND&quot;) SERIES [●] MUNIFUND PREFERRED SHARES IN THE VARIABLE RATE REMARKETED MODE (&quot;VRRM-MFP SHARES&quot;) CUSIP No. [●]*
+
+RETENTION NOTICE
+
+TO: [●], as Remarketing Agent
+
+Further to the Remarketing Notice dated [●] (the &quot;Remarketing Notice&quot;) all VRRM-MFP Shares will be subject to mandatory tender for purchase at a price equal to [●] (the &quot;Purchase Price&quot;) on [●] (the &quot;Remarketing Date&quot;).
+
+As set forth in the Fund&#x27;s Statement Establishing and Fixing the Rights and Preferences of Series [●] MuniFund Preferred Shares effective [●] (the &quot;Statement&quot;), as modified with respect to the Variable Rate Remarketed Mode (the Initial Mode) by the Supplement to the Statement Establishing and Fixing the Rights and Preferences of Series [●] MuniFund Preferred Shares Initially Designating the Variable Rate Remarketed Mode for the Series [●] MuniFund Preferred Shares effective [●], as amended, revised or supplemented from time to time (the &quot;Supplement&quot;), any Beneficial Owner of a VRRM-MFP Share that is not a Tendered VRRM-MFP Share that was part of the Failed Remarketing Event to which the Remarketing Notice relates, as determined by the Remarketing Agent, may deliver written notice to the Remarketing Agent and the Calculation and Paying Agent by Electronic Means at least three Business Days prior to the Remarketing Date that it wishes to retain its VRRM-MFP Shares (each such Beneficial Owner, a &quot;Retaining Beneficial Owner&quot;).
+
+On the Remarketing Date, the VRRM-MFP Shares held by each Retaining Beneficial Owner will be subject to mandatory tender and repurchased by the Retaining Beneficial Owner at a price equal to the Purchase Price on the Remarketing Date.
+
+For purposes of the foregoing, the undersigned Beneficial Owner of VRRM-MFP Shares hereby provides notice of its wish to retain VRRM-MFP Shares of which it is Beneficial Owner, in the following amount: [●]. The undersigned person electing to retain its VRRM-MFP Shares represents that it is the Beneficial Owner of the number of VRRM- MFP Shares set forth above, and such number constitutes all of the VRRM-MFP Shares owned by the undersigned.
+
+Terms used herein and not otherwise defined will have the meanings given to such terms in the Supplement.
+
+Dated: * NOTE: None of the Fund, the Remarketing Agent or the Calculation and Paying Agent will be responsible for the selection or use of the CUSIP Numbers selected, nor is any representation made as to its correctness indicated in any notice or as printed on any VRRM-MFP Share certificate. It is included solely as a convenience to VRRM-MFP Shareholders.
+
+
+
+
+
+[Complete applicable signature block below.] Print name of Beneficial Owner
+
+By: Name: Title: [OR] Print name of Agent Member
+
+By: Name: Title:
+
+Cc: [●] Nuveen AMT-Free Municipal Credit Income Fund</pre>
 
 **Question**
 
 <pre>Does the contract contain an answer to the following extraction request?
-Highlight the parts (if any) of this contract related to &quot;Anti-Assignment&quot; that should be reviewed by a lawyer. Details: Is consent or notice required of a party if the contract is assigned to a third party?</pre>
+Highlight the parts (if any) of this contract related to &quot;Agreement Date&quot; that should be reviewed by a lawyer. Details: The date of the contract</pre>
+
+**Criteria (choice)**
+
+<pre>1. no
+2. yes</pre>
+
+**Gold target (weight)**
+
+<pre>2. yes — 1</pre>
+
+</details>
+
+<details><summary>Example 3</summary>
+
+published Jev · train · cuad:train:ALLISONTRANSMISSIONHOLDINGSINC_12_15_2014-EX-99.1-COOPERATION AGREEMENT__Parties_6:cuad-answerability-b11692cc91
+
+**State**
+
+<pre>Exhibit 99.1
+
+COOPERATION AGREEMENT
+
+This Cooperation Agreement (this &quot;Agreement&quot;) dated December 12, 2014, is by and among the persons and entities listed on Schedule A (collectively, the &quot;ValueAct Group&quot;, and individually a &quot;member&quot; of the ValueAct Group), Allison Transmission Holdings, Inc. (the &quot;Company&quot;) and Gregory P. Spivy, in his individual capacity and as a member of the ValueAct Group (the &quot;ValueAct Designee&quot;).
+
+WHEREAS, the ValueAct Group currently beneficially owns 19,125,204 shares of the common stock, par value $0.01 per share, of the Company (the &quot;Common Stock&quot;), which represents approximately 10.77% of the issued and outstanding shares of Common Stock.
+
+WHEREAS, the Nominating and Governance Committee of the Board (the &quot;Nominating Committee&quot;) and the Company&#x27;s Board of Directors (the &quot;Board&quot;) have considered the qualifications of the ValueAct Designee and conducted such review as they have deemed appropriate.
+
+WHEREAS, the Board has determined that it is in the best interests of the Company to appoint the ValueAct Designee on the terms set forth in this Agreement.
+
+NOW, THEREFORE, In consideration of and reliance upon the mutual covenants and agreements contained herein, and for other good and valuable consideration, the receipt and sufficiency of which is hereby acknowledged, the parties hereto agree as follows:
+
+1. Board Nomination.
+
+(a) Subject to the satisfactory completion of the Company&#x27;s customary background check, the Board shall appoint the ValueAct Designee to serve as a director beginning within ten (10) calendar days following receipt of the ValueAct Group&#x27;s written request to the Company to have the ValueAct Designee appointed to the Board; provided that, at such time, the Board does not conclude in good faith and based on the written opinion of outside legal counsel that such appointment would constitute a breach of the directors&#x27; fiduciary duties. If the ValueAct Designee is appointed to the Board pursuant to this Section 1(a), the Company shall include the ValueAct Designee as a Class I Director, which term expires at the Company&#x27;s 2016 annual meeting of stockholders.
+
+(b) As a condition to the ValueAct Designee&#x27;s appointment to the Board, the ValueAct Group, including the ValueAct Designee, agrees to provide to the Company information required to be or customarily disclosed for directors, candidates for directors, and their affiliates and representatives in a proxy statement or other filings under applicable law or stock exchange rules or listing standards, information in connection with assessing eligibility, independence and other criteria applicable to directors or satisfying compliance and legal obligations, and such other information as reasonably requested by the Company from time to time with respect to the ValueAct Group and the ValueAct Designee.
+
+(c) The ValueAct Designee agrees that, at all times while serving as a member of the Board, he will (i) meet all director independence and other standards of the Company, the New York Stock Exchange and the Securities and Exchange Commission (&quot;SEC&quot;) and applicable provisions of the Securities Exchange Act of 1934, as amended (the &quot;Exchange Act&quot;), and the rules and regulations promulgated thereunder, including Rule 10A- 3; and (ii) be qualified to serve as a director under the Delaware General Corporation Law (the &quot;DGCL&quot;) (clauses (i) and (ii), the &quot;Conditions&quot;). The ValueAct Designee will promptly advise the Nominating Committee if he ceases to satisfy any of the Conditions.
+
+(d) At all times while serving as a member of the Board, the ValueAct Designee shall comply with all policies, procedures, processes, codes, rules, standards and guidelines applicable to Board members, including the Company&#x27;s Code of Business Conduct, Insider Trading Policy, Executive Stock Ownership Policy as in effect on the date hereof, and Corporate Governance Guidelines, and (except as permitted by the Confidentiality Agreement (as defined in Section 7 below)) preserve the confidentiality of Company business and information, including discussions or matters considered in meetings of the Board or Board committees to the extent not disclosed publicly by the Company.   1
+
+
+
+
+
+(e) So long as the ValueAct Group collectively beneficially owns, in the aggregate, at least 7.5% of the outstanding Common Stock, if, during the Covered Period, a vacancy on the Board is created as a result of the ValueAct Designee&#x27;s death, resignation, disqualification or removal, then the ValueAct Group and the Company (acting through the Board) shall work together in good faith to fill such vacancy or replace such nominee with an individual who (A) meets the Conditions, (B) meets the historical standards and criteria applied by the Company in nominating and appointing directors, and (C) is otherwise mutually acceptable (in each of their sole discretion) to the ValueAct Group and the Company, and thereafter such individual shall serve and/or be nominated as the &quot;ValueAct Designee&quot; under this Agreement.
+
+(f) The Company&#x27;s obligations hereunder shall terminate immediately, and the ValueAct Designee shall promptly offer to resign from the Board, and any committee of the Board on which he then sits (and, if requested by the Company, promptly deliver his written resignation to the Board (which shall provide for his immediate resignation) it being understood that it shall be in the Board&#x27;s sole discretion whether to accept or reject such resignation) if: (i) members of the ValueAct Group, collectively, cease to beneficially own at least 7.5% of the Company&#x27;s outstanding Common Stock; (ii) the ValueAct Designee ceases to satisfy the conditions set forth in clauses (c)-(d) above; (iii) a member of the ValueAct Group, including the ValueAct Designee, otherwise ceases to comply or breaches any of the terms of this Agreement or the Confidentiality Agreement; or (iv) the employment of the ValueAct Designee with the ValueAct Group is terminated for any reason. The ValueAct Group agrees to cause the ValueAct Designee to resign from the Board if the ValueAct Designee fails to resign if and when requested pursuant to this Section 1(f). Notwithstanding the foregoing, in the event of the occurrence of an event set forth in subsection (ii) or (iv) above, the provisions of Section 1(e) must be complied with before the Company&#x27;s obligations hereunder may terminate.
+
+(g) The percentage thresholds set forth in clauses (e) and (f) above shall not be deemed unsatisfied to the extent a failure to maintain the specified ownership thresholds is the result of share issuances or similar Company actions that increase the number of outstanding shares of Common Stock.
+
+2. Standstill.
+
+(a) Each member of the ValueAct Group agrees that, during the Covered Period, (unless specifically requested in writing by the Company, acting through a resolution of a majority of the Company&#x27;s directors not including the ValueAct Designee), it shall not, and shall cause each of its Affiliates or Associates (as such terms are defined in Rule 12b-2 promulgated by the SEC under the Exchange Act) (collectively and individually, the &quot;ValueAct Affiliates,&quot; provided that no portfolio company of the ValueAct Group shall be deemed a &quot;ValueAct Affiliate&quot; so long as such portfolio company (A) has not discussed any of the actions set forth in this subsection (a) with the ValueAct Group or the ValueAct Designee, (B) has not received from the ValueAct Group or the ValueAct Designee information concerning the Company or its business, and (C) is not acting at the request of, in coordination with or on behalf of the ValueAct Group or the ValueAct Designee), not to, directly or indirectly, in any manner, alone or in concert with others:
+
+(i) make, engage in, or in any way participate in, directly or indirectly, any &quot;solicitation&quot; of proxies (as such terms are used in the proxy rules of the SEC but without regard to the exclusion set forth in Rule 14a-1(l)(2)(iv) of the Exchange Act) or consents to vote, or seek to advise, encourage or influence any person with respect to the voting of any securities of the Company or any securities convertible or exchangeable into or exercisable for any such securities (collectively, &quot;securities of the Company&quot;) for the election of individuals to the Board or to approve stockholder proposals, or become a &quot;participant&quot; in any contested &quot;solicitation&quot; for the election of directors with respect to the Company (as such terms are defined or used under the Exchange Act) (other than a &quot;solicitation&quot; or acting as a &quot;participant&quot; in support of all of the nominees of the Board at any stockholder meeting) or make or be the proponent of any stockholder proposal (pursuant to Rule 14a-8 under the Exchange Act or otherwise);
+
+(ii) form, join, encourage, influence, advise or in any way participate in any Group (as such term is defined in Section 13(d)(3) of the Exchange Act) with any persons who are not ValueAct Affiliates   2
+
+
+
+
+
+with respect to any securities of the Company or otherwise in any manner agree, attempt, seek or propose to deposit any securities of the Company in any voting trust or similar arrangement, or subject any securities of the Company to any arrangement or agreement with respect to the voting thereof, except as expressly set forth in this Agreement;
+
+(iii) acquire, offer or propose to acquire, or agree to acquire, directly or indirectly, whether by purchase, tender or exchange offer, through the acquisition of control of another person, by joining a partnership, limited partnership, syndicate or other group (including any group of persons that would be treated as a single &quot;person&quot; under Section 13(d) of the Exchange Act), through swap or hedging transactions or otherwise, any securities of the Company or any rights decoupled from the underlying securities of the Company that would result in the ValueAct Group (together with the ValueAct Affiliates) owning, controlling or otherwise having any beneficial or other ownership interest in more than 12% in the aggregate of the shares of Common Stock outstanding at such time; provided, that, nothing herein will require Common Stock to be sold to the extent the ValueAct Group and the ValueAct Affiliates, collectively, exceed the ownership limit under this paragraph as the result of a share repurchase or similar Company actions that reduces the number of outstanding shares of Common Stock;
+
+(iv) sell, offer or agree to sell directly or indirectly, through swap or hedging transactions or otherwise, the securities of the Company or any rights decoupled from the underlying securities of the Company held by the ValueAct Group or any ValueAct Affiliate to any person or entity not a (A) party to this Agreement, (B) member of the Board, (C) officer of the Company or (D) ValueAct Affiliate (any person or entity not set forth in clauses (A)-(D) shall be referred to as a &quot;Third Party&quot;), that would knowingly result in such Third Party, together with its affiliates and associates, owning, controlling or otherwise having any beneficial or other ownership interest in the aggregate of more than 4.9% of the shares of Common Stock outstanding at such time, except in a transaction approved by the Board;
+
+(v) effect or seek to effect, offer or propose to effect, cause or participate in, or in any way assist or facilitate any other person to effect or seek, offer or propose to effect or participate in, any tender or exchange offer, merger, consolidation, acquisition, scheme, arrangement, business combination, recapitalization, reorganization, sale or acquisition of material assets, liquidation, dissolution or other extraordinary transaction involving the Company or any of its subsidiaries or joint ventures or any of their respective securities (each, an &quot;Extraordinary Transaction&quot;), or make any public statement with respect to an Extraordinary Transaction; provided, however, that this clause shall not preclude the tender by the ValueAct Group or a ValueAct Affiliate of any securities of the Company into any tender or exchange offer or vote by the ValueAct Group or a ValueAct Affiliate of any securities of the Company with respect to any Extraordinary Transaction;
+
+(vi) engage in any short sale or any purchase, sale or grant of any option, warrant, convertible security, stock appreciation right, or other similar right (including, without limitation, any put or call option or &quot;swap&quot; transaction) with respect to any security (other than a broad- based market basket or index) that includes, relates to or derives any significant part of its value from a decline in the market price or value of the securities of the Company;
+
+(vii) (A) call or seek to call any meeting of stockholders, including by written consent, (B) seek representation, on or nominate any candidate to, the Board, except as set forth herein, (C) seek the removal of any member of the Board, (D) solicit consents from stockholders or otherwise act or seek to act by written consent, (E) conduct a referendum of stockholders, or (F) make a request for any stockholder list or other Company books and records, whether pursuant to Section 220 of the DGCL or otherwise;
+
+(viii) take any action in support of or make any proposal or request that constitutes: (A) advising, controlling, changing or influencing the Board or management of the Company, including any plans or proposals to change the number or term of directors or to fill any vacancies on the Board; (B) any material change in the capitalization, stock repurchase programs and practices or dividend policy of the Company; (C) any other material change in the Company&#x27;s management, business or corporate structure; (D) seeking to have the Company waive or make amendments or modifications to the Company&#x27;s Certificate of Incorporation or Bylaws, or other actions that may impede or facilitate the acquisition of control of the Company by any person; (E) causing a class of securities of the Company to be delisted from, or to cease to be authorized to be quoted on, any securities exchange; or (F) causing a class of securities of the Company to become eligible for termination of registration pursuant to Section 12(g)(4) of the Exchange Act;   3
+
+
+
+
+
+(ix) disparage or cause to be disparaged the Company or Affiliates thereof, any of its current or former officers, or directors;
+
+(x) make any public disclosure, announcement or statement regarding any intent, purpose, plan or proposal with respect to the Board, the Company, its management, policies or affairs, any of its securities or assets or this Agreement that is inconsistent with the provisions of this Agreement;
+
+(xi) enter into any substantive discussions, negotiations, agreements, or understandings with any Third Party with respect to any of the foregoing, or advise, assist, knowingly encourage or seek to persuade any Third Party to take any action or make any statement with respect to any of the foregoing, or otherwise take or cause any action or make any statement inconsistent with any of the foregoing; or
+
+(xii) request, directly or indirectly, any amendment or waiver of the foregoing.
+
+The foregoing provisions of this Section 2(a) shall not be deemed to prohibit the ValueAct Group or its directors, officers, partners, employees, members or agents (acting in such capacity) (&quot;Representatives&quot;) from communicating privately with the Company&#x27;s directors, officers or advisors so long as such communications are not intended to, and would not reasonably be expected to, require any public disclosure of such communications.
+
+(b) Each member of the ValueAct Group shall cause all shares of Common Stock beneficially owned, directly or indirectly, by it, or by any ValueAct Affiliate, to be present for quorum purposes and to be voted, at the Company&#x27;s annual and special stockholder meetings and at any adjournments or postponements thereof, and further agrees that at the 2015 annual stockholder meeting they shall vote in favor of (i) all directors nominated by the Board for election at such meeting and (ii) in accordance with the Board&#x27;s recommendation with respect to any proposals for the election of directors that may be the subject of stockholder action at such meeting.
+
+(c) The ValueAct Group acknowledges that the ValueAct Designee shall have all of the rights and obligations, including fiduciary duties to the Company and its stockholders, of a director under applicable law and the Company&#x27;s organizational documents while the ValueAct Designee is serving on the Board. Notwithstanding the foregoing, nothing in this Section 2 shall limit any actions that may be taken by the ValueAct Designee acting solely as a director of the Company consistent with his fiduciary duties as a director of the Company (it being understood and agreed that the ValueAct Group and the ValueAct Affiliates shall not seek to do indirectly through the ValueAct Designee anything that would be prohibited if done by the ValueAct Group or the ValueAct Affiliates).
+
+For purposes of this Agreement the terms &quot;person&quot; or &quot;persons&quot; shall mean any individual, corporation (including not-for-profit), general or limited partnership, limited liability or unlimited liability company, joint venture, estate, trust, association, organization or other entity of any kind or nature.
+
+3. Representations of the Company. The Company represents and warrants as follows: (a) the Company has the power and authority to execute, deliver and carry out the terms and provisions of this Agreement and to consummate the transactions contemplated hereby; and (b) this Agreement has been duly and validly authorized, executed and delivered by the Company, constitutes a valid and binding obligation and agreement of the Company and is enforceable against the Company in accordance with its terms.
+
+4. Representations of the ValueAct Group. The ValueAct Group, jointly and severally, represent and warrant as follows: (a) the ValueAct Group has the power and authority to execute, deliver and carry out the terms and provisions of this Agreement and to consummate the transactions contemplated hereby; (b) this Agreement has been duly and validly authorized, executed and delivered by the ValueAct Group, constitutes a valid and binding obligation and agreement of the ValueAct Group and is enforceable against the ValueAct Group in accordance with its terms; and (c) the ValueAct Group, together with the ValueAct Affiliates, beneficially owns, directly or indirectly, an aggregate of 19,125,204 shares of Common Stock and such shares of Common Stock constitute all of the Common Stock beneficially owned by the ValueAct Group and the ValueAct Affiliates or in which the ValueAct Group or the ValueAct Affiliates have any interest or right to acquire, whether through derivative securities, voting agreements or otherwise; and (d) as of the date of this Agreement, the ValueAct Designee satisfies all of the Conditions.   4
+
+
+
+
+
+5. Termination.
+
+(a) This Agreement is effective as of the date hereof and shall remain in full force and effect for the period (the &quot;Covered Period&quot;) commencing on the date hereof and ending on the date that is the earliest of: (i) the Company&#x27;s failure to appoint the ValueAct Designee to the Board following the ValueAct Group&#x27;s written request to the Company to have the ValueAct Designee appointed to the Board pursuant to Section 1(a) of this Agreement; (ii) the failure of the Company to comply in good faith with Section 1(e) of this Agreement; or (iii) the date which is the 60t h day prior to the Company&#x27;s 2016 annual meeting of stockholders.
+
+(b) The provisions of Section 1(d) this Section 5, Section 7 through Section 16 (and, for the avoidance of doubt, the Confidentiality Agreement) shall survive the termination of this Agreement. No termination pursuant to Section 5(a) shall relieve any party hereto from liability for any breach of this Agreement prior to such termination.
+
+6. Public Announcement and SEC Filing.
+
+(a) The Company shall file promptly a Form 8-K reporting entry into this Agreement (the &quot;Form 8-K&quot;) and appending or incorporating by reference this Agreement as an exhibit thereto.
+
+(b) The ValueAct Group shall promptly, but in no case prior to the date of filing of the Form 8-K by the Company pursuant to Section 6(a) hereof, file an amendment to its Schedule 13D with respect to the Company filed with the SEC on November 13, 2013 (the &quot;ValueAct Schedule 13D&quot;), reporting the entry into this Agreement and amending applicable items to conform to its obligations hereunder. None of the ValueAct Group, the ValueAct Affiliates or the ValueAct Designee shall (i) issue a press release in connection with this Agreement or the actions contemplated hereby or (ii) otherwise make any public statement, disclosure or announcement with respect to this Agreement or the actions contemplated hereby, other than as mutually agreed to by the Company and the ValueAct Group.
+
+(c) The Company shall promptly issue a press release in connection with this Agreement and in the form attached hereto as Exhibit A (the &quot;Press Release&quot;), which is expressly agreed to by the ValueAct Group.
+
+7. Confidentiality Agreement. The Company hereby agrees that, notwithstanding any other provision of this Agreement to the contrary, the ValueAct Group may be provided confidential information in accordance with and subject to the terms of a Confidentiality Agreement in the form attached hereto as Exhibit B (the &quot;Confidentiality Agreement&quot;), after the Confidentiality Agreement has been mutually executed and delivered concurrently with the appointment of the ValueAct Designee to the Board pursuant to the terms of this Agreement.
+
+8. Compensation. The ValueAct Designee shall participate in all director compensation and benefit programs in which the Company&#x27;s other non-employee directors participate. The Company acknowledges that pursuant to the ValueAct Group&#x27;s policies, cash, equity awards and other property received by the ValueAct Designee are held by such person for the benefit of certain members of the ValueAct Group. The Company agrees that it will seek board or appropriate committee approval of all stock-based awards made to the ValueAct Designee so that the grant of such awards shall be exempt from Section 16(b) of the Exchange Act by virtue of Rule 16b-3 thereunder. Without limiting the foregoing, the Company also acknowledges that as a result of the ValueAct Designee&#x27;s service on the Board, members of the ValueAct Group may be considered directors of the Company by deputization under applicable interpretations of Section 16 of the Exchange Act. The Company agrees that it will seek board or appropriate committee approval for purposes of Rule 16b-3 for all transactions in classes of Company securities subject to Section 16 and involving the ValueAct Designee or any member of the ValueAct Group who may be considered a &quot;director by deputization&quot; or who may be deemed to have an indirect interest in the transaction in question.
+
+9. Miscellaneous. The parties agree that irreparable damage would occur in the event any of the provisions of this Agreement were not performed in accordance with the terms hereof and that such damage would not be adequately compensable in monetary damages. Accordingly, the parties hereto shall be entitled to an injunction or injunctions to prevent breaches of this Agreement, to enforce specifically the terms and provisions of this Agreement exclusively in the Court of Chancery or other federal or state courts of the State of Delaware and to   5
+
+
+
+
+
+require the resignation of the ValueAct Designee from the Board commencing on the date that is 10 days following the date that the ValueAct Designee and/or the ValueAct Group materially breaches its obligations under this Agreement, provided, that, such breach has not been cured prior to the expiration of such 10-day period, in addition to any other remedies at law or in equity, and each party agrees it will not take any action, directly or indirectly, in opposition to another party seeking relief. Each of the parties hereto agrees to waive any bonding requirement under any applicable law, in the case any other party seeks to enforce the terms by way of equitable relief. Furthermore, each of the parties hereto (a) consents to submit itself to the personal jurisdiction of the Court of Chancery or other federal or state courts of the State of Delaware in the event any dispute arises out of this Agreement or the transactions contemplated by this Agreement, (b) agrees that it shall not attempt to deny or defeat such personal jurisdiction by motion or other request for leave from any such court, (c) agrees that it shall not bring any action relating to this Agreement or the transactions contemplated by this Agreement in any court other than the Court of Chancery or other federal or state courts of the State of Delaware, and each of the parties irrevocably waives the right to trial by jury, and (d) each of the parties irrevocably consents to service of process by a reputable overnight mail delivery service, signature requested, to the address set forth in Section 11 of this Agreement or as otherwise provided by applicable law. THIS AGREEMENT SHALL BE GOVERNED IN ALL RESPECTS, INCLUDING WITHOUT LIMITATION VALIDITY, INTERPRETATION AND EFFECT, BY THE LAWS OF THE STATE OF DELAWARE APPLICABLE TO CONTRACTS EXECUTED AND TO BE PERFORMED WHOLLY WITHIN SUCH STATE WITHOUT GIVING EFFECT TO THE CHOICE OF LAW PRINCIPLES OF SUCH STATE.
+
+10. Expenses. All attorneys&#x27; fees, costs and expenses incurred in connection with this Agreement and all matters related hereto will be paid by the party incurring such fees, costs or expenses.
+
+11. Entire Agreement; Amendment. This Agreement and the Confidentiality Agreement contain the entire agreement and understanding of the parties with respect to the subject matter hereof and supersede any and all prior and contemporaneous agreements, memoranda, arrangements and understandings, both written and oral, between the parties, or any of them, with respect to the subject matter hereof. This Agreement may be amended only by an agreement in writing executed by the parties hereto, and no waiver of compliance with any provision or condition of this Agreement and no consent provided for in this Agreement shall be effective unless evidenced by a written instrument executed by the party against whom such waiver or consent is to be effective. No failure or delay by a party in exercising any right, power or privilege hereunder shall operate as a waiver thereof, nor shall any single or partial exercise thereof preclude any other or further exercise thereof or the exercise of any right, power or privilege hereunder.
+
+12. Notices. All notices, consents, requests, instructions, approvals and other communications provided for herein and all legal process in regard hereto shall be in writing and shall be deemed validly given, made or served, when delivered in person or sent by overnight courier, when actually received during normal business hours at the address specified in this subsection:   If to the Company:   Allison Transmission Holdings, Inc.   Mail Code L-25   One Allison Way   Indianapolis, IN 46222-3271   Attention: General Counsel
+
+If to the ValueAct Group:   ValueAct Capital Management, L.P.   One Letterman Drive   Building D, 4t h Floor   San Francisco, CA 94129   Attention: General Counsel
+
+13. Severability. If at any time subsequent to the date hereof, any provision of this Agreement shall be held by any court of competent jurisdiction to be illegal, void or unenforceable, such provision shall be of no force and effect, but the illegality or unenforceability of such provision shall have no effect upon the legality or enforceability of any other provision of this Agreement.   6
+
+
+
+
+
+14. Counterparts. This Agreement may be executed in two or more counterparts either manually or by electronic or digital signature (including by facsimile or electronic mail transmission), each of which shall be deemed to be an original and all of which together shall constitute a single binding agreement on the parties, notwithstanding that not all parties are signatories to the same counterpart.
+
+15. No Third Party Beneficiaries; Assignment. This Agreement is solely for the benefit of the parties hereto and is not binding upon or enforceable by any other persons. No party to this Agreement may assign its rights or delegate its obligations under this Agreement, whether by operation of law or otherwise, and any assignment in contravention hereof shall be null and void. Nothing in this Agreement, whether express or implied, is intended to or shall confer any rights, benefits or remedies under or by reason of this Agreement on any persons other than the parties hereto, nor is anything in this Agreement intended to relieve or discharge the obligation or liability of any third persons to any party.
+
+16. Interpretation and Construction. When a reference is made in this Agreement to a Section, such reference shall be to a Section of this Agreement, unless otherwise indicated. The headings contained in this Agreement are for reference purposes only and shall not affect in any way the meaning or interpretation of this Agreement. Whenever the words &quot;include,&quot; &quot;includes&quot; and &quot;including&quot; are used in this Agreement, they shall be deemed to be followed by the words &quot;without limitation.&quot; The words &quot;hereof, &quot;herein&quot; and &quot;hereunder&quot; and words of similar import when used in this Agreement shall refer to this Agreement as a whole and not to any particular provision of this Agreement. The word &quot;will&quot; shall be construed to have the same meaning as the word &quot;shall.&quot; The words &quot;dates hereof&quot; will refer to the date of this Agreement. The word &quot;or&quot; is not exclusive. The definitions contained in this Agreement are applicable to the singular as well as the plural forms of such terms. Any agreement, instrument, law, rule or statute defined or referred to herein means, unless otherwise indicated, such agreement, instrument, law, rule or statute as from time to time amended, modified or supplemented. Each of the parties hereto acknowledges that it has been represented by counsel of its choice throughout all negotiations that have preceded the execution of this Agreement, and that it has executed the same with the advice of said independent counsel. Each party cooperated and participated in the drafting and preparation of this Agreement and the documents referred to herein, and any and all drafts relating thereto exchanged among the parties shall be deemed the work product of all of the parties and may not be construed against any party by reason of its drafting or preparation. Accordingly, any rule of law or any legal decision that would require interpretation of any ambiguities in this Agreement against any party that drafted or prepared it is of no application and is hereby expressly waived by each of the parties hereto, and any controversy over interpretations of this Agreement shall be decided without regards to events of drafting or preparation.
+
+[Signature Pages Follow]   7
+
+
+
+
+
+IN WITNESS WHEREOF, each of the parties hereto has executed this COOPERATION AGREEMENT or caused the same to be executed by its duly authorized representative as of the date first above written.   Allison Transmission Holdings, Inc.
+
+By:  /s/ Eric C. Scroggins Name:  Eric C. Scroggins Title:  Vice President, General Counsel &amp; Secretary   [Signature Page to Cooperation Agreement]
+
+
+
+
+
+IN WITNESS WHEREOF, each of the parties hereto has executed this COOPERATION AGREEMENT or caused the same to be executed by its duly authorized representative as of the date first above written.
+
+VA Partners I, LLC    By:  /s/ George F. Hamel, Jr. Name:  George F. Hamel, Jr. Title:  Chief Operating Officer
+
+ValueAct Capital Master Fund, L.P.    By:  /s/ George F. Hamel, Jr. Name:  George F. Hamel, Jr. Title:  Chief Operating Officer
+
+ValueAct Capital Management, L.P.    By:  /s/ George F. Hamel, Jr. Name:  George F. Hamel, Jr. Title:  Chief Operating Officer
+
+ValueAct Capital Management, LLC    By:  /s/ George F. Hamel, Jr. Name:  George F. Hamel, Jr. Title:  Chief Operating Officer
+
+ValueAct Holdings, L.P.    By:  /s/ George F. Hamel, Jr. Name:  George F. Hamel, Jr. Title:  Chief Operating Officer
+
+ValueAct Holdings GP, LLC    By:  /s/ George F. Hamel, Jr. Name:  George F. Hamel, Jr. Title:  Chief Operating Officer   /s/ Gregory P. Spivy Gregory P. Spivy   [Signature Page to Cooperation Agreement]
+
+
+
+
+
+Schedule A
+
+Members of ValueAct Group
+
+VA Partners I, LLC
+
+ValueAct Capital Master Fund, L.P.
+
+ValueAct Capital Management, L.P.
+
+ValueAct Capital Management, LLC
+
+ValueAct Holdings, L.P.
+
+ValueAct Holdings GP, LLC
+
+Gregory P. Spivy</pre>
+
+**Question**
+
+<pre>Does the contract contain an answer to the following extraction request?
+Highlight the parts (if any) of this contract related to &quot;Parties&quot; that should be reviewed by a lawyer. Details: The two or more parties who signed the contract</pre>
 
 **Criteria (choice)**
 

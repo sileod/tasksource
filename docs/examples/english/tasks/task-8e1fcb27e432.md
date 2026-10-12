@@ -4,81 +4,351 @@ Classification · `mneb/maven-arg`
 
 <details><summary>Example 1</summary>
 
-current local Jev recast (not yet published) · train · maven-arg-role-0ec984a411:train:0
+published Jev · train · maven-arg:train:8f1bdffff7ace03ea83a9b82f5774614eefe1d29505db12d2bd10032231c36c0:Award:1116:1123:1209:1216:maven-arg-role-0ec984a411
 
 **State**
 
-<pre>Hurricane Lili was a relatively long-lived hurricane of the 1996 Atlantic hurricane season that affected countries from Central America to the United Kingdom . Lili formed on October 14 from a tropical wave , which emerged from the coast of west Africa on October 4 . After the storm formed , further strengthening of Lili was gradual , first to tropical storm status on October 16 and then to hurricane status on October 17 . The next day , Lili struck Cuba and moved across the central portion of the island , the first hurricane to hit the country since Hurricane Kate in 1985 . After emerging into the [ARGUMENT]Atlantic Ocean[/ARGUMENT] , the hurricane [TRIGGER]accelerated[/TRIGGER] northeastward , briefly peaking as a category 3 hurricane on the Saffir-Simpson Hurricane Scale near the Bahamas . For almost an entire week , Hurricane Lili oscillated in intensity while fluctuating several times in forward speed . About two weeks passed before Lili transitioned into an extratropical storm north of the Azores on October 27 , which subsequently moved across Ireland and Great Britain . Early in its duration , Lili caused flooding in Central America that left thousands homeless and killed 14 people . Damage was heaviest in Cuba , mostly due to the hurricane &#x27;s heavy rainfall which totaled 29.41 in ( 747 mm ) . The hurricane affected 11 Cuban provinces , damaging 92,542 houses and destroying another 6,369 . The rains heavily damaged the sugar cane and banana crops , and overall damage in the country was estimated at $ 362 million ( 1996 USD ) . After 269,995 people were evacuated in advance of Lili , there were no deaths in the country . In nearby Florida , one person died after being swept into a drain during the storm &#x27;s heavy rains . Moisture from Lili also fueled a storm that struck the northeastern United States , which contributed indirectly to a death when a man in Maine tried driving across a flooded roadway . Damage in the Bahamas was not severe , limited to some damaged roofs and downed trees . When the remnants of Lili struck Ireland and the United Kingdom , it produced strong winds and high seas that damaged hundreds of houses , causing $ 300 million in damage ( 1996 USD ) and six deaths .</pre>
+<pre>The Battle of Ramadi in 2006 ( sometimes referred to as the Second Battle of Ramadi ) was fought during the Iraq War from March 2006 to November 2006 , for control of the capital of the Al Anbar Governorate in western Iraq . A combined force of U.S . Soldiers , U.S. Marines , U.S. Navy SEALs , and Iraqi Security Forces fought insurgents for control of key locations in Ramadi , including the Government Centre and the General Hospital . Coalition strategy relied on establishing a number of patrol bases called Combat Operation Posts throughout the city . U.S. military officers believe that insurgent actions during the battle led to the formation of the Anbar Awakening . In August , insurgents executed a tribal sheik who was encouraging his kinsmen to join the Iraqi police and prevented his body from being buried in accordance with Islamic laws . In response , Sunni sheiks banded together to drive insurgents from Ramadi . In September 2006 , Sheik Abdul Sattar Abu Risha formed the Anbar Salvation Council , an alliance of approximately 40 Sunni tribes . U.S. Navy SEAL Michael A. Monsoor was posthumously [TRIGGER]awarded[/TRIGGER] the Medal of Honor for actions during the battle . On September 29 , 2006 , he threw [ARGUMENT]himself[/ARGUMENT] upon a grenade which threatened the lives of the other members of his team . Monsoor had previously been awarded the Silver Star in May for rescuing an injured comrade in the city . The battle also marked the first use of chlorine bombs by insurgents during the war . On October 21 , 2006 , insurgents detonated a car-bomb with two 100-pound chlorine tanks , injuring three Iraqi policemen and a civilian in Ramadi .</pre>
 
 **Question**
 
 <pre>What semantic role does [ARGUMENT] play in the event marked [TRIGGER]?
-Event type: Motion</pre>
+Event type: Award</pre>
 
 **Criteria (choice)**
 
-<pre>1. Agent
-2. Cause
-3. Killer
-4. Location
-5. Location original</pre>
+<pre>1. Action
+2. Activity
+3. Agent
+4. Agreement
+5. Arguer 2
+6. Assailant
+7. Attribute
+8. Author
+9. Behavior
+10. Believer
+11. Builder
+12. Category
+13. Cause
+14. Communicator
+15. Component
+16. Conclusion
+17. Consequence
+18. Container
+19. Content
+20. Creator
+21. Depiction
+22. Destination
+23. Details
+24. Employer
+25. Event
+26. Feedback
+27. Final
+28. Final Location
+29. Giver
+30. Goal
+31. Group
+32. Helper
+33. Hiding place
+34. Hindrance
+35. Host
+36. Incident
+37. Initial
+38. Instrument
+39. Issue
+40. Item
+41. Job content
+42. Killer
+43. Location
+44. Location final
+45. Location original
+46. Loser
+47. Loss
+48. Member
+49. Message
+50. Message Receiver
+51. Motivation
+52. Name
+53. New Occupation
+54. New leader
+55. New name
+56. Object
+57. Objective
+58. Old leader
+59. Old name
+60. Operator
+61. Orientation
+62. Origin
+63. Outcome
+64. Part
+65. Participant
+66. Participant A
+67. Participant B
+68. Partner
+69. Partner 1
+70. Partner 2
+71. Passby
+72. Patient
+73. Payer
+74. Possibility
+75. Product
+76. Proposer
+77. Purpose
+78. Reason
+79. Recipient
+80. Result
+81. Reward
+82. Selector
+83. Sender
+84. Source
+85. Speaker
+86. State
+87. Supplier
+88. Suspect
+89. Symbol event
+90. Target Objective
+91. Trainer
+92. Treatment
+93. Upcoming activity
+94. Victim
+95. Winner</pre>
 
 **Gold target (weight)**
 
-<pre>5. Location original — 1</pre>
+<pre>95. Winner — 1</pre>
 
 </details>
 
 <details><summary>Example 2</summary>
 
-current local Jev recast (not yet published) · train · maven-arg-role-0ec984a411:train:1
+published Jev · train · maven-arg:train:a1dd3a0afb51a62fd1788a4d0c3e29be4d51ef6230a8e9fbedc40cc642ddee21:Receiving:163:171:652:657:maven-arg-role-0ec984a411
 
 **State**
 
-<pre>The Second Battle of Kosovo ( Hungarian : `` második rigómezei csata &#x27;&#x27; , Turkish : `` İkinci Kosova Savaşı &#x27;&#x27; ) ( 17–20 October 1448 ) was a land battle between a Hungarian-led Crusader army and the Ottoman Empire at Kosovo Polje . It was the culmination of a Hungarian offensive to avenge the defeat at Varna four years earlier . In the three-day battle the Ottoman army under the command of Sultan Murad II defeated the Crusader army of regent John Hunyadi . Calculating that he would need more than 40,000 men to defeat the Ottomans , the Hungarian regent sought to join up with anti-Ottoman Albanian forces , possibly led by Skanderbeg . The Ottomans in their base at Sofia received word of the Crusader army &#x27;s march route and subsequently began readying their men . Having failed to locate the main Ottoman army , whom he believed to still be at their capital in Edirne , Hunyadi was caught by surprise on 17 October when the Ottoman army appeared in front of his men at Kosovo Field . He constructed a `` tabor &#x27;&#x27; wagon fort at Plementina hill from which to fight the Ottomans , who built their own stockade in response . Cavalry skirmishing on the flanks of the stockades during the first two days and a Crusader night-time attack using their wagons and guns against the Sultan &#x27;s central position on the night of 18/19 October produced much bloodshed but no conclusive results . On 19 October Murad II used his `` sipahi &#x27;&#x27; cavalry from Thessaly to envelop the cavalry on the Crusader left flank , along with a general assault all along the line to distract Hunyadi from the primary effort . The maneuver worked and the Wallachian , Moldavian and Hungarian cavalry were cut down by the `` sipahis &#x27;&#x27; , who took no prisoners . Much of the Crusader army then retreated . On 20 October , with [ARGUMENT]Murad II[/ARGUMENT] personally [TRIGGER]observing[/TRIGGER] the struggle , the Janissaries attacked and killed everyone left in the stockade . The battle ended any hopes of saving Constantinople from the Ottoman Empire . The Hungarian kingdom no longer had the military and financial resources to mount an offensive against the Ottomans . With the end of the half-century-long Crusader threat to their European frontier , Murad &#x27;s son Mehmed II was free to lay siege to Constantinople in 1453 .</pre>
+<pre>The 1951 Asian Games ( ) , officially known as the First Asian Games , was a multi-sport event celebrated in New Delhi , India from 4 to 11 March 1951 . The Games [TRIGGER]received[/TRIGGER] names like First Asiad and 1951 Asiad . A total of 489 athletes representing 11 Asian National Olympic Committees ( NOCs ) participated in 57 events from eight sports and discipline . The Games was the successor of the Far Eastern Games and the revival of the Western Asiatic Games . The 1951 Asiad were originally scheduled to be held in 1950 , but postponed until 1951 due to delays in preparations . On 13 February 1949 , the Asian Games Federation was formally established in [ARGUMENT]Delhi[/ARGUMENT] , with Delhi unanimously announced as the first host city of the Asian Games . The games were managed by a strong Organising Committee ( see Organisation below ) . Countries invited included almost all the independent Asian countries of the time except Soviet Union and Vietnam , due to the political structure of those nations . National Stadium was the venue for all events . The official logo of the First Asiad depicted a bright sun in red with 16 rays and a white circle in the middle of the disc of the sun and eleven rings , representing each participating nation , on a white background , symbolising peace . Japanese athletes won the most golds and overall medals , with 24 and 60 respectively ; while the host nation India had 15 golds and 51 overall medals with most bronzes ( 20 ) and finished at second spot in a medal table . The next Asian Games organised by India were the 1982 Asian Games , some 31 years later .</pre>
 
 **Question**
 
 <pre>What semantic role does [ARGUMENT] play in the event marked [TRIGGER]?
-Event type: Perception active</pre>
+Event type: Receiving</pre>
 
 **Criteria (choice)**
 
-<pre>1. Agent
-2. Cause
-3. Killer
-4. Location
-5. Location original</pre>
+<pre>1. Action
+2. Activity
+3. Agent
+4. Agreement
+5. Arguer 2
+6. Assailant
+7. Attribute
+8. Author
+9. Behavior
+10. Believer
+11. Builder
+12. Category
+13. Cause
+14. Communicator
+15. Component
+16. Conclusion
+17. Consequence
+18. Container
+19. Content
+20. Creator
+21. Depiction
+22. Destination
+23. Details
+24. Employer
+25. Event
+26. Feedback
+27. Final
+28. Final Location
+29. Giver
+30. Goal
+31. Group
+32. Helper
+33. Hiding place
+34. Hindrance
+35. Host
+36. Incident
+37. Initial
+38. Instrument
+39. Issue
+40. Item
+41. Job content
+42. Killer
+43. Location
+44. Location final
+45. Location original
+46. Loser
+47. Loss
+48. Member
+49. Message
+50. Message Receiver
+51. Motivation
+52. Name
+53. New Occupation
+54. New leader
+55. New name
+56. Object
+57. Objective
+58. Old leader
+59. Old name
+60. Operator
+61. Orientation
+62. Origin
+63. Outcome
+64. Part
+65. Participant
+66. Participant A
+67. Participant B
+68. Partner
+69. Partner 1
+70. Partner 2
+71. Passby
+72. Patient
+73. Payer
+74. Possibility
+75. Product
+76. Proposer
+77. Purpose
+78. Reason
+79. Recipient
+80. Result
+81. Reward
+82. Selector
+83. Sender
+84. Source
+85. Speaker
+86. State
+87. Supplier
+88. Suspect
+89. Symbol event
+90. Target Objective
+91. Trainer
+92. Treatment
+93. Upcoming activity
+94. Victim
+95. Winner</pre>
 
 **Gold target (weight)**
 
-<pre>1. Agent — 1</pre>
+<pre>43. Location — 1</pre>
 
 </details>
 
 <details><summary>Example 3</summary>
 
-current local Jev recast (not yet published) · train · maven-arg-role-0ec984a411:train:2
+published Jev · train · maven-arg:train:dd3a4dca3eb1a18484633a933f2391ecfacea9ca17b81a6538161771dcf6b00a:Bodily_harm:1044:1052:1018:1033:maven-arg-role-0ec984a411
 
 **State**
 
-<pre>The Ceremonials Tour was the second concert tour by English indie rock band Florence and the Machine . The tour included performances at Music festivals because it is lead singer Florence Welch &#x27;s favourite way to [TRIGGER]perform[/TRIGGER] live . Welch had originally planned to spend over one year touring for `` Ceremonials &#x27;&#x27; ( their previous tour lasted almost three and a half years ) before announcing that the December 2012 dates would be the final performances of the tour . On 25 February 2013 it was announced that Florence and the Machine would be playing at the Coke Live Music Festival in [ARGUMENT]Poland[/ARGUMENT] on 10 August 2013 , and on 26 March 2013 it was announced that the band would be playing at Chime for Change &#x27;s `` The Sound of Change Live &#x27;&#x27; concert at London &#x27;s Twickenham Stadium alongside Beyoncé , Ellie Goulding and Haim , amongst others . The Ceremonials Tour was a critical and commercial success . Pollstar announced that the Ceremonials Tour was the 40th best-selling tour in the world in 2012 having earned $ 31.8 million worldwide and having sold 618,436 tickets . `` Paste Magazine &#x27;&#x27; ranked the tour as the 7th best tour of 2012 .</pre>
+<pre>The 1995 Men &#x27;s World Ice Hockey Championships was the 59th such event sanctioned by the International Ice Hockey Federation ( IIHF ) . Teams representing 39 countries participated in several levels of competition . The competition also served as qualifications for group placements in the 1996 competition . The top Championship Group tournament took place in Sweden from 23 April to 7 May 1995 , with games played in Stockholm and Gävle . In the tournament final , Finland won the gold medal by defeating Sweden 4–1 at the Globen arena in Stockholm . The Finnish goals were scored by Timo Jutila and Ville Peltonen , who scored a hat trick . The gold medal was the first in Finland &#x27;s history . Sweden had written a fight song , `` Den glider in &#x27;&#x27; , which also was intended to be the official song of the championships . After the finals , the song became very popular in Finland . Because of the 1994–95 NHL lockout , it originally created a dream scenario for the tournament hosts . With a cancelled NHL season , [ARGUMENT]all NHL players[/ARGUMENT] free from [TRIGGER]injuries[/TRIGGER] would have been available . But when the NHL season began in late January 1995 , it instead created a scenario where fewer NHL players than usual became available . The Canadian and American teams would logically be hit the hardest , but the Americans found a way to lead their group in the first round . The Canadians , who struggled in the early tournament , beat the Americans in the quarter-finals , took the Swedes to overtime before losing , and then beat the Czechs for the bronze . Andrew McKim , playing in the minors for the Adirondack Red Wings , ended up being the tournament scoring leader .</pre>
 
 **Question**
 
 <pre>What semantic role does [ARGUMENT] play in the event marked [TRIGGER]?
-Event type: Hold</pre>
+Event type: Bodily harm</pre>
 
 **Criteria (choice)**
 
-<pre>1. Agent
-2. Cause
-3. Killer
-4. Location
-5. Location original</pre>
+<pre>1. Action
+2. Activity
+3. Agent
+4. Agreement
+5. Arguer 2
+6. Assailant
+7. Attribute
+8. Author
+9. Behavior
+10. Believer
+11. Builder
+12. Category
+13. Cause
+14. Communicator
+15. Component
+16. Conclusion
+17. Consequence
+18. Container
+19. Content
+20. Creator
+21. Depiction
+22. Destination
+23. Details
+24. Employer
+25. Event
+26. Feedback
+27. Final
+28. Final Location
+29. Giver
+30. Goal
+31. Group
+32. Helper
+33. Hiding place
+34. Hindrance
+35. Host
+36. Incident
+37. Initial
+38. Instrument
+39. Issue
+40. Item
+41. Job content
+42. Killer
+43. Location
+44. Location final
+45. Location original
+46. Loser
+47. Loss
+48. Member
+49. Message
+50. Message Receiver
+51. Motivation
+52. Name
+53. New Occupation
+54. New leader
+55. New name
+56. Object
+57. Objective
+58. Old leader
+59. Old name
+60. Operator
+61. Orientation
+62. Origin
+63. Outcome
+64. Part
+65. Participant
+66. Participant A
+67. Participant B
+68. Partner
+69. Partner 1
+70. Partner 2
+71. Passby
+72. Patient
+73. Payer
+74. Possibility
+75. Product
+76. Proposer
+77. Purpose
+78. Reason
+79. Recipient
+80. Result
+81. Reward
+82. Selector
+83. Sender
+84. Source
+85. Speaker
+86. State
+87. Supplier
+88. Suspect
+89. Symbol event
+90. Target Objective
+91. Trainer
+92. Treatment
+93. Upcoming activity
+94. Victim
+95. Winner</pre>
 
 **Gold target (weight)**
 
-<pre>4. Location — 1</pre>
+<pre>72. Patient — 1</pre>
 
 </details>

@@ -4,15 +4,15 @@ Classification · `bigbio/hallmarks_of_cancer`
 
 <details><summary>Example 1</summary>
 
-current local Jev recast (not yet published) · train · hallmarks-of-cancer-yesno-a3118063ba:train:0
+published Jev · train · hallmarks-of-cancer:train:22920668_8:cellular energetics:hallmarks-of-cancer-yesno-a3118063ba
 
 **State**
 
-<pre>However , the percentage of cell killing observed following PDT differed between the 2 cell lines ; a maximum of of DOK cell killing was achieved as compared to killing for H357 cells .</pre>
+<pre>Immunocytochemical analysis showed that in these mice , RARα responsive genes such as Cyp26A1 , E-cadherin , cellular retinol-binding protein 1 ( CRBP1 ) and p27 , were up-regulated .</pre>
 
 **Question**
 
-<pre>Does this sentence describe enabling replicative immortality?</pre>
+<pre>Does this sentence describe cellular energetics?</pre>
 
 **Criteria (choice)**
 
@@ -27,15 +27,15 @@ current local Jev recast (not yet published) · train · hallmarks-of-cancer-yes
 
 <details><summary>Example 2</summary>
 
-current local Jev recast (not yet published) · train · hallmarks-of-cancer-yesno-a3118063ba:train:1
+published Jev · train · hallmarks-of-cancer:train:22384180_7:genomic instability and mutation:hallmarks-of-cancer-yesno-a3118063ba
 
 **State**
 
-<pre>Therefore , a second study was conducted in which MDS was given ad libitum or pair-fed with MDD .</pre>
+<pre>Subsequently , we found that As(2)O(3) treatment in a dose- and time-dependent fashion markedly increased the level of acetylated α-tubulin and acetylated Hsp90 , and inhibited the chaperone association with IKKα activities and increased degradation of IKKα .</pre>
 
 **Question**
 
-<pre>Does this sentence describe avoiding immune destruction?</pre>
+<pre>Does this sentence describe genomic instability and mutation?</pre>
 
 **Criteria (choice)**
 
@@ -50,15 +50,15 @@ current local Jev recast (not yet published) · train · hallmarks-of-cancer-yes
 
 <details><summary>Example 3</summary>
 
-current local Jev recast (not yet published) · train · hallmarks-of-cancer-yesno-a3118063ba:train:2
+published Jev · train · hallmarks-of-cancer:train:20350779_4:tumor promoting inflammation:hallmarks-of-cancer-yesno-a3118063ba
 
 **State**
 
-<pre>In contrast , at centrosomes 83% of BARD1 was rapidly mobile with extremely fast turnover ( recovery time The faster exchange of BARD1 at centrosomes correlated with BRCA1-independent recruitment .</pre>
+<pre>EMT could also be induced in cells with defective TGF-beta signalling .</pre>
 
 **Question**
 
-<pre>Does this sentence describe activating invasion and metastasis?</pre>
+<pre>Does this sentence describe tumor promoting inflammation?</pre>
 
 **Criteria (choice)**
 

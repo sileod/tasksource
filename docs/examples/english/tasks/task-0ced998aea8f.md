@@ -4,37 +4,11 @@ Classification · `tasksource/pubmed-rct`
 
 <details><summary>Example 1</summary>
 
-current local Jev recast (not yet published) · train · pubmed-rct-role-3fb579e577:train:0
+published Jev · train · pubmed-rct:train:18307373:10:pubmed-rct-role-3fb579e577
 
 **State**
 
-<pre>The rise in plasma renin activity during salt restriction was steeper in the counter-regulator group than in the other groups , whereas the changes in plasma noradrenaline concentrations were similar in all groups .</pre>
-
-**Question**
-
-<pre>What rhetorical role does this sentence play in its randomized controlled trial abstract?</pre>
-
-**Criteria (choice)**
-
-<pre>1. background
-2. objective
-3. methods
-4. results
-5. conclusions</pre>
-
-**Gold target (weight)**
-
-<pre>4. results — 1</pre>
-
-</details>
-
-<details><summary>Example 2</summary>
-
-current local Jev recast (not yet published) · train · pubmed-rct-role-3fb579e577:train:1
-
-**State**
-
-<pre>Convenience sample of 157 community-living women , aged 55 to 90 years , after completion of a comprehensive diagnostic evaluation .</pre>
+<pre>Safety measurements included vital signs , clinical laboratory tests , a physical examination , ECG readings and adverse event reports .</pre>
 
 **Question**
 
@@ -54,13 +28,39 @@ current local Jev recast (not yet published) · train · pubmed-rct-role-3fb579e
 
 </details>
 
-<details><summary>Example 3</summary>
+<details><summary>Example 2</summary>
 
-current local Jev recast (not yet published) · train · pubmed-rct-role-3fb579e577:train:2
+published Jev · train · pubmed-rct:train:7743989:8:pubmed-rct-role-3fb579e577
 
 **State**
 
-<pre>There were no statistically significant differences in the reductions of the numbers of CFU/ml , comparing the 2 preparation instruments ( P &gt; .05 ) .</pre>
+<pre>Mortality rate was 16 % and with no difference by ORS group .</pre>
+
+**Question**
+
+<pre>What rhetorical role does this sentence play in its randomized controlled trial abstract?</pre>
+
+**Criteria (choice)**
+
+<pre>1. background
+2. objective
+3. methods
+4. results
+5. conclusions</pre>
+
+**Gold target (weight)**
+
+<pre>4. results — 1</pre>
+
+</details>
+
+<details><summary>Example 3</summary>
+
+published Jev · train · pubmed-rct:train:21651729:9:pubmed-rct-role-3fb579e577
+
+**State**
+
+<pre>There was a 93 % reduction in the use of split-thickness skin grafts in the treatment group .</pre>
 
 **Question**
 
