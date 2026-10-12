@@ -12,9 +12,9 @@ from .identifiers import repository_links
 TASKS = ('multiple-choice', 'text-classification', 'token-classification', 'image-classification', 'question-answering')
 
 
-def retrieve(cache, queries=(), tasks=(), limit=100, offline=False):
+def retrieve(cache, queries=(), tasks=(), limit=100, offline=False, languages=()):
     settings = dict(queries=list(queries), tasks=list(tasks), limit=limit,
-                    default_tasks=list(TASKS) if not queries and not tasks else [])
+                    default_tasks=list(TASKS) if not queries and not tasks else [], languages=list(languages))
     path = Path(cache)/('hf_hub-'+hashlib.sha256(json.dumps(settings, sort_keys=True).encode()).hexdigest()+'.json')
     if not path.exists():
         if offline:
@@ -25,7 +25,7 @@ def retrieve(cache, queries=(), tasks=(), limit=100, offline=False):
         for query in queries or (None,):
             for category in categories or (None,):
                 for info in api.list_datasets(search=query, task_categories=category,
-                                             sort='downloads', limit=limit, full=True):
+                                             sort='downloads', limit=limit, full=True, language=list(languages) or None):
                     card = info.card_data.to_dict() if info.card_data else {}
                     records[info.id] = dict(id=info.id, sha=info.sha, tags=info.tags or [],
                         card=card, downloads=info.downloads, likes=info.likes,
@@ -45,7 +45,8 @@ def retrieve(cache, queries=(), tasks=(), limit=100, offline=False):
         rows.append(dict(name=repo, aliases=[repo.rsplit('/', 1)[-1]],
             sources=[dict(source='hf_hub', url=url)], dataset_urls=[url], huggingface=[repo], github=links['github'],
             papers=papers, tasks=tasks, decision_tasks=[t for t in tasks if any(k in t.replace('-', ' ') for k in DECISION_TASKS)],
-            languages=card.get('language') or [], modalities=card.get('modalities') or [], train_status='unchecked',
+            languages=([card['language']] if isinstance(card.get('language'), str) else card.get('language'))
+                      or [t.split(':', 1)[1] for t in tags if t.startswith('language:')], modalities=card.get('modalities') or [], train_status='unchecked',
             hub_metadata=dict(revision=item['sha'], license=card.get('license'),
                               downloads=item['downloads'], likes=item['likes'], last_modified=item['last_modified'])))
     return rows, dict(source='hf_hub', **settings,

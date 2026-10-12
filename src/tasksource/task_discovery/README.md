@@ -95,3 +95,28 @@ python -m tasksource.task_discovery match build/discovery/hf_candidates.jsonl \
 ```
 
 Resolved references retain original URLs and add Semantic Scholar IDs and external arXiv/DOI IDs. Unresolved references and request failures remain explicit. Authentication uses `SEMANTIC_SCHOLAR_API_KEY`, falling back to `~/.config/tasksource/semantic_scholar_api_key` (keep it private, mode 0600). Neither credentials nor request headers enter snapshots. Rate-limited requests get bounded backoff; cached successes are reused.
+
+## Two phases: discover, then process
+
+`discover_task_prospects` retrieves and screens potential sources cheaply. It does not convert datasets, create task annotations, publish mirrors or rewrite curated decisions. Its handoff is input for the separate, heavier `process_task_prospect` phase (implementation and deeper source validation), which is deliberately outside this discovery command.
+
+```bash
+python -m tasksource.task_discovery retrieve --source hf_hub \
+  --task multiple-choice --task text-classification --language en --limit 5000 \
+  --output build/discovery/prospects-hf.jsonl
+python -m tasksource.task_discovery retrieve --source paperswithcode \
+  --output build/discovery/prospects-pwc.jsonl
+python -m tasksource.task_discovery.discover_task_prospects \
+  build/discovery/prospects-hf.jsonl build/discovery/prospects-pwc.jsonl \
+  --output build/discovery/prospects-pass --limit 100 --seed 0 --language en \
+  --model openrouter/perplexity/pplx-decider-v1.1-27b \
+  --model openrouter/~typesafe/jev-latest
+```
+
+The pass matches implemented catalogs, mirrors, structured prior decisions and the curated queue, retaining GitHub/paper overlap hints. It draws a deterministic source-stratified sample of unmatched candidates, checks Viewer splits and one training-row/schema preview, and reviews bounded card/README evidence. GitHub/paper-only sources remain unknown when those documents do not establish training availability; the command does not download full corpora or papers. Missing Viewer results do not prove that training data is absent.
+
+`jev_review` uses native Decisions requests through optional tool dependency [litlm](https://github.com/sileod/litlm) (`c3340b1` or newer). All eligibility questions share one evidence state. Repeat `--model` for an ensemble; native probabilities, returned model versions, member disagreements and failures are preserved. Raw requests/results are separate from the final handoff, successful requests are cached, and credentials stay outside artifacts.
+
+The output directory retains `matched.jsonl`, `checked.jsonl`, per-model review artifacts, `prospects.jsonl` and a `handoff.jsonl` of promising candidates. A promising source needs explicit evidence and all configured reviewers assigning at least 0.8 to each eligibility criterion; HF sources additionally need observed training-split metadata and no failed training checks. Missing evidence or reviewer disagreement stays `needs_evidence`. These are screening judgments, not verified annotation quality. The manifest records input/catalog hashes, seed, model routes and prompt/code hashes. The human-curated queue remains separate.
+
+For English-focused discovery, HF retrieval passes `--language en` directly to the Hub API, including multilingual datasets tagged English. The screening command also accepts `--language en`: declared English is preferred within each source sample, known non-English sources are excluded, and missing language metadata remains eligible for evidence review. PWC language names such as `English` are normalized. OpenAlex paper language is not treated as dataset language. Filters are recorded in cache keys and run manifests; metadata tags do not establish example-level language quality.
