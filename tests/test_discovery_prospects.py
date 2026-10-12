@@ -85,3 +85,12 @@ def test_multiple_splits_do_not_claim_disjointness(monkeypatch):
     result=discovery.training_evidence({'name':'Source','huggingface':['org/data']},'unused')
     assert result['source_splits']==['test','train'] and result['split_policy']=='multiple_splits'
     assert 'disjoint' not in result
+
+
+def test_annotation_provenance_is_preserved_without_becoming_an_eligibility_vote():
+    row=reviewed('yes','yes')
+    for review in row['reviews']:
+        review['data']['answers']['annotation_origin']={'type':'choice','probabilities':{'model':0.95,'unknown':0.05}}
+    assert discovery.prospect_status(row)=='promising'
+    assert set(jev_review.PROVENANCE).isdisjoint(jev_review.CHECKS)
+    assert all('unknown' in jev_review.QUESTIONS[q]['criteria'] for q in jev_review.PROVENANCE)
