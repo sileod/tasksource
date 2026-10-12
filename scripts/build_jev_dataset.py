@@ -928,6 +928,9 @@ def publish_dataset(
         )
         for split, split_dataset in dataset.items()
     })
+    dataset = DatasetDict({split: rows.filter(lambda states: [state is not None for state in states],
+                                              input_columns="state", batched=True, desc="Empty states")
+                           for split, rows in dataset.items()})
     bad = bad_examples()
     dataset = DatasetDict({
         split: add_example_ids(rows).filter(
