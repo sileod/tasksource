@@ -2,7 +2,7 @@
 
 [English tasks](english/README.md) · [Searchable HTML](english/index.html)
 
-The English gallery lists every task in `list_tasks()`. It shows up to three real training examples per task, retaining the published Jev state, question, criterion order and gold distribution. Boolean decisions show the probability of true. Expand an example to read its full text; examples are not truncated.
+The English gallery lists every task in `list_tasks()`. It shows up to three real training examples per task, retaining the published Jev state, question, criterion order and gold distribution. Boolean decisions show the probability of true. The HTML shows the first example immediately, with input and decision side by side. Long fields show the beginning and end; expand “Full text” for the complete content. Two more examples are folded below each task. The Markdown and JSON retain full texts.
 
 For tasks absent from the published `full` config, optional source loads show canonical preprocessed fields with decoded class labels instead. These are labeled separately, with provenance in `examples.json`. Failed or timed-out loads are reported, not replaced by fabricated examples. These samples illustrate the transformations; they are not a comprehensive quality audit.
 

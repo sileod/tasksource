@@ -106,6 +106,15 @@ def format_example(row):
             (f"Criteria ({row['kind']})", options), ('Gold target (weight)', gold)]
 
 
+def html_text(value, limit=700):
+    """Show a middle-cropped preview; retain the complete text in a native foldout."""
+    full = '<pre>' + html.escape(value) + '</pre>'
+    if len(value) <= limit:
+        return full
+    preview = value[:limit * 3 // 4] + '\n… [middle omitted] …\n' + value[-limit // 4:]
+    return '<pre>' + html.escape(preview) + '</pre><details><summary>Full text (' + f'{len(value):,}' + ' characters)</summary>' + full + '</details>'
+
+
 def write(output, revision, examples, count, errors=None):
     output.mkdir(parents=True, exist_ok=True)
     catalog = list_tasks()
@@ -135,13 +144,18 @@ def write(output, revision, examples, count, errors=None):
         for i, row in enumerate(task['examples'], 1):
             provenance = f"{row.get('origin', 'published Jev')} · {row['split']} · {row['id']}"
             md += [f'<details><summary>Example {i}</summary>', '', provenance, '']
-            fields = []
+            inputs, decisions = [], []
             for label, value in format_example(row):
                 # HTML pre handles arbitrary source text, including Markdown fences/HTML.
                 md += [f'**{label}**', '', f'<pre>{esc(value)}</pre>', '']
-                fields.append(f'<h4>{esc(label)}</h4><pre>{esc(value)}</pre>')
+                target = decisions if label in ('Question', 'Decision', 'Gold target', 'Gold labels') or label.startswith(('Criteria', 'Gold target')) else inputs
+                style = ' gold' if label.startswith('Gold') else ''
+                target.append(f'<div class="field{style}"><h4>{esc(label)}</h4>' + html_text(value) + '</div>')
             md += ['</details>', '']
-            body.append(f'<details><summary>Example {i}</summary><p>{esc(provenance)}</p>' + ''.join(fields) + '</details>')
+            rendered = '<div class="example-grid"><div>' + ''.join(inputs) + '</div><div>' + ''.join(decisions) + '</div></div>'
+            rendered += f'<details class="provenance"><summary>Source and row ID</summary>{esc(provenance)}</details>'
+            body.append('<section class="primary-example">' + rendered + '</section>' if i == 1 else
+                        f'<details class="extra-example"><summary>Example {i}</summary>' + rendered + '</details>')
         if not body:
             message = 'No training example in this published Jev snapshot.' + (' Source load: ' + task['error'] if task['error'] else '')
             md += [message, '']
@@ -150,18 +164,26 @@ def write(output, revision, examples, count, errors=None):
         index.append(f"| [{task_id}](tasks/{anchor}.md) | {task['type']} | {len(task['examples'])} |")
         articles.append(f'<article id="{anchor}" data-search="{esc(header.lower(), quote=True)}" '
                         f'data-covered="{bool(task["examples"])}"><h2><a href="#{anchor}">{esc(task_id)}</a></h2>'
-                        f'<p>{esc(task["type"])} · {esc(task["dataset"])}</p>' + ''.join(body) + '</article>')
+                        f'<p class="task-meta">{esc(task["type"])} · {esc(task["dataset"])}</p>' + ''.join(body) + '</article>')
     (output / 'README.md').write_text('\n'.join(index) + '\n')
     page = '''<!doctype html><html lang="en"><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Tasksource English examples</title><style>
-body{font:16px/1.5 system-ui;max-width:1000px;margin:2rem auto;padding:0 1rem;color:#17212b;background:#fafafa}
-a{color:#175fa8}article{border-top:1px solid #ccd3db;padding:1rem 0}h2{font-size:1.2rem}
-pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f0f2f5;padding:1rem;font:14px/1.5 monospace}
-summary{cursor:pointer;padding:.5rem 0}input{font:inherit;padding:.5rem;max-width:90%}
-nav{position:sticky;top:0;background:#fafafa;padding:1rem 0}.missing{color:#666}
+*{box-sizing:border-box}body{font:15px/1.45 system-ui;max-width:1220px;margin:1.5rem auto;padding:0 1rem;color:#17212b;background:#fafafa}
+a{color:#175fa8}article{border:1px solid #dbe0e7;border-radius:8px;background:white;padding:1rem;margin:.8rem 0}
+h1{font-size:1.7rem}h2{font-size:1.1rem;margin:0}h4{font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:#536071;margin:0 0 .25rem}
+.task-meta{font-size:.8rem;color:#667085;margin:.15rem 0 .7rem}.example-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:1.2rem}
+.field{margin-bottom:.6rem}pre{white-space:pre-wrap;overflow-wrap:anywhere;margin:0;background:#f4f6f8;border-radius:4px;padding:.6rem;font:13px/1.45 ui-monospace,monospace}
+.field > pre{max-height:16rem;overflow:auto}details pre{max-height:70vh;overflow:auto}
+.gold pre{background:#edf7ef;color:#185a31}.gold h4{color:#185a31}
+summary{cursor:pointer;font-size:.8rem;padding:.3rem 0;color:#175fa8}.provenance{font-size:.75rem;color:#667085;overflow-wrap:anywhere}
+.extra-example{border-top:1px solid #edf0f4}.extra-example[open]{padding-top:.4rem}
+input{font:inherit;padding:.45rem;border:1px solid #ccd3db;border-radius:5px;max-width:90%}
+nav{position:sticky;top:0;background:#fafafaf5;padding:.7rem 0;z-index:1;border-bottom:1px solid #dbe0e7;display:flex;gap:.8rem;align-items:center;flex-wrap:wrap}
+nav label{font-size:.8rem}#search{width:350px}#count,.missing{color:#667085;font-size:.8rem}
+@media(max-width:700px){.example-grid{grid-template-columns:1fr;gap:0}body{padding:0 .6rem}article{padding:.75rem}}
 </style><h1>English example gallery</h1>'''
-    page += f'<p>{esc(summary)}</p><p>{esc(note)}</p><p><a href="README.md">Markdown</a> · <a href="examples.json">JSON</a> · <a href="https://huggingface.co/datasets/{REPO}/tree/{revision}">Published snapshot</a></p>'
+    page += f'<p>{esc(summary)} First example visible; two more available below each task.</p><details><summary>About these examples</summary><p>{esc(note)}</p></details><p><a href="README.md">Markdown</a> · <a href="examples.json">JSON</a> · <a href="https://huggingface.co/datasets/{REPO}/tree/{revision}">Published snapshot</a></p>'
     page += '''<nav><input id="search" type="search" placeholder="Filter task name, type or source" aria-label="Filter tasks">
 <label><input id="missing" type="checkbox"> Missing examples only</label> <span id="count"></span></nav>'''
     page += '\n'.join(articles)
@@ -172,7 +194,7 @@ function filter(){let count=0;for(const task of document.querySelectorAll('artic
  if(!task.hidden)count++;}document.querySelector('#count').textContent=count+' tasks';}
 search.addEventListener('input',filter);missing.addEventListener('change',filter);filter();
 </script></html>'''
-    (output / 'index.html').write_text(page)
+    (output / 'index.html').write_text(page.replace(' \n', '&#32;\n').replace('\t\n', '&#9;\n'))
     print(summary, flush=True)
 
 
