@@ -146,6 +146,10 @@ def test_hub_retrieval_snapshots_metadata_and_replays_without_api(tmp_path, monk
     assert row['hub_metadata']['revision']=='source-revision' and row['hub_metadata']['license']=='cc-by-4.0'
     assert row['papers'][0]['url']=='https://arxiv.org/abs/1234.56789'
     assert all(c['limit']==2 and c['full'] and c['task_categories'] is None for c in calls)
+    _,defaults=hub.retrieve(tmp_path,limit=2)
+    assert 'multiple-choice' in {c['task_categories'] for c in calls}
+    assert defaults['default_tasks']==list(hub.TASKS)
+    assert defaults['snapshot']!=manifest['snapshot']
     monkeypatch.setattr(hub,'HfApi',lambda:pytest.fail('Offline replay called Hub'))
     assert hub.retrieve(tmp_path,queries=['Example','alternate'],limit=2,offline=True)==(rows,manifest)
     with pytest.raises(FileNotFoundError):hub.retrieve(tmp_path,queries=['uncached'],offline=True)

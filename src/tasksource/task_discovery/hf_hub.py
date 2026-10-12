@@ -9,11 +9,12 @@ from huggingface_hub import HfApi
 from .paperswithcode import DECISION_TASKS
 from .identifiers import repository_links
 
-TASKS = ('text-classification', 'token-classification', 'image-classification', 'question-answering')
+TASKS = ('multiple-choice', 'text-classification', 'token-classification', 'image-classification', 'question-answering')
 
 
 def retrieve(cache, queries=(), tasks=(), limit=100, offline=False):
-    settings = dict(queries=list(queries), tasks=list(tasks), limit=limit)
+    settings = dict(queries=list(queries), tasks=list(tasks), limit=limit,
+                    default_tasks=list(TASKS) if not queries and not tasks else [])
     path = Path(cache)/('hf_hub-'+hashlib.sha256(json.dumps(settings, sort_keys=True).encode()).hexdigest()+'.json')
     if not path.exists():
         if offline:
@@ -47,6 +48,6 @@ def retrieve(cache, queries=(), tasks=(), limit=100, offline=False):
             languages=card.get('language') or [], modalities=card.get('modalities') or [], train_status='unchecked',
             hub_metadata=dict(revision=item['sha'], license=card.get('license'),
                               downloads=item['downloads'], likes=item['likes'], last_modified=item['last_modified'])))
-    return rows, dict(source='hf_hub', **settings, default_tasks=list(TASKS) if not queries and not settings['tasks'] else [],
+    return rows, dict(source='hf_hub', **settings,
         snapshot=str(path), snapshot_sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
         retrieved_at=snapshot['retrieved_at'], candidates=len(rows))
