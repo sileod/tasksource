@@ -185,7 +185,7 @@ is not produced by or affiliated with TypeSafe or OpenJev.
 | `event_triggered_execution` | `rule_on_signal` (choice), `object_final_state`, `rule_enabled_at_end`, `object_ever_targeted` (noul), `total_firings` (score); 1–8 competing rules over 3–18 timestamped events, with priorities, event guards, cooldowns, enable/disable controls, and unsorted presentation |
 | `evidence_sufficiency` | `claim_supported` (noul), `has_conflict` (noul), `strongest_support_origin` (choice); retractions from level 2, mirrored (non-independent) origins from level 3, validity by collection day at level 4 |
 | `goal_directed_planning` | `goal_reachable`, `probe_applicable`, `probe_optimal_first`, `probe_required` (noul), `minimal_actions` (score), `first_legal_action` (choice); 3–12 steps with conjunctive and alternative prerequisites, unavailable actions, and exact shortest-plan labels |
-| `graph_navigation` | `reachable`, `within_budget`, `edge_essential` (noul), `shortest_cost`, `first_hop` (choice); 4–18 directed nodes with edge costs, closures, mandatory waypoints, and optimal-route alternatives |
+| `graph_navigation` | `reachable`, `within_budget`, `edge_essential` (noul), `shortest_cost`, `first_hop` (choice); 4–16 directed nodes with edge costs, closures, mandatory waypoints, and optimal-route alternatives |
 | `instruction_execution` | `resolution` and `deferred_registration` (choice), `target_count`, `changed_count` (score), `probe_selected`, `probe_final_state` (noul); natural-language selection, exceptions, immediate/deferred updates, ambiguity, and atomic/best-effort/ordered execution across 3–26 entities |
 | `multi_view_adjudication` | `intent` (choice), `is_urgent` (noul), `workflow_impact` (score); near-threshold signals from level 2, auth failures counted from login events from level 3, deadlines as clock times at level 4 |
 | `needle_retrieval` | `value_of_id` (choice), `id_has_value` (noul), `id_listed` (noul); up to ~300 records whose ids differ from the target by one or two digits, and from level 2 a chain of one to three id reissues to follow; 6 to 20 options |
@@ -214,19 +214,23 @@ train. In each config, the first 1,000 train rows cycle through the levels
 
 ## Difficulty by level
 
-The four new configurations are structurally scaled from level 0 to 4 like the existing tasks: entity/step/rule/node counts grow, and additional constraints (set exceptions, unavailability, OR prerequisites, rule cooldowns, or graph closures/waypoints) appear at higher levels. Their generated labels are independently checked by state replay, shortest-path, and exhaustive planning tests in \`tests/test_procedural_execution.py\`. **They do not yet have empirical Jev kappa calibration**; the table below reports only the previously calibrated configurations.
 
 Level 0 is meant to be easy for a strong decision model and level 4 hard. The
 table gives Jev's chance-adjusted accuracy, kappa = (accuracy − chance) /
 (1 − chance), on 40 fresh states per level (every question of each state;
-`typesafe/jev-1.13-20260917`, September 2026). 1 is perfect, 0 is chance.
+`typesafe/jev-1.13-20260917`, September 2026; `jev-latest`, October 2026, for `event_triggered_execution`,
+`goal_directed_planning`, `graph_navigation` and `instruction_execution`). 1 is perfect, 0 is chance.
 
 | config | level 0 | 1 | 2 | 3 | 4 |
 |---|---|---|---|---|---|
 | `arithmetic` | 0.83 | 0.64 | 0.59 | 0.54 | 0.59 |
 | `entity_belief_tracking` | 0.91 | 0.93 | 0.78 | 0.74 | 0.66 |
 | `event_state_reconstruction` | 0.97 | 0.99 | 0.92 | 0.73 | 0.60 |
+| `event_triggered_execution` | 0.91 | 0.75 | 0.63 | 0.44 | 0.60 |
 | `evidence_sufficiency` | 0.99 | 0.97 | 0.78 | 0.72 | 0.78 |
+| `goal_directed_planning` | 1.00 | 0.87 | 0.62 | 0.53 | 0.51 |
+| `graph_navigation` | 0.90 | 0.81 | 0.54 | 0.27 | 0.17 |
+| `instruction_execution` | 0.99 | 0.98 | 0.73 | 0.72 | 0.67 |
 | `multi_view_adjudication` | 0.82 | 0.87 | 0.82 | 0.73 | 0.74 |
 | `needle_retrieval` | 1.00 | 0.99 | 0.78 | 0.83 | 0.36 |
 | `partial_observation_calibration` | 0.73 | 0.37 | 0.60 | 0.18 | 0.23 |

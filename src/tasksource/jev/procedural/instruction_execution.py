@@ -21,7 +21,8 @@ N_ENTITIES = [3, 5, 8, 14, 22]
 SEMANTICS = ("A request selects the named entities after any exclusions. Immediate updates set the named boolean "
              "property to the requested value. Unavailable entities cannot be changed. Atomic requests change "
              "nothing if any selected entity is unavailable; best-effort requests skip unavailable entities. "
-             "Ordered requests perform steps in order, including repeated updates. Clarify an ambiguous or "
+             "Ordered requests perform steps in order, including repeated updates, and skip unavailable entities "
+             "like best-effort requests. Clarify an ambiguous or "
              "missing name without changing anything. A query only reads state. A schedule or recurring rule "
              "is registered now and does not immediately modify entity properties.")
 

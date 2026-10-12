@@ -1,14 +1,14 @@
 """Compute directed shortest paths with closures, weights, and waypoints.
 
-Levels grow the graph and introduce unequal costs, closed edges, optional
-mandatory waypoints, and near-optimal alternatives.
+Levels add one difficulty at a time: small integer costs (level 2), closed edges, larger costs and
+optional mandatory waypoints (level 3), then a larger graph (level 4).
 """
 
 from heapq import heappop, heappush
 
 from ._common import Problem, choice_answer, noul_answer
 
-SIZES = [4, 6, 9, 13, 18]
+SIZES = [4, 6, 7, 10, 15]
 SEMANTICS = ("Edges are directed and can be traversed only when open=true. Each traversal adds its positive "
              "integer cost. A route must go from start to finish; if via is not null, the route must visit via "
              "at least once before finishing. Repeated nodes are allowed. Minimize total cost. When multiple "
@@ -63,20 +63,20 @@ def generate(rng, level=0):
     def add(a, b):
         if a != b and (a, b) not in edges:
             edges[a, b] = {"id": f"E{len(edges)+1}", "from": a, "to": b,
-                           "cost": rng.randint(1, 9) if level >= 2 else 1, "open": True}
+                           "cost": rng.randint(1, [1, 1, 3, 5, 9][level]), "open": True}
 
     backbone = rng.sample(nodes[1:-1], min(len(nodes) - 2, [1, 2, 3, 4, 5][level]))
     path = [nodes[0], *backbone, nodes[-1]]
     for a, b in zip(path, path[1:]):
         add(a, b)
-    n_edges = [5, 10, 19, 32, 55][level]
+    n_edges = [5, 10, 13, 22, 40][level]
     while len(edges) < n_edges:
         a, b = rng.sample(nodes, 2)
         add(a, b)
     for edge in edges.values():
-        if level >= 2 and rng.random() < [0, 0, 0.16, 0.22, 0.28][level]:
+        if rng.random() < [0, 0, 0, 0.18, 0.25][level]:
             edge["open"] = False
-    if level >= 2 and rng.random() < 0.16:
+    if level >= 3 and rng.random() < 0.16:
         for e in edges.values():
             if e["to"] == nodes[-1]:
                 e["open"] = False
