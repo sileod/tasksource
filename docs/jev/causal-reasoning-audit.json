@@ -189,5 +189,40 @@
       "causal-reasoning:train:247e23e0ab67eddbd250e7fe8d5231e82a96ec9d23621ae38dfb0b14f2ee3777:causal-reasoning-transitivity-09db96cbf3"
     ]
   },
-  "repackaged": false
+  "repackaged": false,
+  "published_examples": [
+    {
+      "id": "causal-reasoning:train:419acfcd97bf9534d7bb549eec8142f9571453d5beec63178b641e034bc237ba:causal-reasoning-transitivity-09db96cbf3",
+      "state": "Directed causal graph: MU causes Hk. MU causes fz.\nQuestion: Does Hk cause MU?",
+      "question": "Answer the displayed question. A causes B if a directed path leads from A to B in the given graph.",
+      "gold": [
+        "no"
+      ]
+    },
+    {
+      "id": "causal-reasoning:train:f77772beff0c1219ebedbbe65264f6db519f05378e796d26d3492198801f37cc:causal-reasoning-transitivity-09db96cbf3",
+      "state": "Directed causal graph: hn causes 5r. Ig causes 5r. Ig causes W. tx causes W.\nQuestion: Does 5r cause W?",
+      "question": "Answer the displayed question. A causes B if a directed path leads from A to B in the given graph.",
+      "gold": [
+        "no"
+      ]
+    },
+    {
+      "id": "causal-reasoning:train:247e23e0ab67eddbd250e7fe8d5231e82a96ec9d23621ae38dfb0b14f2ee3777:causal-reasoning-transitivity-09db96cbf3",
+      "state": "Directed causal graph: HfW causes Fj7. qf causes Fj7. qf causes Yeq. Yeq causes T.\nQuestion: Does Yeq cause T?",
+      "question": "Answer the displayed question. A causes B if a directed path leads from A to B in the given graph.",
+      "gold": [
+        "yes"
+      ]
+    }
+  ],
+  "publication": {
+    "commit": "f8ff7e81ed820eeac1ad7afd63449fe99c8a76c3",
+    "configs": [
+      "default",
+      "full"
+    ],
+    "train": 49404,
+    "test": 100
+  }
 }

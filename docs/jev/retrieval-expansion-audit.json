@@ -162,5 +162,13 @@
   "checks": {
     "regression_tests": "23 passed",
     "all_prior_parquet_blobs": "Publication enforces identical blobs; parent-commit guarded."
+  },
+  "publication": {
+    "commit": "f8ff7e81ed820eeac1ad7afd63449fe99c8a76c3",
+    "configs": [
+      "default",
+      "full"
+    ],
+    "prior_parquet_blobs_preserved": true
   }
 }
