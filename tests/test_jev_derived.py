@@ -394,6 +394,15 @@ class BalanceLabelsTest(unittest.TestCase):
         groups = {r["id"] for r in direct}
         self.assertEqual("s-1:train:50" in groups, any(r["variant"] == "label_verification" for r in kept))
 
+    def test_graded_questions_with_one_label_keep_the_floor(self):
+        rows = [{"id": f"g:train:{i}:g-share", "variant": "direct", "source": "g", "kind": "noul",
+                 "options": [], "target": [0.01]} for i in range(40)]
+        rows.append({**rows[0], "id": "g:train:0:g-share:noul-label-verification", "variant": "label_verification"})
+        kept = balance_labels(Dataset.from_list(rows), ratio=3, floor=10)
+        direct = {r["id"] for r in kept if r["variant"] == "direct"}
+        self.assertEqual(len(direct), 10)
+        self.assertEqual("g:train:0:g-share" in direct, len(kept) == 11)
+
 
 if __name__ == "__main__":
     unittest.main()

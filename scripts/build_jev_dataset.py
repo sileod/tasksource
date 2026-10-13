@@ -878,28 +878,36 @@ def direct_label(kind, options, target):
 
 
 def balance_labels(dataset, ratio=MAX_MAJORITY_RATIO, floor=MAJORITY_FLOOR):
-    """Drop source rows (with their variants) of a decision's majority label beyond ``ratio``
-    times the other labels. Kept rows are a stable random sample of the majority."""
-    groups = {}  # (source, label) -> source-row groups
+    """Drop direct rows (with their variants) of a question's majority label beyond ``ratio``
+    times its other labels, or beyond ``floor`` when it has a single label (yes/no at 0.5 for
+    graded answers). Kept rows are a stable random sample of the majority."""
+    labels = {}  # (source, question) -> label -> direct row ids
     columns = dataset.select_columns(["id", "source", "variant", "kind", "options", "target"])
     for batch in columns.with_format("arrow").iter(batch_size=100_000):
         for identifier, source, variant, kind, options, target in zip(*(batch[c].to_pylist() for c in batch.column_names)):
-            if (variant == "direct" and kind in ("choice", "noul") and identifier.count(":") == 2
+            question = identifier.split(":", 3)[3] if identifier.count(":") > 2 else "decision"
+            if (variant == "direct" and kind in ("choice", "noul") and not question.startswith("token-")
                     and not source.startswith(procedural.SOURCE_PREFIX)):
-                groups.setdefault(source, {}).setdefault(direct_label(kind, options, target), []).append(identifier)
+                labels.setdefault((source, question), {}).setdefault(
+                    direct_label(kind, options, target), []).append(identifier)
     dropped = set()
-    for source, labels in groups.items():
-        if len(labels) < 2:
-            continue
-        label, rows = max(labels.items(), key=lambda item: len(item[1]))
-        keep = max(floor, ratio * (sum(map(len, labels.values())) - len(rows)))
+    for counts in labels.values():
+        rows = max(counts.values(), key=len)
+        keep = max(floor, ratio * (sum(map(len, counts.values())) - len(rows)))
         if len(rows) > keep:
-            rows = sorted(rows, key=lambda group: stable_fraction(group, "label-balance"))
+            rows = sorted(rows, key=lambda row: stable_fraction(row, "label-balance"))
             dropped.update(rows[keep:])
     if not dropped:
         return dataset
-    return dataset.filter(lambda ids: [source_row_group(i) not in dropped for i in ids],
-                          input_columns="id", batched=True, batch_size=50_000, desc="Label balance")
+
+    def kept(ids):  # a variant's id extends its direct row's id
+        out = []
+        for identifier in ids:
+            parts = identifier.split(":")
+            out.append(not any(":".join(parts[:k]) in dropped for k in range(3, len(parts) + 1)))
+        return out
+
+    return dataset.filter(kept, input_columns="id", batched=True, batch_size=50_000, desc="Label balance")
 
 
 def bad_examples(path=BAD_EXAMPLES):

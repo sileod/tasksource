@@ -99,9 +99,10 @@ def source_quotas(sizes, total_rows, scores=None):
     scores = source_scores() if scores is None else scores
     members = {}
     for source, size in sizes.items():
-        if scores.get(source, 0) > 0 and size:
-            # procedural generators keep equal shares: their difficulty is set by their levels
-            weight = 1.0 if bucket(source) == "procedural" else scores[source] * math.sqrt(size)
+        # procedural generators need no score and keep equal shares: their difficulty is set by their levels
+        procedural = bucket(source) == "procedural"
+        if (procedural or scores.get(source, 0) > 0) and size:
+            weight = 1.0 if procedural else scores[source] * math.sqrt(size)
             members.setdefault(bucket(source), {})[source] = weight
     capacity = {name: sum(sizes[s] for s in sources) for name, sources in members.items()}
     rows = waterfill(total_rows, {name: BUCKETS[name][1] for name in members}, capacity)
