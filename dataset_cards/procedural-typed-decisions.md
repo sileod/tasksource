@@ -234,7 +234,7 @@ Level 0 is meant to be easy for a strong decision model and level 4 hard. The
 table gives Jev's chance-adjusted accuracy, kappa = (accuracy − chance) /
 (1 − chance), on 40 fresh states per level (every question of each state;
 `typesafe/jev-1.13-20260917`, September 2026; `jev-latest`, October 2026, for `event_triggered_execution`,
-`goal_directed_planning`, `graph_navigation`, `instruction_execution` and `record_eligibility`, 30 states per level). 1 is perfect, 0 is chance.
+`goal_directed_planning`, `graph_navigation`, `instruction_execution`, `partial_observation_calibration` and `record_eligibility`, 30–40 states per level). 1 is perfect, 0 is chance.
 
 | config | level 0 | 1 | 2 | 3 | 4 |
 |---|---|---|---|---|---|
@@ -248,7 +248,7 @@ table gives Jev's chance-adjusted accuracy, kappa = (accuracy − chance) /
 | `instruction_execution` | 0.99 | 0.98 | 0.73 | 0.72 | 0.67 |
 | `multi_view_adjudication` | 0.82 | 0.87 | 0.82 | 0.73 | 0.74 |
 | `needle_retrieval` | 1.00 | 0.99 | 0.78 | 0.83 | 0.36 |
-| `partial_observation_calibration` | 0.73 | 0.37 | 0.60 | 0.18 | 0.23 |
+| `partial_observation_calibration` | 0.74 | 0.45 | 0.35 | 0.30 | 0.20 |
 | `policy_applicability` | 0.73 | 0.60 | 0.53 | 0.64 | 0.35 |
 | `policy_under_uncertainty` | 0.35 | 0.42 | 0.38 | 0.57 | 0.39 |
 | `record_aggregation` | 0.99 | 0.96 | 0.84 | 0.75 | 0.70 |

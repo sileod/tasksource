@@ -4,14 +4,12 @@ from fractions import Fraction
 
 from ._common import Problem, sround
 
-RATES = [
-    (Fraction(4, 5), Fraction(1, 5)),
-    (Fraction(3, 4), Fraction(1, 4)),
-    (Fraction(2, 3), Fraction(1, 3)),
-    (Fraction(9, 10), Fraction(2, 5)),
-]
+# Small-denominator fractions: enough distinct states at every level, still exact by hand.
+FRACTIONS = sorted({Fraction(n, d) for d in range(2, 13) for n in range(1, d)})
+PRIORS = [x for x in FRACTIONS if Fraction(1, 10) <= x <= Fraction(9, 10)]
+TPRS = [x for x in FRACTIONS if Fraction(3, 5) <= x <= Fraction(19, 20)]
+FPRS = [x for x in FRACTIONS if Fraction(1, 20) <= x <= Fraction(2, 5)]
 N_SENSORS = [1, 2, 3, 4, 6]
-PRIORS = [Fraction(1, 5), Fraction(1, 3), Fraction(1, 2), Fraction(2, 3), Fraction(4, 5)]
 
 
 def _text(x):
@@ -24,7 +22,7 @@ def generate(rng, level=0):
     yes, no = prior, 1 - prior
     sensors = []
     for i in range(max(1, n_sensors)):
-        tpr, fpr = rng.choice(RATES)
+        tpr, fpr = rng.choice(TPRS), rng.choice(FPRS)
         positive = rng.choice([True, False])
         sensors.append({
             "id": f"S{i+1}",
