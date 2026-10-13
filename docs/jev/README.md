@@ -713,7 +713,7 @@ Use `--tasks` to append selected sources, including new catalog additions:
 
 ```bash
 python -m scripts.append_jev_vision --tasks gameqa/mcq valen-game/optimal-action \
-  --cap 20000 --output build/vision-game-20k --push
+  --cap 20000 --output build/vision-game-20k --push --release v2026.10.13.3
 ```
 
 The [game-source audit](game-expansion-audit.md) documents the native archive joins,

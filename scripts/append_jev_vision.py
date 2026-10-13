@@ -9,6 +9,7 @@ import hashlib
 import json
 import math
 from pathlib import Path
+import re
 from types import SimpleNamespace
 
 from datasets import concatenate_datasets, disable_progress_bars, load_from_disk
@@ -148,12 +149,23 @@ def run(args):
         return
     # Rebase metadata over unrelated text updates, but never over a changed vision release.
     head = api.dataset_info(REPO, files_metadata=True)
+    if args.release in {ref.name for ref in api.list_repo_refs(REPO, repo_type='dataset').tags}:
+        raise ValueError(f'Release tag already exists: {args.release}')
     current = {s.rfilename: s.blob_id for s in head.siblings
                if s.rfilename.startswith('vision/') and s.rfilename.endswith('.parquet')}
     if current != base['parquets']:
         raise ValueError('Vision shards changed during build; publication needs reconciliation')
     def download(name):
         return Path(hf_hub_download(REPO, name, repo_type='dataset', revision=head.sha))
+    # Publish only this entry: the local changelog may include a pending text rebuild.
+    changelog = Path(__file__).resolve().parents[1] / 'dataset_cards/jev-CHANGELOG.md'
+    entry = re.search(r'^## ' + re.escape(args.release) + r'\n.*?(?=^## |\Z)',
+                      changelog.read_text(), re.M | re.S)
+    if entry is None:
+        raise ValueError(f'No changelog entry for {args.release}')
+    published_notes = download('CHANGELOG.md').read_text()
+    offset = published_notes.index('\n## ')
+    (output / 'CHANGELOG.md').write_text(published_notes[:offset] + '\n' + entry[0].rstrip() + '\n' + published_notes[offset:])
     card = DatasetCard.load(str(download('README.md')))
     audit = json.loads(download('vision/release-audit.json').read_text())
     sources_doc = yaml.safe_load(download('vision/sources.yaml').read_text())
@@ -179,6 +191,7 @@ def run(args):
     operations = [CommitOperationAdd(path_in_repo='vision/' + p.name, path_or_fileobj=p) for p in files]
     operations += [CommitOperationAdd(path_in_repo=remote, path_or_fileobj=output / local)
                    for remote, local in [('README.md', 'README.md'), ('vision/release-audit.json', 'release-audit.json'),
+                                         ('CHANGELOG.md', 'CHANGELOG.md'),
                                          ('vision/sources.yaml', 'sources.yaml'),
                                          (f'vision/additions/{stamp}/manifest.json', 'manifest.json')]]
     result = api.create_commit(REPO, repo_type='dataset', parent_commit=head.sha, operations=operations,
@@ -186,6 +199,7 @@ def run(args):
     after = api.dataset_info(REPO, revision=result.oid, files_metadata=True)
     blobs = {s.rfilename: s.blob_id for s in after.siblings}
     assert all(blobs.get(name) == digest for name, digest in base['parquets'].items())
+    api.create_tag(REPO, repo_type='dataset', tag=args.release, revision=result.oid)
     dump(output / 'published.json', dict(revision=result.oid, train_rows=train['rows'], **manifest))
     print('Published', result.oid, 'train rows', train['rows'], flush=True)
 
@@ -197,8 +211,11 @@ if __name__ == '__main__':
     parser.add_argument('--seed', type=int, default=0)
     parser.add_argument('--tasks', nargs='+', help='Append only these vision tasks, including newly registered sources')
     parser.add_argument('--push', action='store_true')
+    parser.add_argument('--release', help='Version with an entry in dataset_cards/jev-CHANGELOG.md; required for --push')
     args = parser.parse_args()
     if args.cap <= 0:
         parser.error('--cap must be positive')
+    if args.push and not args.release:
+        parser.error('--push requires --release')
     disable_progress_bars()
     run(args)
