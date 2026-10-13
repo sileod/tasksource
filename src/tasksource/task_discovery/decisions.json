@@ -2313,5 +2313,39 @@
         "findings": "Native archive join is reproducible and split-ID offset is validated bijectively. Coarse review nevertheless found negative VAT with no supporting sentiment in a list of topics, and uncertain positive crime under sarcastic Maybe not. Park training, retain native mirror and evidence for future review."
       }
     ]
+  },
+  {
+    "name": "LlavaGuard",
+    "scope": "dataset",
+    "status": "deferred",
+    "reason_code": "gated_source",
+    "reason": "Current authenticated Hub account receives 403 for train.csv/test.csv. Annotation Apache 2.0 does not cover linked images; source card requires individual image terms. Native per-example policy must be retained when implementing.",
+    "evidence": [
+      "https://huggingface.co/datasets/AIML-TUDA/LlavaGuard/blob/6a3376099a76d115e8c244e60841d0949efedb01/README.md"
+    ],
+    "checked_on": "2026-10-13",
+    "reconsider_if": "Access is granted to the configured Hub account and a permitted, reproducible image acquisition path is verified.",
+    "huggingface": [
+      "AIML-TUDA/LlavaGuard"
+    ],
+    "github": [],
+    "papers": [
+      "arxiv:2406.05113",
+      "https://proceedings.mlr.press/v267/helff25a.html"
+    ],
+    "source_revisions": {
+      "AIML-TUDA/LlavaGuard": "6a3376099a76d115e8c244e60841d0949efedb01"
+    },
+    "reviews": [
+      {
+        "reviewer": {
+          "kind": "model",
+          "model": "gpt-6.1-sol"
+        },
+        "checked_on": "2026-10-13",
+        "verdict": "defer",
+        "findings": "Source metadata inspected; annotation and image quality not auditable because the CSVs are gated. No unauthorized mirror or invented labels."
+      }
+    ]
   }
 ]

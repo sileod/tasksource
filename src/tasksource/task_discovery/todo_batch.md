@@ -146,3 +146,20 @@ Expanded the two game families to **20,000 training rows each** in [v2026.10.13.
 | MAMS-ATSA | mams/atsa | Direct existing Hub JSONL; all native sentences and aspect/polarity pairs verified against original XML |
 
 [Mapping and coarse review](../../../docs/jev/audits/target-sentiment-audit.json). Active tasks enter through the catalog and canonical text build; no one-off Jev append. Original source splits are preserved, with repeated/conflicting inputs and sentence-group leakage excluded.
+
+## Batch 11 — image safety (user-curated)
+
+| Source | Intended task | Status / next canonical build |
+|---|---|---|
+| OpenSafetyLab/t2i_safety_dataset | t2isafety/toxicity | Repackaging generated-image toxicity labels; 30,781 train / 366 test candidates before image integrity and split checks. Register the validated mirror in vision_tasks.py, smoke-test with --vision, then include through the canonical vision build. No privacy/demographic projection. |
+| AIML-TUDA/LlavaGuard | Policy-conditioned safe/unsafe | Deferred: current Hub account receives 403 for annotation CSVs. Preserve native per-row policy if access is granted; rationales stay in metadata. Linked images have individual licenses, not the annotation Apache license. |
+
+## Batch 12 — memes (user-curated, queued)
+
+| Dataset | Requested view | Review needed before integration |
+|---|---|---|
+| MemeQA (ACL 2025) | Native visual MCQA | Confirm labeled training split, native choices/gold and separate image join; retain meme groups across splits |
+| MET-Meme | Metaphor, sentiment, intention, offensiveness | Confirm public image distribution, original human labels, task definitions and train/evaluation groups |
+| Memotion 2.0 | Humor, sarcasm, offense, motivation, sentiment | Verify shared-task training access and native multilabel/ordinal semantics; keep held-out memes out of training |
+
+These are human-curated queue entries, not automatically approved training sources. New usable tasks enter the catalog and canonical build; expensive archive/image preparation goes through scripts/upload_repackaged.py.
