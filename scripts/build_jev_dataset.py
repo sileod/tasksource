@@ -1596,6 +1596,9 @@ def build(args):
                         fn_kwargs={"task_id": task_id, "split": split, "keep_source_index": True},
                         remove_columns=split_dataset.column_names,
                     )
+                    # empty source texts (e.g. blank tweets) carry no decision
+                    split_dataset = split_dataset.filter(lambda state: bool(state and state.strip()),
+                                                         input_columns="state")
                     write_source_index(output, split, task_id, split_dataset)
                     split_dataset = merge_identical_inputs(split_dataset.remove_columns(SOURCE_INDEX))
                     pack_audit = []
