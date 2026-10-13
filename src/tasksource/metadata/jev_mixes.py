@@ -5,6 +5,7 @@ times the square root of their size, so large sources do not crowd out small one
 
 import csv
 import math
+import statistics
 import re
 from pathlib import Path
 
@@ -97,12 +98,18 @@ def source_quotas(sizes, total_rows, scores=None):
     """Rows per source: buckets get ``total_rows`` by their share, sources split their bucket's rows by
     score x sqrt(size), never above their size; a bucket short of rows passes the rest to the others."""
     scores = source_scores() if scores is None else scores
+    # a source not scored yet (new in the catalog) takes its bucket's median score until scores are regenerated
+    by_bucket = {}
+    for source, score in scores.items():
+        by_bucket.setdefault(bucket(source), []).append(score)
+    provisional = {name: statistics.median(values) for name, values in by_bucket.items()}
     members = {}
     for source, size in sizes.items():
         # procedural generators need no score and keep equal shares: their difficulty is set by their levels
         procedural = bucket(source) == "procedural"
-        if (procedural or scores.get(source, 0) > 0) and size:
-            weight = 1.0 if procedural else scores[source] * math.sqrt(size)
+        score = scores.get(source, provisional.get(bucket(source), 0))
+        if (procedural or score > 0) and size:
+            weight = 1.0 if procedural else score * math.sqrt(size)
             members.setdefault(bucket(source), {})[source] = weight
     capacity = {name: sum(sizes[s] for s in sources) for name, sources in members.items()}
     rows = waterfill(total_rows, {name: BUCKETS[name][1] for name in members}, capacity)

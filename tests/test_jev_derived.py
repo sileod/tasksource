@@ -452,3 +452,13 @@ class SourceIndexTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SourceQuotasTest(unittest.TestCase):
+    def test_new_sources_enter_the_mix_with_their_bucket_median(self):
+        from tasksource.metadata.jev_mixes import source_quotas
+        scores = {"clinc_oos": 1.0, "banking77": 3.0}
+        quotas = source_quotas({"clinc_oos": 1000, "banking77": 1000, "snips/new": 1000}, 600, scores=scores)
+        self.assertIn("snips/new", quotas)
+        self.assertLess(quotas["clinc_oos"], quotas["snips/new"])
+        self.assertLess(quotas["snips/new"], quotas["banking77"])
