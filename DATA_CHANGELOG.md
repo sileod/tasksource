@@ -5,6 +5,10 @@ concise bullets on what changed in the data. `tasksource-jev-typed-decisions` re
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
 
+## tasksource-jev-typed-decisions v2026.10.13.6
+
+- `vision`: +191,169 training rows (118,649 → 309,818), up to 30,000 rows per source family: NLVR2, Visual7W, TallyQA, MapQA, A-OKVQA, RICO widgets, CLEVR, SPair-71k, GameQA, Valen game, AI2D, ScienceQA, TQA. Families without more unseen rows are unchanged; existing rows and evaluation splits are unchanged.
+
 ## mentis-oculi-paper-fold 2026-10-13
 
 - Add a fresh procedural pilot: 20 training and 5 validation paper-fold puzzles with five native image panels. Published benchmark examples are not ingested.

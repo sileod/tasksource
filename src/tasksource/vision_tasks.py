@@ -622,3 +622,22 @@ met_meme__metaphor = VisualClassification(**_MET_MEME,task_id='met-meme/metaphor
 memeqa__mcq = VisualMultipleChoice(dataset_name='tasksource/memeqa',task_id='memeqa/mcq',
     choices_list='choices_list',metadata='metadata',pre_process=grouped_mc_rows,
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/memeqa'],'streaming':True})
+
+
+tron__mcq = VisualMultipleChoice(
+    dataset_name='tasksource/tron-mcq', task_id='tron/mcq', choices_list='choices_list',
+    metadata='metadata', pre_process=grouped_mc_rows,
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/tron-mcq'],'streaming':True},
+)
+
+trace__mcq = VisualMultipleChoice(
+    dataset_name='tasksource/trace-mcq', task_id='trace/mcq', choices_list='choices_list',
+    metadata='metadata', pre_process=grouped_mc_rows,
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/trace-mcq'],'streaming':True},
+)
+
+mentis_oculi__paper_fold = VisualMultipleChoice(
+    dataset_name='tasksource/mentis-oculi-paper-fold', task_id='mentis-oculi/paper-fold', choices_list='choices_list',
+    metadata='metadata', pre_process=grouped_mc_rows,
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/mentis-oculi-paper-fold'],'streaming':True},
+)

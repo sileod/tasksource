@@ -1,4 +1,4 @@
-52 visual tasks. Load one with `load_task(id, vision=True)`; the annotations are in [vision_tasks.py](src/tasksource/vision_tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
+55 visual tasks. Load one with `load_task(id, vision=True)`; the annotations are in [vision_tasks.py](src/tasksource/vision_tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
 
 | # | id | type | dataset | question |
 |--:|---|---|---|:-:|
@@ -54,6 +54,9 @@
 | 50 | [met-meme/offensiveness](src/tasksource/vision_tasks.py#L614) | VisualClassification | [Anthony3456347095/MET-Meme](https://hf.co/datasets/Anthony3456347095/MET-Meme) | ✓ |
 | 51 | [met-meme/metaphor](src/tasksource/vision_tasks.py#L618) | VisualClassification | [Anthony3456347095/MET-Meme](https://hf.co/datasets/Anthony3456347095/MET-Meme) | ✓ |
 | 52 | [memeqa/mcq](src/tasksource/vision_tasks.py#L622) | VisualMultipleChoice | [tasksource/memeqa](https://hf.co/datasets/tasksource/memeqa) |  |
+| 53 | [tron/mcq](src/tasksource/vision_tasks.py#L627) | VisualMultipleChoice | [tasksource/tron-mcq](https://hf.co/datasets/tasksource/tron-mcq) |  |
+| 54 | [trace/mcq](src/tasksource/vision_tasks.py#L633) | VisualMultipleChoice | [tasksource/trace-mcq](https://hf.co/datasets/tasksource/trace-mcq) |  |
+| 55 | [mentis-oculi/paper-fold](src/tasksource/vision_tasks.py#L639) | VisualMultipleChoice | [tasksource/mentis-oculi-paper-fold](https://hf.co/datasets/tasksource/mentis-oculi-paper-fold) |  |
 
 ### Candidate grounding
 
@@ -83,3 +86,9 @@ repackaged crop transformation using the same displayed-image box convention.
 `memeqa/mcq` uses the native single-answer, human-verified None-minus questions; multiselect QAs are excluded. The [reproducible archive join](scripts/repackage_dataset/memes.py) preserves the original meme-level training/development/test partitions and encoded images. Automatically constructed source distractors are explicitly recorded in annotation provenance; image research-use terms are separate from the annotation repository's MIT license.
 
 `met-meme/sentiment`, `/intention`, `/offensiveness`, and `/metaphor` load the existing image-embedded Hub upload directly. Only English source records are used. The Hub's partitions are retained, with exact held-out image copies removed from earlier splits; these are not claimed to be the author's original splits. The original Kaggle license is Unknown and is marked unspecified. See the [coarse source and recast audit](docs/jev/audits/meme-safety-batch-audit.json).
+
+### Procedural visual decisions
+
+`tron/mcq`, `trace/mcq` and `mentis-oculi/paper-fold` use the existing visual MC template. Their [reproducible static builders](scripts/repackage_dataset/procedural/README.md) retain native image bytes, record seeds/source pins and verify exactly one accepted option. TRACE retains its native partitions; TRON and Mentis use fresh split-specific seeds with held-out image-copy exclusions.
+
+Initial scope: five TRON environments (4,084/82 train/validation QAs), TRACE (5,000/100), and Mentis paper folding (20/5). The Mentis pilot does not ingest published benchmark puzzles. Licenses differ: TRON research-use, TRACE CC BY 4.0 with asset credits, Mentis procedural paper-fold Apache-2.0. See the [coarse visual and recast audit](docs/jev/audits/procedural-vision-audit.json).

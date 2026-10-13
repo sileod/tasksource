@@ -5,6 +5,16 @@ Keys are task families, shared by their visual classification/MC views.
 """
 
 SOURCE_LICENSE_EVIDENCE = {
+    'tron': {'license': 'research-use', 'checked': '2026-10-13',
+             'scope': 'TRON procedural generator and generated instances; original research-use terms',
+             'url': 'https://github.com/YangTianze009/TRON#license'},
+    'trace': {'license': 'cc-by-4.0', 'checked': '2026-10-13',
+              'scope': 'TRACE released images/answers; original bundled asset credits also apply',
+              'url': 'https://huggingface.co/datasets/maveryn/trace/blob/4f01a535f489cb1db71ca43d10cdbc38a1746b5c/LICENSE'},
+    'mentis-oculi': {'license': 'apache-2.0', 'checked': '2026-10-13',
+                     'scope': 'MentisOculi generator; fresh procedural paper-fold shapes only',
+                     'url': 'https://github.com/Jana-Z/mentis-oculi/blob/ac6d97acf231767f408a9e5d75515872b90190d6/LICENSE'},
+
     'mams': {'license': 'apache-2.0', 'checked': '2026-10-13',
              'scope': 'original MAMS dataset and code repository',
              'url': 'https://github.com/siat-nlp/MAMS-for-ABSA/blob/cddcdb0f423b3fdb2c76b70744737abed3a00d17/LICENSE'},
