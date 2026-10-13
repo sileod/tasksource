@@ -54,7 +54,7 @@ requests, not rows, if you want to keep them together.
 ## Row order and configs
 
 The first 1,000 train rows rotate through sources (in alphabetical order) so the Hub viewer shows
-variety; after them, train is shuffled by question group. Shuffle before training or taking a
+variety; after them, train is shuffled by question group, by a hash of the group, so a group keeps its relative place across releases. Shuffle before training or taking a
 sample, or the prefix over-represents small sources:
 
 ```python

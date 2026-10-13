@@ -434,15 +434,18 @@ def pretty_order(dataset, first_rows=1_000, seed=0):
     a group (``group_id``) stay adjacent, in the prefix too.
     """
     first_rows = min(first_rows, len(dataset))
-    shuffle = np.random.default_rng(seed).permutation
     if "group_id" in dataset.column_names:
-        codes = pd.factorize(np.asarray(dataset.select_columns(["group_id"])[:]["group_id"], dtype=object))[0]
+        codes, groups = pd.factorize(np.asarray(dataset.select_columns(["group_id"])[:]["group_id"], dtype=object))
+        # shuffled by a hash of the group, not a permutation of positions: a group keeps its
+        # relative place across rebuilds, so annotations of a prefix stay reusable
+        base = np.argsort(np.argsort([stable_fraction(group, f"row-order:{seed}") for group in groups]))
     else:
         codes = np.arange(len(dataset))
+        base = np.random.default_rng(seed).permutation(len(codes))
 
     def grouped(lead=()):
         """Rows ordered by group: the groups of ``lead`` rows first, in that order, then the rest shuffled."""
-        rank = shuffle(codes.max() + 1 if len(codes) else 0).astype(np.int64)
+        rank = base.astype(np.int64)
         lead_groups = list(dict.fromkeys(codes[row] for row in lead))
         rank[lead_groups] = np.arange(len(lead_groups)) - len(lead_groups)
         return dataset.select(np.lexsort((np.arange(len(codes)), rank[codes])))
