@@ -1,9 +1,19 @@
-## tasksource ![](https://aeiljuispo.cloudimg.io/v7/https://s3.amazonaws.com/moonup/production/uploads/5fc0bcb41160c47d1d43856b/j06-U5e2Tifi2xOnTudqS.jpeg?w=20&h=20&f=face) 600+ curated datasets and preprocessings for instant and interchangeable use
+## tasksource ![](https://aeiljuispo.cloudimg.io/v7/https://s3.amazonaws.com/moonup/production/uploads/5fc0bcb41160c47d1d43856b/j06-U5e2Tifi2xOnTudqS.jpeg?w=20&h=20&f=face) 1,100+ decision tasks, standardized for interchangeable use
 
-Huggingface Datasets is an excellent library, but it lacks standardization, and datasets often require preprocessing work to be used interchangeably.
-`tasksource` streamlines interchangeable datasets usage to scale evaluation or multi-task learning.
+tasksource is a collection of **decision tasks**: classification, multiple choice and token labeling,
+with negative examples or classes, standardized so that they can be used interchangeably for
+multi-task training, evaluation and reward modeling.
 
-Each dataset is standardized to a `MultipleChoice`, `Classification`, or `TokenClassification` template with canonical fields. We focus on discriminative tasks (= with negative examples or classes) for our annotations but also provide a `SequenceToSequence` template. Browse the [English](catalog_english.md), [multilingual](catalog_multilingual.md), and [vision](catalog_vision.md) task catalogs for the available annotations. A preprocessing is a function that accepts a dataset and returns the standardized dataset. Preprocessing code is concise and human-readable.
+Hugging Face Datasets is an excellent library, but datasets lack a common format and often need
+preprocessing before they can be used together. Each tasksource annotation maps a dataset to one of three
+templates with canonical fields: `Classification`, `MultipleChoice` or `TokenClassification`. An annotation
+is a short, readable function from a dataset to its standardized form.
+
+- 570 English, 550 multilingual and 45 vision tasks: browse the [English](catalog_english.md),
+  [multilingual](catalog_multilingual.md) and [vision](catalog_vision.md) catalogs.
+- Soft labels (annotator votes and rating distributions), license filters, and per-task questions that say what to decide.
+- Recasts to typed decisions ([tasksource-jev-typed-decisions](#tasksource-jev-typed-decisions)),
+  instructions and label NLI.
 
 ### Usage
 
@@ -21,12 +31,10 @@ for id in df[df.task_type=="MultipleChoice"].id:
 
 #### Task catalogs
 
-Browse the [English](catalog_english.md), [multilingual](catalog_multilingual.md),
-and [vision](catalog_vision.md) catalogs, and feel free to request a new task.
-The [English example gallery](docs/examples/english/README.md) shows formatted
+Feel free to request a new task. The [English example gallery](docs/examples/english/README.md) shows formatted
 inputs, questions and gold answers, with a searchable HTML version.
-The English catalog includes 200+ MultipleChoice tasks and 200+ Classification
-tasks. Evaluation benchmarks are kept separate in
+The English catalog has about 460 Classification, 100 MultipleChoice and 15
+TokenClassification tasks. Evaluation benchmarks are kept separate in
 [eval_only.py](src/tasksource/eval_only.py). Annotations excluded for duplicates,
 source problems, or unsound supervision remain in
 [parked.py](src/tasksource/parked.py). Both record the reason for exclusion.
@@ -108,37 +116,34 @@ We also recast all classification tasks as natural language inference, to improv
 
 ### tasksource-jev-typed-decisions
 
-Tasksource classification, multiple-choice, and vetted token tasks can be recast as
-runtime-defined typed decisions (the Jev / System One request format: `choice`,
-`score`, and `noul` questions over a state). The canonical representation keeps
-the state, instructions, criteria, integer label, and textual answer separate:
+Every classification, multiple-choice and vetted token task can be recast as a typed decision: a
+state and one or more questions of three kinds, `choice` (pick one option), `score` (an ordered scale)
+and `noul` (yes/no or a probability). This is the Jev / System One request format.
 
 [🤗 tasksource/tasksource-jev-typed-decisions](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions)
+is the published corpus:
 
-The [Jev build runbook](docs/jev/README.md) covers smoke tests, resumable builds,
-validation, and publication.
+| config | content |
+|---|---|
+| `default` | 1M train rows, a mix steered by source quality, difficulty and option count |
+| `full` | 2.5M train rows from every source |
+| `vision` | decisions over images |
+
+It includes
+[🤗 tasksource/procedural-typed-decisions](https://huggingface.co/datasets/tasksource/procedural-typed-decisions):
+generated states (ledgers, schedules, graphs, policies, records) with exact labels at five difficulty levels.
 
 ```python
 from tasksource import load_task, render_typed_decision
 
 dataset = load_task("glue/rte", recast="jev")
 request = render_typed_decision(dataset["train"][0], model="openjev")
-
 ```
 
-The canonical conversion is deterministic and does not paraphrase criteria,
-except that a final "all/none of the above" becomes "all/none of the other
-options". Multiple-choice criteria keep every source option and are permuted per
-row, seeded by task, split, and row index, so the gold slot carries no signal;
-rows whose options refer to other options by position or letter keep their
-order. The published 1M corpus adds explicit, deterministic, low-frequency
-subrecasts for label verification (`noul`), criterion-order invariance, and
-manually vetted instruction variation. Every row records its source, normalized
-`train`/`dev`/`test` split, and variant. BIG-bench, MMLU, and BLiMP are excluded.
-The flat rows carry `group_id` and `question_id`; `render_typed_decision_group`
-combines related canonical decisions into one multi-question request.
-Publication keeps each source-row group together under the 500k cap and uses
-reviewed question and paired-field wording to reduce repeated boilerplate.
+The conversion is deterministic. Multiple-choice options are permuted per row, so the gold position carries
+no signal, and over-represented labels are capped so that always answering the common label does not pay.
+BIG-bench, MMLU and BLiMP are excluded. The [dataset card](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions)
+documents the row format, variants and mixing; the [build runbook](docs/jev/README.md) covers building and publishing.
 
 ### Write and use custom preprocessings
 
@@ -153,7 +158,7 @@ winogrande = MultipleChoice('sentence',['option1','option2'],'answer',
     dataset_name='winogrande',config_name='winogrande_xl',
     splits=['train','validation',None]) # test labels are not usable
     
-tasks = [winogrande.load(), codah.load()]) #  Aligned datasets (same columns) can be used interchangably  
+tasks = [winogrande.load(), codah.load()]  # aligned datasets (same columns) can be used interchangeably
 ```
 
  ### Citation and contact
@@ -173,5 +178,3 @@ For more details, refer to this [article:](https://arxiv.org/abs/2301.05948)
 }
 ```
 For help integrating tasksource into your experiments, please contact [damien.sileo@inria.fr](mailto:damien.sileo@inria.fr).
-
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
