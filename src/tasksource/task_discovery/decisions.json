@@ -2284,7 +2284,7 @@
     ],
     "status": "deferred",
     "reason_code": "ambiguous_supervision",
-    "reason": "Native archive join is reproducible and split-ID offset is validated bijectively. Coarse review nevertheless found negative VAT with no supporting sentiment in a list of topics, and uncertain positive crime under sarcastic Maybe not. Park training, retain native mirror and evidence for future review.",
+    "reason": "Coarse source review found unsupported topic sentiment (VAT negative in a list of policy topics); retain native mirror but defer training pending an annotation audit.",
     "evidence": [
       "docs/jev/audits/target-sentiment-audit.json",
       "https://doi.org/10.6084/m9.figshare.4479563.v1",
@@ -2312,7 +2312,8 @@
         "verdict": "defer",
         "findings": "Native archive join is reproducible and split-ID offset is validated bijectively. Coarse review nevertheless found negative VAT with no supporting sentiment in a list of topics, and uncertain positive crime under sarcastic Maybe not. Park training, retain native mirror and evidence for future review."
       }
-    ]
+    ],
+    "annotation": "tasksource.parked.uk_election__sentiment"
   },
   {
     "name": "LlavaGuard",
