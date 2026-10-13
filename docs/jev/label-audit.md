@@ -46,5 +46,6 @@ least 200 examples, 212 are under 2% flagged, 104 over 8% and 14 over 20%. Commo
 
 Flags are not errors: reading random rows of the most flagged sources found real label noise in some
 (`dair-ai/emotion`, CrowdFlower `text_emotion`, IndicGLUE ACTSA, since removed), missing input in others
-(DiscoSense lacked its discourse connective, since restored), and defensible labels in the rest.
+(DiscoSense lacked its discourse connective, since restored), and defensible labels in the rest. A [per-task review](audits/jev-filter-review.md) of the first screening
+records the manual decisions behind these readings.
 On the 17,822-example Jev sample, DeepSeek flagged 906, Jev 2,997, and both 530.

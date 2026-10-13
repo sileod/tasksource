@@ -1,6 +1,6 @@
 # Game decisions — 2026-10-13
 
-Two short visual annotations reuse the existing templates and grouped-QA loader. Separate image archives make one-time repackaging necessary; the [reproducible script](../../scripts/repackage_dataset/games.py) is linked from each mirror's dataset card.
+Two short visual annotations reuse the existing templates and grouped-QA loader. Separate image archives make one-time repackaging necessary; the [reproducible script](../../../scripts/repackage_dataset/games.py) is linked from each mirror's dataset card.
 
 | Task | Original source | Mirror | Train / test decisions | License |
 |---|---|---|---:|---|

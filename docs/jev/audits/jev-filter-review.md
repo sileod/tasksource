@@ -1,5 +1,7 @@
 # JEV filtering: per-task review
 
+*Record of the 2026-10-05 review of the first screening; the scripts it cites were removed and remain in Git history.*
+
 This is a review of screening evidence, not an approved exclusion list. No JEV
 Hub configuration or example was changed by this review. Jev is a weak supporting
 signal; DeepSeek V4 Flash is a fallible screener. Agreement between them does not

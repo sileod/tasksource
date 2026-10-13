@@ -2,7 +2,7 @@
 
 Each release is tagged on the Hub: `load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`.
 
-## v2026.10.13.2
+## v2026.10.13.4
 
 - `source_index` (`split:row` of the original dataset row) on every row, to trace label errors back to their source.
 - Stable row order across rebuilds: shuffled by `example_id`, so row-level annotations stay valid.

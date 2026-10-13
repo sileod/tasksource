@@ -116,7 +116,7 @@ def upload(repo_id="tasksource/it-support-tickets", card_path=None):
             commit_message="Add data-only IT support ticket classification dataset",
         )
         if card_path is None:
-            card_path = Path(__file__).resolve().parents[1] / "dataset_cards" / "tasksource-it-support-tickets.md"
+            card_path = Path(__file__).resolve().parents[2] / "dataset_cards" / "tasksource-it-support-tickets.md"
         api.upload_file(
             path_or_fileobj=str(card_path), path_in_repo="README.md",
             repo_id=repo_id, repo_type="dataset",

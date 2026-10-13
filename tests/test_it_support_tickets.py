@@ -3,7 +3,7 @@ import unittest
 import pandas as pd
 from datasets import ClassLabel
 
-from scripts.build_it_support_tickets import build_dataset, merge_source_split
+from scripts.repackage_dataset.it_support_tickets import build_dataset, merge_source_split
 
 
 class ItSupportTicketsIngestionTest(unittest.TestCase):
