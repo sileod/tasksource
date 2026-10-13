@@ -66,7 +66,8 @@ def valen_records(row):
                 action=action,source_probabilities=probabilities,source_metadata=row['meta']),ensure_ascii=False))
 
 
-def _package(name, source, revision, groups, archives, files, excluded, mc, conversion, license, shuffle_seed=None):
+def _package(name, source, revision, groups, archives, files, excluded, mc, conversion, license, shuffle_seed=None,
+             annotation_provenance='procedural game/solver labels; source rationales and hidden states are never model inputs'):
     features = Features(dict(images=Sequence(Image(decode=False)),image_group_id=Value('string'),
         qa=[dict(inputs=Value('string'),labels=Value('int64' if mc else 'string'),metadata=Value('string'),
                  **({'choices_list':Sequence(Value('string'))} if mc else {}))]))
@@ -102,7 +103,7 @@ def _package(name, source, revision, groups, archives, files, excluded, mc, conv
     report.update(conversion_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         source_file_sha256={n:hashlib.file_digest(open(p,'rb'),'sha256').hexdigest() for n,p in files.items()},
         exclusions_by_reason=dict(Counter(r['reason'] for r in excluded)),
-        annotation_provenance='procedural game/solver labels; source rationales and hidden states are never model inputs')
+        annotation_provenance=annotation_provenance)
     (directory/'provenance.json').write_text(json.dumps(report,indent=2)+'\n')
     return result
 
