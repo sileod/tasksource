@@ -267,7 +267,7 @@ def _used_label_names(dataset):
     return dataset.map(lambda x: {"label_text": names[x["label"]]})
 
 indic_glue__sentiment = Classification("text", labels="label_text", dataset_name="ai4bharat/indic_glue",
-    config_name=["actsa-sc.te", "iitp-mr.hi", "iitp-pr.hi", "inltkh.te"], pre_process=_used_label_names)
+    config_name=["iitp-mr.hi", "iitp-pr.hi", "inltkh.te"], pre_process=_used_label_names)
 def _indic_glue_files(configs):
     # one task per family across languages, so a family is not weighted by its language count
     return {"data_files": {split: [f"hf://datasets/ai4bharat/indic_glue/{config}/{split}-*.parquet" for config in configs]

@@ -2175,5 +2175,97 @@
     "papers": [
       "arxiv:2108.00573"
     ]
+  },
+  {
+    "name": "dair-ai/emotion",
+    "scope": "task",
+    "tasks": [
+      "emotion"
+    ],
+    "status": "deferred",
+    "reason_code": "incorrect_labels",
+    "reason": "hashtag-derived emotion labels; a 2026 LLM screen flagged 25% (e.g. 'i didnt feel so hot' labeled love); go_emotions, tweet_eval/emotion and emo2019 cover emotion",
+    "evidence": [
+      "'i didnt feel so hot' labeled love; 'ive had so much more energy... skin started to clear up' labeled sadness"
+    ],
+    "checked_on": "2026-10-13",
+    "reconsider_if": "A human-annotated release of the same data.",
+    "huggingface": [
+      "dair-ai/emotion"
+    ],
+    "github": [],
+    "papers": [
+      "https://aclanthology.org/D18-1404"
+    ],
+    "annotation": "tasksource.parked.dair_ai_emotion",
+    "review_findings": "DeepSeek V4 Flash screened every published Jev example of the task (2026-10); a manual read of flagged samples confirmed the label problems."
+  },
+  {
+    "name": "app_reviews",
+    "scope": "task",
+    "tasks": [
+      "app_reviews"
+    ],
+    "status": "deferred",
+    "reason_code": "incorrect_labels",
+    "reason": "many reviews are only a reviewer name with a star rating; 24% flagged; yelp_review_full and amazon_polarity cover review ratings",
+    "evidence": [
+      "Reviews consisting only of a name ('Anju kumari', 'Kush rho') labeled 5 or 4 stars"
+    ],
+    "checked_on": "2026-10-13",
+    "reconsider_if": "A release filtering reviews without content.",
+    "huggingface": [
+      "app_reviews"
+    ],
+    "github": [],
+    "papers": [],
+    "annotation": "tasksource.parked.app_reviews",
+    "review_findings": "DeepSeek V4 Flash screened every published Jev example of the task (2026-10); a manual read of flagged samples confirmed the label problems."
+  },
+  {
+    "name": "CrowdFlower text emotion",
+    "scope": "task",
+    "tasks": [
+      "crowdflower/text_emotion"
+    ],
+    "status": "deferred",
+    "reason_code": "incorrect_labels",
+    "reason": "neutral tweets carry arbitrary emotion labels; 28% flagged; go_emotions covers emotion",
+    "evidence": [
+      "'@ABIBAN where you ladies off to?' labeled surprise; 'Guess not today' labeled worry"
+    ],
+    "checked_on": "2026-10-13",
+    "reconsider_if": "Adjudicated emotion labels.",
+    "huggingface": [
+      "tasksource/crowdflower"
+    ],
+    "github": [],
+    "papers": [],
+    "annotation": "tasksource.parked.crowdflower__text_emotion",
+    "review_findings": "DeepSeek V4 Flash screened every published Jev example of the task (2026-10); a manual read of flagged samples confirmed the label problems."
+  },
+  {
+    "name": "IndicGLUE ACTSA (Telugu)",
+    "scope": "task",
+    "tasks": [
+      "indic_glue/actsa-sc.te"
+    ],
+    "status": "deferred",
+    "reason_code": "incorrect_labels",
+    "reason": "Telugu ACTSA sentiment labels often contradict the text; 43% flagged; inltkh.te and iitp Hindi sets cover Indic sentiment",
+    "evidence": [
+      "A sentence about shooting a dead body repeatedly labeled positive; 'Ambedkar is an epoch-maker' labeled negative"
+    ],
+    "checked_on": "2026-10-13",
+    "reconsider_if": "A corrected ACTSA release or a native-speaker audit.",
+    "huggingface": [
+      "ai4bharat/indic_glue"
+    ],
+    "github": [],
+    "papers": [
+      "https://aclanthology.org/2020.findings-emnlp.445"
+    ],
+    "annotation": "tasksource.parked.indic_glue__sentiment_actsa",
+    "review_findings": "DeepSeek V4 Flash screened every published Jev example of the task (2026-10); a manual read of flagged samples confirmed the label problems."
   }
 ]

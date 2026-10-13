@@ -645,15 +645,9 @@ financial_phrasebank = Classification(sentence1="text", labels="label", splits=[
 
 poem_sentiment = Classification(sentence1="verse_text", labels="label")
 
-emotion = Classification(sentence1="text", labels="label", dataset_name="dair-ai/emotion")
-
 dbpedia_14 = Classification(sentence1="content", labels="label", splits=["train", None, "test"], config_name=["dbpedia_14"])
 
 amazon_polarity = Classification(sentence1="content", labels="label", splits=["train", None, "test"], config_name=["amazon_polarity"])
-
-app_reviews = Classification("review", labels="star", splits=["train", None, None], ordinal=True,
-    question="How many stars did the reviewer give the app?",
-    label_values={star: f"{star} star" + "s" * (star > 1) for star in range(1, 6)})
 
 
 hate_speech18 = Classification(sentence1="text", labels="label", splits=["train", None, None],
@@ -790,8 +784,7 @@ crowdflower = Classification("text", labels="label",
             'economic-news',
             'political-media-audience',
             'political-media-bias',
-            'political-media-message',
-            'text_emotion'],
+            'political-media-message'],
  question={
      "sentiment_nuclear_power": "What is the tweet's sentiment toward nuclear energy, or is it unrelated?",
      "tweet_global_warming": "Does the tweet indicate that the author believes global warming is occurring?",
@@ -801,7 +794,6 @@ crowdflower = Classification("text", labels="label",
      "political-media-audience": "Is this political message aimed at a constituency or a national audience?",
      "political-media-bias": "Is this political message partisan or neutral?",
      "political-media-message": "What type of political message is this?",
-     "text_emotion": "What emotion does the text express?",
  },
 )
 
@@ -1510,6 +1502,7 @@ space_nli = Classification("premises","hypothesis","label",dataset_name="tasksou
 
 propsegment = Classification("hypothesis","premise",
     labels = lambda x:{'n':'neutral','e':'entailment','c':'contradiction'}[x['label']],
+    question="Does text_B entail the marked proposition in text_A, contradict it, or neither?",
     dataset_name="json", task_id="propsegment/nli",
     load_dataset_kwargs={"data_files": {
         "train": "https://raw.githubusercontent.com/schen149/PropSegmEnt/main/propnli.train.jsonl",
