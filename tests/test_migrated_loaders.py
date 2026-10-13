@@ -174,7 +174,6 @@ class MigratedLoaderHelperTest(unittest.TestCase):
             "scifact_entailment": "tasksource/scifact_entailment",
             "head_qa___en": "EleutherAI/headqa",
             "wiki_hop___original": "MoE-UNC/wikihop",
-            "prost": "json",
             "discosense": "tasksource/discosense",
             "hope_edi": "csv",
             "numer_sense": "tasksource/numer_sense",
@@ -281,3 +280,9 @@ class MigratedLoaderHelperTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def test_propsegment_question_uses_document_to_proposition_direction():
+    from tasksource.tasks import propsegment
+    assert propsegment.sentence1=='hypothesis' and propsegment.sentence2=='premise'
+    assert propsegment.question.startswith('Does text_B entail the marked proposition in text_A')

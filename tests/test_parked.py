@@ -27,6 +27,9 @@ class ParkedTasksTest(unittest.TestCase):
             listed = set(list_tasks(**flags).preprocessing_name)
             self.assertFalse(listed & (names | set(parked.PARKED)))
         self.assertIn("mmlu", names)
+        self.assertIn("prost", names)
+        self.assertEqual(eval_only.prost.splits, ['test', None, None])
+        self.assertFalse(eval_only.prost.complete_splits)
         self.assertNotIn("quora", names)
         self.assertEqual((eval_only.glue___ax.dataset_name, eval_only.glue___ax.config_name),
                          ("glue", "ax"))

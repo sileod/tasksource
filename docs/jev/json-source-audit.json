@@ -1,0 +1,240 @@
+{
+  "checked_on": "2026-10-13",
+  "scope": "English catalog JSON loaders before this audit: 10 views, 7 declarations",
+  "training_smoke": [
+    {
+      "task": "headline_cause/en_simple",
+      "status": "passed",
+      "label_count": 3,
+      "error": null
+    },
+    {
+      "task": "lexical_relation_classification/EVALution",
+      "status": "passed",
+      "label_count": 7,
+      "error": null
+    },
+    {
+      "task": "lexical_relation_classification/ROOT09",
+      "status": "passed",
+      "label_count": 3,
+      "error": null
+    },
+    {
+      "task": "lexical_relation_classification/BLESS",
+      "status": "passed",
+      "label_count": 6,
+      "error": null
+    },
+    {
+      "task": "lexical_relation_classification/K&H+N",
+      "status": "passed",
+      "label_count": 4,
+      "error": null
+    },
+    {
+      "task": "lexical_relation_classification/CogALexV",
+      "status": "passed",
+      "label_count": 5,
+      "error": null
+    },
+    {
+      "task": "propsegment/nli",
+      "status": "passed",
+      "label_count": 3,
+      "error": null
+    },
+    {
+      "task": "agent_action_safety",
+      "status": "passed",
+      "label_count": 2,
+      "error": null
+    },
+    {
+      "task": "docred",
+      "status": "passed",
+      "label_count": 96,
+      "error": null
+    }
+  ],
+  "native_comparisons": [
+    {
+      "task": "lexical_relation_classification/ROOT09",
+      "repo": "relbert/lexical_relation_classification",
+      "config": "ROOT09",
+      "raw_splits": {
+        "train": 8933,
+        "validation": 638,
+        "test": 3191
+      },
+      "native_splits": {
+        "train": 8933,
+        "validation": 638,
+        "test": 3191
+      },
+      "identical": true,
+      "native_features": [
+        "head",
+        "tail",
+        "relation"
+      ]
+    },
+    {
+      "task": "lexical_relation_classification/K&H+N",
+      "repo": "relbert/lexical_relation_classification",
+      "config": "K&H+N",
+      "raw_splits": {
+        "train": 40256,
+        "validation": 2876,
+        "test": 14377
+      },
+      "native_splits": {
+        "train": 40256,
+        "validation": 2876,
+        "test": 14377
+      },
+      "identical": true,
+      "native_features": [
+        "head",
+        "tail",
+        "relation"
+      ]
+    },
+    {
+      "task": "lexical_relation_classification/BLESS",
+      "repo": "relbert/lexical_relation_classification",
+      "config": "BLESS",
+      "raw_splits": {
+        "train": 18582,
+        "validation": 1327,
+        "test": 6637
+      },
+      "native_splits": {
+        "train": 18582,
+        "validation": 1327,
+        "test": 6637
+      },
+      "identical": true,
+      "native_features": [
+        "head",
+        "tail",
+        "relation"
+      ]
+    },
+    {
+      "task": "lexical_relation_classification/EVALution",
+      "repo": "relbert/lexical_relation_classification",
+      "config": "EVALution",
+      "raw_splits": {
+        "train": 5160,
+        "validation": 372,
+        "test": 1846
+      },
+      "native_splits": {
+        "train": 5160,
+        "validation": 372,
+        "test": 1846
+      },
+      "identical": true,
+      "native_features": [
+        "head",
+        "tail",
+        "relation"
+      ]
+    },
+    {
+      "task": "lexical_relation_classification/CogALexV",
+      "repo": "relbert/lexical_relation_classification",
+      "config": "CogALexV",
+      "raw_splits": {
+        "train": 3054,
+        "test": 4260
+      },
+      "native_splits": {
+        "train": 3054,
+        "test": 4260
+      },
+      "identical": true,
+      "native_features": [
+        "head",
+        "tail",
+        "relation"
+      ]
+    },
+    {
+      "task": "headline_cause/en_simple",
+      "repo": "IlyaGusev/headline_cause",
+      "config": "en_simple",
+      "raw_splits": {
+        "train": 4332,
+        "validation": 542,
+        "test": 542
+      },
+      "native_splits": {
+        "train": 4332,
+        "validation": 542,
+        "test": 542
+      },
+      "identical": false,
+      "native_features": [
+        "left_url",
+        "right_url",
+        "left_title",
+        "right_title",
+        "left_timestamp",
+        "right_timestamp",
+        "id",
+        "has_link",
+        "label",
+        "result",
+        "agreement"
+      ]
+    },
+    {
+      "task": "propsegment/nli",
+      "repo": "sihaochen/propsegment",
+      "config": "nli",
+      "raw_splits": {
+        "train": 23835,
+        "validation": 1949,
+        "test": 8284
+      },
+      "native_splits": {
+        "train": 23835,
+        "validation": 1949,
+        "test": 8284
+      },
+      "identical": true,
+      "native_features": [
+        "hypothesis",
+        "premise",
+        "label"
+      ]
+    }
+  ],
+  "headline_comparison_note": "Only left_timestamp/right_timestamp representations differ; input titles and labels are identical across all three splits.",
+  "evaluation_only": {
+    "task": "prost",
+    "source": "corypaik/prost",
+    "native_splits": {
+      "test": 18736
+    },
+    "action": "Moved to eval_only; excluded from training discovery and mix bucket regex.",
+    "evidence": "https://huggingface.co/datasets/corypaik/prost#curation-rationale"
+  },
+  "prompt_repair": {
+    "task": "propsegment/nli",
+    "reason": "Source premise/document is sentence2; the default NLI question assumed sentence1 was the premise.",
+    "question": "Does text_B entail the marked proposition in text_A, contradict it, or neither?"
+  },
+  "conclusions": {
+    "new_mirrors_required": [],
+    "loader_failures": 0,
+    "existing_hub_exports_rebuilt": false
+  },
+  "limitations": [
+    "Small loader samples establish schema usability, not semantic correctness of every annotation.",
+    "Native Parquet multiconfig exports require selecting their data_dir; a simple config-name substitution is insufficient.",
+    "Existing published Jev rows are not retroactively removed or re-prompted by these source-code changes."
+  ]
+}

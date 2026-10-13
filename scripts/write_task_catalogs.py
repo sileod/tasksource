@@ -10,6 +10,7 @@ import re
 from pathlib import Path
 
 from tasksource import list_tasks
+from tasksource.access import RAW_BUILDERS, _task_repos
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -18,8 +19,12 @@ def cell(text):
     return " ".join(str(text or "").split()).replace("|", "\\|")
 
 
-def dataset_link(name):
-    if name in ("csv", "json", "parquet", "text") or "/" not in str(name):
+def dataset_link(name, mapping=None, task_id=""):
+    if name in RAW_BUILDERS and mapping is not None:
+        repos = _task_repos(mapping, name, task_id)
+        if repos:
+            return ', '.join(dataset_link(repo) for repo in repos) + f' (`{name}` loader)'
+    if name in RAW_BUILDERS or "/" not in str(name):
         return cell(name)
     return f"[{name}](https://hf.co/datasets/{name})"
 
@@ -51,7 +56,7 @@ def write(path, multilingual=False, vision=False):
     for index, row in enumerate(tasks.itertuples(), 1):
         lines.append("| " + " | ".join([
             str(index), f"[{cell(row.id)}]({module}#L{lines_of[row.preprocessing_name]})", row.task_type,
-            dataset_link(row.dataset_name), "✓" if getattr(row.mapping, "question", None) else "",
+            dataset_link(row.dataset_name, row.mapping, row.id), "✓" if getattr(row.mapping, "question", None) else "",
         ]) + " |")
     soft = list_tasks(multilingual=multilingual, vision=vision, soft=True)
     soft = soft[soft.soft_labels]
@@ -73,7 +78,7 @@ def write(path, multilingual=False, vision=False):
                 f"[{cell(row.id)}]({module}#L{lines_of[row.preprocessing_name]})", row.mapping.kind,
                 row.mapping.aggregation, str(row.mapping.annotators or ""),
                 ("regression" if row.mapping.regression else row.mapping.hard_type) or "",
-                dataset_link(row.dataset_name),
+                dataset_link(row.dataset_name, row.mapping, row.id),
             ]) + " |")
     path.write_text("\n".join(lines) + "\n")
     print(f"{path.name}: {len(tasks)} tasks")

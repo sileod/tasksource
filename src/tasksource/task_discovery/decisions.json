@@ -2177,6 +2177,36 @@
     ]
   },
   {
+    "name": "prost",
+    "annotation": "tasksource.eval_only.prost",
+    "scope": "dataset",
+    "tasks": [
+      "prost"
+    ],
+    "huggingface": [
+      "corypaik/prost"
+    ],
+    "github": [
+      "https://github.com/nala-cub/prost"
+    ],
+    "papers": [
+      {
+        "url": "https://arxiv.org/abs/2106.03634"
+      }
+    ],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "PROST is a test-only zero-shot physical-reasoning probe; its publisher explicitly provides no training data",
+    "checked_on": "2026-10-13",
+    "source_revisions": {
+      "corypaik/prost": "b3efebf08969fc19335ba894353316878b6fa493"
+    },
+    "evidence": [
+      "https://huggingface.co/datasets/corypaik/prost/blob/b3efebf08969fc19335ba894353316878b6fa493/README.md"
+    ],
+    "reconsider_if": "The publisher releases a designated training partition and its overlap with the original test benchmark is checked."
+  },
+  {
     "name": "dair-ai/emotion",
     "scope": "task",
     "tasks": [

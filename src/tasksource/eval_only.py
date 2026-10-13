@@ -23,6 +23,12 @@ mmlu = MultipleChoice('question',labels='answer',choices_list='choices',splits=[
     config_name=MMLU
 )
 
+# PROST explicitly provides test examples only; keep it out of training discovery.
+# The annotation's internal train slot is a benchmark interface, not source training data.
+prost = MultipleChoice(cat(['context','ex_question']), choices=['A','B','C','D'], labels='label',
+    dataset_name='corypaik/prost', load_dataset_kwargs={'revision':'refs/convert/parquet'},
+    splits=['test',None,None], complete_splits=False)
+
 # BLiMP is an evaluation benchmark (test-only minimal pairs)
 blimp_hard = MultipleChoice(inputs=constant(''),
     choices=['sentence_good','sentence_bad'],
@@ -155,6 +161,7 @@ cladder = Classification(_cladder_context, "question", "answer", dataset_name="t
     pre_process=lambda ds: ds.filter(lambda x: bool(x["reasoning"]["step1"])))
 
 REASONS = {
+    'prost': 'PROST is a test-only zero-shot physical-reasoning probe; its publisher explicitly provides no training data',
     'cladder': 'CLadder is a causal-reasoning evaluation benchmark, not a training source',
     'mmlu': 'MMLU is an evaluation benchmark; no train split',
     'blimp_hard': 'BLiMP is an evaluation benchmark (test-only minimal pairs)',

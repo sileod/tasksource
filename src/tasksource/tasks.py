@@ -1070,15 +1070,6 @@ moral_stories = MultipleChoice(cat(["situation","intention"]),
     choices=['moral_action',"immoral_action"],labels=constant(0),
     dataset_name="LabHC/moral_stories", task_id="moral_stories/full")
 
-def _prost_label(x):
-    value = str(x["label"]).strip()
-    return "ABCD".index(value) if value in "ABCD" else int(value)
-
-prost = MultipleChoice(cat(["context","ex_question"]), choices=['A','B','C','D'],
-    labels=_prost_label, dataset_name="json", task_id="prost",
-    load_dataset_kwargs={"data_files":
-        "hf://datasets/corypaik/prost/data/default.jsonl"})
-
 dyna_hate = Classification("text",labels="label",dataset_name="tasksource/dynahate",splits=['train',None,None])
 
 syntactic_augmentation_nli = Classification('sentence1',"sentence2","gold_label",dataset_name="tasksource/syntactic-augmentation-nli")

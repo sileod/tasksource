@@ -23,7 +23,7 @@ BUCKETS = {
                         r"puzzte|brainteasers|math_qa|prm800k|satisfiability|temporal-nli|tracie|conceptrules|regset|"
                         r"logical-|monotonicity|strategy-qa|riddle_sense|winodict|missing-item", 0.15),
     "knowledge_mcqa": (r"medmcqa|MedQA|wikimedqa|head_qa|ScienceQA|sciq|qasc|openbookqa|ai2_arc|^race|quail|cosmos_qa|"
-                       r"dream|mutual|wiki_hop|numer_sense|commonsense_qa|mctest|onestop|ekar|quartz|quarel|prost|"
+                       r"dream|mutual|wiki_hop|numer_sense|commonsense_qa|mctest|onestop|ekar|quartz|quarel|"
                        r"feasibilityQA|CREAK|com2sense|codah|sen-making|twentyquestions|CONDAQA|boolq|mc_taco", 0.1),
     "long_doc_factcheck": (r"doc-nli|contract-nli|lex_glue|hover|vitaminc|wice|fever|health_fact|scifact|ConTRoL|sharc|"
                            r"liar|x-fact|fool-me-twice|synthetic-retrieval-NLI|seahorse|AmbigNQ|SDOH|nli4ct|biosift|"
