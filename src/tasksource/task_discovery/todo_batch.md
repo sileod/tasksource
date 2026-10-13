@@ -124,3 +124,12 @@ Published the four accepted Batch 6/7 views to Jev `default` and `full` in [Hub 
 [Source and staged-export audit](../../../docs/jev/aspect-privacy-audit.md): no new mirrors; two manually reviewed examples per view; 32 focused tests passed. FABSA's license remains explicitly unspecified.
 
 Published to Jev `default` and `full` in [Hub commit 8fea8388](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/commit/8fea8388f24f0ead40c9364fa6a73dd675df33ba): **7,000 train / 700 validation / 700 test** rows per config. Existing Parquet blobs and root card body were preserved; new shards were downloaded and verified against the reviewed build. The English gallery includes three published examples per new view.
+
+## Batch 9 — game decisions (user-approved)
+
+| Source | Implemented view | Status |
+|---|---|---|
+| OpenMOSS-Team/GameQA-140K | gameqa/mcq | Full native archive join hosted; 80,379 training / 10,493 test MCQs after format and held-out-image filtering |
+| Valen-Team/Valen-Eval-Game | valen-game/optimal-action | Full native archive join hosted; 30,000 train / 500 test states, four action judgments per state, all tied optimal actions retained |
+
+[Source/recast audit](../../../docs/jev/game-expansion-audit.md). Pilot published to the Jev vision config in [0100b447](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/commit/0100b447ed4ee8b55bb9f89e725b62420ac71d2f): 1,000 training rows per task; existing rows and evaluation preserved.

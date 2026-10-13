@@ -118,6 +118,24 @@
       "assessment": "Independent forward BFS confirms up/left at distance 6; down needs 8, right is invalid.",
       "encoded_image_bytes_unchanged": true,
       "recast_gold_alignment": true
+    },
+    {
+      "task": "vision/gameqa/mcq",
+      "native_split": "published train pilot",
+      "id": "vision/gameqa/mcq:train:294a2e5c13e08a24f984d747:a3b4290d80b3d146:0",
+      "gold": "Y",
+      "assessment": "Read image: row 6 column 5 contains Y.",
+      "encoded_image_bytes_unchanged": true,
+      "recast_gold_alignment": true
+    },
+    {
+      "task": "vision/valen-game/optimal-action",
+      "native_split": "published train pilot",
+      "id": "vision/valen-game/optimal-action:train:80b96956c4fb4490013f8e80:d63e0a258b987046:1d65ce8a63d01ec82a4695c7",
+      "gold": "Yes",
+      "assessment": "Read image: a right push moves the adjacent box onto the goal.",
+      "encoded_image_bytes_unchanged": true,
+      "recast_gold_alignment": true
     }
   ],
   "independent_solver_check": {
@@ -158,5 +176,16 @@
     "family_cap": 1000,
     "baseline_revision": "cba72e3a62145f8e9c4ea6ad146397be0151f42e",
     "evaluation_shards": "unchanged"
+  },
+  "publication": {
+    "repo": "tasksource/tasksource-jev-typed-decisions",
+    "config": "vision",
+    "revision": "0100b447ed4ee8b55bb9f89e725b62420ac71d2f",
+    "added_train_rows": 2000,
+    "vision_train_rows": 68085,
+    "all_previous_parquet_blobs_preserved": true,
+    "downloaded_append_matches_reviewed_build": true,
+    "root_card_body_preserved": true,
+    "implementation_git": "cf845df"
   }
 }

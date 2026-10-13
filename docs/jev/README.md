@@ -709,6 +709,16 @@ Source build manifests, exclusions and the baseline revision accompany each appe
 FigureQA is retained as-is and excluded from expansion because its recorded original
 terms prohibit redistribution.
 
+Use `--tasks` to append selected sources, including new catalog additions:
+
+```bash
+python -m scripts.append_jev_vision --tasks gameqa/mcq valen-game/optimal-action \
+  --cap 1000 --output build/vision-game-addition --push
+```
+
+The [game-source audit](game-expansion-audit.md) documents the native archive joins,
+option validation, tied optimal-action supervision and image/split checks.
+
 The [relation-source audit](relation-expansion-audit.json) reviews direct MAVEN-ERE
 causal and BioRED relation views plus the reproducible MATRES TimeML join. Native
 document partitions and full evidence are retained. MAVEN-ERE temporal is parked

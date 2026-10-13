@@ -16,3 +16,5 @@ Image bytes remain unchanged, with one image stored per QA group. Retained train
 Two images per task were read and checked through the shared loader/Jev recast. The word-search letter and enemy count are visibly correct; the one-step Sokoban push is correct. An independent forward BFS confirms both optimal actions in the six-step Sokoban test example. These are coarse checks, not certification of all game labels.
 
 The [machine-readable audit](game-expansion-audit.json) records source revisions, file hashes, exclusions, mirror revisions and the reviewed examples.
+
+Published a pilot in [vision revision 0100b447](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/commit/0100b447ed4ee8b55bb9f89e725b62420ac71d2f): **1,000 training rows per task**, 2,000 additions total; the config now has **68,085 training rows**. Native gold and image hashes were checked for all additions; one actual pilot image per task was also read. All prior Parquet blobs, evaluation shards and the root card body were preserved.
