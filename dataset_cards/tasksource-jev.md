@@ -79,7 +79,7 @@ Tasksource standardizes native labels and choices, adds task-specific questions 
 
 Native source partitions are retained where available; derived group-based holdouts and overlap exclusions are documented per source. These checks do not establish absence of all cross-dataset or benchmark contamination. For example, Mind2Web text tasks use derived holdouts from public training trajectories, not official benchmark tests; alignment with private Decision Index evaluation rows is unverified. Mind2Web is excluded from the visual config.
 
-Source and recast reviews are coarse checks, not corpus-wide correctness guarantees. [English examples](https://github.com/sileod/tasksource/blob/main/docs/examples/english/README.md) illustrate the exported and canonical representations.
+Source and recast reviews are coarse checks, not corpus-wide correctness guarantees. [English examples](https://github.com/sileod/tasksource/blob/main/docs/examples.md) illustrate the exported and canonical representations.
 
 ## Licenses
 

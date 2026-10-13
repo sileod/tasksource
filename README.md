@@ -30,8 +30,8 @@ for id in df[df.task_type=="MultipleChoice"].id:
     dataset = load_task(id) # all yielded datasets can be used interchangeably
 ```
 
-The [English example gallery](docs/examples/english/README.md) shows formatted inputs, questions and
-gold answers. Evaluation benchmarks are kept out of the training catalogs; load them with
+The [example catalog](docs/examples.md) shows one real example per task: input, question, options and
+gold answer. Evaluation benchmarks are kept out of the training catalogs; load them with
 `from tasksource import eval_only`. Feel free to request a new task.
 
 Datasets are downloaded to `$HF_DATASETS_CACHE`, like any Hugging Face dataset; large multi-task runs

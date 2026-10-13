@@ -52,7 +52,7 @@ def write(path, multilingual=False, vision=False):
         "|--:|---|---|---|:-:|",
     ]
     if not multilingual and not vision:
-        lines[1:1] = ['', 'Browse the [English example gallery](docs/examples/english/README.md) for formatted inputs, questions and gold answers.']
+        lines[1:1] = ['', 'Browse the [example catalog](docs/examples.md): one real example per task.']
     for index, row in enumerate(tasks.itertuples(), 1):
         lines.append("| " + " | ".join([
             str(index), f"[{cell(row.id)}]({module}#L{lines_of[row.preprocessing_name]})", row.task_type,

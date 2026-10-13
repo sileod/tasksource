@@ -1,6 +1,6 @@
 574 English tasks. Load one with `load_task(id)`; the annotations are in [tasks.py](src/tasksource/tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
 
-Browse the [English example gallery](docs/examples/english/README.md) for formatted inputs, questions and gold answers.
+Browse the [example catalog](docs/examples.md): one real example per task.
 
 | # | id | type | dataset | question |
 |--:|---|---|---|:-:|

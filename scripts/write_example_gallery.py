@@ -1,12 +1,10 @@
 """Render real published Jev examples, indexed by the complete English catalog.
 
-PYTHONPATH=src python scripts/write_example_gallery.py --examples 3
-The snapshot is pinned in examples.json; rerun with --revision to reproduce it.
-Use --load-missing for bounded canonical source loads; failures stay visible.
+PYTHONPATH=src python scripts/write_example_gallery.py [--revision COMMIT] [--load-missing]
+Writes docs/examples.md. --load-missing previews tasks absent from the release by loading their source.
 """
 import argparse
 import hashlib
-import html
 import json
 import subprocess
 import sys
@@ -14,6 +12,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import pyarrow.parquet as pq
+import yaml
 from huggingface_hub import HfApi, hf_hub_download
 from tasksource import list_tasks
 
@@ -124,127 +123,73 @@ def format_example(row):
             (f"Criteria ({row['kind']})", options), ('Gold target (weight)', gold)]
 
 
-def html_text(value, limit=700):
-    """Show a middle-cropped preview; retain the complete text in a native foldout."""
-    full = '<pre>' + html.escape(value) + '</pre>'
-    if len(value) <= limit:
-        return full
-    preview = value[:limit * 3 // 4] + '\n… [middle omitted] …\n' + value[-limit // 4:]
-    return '<pre>' + html.escape(preview) + '</pre><details><summary>Full text (' + f'{len(value):,}' + ' characters)</summary>' + full + '</details>'
+CROP = 1200  # longer texts keep their beginning and end
 
 
-def write(output, revision, examples, count, errors=None):
-    output.mkdir(parents=True, exist_ok=True)
-    catalog = list_tasks()
-    tasks = [dict(id=r.id, type=r.task_type, dataset=r.dataset_name,
-                  examples=examples.get(r.id, [])[:count], error=(errors or {}).get(r.id)) for r in catalog.itertuples()]
-    covered = sum(bool(t['examples']) for t in tasks)
-    summary = f'{covered} of {len(tasks)} English catalog tasks have examples.'
-    note = ('Real examples from the published full Jev training config. Criteria stay in exported order; '
-            'gold weights are shown exactly. Source-loaded canonical fallbacks and current local recast previews are explicitly labeled. These examples illustrate preprocessing, not a quality guarantee. '
-            'Tasks without an exported example remain listed; this does not imply their source is unavailable.')
-    payload = dict(repo=REPO, revision=revision, examples_per_task=count, seed=0,
-                   generator_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(), tasks=tasks)
-    (output / 'examples.json').write_text(json.dumps(payload, ensure_ascii=False, indent=2) + '\n')
-    md = ['# English example gallery', '', summary, '', note, '',
-          '[Searchable HTML](index.html) · [Machine-readable examples](examples.json)', '',
-          f'[Published snapshot](https://huggingface.co/datasets/{REPO}/tree/{revision})', '']
-    index = md + ['| Task | Type | Examples |', '|---|---|--:|']
-    (output / 'tasks').mkdir(exist_ok=True)
-    articles = []
-    esc = html.escape
-    for task in tasks:
-        task_id = task['id']
-        anchor = 'task-' + hashlib.sha256(task_id.encode()).hexdigest()[:12]
-        header = f"{task_id} · {task['type']} · {task['dataset']}"
-        md = [f'# {task_id}', '', f"{task['type']} · `{task['dataset']}`", '']
-        body = []
-        for i, row in enumerate(task['examples'], 1):
-            provenance = f"{row.get('origin', 'published Jev')} · {row['split']} · {row['id']}"
-            md += [f'<details><summary>Example {i}</summary>', '', provenance, '']
-            inputs, decisions = [], []
-            for label, value in format_example(row):
-                # HTML pre handles arbitrary source text, including Markdown fences/HTML.
-                md += [f'**{label}**', '', f'<pre>{esc(value)}</pre>', '']
-                target = decisions if label in ('Question', 'Decision', 'Gold target', 'Gold labels') or label.startswith(('Criteria', 'Gold target')) else inputs
-                style = ' gold' if label.startswith('Gold') else ''
-                target.append(f'<div class="field{style}"><h4>{esc(label)}</h4>' + html_text(value) + '</div>')
-            md += ['</details>', '']
-            rendered = '<div class="example-grid"><div>' + ''.join(inputs) + '</div><div>' + ''.join(decisions) + '</div></div>'
-            rendered += f'<details class="provenance"><summary>Source and row ID</summary>{esc(provenance)}</details>'
-            body.append('<section class="primary-example">' + rendered + '</section>' if i == 1 else
-                        f'<details class="extra-example"><summary>Example {i}</summary>' + rendered + '</details>')
-        if not body:
-            message = 'No training example in this published Jev snapshot.' + (' Source load: ' + task['error'] if task['error'] else '')
-            md += [message, '']
-            body.append(f'<p class="missing">{message}</p>')
-        (output / 'tasks' / f'{anchor}.md').write_text('\n'.join(md).replace('\r', '&#13;').replace(' \n', '&#32;\n').replace('\t\n', '&#9;\n'))
-        index.append(f"| [{task_id}](tasks/{anchor}.md) | {task['type']} | {len(task['examples'])} |")
-        articles.append(f'<article id="{anchor}" data-search="{esc(header.lower(), quote=True)}" '
-                        f'data-covered="{bool(task["examples"])}"><h2><a href="#{anchor}">{esc(task_id)}</a></h2>'
-                        f'<p class="task-meta">{esc(task["type"])} · {esc(task["dataset"])}</p>' + ''.join(body) + '</article>')
-    active = {'task-' + hashlib.sha256(t['id'].encode()).hexdigest()[:12] + '.md' for t in tasks}
-    for old in (output / 'tasks').glob('task-*.md'):
-        if old.name not in active:
-            old.unlink()
-    (output / 'README.md').write_text('\n'.join(index) + '\n')
-    page = '''<!doctype html><html lang="en"><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Tasksource English examples</title><style>
-*{box-sizing:border-box}body{font:15px/1.45 system-ui;max-width:1220px;margin:1.5rem auto;padding:0 1rem;color:#17212b;background:#fafafa}
-a{color:#175fa8}article{border:1px solid #dbe0e7;border-radius:8px;background:white;padding:1rem;margin:.8rem 0}
-h1{font-size:1.7rem}h2{font-size:1.1rem;margin:0}h4{font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:#536071;margin:0 0 .25rem}
-.task-meta{font-size:.8rem;color:#667085;margin:.15rem 0 .7rem}.example-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:1.2rem}
-.field{margin-bottom:.6rem}pre{white-space:pre-wrap;overflow-wrap:anywhere;margin:0;background:#f4f6f8;border-radius:4px;padding:.6rem;font:13px/1.45 ui-monospace,monospace}
-.field > pre{max-height:16rem;overflow:auto}details pre{max-height:70vh;overflow:auto}
-.gold pre{background:#edf7ef;color:#185a31}.gold h4{color:#185a31}
-summary{cursor:pointer;font-size:.8rem;padding:.3rem 0;color:#175fa8}.provenance{font-size:.75rem;color:#667085;overflow-wrap:anywhere}
-.extra-example{border-top:1px solid #edf0f4}.extra-example[open]{padding-top:.4rem}
-input{font:inherit;padding:.45rem;border:1px solid #ccd3db;border-radius:5px;max-width:90%}
-nav{position:sticky;top:0;background:#fafafaf5;padding:.7rem 0;z-index:1;border-bottom:1px solid #dbe0e7;display:flex;gap:.8rem;align-items:center;flex-wrap:wrap}
-nav label{font-size:.8rem}#search{width:350px}#count,.missing{color:#667085;font-size:.8rem}
-@media(max-width:700px){.example-grid{grid-template-columns:1fr;gap:0}body{padding:0 .6rem}article{padding:.75rem}}
-</style><h1>English example gallery</h1>'''
-    page += f'<p>{esc(summary)} First example visible; two more available below each task.</p><details><summary>About these examples</summary><p>{esc(note)}</p></details><p><a href="README.md">Markdown</a> · <a href="examples.json">JSON</a> · <a href="https://huggingface.co/datasets/{REPO}/tree/{revision}">Published snapshot</a></p>'
-    page += '''<nav><input id="search" type="search" placeholder="Filter task name, type or source" aria-label="Filter tasks">
-<label><input id="missing" type="checkbox"> Missing examples only</label> <span id="count"></span></nav>'''
-    page += '\n'.join(articles)
-    page += '''<script>
-const search=document.querySelector('#search'), missing=document.querySelector('#missing');
-function filter(){let count=0;for(const task of document.querySelectorAll('article')){
- task.hidden=!task.dataset.search.includes(search.value.toLowerCase())||(missing.checked&&task.dataset.covered==='True');
- if(!task.hidden)count++;}document.querySelector('#count').textContent=count+' tasks';}
-search.addEventListener('input',filter);missing.addEventListener('change',filter);filter();
-</script></html>'''
-    (output / 'index.html').write_text(page.replace('\r', '&#13;').replace(' \n', '&#32;\n').replace('\t\n', '&#9;\n'))
-    print(summary, flush=True)
+def crop(value):
+    if not isinstance(value, str) or len(value) <= CROP:
+        return value
+    return f"{value[:CROP * 2 // 3]}\n[... {len(value) - CROP:,} characters omitted ...]\n{value[-CROP // 3:]}"
+
+
+def entry(task, row):
+    """One example as plain data: every field visible, long texts middle-cropped."""
+    if 'canonical' in row:
+        fields = {name.lower(): crop(value) for name, value in format_example(row)}
+        return dict(task=task['id'], note='source-loaded preview; not in the published Jev config', **fields)
+    out = dict(task=task['id'], state=crop(row['state']), question=row['question'])
+    if row['kind'] == 'noul' and not row['options']:
+        out['probability_true'] = row['target'][0]
+        return out
+    out['options'] = list(row['options'])
+    gold = {option: weight for option, weight in zip(row['options'], row['target']) if weight}
+    out['answer'] = next(iter(gold)) if list(gold.values()) == [1.0] else gold
+    if row['kind'] != 'choice':
+        out['kind'] = row['kind']
+    return out
+
+
+class Literal(yaml.SafeDumper):
+    pass
+
+
+Literal.add_representer(str, lambda dumper, value: dumper.represent_scalar(
+    'tag:yaml.org,2002:str', value, style='|' if '\n' in value else None))
+
+
+def write(output, revision, examples, errors=None):
+    """A single scrollable file: one example per task, each a YAML block (human-readable, copyable, parseable)."""
+    lines = ['# Example catalog', '',
+             f'One real training example per task from [{REPO}](https://huggingface.co/datasets/{REPO}) '
+             f'(revision `{revision}`), in catalog order. Each block is YAML (`yaml.safe_load`); texts over '
+             f'{CROP:,} characters are cropped in the middle. Regenerate with `python scripts/write_example_gallery.py`.', '']
+    missing = []
+    for r in list_tasks().itertuples():
+        rows = [row for row in examples.get(r.id, []) if 'canonical' in row or row.get('kind') in ('choice', 'score', 'noul')]
+        if not rows:
+            missing.append(r.id)
+            continue
+        task = dict(id=r.id)
+        block = yaml.dump(entry(task, rows[0]), Dumper=Literal, allow_unicode=True, sort_keys=False, width=10_000)
+        lines += [f'## {r.id}', '', '````yaml', block.rstrip(), '````', '']  # four backticks: texts may contain fences
+    if missing:
+        lines += ['## Without examples', '', ', '.join(f'`{task}`' for task in missing), '']
+    output.write_text('\n'.join(lines))
+    print(f'{output}: {len(list_tasks()) - len(missing)} tasks, {len(missing)} without examples')
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--examples', type=int, choices=range(1, 6), default=3)
     parser.add_argument('--source-task', help=argparse.SUPPRESS)
     parser.add_argument('--current-recast', action='store_true', help=argparse.SUPPRESS)
-    parser.add_argument('--refresh-task', action='append', default=[], help='Refresh a task from its source into the existing snapshot; label local previews')
     parser.add_argument('--load-missing', action='store_true', help='Try canonical source loads for missing exports')
     parser.add_argument('--timeout', type=int, default=90, help='Seconds per fallback source load')
     parser.add_argument('--revision', default='main')
-    parser.add_argument('--output', type=Path, default=ROOT / 'docs/examples/english')
+    parser.add_argument('--output', type=Path, default=ROOT / 'docs/examples.md')
     args = parser.parse_args()
     if args.source_task:
-        print('GALLERY_RESULT=' + json.dumps(source_examples(args.source_task, args.examples, args.current_recast)))
-    elif args.refresh_task:
-        snapshot = json.loads((args.output / 'examples.json').read_text())
-        examples = {t['id']: t['examples'] for t in snapshot['tasks']}
-        errors = {t['id']: t['error'] for t in snapshot['tasks'] if t.get('error')}
-        for task in args.refresh_task:
-            if task not in examples:
-                parser.error(f'Unknown task: {task}')
-            examples[task] = []
-            errors.pop(task, None)
-        errors.update(load_missing(args.refresh_task, examples, args.examples, args.timeout, current_recast=True))
-        write(args.output, snapshot['revision'], examples, args.examples, errors)
+        print('GALLERY_RESULT=' + json.dumps(source_examples(args.source_task, 1, args.current_recast)))
     else:
-        revision, examples = collect(args.revision, args.examples)
-        errors = load_missing(list_tasks().id, examples, args.examples, args.timeout) if args.load_missing else {}
-        write(args.output, revision, examples, args.examples, errors)
+        revision, examples = collect(args.revision, 1)
+        errors = load_missing(list_tasks().id, examples, 1, args.timeout) if args.load_missing else {}
+        write(args.output, revision, examples, errors)
