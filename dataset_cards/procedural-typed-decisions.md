@@ -176,7 +176,7 @@ retrieval, and aggregation configs) with **several typed questions over that sam
 Jev / System One request shape: `choice` (pick one criterion), `noul` (a
 number in [0, 1]; a probability or a yes/no), and `score` (an ordered rubric).
 Every answer is computed exactly from the state by rules that the state
-itself spells out, so the labels are noise-free. No yes/no or choice label exceeds 60% of a question's answers: a state skips a question whose answer is already over-represented, so states ask varying subsets of their task's questions. Several configs vary the number of options
+itself spells out, so the labels are noise-free. No yes/no or choice label exceeds 60% of a question's answers: yes/no questions are at most a third of a task's questions. A state skips a question whose answer, or whose yes/no format, is already over-represented, so states ask varying subsets of their task's questions. Several configs vary the number of options
 (4 to 60), to balance the binary and 4–6-option questions that dominate the rest of Jev.
 
 This is an independent dataset. It is not an official TypeSafe Jev dataset and

@@ -24,6 +24,8 @@ MAX_CLASS_NAMES = 100
 # drops the question when its label would; states left without questions are skipped.
 MAX_LABEL_SHARE = 0.6
 BALANCE_WARMUP = 20
+# Yes/no questions are cheap to ask and dominate decision data: at most this share of a task's questions.
+MAX_YES_NO_SHARE = 1 / 3
 
 
 def balance_label(answer):
@@ -32,18 +34,32 @@ def balance_label(answer):
     return answer.get("choice")  # graded scores keep their natural distribution
 
 
-def balanced_questions(problem, counts, max_share=MAX_LABEL_SHARE, warmup=BALANCE_WARMUP):
-    """The problem's questions whose label is not already over-represented; updates ``counts``."""
+def yes_no(answer):
+    return answer["type"] == "noul" and answer["noul"] in (0.0, 1.0)
+
+
+def balanced_questions(problem, counts, max_share=MAX_LABEL_SHARE, warmup=BALANCE_WARMUP,
+                       max_yes_no=MAX_YES_NO_SHARE):
+    """The problem's questions whose label is not already over-represented, and yes/no questions while
+    under their share of the task's questions; updates ``counts``."""
     kept = {}
-    for qid, spec in problem.questions.items():
-        label = balance_label(problem.answers[qid])
+    asked = counts.setdefault(None, Counter())  # the task's questions: yes/no or not
+    # least-asked questions first, so the yes/no budget is shared among a task's yes/no questions
+    order = sorted(problem.questions, key=lambda qid: sum(counts.get(qid, Counter()).values()))
+    for qid in order:
+        spec, answer = problem.questions[qid], problem.answers[qid]
+        label = balance_label(answer)
         seen = counts.setdefault(qid, Counter())
         total = sum(seen.values())
         if label is not None and total >= warmup and seen[label] + 1 > max_share * (total + 1):
             continue
+        binary, everything = asked[True], sum(asked.values())
+        if yes_no(answer) and everything >= warmup and binary + 1 > max_yes_no * (everything + 1):
+            continue
         seen[label] += 1
+        asked[yes_no(answer)] += 1
         kept[qid] = spec
-    return kept
+    return {qid: spec for qid, spec in problem.questions.items() if qid in kept}
 
 
 def generate_split(task, split, rows, levels, exclude, max_attempts=50):

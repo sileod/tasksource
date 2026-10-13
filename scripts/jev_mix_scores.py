@@ -61,7 +61,7 @@ def zone(pg, low=0.35, high=0.8):
 
 
 def options_factor(n_options):
-    return 0.6 if n_options <= 2 else 0.9 if n_options == 3 else 1.0 if n_options <= 5 else 1.2
+    return 0.2 if n_options <= 2 else 0.7 if n_options == 3 else 1.0 if n_options <= 5 else 1.4
 
 
 def shard_stats(shards):
