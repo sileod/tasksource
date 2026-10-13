@@ -404,6 +404,34 @@ class BalanceLabelsTest(unittest.TestCase):
         self.assertEqual("g:train:0:g-share" in direct, len(kept) == 11)
 
 
+class KeepHubConfigsTest(unittest.TestCase):
+    def test_publishing_text_configs_keeps_the_others(self):
+        import tempfile
+        from pathlib import Path
+        from unittest import mock
+        import scripts.build_jev_dataset as build
+
+        def config(name):
+            return {"config_name": name, "data_files": [{"split": "train", "path": f"{name}/train-*"}]}
+
+        with tempfile.TemporaryDirectory() as tmp:
+            hub, card = Path(tmp) / "hub.md", Path(tmp) / "card.md"
+            hub.write_text("---\n" + build.yaml.safe_dump({"configs": [config(n) for n in ("default", "full", "vision")]})
+                           + "---\n# old\n")
+            card.write_text("---\npretty_name: jev\n---\n# new\n")
+            with mock.patch.object(build, "hf_hub_download", lambda *args, **kwargs: str(hub)):
+                build.keep_hub_configs(card, "repo", pushed={"default", "full"})
+            meta, body = build.card_header(card.read_text())
+            self.assertEqual([entry["config_name"] for entry in meta["configs"]], ["vision"])
+            self.assertEqual((meta["pretty_name"], body), ("jev", "# new\n"))
+
+            card.write_text("---\n" + build.yaml.safe_dump({"configs": [config("default")]}) + "---\n# new\n")
+            with mock.patch.object(build, "hf_hub_download", lambda *args, **kwargs: str(hub)):
+                build.keep_hub_configs(card, "repo", pushed={"default", "full"})
+            meta, _ = build.card_header(card.read_text())
+            self.assertEqual([entry["config_name"] for entry in meta["configs"]], ["default", "vision"])
+
+
 class SourceIndexTest(unittest.TestCase):
     def test_preprocessing_keeps_the_original_row_through_filters(self):
         from tasksource import Classification

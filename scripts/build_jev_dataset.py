@@ -20,7 +20,8 @@ from functools import cache
 from pathlib import Path
 
 from datasets import Dataset, DatasetDict, Features, Image, Sequence, List, Value, concatenate_datasets, load_dataset
-from huggingface_hub import HfApi
+from huggingface_hub import HfApi, hf_hub_download
+from huggingface_hub.utils import EntryNotFoundError, RepositoryNotFoundError
 import numpy as np
 import pandas as pd
 import pyarrow.compute as pc
@@ -1084,6 +1085,7 @@ def publish_dataset(
     )
     write_sources_yaml(output / "sources.yaml", release_audit, latest_records(output / "build-report.jsonl"), licenses)
     api = HfApi()
+    keep_hub_configs(output / "README.md", repo_id, pushed={"default", "full"})
     api.upload_file(
         path_or_fileobj=str(output / "README.md"),
         path_in_repo="README.md",
@@ -1115,7 +1117,7 @@ def publish_dataset(
     for name in (
         "build-report.jsonl", "build-summary.json", "build-manifest.json",
         "failed-tasks.json", "outdated-datasets.json", "fixed-source-audit.json",
-        "release-audit.json", "token-source-status.md", "sources.yaml", "AGENTS.md",
+        "release-audit.json", "token-source-status.md", "sources.yaml", "AGENTS.md", "CHANGELOG.md",
     ):
         path = output / name
         if path.exists():
@@ -1126,6 +1128,51 @@ def publish_dataset(
                 repo_type="dataset",
                 commit_message=f"Add {name}",
             )
+    if (output / "CHANGELOG.md").exists():
+        tag_release(api, repo_id, output / "CHANGELOG.md")
+
+
+def card_header(text):
+    """The YAML metadata of a dataset card and the rest of it."""
+    if not text.startswith("---\n"):
+        return {}, text
+    header, body = text[4:].split("\n---\n", 1)
+    return yaml.safe_load(header) or {}, body
+
+
+def keep_hub_configs(card_path, repo_id, pushed):
+    """Carry the Hub card's other configs (vision, filtered-full) into the local card,
+    so publishing the text configs never drops them from the viewer."""
+    try:
+        hub = Path(hf_hub_download(repo_id, "README.md", repo_type="dataset"))
+    except (EntryNotFoundError, RepositoryNotFoundError):
+        return
+    hub_meta, _ = card_header(hub.read_text(encoding="utf-8"))
+    meta, body = card_header(card_path.read_text(encoding="utf-8"))
+    for key in ("configs", "dataset_info"):
+        entries = hub_meta.get(key) or []
+        local = meta.get(key) or []
+        names = pushed | {entry.get("config_name", "default") for entry in local}
+        kept = [entry for entry in (entries if isinstance(entries, list) else [entries])
+                if entry.get("config_name", "default") not in names]
+        if kept:
+            meta[key] = local + kept
+    card_path.write_text("---\n" + yaml.safe_dump(meta, sort_keys=False, allow_unicode=True) + "---\n" + body,
+                         encoding="utf-8")
+
+
+def tag_release(api, repo_id, changelog):
+    """Tag the published revision with the changelog's latest version (## vYYYY.MM.DD[.n])."""
+    match = re.search(r"^## (v\d{4}\.\d{2}\.\d{2}(?:\.\d+)?)", changelog.read_text(encoding="utf-8"), re.M)
+    if not match:
+        print("CHANGELOG.md has no version heading; release not tagged", flush=True)
+        return
+    tags = {ref.name for ref in api.list_repo_refs(repo_id, repo_type="dataset").tags}
+    if match[1] in tags:
+        print(f"{match[1]} is already tagged; add a CHANGELOG entry to tag this release", flush=True)
+        return
+    api.create_tag(repo_id, tag=match[1], repo_type="dataset")
+    print(f"Tagged {repo_id} {match[1]}", flush=True)
 
 
 def source_provenance(source):
@@ -1607,6 +1654,7 @@ def build(args):
         shutil.copyfile(args.card, output / "README.md")
         shutil.copyfile(args.card.parent / "jev-token-source-status.md", output / "token-source-status.md")
         shutil.copyfile(args.card.parent / "jev-AGENTS.md", output / "AGENTS.md")
+        shutil.copyfile(args.card.parent / "jev-CHANGELOG.md", output / "CHANGELOG.md")
         selected = set(tasks.source_id)
         latest = latest_records(report_path)
         failures = [
