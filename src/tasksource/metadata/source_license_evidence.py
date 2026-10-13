@@ -5,6 +5,9 @@ Keys are task families, shared by their visual classification/MC views.
 """
 
 SOURCE_LICENSE_EVIDENCE = {
+    'mams': {'license': 'apache-2.0', 'checked': '2026-10-13',
+             'scope': 'original MAMS dataset and code repository',
+             'url': 'https://github.com/siat-nlp/MAMS-for-ABSA/blob/cddcdb0f423b3fdb2c76b70744737abed3a00d17/LICENSE'},
     'cebab': {'license': 'cc-by-4.0', 'checked': '2026-10-13',
               'scope': 'original corpus and human-written counterfactual edits',
               'url': 'https://github.com/CEBaBing/CEBaB/blob/gh-pages/cebab_datasheet.md#distribution'},
@@ -40,6 +43,12 @@ SOURCE_LICENSE_EVIDENCE = {
 # Scoped review: a permissive annotation/repository license cannot clear photos.
 # ``license_use`` applies conservatively to the complete image + annotation row.
 SOURCE_LICENSE_REVIEWS = {
+    'uk-election': {
+        'checked': '2026-10-13', 'license_use': 'unspecified', 'status': 'partial',
+        'annotations': {'license': 'cc-by-4.0', 'scope': 'released sentiment annotations'},
+        'scope': 'Figshare explicitly reserves tweet-content rights to Twitter; annotation license does not clear tweet text',
+        'url': 'https://api.figshare.com/v2/articles/4479563/versions/1',
+    },
     'preco': {
         'checked': '2026-10-11', 'license_use': 'non-commercial', 'status': 'partial',
         'annotations': {'license': 'research purposes', 'scope': 'original dataset distribution'},

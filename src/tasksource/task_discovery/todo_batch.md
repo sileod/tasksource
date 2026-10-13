@@ -135,3 +135,14 @@ Published to Jev `default` and `full` in [Hub commit 8fea8388](https://huggingfa
 [Source/recast audit](../../../docs/jev/game-expansion-audit.md). Pilot published to the Jev vision config in [0100b447](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/commit/0100b447ed4ee8b55bb9f89e725b62420ac71d2f): 1,000 training rows per task; existing rows and evaluation preserved.
 
 Expanded the two game families to **20,000 training rows each** in [v2026.10.13.3](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/commit/bfb636a73eb3250e073fafbbb79b989141ca5517). All 38,000 additions passed native-gold/image-hash checks; new Valen rows are English, new rows are shuffled with seed 0, and previous data/evaluation are preserved.
+
+## Batch 10 — target/aspect sentiment (user-curated)
+
+| Source | Task | Outcome |
+|---|---|---|
+| NewsMTSC | newsmtsc | Direct official converted Parquet, real-world view; author framing of the exact marked mention |
+| UK election / TDParse | uk-election/sentiment | Native Figshare join mirrored reproducibly; parked after coarse label review found unsupported topic sentiment |
+| SentiHood | sentihood/sentiment | Direct existing Hub JSONL; native entity/aspect Positive/Negative only; one conflicted dev pair excluded |
+| MAMS-ATSA | mams/atsa | Direct existing Hub JSONL; all native sentences and aspect/polarity pairs verified against original XML |
+
+[Mapping and coarse review](../../../docs/jev/audits/target-sentiment-audit.json). Active tasks enter through the catalog and canonical text build; no one-off Jev append. Original source splits are preserved, with repeated/conflicting inputs and sentence-group leakage excluded.

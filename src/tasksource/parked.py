@@ -18,6 +18,7 @@ from .metadata.source_revisions import SOURCE_REVISIONS
 from .tasks import _document_holdouts, _unique_text_splits, _decision_metadata, _probing, _SENTENCE_LENGTH
 from .tasks import _MAVEN_ERE, _MAVEN_ERE_TEMPORAL, _maven_ere_splits, _maven_ere_records, _flatten_text
 import hashlib
+import json
 
 maven_ere__temporal = Classification('sentence1',labels='labels',**_MAVEN_ERE,task_id='maven-ere/temporal',
     pre_process=lambda d:_flatten_text(_maven_ere_splits(d),lambda r:_maven_ere_records(r,_MAVEN_ERE_TEMPORAL),paired=False),
@@ -209,6 +210,15 @@ indic_glue__sentiment_actsa = Classification("text", labels="label_text", datase
     config_name="actsa-sc.te", pre_process=_used_label_names)
 
 
+uk_election__sentiment = Classification('sentence1','sentence2','labels',
+    dataset_name='tasksource/uk-election',task_id='uk-election/sentiment',complete_splits=False,metadata='metadata',
+    label_values={v:v for v in ('negative','neutral','positive')},
+    pre_process=lambda d:_unique_text_splits(_document_holdouts(d,lambda r:json.loads(r['metadata'])['split_group_id']),
+        lambda r:(r['sentence1'],r['sentence2'].casefold()),'labels'),
+    question='What sentiment does this tweet express toward {sentence2}?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/uk-election']})
+
+
 KINDS = {
     "low_value": "valid supervision with limited standalone training value",
     "duplicate": "duplicates or is covered by a listed task",
@@ -219,6 +229,7 @@ KINDS = {
 }
 
 PARKED = {
+    'uk_election__sentiment': ('unsound', 'Coarse source review found unsupported topic sentiment (VAT negative in a list of policy topics); retain native mirror but defer training pending an annotation audit.'),
     "dair_ai_emotion": ("unsound", "hashtag-derived emotion labels; a 2026 LLM screen flagged 25% (e.g. 'i didnt feel so hot' labeled love); go_emotions, tweet_eval/emotion and emo2019 cover emotion"),
     "crowdflower__text_emotion": ("unsound", "neutral tweets carry arbitrary emotion labels; 28% flagged; go_emotions covers emotion"),
     "indic_glue__sentiment_actsa": ("unsound", "Telugu ACTSA sentiment labels often contradict the text; 43% flagged; inltkh.te and iitp Hindi sets cover Indic sentiment"),

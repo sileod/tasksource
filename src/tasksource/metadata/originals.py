@@ -11,6 +11,7 @@ by scripts/upload_repackaged.py) or a task switches to a mirror.
 """
 
 ORIGINALS = {
+    "tasksource/uk-election": [],  # original Figshare tweet/annotation archives, DOI in mirror card
     "tasksource/gameqa": ["OpenMOSS-Team/GameQA-140K"],
     "tasksource/valen-game": ["Valen-Team/Valen-Eval-Game"],
     "EleutherAI/CEBaB": ["CEBaB/CEBaB"],

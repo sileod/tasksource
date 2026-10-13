@@ -2275,5 +2275,43 @@
     ],
     "annotation": "tasksource.parked.indic_glue__sentiment_actsa",
     "review_findings": "DeepSeek V4 Flash screened every published Jev example of the task (2026-10); a manual read of flagged samples confirmed the label problems."
+  },
+  {
+    "name": "UK election target sentiment (TDParse)",
+    "scope": "task",
+    "tasks": [
+      "uk-election/sentiment"
+    ],
+    "status": "deferred",
+    "reason_code": "ambiguous_supervision",
+    "reason": "Native archive join is reproducible and split-ID offset is validated bijectively. Coarse review nevertheless found negative VAT with no supporting sentiment in a list of topics, and uncertain positive crime under sarcastic Maybe not. Park training, retain native mirror and evidence for future review.",
+    "evidence": [
+      "docs/jev/audits/target-sentiment-audit.json",
+      "https://doi.org/10.6084/m9.figshare.4479563.v1",
+      "Native train tweet 581205408909398016, target vat, negative"
+    ],
+    "checked_on": "2026-10-13",
+    "reconsider_if": "A source-level annotation audit establishes text-supported label semantics or a corrected annotation release is available.",
+    "huggingface": [
+      "tasksource/uk-election"
+    ],
+    "github": [],
+    "papers": [
+      "https://aclanthology.org/E17-1046/"
+    ],
+    "source_revisions": {
+      "tasksource/uk-election": "8249ff8b23338b7e8817293a002d08d4ca58f00c"
+    },
+    "reviews": [
+      {
+        "reviewer": {
+          "kind": "model",
+          "model": "gpt-6.1-sol"
+        },
+        "checked_on": "2026-10-13",
+        "verdict": "defer",
+        "findings": "Native archive join is reproducible and split-ID offset is validated bijectively. Coarse review nevertheless found negative VAT with no supporting sentiment in a list of topics, and uncertain positive crime under sarcastic Maybe not. Park training, retain native mirror and evidence for future review."
+      }
+    ]
   }
 ]

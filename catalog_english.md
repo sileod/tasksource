@@ -1,4 +1,4 @@
-574 English tasks. Load one with `load_task(id)`; the annotations are in [tasks.py](src/tasksource/tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
+577 English tasks. Load one with `load_task(id)`; the annotations are in [tasks.py](src/tasksource/tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
 
 Browse the [example catalog](docs/examples.md): one real example per task.
 
@@ -578,6 +578,10 @@ Browse the [example catalog](docs/examples.md): one real example per task.
 | 572 | [cebab/noise](src/tasksource/tasks.py#L3365) | Classification | [EleutherAI/CEBaB](https://hf.co/datasets/EleutherAI/CEBaB) | ✓ |
 | 573 | [fabsa/sentiment](src/tasksource/tasks.py#L3378) | Classification | [jordiclive/FABSA](https://hf.co/datasets/jordiclive/FABSA) | ✓ |
 | 574 | [tab/identifier](src/tasksource/tasks.py#L3395) | Classification | [doshimit3015/text-anonymization-benchmark](https://hf.co/datasets/doshimit3015/text-anonymization-benchmark) | ✓ |
+
+| 575 | [newsmtsc](src/tasksource/tasks.py#L3410) | Classification | [fhamborg/news_sentiment_newsmtsc](https://hf.co/datasets/fhamborg/news_sentiment_newsmtsc) | ✓ |
+| 576 | [sentihood/sentiment](src/tasksource/tasks.py#L3440) | Classification | [bhavnicksm/sentihood](https://hf.co/datasets/bhavnicksm/sentihood) | ✓ |
+| 577 | [mams/atsa](src/tasksource/tasks.py#L3457) | Classification | [NEUDM/mams](https://hf.co/datasets/NEUDM/mams) | ✓ |
 
 ## Soft labels
 

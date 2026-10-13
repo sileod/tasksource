@@ -3399,3 +3399,64 @@ tab__identifier = Classification('sentence1',labels='labels',dataset_name='doshi
     question='For the person specified in the anonymization task, is [TARGET] a direct identifier, a quasi-identifier (identifying in combination), or safe to leave unmasked?',
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['doshimit3015/text-anonymization-benchmark'],
         'data_files':{s:f'echr_{n}.zip' for s,n in [('train','train'),('validation','dev'),('test','test')]}})
+
+
+def _newsmtsc_text(row):
+    if row['sentence'][row['from']:row['to']] != row['mention']:
+        raise ValueError('NewsMTSC target span/text mismatch')
+    return _marked_spans(row['sentence'], [('TARGET', row['from'], row['to'])])
+
+
+newsmtsc = Classification(_newsmtsc_text, labels='polarity',
+    dataset_name='fhamborg/news_sentiment_newsmtsc', task_id='newsmtsc', complete_splits=False,
+    label_values={-1:'negative',0:'neutral',1:'positive'},
+    metadata=lambda r:_decision_metadata(r['id'],hashlib.sha256(r['sentence'].encode()).hexdigest(),
+        mention=r['mention'],start=r['from'],end=r['to'],source_config='rw'),
+    pre_process=lambda d:_unique_text_splits(_document_holdouts(d,'sentence'),
+        lambda r:(r['sentence'],r['from'],r['to']),'polarity'),
+    question='How does the author portray [TARGET] in this news sentence: negatively, neutrally, or positively?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['fhamborg/news_sentiment_newsmtsc'],'data_dir':'rw'})
+
+
+
+
+def _sentihood_opinions(row):
+    for opinion in row['opinions']:
+        target, aspect = opinion['target_entity'], opinion['aspect']
+        if target not in row['text']:raise ValueError('SentiHood target absent from text')
+        yield dict(sentence1=row['text'], sentence2=f"What sentiment is expressed about {aspect.replace('-', ' ')} for {target}?",
+            labels=opinion['sentiment'],metadata=_decision_metadata(f"{row['id']}:{target}:{aspect}",
+                hashlib.sha256(row['text'].encode()).hexdigest(),native_id=row['id'],target=target,aspect=aspect))
+
+
+def _sentihood_rows(dataset):
+    # IDs are split-local. Only the original dev pair 306 has conflicting labels.
+    dataset = DatasetDict({s:rows.filter(lambda r:r['id'] != 306) if s == 'validation' else rows
+                           for s,rows in dataset.items()})
+    return _unique_text_splits(_flatten_text(_document_holdouts(dataset,'text'),_sentihood_opinions),
+        lambda r:(r['sentence1'],r['sentence2']),'labels')
+
+
+sentihood__sentiment = Classification('sentence1','sentence2','labels',dataset_name='bhavnicksm/sentihood',
+    task_id='sentihood/sentiment',metadata='metadata',complete_splits=False,
+    label_values={'Negative':'negative','Positive':'positive'},question='{sentence2}',
+    pre_process=_sentihood_rows,
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['bhavnicksm/sentihood']})
+
+
+def _mams_aspects(row):
+    if len(row['input']) != 1:raise ValueError('Unexpected MAMS sentence format')
+    text = row['input'][0]
+    for term, polarity in ast.literal_eval(row['output']):
+        if term not in text:raise ValueError('MAMS aspect absent from text')
+        yield dict(sentence1=text,sentence2=f'What sentiment is expressed toward the aspect "{term}"?',labels=polarity,
+            metadata=_decision_metadata(hashlib.sha256((text+'\0'+term).encode()).hexdigest(),
+                hashlib.sha256(text.encode()).hexdigest(),aspect=term,source_config='ATSA'))
+
+
+mams__atsa = Classification('sentence1','sentence2','labels',dataset_name='NEUDM/mams',task_id='mams/atsa',
+    metadata='metadata',complete_splits=False,label_values={v:v for v in ('negative','neutral','positive')},
+    question='{sentence2}',
+    pre_process=lambda d:_unique_text_splits(_flatten_text(_document_holdouts(d,lambda r:r['input'][0]),_mams_aspects),
+        lambda r:(r['sentence1'],r['sentence2']),'labels'),
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['NEUDM/mams'],'data_dir':'Generation/ATSA'})

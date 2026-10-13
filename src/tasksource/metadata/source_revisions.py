@@ -1,6 +1,10 @@
 """Reviewed source snapshots; keep opaque revision IDs out of task annotations."""
 
 SOURCE_REVISIONS = {
+    "fhamborg/news_sentiment_newsmtsc": "57315609fae7eacbab81bf6ab3f24d036857f26e",  # official converted Parquet
+    "bhavnicksm/sentihood": "fc4fb9e46f37bfe9ba27571358897924e8258bdc",
+    "NEUDM/mams": "292cd37d971c53c08ebbefd969aaf33466f31bb3",
+    "tasksource/uk-election": "8249ff8b23338b7e8817293a002d08d4ca58f00c",
     "tasksource/gameqa": "b15dac5e0ef1f57aff722e3a9b46f6c579ea08b4",
     "tasksource/valen-game": "8f2a9e107feb174f315d16b5dc0ea5f82fe096c7",
     "EleutherAI/CEBaB": "d1e1c91387a2fcd3f987e125c23f2c3895aea549",

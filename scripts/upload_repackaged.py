@@ -27,10 +27,12 @@ from scripts.repackage_dataset.linguistic import semcor, streusle, spider
 from scripts.repackage_dataset.relations import matres
 from scripts.repackage_dataset.superclevr import superclevr
 from scripts.repackage_dataset.games import gameqa, valen_game
+from scripts.repackage_dataset.target_sentiment import uk_election
 from scripts.repackage_dataset.regions import coco_regions, doclaynet_region, bapps, spair71k_grid
 
 
 BUILDERS = {"gameqa": ("tasksource/gameqa", gameqa),
+            "uk-election": ("tasksource/uk-election", uk_election),
             "valen_game": ("tasksource/valen-game", valen_game),
             "discosense": ("tasksource/discosense", discosense),
             "matres": ("tasksource/matres", matres),
@@ -75,6 +77,7 @@ BUILDERS = {"gameqa": ("tasksource/gameqa", gameqa),
 
 # license metadata for repackaged sets, as the originals state it
 LICENSES = {"tasksource/gameqa": "mit", "tasksource/valen-game": "apache-2.0",
+            "tasksource/uk-election": "cc-by-4.0",
             "tasksource/discosense": "apache-2.0",
             "tasksource/antique": "other", "tasksource/semcor": "other", "tasksource/streusle": "cc-by-sa-4.0",
             "tasksource/spider": "cc-by-sa-4.0", "tasksource/slurp": "cc-by-4.0", "tasksource/mcscript2": "other",

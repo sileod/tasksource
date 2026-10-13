@@ -1,0 +1,330 @@
+{
+  "checked_on": "2026-10-13",
+  "reviewer": "gpt-6.1-sol",
+  "active": [
+    "newsmtsc",
+    "sentihood/sentiment",
+    "mams/atsa"
+  ],
+  "parked": [
+    "uk-election/sentiment"
+  ],
+  "source_comparison": {
+    "sentihood-train": {
+      "source_url": "https://raw.githubusercontent.com/Nix07/Utilizing-BERT-for-Aspect-Based-Sentiment-Analysis/6fe20f3c73e0aba70cc5e79b6a2facd42a588e32/SentiHood%20Dataset/sentihood-train.json",
+      "source_sha256": "7067022c589efb72f03acb73f6da6720e4297a174bf4fd1401a57698421b7461",
+      "original_sentences": 2977,
+      "labels_match": true
+    },
+    "sentihood-validation": {
+      "source_url": "https://raw.githubusercontent.com/Nix07/Utilizing-BERT-for-Aspect-Based-Sentiment-Analysis/6fe20f3c73e0aba70cc5e79b6a2facd42a588e32/SentiHood%20Dataset/sentihood-dev.json",
+      "source_sha256": "2f11740fd921d7738295cd2459f7917fc8e10bf1437485bc424484bb503c6b29",
+      "original_sentences": 747,
+      "labels_match": false,
+      "known_conflict_native_ids": [
+        306
+      ],
+      "policy": "Exclude the conflicted pair; never choose one original label arbitrarily"
+    },
+    "sentihood-test": {
+      "source_url": "https://raw.githubusercontent.com/Nix07/Utilizing-BERT-for-Aspect-Based-Sentiment-Analysis/6fe20f3c73e0aba70cc5e79b6a2facd42a588e32/SentiHood%20Dataset/sentihood-test.json",
+      "source_sha256": "d3a297b550bc8bf4f2bb13e23766082bfd4c2deaf36d4faaa9677a948a1478f1",
+      "original_sentences": 1491,
+      "labels_match": true
+    },
+    "mams-train": {
+      "source_url": "https://raw.githubusercontent.com/siat-nlp/MAMS-for-ABSA/cddcdb0f423b3fdb2c76b70744737abed3a00d17/data/MAMS-ATSA/raw/train.xml",
+      "source_sha256": "26ba39142b28169ebc80408294f4e27493bd1e127c6aa2e85ab4bc750bf8017a",
+      "original_sentences": 4297,
+      "labels_match": true
+    },
+    "mams-validation": {
+      "source_url": "https://raw.githubusercontent.com/siat-nlp/MAMS-for-ABSA/cddcdb0f423b3fdb2c76b70744737abed3a00d17/data/MAMS-ATSA/raw/val.xml",
+      "source_sha256": "5b7d225e2f9482a3814f15aed04ff8323105171a47d22d9899d871c4e0ba86ca",
+      "original_sentences": 500,
+      "labels_match": true
+    },
+    "mams-test": {
+      "source_url": "https://raw.githubusercontent.com/siat-nlp/MAMS-for-ABSA/cddcdb0f423b3fdb2c76b70744737abed3a00d17/data/MAMS-ATSA/raw/test.xml",
+      "source_sha256": "f1a5f53b785335e9c57a1f82b1415026f821040b9e9662a2e467d47a54f20aa9",
+      "original_sentences": 500,
+      "labels_match": true
+    }
+  },
+  "uk_mirror_provenance": {
+    "source_url": "https://doi.org/10.6084/m9.figshare.4479563.v1",
+    "revision": "figshare-v1",
+    "license": "cc-by-4.0",
+    "license_scope": "Annotations CC BY 4.0; Twitter retains tweet-content rights",
+    "split_id_offset": 500000000000000000,
+    "excluded_by_reason": {
+      "does_not_apply": 975,
+      "span_mismatch": 1
+    },
+    "source_file_sha256": {
+      "tweets.tar.gz": "361458f1b73b102bee5f1f359db3f855be864a89c2263be88fada94a757ded1e",
+      "annotations.tar.gz": "d0e6ad59bf08aa0c33253b01657910161a1317d5bc728a3f5a6ed284b6532d8c",
+      "train_id.txt": "1878606601b45dae07a7b3f11a4752b28c7f25f85705b2f2bcce7bac2d8c2cb0",
+      "test_id.txt": "683d01f9fe366678a594a6ebe8b2b2d47eda08f14f501ea0c0a1ab45e32fdd63"
+    },
+    "conversion_sha256": "fbc08a38a81591dc9b8b255dd381fcc9bbbba0b001576ae0ff7e8307a1f9a5a3",
+    "splits": {
+      "train": 9911,
+      "test": 2675
+    },
+    "label_counts": {
+      "train": {
+        "neutral": 3722,
+        "positive": 1466,
+        "negative": 4723
+      },
+      "test": {
+        "neutral": 985,
+        "negative": 1291,
+        "positive": 399
+      }
+    }
+  },
+  "source_and_recast_checks": {
+    "newsmtsc": {
+      "splits": {
+        "train": 8669,
+        "validation": 343,
+        "test": 803
+      },
+      "group_overlap": 0,
+      "label_counts": {
+        "train": {
+          "neutral": 3018,
+          "negative": 3278,
+          "positive": 2373
+        },
+        "validation": {
+          "neutral": 136,
+          "positive": 73,
+          "negative": 134
+        },
+        "test": {
+          "neutral": 319,
+          "positive": 189,
+          "negative": 295
+        }
+      },
+      "examples": [
+        {
+          "state": "“The reasons for my departure are personal, but it has been my great honor to serve President [TARGET]Trump[/TARGET] and this administration,” Dubke, 47, wrote in an email to friends, according to Politico.",
+          "instructions": "How does the author portray [TARGET] in this news sentence: negatively, neutrally, or positively?",
+          "criteria": [
+            "negative",
+            "neutral",
+            "positive"
+          ],
+          "label": 2,
+          "metadata": "{\"end\": 99, \"id\": \"allsides_1031_412_7_Donald Trump's_94_99\", \"mention\": \"Trump\", \"source_config\": \"rw\", \"split_group_id\": \"365782b9c93724615abba731453f6fe890d5dd42e6c83813832eca1fe5161d30\", \"start\": 94}"
+        },
+        {
+          "state": "[TARGET]She[/TARGET] also recently referred to President Trump as a “piece of shit” because of his position on the Dakota Access Pipeline (DAPL) protests.",
+          "instructions": "How does the author portray [TARGET] in this news sentence: negatively, neutrally, or positively?",
+          "criteria": [
+            "negative",
+            "neutral",
+            "positive"
+          ],
+          "label": 0,
+          "metadata": "{\"end\": 3, \"id\": \"allsides_1000_401_3_Reality Leigh Winner_0_3\", \"mention\": \"She\", \"source_config\": \"rw\", \"split_group_id\": \"be88627636477c3eb7d0d77ed61d63a267eaa6213d337b5e54f2049255de7072\", \"start\": 0}"
+        }
+      ]
+    },
+    "uk-election/sentiment": {
+      "splits": {
+        "train": 9518,
+        "test": 2562
+      },
+      "group_overlap": 0,
+      "label_counts": {
+        "train": {
+          "neutral": 3579,
+          "positive": 1396,
+          "negative": 4543
+        },
+        "test": {
+          "neutral": 953,
+          "negative": 1228,
+          "positive": 381
+        }
+      },
+      "examples": [
+        {
+          "state": "Conservatives cut the Police budget and this cut crime! Maybe not... #spin #BattleForNumber10",
+          "instructions": "What sentiment does this tweet express toward crime?",
+          "criteria": [
+            "negative",
+            "neutral",
+            "positive"
+          ],
+          "label": 2,
+          "metadata": "{\"id\": \"581207500663427072:1\", \"tweet_id\": \"581207500663427072\", \"split_group_id\": \"f76c22ffc2623a9d597087dc16a18ea778783fa3ee6a7d976a3e5f08b10a3b11\", \"annotator\": \"user04\", \"target_id\": \"3\", \"offset\": 49, \"target_type\": \"topic keyword\"}"
+        },
+        {
+          "state": "#BattleForNumber10 get to the point: immigration, jobs (real jobs) vat, spending cuts (where ur gonna make em) MPs 2nd jobs, MPs 3rd jobs",
+          "instructions": "What sentiment does this tweet express toward vat?",
+          "criteria": [
+            "negative",
+            "neutral",
+            "positive"
+          ],
+          "label": 0,
+          "metadata": "{\"id\": \"581205408909398016:1\", \"tweet_id\": \"581205408909398016\", \"split_group_id\": \"6f5158e4d01f580885bd584013465c4e86cdacfcad4480aa3e6f2661938f0794\", \"annotator\": \"user01\", \"target_id\": \"4\", \"offset\": 67, \"target_type\": \"topic keyword\"}"
+        }
+      ]
+    },
+    "sentihood/sentiment": {
+      "splits": {
+        "train": 3370,
+        "validation": 835,
+        "test": 1677
+      },
+      "group_overlap": 0,
+      "label_counts": {
+        "train": {
+          "negative": 916,
+          "positive": 2454
+        },
+        "validation": {
+          "positive": 612,
+          "negative": 223
+        },
+        "test": {
+          "positive": 1215,
+          "negative": 462
+        }
+      },
+      "examples": [
+        {
+          "state": "  Along LOCATION1 there are lots of Electronics shops (independent ones)",
+          "instructions": "What sentiment is expressed about shopping for LOCATION1?",
+          "criteria": [
+            "negative",
+            "positive"
+          ],
+          "label": 1,
+          "metadata": "{\"aspect\": \"shopping\", \"id\": \"2013:LOCATION1:shopping\", \"native_id\": 2013, \"split_group_id\": \"dd5f80f64937b9bb3a1b029f1953a54c716620cd636340f66da28d3bdac2b343\", \"target\": \"LOCATION1\"}"
+        },
+        {
+          "state": "    LOCATION1 is transforming and the prices will go up and up",
+          "instructions": "What sentiment is expressed about price for LOCATION1?",
+          "criteria": [
+            "negative",
+            "positive"
+          ],
+          "label": 0,
+          "metadata": "{\"aspect\": \"price\", \"id\": \"1430:LOCATION1:price\", \"native_id\": 1430, \"split_group_id\": \"98b0db6494303567a649df841c4e28cf97638c66be29e58a11f16c250108817f\", \"target\": \"LOCATION1\"}"
+        }
+      ]
+    },
+    "mams/atsa": {
+      "splits": {
+        "train": 11186,
+        "validation": 1332,
+        "test": 1336
+      },
+      "group_overlap": 0,
+      "label_counts": {
+        "train": {
+          "negative": 2764,
+          "positive": 3380,
+          "neutral": 5042
+        },
+        "validation": {
+          "neutral": 604,
+          "positive": 403,
+          "negative": 325
+        },
+        "test": {
+          "neutral": 607,
+          "positive": 400,
+          "negative": 329
+        }
+      },
+      "examples": [
+        {
+          "state": "The decor is not special at all but their food and amazing prices make up for it.",
+          "instructions": "What sentiment is expressed toward the aspect \"food\"?",
+          "criteria": [
+            "negative",
+            "neutral",
+            "positive"
+          ],
+          "label": 2,
+          "metadata": "{\"aspect\": \"food\", \"id\": \"041b1f00af18c7e85c8e12d837f495240822e09ac9620c3dce0d75b47edaaf37\", \"source_config\": \"ATSA\", \"split_group_id\": \"271bb5316fc692fa7575772ddec1122d481a11b6dd301eec317b92430a5c8de9\"}"
+        },
+        {
+          "state": "The decor is not special at all but their food and amazing prices make up for it.",
+          "instructions": "What sentiment is expressed toward the aspect \"decor\"?",
+          "criteria": [
+            "negative",
+            "neutral",
+            "positive"
+          ],
+          "label": 0,
+          "metadata": "{\"aspect\": \"decor\", \"id\": \"4815b23112b860138ce8f562b110542ee58794f7e821c5f5358c2319de2ce7bc\", \"source_config\": \"ATSA\", \"split_group_id\": \"271bb5316fc692fa7575772ddec1122d481a11b6dd301eec317b92430a5c8de9\"}"
+        }
+      ]
+    }
+  },
+  "review_scope": "Two actual Jev examples per source; complete schema/group checks and original-file comparisons where recorded. Not an audit of every label.",
+  "findings": {
+    "newsmtsc": "Author framing includes implicit attitudes conveyed by reported actions; the prompt asks how the author portrays the marked target. Official rw converted Parquet; no duplicate mt training view.",
+    "sentihood": "All distinct train/test opinions match original JSON. Original dev ID 306 has conflicting Positive/Negative safety opinions; Hub silently retains Positive. Exclude it before flattening. Emit only native Positive/Negative opinions; unannotated aspects never become neutral or synthetic negatives.",
+    "mams": "Every train/dev/test sentence and ordered term/polarity pair exactly matches original ATSA XML. Generation instructions and their example answers never enter model inputs.",
+    "uk-election": "Native archive join is reproducible and split-ID offset is validated bijectively. Coarse review nevertheless found negative VAT with no supporting sentiment in a list of topics, and uncertain positive crime under sarcastic Maybe not. Park training, retain native mirror and evidence for future review."
+  },
+  "publication": {
+    "jev": "Not uploaded; active tasks are in the canonical catalog/build for the next complete text release",
+    "uk_mirror": "https://huggingface.co/datasets/tasksource/uk-election/tree/8249ff8b23338b7e8817293a002d08d4ca58f00c"
+  },
+  "validation": {
+    "focused_tests_passed": 16,
+    "canonical_build": [
+      {
+        "task": "newsmtsc",
+        "status": "ok",
+        "rows": {
+          "train": 1110,
+          "validation": 114,
+          "test": 110
+        },
+        "revisions": {
+          "fhamborg/news_sentiment_newsmtsc": "57315609fae7eacbab81bf6ab3f24d036857f26e"
+        }
+      },
+      {
+        "task": "sentihood/sentiment",
+        "status": "ok",
+        "rows": {
+          "train": 1231,
+          "validation": 114,
+          "test": 115
+        },
+        "revisions": {
+          "bhavnicksm/sentihood": "fc4fb9e46f37bfe9ba27571358897924e8258bdc"
+        }
+      },
+      {
+        "task": "mams/atsa",
+        "status": "ok",
+        "rows": {
+          "train": 1059,
+          "validation": 105,
+          "test": 101
+        },
+        "revisions": {
+          "NEUDM/mams": "292cd37d971c53c08ebbefd969aaf33466f31bb3"
+        }
+      }
+    ],
+    "native_split_sentence_group_overlap": 0,
+    "target_spans_checked": "every NewsMTSC row; each retained UK native entity span",
+    "SentiHood_known_conflict_exclusion": "validation/306 only; training row 306 retained"
+  }
+}
