@@ -382,7 +382,10 @@ def add_packed_classification(
     verify_packed_rows(rows, derived, audits, rate, budget)
     if audit is not None:
         audit.extend(audits)
-    return concatenate_datasets([dataset, Dataset.from_list(derived, features=dataset.features)])
+    # packed rows merge several decisions: per-row columns such as metadata stay empty
+    empty = dict.fromkeys(dataset.column_names)
+    return concatenate_datasets([dataset, Dataset.from_list([{**empty, **row} for row in derived],
+                                                            features=dataset.features)])
 
 
 # --- Independent verification -------------------------------------------------
