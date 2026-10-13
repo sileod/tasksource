@@ -1,0 +1,495 @@
+{
+  "checked_on": "2026-10-13",
+  "reviewer": "gpt-6.1-sol",
+  "sources": {
+    "memeqa": {
+      "github": "npnkhoi/memeqa",
+      "revision": "e48b332a02f7b25e08459dd7dcf69f19b430c621",
+      "mirror": "tasksource/memeqa",
+      "mirror_revision": "00de61bf1d903fdd1ad35b2bce4258578dd33b88",
+      "annotation_provenance": "human interpretation paragraphs, automatically constructed/adversarially filtered distractors, independent human answer verification; ACL paper section 3.4",
+      "split_policy": "native meme-level train/dev/test; None-minus single-answer only",
+      "license": "annotation repository MIT; original SemEval images free for general research use; original meme copyright remains separate"
+    },
+    "met-meme": {
+      "huggingface": "Anthony3456347095/MET-Meme",
+      "revision": "2c54b8634c70500d48115b2c05cab9fff97d4495",
+      "original": "https://github.com/liaolianfoka/MET-Meme-A-Multi-modal-Meme-Dataset-Rich-in-Metaphors",
+      "annotation_provenance": "manual labels per original publisher; fidelity of the Hub labels to unretrieved original annotation sheets is not independently verified",
+      "split_policy": "English rows from Hub-provided 60/20/20 partitions; test then validation then train precedence for exact image duplicates; conflicting image-label vectors excluded",
+      "license": "Original Kaggle distribution explicitly Unknown; Hub card unspecified"
+    }
+  },
+  "coarse_image_review": {
+    "memeqa": [
+      {
+        "image": "memeqa-train-0.png",
+        "assessment": "Obama/Biden vote-record meme matches native accusation of voter fraud; needs political background and has near-synonymous distractor voting irregularities, so this is a qualified example, not proof of unambiguous supervision."
+      },
+      {
+        "image": "memeqa-train-1.png",
+        "assessment": "Text explicitly calls Trump one of the greatest; native praises gold matches."
+      },
+      {
+        "image": "memeqa-train-2.png",
+        "assessment": "Text explicitly criticizes Democrats screaming racial slurs at Black police; demeaning gold matches."
+      }
+    ],
+    "met-meme": [
+      {
+        "source_id": "English/image_ (1076).jpg",
+        "assessment": "Cat jumping, invisible pogo stick joke: entertaining, non-offensive, literal reference without a source-target metaphor; happiness is a plausible broad positive tone."
+      },
+      {
+        "source_id": "English/image_ (1784).jpg",
+        "assessment": "Jim Carrey surprise at romantic attention: entertaining and non-offensive, no explicit source-target metaphor; happiness label is broad rather than a precise emotion description."
+      },
+      {
+        "source_id": "English/image_ (2229).jpg",
+        "assessment": "Penguin meme complains about penguin memes: entertaining/non-offensive, literal; hate label expresses dislike/annoyance and is stronger than the displayed sentiment. Retained as native subjective supervision, not objective fact."
+      }
+    ]
+  },
+  "limitations": [
+    "Coarse image review only, three source images each; not an audit of all rows.",
+    "Emotion and offensiveness are subjective; native labels are not relabeled by the reviewing model.",
+    "Exact image checks do not detect all template-level or near-duplicate leakage."
+  ],
+  "blocked_sources": {
+    "LlavaGuard": "Authenticated CSV access rechecked: GatedRepoError 403. Parked with access/license evidence; no modeling decision needed.",
+    "Memotion 2.0": "Official download requires participant registration; referenced public Drive folder returns 404. Reviewed 7K Hub derivatives are not substituted for version 2.0."
+  },
+  "tests": {
+    "focused_passed": 27
+  },
+  "publication": {
+    "vision": "Staging with documented scripts.append_jev_vision; 20k cap per source family; existing rows/evaluation preserved; no publication claimed yet"
+  },
+  "memeqa_conversion": {
+    "source": "https://github.com/npnkhoi/memeqa",
+    "revision": "e48b332a02f7b25e08459dd7dcf69f19b430c621",
+    "format_version": 1,
+    "splits": {
+      "validation": {
+        "rows": 189,
+        "questions": 1244
+      },
+      "test": {
+        "rows": 181,
+        "questions": 1194
+      },
+      "train": {
+        "rows": 550,
+        "questions": 3000
+      }
+    },
+    "conversion_sha256": "d7889b1d7960aeaafce865b80b5b0e521eb61f4b133bb45b13519158b326c82d",
+    "excluded_rows": 3593,
+    "license": "other",
+    "license_url": "https://github.com/npnkhoi/memeqa/blob/e48b332a02f7b25e08459dd7dcf69f19b430c621/LICENSE",
+    "ordering": {
+      "method": "datasets.shuffle",
+      "seed": 0,
+      "unit": "image_group",
+      "within": "native_split"
+    },
+    "source_file_sha256": {
+      "data/training_set_task3.zip": "402de437a0952fb1b6bdb578d8eb42b08cb78809de60a494abcd55d093a9dcf9",
+      "data/dev_set_task3.zip": "83fc1fa124a2132bafadd78e6557bd2bd7bac3628a2d0bf276bed1becfb675e5",
+      "data/test_set_task3.zip": "6200b07851798e99a06a3ab499dab24f711e06fd4ad7e4ba3f41d3d59b69fe88",
+      "data/none_minus/train.json": "1a760597a172ecf1fe45ac03b915dd59039071425e2bef8ad4c663449d504737",
+      "data/none_minus/dev.json": "954f1ff10230a606cc659c397a44153468025e39e9515b664b73215e814996c8",
+      "data/none_minus/test.json": "ca22300a959293a0ff32206855151499ab22e8ba1065800b33cfcef303ef2a2e"
+    },
+    "exclusions_by_reason": {
+      "invalid_choices": 10,
+      "duplicate_choices": 18,
+      "native_multiselect_outside_mc_view": 3565
+    },
+    "annotation_provenance": "human interpretations and answer verification; automatically constructed distractors",
+    "source_url": "https://github.com/npnkhoi/memeqa",
+    "image_source": "https://github.com/di-dimitrov/SEMEVAL-2021-task6-corpus",
+    "image_revision": "796b32fa76b7a5814a48d1870d163058e81e4ce1",
+    "license_scope": "MIT annotation repository; original meme image rights remain separate"
+  },
+  "recast_smoke": {
+    "memeqa/mcq": {
+      "rows": {
+        "validation": 2,
+        "test": 2,
+        "train": 3
+      },
+      "examples": [
+        {
+          "state": "Fill in the blank to complete a sentence that can be derived from the meme: humans are unable to ____ Earth's environment",
+          "instructions": "Choose the criterion that best answers the question.",
+          "criteria": [
+            "control",
+            "understand",
+            "destroy",
+            "preserve"
+          ],
+          "label": 0,
+          "answer": "control",
+          "metadata": "{\"id\": \"deriv_comp/579_image_batch_2/humans are unable to ____ Earth's environment/maskstart21_maskend28\", \"image_group_id\": \"1381d7734dd64f6aa20cb4d5679931a75d51257dab746cc5ce275479f35fc192\", \"image_sha256\": \"1381d7734dd64f6aa20cb4d5679931a75d51257dab746cc5ce275479f35fc192\", \"question_type\": \"Derivation Completion\", \"source_dataset\": \"https://github.com/npnkhoi/memeqa\", \"source_image\": \"579_image_batch_2.png\", \"source_revision\": \"e48b332a02f7b25e08459dd7dcf69f19b430c621\", \"source_split\": \"train\"}",
+          "image_sha256": "1381d7734dd64f6aa20cb4d5679931a75d51257dab746cc5ce275479f35fc192"
+        },
+        {
+          "state": "Fill in the blank to complete a sentence that can be derived from the meme: contradictory for Facebook to ____ memes which the author doubts are truely \"hate speech\" while being OK with child porn and graphic violence",
+          "instructions": "Choose the criterion that best answers the question.",
+          "criteria": [
+            "promote",
+            "allow",
+            "delete",
+            "host"
+          ],
+          "label": 2,
+          "answer": "delete",
+          "metadata": "{\"id\": \"deriv_comp/24_image_batch_2/contradictory for Facebook to ____ memes which the author doubts are truely \\\"hate speech\\\" while being OK with child porn and graphic violence/maskstart30_maskend36\", \"image_group_id\": \"f2267c99152acf9d9868c9ad9b4f4ef3333179fdff9ed8f9984e54648a858799\", \"image_sha256\": \"f2267c99152acf9d9868c9ad9b4f4ef3333179fdff9ed8f9984e54648a858799\", \"question_type\": \"Derivation Completion\", \"source_dataset\": \"https://github.com/npnkhoi/memeqa\", \"source_image\": \"24_image_batch_2.png\", \"source_revision\": \"e48b332a02f7b25e08459dd7dcf69f19b430c621\", \"source_split\": \"train\"}",
+          "image_sha256": "f2267c99152acf9d9868c9ad9b4f4ef3333179fdff9ed8f9984e54648a858799"
+        },
+        {
+          "state": "What is the meme's sentiment towards Black Lives Matter movement?",
+          "instructions": "Choose the criterion that best answers the question.",
+          "criteria": [
+            "Positive",
+            "Negative",
+            "Neutral"
+          ],
+          "label": 1,
+          "answer": "Negative",
+          "metadata": "{\"id\": \"cond_sent_id/557_image_batch_2/Black Lives Matter movement\", \"image_group_id\": \"0b1db0ab473b21ae2a0b7080ab88e3fba4268b2f663bedce617b8668b682f225\", \"image_sha256\": \"0b1db0ab473b21ae2a0b7080ab88e3fba4268b2f663bedce617b8668b682f225\", \"question_type\": \"Conditional Sentiment Identification\", \"source_dataset\": \"https://github.com/npnkhoi/memeqa\", \"source_image\": \"557_image_batch_2.png\", \"source_revision\": \"e48b332a02f7b25e08459dd7dcf69f19b430c621\", \"source_split\": \"train\"}",
+          "image_sha256": "0b1db0ab473b21ae2a0b7080ab88e3fba4268b2f663bedce617b8668b682f225"
+        }
+      ]
+    },
+    "met-meme/sentiment": {
+      "rows": {
+        "test": 2,
+        "validation": 2,
+        "train": 3
+      },
+      "examples": [
+        {
+          "state": "I DON'T THINK TAKING AN EXISTING MOVIE FRANCHISE AND REPLACING ALL THE MALE LEADS WITH WOMEN\nIS A VERY CREARIVE OR GOOF IDEA",
+          "instructions": "What emotional tone does the meme convey?",
+          "criteria": [
+            "happiness",
+            "love",
+            "anger",
+            "sorrow",
+            "fear",
+            "hate",
+            "surprise"
+          ],
+          "label": 2,
+          "answer": "anger",
+          "metadata": "{\"id\": \"English/image_ (2466).jpg\", \"image_group_id\": \"d63ee217a087f1c0b226d08671edf6da34ef632ef41d7d70b401c5ef68e80ad1\"}",
+          "image_sha256": "d63ee217a087f1c0b226d08671edf6da34ef632ef41d7d70b401c5ef68e80ad1"
+        },
+        {
+          "state": "\"Time  is a precious thing.Never waste it.",
+          "instructions": "What emotional tone does the meme convey?",
+          "criteria": [
+            "happiness",
+            "love",
+            "anger",
+            "sorrow",
+            "fear",
+            "hate",
+            "surprise"
+          ],
+          "label": 1,
+          "answer": "love",
+          "metadata": "{\"id\": \"English/image_ (3334).jpg\", \"image_group_id\": \"50e5eccc13e0707b5f2cf6ec9d0c0d135b72225c4c6783a6952b6eac7876b085\"}",
+          "image_sha256": "50e5eccc13e0707b5f2cf6ec9d0c0d135b72225c4c6783a6952b6eac7876b085"
+        },
+        {
+          "state": "WHEN YOU SEE RANDOM FLOATING TEXT ABOVE YOU\nAND REALIZE YOU'RE TRAPPED IN A MEME",
+          "instructions": "What emotional tone does the meme convey?",
+          "criteria": [
+            "happiness",
+            "love",
+            "anger",
+            "sorrow",
+            "fear",
+            "hate",
+            "surprise"
+          ],
+          "label": 6,
+          "answer": "surprise",
+          "metadata": "{\"id\": \"English/image_ (3522).jpg\", \"image_group_id\": \"f0ffe005336f0fee5b19dd123f7c40524204bef78ee3ba984af188442b903e35\"}",
+          "image_sha256": "f0ffe005336f0fee5b19dd123f7c40524204bef78ee3ba984af188442b903e35"
+        }
+      ]
+    },
+    "met-meme/intention": {
+      "rows": {
+        "test": 2,
+        "validation": 2,
+        "train": 3
+      },
+      "examples": [
+        {
+          "state": "I DON'T THINK TAKING AN EXISTING MOVIE FRANCHISE AND REPLACING ALL THE MALE LEADS WITH WOMEN\nIS A VERY CREARIVE OR GOOF IDEA",
+          "instructions": "What is the communicative intention of this meme?",
+          "criteria": [
+            "interactive",
+            "expressive",
+            "entertaining",
+            "offensive",
+            "other"
+          ],
+          "label": 3,
+          "answer": "offensive",
+          "metadata": "{\"id\": \"English/image_ (2466).jpg\", \"image_group_id\": \"d63ee217a087f1c0b226d08671edf6da34ef632ef41d7d70b401c5ef68e80ad1\"}",
+          "image_sha256": "d63ee217a087f1c0b226d08671edf6da34ef632ef41d7d70b401c5ef68e80ad1"
+        },
+        {
+          "state": "\"Time  is a precious thing.Never waste it.",
+          "instructions": "What is the communicative intention of this meme?",
+          "criteria": [
+            "interactive",
+            "expressive",
+            "entertaining",
+            "offensive",
+            "other"
+          ],
+          "label": 1,
+          "answer": "expressive",
+          "metadata": "{\"id\": \"English/image_ (3334).jpg\", \"image_group_id\": \"50e5eccc13e0707b5f2cf6ec9d0c0d135b72225c4c6783a6952b6eac7876b085\"}",
+          "image_sha256": "50e5eccc13e0707b5f2cf6ec9d0c0d135b72225c4c6783a6952b6eac7876b085"
+        },
+        {
+          "state": "WHEN YOU SEE RANDOM FLOATING TEXT ABOVE YOU\nAND REALIZE YOU'RE TRAPPED IN A MEME",
+          "instructions": "What is the communicative intention of this meme?",
+          "criteria": [
+            "interactive",
+            "expressive",
+            "entertaining",
+            "offensive",
+            "other"
+          ],
+          "label": 2,
+          "answer": "entertaining",
+          "metadata": "{\"id\": \"English/image_ (3522).jpg\", \"image_group_id\": \"f0ffe005336f0fee5b19dd123f7c40524204bef78ee3ba984af188442b903e35\"}",
+          "image_sha256": "f0ffe005336f0fee5b19dd123f7c40524204bef78ee3ba984af188442b903e35"
+        }
+      ]
+    },
+    "met-meme/offensiveness": {
+      "rows": {
+        "test": 2,
+        "validation": 2,
+        "train": 3
+      },
+      "examples": [
+        {
+          "state": "I DON'T THINK TAKING AN EXISTING MOVIE FRANCHISE AND REPLACING ALL THE MALE LEADS WITH WOMEN\nIS A VERY CREARIVE OR GOOF IDEA",
+          "instructions": "How offensive is this meme?",
+          "criteria": [
+            "non-offensive",
+            "slightly offensive",
+            "moderately offensive",
+            "very offensive"
+          ],
+          "label": 2,
+          "answer": "moderately offensive",
+          "metadata": "{\"id\": \"English/image_ (2466).jpg\", \"image_group_id\": \"d63ee217a087f1c0b226d08671edf6da34ef632ef41d7d70b401c5ef68e80ad1\"}",
+          "image_sha256": "d63ee217a087f1c0b226d08671edf6da34ef632ef41d7d70b401c5ef68e80ad1"
+        },
+        {
+          "state": "\"Time  is a precious thing.Never waste it.",
+          "instructions": "How offensive is this meme?",
+          "criteria": [
+            "non-offensive",
+            "slightly offensive",
+            "moderately offensive",
+            "very offensive"
+          ],
+          "label": 0,
+          "answer": "non-offensive",
+          "metadata": "{\"id\": \"English/image_ (3334).jpg\", \"image_group_id\": \"50e5eccc13e0707b5f2cf6ec9d0c0d135b72225c4c6783a6952b6eac7876b085\"}",
+          "image_sha256": "50e5eccc13e0707b5f2cf6ec9d0c0d135b72225c4c6783a6952b6eac7876b085"
+        },
+        {
+          "state": "WHEN YOU SEE RANDOM FLOATING TEXT ABOVE YOU\nAND REALIZE YOU'RE TRAPPED IN A MEME",
+          "instructions": "How offensive is this meme?",
+          "criteria": [
+            "non-offensive",
+            "slightly offensive",
+            "moderately offensive",
+            "very offensive"
+          ],
+          "label": 0,
+          "answer": "non-offensive",
+          "metadata": "{\"id\": \"English/image_ (3522).jpg\", \"image_group_id\": \"f0ffe005336f0fee5b19dd123f7c40524204bef78ee3ba984af188442b903e35\"}",
+          "image_sha256": "f0ffe005336f0fee5b19dd123f7c40524204bef78ee3ba984af188442b903e35"
+        }
+      ]
+    },
+    "met-meme/metaphor": {
+      "rows": {
+        "test": 2,
+        "validation": 2,
+        "train": 3
+      },
+      "examples": [
+        {
+          "state": "I DON'T THINK TAKING AN EXISTING MOVIE FRANCHISE AND REPLACING ALL THE MALE LEADS WITH WOMEN\nIS A VERY CREARIVE OR GOOF IDEA",
+          "instructions": "Does the meme use a metaphor, presenting one concept in terms of another?",
+          "criteria": [
+            "literal",
+            "metaphorical"
+          ],
+          "label": 0,
+          "answer": "literal",
+          "metadata": "{\"id\": \"English/image_ (2466).jpg\", \"image_group_id\": \"d63ee217a087f1c0b226d08671edf6da34ef632ef41d7d70b401c5ef68e80ad1\"}",
+          "image_sha256": "d63ee217a087f1c0b226d08671edf6da34ef632ef41d7d70b401c5ef68e80ad1"
+        },
+        {
+          "state": "\"Time  is a precious thing.Never waste it.",
+          "instructions": "Does the meme use a metaphor, presenting one concept in terms of another?",
+          "criteria": [
+            "literal",
+            "metaphorical"
+          ],
+          "label": 0,
+          "answer": "literal",
+          "metadata": "{\"id\": \"English/image_ (3334).jpg\", \"image_group_id\": \"50e5eccc13e0707b5f2cf6ec9d0c0d135b72225c4c6783a6952b6eac7876b085\"}",
+          "image_sha256": "50e5eccc13e0707b5f2cf6ec9d0c0d135b72225c4c6783a6952b6eac7876b085"
+        },
+        {
+          "state": "WHEN YOU SEE RANDOM FLOATING TEXT ABOVE YOU\nAND REALIZE YOU'RE TRAPPED IN A MEME",
+          "instructions": "Does the meme use a metaphor, presenting one concept in terms of another?",
+          "criteria": [
+            "literal",
+            "metaphorical"
+          ],
+          "label": 0,
+          "answer": "literal",
+          "metadata": "{\"id\": \"English/image_ (3522).jpg\", \"image_group_id\": \"f0ffe005336f0fee5b19dd123f7c40524204bef78ee3ba984af188442b903e35\"}",
+          "image_sha256": "f0ffe005336f0fee5b19dd123f7c40524204bef78ee3ba984af188442b903e35"
+        }
+      ]
+    }
+  },
+  "conflicting_native_image_annotations": {
+    "c0080dbd3373b6a624ca272cdab023a3021c4fbcb2b7f216e7a37469c432e833": [
+      {
+        "split": "validation",
+        "images_name": "English/image_ (1306).jpg",
+        "text": "ONLY RESPECTING\nWOMEN YOU'RE\nATTRACTED TO\nISN'T RESPECTING WOMEN",
+        "sentiment category": "3(anger)",
+        "sentiment degree": "1(slightly)",
+        "intention detection": "3(entertaining)",
+        "offensiveness detection": "0(non-offensive)",
+        "metaphor occurrence": "0",
+        "metaphor category": "",
+        "source domain": "",
+        "target domain": "",
+        "target modality": "",
+        "source modality": ""
+      },
+      {
+        "split": "validation",
+        "images_name": "English/image_ (3527).jpg",
+        "text": "ONLY RESPECTING WOMAN YOU'RE ATTACHED TO ISN'T RESPECTING WOMAN",
+        "sentiment category": "5(fear)",
+        "sentiment degree": "1(slightly)",
+        "intention detection": "3(entertaining)",
+        "offensiveness detection": "0(non-offensive)",
+        "metaphor occurrence": "0",
+        "metaphor category": "",
+        "source domain": "",
+        "target domain": "",
+        "target modality": "",
+        "source modality": ""
+      }
+    ],
+    "01d1d1a70782e3b7673d36227527dd82850992adf058ef0985f6c4bd05c80848": [
+      {
+        "split": "train",
+        "images_name": "English/image_ (1689).jpg",
+        "text": "Putin has a slogan too...\n\"Make Russia Great Agian!\" \nTEANDERTHAL PARTY\nCrooked Hillary, Crooked Hillary, Crooked Hillary, Crooked Hillary!",
+        "sentiment category": "1(happiness)",
+        "sentiment degree": "1(slightly)",
+        "intention detection": "4(offensive)",
+        "offensiveness detection": "0(non-offensive)",
+        "metaphor occurrence": "1",
+        "metaphor category": "image dominant",
+        "source domain": "puppet",
+        "target domain": "Donald Trump",
+        "target modality": "image",
+        "source modality": "image"
+      },
+      {
+        "split": "train",
+        "images_name": "English/image_ (2317).jpg",
+        "text": "Putin has a slogan too...\n\"Make Russia Great Again!\"\nTEANDERTHAL PARTY\nCrooked Hillary,\nCrooked Hillary,\nCrooked Hillary,\nCrooked Hillary!",
+        "sentiment category": "6(hate)",
+        "sentiment degree": "1(slightly)",
+        "intention detection": "4(offensive)",
+        "offensiveness detection": "1(slightly)",
+        "metaphor occurrence": "1",
+        "metaphor category": "image dominant",
+        "source domain": "puppet",
+        "target domain": "Donald Trump",
+        "target modality": "image",
+        "source modality": "image"
+      }
+    ]
+  },
+  "integrity": {
+    "met_meme": {
+      "rows": {
+        "test": 800,
+        "validation": 794,
+        "train": 2391
+      },
+      "conflicting_image_label_vectors": 0,
+      "split_overlap": [
+        [
+          "train",
+          "validation",
+          0
+        ],
+        [
+          "train",
+          "test",
+          0
+        ],
+        [
+          "validation",
+          "test",
+          0
+        ]
+      ],
+      "language": "English source filenames only",
+      "partitions": "Hub-provided 60/20/20 split; not claimed to be author-native",
+      "source_license": "Original Kaggle Unknown; Hub unspecified",
+      "original_english_ids_verified": 3992,
+      "original_english_ids_missing_in_hub": 2
+    },
+    "memeqa": {
+      "gold_and_image_hashes_checked": 5438,
+      "split_overlap": [
+        [
+          "train",
+          "validation",
+          0
+        ],
+        [
+          "train",
+          "test",
+          0
+        ],
+        [
+          "validation",
+          "test",
+          0
+        ]
+      ]
+    }
+  }
+}

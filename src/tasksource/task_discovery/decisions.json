@@ -2317,9 +2317,9 @@
   {
     "name": "LlavaGuard",
     "scope": "dataset",
-    "status": "deferred",
+    "status": "parked",
     "reason_code": "gated_source",
-    "reason": "Current authenticated Hub account receives 403 for train.csv/test.csv. Annotation Apache 2.0 does not cover linked images; source card requires individual image terms. Native per-example policy must be retained when implementing.",
+    "reason": "Rechecked configured Hub account: annotation CSV still returns 403. Integration is blocked by source access, not a pending modeling decision. Annotation Apache 2.0 does not cover linked images; preserve exact native per-example policy if access becomes available.",
     "evidence": [
       "https://huggingface.co/datasets/AIML-TUDA/LlavaGuard/blob/6a3376099a76d115e8c244e60841d0949efedb01/README.md"
     ],
@@ -2343,8 +2343,40 @@
           "model": "gpt-6.1-sol"
         },
         "checked_on": "2026-10-13",
-        "verdict": "defer",
-        "findings": "Source metadata inspected; annotation and image quality not auditable because the CSVs are gated. No unauthorized mirror or invented labels."
+        "verdict": "park",
+        "findings": "Repeated authenticated annotation access check returned GatedRepoError 403. No usable authorized data to implement or inspect; moved out of the active batch queue."
+      }
+    ]
+  },
+  {
+    "name": "Memotion 2.0",
+    "scope": "dataset",
+    "status": "parked",
+    "reason_code": "source_unavailable",
+    "reason": "Official source distributes data to registered CodaLab participants. Referenced public Drive folder returns 404. Inspected Hub uploads are the older 7K corpus, not verified Memotion 2.0; do not silently substitute another release.",
+    "evidence": [
+      "https://github.com/rsathya4802/Memotion-2",
+      "https://competitions.codalab.org/competitions/35688",
+      "https://drive.google.com/drive/folders/1fC0EaJtwcfF28GnQBecIZJh3F0XNwHA"
+    ],
+    "checked_on": "2026-10-13",
+    "reconsider_if": "A permitted download of native Memotion 2.0 images, annotations and split manifests is available.",
+    "huggingface": [],
+    "github": [
+      "rsathya4802/Memotion-2"
+    ],
+    "papers": [
+      "https://ceur-ws.org/Vol-3199/paper20.pdf"
+    ],
+    "reviews": [
+      {
+        "reviewer": {
+          "kind": "model",
+          "model": "gpt-6.1-sol"
+        },
+        "checked_on": "2026-10-13",
+        "verdict": "park",
+        "findings": "Official source access instructions inspected; public Drive link unavailable. HF 6992-row/7K derivatives not mistaken for the requested release."
       }
     ]
   }

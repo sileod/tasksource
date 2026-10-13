@@ -29,10 +29,12 @@ from scripts.repackage_dataset.superclevr import superclevr
 from scripts.repackage_dataset.games import gameqa, valen_game
 from scripts.repackage_dataset.target_sentiment import uk_election
 from scripts.repackage_dataset.visual_safety import t2i_safety
+from scripts.repackage_dataset.memes import memeqa
 from scripts.repackage_dataset.regions import coco_regions, doclaynet_region, bapps, spair71k_grid
 
 
-BUILDERS = {"gameqa": ("tasksource/gameqa", gameqa),
+BUILDERS = {"memeqa": ("tasksource/memeqa", memeqa),
+            "gameqa": ("tasksource/gameqa", gameqa),
             "uk-election": ("tasksource/uk-election", uk_election),
             "t2i-safety": ("tasksource/t2i-safety", t2i_safety),
             "valen_game": ("tasksource/valen-game", valen_game),
@@ -78,7 +80,7 @@ BUILDERS = {"gameqa": ("tasksource/gameqa", gameqa),
 
 
 # license metadata for repackaged sets, as the originals state it
-LICENSES = {"tasksource/gameqa": "mit", "tasksource/valen-game": "apache-2.0",
+LICENSES = {"tasksource/memeqa": "other", "tasksource/gameqa": "mit", "tasksource/valen-game": "apache-2.0",
             "tasksource/uk-election": "cc-by-4.0",
             "tasksource/t2i-safety": "apache-2.0",
             "tasksource/discosense": "apache-2.0",

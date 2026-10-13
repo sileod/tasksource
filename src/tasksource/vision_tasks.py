@@ -579,3 +579,46 @@ t2isafety__toxicity = VisualClassification(dataset_name='tasksource/t2i-safety',
     metadata='metadata',pre_process=grouped_qa_rows,label_values={'safe':'safe','unsafe':'unsafe'},
     question='Classify the image under the stated toxicity policy.',
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/t2i-safety'],'streaming':True})
+
+
+def met_meme_english_rows(dataset):
+    """Keep the Hub's English partitions; held-out image copies take precedence."""
+    seen, result = set(), {}
+    for split in [s for s in ('test','validation','train') if s in dataset]:
+        rows = dataset[split].filter(lambda row: row['images_name'].startswith('English/'))
+        heldout = frozenset(seen)
+        rows = rows.filter(lambda row, heldout=heldout: hashlib.sha256(row['image']['bytes']).hexdigest() not in heldout)
+        labels = {}
+        for row in rows:
+            digest = hashlib.sha256(row['image']['bytes']).hexdigest()
+            labels.setdefault(digest,set()).add(tuple(row[k] for k in ('sentiment category',
+                'intention detection','offensiveness detection','metaphor occurrence')))
+        ambiguous = {digest for digest, values in labels.items() if len(values)>1}
+        rows = rows.filter(lambda row, ambiguous=ambiguous: hashlib.sha256(row['image']['bytes']).hexdigest() not in ambiguous)
+        seen.update(labels)  # Also keep ambiguous held-out images out of training.
+        result[split] = rows
+    return type(dataset)(result)
+
+
+_MET_MEME = dict(dataset_name='Anthony3456347095/MET-Meme',images=lambda x:[x['image']],inputs='text',
+    pre_process=met_meme_english_rows,
+    metadata=lambda x:dict(id=x['images_name'],image_group_id=hashlib.sha256(x['image']['bytes']).hexdigest()),
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['Anthony3456347095/MET-Meme'],'streaming':False})
+
+met_meme__sentiment = VisualClassification(**_MET_MEME,task_id='met-meme/sentiment',labels='sentiment category',
+    label_values={f'{i}({v})':v for i,v in enumerate(('happiness','love','anger','sorrow','fear','hate','surprise'),1)},
+    question='What emotional tone does the meme convey?')
+met_meme__intention = VisualClassification(**_MET_MEME,task_id='met-meme/intention',labels='intention detection',
+    label_values={f'{i}({v})':v for i,v in enumerate(('interactive','expressive','entertaining','offensive','other'),1)},
+    question='What is the communicative intention of this meme?')
+met_meme__offensiveness = VisualClassification(**_MET_MEME,task_id='met-meme/offensiveness',labels='offensiveness detection',
+    label_values={'0(non-offensive)':'non-offensive','1(slightly)':'slightly offensive',
+                  '2(moderately)':'moderately offensive','3(very)':'very offensive'},ordinal=True,
+    question='How offensive is this meme?')
+met_meme__metaphor = VisualClassification(**_MET_MEME,task_id='met-meme/metaphor',labels='metaphor occurrence',
+    label_values={'0':'literal','1':'metaphorical'},
+    question='Does the meme use a metaphor, presenting one concept in terms of another?')
+
+memeqa__mcq = VisualMultipleChoice(dataset_name='tasksource/memeqa',task_id='memeqa/mcq',
+    choices_list='choices_list',metadata='metadata',pre_process=grouped_mc_rows,
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/memeqa'],'streaming':True})

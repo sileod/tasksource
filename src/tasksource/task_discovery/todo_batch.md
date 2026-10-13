@@ -147,19 +147,19 @@ Expanded the two game families to **20,000 training rows each** in [v2026.10.13.
 
 [Mapping and coarse review](../../../docs/jev/audits/target-sentiment-audit.json). Active tasks enter through the catalog and canonical text build; no one-off Jev append. Original source splits are preserved, with repeated/conflicting inputs and sentence-group leakage excluded.
 
-## Batch 11 — image safety (user-curated)
+## Batch 11 — image safety (user-curated, processed)
 
 | Source | Intended task | Status / next canonical build |
 |---|---|---|
 | OpenSafetyLab/t2i_safety_dataset | t2isafety/toxicity | Implemented and mirrored: 30,781 train / 366 test judgments; all native gold labels and encoded image hashes verified, zero train/test image overlap. Registered in vision_tasks.py for the next canonical vision build (20,000 train-row family cap). No privacy/demographic projection. |
-| AIML-TUDA/LlavaGuard | Policy-conditioned safe/unsafe | Deferred: current Hub account receives 403 for annotation CSVs. Preserve native per-row policy if access is granted; rationales stay in metadata. Linked images have individual licenses, not the annotation Apache license. |
+| AIML-TUDA/LlavaGuard | Policy-conditioned safe/unsafe | Parked, source-access blocker: rechecked annotation CSV returns authenticated 403. Recorded in decisions.json; no pending modeling decision. Reconsider only after permitted data access. |
 
-## Batch 12 — memes (user-curated, queued)
+## Batch 12 — memes (user-curated, processed)
 
-| Dataset | Requested view | Review needed before integration |
+| Dataset | View | Outcome |
 |---|---|---|
-| MemeQA (ACL 2025) | Native visual MCQA | Confirm labeled training split, native choices/gold and separate image join; retain meme groups across splits |
-| MET-Meme | Metaphor, sentiment, intention, offensiveness | Confirm public image distribution, original human labels, task definitions and train/evaluation groups |
-| Memotion 2.0 | Humor, sarcasm, offense, motivation, sentiment | Verify shared-task training access and native multilabel/ordinal semantics; keep held-out memes out of training |
+| MemeQA (ACL 2025) | Native visual MCQA | Implemented memeqa/mcq via reproducible tasksource/memeqa mirror; 3,000/1,244/1,194 native single-answer QAs, source meme-level splits, human-verified source distractors. Native multiselect excluded. |
+| MET-Meme | Metaphor, sentiment, intention, offensiveness | Implemented four English views directly from Anthony3456347095/MET-Meme; native emotion, intention, offensiveness and metaphor labels. 2,391 train / 794 validation / 800 test per view after exact split-copy and conflicting-image exclusions; source license explicitly unspecified. |
+| Memotion 2.0 | Humor, sarcasm, offense, motivation, sentiment | Parked, source unavailable: official download requires shared-task registration; referenced public Drive link is 404. Existing 7K Hub derivatives are not substituted for version 2.0. Evidence and reconsideration condition in decisions.json. |
 
-These are human-curated queue entries, not automatically approved training sources. New usable tasks enter the catalog and canonical build; expensive archive/image preparation goes through scripts/upload_repackaged.py.
+Batches 11–12 have no unreviewed entries remaining. Accepted tasks enter the catalog and the documented scripts.append_jev_vision build/publication path (20k per source family, existing rows preserved). Access-blocked sources live in decisions.json with evidence and explicit reconsideration conditions.

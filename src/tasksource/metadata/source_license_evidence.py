@@ -43,6 +43,19 @@ SOURCE_LICENSE_EVIDENCE = {
 # Scoped review: a permissive annotation/repository license cannot clear photos.
 # ``license_use`` applies conservatively to the complete image + annotation row.
 SOURCE_LICENSE_REVIEWS = {
+    'memeqa': {
+        'checked': '2026-10-13', 'license_use': 'non-commercial', 'status': 'partial',
+        'annotations': {'license': 'mit', 'scope': 'MemeQA repository',
+                        'url': 'https://github.com/npnkhoi/memeqa/blob/e48b332a02f7b25e08459dd7dcf69f19b430c621/LICENSE'},
+        'images': {'license': 'free for general research use',
+                   'url': 'https://github.com/di-dimitrov/SEMEVAL-2021-task6-corpus#licensing'},
+        'unresolved': 'Research-use permission does not clear original meme-image copyright for every use.',
+    },
+    'met-meme': {
+        'checked': '2026-10-13', 'license_use': 'unspecified', 'status': 'unresolved',
+        'url': 'https://www.kaggle.com/datasets/liaolianfoka/met-meme',
+        'unresolved': 'Original Kaggle distribution explicitly lists Unknown license; Hub card has no license.',
+    },
     'uk-election': {
         'checked': '2026-10-13', 'license_use': 'unspecified', 'status': 'partial',
         'annotations': {'license': 'cc-by-4.0', 'scope': 'released sentiment annotations'},

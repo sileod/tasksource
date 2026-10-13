@@ -1,6 +1,8 @@
 """Reviewed source snapshots; keep opaque revision IDs out of task annotations."""
 
 SOURCE_REVISIONS = {
+    "tasksource/memeqa": "00de61bf1d903fdd1ad35b2bce4258578dd33b88",
+    "Anthony3456347095/MET-Meme": "2c54b8634c70500d48115b2c05cab9fff97d4495",
     "tasksource/t2i-safety": "27a2accd20f854ed21e8e28f11098fd64e02aac8",
     "fhamborg/news_sentiment_newsmtsc": "57315609fae7eacbab81bf6ab3f24d036857f26e",  # official converted Parquet
     "bhavnicksm/sentihood": "fc4fb9e46f37bfe9ba27571358897924e8258bdc",

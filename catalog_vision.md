@@ -1,4 +1,4 @@
-47 visual tasks. Load one with `load_task(id, vision=True)`; the annotations are in [vision_tasks.py](src/tasksource/vision_tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
+52 visual tasks. Load one with `load_task(id, vision=True)`; the annotations are in [vision_tasks.py](src/tasksource/vision_tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
 
 | # | id | type | dataset | question |
 |--:|---|---|---|:-:|
@@ -49,6 +49,11 @@
 | 45 | [gameqa/mcq](src/tasksource/vision_tasks.py#L568) | VisualMultipleChoice | [tasksource/gameqa](https://hf.co/datasets/tasksource/gameqa) |  |
 | 46 | [valen-game/optimal-action](src/tasksource/vision_tasks.py#L572) | VisualClassification | [tasksource/valen-game](https://hf.co/datasets/tasksource/valen-game) | ✓ |
 | 47 | [t2isafety/toxicity](src/tasksource/vision_tasks.py#L578) | VisualClassification | [tasksource/t2i-safety](https://hf.co/datasets/tasksource/t2i-safety) | ✓ |
+| 48 | [met-meme/sentiment](src/tasksource/vision_tasks.py#L601) | VisualClassification | [Anthony3456347095/MET-Meme](https://hf.co/datasets/Anthony3456347095/MET-Meme) | ✓ |
+| 49 | [met-meme/intention](src/tasksource/vision_tasks.py#L604) | VisualClassification | [Anthony3456347095/MET-Meme](https://hf.co/datasets/Anthony3456347095/MET-Meme) | ✓ |
+| 50 | [met-meme/offensiveness](src/tasksource/vision_tasks.py#L607) | VisualClassification | [Anthony3456347095/MET-Meme](https://hf.co/datasets/Anthony3456347095/MET-Meme) | ✓ |
+| 51 | [met-meme/metaphor](src/tasksource/vision_tasks.py#L611) | VisualClassification | [Anthony3456347095/MET-Meme](https://hf.co/datasets/Anthony3456347095/MET-Meme) | ✓ |
+| 52 | [memeqa/mcq](src/tasksource/vision_tasks.py#L615) | VisualMultipleChoice | [tasksource/memeqa](https://hf.co/datasets/tasksource/memeqa) |  |
 
 ### Candidate grounding
 
@@ -72,3 +77,9 @@ repackaged crop transformation using the same displayed-image box convention.
 ### Image safety
 
 `t2isafety/toxicity` classifies generated images as safe/unsafe under an explicit six-category toxicity policy. The [reproducible mirror](scripts/repackage_dataset/visual_safety.py) retains 30,781 train and 366 test judgments, native image bytes and splits. Generation prompts are excluded from inputs; demographic prediction, privacy labels and unreviewed real images are outside this view. See the [source and integrity audit](docs/jev/audits/visual-safety-audit.json).
+
+### Memes
+
+`memeqa/mcq` uses the native single-answer, human-verified None-minus questions; multiselect QAs are excluded. The [reproducible archive join](scripts/repackage_dataset/memes.py) preserves the original meme-level training/development/test partitions and encoded images. Automatically constructed source distractors are explicitly recorded in annotation provenance; image research-use terms are separate from the annotation repository's MIT license.
+
+`met-meme/sentiment`, `/intention`, `/offensiveness`, and `/metaphor` load the existing image-embedded Hub upload directly. Only English source records are used. The Hub's partitions are retained, with exact held-out image copies removed from earlier splits; these are not claimed to be the author's original splits. The original Kaggle license is Unknown and is marked unspecified. See the [coarse source and recast audit](docs/jev/audits/meme-safety-batch-audit.json).

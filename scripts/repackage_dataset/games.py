@@ -72,7 +72,9 @@ def _package(name, source, revision, groups, archives, files, excluded, mc, conv
         qa=[dict(inputs=Value('string'),labels=Value('int64' if mc else 'string'),metadata=Value('string'),
                  **({'choices_list':Sequence(Value('string'))} if mc else {}))]))
     heldout_images = set()
-    heldout_groups = {json.loads(qa['metadata']).get('split_group_id') for qas in groups['test'].values() for qa in qas}-{None}
+    heldouts = [split for split in groups if split != 'train']
+    heldout_groups = {json.loads(qa['metadata']).get('split_group_id')
+                      for split in heldouts for qas in groups[split].values() for qa in qas}-{None}
     def generate(split):
         with zipfile.ZipFile(archives[split]) as archive:
             for path,qas in groups[split].items():
@@ -83,14 +85,14 @@ def _package(name, source, revision, groups, archives, files, excluded, mc, conv
                     excluded.extend(dict(id=json.loads(q['metadata'])['id'],split=split,reason='heldout_image_or_layout') for q in qas)
                     continue
                 with PILImage.open(io.BytesIO(image)) as decoded:decoded.verify()
-                if split=='test':heldout_images.add(digest)
+                if split!='train':heldout_images.add(digest)
                 for qa in qas:
                     metadata = json.loads(qa['metadata']);metadata['image_sha256']=digest
                     qa['metadata']=json.dumps(metadata,ensure_ascii=False)
                 yield dict(images=[{'bytes':image,'path':None}],image_group_id=digest,qa=qas)
     # Read holdouts first so shared screenshots and canonical layouts cannot enter training.
     data = IterableDatasetDict({s:IterableDataset.from_generator(generate,gen_kwargs={'split':s},features=features)
-                                for s in ('test','train')})
+                                for s in [*heldouts,'train']})
     result = _materialize(data,name,source,revision,excluded,conversion,license,
                           f'https://huggingface.co/datasets/{source}')
     directory = Path('build')/(name+'-release')
