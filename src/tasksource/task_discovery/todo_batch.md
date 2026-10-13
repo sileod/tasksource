@@ -122,3 +122,5 @@ Published the four accepted Batch 6/7 views to Jev `default` and `full` in [Hub 
 | TAB | Context-dependent identifier/masking decisions | Implemented existing Hub zipped JSON; native document partitions, person-to-anonymize instruction, full context, offsets and annotator/coreference IDs retained; disagreements remain separate native judgments |
 
 [Source and staged-export audit](../../../docs/jev/aspect-privacy-audit.md): no new mirrors; two manually reviewed examples per view; 32 focused tests passed. FABSA's license remains explicitly unspecified.
+
+Published to Jev `default` and `full` in [Hub commit 8fea8388](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/commit/8fea8388f24f0ead40c9364fa6a73dd675df33ba): **7,000 train / 700 validation / 700 test** rows per config. Existing Parquet blobs and root card body were preserved; new shards were downloaded and verified against the reviewed build. The English gallery includes three published examples per new view.

@@ -683,5 +683,22 @@
     "all_native_tab_spans_checked": true,
     "all_cebab_rating_medians_checked": true,
     "scope": "Coarse manual review of two actual staged export rows per task; not a certification of every source annotation."
+  },
+  "publication": {
+    "repository": "tasksource/tasksource-jev-typed-decisions",
+    "revision": "8fea8388f24f0ead40c9364fa6a73dd675df33ba",
+    "configs": [
+      "default",
+      "full"
+    ],
+    "new_rows_per_config": {
+      "train": 7000,
+      "validation": 700,
+      "test": 700
+    },
+    "all_new_shards_downloaded_and_sha256_verified": true,
+    "existing_parquet_blobs_preserved": true,
+    "root_card_body_preserved": true,
+    "implementation_git": "1dee425"
   }
 }

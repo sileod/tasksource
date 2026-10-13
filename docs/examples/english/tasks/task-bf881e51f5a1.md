@@ -1,6 +1,6 @@
 # discosense
 
-MultipleChoice · `json`
+MultipleChoice · `tasksource/discosense`
 
 <details><summary>Example 1</summary>
 

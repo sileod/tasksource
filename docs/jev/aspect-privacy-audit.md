@@ -17,3 +17,5 @@ TAB retains annotator IDs, native offsets, entity IDs and coreference links in m
 CEBaB declares CC BY 4.0; TAB declares MIT. FABSA has no explicit license in its dataset card and remains marked **unspecified**.
 
 Validation: 32 focused tests and manual review of two staged Jev examples per view. The [machine-readable audit](aspect-privacy-audit.json) records counts, label distributions, revisions, overlap checks and the reviewed rows. This is a coarse preprocessing/source check, not an audit of every annotation.
+
+Published to Jev `default` and `full` in [Hub commit 8fea8388](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/commit/8fea8388f24f0ead40c9364fa6a73dd675df33ba): **7,000 train / 700 validation / 700 test** rows per config. Existing Parquet blobs and root card body were preserved; new shards were downloaded and verified against the reviewed build. The English gallery includes three published examples per new view.
