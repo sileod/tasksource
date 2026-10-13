@@ -93,7 +93,8 @@ def run(args):
         dump(baseline_path, base)
     if (base['cap'], base['seed']) != (args.cap, args.seed):
         raise ValueError('Resume requires the original cap and seed')
-    sources = sorted({row['source'] for row in base['train']})
+    sources = (['vision/' + task.removeprefix('vision/') for task in args.tasks]
+               if getattr(args, 'tasks', None) else sorted({row['source'] for row in base['train']}))
     records, frames = {}, []
     for source in sources:
         directory = output / 'candidates' / slug(source)
@@ -128,7 +129,7 @@ def run(args):
     validate_decisions(addition, 'train')
     if not len(addition):
         raise ValueError('No unseen eligible training rows')
-    stamp = hashlib.sha256((base['revision'] + str(args.cap) + str(args.seed)).encode()).hexdigest()[:12]
+    stamp = hashlib.sha256((base['revision'] + str(args.cap) + str(args.seed) + '\n'.join(sources)).encode()).hexdigest()[:12]
     files = []; count = max(1, math.ceil(addition.data.nbytes / 256_000_000))
     for index in range(count):
         path = output / f'train-append-{stamp}-{index:05d}-of-{count:05d}.parquet'
@@ -160,7 +161,11 @@ def run(args):
                         ('license_use', Counter(addition['license_use']))]:
         train[key] = dict(Counter(train[key]) + values)
     for source, n in counts.items():
+        if source not in sources_doc['sources']:
+            sources_doc['sources'][source] = {**records[source]['provenance'], 'rows': {'train': 0}}
         sources_doc['sources'][source]['rows']['train'] += n
+    sources_doc['datasets'] = sorted({repo for info in sources_doc['sources'].values()
+        for repo in [info.get('dataset'), *info.get('data_files_from', []), *info.get('originals', [])] if repo})
     audit.setdefault('incremental_additions', []).append({'manifest': f'vision/additions/{stamp}/manifest.json',
                                                           'train_rows': len(addition)})
     info = next(x for x in card.data.dataset_info if x['config_name'] == 'vision')
@@ -189,6 +194,7 @@ if __name__ == '__main__':
     parser.add_argument('--output', type=Path, default=Path('build/vision-append-20k'))
     parser.add_argument('--cap', type=int, default=20_000)
     parser.add_argument('--seed', type=int, default=0)
+    parser.add_argument('--tasks', nargs='+', help='Append only these vision tasks, including newly registered sources')
     parser.add_argument('--push', action='store_true')
     args = parser.parse_args()
     if args.cap <= 0:

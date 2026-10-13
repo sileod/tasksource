@@ -110,3 +110,24 @@ def test_gameqa_removes_only_known_answer_format_suffixes():
     row=game();row['question']='How many enemies? Give the number of the correct option.\nOptions:\n1: 7\n2: 2\n3: 5'
     qa,reason=gameqa_record(row,0)
     assert reason is None and qa['inputs']=='How many enemies?'
+
+
+def test_game_catalogs_are_isolated_and_original_sources_can_be_excluded():
+    from tasksource import list_tasks
+    tasks={'gameqa/mcq','valen-game/optimal-action'}
+    assert tasks <= set(list_tasks(vision=True).id)
+    assert not tasks & set(list_tasks().id)
+    assert 'valen-game/optimal-action' not in set(list_tasks(vision=True,excluded_sources=['Valen-Team/Valen-Eval-Game']).id)
+
+
+@pytest.mark.parametrize('task',['gameqa/mcq','valen-game/optimal-action'])
+def test_shared_loader_jev_preserves_native_gold_and_images(task,monkeypatch):
+    from tasksource import access
+    image=png('red')
+    qas=[gameqa_record(game(answer='1'),0)[0]] if task=='gameqa/mcq' else list(valen_records(valen()))
+    data=DatasetDict(train=Dataset.from_list([dict(images=[dict(bytes=image,path=None)],image_group_id='image',qa=qas)]))
+    monkeypatch.setattr(access,'load_dataset',lambda *a,**k:data)
+    rows=access.load_task(task,vision=True,recast='jev')['train']
+    assert all(r['images'][0].size==(4,4) for r in rows)
+    if task=='gameqa/mcq':assert rows[0]['criteria'][rows[0]['label']]=='7'
+    else:assert sum(r['criteria'][r['label']]=='Yes' for r in rows)==2

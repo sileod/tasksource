@@ -1,6 +1,8 @@
 """Reviewed source snapshots; keep opaque revision IDs out of task annotations."""
 
 SOURCE_REVISIONS = {
+    "tasksource/gameqa": "9e326b4d4e2a5e817f13cedf2767e6896438432c",
+    "tasksource/valen-game": "8f2a9e107feb174f315d16b5dc0ea5f82fe096c7",
     "EleutherAI/CEBaB": "d1e1c91387a2fcd3f987e125c23f2c3895aea549",
     "jordiclive/FABSA": "40abb500cd7688529cb831c8c2c2a90d06264379",
     "doshimit3015/text-anonymization-benchmark": "e33fd0a4502d6b2c9e980aa8899fa23df38c9153",

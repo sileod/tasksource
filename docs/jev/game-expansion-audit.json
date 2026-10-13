@@ -1,0 +1,162 @@
+{
+  "checked_on": "2026-10-13",
+  "reviewer": "gpt-6.1-sol",
+  "implementation": "8efaeb4",
+  "mirrors": {
+    "tasksource/gameqa": "9e326b4d4e2a5e817f13cedf2767e6896438432c",
+    "tasksource/valen-game": "8f2a9e107feb174f315d16b5dc0ea5f82fe096c7"
+  },
+  "sources": {
+    "gameqa": {
+      "source": "OpenMOSS-Team/GameQA-140K",
+      "revision": "47fb49645e94a370d5b68a45d986b0a951bbd783",
+      "format_version": 1,
+      "splits": {
+        "test": {
+          "rows": 6186,
+          "questions": 10493
+        },
+        "train": {
+          "rows": 49820,
+          "questions": 80379
+        }
+      },
+      "conversion_sha256": "c71452577e9a5f5e8a1b4e6a448f8412cb1c4a2cb62af44b0600c5187c2dc441",
+      "excluded_rows": 50935,
+      "license": "mit",
+      "license_url": "https://huggingface.co/datasets/OpenMOSS-Team/GameQA-140K",
+      "source_file_sha256": {
+        "games_data.json": "7368c3dc39f2e0cc45cb9401ff13eb965da8bbdd3ea8210aa09ca7e3c086512f",
+        "games_data_test.json": "9ed1271cc9473fc61865b75f72a725d39d371dfd915c06ca3873be88f1f377fe",
+        "games_images.zip": "5a9bfd4e1ee13fd7bbd656dab325a94ee89ba2c4c4b3bfc546d7da0836dd79a0",
+        "games_images_test.zip": "2b82bdb9a642cee39931ab406666f262c6ba9ddfa35954288c9aa27e685bfb83"
+      },
+      "exclusions_by_reason": {
+        "no_native_multiple_choice": 44788,
+        "invalid_answer_index": 154,
+        "unresolved_answer": 507,
+        "misaligned_source_options": 668,
+        "heldout_image_or_layout": 4818
+      },
+      "annotation_provenance": "procedural game/solver labels; source rationales and hidden states are never model inputs"
+    },
+    "valen-game": {
+      "source": "Valen-Team/Valen-Eval-Game",
+      "revision": "4f25038cd30d9a96aa377eea176a4d2e1680a35c",
+      "format_version": 1,
+      "splits": {
+        "test": {
+          "rows": 500,
+          "questions": 2000
+        },
+        "train": {
+          "rows": 30000,
+          "questions": 120000
+        }
+      },
+      "conversion_sha256": "c71452577e9a5f5e8a1b4e6a448f8412cb1c4a2cb62af44b0600c5187c2dc441",
+      "excluded_rows": 0,
+      "license": "apache-2.0",
+      "license_url": "https://huggingface.co/datasets/Valen-Team/Valen-Eval-Game",
+      "source_file_sha256": {
+        "train_sokoban/train.jsonl": "3804a3ed8357dc9b4745e97b864f3088d803082cf53479f343cbf801e22d14dd",
+        "train_sokoban/assets.zip": "1fde501d2ca8eef020c0333564e7f69521c3994077adccb8370fee821bc1ec07",
+        "eval_sokoban/single_step.jsonl": "a3245fa00b828f1591edbe8a466b3c3b29395a1fc0c788743e409df3a4bcfb16",
+        "eval_sokoban/single_step_assets.zip": "edbcd7e656fddb1de0315aa208e9d036ba7bb814cfc1064a7a784e8828d52a12"
+      },
+      "exclusions_by_reason": {},
+      "annotation_provenance": "procedural game/solver labels; source rationales and hidden states are never model inputs"
+    }
+  },
+  "reviewed_examples": [
+    {
+      "task": "gameqa/mcq",
+      "native_split": "train",
+      "gold": [
+        "M"
+      ],
+      "image_sha256": "feba4d34768bddb4ea63a57abafc7748c56bf5033f3cf4f1b3a8db70e4b68a7f",
+      "assessment": "Grid row 2, column 6 visibly contains M.",
+      "encoded_image_bytes_unchanged": true,
+      "recast_gold_alignment": true
+    },
+    {
+      "task": "gameqa/mcq",
+      "native_split": "test",
+      "gold": [
+        "3"
+      ],
+      "image_sha256": "e2b02f0959e5502904724c3ff887e9249ba86f65968305a881ded0474b93e36e",
+      "assessment": "Column 3 visibly contains three enemies.",
+      "encoded_image_bytes_unchanged": true,
+      "recast_gold_alignment": true
+    },
+    {
+      "task": "valen-game/optimal-action",
+      "native_split": "train",
+      "gold": [
+        "No",
+        "Yes",
+        "No",
+        "No"
+      ],
+      "image_sha256": "d627c2eeac211d884386d548f4a155b07023059ff854df367df6c50604d8756a",
+      "assessment": "One right push places the adjacent box onto the final goal.",
+      "encoded_image_bytes_unchanged": true,
+      "recast_gold_alignment": true
+    },
+    {
+      "task": "valen-game/optimal-action",
+      "native_split": "test",
+      "gold": [
+        "Yes",
+        "No",
+        "Yes",
+        "No"
+      ],
+      "image_sha256": "27af35ac117c3694976c108f1a80fc68fa8e3819090583f8d91d0e0555d0f057",
+      "assessment": "Independent forward BFS confirms up/left at distance 6; down needs 8, right is invalid.",
+      "encoded_image_bytes_unchanged": true,
+      "recast_gold_alignment": true
+    }
+  ],
+  "independent_solver_check": {
+    "record": "sokoban-test-195-step005",
+    "distances": {
+      "up": 6,
+      "down": 8,
+      "left": 6,
+      "right": null
+    },
+    "optimal": [
+      "left",
+      "up"
+    ],
+    "distance": 6
+  },
+  "quality_checks": {
+    "image_split_overlap": 0,
+    "identical_image_prompt_conflicts": 0,
+    "gameqa_native_duplicate_prompts": 539,
+    "scope": "Two source/image examples per task, through the actual shared loader/Jev recast. Not an audit of every game answer.",
+    "valen_evaluation_scope": "Selected native 100-layout subset; single-step evaluation and full games share layouts.",
+    "gold_text_conflicts_after_option_order_normalization": 0
+  },
+  "validation": {
+    "vision_game_regression_tests_passed": 110,
+    "skipped_opt_in_tests": 46,
+    "catalog_and_append_checks_passed_after_catalog_update": 14
+  },
+  "export": {
+    "sources": {
+      "vision/gameqa/mcq": 1000,
+      "vision/valen-game/optimal-action": 1000
+    },
+    "rows": 2000,
+    "all_export_gold_and_encoded_image_hashes_verified": 2000,
+    "seed": 0,
+    "family_cap": 1000,
+    "baseline_revision": "cba72e3a62145f8e9c4ea6ad146397be0151f42e",
+    "evaluation_shards": "unchanged"
+  }
+}

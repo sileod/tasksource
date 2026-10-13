@@ -7,6 +7,7 @@ from datasets import Features, Image, Sequence, Value, IterableDataset
 from .preprocess import VisualClassification, VisualMultipleChoice
 from .grounding import grid_labels, grid_center
 from .metadata.source_license_evidence import SOURCE_LICENSE_EVIDENCE
+from .metadata.source_revisions import SOURCE_REVISIONS
 
 
 def figureqa_rows(dataset):
@@ -548,3 +549,13 @@ superclevr__size = VisualClassification(**_SUPERCLEVR, task_id='superclevr/size'
     pre_process=lambda ds: grouped_qa_rows(ds, 'size'), label_values=_SIZE)
 superclevr__material = VisualClassification(**_SUPERCLEVR, task_id='superclevr/material',
     pre_process=lambda ds: grouped_qa_rows(ds, 'material'), label_values=_MATERIAL)
+
+
+gameqa__mcq = VisualMultipleChoice(dataset_name='tasksource/gameqa',task_id='gameqa/mcq',
+    choices_list='choices_list',metadata='metadata',pre_process=grouped_mc_rows,
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/gameqa'],'streaming':True})
+
+valen_game__optimal_action = VisualClassification(dataset_name='tasksource/valen-game',task_id='valen-game/optimal-action',
+    metadata='metadata',pre_process=grouped_qa_rows,label_values=_YESNO,
+    question='Is the proposed next action optimal?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/valen-game'],'streaming':True})
