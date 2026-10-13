@@ -76,6 +76,7 @@ The `default` config is a steered mix of about 1M rows. `full` has every row of 
   one label), `criteria_permutation`, `instruction_paraphrase`, `paired_text_format`
   (surface variations), `packed_derived` (questions over 2-4 packed items).
 - `example_id`: a stable hash of the source example's input and gold answer, shared by its variants.
+- `source_index`: the example's original row in its source dataset (`split:row`), to trace a label back to the source; empty for packed and procedural rows.
 - `split`: the source's own split (`train`, `dev`, `test`); it matches the Hub split.
 
 ```python

@@ -56,6 +56,7 @@ Exact split sizes are in the Dataset Viewer metadata. Task coverage and counts a
 | `target` | Distribution aligned with `options`, or `[p_true]` for `noul`. |
 | `id`, `group_id`, `question_id` | Decision identity and grouping of related questions. |
 | `example_id` | Content-derived example identity used by the build. |
+| `source_index` | Original row of the example in its source dataset, as `split:row` (the split before any re-splitting); empty for packed and generated rows. |
 | `source`, `split`, `variant` | Task identity, split annotation and recast variant. |
 | `license`, `license_use` | Recorded source terms and their usage classification. |
 | `images` | **Vision only:** ordered Hugging Face image features, decoded on access. |

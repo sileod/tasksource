@@ -27,7 +27,7 @@ import pyarrow.compute as pc
 import yaml
 from tasksource import list_tasks, load_task, task_provenance, tasks
 from tasksource.access import lmtasks, load_preprocessing
-from tasksource.preprocess import sample_dataset, disable_image_decoding, dataset_from_rows
+from tasksource.preprocess import SOURCE_INDEX, sample_dataset, disable_image_decoding, dataset_from_rows
 from tasksource.metadata.weights import task_weight
 from tasksource.metadata.jev_mixes import length_factor, source_quotas
 from tasksource.licenses import LICENSE_USES, fetch_card_licenses, provenance_repos, source_license
@@ -285,8 +285,9 @@ def append_report(path, record):
         handle.flush()
 
 
-def to_training_row(example, index, task_id, split):
-    """Convert the lossless internal recast to the common Jev training schema."""
+def to_training_row(example, index, task_id, split, keep_source_index=False):
+    """Convert the lossless internal recast to the common Jev training schema. ``keep_source_index``
+    also returns the example's original ``split:row`` in its source dataset, for the source-index sidecar."""
     options = list(example["criteria"])
     if "target" in example:  # soft labels: the distribution itself
         target = list(example["target"])
@@ -312,7 +313,37 @@ def to_training_row(example, index, task_id, split):
         "source": task_id,
         "variant": "direct",
         "split": normalized_split(split),
+        **({SOURCE_INDEX: example.get(SOURCE_INDEX)} if keep_source_index else {}),
     }
+
+
+def write_source_index(output, split, task_id, rows):
+    """Original source row of each direct decision, kept beside the shards (rows are rebuilt by packing
+    and variants, which do not carry it); publication joins it back by row id."""
+    path = output / "source-index" / f"{split}-{slug(task_id)}.parquet"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    rows.select_columns(["id", SOURCE_INDEX]).to_parquet(path)
+
+
+def source_indices(output):
+    """Row id -> original ``split:row``, from the source-index sidecars."""
+    files = sorted((output / "source-index").glob("*.parquet"))
+    if not files:
+        return {}
+    table = pd.concat([pd.read_parquet(path) for path in files])
+    return dict(zip(table["id"], table[SOURCE_INDEX]))
+
+
+def add_source_indices(dataset, origins):
+    """``source_index`` on every row: its own, or its direct row's for a variant (whose id extends it)."""
+    def lookup(ids):
+        out = []
+        for identifier in ids:
+            parts = identifier.split(":")
+            out.append(next((origins[key] for key in (":".join(parts[:k]) for k in range(len(parts), 2, -1))
+                             if key in origins), None))
+        return {SOURCE_INDEX: out}
+    return dataset.map(lookup, input_columns="id", batched=True, batch_size=50_000, desc="Source index")
 
 
 def write_pack_audit(output, split, task_id, records):
@@ -939,6 +970,8 @@ def publish_dataset(
         )
         for split, split_dataset in dataset.items()
     })
+    origins = source_indices(output)
+    dataset = DatasetDict({split: add_source_indices(rows, origins) for split, rows in dataset.items()})
     dataset = DatasetDict({split: rows.filter(lambda states: [state is not None for state in states],
                                               input_columns="state", batched=True, desc="Empty states")
                            for split, rows in dataset.items()})
@@ -1513,10 +1546,11 @@ def build(args):
                     split_dataset = split_dataset.map(
                         to_training_row,
                         with_indices=True,
-                        fn_kwargs={"task_id": task_id, "split": split},
+                        fn_kwargs={"task_id": task_id, "split": split, "keep_source_index": True},
                         remove_columns=split_dataset.column_names,
                     )
-                    split_dataset = merge_identical_inputs(split_dataset)
+                    write_source_index(output, split, task_id, split_dataset)
+                    split_dataset = merge_identical_inputs(split_dataset.remove_columns(SOURCE_INDEX))
                     pack_audit = []
                     split_dataset = add_packed_classification(
                         split_dataset, row.task_type, rate=args.pack_rate,

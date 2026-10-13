@@ -14,7 +14,7 @@ from tasksource.jev.length import LengthBudget, render_request
 from tasksource.jev.options import choice_permutation, gold_position_violations, permute_choices
 from scripts.build_jev_dataset import (
     TRAINING_FEATURES, add_question_groups, diverse_cap, drop_train_overlap,
-    add_example_ids, balance_labels, content_keys, merge_identical_inputs, to_training_row, validate_decisions,
+    add_example_ids, add_source_indices, balance_labels, content_keys, merge_identical_inputs, to_training_row, validate_decisions,
 )
 from datasets import ClassLabel, Features, Value
 from tasksource.tasks import _copa_input, _esci_product
@@ -402,6 +402,24 @@ class BalanceLabelsTest(unittest.TestCase):
         direct = {r["id"] for r in kept if r["variant"] == "direct"}
         self.assertEqual(len(direct), 10)
         self.assertEqual("g:train:0:g-share" in direct, len(kept) == 11)
+
+
+class SourceIndexTest(unittest.TestCase):
+    def test_preprocessing_keeps_the_original_row_through_filters(self):
+        from tasksource import Classification
+        task = Classification("text", labels="label", pre_process=lambda d: d.filter(lambda r: r["text"] != "drop"))
+        source = DatasetDict(train=Dataset.from_dict({"text": ["a", "drop", "b"] * 10, "label": ["x", "y", "x"] * 10}))
+        texts = source["train"]["text"]
+        for split, rows in task(source, source_index=True).items():  # evaluation splits are carved from train
+            for row in rows:
+                origin, index = row["source_index"].split(":")
+                self.assertEqual((origin, texts[int(index)]), ("train", row["sentence1"]))
+        self.assertNotIn("source_index", task(source)["train"].column_names)
+
+    def test_variants_take_their_direct_rows_source_index(self):
+        ids = ["s:train:0", "s:train:0:noul-label-verification", "g:train:k:q", "g:train:k:q:choice-x", "s:train:pack-1:A"]
+        rows = add_source_indices(Dataset.from_dict({"id": ids}), {"s:train:0": "train:7", "g:train:k:q": "train:3"})
+        self.assertEqual(rows["source_index"], ["train:7", "train:7", "train:3", "train:3", None])
 
 
 if __name__ == "__main__":

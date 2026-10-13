@@ -364,7 +364,8 @@ def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preproc
     if recast == "jev" and not vision and isinstance(preprocessing, MultipleChoiceFields):
         # Jev permutes criteria itself and needs every source option.
         options = dict(gold_first=False, max_options=JEV_MAX_MC_OPTIONS)
-    dataset= preprocessing(dataset,max_rows, max_rows_eval, seed=seed, pre_processed=pre_processed, **options)
+    dataset= preprocessing(dataset,max_rows, max_rows_eval, seed=seed, pre_processed=pre_processed,
+                           source_index=recast == "jev", **options)
     if grounding is not None:
         from .grounding import augment_grounding
         dataset = augment_grounding(dataset, seed=seed, excluded_sources=excluded_sources, **grounding)

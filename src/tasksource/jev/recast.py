@@ -171,7 +171,7 @@ def _recast_soft(dataset, task, question, kind, row_options, group):
         for split, rows in dataset.items() if len(rows)  # e.g. hidden test labels
     })
     keep = {"state", "instructions", "criteria", "target", "task", "kind", "group", "source_row", "question_id",
-            "metadata", "images"}
+            "metadata", "images", "source_index"}
     return converted.remove_columns([c for c in converted["train"].column_names if c not in keep])
 
 
@@ -290,10 +290,11 @@ def recast_jev(dataset, task=None, question=None, ordinal=False, kind=None, row_
                 "state": [], "instructions": [], "criteria": [], "label": [],
                 "answer": [], "task": [], "shared_state": [],
                 "question_id": [], "source_row": [], "target_index": [],
-                "target_token": [],
+                "target_token": [], "source_index": [],
             }
-            for tokens, token_labels, source_index in zip(
-                batch["tokens"], batch["labels"], indices
+            origins = batch.get("source_index") or [None] * len(indices)
+            for tokens, token_labels, source_index, origin in zip(
+                batch["tokens"], batch["labels"], indices, origins
             ):
                 if len(tokens) != len(token_labels):
                     raise ValueError(
@@ -315,6 +316,7 @@ def recast_jev(dataset, task=None, question=None, ordinal=False, kind=None, row_
                     output["source_row"].append(source_index)
                     output["target_index"].append(token_index)
                     output["target_token"].append(tokens[token_index])
+                    output["source_index"].append(origin)
             return output
 
         return dataset.map(
@@ -342,7 +344,7 @@ def recast_jev(dataset, task=None, question=None, ordinal=False, kind=None, row_
             return {key: str(metadata[key]) for key in ("group", "source_row", "question_id") if key in metadata}
         converted = converted.map(identity)
     keep = {"state", "instructions", "criteria", "label", "answer", "task", "kind", "images", "metadata",
-            "group", "source_row", "question_id"}
+            "group", "source_row", "question_id", "source_index"}
     remove = [name for name in converted["train"].column_names if name not in keep]
     if remove:
         converted = converted.remove_columns(remove)

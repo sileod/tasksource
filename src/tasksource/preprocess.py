@@ -72,6 +72,22 @@ def reservoir_sample(rows, limit, seed=0):
                 sample[slot] = (index, row)
     return [row for index, row in sorted(sample)]
 
+# Original row of each example in the loaded source dataset ("split:row"), kept through preprocessing
+# so that a problem found downstream can be traced to, and reported against, the source.
+SOURCE_INDEX = "source_index"
+
+
+def add_source_index(dataset):
+    """Number the rows of each split of a freshly loaded dataset, before any preprocessing."""
+    if not isinstance(dataset, datasets.DatasetDict):
+        return dataset
+    return datasets.DatasetDict({
+        split: rows if SOURCE_INDEX in rows.column_names or not isinstance(rows, datasets.Dataset)
+        else rows.add_column(SOURCE_INDEX, [f"{split}:{i}" for i in range(len(rows))])
+        for split, rows in dataset.items()
+    })
+
+
 class Preprocessing(DotWiz):
     default_splits = ('train','validation','test')
     _instances = []
@@ -92,8 +108,9 @@ class Preprocessing(DotWiz):
         return self(datasets.load_dataset(
             self.dataset_name, self.config_name, **self.load_dataset_kwargs))
 
-    def __call__(self,dataset, max_rows=None, max_rows_eval=None,seed=0, pre_processed=False):
+    def __call__(self,dataset, max_rows=None, max_rows_eval=None,seed=0, pre_processed=False, source_index=False):
         """``pre_processed=True`` skips ``pre_process`` (already applied, e.g. before streaming sampling).
+        ``source_index=True`` keeps each row's original ``split:row`` in a ``source_index`` column.
 
         Empty training splits raise ValueError; empty evaluation splits retain the canonical schema.
         """
@@ -101,6 +118,8 @@ class Preprocessing(DotWiz):
         if visual:
             dataset = disable_image_decoding(dataset)
         if not pre_processed:
+            if source_index:
+                dataset = add_source_index(dataset)
             dataset = self.pre_process(dataset)
 
         # manage splits
@@ -138,7 +157,7 @@ class Preprocessing(DotWiz):
         dataset = align_empty_splits(dataset)
         dataset=dataset.remove_columns(  # question is metadata, never a column
             get_column_names(dataset)-(set(self.to_dict().keys())-{'question'}
-            - ({'metadata'} if self.metadata is None else set())))
+            - ({'metadata'} if self.metadata is None else set())) - {SOURCE_INDEX})
         if 'metadata' in get_column_names(dataset):
             def encode_metadata(row):
                 value = row['metadata']
