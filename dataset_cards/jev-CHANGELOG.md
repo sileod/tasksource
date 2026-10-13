@@ -10,6 +10,10 @@ Each release is tagged on the Hub: `load_dataset("tasksource/tasksource-jev-type
 - DiscoSense states include the discourse connective; PropSegmEnt question fixed; PROST removed (test-only).
 - New: CEBaB, FABSA and TAB.
 
+## v2026.10.13.1
+
+- `vision`: game decisions, 1,000 training rows each from [GameQA](https://huggingface.co/datasets/OpenMOSS-Team/GameQA-140K) multiple-choice questions and [Valen](https://huggingface.co/datasets/Valen-Team/Valen-Eval-Game) optimal-action judgments (68,085 vision training rows). Existing rows and evaluation splits are unchanged.
+
 ## v2026.10.13
 
 - 18 procedural sources, including `record_eligibility`; procedural rows are label-balanced (at most 60% per answer, yes/no at most a third of questions).
