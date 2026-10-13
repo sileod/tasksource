@@ -63,10 +63,12 @@
     "focused_passed": 27,
     "final_meme_cases_passed": 8,
     "streaming_split_filters": "passed; frozen per-split exclusion sets",
-    "final_meme_and_image_only_builder_cases_passed": 10
+    "final_meme_and_image_only_builder_cases_passed": 10,
+    "vision_publisher_cases_passed": 3
   },
   "publication": {
-    "vision": "Staging with documented scripts.append_jev_vision; 20k cap per source family; existing rows/evaluation preserved; no publication claimed yet"
+    "vision": "Staging with documented scripts.append_jev_vision; 20k cap per source family; existing rows/evaluation preserved; no publication claimed yet",
+    "failure_policy": "Explicitly requested source failures stop publication; cached successful source builds remain resumable."
   },
   "memeqa_conversion": {
     "source": "https://github.com/npnkhoi/memeqa",

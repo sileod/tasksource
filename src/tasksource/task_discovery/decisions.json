@@ -2357,7 +2357,8 @@
     "evidence": [
       "https://github.com/rsathya4802/Memotion-2",
       "https://competitions.codalab.org/competitions/35688",
-      "https://drive.google.com/drive/folders/1fC0EaJtwcfF28GnQBecIZJh3F0XNwHA"
+      "https://drive.google.com/drive/folders/1fC0EaJtwcfF28GnQBecIZJh3F0XNwHA",
+      "https://github.com/claws-lab/MMSoc/blob/master/mmsoc/utils/data_utils.py"
     ],
     "checked_on": "2026-10-13",
     "reconsider_if": "A permitted download of native Memotion 2.0 images, annotations and split manifests is available.",
@@ -2376,7 +2377,7 @@
         },
         "checked_on": "2026-10-13",
         "verdict": "park",
-        "findings": "Official source access instructions inspected; public Drive link unavailable. HF 6992-row/7K derivatives not mistaken for the requested release."
+        "findings": "Official access instructions inspected; public Drive folder returned 404. The public MMSoc conversion code explicitly reads memotion_dataset_7k/labels.xlsx and its images, confirming it is the older 7K source rather than a verified native 2.0 release."
       }
     ]
   }

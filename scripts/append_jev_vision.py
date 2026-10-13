@@ -121,6 +121,9 @@ def run(args):
             records[source] = {'status': 'failed', 'error': f'{type(error).__name__}: {error}'}
             print(source, records[source], flush=True)
         dump(output / 'progress.json', records)
+    failed = [source for source, record in records.items() if record['status'] == 'failed']
+    if args.push and args.tasks and failed:
+        raise ValueError(f'Requested source builds failed; publication stopped: {failed}')
     if not frames:
         raise ValueError('No source builds succeeded')
     candidates = concatenate_datasets(frames)
