@@ -1408,6 +1408,7 @@ def build_vision(args):
             converted = []
             for index, example in enumerate(rows):
                 row = to_training_row(example, index, source, split)
+                row['state'] = row['state'] or ''  # Image-only decisions need no text state.
                 images = image_keys(row['images'])
                 leakage_images = image_keys(row['images'], row.get('metadata'))
                 if split == 'train':

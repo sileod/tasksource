@@ -7,7 +7,7 @@ concise bullets on what changed in the data. `tasksource-jev-typed-decisions` re
 ## tasksource-jev-typed-decisions v2026.10.13.5
 
 - Add generated-image T2ISafety toxicity judgments, native single-answer MemeQA, and four English MET-Meme classification views. Training is capped at 20,000 rows per source family; existing training and evaluation shards are preserved.
-- Generation prompts and answer metadata stay out of inputs. MemeQA retains its native meme splits; MET-Meme retains its Hub partitions with held-out image copies and conflicting duplicate-image labels removed. MemeQA image terms are marked research-use; MET-Meme's license is explicitly unspecified.
+- Image-only memes remain usable with an empty text state. Generation prompts and answer metadata stay out of inputs. MemeQA retains its native meme splits; MET-Meme retains its Hub partitions with held-out image copies and conflicting duplicate-image labels removed. MemeQA image terms are marked research-use; MET-Meme's license is explicitly unspecified.
 
 ## memeqa 2026-10-13
 

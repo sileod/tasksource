@@ -62,7 +62,8 @@
   "tests": {
     "focused_passed": 27,
     "final_meme_cases_passed": 8,
-    "streaming_split_filters": "passed; frozen per-split exclusion sets"
+    "streaming_split_filters": "passed; frozen per-split exclusion sets",
+    "final_meme_and_image_only_builder_cases_passed": 10
   },
   "publication": {
     "vision": "Staging with documented scripts.append_jev_vision; 20k cap per source family; existing rows/evaluation preserved; no publication claimed yet"
@@ -493,5 +494,6 @@
         ]
       ]
     }
-  }
+  },
+  "build_repair": "Full-source staging exposed image-only rows with an absent text state. The visual builder now normalizes that state to an empty string, preserving images and explicit questions; regression covers null states and option permutations."
 }

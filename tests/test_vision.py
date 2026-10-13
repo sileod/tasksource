@@ -716,11 +716,12 @@ def test_visual_counts_keep_full_numeric_ontology(task, maximum, monkeypatch):
                for row in recast['train'])
 
 
-def test_vision_builder_distinguishes_option_permutations(tmp_path, monkeypatch):
+@pytest.mark.parametrize('state',['Same question',None])
+def test_vision_builder_distinguishes_option_permutations(tmp_path, monkeypatch, state):
     from types import SimpleNamespace
     import scripts.build_jev_dataset as builder
     ds = DatasetDict(train=Dataset.from_list([
-        {'images': [png('red')], 'state': 'Same question', 'instructions': 'Choose.',
+        {'images': [png('red')], 'state': state, 'instructions': 'Choose.',
          'criteria': options, 'label': label}
         for options, label in [(['yes', 'no'], 0), (['no', 'yes'], 1)]], features=Features({
             'images': Sequence(Image(decode=False)), 'state': Value('string'),
