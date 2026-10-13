@@ -1,4 +1,4 @@
-## tasksource ![](https://aeiljuispo.cloudimg.io/v7/https://s3.amazonaws.com/moonup/production/uploads/5fc0bcb41160c47d1d43856b/j06-U5e2Tifi2xOnTudqS.jpeg?w=20&h=20&f=face) 1,100+ decision tasks, standardized for interchangeable use
+## <img src="https://cdn-avatars.huggingface.co/v1/production/uploads/5fc0bcb41160c47d1d43856b/j06-U5e2Tifi2xOnTudqS.jpeg" alt="" height="32" align="absmiddle"> tasksource: 1,100+ decision tasks, standardized for interchangeable use
 
 tasksource is a collection of **decision tasks**: classification, multiple choice and token labeling,
 with negative examples or classes, standardized so that they can be used interchangeably for
