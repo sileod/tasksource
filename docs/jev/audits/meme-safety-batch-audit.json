@@ -60,7 +60,9 @@
     "Memotion 2.0": "Official download requires participant registration; referenced public Drive folder returns 404. Reviewed 7K Hub derivatives are not substituted for version 2.0."
   },
   "tests": {
-    "focused_passed": 27
+    "focused_passed": 27,
+    "final_meme_cases_passed": 8,
+    "streaming_split_filters": "passed; frozen per-split exclusion sets"
   },
   "publication": {
     "vision": "Staging with documented scripts.append_jev_vision; 20k cap per source family; existing rows/evaluation preserved; no publication claimed yet"

@@ -62,13 +62,17 @@ def test_met_meme_native_labels_english_and_image_holdouts(monkeypatch,task,gold
     assert 'Native meme text' in recast['state']
 
 
-def test_met_conflicting_images_excluded_without_resolving_labels():
+@pytest.mark.parametrize('streaming',[False,True])
+def test_met_conflicting_images_excluded_without_resolving_labels(streaming):
     from tasksource.vision_tasks import met_meme_english_rows
     row={'images_name':'English/a.jpg','image':png('red'),'sentiment category':'1(happiness)',
          'intention detection':'3(entertaining)','offensiveness detection':'0(non-offensive)','metaphor occurrence':'0'}
     features=Features({k:Image(decode=False) if k=='image' else Value('string') for k in row})
     native=DatasetDict(train=Dataset.from_list([row,{**row,'image':png('blue')}],features=features),
         test=Dataset.from_list([row,{**row,'metaphor occurrence':'1'},{**row,'image':png('green')}],features=features))
-    result=met_meme_english_rows(native)
+    if streaming:
+        from datasets import IterableDatasetDict
+        native=IterableDatasetDict({s:rows.to_iterable_dataset() for s,rows in native.items()})
+    result={s:list(rows) for s,rows in met_meme_english_rows(native).items()}
     assert len(result['test'])==len(result['train'])==1
     assert result['train'][0]['image']==png('blue')
