@@ -11,3 +11,9 @@ Each repackaged dataset README must link to the original data distribution and t
 # Dataset documentation
 
 Keep Hub root dataset cards focused on current usage, configs, schema and license scope. Put release notes in CHANGELOG.md or addition manifests, and config-specific details in that config’s README. Incremental publication scripts must preserve the root card body rather than append batch summaries.
+
+# Jev releases
+
+The text configs of `tasksource/tasksource-jev-typed-decisions` (`default`, `full`) come only from `scripts/build_jev_dataset.py`, and each publish replaces all their shards. Add text sources to the catalog so the build includes them; shards appended outside the build are lost at the next publish. Appends are fine for `vision`, which text publishes leave untouched.
+
+Every publish is a release: its newest `## vYYYY.MM.DD[.n]` entry in `dataset_cards/jev-CHANGELOG.md` (published as `CHANGELOG.md`) lists in a few user-facing bullets what changed, and the Hub revision gets that tag. The build does both from the changelog; other publication scripts upload the changelog and call `HfApi.create_tag`.
