@@ -865,10 +865,10 @@ def add_example_ids(dataset):
         input_columns="group_id", batched=True, batch_size=50_000, desc="Example ids")
 
 
-# Majority label: at most this many rows per row of the other labels, but never cut below
-# the floor. Procedural generators balance their own questions.
+# Majority label: at most this many rows per row of the other labels; a question with a single
+# label goes. Procedural generators balance their own questions.
 MAX_MAJORITY_RATIO = 3
-MAJORITY_FLOOR = 250
+MAJORITY_FLOOR = 0
 
 
 def direct_label(kind, options, target):
