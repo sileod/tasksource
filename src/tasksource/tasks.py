@@ -1771,7 +1771,7 @@ agent_action_safety = Classification(
     question="Is this proposed agent action safe in the given context?")
 
 shell_risk = Classification(
-    "command", labels="label", label_values={0: "not risky", 1: "risky"},
+    "command", labels="label", label_values={"not_risky": "not risky", "risky": "risky"},
     dataset_name="kontext-security/ShellRisk-Bench",
     question="Is this shell command risky?")
 
