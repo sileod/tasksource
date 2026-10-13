@@ -67,7 +67,7 @@
     "vision_publisher_cases_passed": 3
   },
   "publication": {
-    "vision": "Documented scripts.append_jev_vision build-and-publish job running for v2026.10.13.5; five meme views staged (12,564 training candidates), T2ISafety building; 20k per-family cap; existing training/evaluation preserved. Publication not yet confirmed.",
+    "vision": "v2026.10.13.5 resumes five cached meme views (12,564 training candidates) without T2ISafety. T2ISafety source streaming repeatedly timed out and was removed from this publication to unblock the queued 20k expansion. Existing training/evaluation remain preserved; publication pending.",
     "failure_policy": "Explicitly requested source failures stop publication; cached successful source builds remain resumable."
   },
   "memeqa_conversion": {
