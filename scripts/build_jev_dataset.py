@@ -1161,11 +1161,23 @@ def keep_hub_configs(card_path, repo_id, pushed):
                          encoding="utf-8")
 
 
+CHANGELOG = Path(__file__).resolve().parent.parent / "DATA_CHANGELOG.md"
+DATASET = "tasksource-jev-typed-decisions"
+
+
+def dataset_changelog(text, dataset=DATASET):
+    """The repository changelog's header and the entries of one dataset (headings ``## <dataset> ...``)."""
+    header, *entries = re.split(r"(?m)^(?=## )", text)
+    return header + "".join(entry for entry in entries if entry.startswith(f"## {dataset} ")
+                            or entry.startswith(f"## {dataset}:"))
+
+
 def tag_release(api, repo_id, changelog):
-    """Tag the published revision with the changelog's latest version (## vYYYY.MM.DD[.n])."""
-    match = re.search(r"^## (v\d{4}\.\d{2}\.\d{2}(?:\.\d+)?)", changelog.read_text(encoding="utf-8"), re.M)
+    """Tag the published revision with the dataset's newest changelog version (## <dataset> vYYYY.MM.DD[.n])."""
+    match = re.search(rf"^## {re.escape(DATASET)} (v\d{{4}}\.\d{{2}}\.\d{{2}}(?:\.\d+)?)$",
+                      changelog.read_text(encoding="utf-8"), re.M)
     if not match:
-        print("CHANGELOG.md has no version heading; release not tagged", flush=True)
+        print("CHANGELOG.md has no version entry; release not tagged", flush=True)
         return
     tags = {ref.name for ref in api.list_repo_refs(repo_id, repo_type="dataset").tags}
     if match[1] in tags:
@@ -1658,7 +1670,7 @@ def build(args):
         shutil.copyfile(args.card, output / "README.md")
         shutil.copyfile(args.card.parent / "jev-token-source-status.md", output / "token-source-status.md")
         shutil.copyfile(args.card.parent / "jev-AGENTS.md", output / "AGENTS.md")
-        shutil.copyfile(args.card.parent / "jev-CHANGELOG.md", output / "CHANGELOG.md")
+        (output / "CHANGELOG.md").write_text(dataset_changelog(CHANGELOG.read_text(encoding="utf-8")), encoding="utf-8")
         selected = set(tasks.source_id)
         latest = latest_records(report_path)
         failures = [

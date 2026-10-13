@@ -1,8 +1,10 @@
-# Changelog
+# Data changelog
 
-Each release is tagged on the Hub: `load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`.
+Changes that affect published data, newest first: one entry per publish, `## <dataset> <version>`, with a few
+concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
+(`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
-## v2026.10.13.4
+## tasksource-jev-typed-decisions v2026.10.13.4
 
 - `source_index` (`split:row` of the original dataset row) on every row, to trace label errors back to their source.
 - Stable row order across rebuilds: shuffled by `example_id`, so row-level annotations stay valid.
@@ -11,23 +13,29 @@ Each release is tagged on the Hub: `load_dataset("tasksource/tasksource-jev-type
 - New: CEBaB, FABSA and TAB.
 - Restores 57 sources missing from v2026.10.13 (MAUD, multidogo, WikiQA, OLID, TabFact and others), now built with the rest instead of appended.
 
-## v2026.10.13.3
+## tasksource-jev-typed-decisions v2026.10.13.3
 
 - `vision`: GameQA and Valen Game grow to 20,000 training rows each, retaining the original 1,000-row pilots (106,085 vision training rows total). All new Valen rows are English; its preserved bilingual pilot leaves 19,493 English and 507 Chinese rows.
 - New rows are shuffled together with seed 0; original shards and evaluation splits are unchanged. GameQA question identities now include the native record to avoid collisions.
 
-## v2026.10.13.1
+## tasksource-jev-typed-decisions v2026.10.13.1
 
 - `vision`: game decisions, 1,000 training rows each from [GameQA](https://huggingface.co/datasets/OpenMOSS-Team/GameQA-140K) multiple-choice questions and [Valen](https://huggingface.co/datasets/Valen-Team/Valen-Eval-Game) optimal-action judgments (68,085 vision training rows). Existing rows and evaluation splits are unchanged.
 
-## v2026.10.13
+## tasksource-jev-typed-decisions v2026.10.13
 
 - 18 procedural sources, including `record_eligibility`; procedural rows are label-balanced (at most 60% per answer, yes/no at most a third of questions).
 - Label balance: per source and question, the majority label is at most three times the rarest; single-label questions are dropped.
 - `default` mix weighs sources by option count, so binary decisions are 15% of rows.
 - Known issue: 58 sources from earlier appends are missing (MAUD, multidogo, WikiQA, OLID, TabFact and others).
 
-## Earlier releases
+## procedural-typed-decisions 2026-10-13
+
+- New task `record_eligibility`; `partial_observation_calibration` recalibrated so levels go from easy (L0) to hard (L4).
+- Answers balanced: at most 60% per answer within a question, and yes/no questions at most a third of each task.
+
+
+## tasksource-jev-typed-decisions: earlier releases
 
 Untagged notes from the dataset card before its cleanup. Counts and policies describe their snapshots.
 

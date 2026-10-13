@@ -34,9 +34,8 @@ caps sources, removes evaluation rows overlapping train, and pushes `full` (ever
 `example_id`, so row-level annotations survive rebuilds. `build-manifest.json`, `release-audit.json`,
 `failed-tasks.json` and `sources.yaml` (source revisions and licenses) are published with the data.
 
-Each publish is a release: add a `## vYYYY.MM.DD[.n]` entry to
-[`dataset_cards/jev-CHANGELOG.md`](../../dataset_cards/jev-CHANGELOG.md) first; the build uploads it and tags
-the Hub revision. Never pass `--upload` to a partial build (`--tasks`): it would replace the release.
+Each publish is a release: add a `## tasksource-jev-typed-decisions vYYYY.MM.DD[.n]` entry to
+[`DATA_CHANGELOG.md`](../../DATA_CHANGELOG.md) first; the build publishes the dataset's entries and tags the Hub revision. Never pass `--upload` to a partial build (`--tasks`): it would replace the release.
 
 Smoke test, without publishing:
 

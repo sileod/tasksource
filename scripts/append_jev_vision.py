@@ -158,8 +158,8 @@ def run(args):
     def download(name):
         return Path(hf_hub_download(REPO, name, repo_type='dataset', revision=head.sha))
     # Publish only this entry: the local changelog may include a pending text rebuild.
-    changelog = Path(__file__).resolve().parents[1] / 'dataset_cards/jev-CHANGELOG.md'
-    entry = re.search(r'^## ' + re.escape(args.release) + r'\n.*?(?=^## |\Z)',
+    changelog = Path(__file__).resolve().parents[1] / 'DATA_CHANGELOG.md'
+    entry = re.search(r'^## tasksource-jev-typed-decisions ' + re.escape(args.release) + r'\n.*?(?=^## |\Z)',
                       changelog.read_text(), re.M | re.S)
     if entry is None:
         raise ValueError(f'No changelog entry for {args.release}')
@@ -211,7 +211,7 @@ if __name__ == '__main__':
     parser.add_argument('--seed', type=int, default=0)
     parser.add_argument('--tasks', nargs='+', help='Append only these vision tasks, including newly registered sources')
     parser.add_argument('--push', action='store_true')
-    parser.add_argument('--release', help='Version with an entry in dataset_cards/jev-CHANGELOG.md; required for --push')
+    parser.add_argument('--release', help='Version with a "## tasksource-jev-typed-decisions VERSION" entry in DATA_CHANGELOG.md; required for --push')
     args = parser.parse_args()
     if args.cap <= 0:
         parser.error('--cap must be positive')

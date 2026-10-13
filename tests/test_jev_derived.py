@@ -462,3 +462,14 @@ class SourceQuotasTest(unittest.TestCase):
         self.assertIn("snips/new", quotas)
         self.assertLess(quotas["clinc_oos"], quotas["snips/new"])
         self.assertLess(quotas["snips/new"], quotas["banking77"])
+
+
+class ChangelogTest(unittest.TestCase):
+    def test_dataset_entries_and_newest_version(self):
+        from scripts.build_jev_dataset import dataset_changelog
+        text = ("# Changelog\n\nintro\n\n## tasksource-jev-typed-decisions v2026.10.14\n\n- a\n\n"
+                "## procedural-typed-decisions 2026-10-13\n\n- b\n\n## tasksource-jev-typed-decisions: earlier releases\n\n### x\n")
+        out = dataset_changelog(text)
+        self.assertIn("v2026.10.14", out)
+        self.assertIn("### x", out)
+        self.assertNotIn("procedural", out)
