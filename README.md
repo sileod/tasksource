@@ -2,7 +2,8 @@
 
 tasksource is a collection of **decision tasks**: classification, multiple choice and token labeling,
 with negative examples or classes, standardized so that they can be used interchangeably for
-multi-task training, evaluation and reward modeling.
+multi-task training, evaluation and reward modeling. Labels come from human annotation or from
+procedures that verify them, and the focus is on training data: evaluation benchmarks are kept separate.
 
 Hugging Face Datasets is an excellent library, but datasets lack a common format and often need
 preprocessing before they can be used together. Each tasksource annotation maps a dataset to one of three
@@ -13,7 +14,7 @@ is a short, readable function from a dataset to its standardized form.
   [multilingual](catalog_multilingual.md) and [vision](catalog_vision.md) catalogs.
 - Soft labels (annotator votes and rating distributions), license filters, and per-task questions that say what to decide.
 - Recasts to typed decisions ([tasksource-jev-typed-decisions](#tasksource-jev-typed-decisions)),
-  instructions and label NLI.
+  [instructions](#tasksource-instruct) and [label NLI](#tasksource-label-nli).
 
 ### Usage
 
