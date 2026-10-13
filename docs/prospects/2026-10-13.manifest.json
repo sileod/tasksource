@@ -1,0 +1,36 @@
+{
+  "completed_at": "2026-10-13T03:56:31.130552+00:00",
+  "status": "complete",
+  "reviewed": 11776,
+  "shortlisted": 142,
+  "stages": {
+    "classification": {
+      "inventory": 13159,
+      "last_batch": 71,
+      "selected": 9097,
+      "status": "complete"
+    },
+    "ranking": {
+      "inventory": 2628,
+      "last_batch": 14,
+      "selected": 1920,
+      "status": "complete"
+    },
+    "sentence-similarity": {
+      "inventory": 862,
+      "last_batch": 4,
+      "selected": 527,
+      "status": "complete"
+    },
+    "zero-shot-classification": {
+      "inventory": 716,
+      "last_batch": 1,
+      "selected": 232,
+      "status": "complete"
+    }
+  },
+  "input_handoff_sha256": "8e266d2d462d9d73abd00e7fa44a3b57923d4a1eb06cf55a9d1d7971d5c9444d",
+  "output_sha256": "87d571c1c1885b2688b03dfec50496dfba1a64e75fd290273698e613c909f942",
+  "scope": "Automated discovery results only; no implementation approval or manual audit.",
+  "review_policy": "human/procedural labels or independently verified synthetic labels; see discovery documentation"
+}

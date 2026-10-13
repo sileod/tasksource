@@ -4,6 +4,14 @@ Potential additions to Tasksource, separate from the implemented [English](../ca
 [multilingual](../catalog_multilingual.md) and [vision](../catalog_vision.md) catalogs.
 These are screening results, **not approved training sources or completed integrations**.
 
+## Published screening results
+
+- [October 13 exhaustive HF category pass](prospects/2026-10-13.md): 142 shortlisted
+  sources from 11,776 screened candidates; includes downloadable review records.
+- October 12 mixed-source pass: the 15 candidates summarized below.
+
+## October 12 snapshot
+
 Snapshot: October 12, 2026. A 5,000-candidate discovery pass produced 42 eligibility
 passes; 15 remained after annotation-provenance screening. All 15 appear below,
 including candidates subsequently flagged for overlap or other holds. The order
@@ -64,7 +72,6 @@ summary, not a dump of the internal implementation queue or raw review inputs.
 Deeper processing must confirm answerability, label correctness, novelty, licenses
 and leakage before a source enters a training catalog.
 
-The exhaustive English-tagged HF discovery queue continues separately through
-classification, zero-shot classification, sentence similarity and ranking, in that
-order. This page is a dated snapshot, not a live progress counter or a claim of
-exhaustive coverage.
+The exhaustive English-tagged HF category queue completed on October 13; its
+[separate shortlist](prospects/2026-10-13.md) preserves the results without changing
+these earlier follow-up notes. These pages are dated snapshots, not live counters.
