@@ -123,7 +123,16 @@ The pass matches implemented catalogs, mirrors, structured prior decisions and t
 
 The output directory retains `matched.jsonl`, `checked.jsonl`, per-model review artifacts, `prospects.jsonl` and a `handoff.jsonl` of promising candidates. A promising source needs explicit evidence and all configured reviewers assigning at least 0.8 to training and decision fit; resources must be demonstrated by a fetched Viewer row or supported at 0.8 by all reviewers; HF sources additionally need observed training-split metadata and no failed training checks. Missing evidence or reviewer disagreement stays `needs_evidence`. These are screening judgments, not verified annotation quality. The manifest records input/catalog hashes, seed, model routes and prompt/code hashes. The human-curated queue remains separate.
 
-For English-focused discovery, HF retrieval passes `--language en` directly to the Hub API, including multilingual datasets tagged English. The screening command also accepts `--language en`: declared English is preferred within each source sample, known non-English sources are excluded, and missing language metadata remains eligible for evidence review. PWC language names such as `English` are normalized. OpenAlex paper language is not treated as dataset language. Filters are recorded in cache keys and run manifests; metadata tags do not establish example-level language quality.
+For English-focused discovery, HF retrieval passes `--language en` directly to the Hub API, including multilingual datasets tagged English. The screening command also accepts `--language en`: declared English is preferred within each source sample, known non-English sources are excluded, and missing language metadata remains eligible for evidence review. PWC language names such as `English` are normalized. OpenAlex paper language is not treated as dataset language. Retrieval accepts
+`--source openalex --language en` to filter English papers; this does not establish
+that their datasets are English. Abstracts are reconstructed from the supplied
+inverted index and retained as review evidence, with missing abstracts left empty. Filters are recorded in cache keys and run manifests; metadata tags do not establish example-level language quality.
+
+When screening with `--language`, an additional native decision checks the actual
+labeled dataset language from source evidence. Paper language and repository tags
+alone do not satisfy it; unknown language remains unresolved and explicit mismatches
+are unsuitable for that language-scoped pass. Earlier snapshots without this
+question retain their original judgments and require language checks before use.
 
 Training availability and split safety are separate. Screening records `source_splits` and `split_policy` (`train_only`, `multiple_splits`, `unknown`). A Hub split named `train` is not sufficient positive evidence: the train criterion requires source documentation of a designated training partition or a corpus intended for training. Train-only dumps may include evaluation material; even multiple split names do not prove disjointness. The processing phase must verify source partitions and leakage before implementation.
 
@@ -183,3 +192,30 @@ The queue processes 128-source batches, excludes implemented/parked/curated sour
 A lock prevents duplicate runners. Rerunning the exact command skips completed stages and batches; cached successful model calls survive an interrupted batch. Fatal batch processes get one retry, then stop with `batch_failed`. Source-level uncertainty, inaccessible/gated sources and request failures remain explicit in batch artifacts. Viewer requests are paced to one uncached request per second per process, with bounded 429 backoff and atomic cache writes. This is separate from litlm's adaptive model concurrency.
 
 `status.json` and `report.md` track stage progress; the root `handoff.jsonl` accumulates the shortlist after each completed batch. All judgments remain in each batch's `prospects.jsonl`, with inputs, prompts, controls and logs beside them. The human/procedural plus independently verified-synthetic policy is enabled. The queue does not implement datasets or modify the human-curated queue. Closing the interactive session does not stop a detached runner; machine/process termination requires rerunning the saved command.
+
+
+## Bounded OpenAlex domain passes
+
+```bash
+# Retrieve four searches per domain (100 papers/query), then review 12/domain:
+python scripts/discover_openalex.py --pilot-only
+# After inspecting the pilot, review resource-linked leads (up to 188/domain):
+python scripts/discover_openalex.py
+```
+
+The script records general, medical and legal query sets explicitly and uses
+English-paper filtering. It reuses discovery matching, prior-screening exclusions,
+reviewer controls and the human/procedural plus verified-synthetic policy. Domains
+exclude earlier passes so shared papers are not knowingly reviewed twice under the
+same identity. Cross-source aliases remain imperfect. Paper-only records can remain
+`needs_evidence`: abstracts do not always document train partitions or resource
+links, and an English paper can describe a non-English corpus. No papers are treated
+as datasets merely because of their titles. Saved commands, source snapshots,
+evidence hashes and review judgments support replay. Successful steps are skipped
+on resume; use a fresh output directory if changing query settings. This produces
+prospects only and never edits task annotations or the internal implementation queue.
+Expansion prioritizes papers with explicit HF/GitHub links so cards/READMEs can
+provide evidence absent from abstracts. Other retrieved leads remain in the saved
+inventory, unresolved rather than rejected. The combined final shortlist is in
+`english-confirmed/handoff.jsonl`; any legacy eligibility passes are re-reviewed
+with the dataset-language criterion before appearing there.

@@ -95,7 +95,7 @@ def configure_key():
         os.environ['JEV_OPENROUTER_API_KEY']=key_path.read_text().strip()
 
 
-def run(rows,output,cache,models,offline=False):
+def run(rows,output,cache,models,offline=False,languages=()):
     from litlm import complete,ensemble
     from litlm_cli import _record
     output.mkdir(parents=True,exist_ok=True)
@@ -103,7 +103,13 @@ def run(rows,output,cache,models,offline=False):
     with ThreadPoolExecutor(max_workers=8) as pool:
         states=list(pool.map(lambda row:json.dumps(evidence(row,cache,offline),sort_keys=True,ensure_ascii=False),rows))
     (output/'inputs.jsonl').write_text(''.join(json.dumps(s,ensure_ascii=False)+'\n' for s in states))
-    (output/'questions.json').write_text(json.dumps(QUESTIONS,indent=2)+'\n')
+    questions=dict(QUESTIONS)
+    if languages:
+        questions['dataset_language']=dict(type='choice',criteria=QUESTIONS['train']['criteria'],
+            instructions='Use supplied evidence only. Does the actual labeled dataset include usable training examples in '
+            +', '.join(languages)+'? Paper language, English metadata and repository tags alone are insufficient. '
+            'A multilingual dataset qualifies if this language subset exists. Missing evidence means unknown.')
+    (output/'questions.json').write_text(json.dumps(questions,indent=2)+'\n')
     hashes=[hashlib.sha256(s.encode()).hexdigest() for s in states]
     questions_hash=hashlib.sha256((output/'questions.json').read_bytes()).hexdigest()
     print(f'Evidence saved; reviewing {len(states)} candidates with {len(models)} models',flush=True)
@@ -114,7 +120,7 @@ def run(rows,output,cache,models,offline=False):
             completed+=1
             if completed%100==0:print(f'Model reviews completed: {completed}/{len(states)*len(models)}',flush=True)
             raw.write(json.dumps(dict(index=index,state_sha256=hashes[index],**_record(result)))+'\n');raw.flush()
-        options=dict(decisions=QUESTIONS,api_key_envs=['JEV_OPENROUTER_API_KEY'],adaptive_concurrency=True,
+        options=dict(decisions=questions,api_key_envs=['JEV_OPENROUTER_API_KEY'],adaptive_concurrency=True,
                      max_concurrency=32,num_retries=0,caching=True,show_progress=False,on_result=save)
         results=ensemble(states,models,**options) if len(models)>1 else complete(states,model=models[0],**options)
     records=[]
@@ -126,7 +132,8 @@ def run(rows,output,cache,models,offline=False):
             ensemble=_record(result) if len(models)>1 else None,
             review_evidence_count=len(json.loads(states[i])['evidence']),
             review_state_sha256=hashes[i],review_questions_sha256=questions_hash,
-            review_status='failed' if result.failed else 'reviewed',requires_processing=True))
+            review_status='failed' if result.failed else 'reviewed',requires_processing=True,
+            review_languages=list(languages)))
     (output/'reviews.jsonl').write_text(''.join(json.dumps(r,ensure_ascii=False)+'\n' for r in records))
     manifest=dict(scheduling=dict(adaptive_concurrency=True,max_concurrency=32,num_retries=0),models=models,records=len(rows),failed=sum(r['review_status']=='failed' for r in records),
         inputs_sha256=hashlib.sha256((output/'inputs.jsonl').read_bytes()).hexdigest(),

@@ -62,6 +62,7 @@ def prospect_status(row):
     if not answers:return 'needs_evidence'
     # Keep each model's decision: the average alone cannot erase disagreement.
     questions=('train','decision_fit') if observed_resource(row) else ('train','resources','decision_fit')
+    if row.get('review_languages'):questions+=('dataset_language',)
     for question in questions:
         if all(a.get(question,{}).get('probabilities',{}).get('no',0)>=0.8 for a in answers):return 'not_suitable'
     if row.get('train_status')=='not_listed' or (row.get('huggingface') and row.get('train_status')!='present'):
@@ -167,7 +168,7 @@ def main():
         checked=list(pool.map(lambda r:training_evidence(r,args.cache,args.offline_evidence),selected))
     write_rows(args.output/'checked.jsonl',checked)
     print('Training metadata saved; collecting evidence and reviewing',flush=True)
-    manifest=run(checked,args.output/'review',args.cache,args.model or [MODEL],args.offline_evidence) if checked else {}
+    manifest=run(checked,args.output/'review',args.cache,args.model or [MODEL],args.offline_evidence,languages=args.language) if checked else {}
     reviewed=[json.loads(l) for l in (args.output/'review/reviews.jsonl').read_text().splitlines()] if checked else []
     manifest.update(save_prospects(reviewed,args.output,args.annotation_origin,args.allow_verified_synthetic))
     manifest.update(input_hashes={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in args.inputs},

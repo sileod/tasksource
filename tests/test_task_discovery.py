@@ -165,14 +165,18 @@ def test_openalex_bounded_pages_preserve_paper_identity_without_inventing_datase
     calls=[]
     def query(url,*args):
         params=parse_qs(urlsplit(url).query);page=int(params['page'][0]);size=int(params['per_page'][0])
-        calls.append((page,size))
+        calls.append((page,size,params.get('filter')))
         return dict(url=url,sha256='hash',data=dict(results=[dict(id=f'https://openalex.org/W{page*100+i}',
             title=f'Classification dataset paper {page*100+i}',doi=f'https://doi.org/10.1234/{page*100+i}',
             publication_year=2024,locations=[dict(landing_page_url='https://github.com/org/data',pdf_url=None)],
-            abstract_inverted_index={'https://huggingface.co/datasets/org/data':[0]}) for i in range(size)]))
+            language='en',abstract_inverted_index={'https://huggingface.co/datasets/org/data':[2],
+                'training':[1], 'Human':[0]}) for i in range(size)]))
     monkeypatch.setattr(openalex,'cached_json',query)
-    rows,manifest=openalex.retrieve(tmp_path,queries=['classification dataset'],limit=101)
-    assert calls==[(1,100),(2,1)] and len(rows)==101
+    rows,manifest=openalex.retrieve(tmp_path,queries=['classification dataset'],limit=101,languages=['en'])
+    assert calls==[(1,100,['language:en']),(2,1,['language:en'])] and len(rows)==101
+    assert rows[0]['description']=='Human training https://huggingface.co/datasets/org/data'
+    assert rows[0]['paper_language']=='en' and rows[0]['languages']==[]
+    assert manifest['paper_languages']==['en']
     assert rows[0]['candidate_kind']=='paper' and rows[0]['train_status']=='unchecked'
     assert rows[0]['github']==['https://github.com/org/data']
     assert rows[0]['huggingface']==['https://huggingface.co/datasets/org/data']

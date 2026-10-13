@@ -61,6 +61,22 @@ def test_review_preserves_history_model_answers_and_evidence_without_promoting(t
     assert calls[0]['adaptive_concurrency'] and calls[0]['max_concurrency']==32
     assert 'per_key_rpm' not in calls[0]
     assert 'private-test-key' not in ''.join(p.read_text() for p in (tmp_path/'review').glob('*'))
+    jev_review.run([source],tmp_path/'english',tmp_path/'cache',['openrouter/test'],languages=['en'])
+    assert 'dataset_language' in calls[-1]['decisions']
+    english=json.loads((tmp_path/'english/reviews.jsonl').read_text())
+    assert english['review_languages']==['en']
+    assert 'dataset_language' not in jev_review.QUESTIONS
+
+
+def test_language_scope_checks_dataset_not_paper_language():
+    row=reviewed('yes')
+    row.update(paper_language='en',review_languages=['en'])
+    assert discovery.prospect_status(row)=='needs_evidence'
+    answer=row['reviews'][0]['data']['answers']
+    answer['dataset_language']=dict(probabilities={'yes':0,'no':1,'unknown':0})
+    assert discovery.prospect_status(row)=='not_suitable'
+    answer['dataset_language']=dict(probabilities={'yes':1,'no':0,'unknown':0})
+    assert discovery.prospect_status(row)=='promising'
 
 
 def test_discovery_uses_current_evidence_and_question_reviews_not_stale_history():

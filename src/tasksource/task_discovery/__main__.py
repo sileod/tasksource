@@ -22,7 +22,7 @@ def main():
     fetch.add_argument('--snapshot', type=Path, help='Local copy of the pinned .json.gz export')
     fetch.add_argument('--all', action='store_true', help='Include datasets without decision-oriented task tags')
     fetch.add_argument('--task', action='append', default=[], help='Case-insensitive task-tag substring; repeat for OR')
-    fetch.add_argument('--language', action='append', default=[], help='Hub dataset language code; repeat for OR (e.g. en)')
+    fetch.add_argument('--language', action='append', default=[], help='HF dataset or OpenAlex paper language code; repeat for OR (e.g. en)')
     compare = commands.add_parser('match', help='Deduplicate and compare any canonical candidate JSONL')
     compare.add_argument('input', type=Path)
     compare.add_argument('--index',type=Path,help='External catalog links JSONL; defaults to bundled index')
@@ -43,8 +43,8 @@ def main():
     if args.command == 'retrieve':
         if args.limit < 1:
             parser.error('--limit must be positive')
-        if args.language and any(s != 'hf_hub' for s in (args.source or ['paperswithcode'])):
-            parser.error('--language is a Hub dataset filter; retrieve other sources separately')
+        if args.language and 'paperswithcode' in (args.source or ['paperswithcode']):
+            parser.error('--language is an HF dataset/OpenAlex paper filter; retrieve PWC separately')
         rows, runs = [], []
         for source in dict.fromkeys(args.source or ['paperswithcode']):
             if source == 'paperswithcode':
@@ -59,7 +59,7 @@ def main():
                 found, report = fetch_source(args.cache, args.query, args.task, args.limit, args.offline, languages=args.language)
             else:
                 from .openalex import retrieve as fetch_source
-                found, report = fetch_source(args.cache, args.query, args.limit, args.offline)
+                found, report = fetch_source(args.cache, args.query, args.limit, args.offline, languages=args.language)
             rows.extend(found)
             runs.append(report)
         rows = deduplicate(rows)
