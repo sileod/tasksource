@@ -932,12 +932,12 @@ mc_taco = Classification(
 ade_corpus_v2___Ade_corpus_v2_classification = Classification("text",labels="label",
     question="Does the sentence report an adverse effect of a drug?")
 
-discosense = MultipleChoice("context",choices=regen(r"option_[0-3]"),labels="label",
-    dataset_name="json", task_id="discosense",
-    load_dataset_kwargs={"data_files": {
-        "train": "https://raw.githubusercontent.com/prajjwal1/discosense/main/data/discosense_train.json",
-        "test": "https://raw.githubusercontent.com/prajjwal1/discosense/main/data/discosense_test.json",
-    }})
+discosense = MultipleChoice(
+    cat(['context','marker'], separator='\n'), choices=regen(r"option_[0-3]"), labels="label",
+    dataset_name="tasksource/discosense",
+    question="Which continuation best follows the context and the given discourse connective?",
+    complete_splits=False,
+)
     
 circa = Classification(
     sentence1=cat(["context","question-X"]),

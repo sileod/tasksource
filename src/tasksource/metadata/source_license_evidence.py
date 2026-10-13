@@ -5,6 +5,9 @@ Keys are task families, shared by their visual classification/MC views.
 """
 
 SOURCE_LICENSE_EVIDENCE = {
+    'discosense': {'license': 'apache-2.0', 'checked': '2026-10-13',
+                   'scope': 'license declaration in the original dataset README (malformed Hub front matter)',
+                   'url': 'https://huggingface.co/datasets/prajjwal1/discosense/blob/6d008011ac5b47dcd75029f46901da81382b6d89/README.md'},
     'antique': {'license': 'research-only (original ANTIQUE distribution)',
                 'scope': 'original Yahoo answer collection and relevance judgments; no inferred software license',
                 'url': 'https://ciir.cs.umass.edu/downloads/Antique/readme.txt'},

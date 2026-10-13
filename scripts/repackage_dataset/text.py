@@ -9,12 +9,15 @@ datasets from tasksource/metadata/originals.py (add the entry there first).
 """
 
 import ast
+from collections import Counter
+import hashlib
 import json
 import re
 import urllib.request
 from pathlib import Path
 
 from datasets import ClassLabel, Dataset, DatasetDict, load_dataset
+from huggingface_hub import hf_hub_download
 
 from tasksource.jev.augmentations import stable_fraction
 SHARC_URL = "https://raw.githubusercontent.com/nikhilweee/neural-conv-qa/master/datasets/mod_{}.json"
@@ -26,6 +29,52 @@ MULTILINGUAL_SENTIMENTS_URL = "https://raw.githubusercontent.com/tyqiangz/multil
 LEWIDI_URL = "https://raw.githubusercontent.com/Le-Wi-Di/le-wi-di.github.io/546eaab420adab3c658813ae3fc7ae9f73cf8f05/{}"
 CHAOS_MNLI_URL = "hf://datasets/tasksource/chaos-mnli-ambiguity/chaos_mnli.jsonl"
 CLUTRR_URL = "hf://datasets/kendrivp/CLUTRR_v1_extracted/gen_train234_test2to10/CLUTRR_v1_gen_train234_test2to10_{}.json"
+DISCOSENSE_REVISION = '6d008011ac5b47dcd75029f46901da81382b6d89'
+DISCOSENSE_HASHES = {
+    'train': 'd8ed165694fefc8c5c58e2484fb6f0a97d5f701f74f2c14e4abccb2f3220e4f1',
+    'test': '76ca46ead36f3651f635df04ff4f0f6f01b6443a7d625636462df3d062f54970',
+}
+
+
+def discosense():
+    """DiscoSense: four-choice commonsense reasoning with discourse connectives.
+
+    Original distribution: https://github.com/prajjwal1/discosense.
+    Source paper: https://arxiv.org/abs/2210.12478.
+    All native fields, option order, integer gold indices and train/test partitions
+    are preserved verbatim. No validation partition or new distractors are created.
+    Use both `context` and `marker` as input; `label` indexes `option_0`–`option_3`.
+    The pinned source Hub README declares Apache-2.0; see provenance for evidence.
+    Rebuild with `python scripts/upload_repackaged.py discosense`.
+    """
+    directory = Path('build/discosense-release')
+    directory.mkdir(parents=True, exist_ok=True)
+    data, hashes = DatasetDict(), {}
+    for split, expected in DISCOSENSE_HASHES.items():
+        filename = f'discosense_{split}.json'
+        raw = Path(hf_hub_download('prajjwal1/discosense', filename, repo_type='dataset',
+                                  revision=DISCOSENSE_REVISION)).read_bytes()
+        hashes[filename] = hashlib.sha256(raw).hexdigest()
+        if hashes[filename] != expected:
+            raise ValueError(f'DiscoSense source checksum mismatch: {filename}')
+        rows = json.loads(raw)
+        for row in rows:
+            options = [row[f'option_{i}'] for i in range(4)]
+            if type(row['label']) is not int or not 0 <= row['label'] < 4 or len(set(options)) != 4:
+                raise ValueError(f'Invalid DiscoSense options/label: {split}/{row["idx"]}')
+            if any(not isinstance(v, str) or not v.strip() for v in [row['context'], row['marker'], *options]):
+                raise ValueError(f'Empty DiscoSense input: {split}/{row["idx"]}')
+        data[split] = Dataset.from_list(rows)
+        data[split].to_parquet(directory/f'{split}.parquet')
+    groups = [{(r['context'], r['marker']) for r in data[s]} for s in ('train', 'test')]
+    report = dict(source='https://github.com/prajjwal1/discosense', source_repo='prajjwal1/discosense',
+        revision=DISCOSENSE_REVISION, source_hashes=hashes, license='apache-2.0',
+        license_evidence=f'https://huggingface.co/datasets/prajjwal1/discosense/blob/{DISCOSENSE_REVISION}/README.md',
+        conversion_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+        splits={s:len(d) for s,d in data.items()}, label_counts={s:dict(Counter(d['label'])) for s,d in data.items()},
+        context_marker_overlap=len(groups[0] & groups[1]), excluded_rows=0, split_policy='native_train_test')
+    (directory/'provenance.json').write_text(json.dumps(report, indent=2)+'\n')
+    return data
 
 
 def _split_of(key, validation=0.1, test=0.1):

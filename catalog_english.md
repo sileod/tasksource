@@ -242,7 +242,7 @@ Browse the [English example gallery](docs/examples/english/README.md) for format
 | 236 | [commonsense_qa](src/tasksource/tasks.py#L919) | MultipleChoice | [tau/commonsense_qa](https://hf.co/datasets/tau/commonsense_qa) |  |
 | 237 | [mc_taco](src/tasksource/tasks.py#L925) | Classification | [marcov/mc_taco_promptsource](https://hf.co/datasets/marcov/mc_taco_promptsource) | ✓ |
 | 238 | [ade_corpus_v2/Ade_corpus_v2_classification](src/tasksource/tasks.py#L932) | Classification | [ade-benchmark-corpus/ade_corpus_v2](https://hf.co/datasets/ade-benchmark-corpus/ade_corpus_v2) | ✓ |
-| 239 | [discosense](src/tasksource/tasks.py#L935) | MultipleChoice | json |  |
+| 239 | [discosense](src/tasksource/tasks.py#L935) | MultipleChoice | [tasksource/discosense](https://hf.co/datasets/tasksource/discosense) | ✓ |
 | 240 | [circa](src/tasksource/tasks.py#L942) | Classification | [google-research-datasets/circa](https://hf.co/datasets/google-research-datasets/circa) |  |
 | 241 | [code_x_glue_cc_defect_detection](src/tasksource/tasks.py#L947) | Classification | [google/code_x_glue_cc_defect_detection](https://hf.co/datasets/google/code_x_glue_cc_defect_detection) | ✓ |
 | 242 | [phrase_similarity](src/tasksource/tasks.py#L952) | Classification | [Deehan1866/processed_phrase_similarity](https://hf.co/datasets/Deehan1866/processed_phrase_similarity) |  |

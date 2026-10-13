@@ -11,6 +11,7 @@ by scripts/upload_repackaged.py) or a task switches to a mirror.
 """
 
 ORIGINALS = {
+    "tasksource/discosense": ["prajjwal1/discosense"],
     "tasksource/antique": ["irds/antique", "irds/antique_train", "irds/antique_test"],
     "tasksource/matres": [],  # native MATRES/TempEval3 GitHub distributions
 
@@ -104,7 +105,6 @@ ORIGINALS = {
     "vwxyzjn/summarize_from_feedback_oai_preprocessing": ["openai/summarize_from_feedback"],
     # raw-file loaders, keyed by task id
     "TuringBench": ["turingbench/TuringBench"],
-    "discosense": ["prajjwal1/discosense"],
     "docred": ["thunlp/docred"],
     "dream": ["dataset-org/dream"],
     "hope_edi/english": ["dravidianlangtech/hope_edi"],

@@ -175,7 +175,7 @@ class MigratedLoaderHelperTest(unittest.TestCase):
             "head_qa___en": "EleutherAI/headqa",
             "wiki_hop___original": "MoE-UNC/wikihop",
             "prost": "json",
-            "discosense": "json",
+            "discosense": "tasksource/discosense",
             "hope_edi": "csv",
             "numer_sense": "tasksource/numer_sense",
             "valueeval_stance": "csv",

@@ -160,7 +160,7 @@ Data-only alternatives are used directly where available; tasksource mirrors rem
 | head_qa/en | `EleutherAI/headqa` en (answer structs/`ra`/`qid` ints; no copy) |
 | wiki_hop/original | `MoE-UNC/wikihop` (`query`→`question`; train/validation, no test; no copy) |
 | prost | `corypaik/prost` `data/default.jsonl` via generic JSON; no copy |
-| discosense | `prajjwal1/discosense` GitHub JSONs via generic JSON; no copy |
+| discosense | `tasksource/discosense` data-only mirror of pinned original JSONs; native train/test and all fields retained; context includes the discourse marker |
 | trec | CogComp `train_5500.label`/`TREC_10.label` with the original 50-name order (the `KushT` mirror's ints follow a different order) |
 | liar | `cs.ucsb.edu` `liar_dataset.zip` (all 14 cols, 6-way order `false…pants-fire`) |
 | math_qa | `math-qa.github.io` `MathQA.zip` (full 29,837 train — better than the `Calc` subset) |
