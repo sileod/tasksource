@@ -29,96 +29,39 @@ for id in df[df.task_type=="MultipleChoice"].id:
     dataset = load_task(id) # all yielded datasets can be used interchangeably
 ```
 
-#### Task catalogs
+The [English example gallery](docs/examples/english/README.md) shows formatted inputs, questions and
+gold answers. Evaluation benchmarks are kept out of the training catalogs; load them with
+`from tasksource import eval_only`. Feel free to request a new task.
 
-Feel free to request a new task. The [English example gallery](docs/examples/english/README.md) shows formatted
-inputs, questions and gold answers, with a searchable HTML version.
-The English catalog has about 460 Classification, 100 MultipleChoice and 15
-TokenClassification tasks. Evaluation benchmarks are kept separate in
-[eval_only.py](src/tasksource/eval_only.py). Annotations excluded for duplicates,
-source problems, or unsound supervision remain in
-[parked.py](src/tasksource/parked.py). Both record the reason for exclusion.
-Use `from tasksource import eval_only` to access a benchmark annotation directly;
-these annotations are excluded from the training catalogs.
+Datasets are downloaded to `$HF_DATASETS_CACHE`, like any Hugging Face dataset; large multi-task runs
+need more than 100GB.
 
-The [discovery tools](src/tasksource/task_discovery/README.md) retrieve and deduplicate
-dataset candidates, link source and paper identities, and retain structured review
-history. Browse the [dataset prospects](docs/prospects.md) for screened sources
-awaiting deeper checks; these are separate from the implemented task catalogs.
+#### Vision
 
-Visual annotations are in [vision_tasks.py](src/tasksource/vision_tasks.py).
-Discover them with `list_tasks(vision=True)` and load them with
-`load_task(id, vision=True)`. Use `recast="jev"` or `recast="instruct"` to keep
-images alongside the rendered decisions or prompts.
+`list_tasks(vision=True)` lists the visual tasks and `load_task(id, vision=True)` loads them, with images.
 
-Datasets are downloaded to `$HF_DATASETS_CACHE`, like any Hugging Face dataset.
-Ensure you have more than 100GB of space available for large multi-task runs.
+#### Questions
 
-#### Prompts
-
-Inputs are kept raw by default. When the inputs alone do not say what to predict,
-an annotation carries a `question` ("Is this search query a well-formed question?"),
-exposed as `dataset.question`.
-
-`load_task(id, prompted=True)` appends the question to the inputs. The instruct
-and typed-decision recasts use it as their instruction. For a per-example question
-or query context, annotations can use `{sentence2}` in the question string:
-`question="Which role does the marked argument play?\n{sentence2}"`. Recasts put
-`sentence1` in the state and substitute `sentence2` into the question; raw fields
-stay unchanged. Ordinary paired-text tasks retain both texts in the state.
+Inputs are kept raw. When they do not say what to predict, a task carries a `question`
+("Is this search query a well-formed question?"), exposed as `dataset.question`;
+`load_task(id, prompted=True)` appends it to the inputs.
 
 #### Soft labels
 
-Some annotations are distributions rather than single labels: annotator votes,
-rater shares, survey counts. These `SoftLabeling` annotations load as
-probabilities with `load_task(id, soft=True)` (`labels` over `options`). Most also
-have a hard view: their majority label on rows with clear agreement, which is
-what `load_task(id)` and the default `list_tasks()` give.
-
-`list_tasks(soft=True)` lists the soft views, including annotations that only
-make sense as distributions, such as ProtoQA survey answers. They are listed at
-the end of [catalog_english.md](catalog_english.md).
-
-Each records whether it summarizes annotator votes or mean ratings, and how many
-annotators judged an item. Vote shares from three annotators are coarse
-(0, 1/3, 2/3, 1); `min_annotators=5` leaves them out.
+Some tasks are distributions rather than single labels: annotator votes, rater shares, survey counts.
+`load_task(id, soft=True)` loads them as probabilities over the options, and `list_tasks(soft=True)`
+lists them. By default, `load_task(id)` gives the majority label on rows with clear agreement.
 
 #### Licenses
 
-`list_tasks(license_use="commercial")` keeps tasks whose sources allow commercial
-use. The filter also accepts `non-commercial`, `unspecified`, or a list.
-`task_licenses()` gives each task's licenses and where they come from.
-
-Licenses are read from the Hub cards of the datasets a task loads and of their
-originals, plus [Data Provenance Initiative](https://www.dataprovenance.org/)
-annotations. Both are snapshotted in the package;
-`task_licenses(fresh=True)` reads the current cards.
-
-`license_use` takes the most restrictive license found. `other`, bare `cc`, and
-missing licenses are `unspecified`. This is a best-effort filter, not legal advice.
-
-### Pretrained models:
-
-Text encoder pretrained on tasksource reached state-of-the-art results: [🤗/deberta-v3-base-tasksource-nli](https://hf.co/sileod/deberta-v3-base-tasksource-nli)
-
-Tasksource pretraining is notably helpful for RLHF reward modeling or any kind of classification, including zero-shot. You can also find a large and a multilingual version.
-
-### tasksource-instruct
-
-The repo also contains some recasting code to convert tasksource datasets to instructions, providing one of the richest instruction-tuning datasets:
-[🤗/tasksource-instruct-v0](https://hf.co/datasets/tasksource/tasksource-instruct-v0)
-
-
-### tasksource-label-nli
-
-We also recast all classification tasks as natural language inference, to improve entailment-based zero-shot classification detection:
-[🤗/zero-shot-label-nli](https://huggingface.co/datasets/tasksource/zero-shot-label-nli)
+`list_tasks(license_use="commercial")` keeps tasks whose sources allow commercial use (also
+`non-commercial`, `unspecified`, or a list), and `task_licenses()` gives each task's licenses and their
+sources. This is a best-effort filter, not legal advice.
 
 ### tasksource-jev-typed-decisions
 
-Every classification, multiple-choice and vetted token task can be recast as a typed decision: a
-state and one or more questions of three kinds, `choice` (pick one option), `score` (an ordered scale)
-and `noul` (yes/no or a probability). This is the Jev / System One request format.
+Tasks can be recast as typed decisions: a state and one or more questions of three kinds, `choice`
+(pick one option), `score` (an ordered scale) and `noul` (yes/no or a probability). This is the Jev / System One request format.
 
 [🤗 tasksource/tasksource-jev-typed-decisions](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions)
 is the published corpus:
@@ -140,10 +83,25 @@ dataset = load_task("glue/rte", recast="jev")
 request = render_typed_decision(dataset["train"][0], model="openjev")
 ```
 
-The conversion is deterministic. Multiple-choice options are permuted per row, so the gold position carries
-no signal, and over-represented labels are capped so that always answering the common label does not pay.
-BIG-bench, MMLU and BLiMP are excluded. The [dataset card](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions)
-documents the row format, variants and mixing; the [build runbook](docs/jev/README.md) covers building and publishing.
+Multiple-choice options are shuffled per row and over-represented labels are capped, so neither the gold
+position nor the most common label pays. Benchmarks such as MMLU, BIG-bench and BLiMP are excluded.
+See the [dataset card](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions) for the row format and the mixes.
+
+### Pretrained models
+
+Text encoder pretrained on tasksource reached state-of-the-art results: [🤗/deberta-v3-base-tasksource-nli](https://hf.co/sileod/deberta-v3-base-tasksource-nli)
+
+Tasksource pretraining is notably helpful for RLHF reward modeling or any kind of classification, including zero-shot. You can also find a large and a multilingual version.
+
+### tasksource-instruct
+
+Tasks recast as instructions (`recast="instruct"`), one of the richest instruction-tuning datasets:
+[🤗/tasksource-instruct-v0](https://hf.co/datasets/tasksource/tasksource-instruct-v0)
+
+### tasksource-label-nli
+
+Classification tasks recast as natural language inference, for entailment-based zero-shot classification:
+[🤗/zero-shot-label-nli](https://huggingface.co/datasets/tasksource/zero-shot-label-nli)
 
 ### Write and use custom preprocessings
 
@@ -153,17 +111,17 @@ from tasksource import MultipleChoice
 codah = MultipleChoice('question_propmt',choices_list='candidate_answers',
     labels='correct_answer_idx',
     dataset_name='codah', config_name='codah')
-    
+
 winogrande = MultipleChoice('sentence',['option1','option2'],'answer',
     dataset_name='winogrande',config_name='winogrande_xl',
     splits=['train','validation',None]) # test labels are not usable
-    
+
 tasks = [winogrande.load(), codah.load()]  # aligned datasets (same columns) can be used interchangeably
 ```
 
- ### Citation and contact
+### Citation and contact
 
-For more details, refer to this [article:](https://arxiv.org/abs/2301.05948) 
+For more details, refer to the [article](https://arxiv.org/abs/2301.05948):
 ```bib
 @inproceedings{sileo-2024-tasksource,
     title = "tasksource: A Large Collection of {NLP} tasks with a Structured Dataset Preprocessing Framework",
