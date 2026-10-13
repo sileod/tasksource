@@ -1,4 +1,4 @@
-46 visual tasks. Load one with `load_task(id, vision=True)`; the annotations are in [vision_tasks.py](src/tasksource/vision_tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
+47 visual tasks. Load one with `load_task(id, vision=True)`; the annotations are in [vision_tasks.py](src/tasksource/vision_tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
 
 | # | id | type | dataset | question |
 |--:|---|---|---|:-:|
@@ -48,6 +48,7 @@
 | 44 | [superclevr/material](src/tasksource/vision_tasks.py#L550) | VisualClassification | [tasksource/superclevr](https://hf.co/datasets/tasksource/superclevr) |  |
 | 45 | [gameqa/mcq](src/tasksource/vision_tasks.py#L568) | VisualMultipleChoice | [tasksource/gameqa](https://hf.co/datasets/tasksource/gameqa) |  |
 | 46 | [valen-game/optimal-action](src/tasksource/vision_tasks.py#L572) | VisualClassification | [tasksource/valen-game](https://hf.co/datasets/tasksource/valen-game) | ✓ |
+| 47 | [t2isafety/toxicity](src/tasksource/vision_tasks.py#L578) | VisualClassification | [tasksource/t2i-safety](https://hf.co/datasets/tasksource/t2i-safety) | ✓ |
 
 ### Candidate grounding
 
@@ -67,3 +68,7 @@ repackaged crop transformation using the same displayed-image box convention.
 ### Game decisions
 
 `gameqa/mcq` uses native GameQA options; `valen-game/optimal-action` asks whether each proposed direction is optimal, retaining every tied optimal action. Its Tasksource view selects English source rules before sampling (60,000 train / 896 test decisions); the mirror retains both source languages. Both use [reproducibly joined image mirrors](scripts/repackage_dataset/games.py), preserve native train/test partitions and encoded images, and exclude shared evaluation screenshots/layouts from training. See the [source and recast audit](docs/jev/game-expansion-audit.md).
+
+### Image safety
+
+`t2isafety/toxicity` classifies generated images as safe/unsafe under an explicit six-category toxicity policy. The [reproducible mirror](scripts/repackage_dataset/visual_safety.py) retains 30,781 train and 366 test judgments, native image bytes and splits. Generation prompts are excluded from inputs; demographic prediction, privacy labels and unreviewed real images are outside this view. See the [source and integrity audit](docs/jev/audits/visual-safety-audit.json).

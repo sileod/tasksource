@@ -151,7 +151,7 @@ Expanded the two game families to **20,000 training rows each** in [v2026.10.13.
 
 | Source | Intended task | Status / next canonical build |
 |---|---|---|
-| OpenSafetyLab/t2i_safety_dataset | t2isafety/toxicity | Repackaging generated-image toxicity labels; 30,781 train / 366 test candidates before image integrity and split checks. Register the validated mirror in vision_tasks.py, smoke-test with --vision, then include through the canonical vision build. No privacy/demographic projection. |
+| OpenSafetyLab/t2i_safety_dataset | t2isafety/toxicity | Implemented and mirrored: 30,781 train / 366 test judgments; all native gold labels and encoded image hashes verified, zero train/test image overlap. Registered in vision_tasks.py for the next canonical vision build (20,000 train-row family cap). No privacy/demographic projection. |
 | AIML-TUDA/LlavaGuard | Policy-conditioned safe/unsafe | Deferred: current Hub account receives 403 for annotation CSVs. Preserve native per-row policy if access is granted; rationales stay in metadata. Linked images have individual licenses, not the annotation Apache license. |
 
 ## Batch 12 — memes (user-curated, queued)

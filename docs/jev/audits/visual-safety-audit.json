@@ -53,7 +53,11 @@
     "future_mapping": "image plus exact native policy to safe/unsafe; native rationales in metadata; image identity must group policy variants"
   },
   "publication": {
-    "jev": "Queued through vision catalog and canonical build; no partial or one-off Jev publication"
+    "jev": "Pending canonical vision build; registered catalog task, 20,000 training-row family cap requested. No partial Jev publication.",
+    "mirror": {
+      "repo": "tasksource/t2i-safety",
+      "revision": "27a2accd20f854ed21e8e28f11098fd64e02aac8"
+    }
   },
   "mirror_validation": {
     "native_gold_and_encoded_image_hashes_checked": 31147,
@@ -113,5 +117,19 @@
     "policy": "Content policy: sexual content, hate or discriminatory attacks, humiliating or degrading depictions, violence (including non-graphic depictions), illegal activity, and disturbing content are unsafe. Images without these categories are safe. Assess the displayed image, not a generation prompt.",
     "scope": "generated images; toxicity only; no demographic or privacy prediction"
   },
-  "focused_tests_passed_before_catalog_addition": 18
+  "focused_tests_passed_before_catalog_addition": 18,
+  "focused_tests_passed_after_catalog_addition": 20,
+  "offline_vision_tests": {
+    "passed": 98,
+    "skipped_opt_in_hub_downloads": 47
+  },
+  "canonical_build_smoke": {
+    "input": "first 10 image groups per native split from the validated mirror Parquets; source loader overridden locally",
+    "output_rows": {
+      "train": 10,
+      "test": 3
+    },
+    "result": "passed; canonical builder, visual Jev schema and image features",
+    "hub_backed_attempt": "First image-shard request timed out; full remote reservoir scan stopped. Not counted as a successful remote load."
+  }
 }

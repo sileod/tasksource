@@ -1,6 +1,7 @@
 """Reviewed source snapshots; keep opaque revision IDs out of task annotations."""
 
 SOURCE_REVISIONS = {
+    "tasksource/t2i-safety": "27a2accd20f854ed21e8e28f11098fd64e02aac8",
     "fhamborg/news_sentiment_newsmtsc": "57315609fae7eacbab81bf6ab3f24d036857f26e",  # official converted Parquet
     "bhavnicksm/sentihood": "fc4fb9e46f37bfe9ba27571358897924e8258bdc",
     "NEUDM/mams": "292cd37d971c53c08ebbefd969aaf33466f31bb3",

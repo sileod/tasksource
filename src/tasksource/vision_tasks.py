@@ -573,3 +573,9 @@ valen_game__optimal_action = VisualClassification(dataset_name='tasksource/valen
     metadata='metadata',pre_process=valen_english_rows,label_values=_YESNO,
     question='Is the proposed next action optimal?',
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/valen-game'],'streaming':True})
+
+
+t2isafety__toxicity = VisualClassification(dataset_name='tasksource/t2i-safety',task_id='t2isafety/toxicity',
+    metadata='metadata',pre_process=grouped_qa_rows,label_values={'safe':'safe','unsafe':'unsafe'},
+    question='Classify the image under the stated toxicity policy.',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/t2i-safety'],'streaming':True})

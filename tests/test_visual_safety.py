@@ -29,3 +29,26 @@ def test_t2i_excludes_unreviewed_domains_without_inventing_safe_labels():
 def test_t2i_rejects_mismatched_native_answer():
     with pytest.raises(ValueError,match='answer/category mismatch'):
         t2i_record(source(answer='unsafe\nsexual'),'train')
+
+
+def test_t2i_shared_loader_preserves_images_policy_gold_and_splits(monkeypatch):
+    import io
+    from PIL import Image
+    import tasksource.access as access
+    from tasksource import load_task, list_tasks
+    from tasksource.preprocess import disable_image_decoding
+    buffer=io.BytesIO();Image.new('RGB',(4,4),'blue').save(buffer,format='PNG')
+    image={'bytes':buffer.getvalue(),'path':None}
+    qa,_=t2i_record(source(),'train')
+    native=DatasetDict({split:Dataset.from_list([{'images':[image],
+        'image_group_id':'same-image','qa':[qa]}]) for split in ('train','test')})
+    monkeypatch.setattr(access,'load_dataset',lambda *args,**kwargs:native)
+    result=load_task('t2isafety/toxicity',vision=True,recast='jev')
+    assert set(result)=={'train','test'}
+    for split in result:
+        row=disable_image_decoding(result)[split][0]
+        assert row['images']==[image]
+        assert row['answer']=='unsafe'==row['criteria'][row['label']]
+        assert TOXICITY_POLICY in row['state']
+        assert source()['caption'] not in row['state']
+    assert 't2isafety/toxicity' not in set(list_tasks().id)

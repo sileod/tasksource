@@ -7,7 +7,7 @@ concise bullets on what changed in the data. `tasksource-jev-typed-decisions` re
 ## t2i-safety 2026-10-13
 
 - New generated-image toxicity mirror: 30,781 train and 366 test judgments, with native safe/unsafe labels and an explicit six-category policy. Original image bytes and split membership are preserved; image groups are shuffled with seed 0.
-- Generation prompts stay out of inputs. Demographic prediction, privacy-only/mixed labels and unreviewed real images are outside this view. Registered for the next canonical vision build.
+- Generation prompts stay out of inputs. Demographic prediction, privacy-only/mixed labels and unreviewed real images are outside this view. Registered for the next canonical vision build with a 20,000-training-row family cap.
 
 ## uk-election 2026-10-13
 
