@@ -8,6 +8,8 @@ These are screening results, **not approved training sources or completed integr
 
 - [October 13 exhaustive HF category pass](prospects/2026-10-13.md): 142 shortlisted
   sources from 11,776 screened candidates; includes downloadable review records.
+- [October 12 exhaustive HF multiple-choice pass](prospects/2026-10-12-multiple-choice.md):
+  9 eligibility passes, including 2 provenance-filter passes, from 208 screened sources.
 - October 12 mixed-source pass: the 15 candidates summarized below.
 
 ## October 12 snapshot
