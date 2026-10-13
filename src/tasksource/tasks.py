@@ -2529,13 +2529,13 @@ def _decision_metadata(identifier, group, **extra):
     return json.dumps(dict(id=str(identifier), split_group_id=str(group), **extra), sort_keys=True)
 
 
-def _flatten_text(dataset, records, paired=True, features=None):
+def _flatten_text(dataset, records, paired=True, features=None, batch_size=1000):
     fields = ('sentence1','sentence2','labels','metadata') if paired else ('sentence1','labels','metadata')
     features = features or Features({k:Value('string') for k in fields})
     def flatten(batch):
         rows = [item for values in zip(*batch.values()) for item in records(dict(zip(batch,values)))]
         return {k:[r[k] for r in rows] for k in features}
-    return DatasetDict({s:d.map(flatten,batched=True,remove_columns=d.column_names,features=features)
+    return DatasetDict({s:d.map(flatten,batched=True,batch_size=batch_size,remove_columns=d.column_names,features=features)
                         for s,d in dataset.items()})
 
 
@@ -3341,3 +3341,61 @@ causal_reasoning__transitivity = Classification('sentence1',labels='labels',
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['ludwigw/causal-reasoning-benchmarks'],
         'data_files':{'train':'train/transitivity_train.jsonl',
                       'test':[f'eval/{name}_eval.jsonl' for name in ('length','long_names','reversed','shuffled')]}})
+
+
+_CEBAB = dict(dataset_name='EleutherAI/CEBaB',complete_splits=False,
+    metadata=lambda r:json.dumps(dict(original_id=r['original_id'],counterfactual=r['counterfactual'],
+        split_group_id=str(r['original_id']))),
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['EleutherAI/CEBaB']})
+_CEBAB_SENTIMENT = {'Negative':'negative','Positive':'positive','unknown':'no clear positive or negative sentiment'}
+
+cebab__rating = Classification('text',labels='rating',**_CEBAB,task_id='cebab/rating',
+    pre_process=lambda d:_document_holdouts(d,'text'),
+    label_values={i:f'{i} star'+('s' if i!=1 else '') for i in range(1,6)},ordinal=True,score_only=True,
+    question='How would readers rate this restaurant review, from 1 star (worst) to 5 stars (best)? Predict the median rating.')
+cebab__food = Classification('text',labels='food',**_CEBAB,task_id='cebab/food',
+    pre_process=lambda d:_document_holdouts(d,'text').filter(lambda r:r['food'] is not None),label_values=_CEBAB_SENTIMENT,
+    question='What sentiment does this restaurant review express about the food?')
+cebab__ambiance = Classification('text',labels='ambiance',**_CEBAB,task_id='cebab/ambiance',
+    pre_process=lambda d:_document_holdouts(d,'text').filter(lambda r:r['ambiance'] is not None),label_values=_CEBAB_SENTIMENT,
+    question='What sentiment does this restaurant review express about the ambiance?')
+cebab__service = Classification('text',labels='service',**_CEBAB,task_id='cebab/service',
+    pre_process=lambda d:_document_holdouts(d,'text').filter(lambda r:r['service'] is not None),label_values=_CEBAB_SENTIMENT,
+    question='What sentiment does this restaurant review express about the service?')
+cebab__noise = Classification('text',labels='noise',**_CEBAB,task_id='cebab/noise',
+    pre_process=lambda d:_document_holdouts(d,'text').filter(lambda r:r['noise'] is not None),label_values=_CEBAB_SENTIMENT,
+    question='What sentiment does this restaurant review express about the noise level?')
+
+
+def _fabsa_records(row):
+    for aspect,polarity in row['labels']:
+        if sum(a==aspect for a,p in row['labels'])!=1:continue  # Multiple sentiments for this aspect.
+        yield dict(sentence1=row['text'],sentence2=f'What sentiment is expressed about {aspect.lower()}?',labels=polarity,
+            metadata=_decision_metadata(f"{row['id']}:{aspect}",hashlib.sha256(row['text'].encode()).hexdigest(),
+                native_id=row['id'],aspect=aspect,annotations=row['labels']))
+
+
+fabsa__sentiment = Classification('sentence1','sentence2','labels',dataset_name='jordiclive/FABSA',
+    task_id='fabsa/sentiment',metadata='metadata',complete_splits=False,
+    pre_process=lambda d:_unique_text_splits(_flatten_text(_document_holdouts(d,'text'),_fabsa_records),
+        lambda r:(r['sentence1'],r['sentence2']),'labels'),
+    label_values={v:v for v in ('negative','neutral','positive')},question='{sentence2}',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['jordiclive/FABSA']})
+
+
+def _tab_mentions(row):
+    for mention in row['entity_mentions']:
+        start,end = mention['start_offset'],mention['end_offset']
+        if row['text'][start:end]!=mention['span_text']:raise ValueError('TAB span/text mismatch')
+        yield dict(sentence1=row['task']+'\n\n'+_marked_spans(row['text'],[('TARGET',start,end)]),
+            labels=mention['identifier_type'],metadata=_decision_metadata(mention['entity_mention_id'],row['doc_id'],
+                annotator=row['annotator_id'],annotation=mention))
+
+
+tab__identifier = Classification('sentence1',labels='labels',dataset_name='doshimit3015/text-anonymization-benchmark',
+    task_id='tab/identifier',metadata='metadata',complete_splits=False,
+    pre_process=lambda d:_flatten_text(_document_holdouts(d,'doc_id'),_tab_mentions,paired=False,batch_size=8),
+    label_values={'DIRECT':'direct identifier: mask','QUASI':'quasi-identifier: mask','NO_MASK':'no masking needed'},
+    question='For the person specified in the anonymization task, is [TARGET] a direct identifier, a quasi-identifier (identifying in combination), or safe to leave unmasked?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['doshimit3015/text-anonymization-benchmark'],
+        'data_files':{s:f'echr_{n}.zip' for s,n in [('train','train'),('validation','dev'),('test','test')]}})

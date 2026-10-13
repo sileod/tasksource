@@ -1,0 +1,687 @@
+{
+  "checked_on": "2026-10-13",
+  "reviewer": "gpt-6.1-sol",
+  "repackaged_sources": [],
+  "sources": {
+    "cebab": {
+      "revision": "d1e1c91387a2fcd3f987e125c23f2c3895aea549",
+      "original_revision": "9d2a5a096f1b94344309406886ccc402d9048de8",
+      "cleaned_rating_matches_every_native_vote_median": true,
+      "original_id_split_overlap": 0,
+      "splits": {
+        "train": {
+          "native_rows": 11728,
+          "rating_counts": {
+            "1": 1454,
+            "2": 3281,
+            "3": 3175,
+            "5": 1880,
+            "4": 1938
+          },
+          "aspects": {
+            "food": {
+              "Negative": 4461,
+              "Positive": 4279,
+              "unknown": 2012
+            },
+            "ambiance": {
+              "unknown": 4021,
+              "Positive": 2230,
+              "Negative": 2120
+            },
+            "service": {
+              "Negative": 3326,
+              "Positive": 3083,
+              "unknown": 3020
+            },
+            "noise": {
+              "unknown": 4721,
+              "Negative": 1828,
+              "Positive": 1049
+            }
+          }
+        },
+        "validation": {
+          "native_rows": 1673,
+          "rating_counts": {
+            "3": 452,
+            "4": 281,
+            "1": 194,
+            "5": 437,
+            "2": 309
+          },
+          "aspects": {
+            "food": {
+              "Negative": 507,
+              "Positive": 730,
+              "unknown": 279
+            },
+            "ambiance": {
+              "unknown": 545,
+              "Negative": 234,
+              "Positive": 395
+            },
+            "service": {
+              "Positive": 513,
+              "Negative": 346,
+              "unknown": 435
+            },
+            "noise": {
+              "unknown": 577,
+              "Positive": 155,
+              "Negative": 186
+            }
+          }
+        },
+        "test": {
+          "native_rows": 1689,
+          "rating_counts": {
+            "4": 265,
+            "5": 415,
+            "1": 222,
+            "2": 326,
+            "3": 461
+          },
+          "aspects": {
+            "food": {
+              "Positive": 717,
+              "Negative": 558,
+              "unknown": 314
+            },
+            "ambiance": {
+              "unknown": 555,
+              "Negative": 243,
+              "Positive": 303
+            },
+            "service": {
+              "unknown": 422,
+              "Positive": 449,
+              "Negative": 426
+            },
+            "noise": {
+              "Negative": 201,
+              "Positive": 161,
+              "unknown": 585
+            }
+          }
+        }
+      },
+      "limitation": "Existing cleaned copy omits edit IDs and vote distributions; original ID and counterfactual flag preserve review families. Null/unresolved aspect labels are excluded; unknown is not neutral.",
+      "duplicate_text_holdouts": {
+        "train_validation": 6,
+        "train_test": 6,
+        "validation_test": 1
+      },
+      "canonical_rows": {
+        "train": {
+          "rating": 11712,
+          "food": 10736,
+          "ambiance": 8360,
+          "service": 9415,
+          "noise": 7591
+        },
+        "validation": {
+          "rating": 1671,
+          "food": 1514,
+          "ambiance": 1173,
+          "service": 1292,
+          "noise": 918
+        },
+        "test": {
+          "rating": 1689,
+          "food": 1589,
+          "ambiance": 1101,
+          "service": 1297,
+          "noise": 947
+        }
+      }
+    },
+    "fabsa": {
+      "revision": "40abb500cd7688529cb831c8c2c2a90d06264379",
+      "splits": {
+        "train": {
+          "native_reviews": 7930,
+          "projected_sentiment_counts": {
+            "negative": 4296,
+            "positive": 9051,
+            "neutral": 505
+          },
+          "multi_polarity_aspects": 73
+        },
+        "validation": {
+          "native_reviews": 1057,
+          "projected_sentiment_counts": {
+            "neutral": 65,
+            "positive": 1214,
+            "negative": 555
+          },
+          "multi_polarity_aspects": 12
+        },
+        "test": {
+          "native_reviews": 1587,
+          "projected_sentiment_counts": {
+            "positive": 1805,
+            "negative": 875,
+            "neutral": 90
+          },
+          "multi_polarity_aspects": 21
+        }
+      },
+      "text_overlap": {
+        "train_validation": 41,
+        "train_test": 46,
+        "validation_test": 18
+      },
+      "policy": "Holdout reviews take precedence. Only annotated single-polarity aspects are emitted; absent aspects are not neutral. Conflicting/duplicate prompts are removed.",
+      "license": "unspecified",
+      "canonical_rows": {
+        "train": {
+          "rows": 13436,
+          "labels": {
+            "negative": 4276,
+            "positive": 8656,
+            "neutral": 504
+          }
+        },
+        "validation": {
+          "rows": 1798,
+          "labels": {
+            "neutral": 65,
+            "positive": 1178,
+            "negative": 555
+          }
+        },
+        "test": {
+          "rows": 2741,
+          "labels": {
+            "positive": 1776,
+            "negative": 875,
+            "neutral": 90
+          }
+        }
+      }
+    },
+    "tab": {
+      "revision": "e33fd0a4502d6b2c9e980aa8899fa23df38c9153",
+      "splits": {
+        "train": {
+          "native_annotator_rows": 1112,
+          "documents": 1014,
+          "label_counts": {
+            "DIRECT": 3677,
+            "NO_MASK": 31129,
+            "QUASI": 60224
+          },
+          "identifier_disagreement_spans": 765,
+          "span_mismatches": 0,
+          "duplicate_mention_ids": 0
+        },
+        "validation": {
+          "native_annotator_rows": 541,
+          "documents": 127,
+          "label_counts": {
+            "DIRECT": 1450,
+            "NO_MASK": 9162,
+            "QUASI": 18823
+          },
+          "identifier_disagreement_spans": 1816,
+          "span_mismatches": 0,
+          "duplicate_mention_ids": 0
+        },
+        "test": {
+          "native_annotator_rows": 555,
+          "documents": 127,
+          "label_counts": {
+            "DIRECT": 1612,
+            "NO_MASK": 9732,
+            "QUASI": 19197
+          },
+          "identifier_disagreement_spans": 1877,
+          "span_mismatches": 0,
+          "duplicate_mention_ids": 0
+        }
+      },
+      "document_split_overlap": 0,
+      "policy": "Each native annotator judgment is retained separately, including disagreement; metadata preserves annotator, span, entity and coreference IDs. No inferred unannotated negatives or consensus labels."
+    }
+  },
+  "export": {
+    "parent_revision": "2cc369f550cd77735cae897c2cd75a126d490a08",
+    "tasks": [
+      "cebab/rating",
+      "cebab/food",
+      "cebab/ambiance",
+      "cebab/service",
+      "cebab/noise",
+      "fabsa/sentiment",
+      "tab/identifier"
+    ],
+    "configs": [
+      "default",
+      "full"
+    ],
+    "max_rows": 1000,
+    "max_rows_eval": 100,
+    "splits": {
+      "train": {
+        "rows": 7000,
+        "sources": {
+          "cebab/rating": 1000,
+          "cebab/food": 1000,
+          "cebab/ambiance": 1000,
+          "cebab/service": 1000,
+          "cebab/noise": 1000,
+          "fabsa/sentiment": 1000,
+          "tab/identifier": 1000
+        },
+        "num_bytes": 15944637,
+        "file_bytes": 6550949,
+        "sha256": "be7cb90121e3289456632f627fcf98bb7cf20476d86a1e52c1bd454e6f7737af"
+      },
+      "validation": {
+        "rows": 700,
+        "sources": {
+          "cebab/rating": 100,
+          "cebab/food": 100,
+          "cebab/ambiance": 100,
+          "cebab/service": 100,
+          "cebab/noise": 100,
+          "fabsa/sentiment": 100,
+          "tab/identifier": 100
+        },
+        "num_bytes": 973925,
+        "file_bytes": 337835,
+        "sha256": "63524386ac610b93e12922d88f5217c67a04523d5597df6ad9b3c3eea85cab91"
+      },
+      "test": {
+        "rows": 700,
+        "sources": {
+          "cebab/rating": 100,
+          "cebab/food": 100,
+          "cebab/ambiance": 100,
+          "cebab/service": 100,
+          "cebab/noise": 100,
+          "fabsa/sentiment": 100,
+          "tab/identifier": 100
+        },
+        "num_bytes": 940156,
+        "file_bytes": 323979,
+        "sha256": "c7010f513f3b0ac9935385f1428feab5222b9e6bc9e46c19308e523c9767a5c4"
+      }
+    },
+    "provenance": {
+      "cebab/rating": {
+        "dataset": "EleutherAI/CEBaB",
+        "revision": "d1e1c91387a2fcd3f987e125c23f2c3895aea549",
+        "originals": [
+          "CEBaB/CEBaB"
+        ]
+      },
+      "cebab/food": {
+        "dataset": "EleutherAI/CEBaB",
+        "revision": "d1e1c91387a2fcd3f987e125c23f2c3895aea549",
+        "originals": [
+          "CEBaB/CEBaB"
+        ]
+      },
+      "cebab/ambiance": {
+        "dataset": "EleutherAI/CEBaB",
+        "revision": "d1e1c91387a2fcd3f987e125c23f2c3895aea549",
+        "originals": [
+          "CEBaB/CEBaB"
+        ]
+      },
+      "cebab/service": {
+        "dataset": "EleutherAI/CEBaB",
+        "revision": "d1e1c91387a2fcd3f987e125c23f2c3895aea549",
+        "originals": [
+          "CEBaB/CEBaB"
+        ]
+      },
+      "cebab/noise": {
+        "dataset": "EleutherAI/CEBaB",
+        "revision": "d1e1c91387a2fcd3f987e125c23f2c3895aea549",
+        "originals": [
+          "CEBaB/CEBaB"
+        ]
+      },
+      "fabsa/sentiment": {
+        "dataset": "jordiclive/FABSA",
+        "revision": "40abb500cd7688529cb831c8c2c2a90d06264379"
+      },
+      "tab/identifier": {
+        "dataset": "doshimit3015/text-anonymization-benchmark",
+        "revision": "e33fd0a4502d6b2c9e980aa8899fa23df38c9153"
+      }
+    },
+    "excluded": [],
+    "max_request_bytes": 131072,
+    "licenses": {
+      "cebab/rating": {
+        "license": "cc-by-4.0, cc-by-4.0 (original source)",
+        "license_use": "commercial",
+        "card_licenses": {
+          "EleutherAI/CEBaB": [
+            "cc-by-4.0"
+          ]
+        },
+        "source_license_evidence": {
+          "license": "cc-by-4.0",
+          "checked": "2026-10-13",
+          "scope": "original corpus and human-written counterfactual edits",
+          "url": "https://github.com/CEBaBing/CEBaB/blob/gh-pages/cebab_datasheet.md#distribution"
+        }
+      },
+      "cebab/food": {
+        "license": "cc-by-4.0, cc-by-4.0 (original source)",
+        "license_use": "commercial",
+        "card_licenses": {
+          "EleutherAI/CEBaB": [
+            "cc-by-4.0"
+          ]
+        },
+        "source_license_evidence": {
+          "license": "cc-by-4.0",
+          "checked": "2026-10-13",
+          "scope": "original corpus and human-written counterfactual edits",
+          "url": "https://github.com/CEBaBing/CEBaB/blob/gh-pages/cebab_datasheet.md#distribution"
+        }
+      },
+      "cebab/ambiance": {
+        "license": "cc-by-4.0, cc-by-4.0 (original source)",
+        "license_use": "commercial",
+        "card_licenses": {
+          "EleutherAI/CEBaB": [
+            "cc-by-4.0"
+          ]
+        },
+        "source_license_evidence": {
+          "license": "cc-by-4.0",
+          "checked": "2026-10-13",
+          "scope": "original corpus and human-written counterfactual edits",
+          "url": "https://github.com/CEBaBing/CEBaB/blob/gh-pages/cebab_datasheet.md#distribution"
+        }
+      },
+      "cebab/service": {
+        "license": "cc-by-4.0, cc-by-4.0 (original source)",
+        "license_use": "commercial",
+        "card_licenses": {
+          "EleutherAI/CEBaB": [
+            "cc-by-4.0"
+          ]
+        },
+        "source_license_evidence": {
+          "license": "cc-by-4.0",
+          "checked": "2026-10-13",
+          "scope": "original corpus and human-written counterfactual edits",
+          "url": "https://github.com/CEBaBing/CEBaB/blob/gh-pages/cebab_datasheet.md#distribution"
+        }
+      },
+      "cebab/noise": {
+        "license": "cc-by-4.0, cc-by-4.0 (original source)",
+        "license_use": "commercial",
+        "card_licenses": {
+          "EleutherAI/CEBaB": [
+            "cc-by-4.0"
+          ]
+        },
+        "source_license_evidence": {
+          "license": "cc-by-4.0",
+          "checked": "2026-10-13",
+          "scope": "original corpus and human-written counterfactual edits",
+          "url": "https://github.com/CEBaBing/CEBaB/blob/gh-pages/cebab_datasheet.md#distribution"
+        }
+      },
+      "fabsa/sentiment": {
+        "license": "unspecified",
+        "license_use": "unspecified"
+      },
+      "tab/identifier": {
+        "license": "mit, mit (original source)",
+        "license_use": "commercial",
+        "card_licenses": {
+          "doshimit3015/text-anonymization-benchmark": [
+            "mit"
+          ]
+        },
+        "source_license_evidence": {
+          "license": "mit",
+          "checked": "2026-10-13",
+          "scope": "original TAB corpus distribution",
+          "url": "https://github.com/NorskRegnesentral/text-anonymization-benchmark/blob/master/LICENSE.txt"
+        }
+      }
+    },
+    "conversion_sha256": "dfa881d30165fdd0849b8ec5ee6ee5b9f7bf4429a10f066444acca3db11b256e",
+    "row_metadata": "additions/12eb4d3fc2c3/rows.json",
+    "preserved_parquets": {
+      "data/test-00000-of-00001.parquet": "d62381db7b4e2fb650c3d1a356293360835f8a21",
+      "data/train-00000-of-00006.parquet": "fe5b854b653a628aad007595e3fc5d28a8703145",
+      "data/train-00001-of-00006.parquet": "d3db9ee914a1713009e74e65e42f02e0a4b93610",
+      "data/train-00002-of-00006.parquet": "91e1f061966c90f1a07163f7dd4b1b38a673acdd",
+      "data/train-00003-of-00006.parquet": "70428bfbc0de51f9efb8c8744ce2a19db0590348",
+      "data/train-00004-of-00006.parquet": "c6dcdb885c3b23e51aff674ea885d5a933d1fc93",
+      "data/train-00005-of-00006.parquet": "a2eeeb173ad8979d92543eb507c6897d0135c786",
+      "data/validation-00000-of-00001.parquet": "1ae17ea1e32f3c9abd36507c3eb57243c7024afe",
+      "filtered-full/train-00000-of-00013.parquet": "5737559c3e645352865e30639ba38add013f433c",
+      "filtered-full/train-00001-of-00013.parquet": "f05cab49ecd2e123417cda06a912d5baa1e3edb5",
+      "filtered-full/train-00002-of-00013.parquet": "1ad0b6ac697c716083b43aed3a9e24874e0bf27c",
+      "filtered-full/train-00003-of-00013.parquet": "4e72c472ea72d0c525ce1cd7cb3092fc1f28c79e",
+      "filtered-full/train-00004-of-00013.parquet": "13230c1780138961bcd76186d07a803767356562",
+      "filtered-full/train-00005-of-00013.parquet": "026bc639b2d28d119d9d5ba694ad01794096cf08",
+      "filtered-full/train-00006-of-00013.parquet": "26d69f41fb2fb1ea3340b342d38b75fdccb6a89f",
+      "filtered-full/train-00007-of-00013.parquet": "e38175a7c707249ec88b3e182d6dbfdefe622062",
+      "filtered-full/train-00008-of-00013.parquet": "62280725c18c39d2f3a2a633525c6c95eb030ef2",
+      "filtered-full/train-00009-of-00013.parquet": "bd7e372cd8e1558cc0588024f542e14475c6d301",
+      "filtered-full/train-00010-of-00013.parquet": "e37335bdec520b0f9668e6fb7a434fd2db09e3d4",
+      "filtered-full/train-00011-of-00013.parquet": "c4c3809e06e03913c405c6b54149c6ae7333a8ef",
+      "filtered-full/train-00012-of-00013.parquet": "46547010c6d35bd196e10c434a4fca46194f0a93",
+      "full/test-00000-of-00001.parquet": "cfcfb8dc7d039240630918307459837e34da70af",
+      "full/train-00000-of-00015.parquet": "fbe60b6a365823cc9aebbfb5aa9642a31010d0b8",
+      "full/train-00001-of-00015.parquet": "ad8694feee7a3f419e90df325c62c77f7e9fb68b",
+      "full/train-00002-of-00015.parquet": "5ee2feccc92458603a2d5e792ad2b9578c816adb",
+      "full/train-00003-of-00015.parquet": "4842a132fb147b00bc5724236daf5dc1994124c4",
+      "full/train-00004-of-00015.parquet": "fee3d19a33903ba9faa9e3e90f708dd938b7f119",
+      "full/train-00005-of-00015.parquet": "a3f2aa91f3d2d8303072c5d0ce0ae5a04f8bcc05",
+      "full/train-00006-of-00015.parquet": "f65c8fc3fe04922b3d308cb4db36be0a41558251",
+      "full/train-00007-of-00015.parquet": "723265fef84fe76ecc37432154ea11e41f302ce5",
+      "full/train-00008-of-00015.parquet": "bab8d8fe0ed1ce53d03181dcb34af7efb24e0cbf",
+      "full/train-00009-of-00015.parquet": "ef36ac78f1dd4a67f5a724995c2986b204b177dd",
+      "full/train-00010-of-00015.parquet": "abc6455baf0122452e29883dae4baccdc0519463",
+      "full/train-00011-of-00015.parquet": "38715f02d5b5072b6f677e8ae5905ae1c7a21778",
+      "full/train-00012-of-00015.parquet": "9a28ea39ade2dc9c69244ea841df6ab34ec8dafa",
+      "full/train-00013-of-00015.parquet": "77c14e998ad10343964496229d59b0d535a90a9d",
+      "full/train-00014-of-00015.parquet": "ad6a28b8f86a96b33041cc9cbdc443563c5af83e",
+      "full/validation-00000-of-00001.parquet": "1013ee7dc8527841e5c042154db203d02ca542c5",
+      "quality/filtered-full-v1/candidates.parquet": "8b201f9bcdf4857d202ac540476e148dd02d9d69",
+      "quality/filtered-full-v1/excluded.parquet": "19c6ac1685ddc4c7228d13053dc8efeef6e3cc5e",
+      "repairs/question-surfaces/example-ids.parquet": "ca6c372c51762fdb50a477b57820baa89283fb94",
+      "vision/test-00000-of-00001.parquet": "f1a017f0f97d4d14c6c115eb296f6bcde5f29bc8",
+      "vision/test-addition-20261009-00000-of-00001.parquet": "ff9f1158392db36149122653dadf76abfac333a1",
+      "vision/train-00000-of-00036.parquet": "046dc0d2dbc23765e598fc4dfbe7bbbdd988a641",
+      "vision/train-00001-of-00036.parquet": "d471d0701b949ff85b487f6f551265b7d64afa48",
+      "vision/train-00002-of-00036.parquet": "df10056fde1d61165ca526c490517bf17f330deb",
+      "vision/train-00003-of-00036.parquet": "10717e54f825fa3dea50b56f690b3498436b4195",
+      "vision/train-00004-of-00036.parquet": "e7a052aa625aaf204d13fffe991022f0c4583e5b",
+      "vision/train-00005-of-00036.parquet": "5c5e2ae087bf1998ea7d2492f3ef0b284f95db1c",
+      "vision/train-00006-of-00036.parquet": "c2bef19550d56e4c1e34ba30bee40063ede42e01",
+      "vision/train-00007-of-00036.parquet": "3433079b9d8ebc06e76257d7f0d53633f09fd995",
+      "vision/train-00008-of-00036.parquet": "e2594e38e8335206d446864784a5fe5c8ad4d3fe",
+      "vision/train-00009-of-00036.parquet": "ea169b77941607243259a86557937e511e8e458e",
+      "vision/train-00010-of-00036.parquet": "922d16d0c673a4435bba94fb80045f26918758cd",
+      "vision/train-00011-of-00036.parquet": "2547f0d11f42b7a2244375c295cd7e9688e0097a",
+      "vision/train-00012-of-00036.parquet": "8142b2b6ebae02783c925f83f7a6954d557ce685",
+      "vision/train-00013-of-00036.parquet": "2f5e11e51d0d6a3798575d16aadbf8e1bf28424f",
+      "vision/train-00014-of-00036.parquet": "c59050c2c20c1f4086f68acc35cf7dafa6bfe1e9",
+      "vision/train-00015-of-00036.parquet": "eec5ad6feb41c31fa6e1971f1215de8c7098aec9",
+      "vision/train-00016-of-00036.parquet": "5d2dba81e43e89b79821701d2355819e5716146d",
+      "vision/train-00017-of-00036.parquet": "7075219f0d7fc3d53ff89fb9ef0f877a70a79b02",
+      "vision/train-00018-of-00036.parquet": "8212aa0fd96af09a231662f2003c3115f05642ce",
+      "vision/train-00019-of-00036.parquet": "1e9b1d605074d1cdfb0b3becf0a68677a97fbba8",
+      "vision/train-00020-of-00036.parquet": "42cd84c93abdc793cc2fa146cfe330d00c52933f",
+      "vision/train-00021-of-00036.parquet": "38a617eabd8f53dd93577aadc5a64c06481c57d1",
+      "vision/train-00022-of-00036.parquet": "9d3463391757063003d37bfa504b3f1729b6dfe4",
+      "vision/train-00023-of-00036.parquet": "3217c4ca2d7d280bf8d0f7cc782f00e3f5354640",
+      "vision/train-00024-of-00036.parquet": "06d6d89788b3d94e3071dca6bd360724aab6a4eb",
+      "vision/train-00025-of-00036.parquet": "e00e2cdaa5fde114a66edef069fb2e769723f12a",
+      "vision/train-00026-of-00036.parquet": "075e6dd30dec0c59abb20d135d021d200bec2af4",
+      "vision/train-00027-of-00036.parquet": "8ed3500cebc811e4abe52b7859428c3a4cd68c2a",
+      "vision/train-00028-of-00036.parquet": "8c31114b2d8869e9b861f1b8f88bc1012a7cc706",
+      "vision/train-00029-of-00036.parquet": "f780cfb0a3b8f618699d3870a8a4cac53c1b2443",
+      "vision/train-00030-of-00036.parquet": "6afa24ed5004f14624ac25a6d0271a49c42f0328",
+      "vision/train-00031-of-00036.parquet": "94ca2674a0bb8fe778085bb2ff246e82341b2762",
+      "vision/train-00032-of-00036.parquet": "e5e6c49dad8b8aba932b51085402252f271bb724",
+      "vision/train-00033-of-00036.parquet": "3024eb6074cf43e9e9b26b1c694275fc358bcbbc",
+      "vision/train-00034-of-00036.parquet": "0a4a67293feef6d9c35567945b69db9168ec424e",
+      "vision/train-00035-of-00036.parquet": "2d67eff8bcd5d6bb1a4e846771db5fea86460fb2",
+      "vision/train-addition-20261009-00000-of-00010.parquet": "31c6632e1fee045cb3f445a1fe3398316b5d8a2b",
+      "vision/train-addition-20261009-00001-of-00010.parquet": "4616e739fcb0f0aac41afa75723cef2c48a963a8",
+      "vision/train-addition-20261009-00002-of-00010.parquet": "56558d76e3577319808282354cbc74407f2957ca",
+      "vision/train-addition-20261009-00003-of-00010.parquet": "506a53fed531e2370d787d9aa630977868a20405",
+      "vision/train-addition-20261009-00004-of-00010.parquet": "b9b646aaf42064ef674c69025e645ccd4425105d",
+      "vision/train-addition-20261009-00005-of-00010.parquet": "335371343dc775a49ca3873e904ed4640ac62e26",
+      "vision/train-addition-20261009-00006-of-00010.parquet": "53e15fb9a7ee15457bb0132777ffff420bbd5f4b",
+      "vision/train-addition-20261009-00007-of-00010.parquet": "742d65c41133deec13b0fcc4e5e6052a375cb9f6",
+      "vision/train-addition-20261009-00008-of-00010.parquet": "5e150c32add03b1e8edc0fd3b693a8b0485aefce",
+      "vision/train-addition-20261009-00009-of-00010.parquet": "0a135d907174ad5fc7aefffce16e6e69d94fe6f1",
+      "vision/validation-00000-of-00001.parquet": "d90a3706877935b558e1257b128dc3526ec88f97",
+      "vision/validation-addition-20261009-00000-of-00001.parquet": "182b85299abf9a74728c600dd2f576233cc06e15"
+    },
+    "release_note": "Native human-labeled decisions: existing cleaned CEBaB ratings/aspects, FABSA annotated-aspect sentiment, and TAB per-annotator identifier judgments. Native splits, original-review/document groups and annotation identities retained. No new mirror. FABSA license remains unspecified.\n\nSource-row metadata: additions/12eb4d3fc2c3/rows.json.\n"
+  },
+  "reviewed_export_examples": [
+    {
+      "task": "cebab/rating",
+      "id": "cebab:train:train:3201:cebab-rating-aa208c51c2",
+      "question": "How would readers rate this restaurant review, from 1 star (worst) to 5 stars (best)? Predict the median rating.",
+      "gold": [
+        "1 star"
+      ],
+      "assessment": "Strong negative overall conclusion despite praise for food; one-star median is plausible."
+    },
+    {
+      "task": "cebab/rating",
+      "id": "cebab:train:train:11687:cebab-rating-aa208c51c2",
+      "question": "How would readers rate this restaurant review, from 1 star (worst) to 5 stars (best)? Predict the median rating.",
+      "gold": [
+        "2 stars"
+      ],
+      "assessment": "Weakly negative review; two-star median is plausible. Ratings remain subjective human judgments."
+    },
+    {
+      "task": "cebab/food",
+      "id": "cebab:train:train:3441:cebab-food-8ba73145e5",
+      "question": "What sentiment does this restaurant review express about the food?",
+      "gold": [
+        "negative"
+      ],
+      "assessment": "Mediocre food explicitly supports negative."
+    },
+    {
+      "task": "cebab/food",
+      "id": "cebab:train:train:8870:cebab-food-8ba73145e5",
+      "question": "What sentiment does this restaurant review express about the food?",
+      "gold": [
+        "no clear positive or negative sentiment"
+      ],
+      "assessment": "Dessert timing describes service, not food quality; no clear food sentiment is defensible."
+    },
+    {
+      "task": "cebab/ambiance",
+      "id": "cebab:train:train:3261:cebab-ambiance-2745f5e649",
+      "question": "What sentiment does this restaurant review express about the ambiance?",
+      "gold": [
+        "positive"
+      ],
+      "assessment": "Beautiful decor supports positive ambiance despite cold steak."
+    },
+    {
+      "task": "cebab/ambiance",
+      "id": "cebab:train:train:1041:cebab-ambiance-2745f5e649",
+      "question": "What sentiment does this restaurant review express about the ambiance?",
+      "gold": [
+        "negative"
+      ],
+      "assessment": "Place is always boring supports negative ambiance despite general praise."
+    },
+    {
+      "task": "cebab/service",
+      "id": "cebab:train:train:5665:cebab-service-6de71bd9dd",
+      "question": "What sentiment does this restaurant review express about the service?",
+      "gold": [
+        "no clear positive or negative sentiment"
+      ],
+      "assessment": "Food, atmosphere, noise and entrance are discussed; service sentiment is not stated."
+    },
+    {
+      "task": "cebab/service",
+      "id": "cebab:train:train:8205:cebab-service-6de71bd9dd",
+      "question": "What sentiment does this restaurant review express about the service?",
+      "gold": [
+        "no clear positive or negative sentiment"
+      ],
+      "assessment": "Food price criticism gives no service sentiment."
+    },
+    {
+      "task": "cebab/noise",
+      "id": "cebab:train:train:8995:cebab-noise-23431204a6",
+      "question": "What sentiment does this restaurant review express about the noise level?",
+      "gold": [
+        "no clear positive or negative sentiment"
+      ],
+      "assessment": "Fishy tuna is food criticism; noise sentiment is not stated."
+    },
+    {
+      "task": "cebab/noise",
+      "id": "cebab:train:train:1140:cebab-noise-23431204a6",
+      "question": "What sentiment does this restaurant review express about the noise level?",
+      "gold": [
+        "no clear positive or negative sentiment"
+      ],
+      "assessment": "Food quality and price criticism do not state noise sentiment."
+    },
+    {
+      "task": "fabsa/sentiment",
+      "id": "fabsa:train:301972816:Online experience: App website:fabsa-sentiment-d95ca06869",
+      "question": "What sentiment is expressed about online experience: app website?",
+      "gold": [
+        "positive"
+      ],
+      "assessment": "Easy and user friendly supports positive online experience."
+    },
+    {
+      "task": "fabsa/sentiment",
+      "id": "fabsa:train:301977608:Staff support: Attitude of staff:fabsa-sentiment-d95ca06869",
+      "question": "What sentiment is expressed about staff support: attitude of staff?",
+      "gold": [
+        "positive"
+      ],
+      "assessment": "Helpful staff explicitly supports positive staff attitude."
+    },
+    {
+      "task": "tab/identifier",
+      "id": "tab:train:001-153922_a8_em142:tab-identifier-4e38e091df",
+      "question": "For the person specified in the anonymization task, is [TARGET] a direct identifier, a quasi-identifier (identifying in combination), or safe to leave unmasked?",
+      "gold": [
+        "no masking needed"
+      ],
+      "assessment": "Four days is hearing duration, not an identifying fact about the protected person in this context; native no-mask judgment is reasonable."
+    },
+    {
+      "task": "tab/identifier",
+      "id": "tab:train:001-98502_a6_em12:tab-identifier-4e38e091df",
+      "question": "For the person specified in the anonymization task, is [TARGET] a direct identifier, a quasi-identifier (identifying in combination), or safe to leave unmasked?",
+      "gold": [
+        "quasi-identifier: mask"
+      ],
+      "assessment": "Birth year 1957 is a plausible quasi-identifier for the named applicant. Full case and target-person instruction are retained."
+    }
+  ],
+  "validation": {
+    "focused_tests": 32,
+    "reviewed_examples": 14,
+    "all_native_tab_spans_checked": true,
+    "all_cebab_rating_medians_checked": true,
+    "scope": "Coarse manual review of two actual staged export rows per task; not a certification of every source annotation."
+  }
+}

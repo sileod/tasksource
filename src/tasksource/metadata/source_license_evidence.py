@@ -5,6 +5,11 @@ Keys are task families, shared by their visual classification/MC views.
 """
 
 SOURCE_LICENSE_EVIDENCE = {
+    'cebab': {'license': 'cc-by-4.0', 'checked': '2026-10-13',
+              'scope': 'original corpus and human-written counterfactual edits',
+              'url': 'https://github.com/CEBaBing/CEBaB/blob/gh-pages/cebab_datasheet.md#distribution'},
+    'tab': {'license': 'mit', 'checked': '2026-10-13', 'scope': 'original TAB corpus distribution',
+            'url': 'https://github.com/NorskRegnesentral/text-anonymization-benchmark/blob/master/LICENSE.txt'},
     'discosense': {'license': 'apache-2.0', 'checked': '2026-10-13',
                    'scope': 'license declaration in the original dataset README (malformed Hub front matter)',
                    'url': 'https://huggingface.co/datasets/prajjwal1/discosense/blob/6d008011ac5b47dcd75029f46901da81382b6d89/README.md'},

@@ -112,3 +112,13 @@ Batch 6/7 source and exact-export audits: [relevance](../../../docs/jev/retrieva
 Published the four accepted views to Jev `default` and `full` in [Hub commit f8ff7e81](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/commit/f8ff7e81ed820eeac1ad7afd63449fe99c8a76c3): **99,082 train / 200 validation / 400 test** rows appended. Training: ANTIQUE 27,422; WikiQA 20,360; NevIR 1,896; causal transitivity 49,404. Native evaluation pools remain available through `load_task`; the export caps each existing evaluation split at 100 rows per task. Every prior Parquet blob was preserved; implementation Git `65d82da`. No COLD, d-separation or MuSiQue rows were published.
 
 Published the four accepted Batch 6/7 views to Jev `default` and `full` in [Hub commit f8ff7e81](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/commit/f8ff7e81ed820eeac1ad7afd63449fe99c8a76c3): 99,082 train / 200 validation / 400 test rows. All 140 previous Parquet blobs verified unchanged. Implementation Git `65d82da`, metadata cleanup `8120bc0`. COLD skipped at user request; d-separation and optional MuSiQue remain explicitly deferred.
+
+## Batch 8 — aspect decisions and contextual privacy (user-approved)
+
+| Source | Requested view | Status |
+|---|---|---|
+| CEBaB | Restaurant rating and aspect-conditioned sentiment; preserve original/counterfactual identity | Implemented five direct views from EleutherAI/CEBaB; inclusive training set once, original-review groups/counterfactual flags retained; median ratings match every original vote distribution |
+| FABSA | Aspect-conditioned sentiment, preserving neutral vs unmentioned | Implemented direct jordiclive/FABSA; single-polarity annotated aspects only, neutral retained, repeated review holdouts and conflicting prompts handled |
+| TAB | Context-dependent identifier/masking decisions | Implemented existing Hub zipped JSON; native document partitions, person-to-anonymize instruction, full context, offsets and annotator/coreference IDs retained; disagreements remain separate native judgments |
+
+[Source and staged-export audit](../../../docs/jev/aspect-privacy-audit.md): no new mirrors; two manually reviewed examples per view; 32 focused tests passed. FABSA's license remains explicitly unspecified.

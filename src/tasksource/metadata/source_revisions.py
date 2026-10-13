@@ -1,6 +1,9 @@
 """Reviewed source snapshots; keep opaque revision IDs out of task annotations."""
 
 SOURCE_REVISIONS = {
+    "EleutherAI/CEBaB": "d1e1c91387a2fcd3f987e125c23f2c3895aea549",
+    "jordiclive/FABSA": "40abb500cd7688529cb831c8c2c2a90d06264379",
+    "doshimit3015/text-anonymization-benchmark": "e33fd0a4502d6b2c9e980aa8899fa23df38c9153",
     "ludwigw/causal-reasoning-benchmarks": "128b00ada5ee94a8e9262d7b0c4836c6edebd5cc",
     "tasksource/antique": "64ee082b79eef22a6c8f80b76e10b4d88c4308b0",
     "microsoft/wiki_qa": "3f104672b5de699878fe7907afc486f0de325eb5",

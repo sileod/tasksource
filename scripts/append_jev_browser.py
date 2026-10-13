@@ -60,7 +60,7 @@ def build(output, max_rows=1000, max_rows_eval=100, tasks=None, description=None
                 meta['native_split'] = native_split
                 row = to_training_row(example, index, task, split)
                 # Source identity is stable across text/visual views and permutations.
-                group = f"{task.split('/')[0]}:{native_split}:{meta.get('source_row') or meta['id']}"
+                group = f"{task.split('/')[0]}:{native_split}:{meta.get('source_row') or example.get('source_index') or meta['id']}"
                 row.update(id=f'{group}:{slug(task)}', group_id=group, question_id=slug(task),
                            license=licenses[task]['license'], license_use=licenses[task]['license_use'])
                 if len(render_request(row['state'], [row]).encode()) > 131_072:
