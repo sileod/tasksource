@@ -12,7 +12,8 @@ from . import (
     arithmetic, entity_belief_tracking, event_state_reconstruction, event_triggered_execution,
     evidence_sufficiency, goal_directed_planning, graph_navigation, instruction_execution,
     multi_view_adjudication, needle_retrieval, partial_observation_calibration,
-    policy_applicability, policy_under_uncertainty, record_aggregation, state_perturbation, table_lookup,
+    policy_applicability, policy_under_uncertainty, record_aggregation, record_eligibility,
+    state_perturbation, table_lookup,
     taxonomy_routing,
 )
 
@@ -22,7 +23,8 @@ TASKS = {
         arithmetic, entity_belief_tracking, event_state_reconstruction, event_triggered_execution,
         evidence_sufficiency, goal_directed_planning, graph_navigation, instruction_execution,
         multi_view_adjudication, needle_retrieval, partial_observation_calibration,
-        policy_applicability, policy_under_uncertainty, record_aggregation, state_perturbation, table_lookup,
+        policy_applicability, policy_under_uncertainty, record_aggregation, record_eligibility,
+        state_perturbation, table_lookup,
         taxonomy_routing,
     )
 }

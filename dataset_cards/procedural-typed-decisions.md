@@ -134,6 +134,14 @@ configs:
     path: record_aggregation/validation-*.parquet
   - split: test
     path: record_aggregation/test-*.parquet
+- config_name: record_eligibility
+  data_files:
+  - split: train
+    path: record_eligibility/train-*.parquet
+  - split: validation
+    path: record_eligibility/validation-*.parquet
+  - split: test
+    path: record_eligibility/test-*.parquet
 - config_name: state_perturbation
   data_files:
   - split: train
@@ -193,9 +201,16 @@ is not produced by or affiliated with TypeSafe or OpenJev.
 | `policy_applicability` | `access_allowed` (noul), `governing_policy` (choice), `review_risk` (score); 2 one-constraint policies at level 0, about 12 policies of up to 5 constraints, many of them near misses, at level 4 |
 | `policy_under_uncertainty` | `access_allowed` (noul), `governing_policy` (choice), `requester_role` (choice); exact posteriors over a role known through history counts and reports of stated reliability |
 | `record_aggregation` | `count_in_category` (score), `largest_quantity` (choice), `any_out_of_stock` (noul), `total_above` (noul), from level 2 `count_filtered` (score, quantity and stock filters) |
+| `record_eligibility` | Prose-only record descriptions and numbered user requirements. `probe_eligibility`, `requirement_status`, `first_eligible`, `decisive_constraint` (choice); `eligible_count` (score), `eligible_if_relaxed`, `probe_fully_eligible` (noul). Three-valued eligibility covers conjunction, negation, disjunction, conditional obligations, combined-cost limits, missing or conflicting evidence, and counterfactual relaxation. 4–27 records and 1–6 constraints by level. |
 | `state_perturbation` | `material_change` (noul), `changed_dimension` (choice), `risk_direction` (score); 1 to 8 records with up to 4 simultaneous changes whose risk effects can offset, and look-alike non-material fields |
 | `table_lookup` | `find_person` (choice, two-condition filter, through the manager from level 2 and with a start-year condition from level 3; 6 to 40 options, capped by the table), `manager_of` (choice, join), `started_before` (noul), `count_matching` (score) |
 | `taxonomy_routing` | `route` (choice among the 4–60 categories of a routing guide drawn fresh per state; many rules share a condition with the right one), `belongs_to` (noul), `conditions_met` (score, 0–4) |
+
+## Record eligibility generation
+
+The `record_eligibility` state contains only a natural-language user request, prose record descriptions, and explicit evaluation semantics. Source facts and logical expression trees are kept in generator test metadata, not the published dataset. Unknown facts are not treated as violations; a known violated requirement dominates any unknown requirements. The first eligible record is defined by the displayed order, and the decisive requirement by the numbered constraints.
+
+Difficulty rises across five levels by increasing record count (4–6 to 25–27), requirement count (1 to 6), and the introduction of nested OR, conditional requirements, summed charges, near-threshold distractors and contradictory reports. Generator correctness and structural progression are tested, but model-calibrated Jev kappa has not yet been measured for this configuration.
 
 ## Schema
 
