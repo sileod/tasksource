@@ -1,5 +1,7 @@
 # tasksource-jev-typed-decisions build
 
+Labels are screened after each publish: see the [label audit](label-audit.md).
+
 Vision source prompts are normalized before recasting: known Cauldron
 answer-length/yes-no suffixes are removed, while `metadata.source_question`
 retains the complete original. Only exact standalone suffixes are removed;
