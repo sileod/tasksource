@@ -13,7 +13,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest='command', required=True)
     fetch = commands.add_parser('retrieve', help='Retrieve dataset or dataset-paper candidates')
-    fetch.add_argument('--source', action='append', choices=('paperswithcode','hf_hub','openalex'),
+    fetch.add_argument('--source', action='append', choices=('paperswithcode','hf_hub','openalex','hf_papers'),
                        help='Repeat to combine sources; defaults to paperswithcode')
     fetch.add_argument('--query', action='append', default=[], help='Hub name or OpenAlex scholarly search; repeat for OR')
     fetch.add_argument('--limit', type=int, default=100, help='Maximum results per query/category (default 100)')
@@ -45,6 +45,8 @@ def main():
             parser.error('--limit must be positive')
         if args.language and 'paperswithcode' in (args.source or ['paperswithcode']):
             parser.error('--language is an HF dataset/OpenAlex paper filter; retrieve PWC separately')
+        if args.language and 'hf_papers' in (args.source or []):
+            parser.error('HF Papers has no dataset-language filter; apply --language during screening')
         rows, runs = [], []
         for source in dict.fromkeys(args.source or ['paperswithcode']):
             if source == 'paperswithcode':
@@ -57,9 +59,12 @@ def main():
             elif source == 'hf_hub':
                 from .hf_hub import retrieve as fetch_source
                 found, report = fetch_source(args.cache, args.query, args.task, args.limit, args.offline, languages=args.language)
-            else:
+            elif source == 'openalex':
                 from .openalex import retrieve as fetch_source
                 found, report = fetch_source(args.cache, args.query, args.limit, args.offline, languages=args.language)
+            else:
+                from .hf_papers import retrieve as fetch_source
+                found, report = fetch_source(args.cache, args.query, args.limit, args.offline)
             rows.extend(found)
             runs.append(report)
         rows = deduplicate(rows)

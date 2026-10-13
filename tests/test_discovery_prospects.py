@@ -202,3 +202,19 @@ def test_allow_verified_synthetic_alone_filters_unverified_model_labels(tmp_path
     manifest=json.loads((tmp_path/'filtered/manifest.json').read_text())
     assert manifest['annotation_origins']==['human','procedural'] and manifest['handoff_count']==1
     assert manifest['annotation_filtered']==1
+
+
+def test_prior_paper_identity_excludes_paper_leads_without_merging_dataset_views():
+    prior=[dict(name='Original dataset',huggingface=[],papers=[{'url':'https://arxiv.org/abs/2401.12345v2'}])]
+    paper=dict(name='Different paper title',candidate_kind='paper',papers=[{'url':'https://arxiv.org/abs/2401.12345'}])
+    dataset=dict(paper,name='Distinct dataset from the same paper',candidate_kind='dataset')
+    assert discovery.unseen_candidates([paper,dataset],prior)==[dataset]
+
+
+def test_large_review_documents_are_bounded_without_mutating_source_evidence():
+    docs=[dict(url='source',sha256='original-hash',metadata={'labels':['x'*10000]})]
+    bounded=jev_review.bounded_documents(docs,limit=100)
+    assert bounded[0]['truncated'] and bounded[0]['sha256']=='original-hash'
+    assert len(bounded[0]['source_document_json_excerpt'])==100
+    assert len(docs[0]['metadata']['labels'][0])==10000
+    assert jev_review.bounded_documents([{'text':'small'}])==[{'text':'small'}]

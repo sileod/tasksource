@@ -15,6 +15,9 @@ These are screening results, **not approved training sources or completed integr
 - [October 13 OpenAlex general/medical/legal passes](prospects/2026-10-13-openalex.md):
   73 paper leads reviewed; no confirmed English shortlist additions.
 
+- [October 13 HF Papers pilot](prospects/2026-10-13-hf-papers.md): 21 paper leads
+  reviewed; 1 eligibility pass, withheld for unresolved provenance.
+
 ## October 12 snapshot
 
 Snapshot: October 12, 2026. A 5,000-candidate discovery pass produced 42 eligibility

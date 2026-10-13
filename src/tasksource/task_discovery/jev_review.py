@@ -66,6 +66,16 @@ QUESTIONS.update({name:dict(type='choice',instructions='Use only supplied eviden
                             criteria=criteria) for name,(instructions,criteria) in PROVENANCE.items()})
 
 
+def bounded_documents(documents,limit=24000):
+    """Bound model input; full source responses remain in the metadata cache."""
+    serialized=[json.dumps(d,sort_keys=True,ensure_ascii=False) for d in documents]
+    if sum(map(len,serialized))<=limit:return documents
+    share=limit//max(1,len(documents))
+    return [dict(url=d.get('url',''),sha256=d.get('sha256'),
+                 source_document_json_excerpt=text[:share],truncated=len(text)>share)
+            for d,text in zip(documents,serialized)]
+
+
 def evidence(row,cache,offline=False):
     documents=list(row.get('evidence',[]));errors=[]
     if row.get('description'):
@@ -86,7 +96,7 @@ def evidence(row,cache,offline=False):
             documents.append(dict(url=readme['git_url'],text=base64.b64decode(readme['content']).decode()[:40000]))
         except (OSError,ValueError,KeyError) as error:errors.append(dict(source=repo,error=str(error)))
     return dict(candidate={k:row.get(k,[]) for k in ('name','huggingface','github','papers','tasks','dataset_urls','config_name','source_splits','split_policy')},
-                evidence=documents,evidence_errors=errors)
+                evidence=bounded_documents(documents),evidence_errors=errors)
 
 
 def configure_key():

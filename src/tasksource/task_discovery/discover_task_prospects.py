@@ -11,7 +11,7 @@ import re
 from pathlib import Path
 from urllib.parse import urlencode
 
-from .identifiers import normalized,source_id
+from .identifiers import normalized,source_id,paper_ids
 from .link import cached_json
 from .match import catalog_hash,catalog_index,catalog_references,match,previous_decisions,queued_sources
 from .jev_review import MODEL,run
@@ -109,11 +109,13 @@ def language_priority(row, requested):
 
 
 def unseen_candidates(rows,previous):
-    """Exclude already screened identities, without merging shared papers/GitHub repos."""
+    """Exclude screened identities; shared papers suppress paper leads, not distinct datasets."""
     names={normalized(r['name']) for r in previous}
     repos={source_id(v,'huggingface') for r in previous for v in r.get('huggingface',[])}
+    papers={p for r in previous for p in paper_ids(r.get('papers',[]))}
     return [r for r in rows if normalized(r['name']) not in names
-            and not repos.intersection(source_id(v,'huggingface') for v in r.get('huggingface',[]))]
+            and not repos.intersection(source_id(v,'huggingface') for v in r.get('huggingface',[]))
+            and not (r.get('candidate_kind')=='paper' and papers.intersection(paper_ids(r.get('papers',[]))))]
 
 
 def write_rows(path,rows):
@@ -132,6 +134,7 @@ def main():
     parser.add_argument('--allow-verified-synthetic',action='store_true',help='With an origin filter, also admit model/mixed labels with independent checks covering all retained labels')
     parser.add_argument('--from-reviews',action='store_true',help='Filter saved reviews without network or model calls')
     parser.add_argument('--include-known',action='store_true',help='Bypass catalog/history/queue exclusion for calibration')
+    parser.add_argument('--hold-related',action='store_true',help='Hold catalog paper/GitHub overlap hints for identity review before spending on screening')
     parser.add_argument('--model',action='append');parser.add_argument('--offline-evidence',action='store_true')
     args=parser.parse_args()
     if args.allow_verified_synthetic and not args.annotation_origin:args.annotation_origin=['human','procedural']
@@ -146,7 +149,8 @@ def main():
     names,repos=catalog_index();references=catalog_references();history=previous_decisions();queue=queued_sources()
     matched=list(match(rows,names,repos,history,queue,references))
     write_rows(args.output/'matched.jsonl',matched)
-    candidates=[r for r in matched if args.include_known or r['status']=='candidate']
+    candidates=[r for r in matched if (args.include_known or r['status']=='candidate')
+                and not (args.hold_related and r.get('related_matches'))]
     previous=[json.loads(line) for p in args.exclude for line in p.read_text().splitlines() if line.strip()]
     unseen=unseen_candidates(candidates,previous)
     eligible=[r for r in unseen if language_priority(r,args.language)<2]
@@ -180,7 +184,8 @@ def main():
         exclusion_hashes={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in args.exclude},
         previously_screened=len(candidates)-len(unseen),
         retrieved=len(rows),unique=len(matched),novel=sum(r['status']=='candidate' for r in matched),
-        selected=len(selected),seed=args.seed,languages=args.language,language_eligible=len(eligible),include_known=args.include_known)
+        selected=len(selected),seed=args.seed,languages=args.language,language_eligible=len(eligible),include_known=args.include_known,
+        hold_related=args.hold_related,related_held=sum(bool(r.get('related_matches')) for r in matched) if args.hold_related else 0)
     (args.output/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
     print(json.dumps(manifest))
 

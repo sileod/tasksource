@@ -25,7 +25,7 @@ not the public discovery results. Discovery never rewrites it.
 
 ## Interchangeable retrieval sources
 
-Use `--source paperswithcode`, `--source hf_hub`, or `--source openalex`. Repeat `--source` to combine retrievals into one deduplicated JSONL; all outputs feed the same `match` and `link` commands.
+Use `--source paperswithcode`, `--source hf_hub`, `--source hf_papers`, or `--source openalex`. Repeat `--source` to combine retrievals into one deduplicated JSONL; all outputs feed the same `match` and `link` commands.
 
 ```bash
 python -m tasksource.task_discovery retrieve --source hf_hub --source openalex \
@@ -219,3 +219,35 @@ provide evidence absent from abstracts. Other retrieved leads remain in the save
 inventory, unresolved rather than rejected. The combined final shortlist is in
 `english-confirmed/handoff.jsonl`; any legacy eligibility passes are re-reviewed
 with the dataset-language criterion before appearing there.
+
+
+## Hugging Face Papers
+
+```bash
+python -m tasksource.task_discovery retrieve --source hf_papers --limit 20 \
+  --cache build/discovery/hf-papers/cache --output build/discovery/hf-papers/inventory.jsonl
+python -m tasksource.task_discovery.discover_task_prospects \
+  build/discovery/hf-papers/inventory.jsonl --limit 12 --language en --hold-related \
+  --allow-verified-synthetic --model openrouter/~typesafe/jev-latest \
+  --exclude build/discovery/hf-papers/previous-identities.jsonl --output build/discovery/hf-papers/pilot
+```
+
+[`hf_papers.py`](hf_papers.py) uses Hugging Face paper search, paper metadata and
+dataset repositories tagged with each paper's arXiv ID. Default searches cover
+English classification, multiple choice, relevance, biomedical and legal data.
+`--query` overrides them; `--limit` is per query (1–120). Search reaches indexed
+paper pages, not only the Daily Papers selection, and is not an exhaustive inventory.
+Responses are checksummed and replayable with `--offline`. Native abstracts are
+retained; AI-generated summaries are not substituted as source evidence. Explicit
+linked repositories can cite a paper without being its official data distribution.
+
+Paper leads use the same canonical records and screening as other sources. HF
+Papers has no dataset-language search filter: apply `--language en` during screening,
+which verifies the actual dataset language from evidence. Before review, build a
+prior-identities JSONL from previous checked records, retaining `name`, `huggingface`
+and `papers`; pass it through `--exclude`. Paper-ID exclusion applies to paper leads,
+not distinct dataset records sharing a paper. `--hold-related` also withholds catalog
+paper/GitHub overlap hints for identity review; held rows stay in `matched.jsonl` and
+counts remain in the manifest. These holds do not declare a source unsuitable or
+prove every projection is already implemented. Titles/aliases and links remain
+imperfect, and unresolved train/resource evidence does not approve a prospect.

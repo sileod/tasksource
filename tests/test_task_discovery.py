@@ -303,3 +303,30 @@ def test_canonical_paper_titles_link_pwc_candidates_without_discarding_them(tmp_
                       {},{},references=catalog_references(path)))[0]
     assert result['status']=='candidate'
     assert result['related_matches']==[dict(by='paper_title',value='datasetanewbenchmark',tasks=['known/view'])]
+
+
+def test_hf_papers_keeps_native_evidence_explicit_links_and_replays(tmp_path,monkeypatch):
+    from tasksource.task_discovery import hf_papers
+    from urllib.parse import parse_qs,urlsplit
+    calls=[]
+    def cached(url,cache,offline):
+        calls.append((url,offline))
+        if '/search?' in url:
+            data=[{'paper':{'id':'2401.12345','title':'A labeled dataset','summary':'Native abstract'}}]
+        elif '/api/papers/' in url:
+            data=dict(title='A labeled dataset',summary='Native abstract',ai_summary='Invented training claims',
+                      githubRepo='https://github.com/org/data',projectPage='https://example.org')
+        else:
+            assert parse_qs(urlsplit(url).query)['filter']==['arxiv:2401.12345']
+            data=[{'id':'Org/Data'}]
+        return dict(url=url,sha256='hash',data=data)
+    monkeypatch.setattr(hf_papers,'cached_json',cached)
+    rows,manifest=hf_papers.retrieve(tmp_path,queries=['first','second'],limit=3)
+    assert len(rows)==1 and rows[0]['candidate_kind']=='paper'
+    assert rows[0]['description']=='Native abstract'
+    assert rows[0]['huggingface']==['Org/Data'] and rows[0]['github']==['https://github.com/org/data']
+    assert rows[0]['languages']==[] and rows[0]['train_status']=='unchecked'
+    assert len(manifest['requests'])==4
+    assert hf_papers.retrieve(tmp_path,queries=['first','second'],limit=3,offline=True)==(rows,manifest)
+    assert calls[-1][1]
+    with pytest.raises(ValueError):hf_papers.retrieve(tmp_path,limit=121)
