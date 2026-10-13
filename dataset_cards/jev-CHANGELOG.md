@@ -9,6 +9,7 @@ Each release is tagged on the Hub: `load_dataset("tasksource/tasksource-jev-type
 - Removed after manual review of random rows: `dair-ai/emotion`, CrowdFlower `text_emotion` and IndicGLUE ACTSA (many wrong labels). `app_reviews` drops reviews under four words.
 - DiscoSense states include the discourse connective; PropSegmEnt question fixed; PROST removed (test-only).
 - New: CEBaB, FABSA and TAB.
+- Restores 57 sources missing from v2026.10.13 (MAUD, multidogo, WikiQA, OLID, TabFact and others), now built with the rest instead of appended.
 
 ## v2026.10.13.1
 
@@ -19,6 +20,7 @@ Each release is tagged on the Hub: `load_dataset("tasksource/tasksource-jev-type
 - 18 procedural sources, including `record_eligibility`; procedural rows are label-balanced (at most 60% per answer, yes/no at most a third of questions).
 - Label balance: per source and question, the majority label is at most three times the rarest; single-label questions are dropped.
 - `default` mix weighs sources by option count, so binary decisions are 15% of rows.
+- Known issue: 58 sources from earlier appends are missing (MAUD, multidogo, WikiQA, OLID, TabFact and others).
 
 ## Earlier releases
 
