@@ -649,6 +649,12 @@ dbpedia_14 = Classification(sentence1="content", labels="label", splits=["train"
 
 amazon_polarity = Classification(sentence1="content", labels="label", splits=["train", None, "test"], config_name=["amazon_polarity"])
 
+app_reviews = Classification("review", labels="star", splits=["train", None, None], ordinal=True,
+    question="How many stars did the reviewer give the app?",
+    # about 30% of reviews are 1-3 words, often only the reviewer's name, which cannot support a rating
+    pre_process=lambda ds: ds.filter(lambda r: len((r["review"] or "").split()) >= 4),
+    label_values={star: f"{star} star" + "s" * (star > 1) for star in range(1, 6)})
+
 
 hate_speech18 = Classification(sentence1="text", labels="label", splits=["train", None, None],
     dataset_name="tasksource/hate_speech18",

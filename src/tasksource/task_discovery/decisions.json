@@ -2231,28 +2231,6 @@
     "review_findings": "DeepSeek V4 Flash screened every published Jev example of the task (2026-10); a manual read of flagged samples confirmed the label problems."
   },
   {
-    "name": "app_reviews",
-    "scope": "task",
-    "tasks": [
-      "app_reviews"
-    ],
-    "status": "deferred",
-    "reason_code": "incorrect_labels",
-    "reason": "many reviews are only a reviewer name with a star rating; 24% flagged; yelp_review_full and amazon_polarity cover review ratings",
-    "evidence": [
-      "Reviews consisting only of a name ('Anju kumari', 'Kush rho') labeled 5 or 4 stars"
-    ],
-    "checked_on": "2026-10-13",
-    "reconsider_if": "A release filtering reviews without content.",
-    "huggingface": [
-      "app_reviews"
-    ],
-    "github": [],
-    "papers": [],
-    "annotation": "tasksource.parked.app_reviews",
-    "review_findings": "DeepSeek V4 Flash screened every published Jev example of the task (2026-10); a manual read of flagged samples confirmed the label problems."
-  },
-  {
     "name": "CrowdFlower text emotion",
     "scope": "task",
     "tasks": [

@@ -201,10 +201,6 @@ snli_ve = VisualClassification(
 
 dair_ai_emotion = Classification(sentence1="text", labels="label", dataset_name="dair-ai/emotion", task_id="emotion")
 
-app_reviews = Classification("review", labels="star", splits=["train", None, None], ordinal=True,
-    question="How many stars did the reviewer give the app?",
-    label_values={star: f"{star} star" + "s" * (star > 1) for star in range(1, 6)})
-
 crowdflower__text_emotion = Classification("text", labels="label", splits=["train", None, None],
     dataset_name="tasksource/crowdflower", config_name="text_emotion", question="What emotion does the text express?")
 
@@ -224,7 +220,6 @@ KINDS = {
 
 PARKED = {
     "dair_ai_emotion": ("unsound", "hashtag-derived emotion labels; a 2026 LLM screen flagged 25% (e.g. 'i didnt feel so hot' labeled love); go_emotions, tweet_eval/emotion and emo2019 cover emotion"),
-    "app_reviews": ("unsound", "many reviews are only a reviewer name with a star rating; 24% flagged; yelp_review_full and amazon_polarity cover review ratings"),
     "crowdflower__text_emotion": ("unsound", "neutral tweets carry arbitrary emotion labels; 28% flagged; go_emotions covers emotion"),
     "indic_glue__sentiment_actsa": ("unsound", "Telugu ACTSA sentiment labels often contradict the text; 43% flagged; inltkh.te and iitp Hindi sets cover Indic sentiment"),
     'maven_ere__temporal': ('unsound', 'Native BEFORE annotation places a 1487 defeat before the war outbreak; source d026ad27155a13c00d9b9812c98f4fc9, pair 26:2.'),
