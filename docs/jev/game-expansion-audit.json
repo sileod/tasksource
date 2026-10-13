@@ -227,5 +227,20 @@
       "root_card_body_preserved": true,
       "vision_train_rows": 106085
     }
+  },
+  "mirror_order_update": {
+    "repo": "tasksource/gameqa",
+    "revision": "b15dac5e0ef1f57aff722e3a9b46f6c579ea08b4",
+    "previous_revision": "9e326b4d4e2a5e817f13cedf2767e6896438432c",
+    "ordering": {
+      "method": "datasets.shuffle",
+      "seed": 0,
+      "unit": "image_group",
+      "within": "native_split"
+    },
+    "validated_image_groups": 56006,
+    "all_rows_equal_after_permutation": true,
+    "uploaded_parquet_sha256_verified": 11,
+    "jev_export": "unchanged"
   }
 }

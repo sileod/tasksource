@@ -66,7 +66,7 @@ def valen_records(row):
                 action=action,source_probabilities=probabilities,source_metadata=row['meta']),ensure_ascii=False))
 
 
-def _package(name, source, revision, groups, archives, files, excluded, mc, conversion, license):
+def _package(name, source, revision, groups, archives, files, excluded, mc, conversion, license, shuffle_seed=None):
     features = Features(dict(images=Sequence(Image(decode=False)),image_group_id=Value('string'),
         qa=[dict(inputs=Value('string'),labels=Value('int64' if mc else 'string'),metadata=Value('string'),
                  **({'choices_list':Sequence(Value('string'))} if mc else {}))]))
@@ -93,7 +93,12 @@ def _package(name, source, revision, groups, archives, files, excluded, mc, conv
     result = _materialize(data,name,source,revision,excluded,conversion,license,
                           f'https://huggingface.co/datasets/{source}')
     directory = Path('build')/(name+'-release')
+    if shuffle_seed is not None:
+        result = result.shuffle(seed=shuffle_seed)
+        for split, rows in result.items():rows.to_parquet(str(directory/(split+'.parquet')))
     report = json.loads((directory/'provenance.json').read_text())
+    if shuffle_seed is not None:
+        report['ordering'] = dict(method='datasets.shuffle', seed=shuffle_seed, unit='image_group', within='native_split')
     report.update(conversion_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
         source_file_sha256={n:hashlib.file_digest(open(p,'rb'),'sha256').hexdigest() for n,p in files.items()},
         exclusions_by_reason=dict(Counter(r['reason'] for r in excluded)),
@@ -110,6 +115,7 @@ def gameqa():
     order, equivalent duplicates collapse, and gold indices are remapped.
     Embedded option blocks are removed before Jev permutation. Screenshots are
     grouped across QAs and test images take precedence over training copies.
+    Image groups are shuffled within each native split with seed 0; QA order is retained.
     Procedural game labels are used; generated rationales are excluded from inputs.
     Original source declares MIT. No validation split is fabricated.
     """
@@ -123,7 +129,7 @@ def gameqa():
             if reason:excluded.append(dict(id=str(index),split=split,reason=reason))
             else:groups[split][row['image']].append(qa)
     return _package('gameqa',GAMEQA,GAMEQA_REVISION,groups,
-        {s:files[f'games_images{suffix}.zip'] for s,suffix in [('train',''),('test','_test')]},files,excluded,True,gameqa,'mit')
+        {s:files[f'games_images{suffix}.zip'] for s,suffix in [('train',''),('test','_test')]},files,excluded,True,gameqa,'mit',shuffle_seed=0)
 
 
 def valen_game():
