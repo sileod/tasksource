@@ -1,27 +1,8 @@
 import json
 from types import SimpleNamespace
 
-from scripts.append_jev_webinstruct import convert
 from scripts.audit_jev_progressive import call, round_robin, render, restore_raw
 from scripts.reconfirm_jev_filtering import MODEL
-
-
-def test_mc_conversion_preserves_semantic_gold_and_all_options():
-    raw = dict(id='42',prompt='Pick the largest.',options=['1','2','3','4','5'],gold=4)
-    row = convert(raw,'mc','train')
-    assert row['state'] == raw['prompt']
-    assert set(row['options']) == set(raw['options'])
-    assert row['options'][row['target'].index(1)] == '5'
-    assert row == convert(raw,'mc','train')
-    assert convert(raw,'mc','test')['group_id'] != row['group_id']
-
-
-def test_binary_conversion_preserves_label_polarity():
-    for gold in [0,1]:
-        row = convert(dict(id='42',prompt='The sky is blue.',label=gold),'binary','train')
-        assert row['options'] == ['no / false','yes / true']
-        assert row['target'][gold] == 1
-        assert row['kind'] == 'choice'
 
 
 def test_round_robin_completes_each_task_round_before_next():

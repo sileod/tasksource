@@ -626,25 +626,9 @@ private set has **not** been verified. Original trajectory/action IDs, snapshot
 hashes and the full split index are published in the mirror's `provenance.json`
 and row metadata so that a later overlap check can use source identity.
 
-`python -m scripts.append_jev_browser` stages direct browser decisions for the
-hosted `default` and `full` configs; `--push` publishes the reviewed patch with a
-parent-revision guard. Existing Parquet blobs are checked for preservation.
-The patch keeps source partitions, caps each task at 1,000 train / 100 rows per
-native evaluation split, folds WebLINX named test subsets into hosted `test`
-while retaining their names in row provenance, excludes requests exceeding 131,072 UTF-8 bytes, and records source-row
-metadata in a sidecar without changing the existing text schema. WebLINX is
-marked non-commercial (CC BY-NC-SA 4.0); source license evidence is recorded for
-all six annotations. Visual Mind2Web remains outside this text addition.
-
-The browser addition is published in [data revision
-`1dcd61f`](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/commit/1dcd61f30efb1853adf53b0715609a9848b876a9):
-5,596 train, 573 validation, and 1,149 test decisions were appended identically
-to `default` and `full`. The [verification receipt](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/blob/main/additions/167c5ad6fb79/verification.json)
-records SHA-256 checks for all six added Parquet paths, preservation of all 91
-existing Parquet blobs, and reading/validation of all 1,149 hosted test rows.
-The [coarse audit](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/blob/main/additions/167c5ad6fb79/quality-audit.json)
-covers two training examples per task and records one ambiguous native WebSRC
-stock-availability question. It does not certify every source answer.
+WebLINX is marked non-commercial (CC BY-NC-SA 4.0); source license evidence is recorded for
+all six annotations. Visual Mind2Web remains outside these text tasks. One native WebSRC
+stock-availability question was found ambiguous in a coarse review.
 
 ### Entity sentiment and search relevance
 
@@ -679,19 +663,6 @@ builders are in `scripts/repackage_dataset/relevance.py`; source revisions,
 conversion hashes, exclusions and split policies are published in each mirror.
 RELISH and SciNUP are omitted because they are evaluation collections without
 native training partitions. They are not converted into synthetic training sets.
-
-The incremental publisher also accepts `--tasks sentfin wands scirepeval/search`
-and a `--description` for the dataset card, reusing the same schema checks,
-source-group leakage checks and parent-revision guard as browser additions.
-
-Published in [data revision `2451442`](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/commit/24514425e993f617d462cc740912e26f2acf6d76):
-1,000 training rows per task, 100 validation rows per task, and 100 test rows each
-for SEntFiN/WANDS (Search has no added test data). Both `default` and `full` receive
-3,000 / 300 / 200 decisions. The [coarse audit](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/blob/main/additions/2d27d40ae2fe/quality-audit.json)
-records source-label alignment for all 3,500 rows, three inspected training
-examples per task, and the weak/context-dependent source-label caveats.
-The [verification receipt](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/blob/main/additions/2d27d40ae2fe/verification.json)
-checks all six hosted shards and preservation of all 97 pre-existing Parquet blobs.
 
 Legal, biomedical and structured-text annotations: [source mappings and preparation](specialized-text.md).
 

@@ -14,6 +14,6 @@ Keep Hub root dataset cards focused on current usage, configs, schema and licens
 
 # Jev releases
 
-The text configs of `tasksource/tasksource-jev-typed-decisions` (`default`, `full`) come only from `scripts/build_jev_dataset.py`, and each publish replaces all their shards. Add text sources to the catalog so the build includes them; shards appended outside the build are lost at the next publish. Appends are fine for `vision`, which text publishes leave untouched.
+The text configs of `tasksource/tasksource-jev-typed-decisions` (`default`, `full`) come only from `scripts/build_jev_dataset.py`, and each publish replaces all their shards. New sources enter through the catalog and the build, not through one-off publication scripts.
 
-Every publish is a release: its newest `## vYYYY.MM.DD[.n]` entry in `dataset_cards/jev-CHANGELOG.md` (published as `CHANGELOG.md`) lists in a few user-facing bullets what changed, and the Hub revision gets that tag. The build does both from the changelog; other publication scripts upload the changelog and call `HfApi.create_tag`.
+Every publish is a release: its newest `## vYYYY.MM.DD[.n]` entry in `dataset_cards/jev-CHANGELOG.md` (published as `CHANGELOG.md`) lists in a few user-facing bullets what changed, and the Hub revision gets that tag. The build does both from the changelog.

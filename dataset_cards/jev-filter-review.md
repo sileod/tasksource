@@ -220,15 +220,3 @@ PYTHONPATH=../litlm:.:src python scripts/audit_jev_progressive.py full \
 Rerunning this command retains completed verdicts and retries only missing examples.
 Benchmark metrics and complete comparisons remain under `build/jev-batch-comparison`.
 
-## Selective WebInstruct publication
-
-`scripts/append_jev_webinstruct.py` builds a patch, and `--push` publishes it atomically
-against the inspected destination revision. It appends filtered WebInstruct MC/binary
-data to both existing configs without resampling old mixtures or replacing old shards.
-The source revision is pinned, every included option and semantic gold is preserved
-through canonical Jev option handling, and binary polarity is explicit. Forty-seven MC
-rows with duplicate option text fail the existing choice contract and are omitted, with
-their IDs in the incremental manifest; no repair is applied. Original source train/test
-assignments remain: 28,440 train and 122 test additions, no validation additions.
-Arrow schema, decision targets, IDs, metadata counts and existing Parquet blob identities
-are checked. The Hub `webinstruct-addition.json` records transformations and provenance.
