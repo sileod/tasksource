@@ -49,11 +49,11 @@
 | 45 | [gameqa/mcq](src/tasksource/vision_tasks.py#L568) | VisualMultipleChoice | [tasksource/gameqa](https://hf.co/datasets/tasksource/gameqa) |  |
 | 46 | [valen-game/optimal-action](src/tasksource/vision_tasks.py#L572) | VisualClassification | [tasksource/valen-game](https://hf.co/datasets/tasksource/valen-game) | ✓ |
 | 47 | [t2isafety/toxicity](src/tasksource/vision_tasks.py#L578) | VisualClassification | [tasksource/t2i-safety](https://hf.co/datasets/tasksource/t2i-safety) | ✓ |
-| 48 | [met-meme/sentiment](src/tasksource/vision_tasks.py#L601) | VisualClassification | [Anthony3456347095/MET-Meme](https://hf.co/datasets/Anthony3456347095/MET-Meme) | ✓ |
-| 49 | [met-meme/intention](src/tasksource/vision_tasks.py#L604) | VisualClassification | [Anthony3456347095/MET-Meme](https://hf.co/datasets/Anthony3456347095/MET-Meme) | ✓ |
-| 50 | [met-meme/offensiveness](src/tasksource/vision_tasks.py#L607) | VisualClassification | [Anthony3456347095/MET-Meme](https://hf.co/datasets/Anthony3456347095/MET-Meme) | ✓ |
-| 51 | [met-meme/metaphor](src/tasksource/vision_tasks.py#L611) | VisualClassification | [Anthony3456347095/MET-Meme](https://hf.co/datasets/Anthony3456347095/MET-Meme) | ✓ |
-| 52 | [memeqa/mcq](src/tasksource/vision_tasks.py#L615) | VisualMultipleChoice | [tasksource/memeqa](https://hf.co/datasets/tasksource/memeqa) |  |
+| 48 | [met-meme/sentiment](src/tasksource/vision_tasks.py#L608) | VisualClassification | [Anthony3456347095/MET-Meme](https://hf.co/datasets/Anthony3456347095/MET-Meme) | ✓ |
+| 49 | [met-meme/intention](src/tasksource/vision_tasks.py#L611) | VisualClassification | [Anthony3456347095/MET-Meme](https://hf.co/datasets/Anthony3456347095/MET-Meme) | ✓ |
+| 50 | [met-meme/offensiveness](src/tasksource/vision_tasks.py#L614) | VisualClassification | [Anthony3456347095/MET-Meme](https://hf.co/datasets/Anthony3456347095/MET-Meme) | ✓ |
+| 51 | [met-meme/metaphor](src/tasksource/vision_tasks.py#L618) | VisualClassification | [Anthony3456347095/MET-Meme](https://hf.co/datasets/Anthony3456347095/MET-Meme) | ✓ |
+| 52 | [memeqa/mcq](src/tasksource/vision_tasks.py#L622) | VisualMultipleChoice | [tasksource/memeqa](https://hf.co/datasets/tasksource/memeqa) |  |
 
 ### Candidate grounding
 

@@ -67,7 +67,7 @@
     "vision_publisher_cases_passed": 3
   },
   "publication": {
-    "vision": "Staging with documented scripts.append_jev_vision; 20k cap per source family; existing rows/evaluation preserved; no publication claimed yet",
+    "vision": "Documented scripts.append_jev_vision build-and-publish job running for v2026.10.13.5; five meme views staged (12,564 training candidates), T2ISafety building; 20k per-family cap; existing training/evaluation preserved. Publication not yet confirmed.",
     "failure_policy": "Explicitly requested source failures stop publication; cached successful source builds remain resumable."
   },
   "memeqa_conversion": {
@@ -497,5 +497,27 @@
       ]
     }
   },
-  "build_repair": "Full-source staging exposed image-only rows with an absent text state. The visual builder now normalizes that state to an empty string, preserving images and explicit questions; regression covers null states and option permutations."
+  "build_repair": "Full-source staging exposed image-only rows with an absent text state. The visual builder now normalizes that state to an empty string, preserving images and explicit questions; regression covers null states and option permutations.",
+  "staged_training_validation": {
+    "vision/met-meme/intention": {
+      "gold_and_state_verified": 2391,
+      "image_only_rows": 36
+    },
+    "vision/met-meme/metaphor": {
+      "gold_and_state_verified": 2391,
+      "image_only_rows": 36
+    },
+    "vision/memeqa/mcq": {
+      "gold_and_state_verified": 3000,
+      "image_only_rows": 0
+    },
+    "vision/met-meme/offensiveness": {
+      "gold_and_state_verified": 2391,
+      "image_only_rows": 36
+    },
+    "vision/met-meme/sentiment": {
+      "gold_and_state_verified": 2391,
+      "image_only_rows": 36
+    }
+  }
 }
