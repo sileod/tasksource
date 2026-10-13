@@ -97,7 +97,7 @@ Tasksource pretraining is notably helpful for RLHF reward modeling or any kind o
 ### tasksource-instruct
 
 Tasks recast as instructions (`recast="instruct"`), one of the richest instruction-tuning datasets:
-[🤗/tasksource-instruct-v0](https://hf.co/datasets/tasksource/tasksource-instruct-v0)
+[🤗/tasksource-instruct](https://hf.co/datasets/tasksource/tasksource-instruct)
 
 ### tasksource-label-nli
 
