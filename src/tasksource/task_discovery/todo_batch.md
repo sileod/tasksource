@@ -163,3 +163,14 @@ Expanded the two game families to **20,000 training rows each** in [v2026.10.13.
 | Memotion 2.0 | Humor, sarcasm, offense, motivation, sentiment | Parked, source unavailable: official download requires shared-task registration; referenced public Drive link is 404. Existing 7K Hub derivatives are not substituted for version 2.0. Evidence and reconsideration condition in decisions.json. |
 
 Batches 11–12 have no unreviewed entries remaining. Accepted tasks enter the catalog and the documented scripts.append_jev_vision build/publication path (20k per source family, existing rows preserved). Access-blocked sources live in decisions.json with evidence and explicit reconsideration conditions.
+
+## Batch 13 — explicitly requested procedural visual sources
+
+These are user requests, separate from automatically discovered prospects.
+
+| Source | Requested view | Status |
+|---|---|---|
+| TRON (YangTianze009/TRON) | Static MC exports from seeded generator/verifier pairs | Implemented seeded static builder under scripts/repackage_dataset/procedural/; five-environment release under final validation. Native text choices or verified same-task distractors. |
+| TRACE (maveryn/trace) | Static MC view of native procedural training examples | Implemented verifier-checked static builder; 5,000/100 native train/validation pilot, original image bytes and asset credits preserved. |
+| TACIT (tylerxdurden/TACIT-benchmark; danielxmed/tacit-benchmark) | Investigate reproducible procedural decision training | Access blocked: supplied GitHub repository and authenticated Hub metadata return 404. Recorded in decisions.json; reconsider after source access is restored. |
+| MentisOculi (Jana-Z/mentis-oculi) | Investigate reproducible procedural decision training | Implemented fresh paper-fold pilot (20 train / 5 validation), native five-panel choices with final geometry verification. Other families remain outside this initial adapter; planning outputs need multiple-valid-plan handling. |

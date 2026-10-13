@@ -7,7 +7,7 @@ from pathlib import Path
 
 # Support direct execution as well as module imports.
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from datasets import DatasetDict
+from datasets import Dataset, DatasetDict
 from huggingface_hub import DatasetCard
 from tasksource.metadata.originals import ORIGINALS
 from scripts.repackage_dataset.text import (
@@ -30,10 +30,17 @@ from scripts.repackage_dataset.games import gameqa, valen_game
 from scripts.repackage_dataset.target_sentiment import uk_election
 from scripts.repackage_dataset.visual_safety import t2i_safety
 from scripts.repackage_dataset.memes import memeqa
+from scripts.repackage_dataset.procedural.tron import tron_mc
+from scripts.repackage_dataset.procedural.trace import trace_mc
+from scripts.repackage_dataset.procedural.mentis import mentis_paper_fold
+from scripts.repackage_dataset.procedural.common import file_sha256
 from scripts.repackage_dataset.regions import coco_regions, doclaynet_region, bapps, spair71k_grid
 
 
-BUILDERS = {"memeqa": ("tasksource/memeqa", memeqa),
+BUILDERS = {"tron-mcq": ("tasksource/tron-mcq", tron_mc),
+            "trace-mcq": ("tasksource/trace-mcq", trace_mc),
+            "mentis-oculi-paper-fold": ("tasksource/mentis-oculi-paper-fold", mentis_paper_fold),
+            "memeqa": ("tasksource/memeqa", memeqa),
             "gameqa": ("tasksource/gameqa", gameqa),
             "uk-election": ("tasksource/uk-election", uk_election),
             "t2i-safety": ("tasksource/t2i-safety", t2i_safety),
@@ -80,7 +87,9 @@ BUILDERS = {"memeqa": ("tasksource/memeqa", memeqa),
 
 
 # license metadata for repackaged sets, as the originals state it
-LICENSES = {"tasksource/memeqa": "other", "tasksource/gameqa": "mit", "tasksource/valen-game": "apache-2.0",
+LICENSES = {"tasksource/tron-mcq": "other", "tasksource/trace-mcq": "cc-by-4.0",
+            "tasksource/mentis-oculi-paper-fold": "apache-2.0",
+            "tasksource/memeqa": "other", "tasksource/gameqa": "mit", "tasksource/valen-game": "apache-2.0",
             "tasksource/uk-election": "cc-by-4.0",
             "tasksource/t2i-safety": "apache-2.0",
             "tasksource/discosense": "apache-2.0",
@@ -106,16 +115,23 @@ LICENSES = {"tasksource/memeqa": "other", "tasksource/gameqa": "mit", "tasksourc
             "tasksource/webinstruct": "apache-2.0"}
 
 
-def push_card(repo, build):
+def push_card(repo, build, directory=None):
     card = DatasetCard.load(repo)
     card.data.source_datasets = ORIGINALS[repo]
     if repo in LICENSES:
         card.data.license = LICENSES[repo]
     sources = ", ".join(f"[{name}](https://huggingface.co/datasets/{name})" for name in ORIGINALS[repo])
-    directory = Path('build') / ('view2space-release-imagefolder' if repo == 'tasksource/view2space' else repo.split('/')[1] + '-release')
+    directory = directory or Path('build') / ('view2space-release-imagefolder' if repo == 'tasksource/view2space' else repo.split('/')[1] + '-release')
     provenance = directory / 'provenance.json'
     if provenance.exists():
         report = json.loads(provenance.read_text())
+        if report.get('annotation_origin') == 'procedural':
+            card.data.language = ['en']
+            card.data.task_categories = ['multiple-choice', 'visual-question-answering']
+            card.data.tags = sorted(set(getattr(card.data,'tags',None) or []) | {'decision-model', 'procedural'})
+            if repo == 'tasksource/tron-mcq':
+                card.data.license_name = 'tron-research-use'
+                card.data.license_link = report['license_url']
         upstream = report.get('source_url') or report.get('source', '')
         if isinstance(upstream, str) and upstream.startswith(('https://', 'http://')):
             sources = ', '.join(filter(None, (sources, f'[original distribution]({upstream})')))
@@ -127,6 +143,8 @@ def push_card(repo, build):
                  f"[{script}](https://github.com/sileod/tasksource/blob/main/{script}#L{inspect.getsourcelines(build)[1]}).\n")
     if provenance.exists():
         card.text += '\n[Conversion provenance](provenance.json): source revisions, hashes, configuration and exclusions.\n'
+    if (directory / 'asset-notices.json').exists():
+        card.text += '\n[Upstream asset credits and licenses](asset-notices.json) accompany the original rendered images.\n'
     if repo in ('tasksource/coco-regions', 'tasksource/doclaynet-region', 'tasksource/bapps', 'tasksource/spair71k-grid', 'tasksource/superclevr', 'tasksource/websrc'):
         report = json.loads((Path('build') / (repo.split('/')[1] + '-release') / 'provenance.json').read_text())
         reports = {'default': report} if 'splits' in report else report
@@ -142,8 +160,7 @@ def push_card(repo, build):
     card.push_to_hub(repo)
     if provenance.exists() and repo != 'tasksource/webinstruct':
         from huggingface_hub import HfApi
-        directory = Path('build') / ('view2space-release-imagefolder' if repo == 'tasksource/view2space' else repo.split('/')[1] + '-release')
-        for filename in ('provenance.json', 'excluded-questions.jsonl'):
+        for filename in ('provenance.json', 'excluded-questions.jsonl', 'asset-notices.json'):
             if not (directory / filename).exists():continue
             HfApi().upload_file(path_or_fileobj=directory / filename, path_in_repo=filename,
                 repo_id=repo, repo_type='dataset', commit_message='Record visual conversion provenance and exclusions')
@@ -163,19 +180,39 @@ def push_card(repo, build):
                     HfApi().upload_file(path_or_fileobj=path, path_in_repo=filename, repo_id=repo,
                                        repo_type='dataset', commit_message='Document WebInstruct presentation audit')
 
+def load_prepared(directory, repo):
+    """Publish exactly the reviewed split files without repeating expensive preparation."""
+    report = json.loads((directory / 'provenance.json').read_text())
+    if report.get('mirror') != repo:raise ValueError('Prepared build belongs to another mirror')
+    hashes = report.get('parquet_sha256', {})
+    if not hashes or {Path(n).stem for n in hashes} != set(report['splits']):
+        raise ValueError('Prepared build requires hashes for every split')
+    for name,digest in hashes.items():
+        if Path(name).name != name or file_sha256(directory / name) != digest:
+            raise ValueError(f'Prepared split checksum mismatch: {name}')
+    dataset = DatasetDict({Path(name).stem:Dataset.from_parquet(str(directory / name)) for name in hashes})
+    if any(len(rows) != report['splits'][split]['rows'] for split,rows in dataset.items()):
+        raise ValueError('Prepared split row count mismatch')
+    return dataset
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("names", nargs="+", choices=BUILDERS)
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--card-only", action="store_true")
+    parser.add_argument("--prepared", type=Path, help="Publish a reviewed, checksummed default-config build without regenerating it")
     parser.add_argument("--bad-examples", type=Path, help="WebInstruct only: confirmed-removal manifest")
     parser.add_argument("--repairs", type=Path, help="WebInstruct only: verified presentation repairs")
     parser.add_argument("--max-rows", type=int, help="Rendered mirrors: maximum training examples (default 5000)")
     parser.add_argument("--max-rows-eval", type=int, help="Rendered mirrors: maximum examples per native evaluation split (default 100)")
     parser.add_argument("--seed", type=int, help="Rendered mirrors: deterministic source annotation sampling seed")
+    parser.add_argument("--generator-task", dest="task_ids", action="append", help="Procedural builders: restrict native task/environment IDs; repeat to select several")
     args = parser.parse_args()
-    options = {key: getattr(args, key) for key in ("max_rows", "max_rows_eval", "seed")
+    options = {key: getattr(args, key) for key in ("max_rows", "max_rows_eval", "seed", "task_ids")
                if getattr(args, key) is not None}
+    if args.prepared and (len(args.names)!=1 or options or args.card_only or args.bad_examples or args.repairs):
+        parser.error('--prepared requires one builder and no generation/card-only options')
     if any(options.get(key, 1) < 1 for key in ("max_rows", "max_rows_eval")):
         parser.error("Row limits must be positive")
     if (args.bad_examples or args.repairs) and args.names != ['webinstruct']:
@@ -186,7 +223,9 @@ def main():
         if options.keys() - inspect.signature(build).parameters.keys():
             parser.error(f"Sampling arguments are not supported by {name}")
         if not args.card_only:
-            dataset = build(args.bad_examples, args.repairs) if name == 'webinstruct' else build(**options)
+            if args.prepared and config:parser.error('--prepared supports default-config mirrors only')
+            dataset = (load_prepared(args.prepared,repo) if args.prepared else
+                       build(args.bad_examples,args.repairs) if name=='webinstruct' else build(**options))
             if isinstance(dataset, Path):  # native imagefolder: retain one copy of each image
                 print(repo, json.loads((dataset / 'provenance.json').read_text()))
                 if args.dry_run:
@@ -207,7 +246,7 @@ def main():
                     splits.push_to_hub(repo, config_name=config_name)
             if args.dry_run:
                 continue
-        push_card(repo, build)
+        push_card(repo, build, args.prepared)
 
 
 if __name__ == "__main__":

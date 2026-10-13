@@ -1,0 +1,94 @@
+import io
+import json
+
+import pytest
+from PIL import Image as PILImage
+
+from scripts.repackage_dataset.procedural.common import seed_for, verified_choices, write_static
+from scripts.repackage_dataset.procedural.trace import trace_question
+from scripts.repackage_dataset.procedural.tron import clean_question, native_mc
+from tasksource import recast_jev
+from tasksource.preprocess import VisualMultipleChoice, disable_image_decoding
+from tasksource.vision_tasks import grouped_mc_rows
+
+
+def test_distractors_reject_numeric_equivalents_and_keep_donor_alignment():
+    verify=lambda x:int(abs(float(x)-1)<0.1)
+    donors=[('1.0','equivalent'),('1.05','within_tolerance'),('2','two'),('3','three'),('4','four')]
+    first=verified_choices('1',donors,verify,42)
+    assert first==verified_choices('1',donors,verify,42)
+    choices,label,metadata=first
+    assert set(choices)=={'1','2','3','4'} and choices[label]=='1'
+    assert metadata['verifier_scores']==[int(i==label) for i in range(4)]
+    assert metadata['donor_ids']==[None if c=='1' else {'2':'two','3':'three','4':'four'}[c] for c in choices]
+    assert seed_for('train',42)!=seed_for('validation',42)
+
+
+def test_no_fake_padding_and_bad_gold_fails():
+    choices,label,_=verified_choices('yes',[('no','other'),('NO','duplicate')],lambda a:int(a=='yes'),0)
+    assert len(choices)==2 and choices[label]=='yes'
+    with pytest.raises(ValueError,match='No verifier-rejected'):
+        verified_choices('yes',[('yes','same')],lambda a:int(a=='yes'),0)
+    with pytest.raises(ValueError,match='rejects its own gold'):
+        verified_choices('yes',[('no','other')],lambda a:0,0)
+
+
+def test_native_mc_preserves_content_and_rejects_opaque_or_multiple_golds():
+    question='Which region is wet?\nA. Water (W)\nB. Air (A)\nC. Undetermined\nAnswer with a single letter A, B, or C.'
+    stem,choices,label,metadata=native_mc(question,'B',lambda a:int(a=='B'))
+    assert stem=='Which region is wet?' and choices==['Water (W)','Air (A)','Undetermined'] and label==1
+    assert metadata['verifier_scores']==[0,1,0]
+    inline='What is the total?\n(A)350 (B)349 (C)385 (D)326\nPick the correct letter (A-D). Reply with the letter inside <answer>X</answer>.'
+    stem,choices,label,_=native_mc(inline,'A',lambda a:int(a=='A'))
+    assert stem=='What is the total?' and choices==['350','349','385','326'] and label==0
+    inline=inline.replace('Pick the correct letter (A-D). Reply with the letter inside',
+        'Select the correct option (A-D) and place the single letter in')
+    assert native_mc(inline,'A',lambda a:int(a=='A'))[1]==['350','349','385','326']
+    with pytest.raises(ValueError,match='without explicit'):
+        native_mc('Look at the figure.','A',lambda a:int(a=='A'))
+    with pytest.raises(ValueError,match='Ambiguous'):
+        native_mc(question,'B',lambda a:1)
+    assert clean_question('What is the area? Numeric answer in <answer>...</answer>.')=='What is the area?'
+
+
+@pytest.mark.parametrize('prompt',[
+    '<image>What is the area?\nFormat for the "answer" field: set "answer" to the integer area in square units.\nExample JSON:\n{"answer":12}',
+    '<image>What is the area?\nReturn a JSON object with "answer" only.\nRequired answer format: set "answer" to the integer area in square units.\nExample JSON:\n{"answer":12}',
+    '<image>What is the area?\nFinal answer format: set "answer" to the integer area in square units.\nExample JSON:\n{"answer":12}',
+    'What is the area?\nReturn a JSON object.\nAnswer field: set "answer" to the integer area in square units.\nExample JSON:\n{"answer":12}',
+])
+def test_trace_prompt_keeps_units_without_image_tokens_or_example_answers(prompt):
+    assert trace_question(prompt)=='What is the area?\nChoose the integer area in square units.'
+    assert trace_question(prompt,'toggle_grid').startswith('Pressing a switch flips that cell and its orthogonal neighbors')
+    with pytest.raises(ValueError,match='Unknown TRACE'):
+        trace_question('Ambiguous output contract.')
+
+
+def test_static_image_groups_splits_and_jev_permutation(tmp_path,monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    def row(identity,color):
+        buffer=io.BytesIO();PILImage.new('RGB',(3,3),color).save(buffer,format='PNG')
+        return dict(id=identity,image=buffer.getvalue(),inputs='Which value fits the diagram?',
+            choices_list=['1','3','5'],labels=1,metadata=dict(task='native-task',seed=seed_for(identity)))
+    train=row('t','red');heldout=row('v','blue')
+    ds=write_static('test',dict(train=[train,{**train,'id':'same-image-question'},heldout],validation=[heldout]),
+        dict(source='source',revision='pin',license='other',license_url='terms'),write_static)
+    assert len(ds['train'])==len(ds['validation'])==1 and len(ds['train'][0]['qa'])==2
+    report=json.loads((tmp_path/'build/test-release/provenance.json').read_text())
+    assert report['image_overlap_excluded']==1
+    from scripts.upload_repackaged import load_prepared
+    path=tmp_path/'build/test-release'
+    assert len(load_prepared(path,'tasksource/test')['train'])==1
+    with pytest.raises(ValueError,match='another mirror'):
+        load_prepared(path,'tasksource/wrong')
+    train_file=path/'train.parquet'
+    train_file.write_bytes(train_file.read_bytes()+b'changed')
+    with pytest.raises(ValueError,match='checksum mismatch'):
+        load_prepared(path,'tasksource/test')
+    task=VisualMultipleChoice(choices_list='choices_list',metadata='metadata',pre_process=grouped_mc_rows)
+    result=disable_image_decoding(recast_jev(task(ds),task='test'))
+    assert len(result['train'])==2
+    for r in result['train']:
+        assert r['answer']=='3'==r['criteria'][r['label']]
+        assert r['images'][0]['bytes']==train['image']
+        assert json.loads(r['metadata'])['task']=='native-task'

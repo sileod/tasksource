@@ -4,6 +4,24 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+
+## mentis-oculi-paper-fold 2026-10-13
+
+- Add a fresh procedural pilot: 20 training and 5 validation paper-fold puzzles with five native image panels. Published benchmark examples are not ingested.
+- Recheck final unfolded option geometry for exactly one matching answer. Record generation seeds, coordinates, source revision and Apache-2.0 terms.
+
+## trace-mcq 2026-10-13
+
+- Add 5,000 training and 100 validation visual multiple-choice questions from TRACE's native release, preserving original image bytes and partitions.
+- Distractors come from training answers for the same task and answer type, checked with the original scorer. Remove JSON output demonstrations, clarify image-label choices, and restore the missing toggle-grid transition rule from source code.
+- Exclude all native validation image copies from training. Preserve CC BY 4.0 attribution and upstream asset notices.
+
+## tron-mcq 2026-10-13
+
+- Add a bounded static visual MC release from five seeded TRON environments: aquarium, angle bisector, bar-chart aggregate, before/after and overlapping-shape count.
+- Keep native text choices where available; otherwise use verifier-rejected answers from other generations of the same environment. Reject ambiguous choices and unsupported answer formats.
+- Preserve generated PNGs, record seeds and verifier results, and exclude held-out image copies from training. Mark TRON's original research-use terms explicitly.
+
 ## tasksource-jev-typed-decisions v2026.10.13.5
 
 - Add native single-answer MemeQA and four English MET-Meme classification views. Training is capped at 20,000 rows per source family; existing training and evaluation shards are preserved.

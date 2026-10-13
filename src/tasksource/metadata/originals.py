@@ -11,6 +11,9 @@ by scripts/upload_repackaged.py) or a task switches to a mirror.
 """
 
 ORIGINALS = {
+    'tasksource/tron-mcq': [],
+    'tasksource/trace-mcq': ['maveryn/trace'],
+    'tasksource/mentis-oculi-paper-fold': [],
     "tasksource/memeqa": [],
     "tasksource/t2i-safety": ["OpenSafetyLab/t2i_safety_dataset"],
     "tasksource/uk-election": [],  # original Figshare tweet/annotation archives, DOI in mirror card

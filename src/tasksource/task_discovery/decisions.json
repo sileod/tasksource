@@ -2381,5 +2381,33 @@
         "findings": "Official access instructions inspected; public Drive folder returned 404. The public MMSoc conversion code explicitly reads memotion_dataset_7k/labels.xlsx and its images, confirming it is the older 7K source rather than a verified native 2.0 release."
       }
     ]
+  },
+  {
+    "name": "TACIT",
+    "scope": "dataset",
+    "tasks": [],
+    "status": "deferred",
+    "reason_code": "source_unavailable",
+    "reason": "User-supplied GitHub repository returns 404 and the supplied Hub repository is unavailable through the configured account; no source data or generator was obtained.",
+    "checked_on": "2026-10-13",
+    "huggingface": [
+      "tylerxdurden/TACIT-benchmark"
+    ],
+    "github": [
+      "https://github.com/danielxmed/tacit-benchmark"
+    ],
+    "papers": [],
+    "evidence": [
+      {
+        "url": "https://github.com/danielxmed/tacit-benchmark",
+        "status": 404
+      },
+      {
+        "url": "https://huggingface.co/api/datasets/tylerxdurden/TACIT-benchmark",
+        "status": 404,
+        "method": "authenticated HfApi.dataset_info"
+      }
+    ],
+    "reconsider_if": "The original data or generator becomes accessible; verify training use and native answer verification before implementing."
   }
 ]
