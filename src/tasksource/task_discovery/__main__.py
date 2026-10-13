@@ -23,6 +23,8 @@ def main():
     fetch.add_argument('--all', action='store_true', help='Include datasets without decision-oriented task tags')
     fetch.add_argument('--task', action='append', default=[], help='Case-insensitive task-tag substring; repeat for OR')
     fetch.add_argument('--language', action='append', default=[], help='HF dataset or OpenAlex paper language code; repeat for OR (e.g. en)')
+    fetch.add_argument('--modality', action='append', default=[], help='HF tag or explicit PWC modality (e.g. image)')
+    fetch.add_argument('--sort', default='downloads', choices=('downloads','trending_score','likes','created_at','last_modified'), help='HF retrieval order')
     compare = commands.add_parser('match', help='Deduplicate and compare any canonical candidate JSONL')
     compare.add_argument('input', type=Path)
     compare.add_argument('--index',type=Path,help='External catalog links JSONL; defaults to bundled index')
@@ -43,6 +45,10 @@ def main():
     if args.command == 'retrieve':
         if args.limit < 1:
             parser.error('--limit must be positive')
+        if args.sort!='downloads' and (args.source or ['paperswithcode'])!=['hf_hub']:
+            parser.error('--sort requires --source hf_hub')
+        if args.modality and set(args.source or ['paperswithcode'])-{'hf_hub','paperswithcode'}:
+            parser.error('--modality supports hf_hub and paperswithcode')
         if args.language and 'paperswithcode' in (args.source or ['paperswithcode']):
             parser.error('--language is an HF dataset/OpenAlex paper filter; retrieve PWC separately')
         if args.language and 'hf_papers' in (args.source or []):
@@ -56,9 +62,15 @@ def main():
                 if args.query:
                     found = [r for r in found if any(q.casefold() in json.dumps(r).casefold() for q in args.query)]
                 report.update(task_queries=args.task, queries=args.query)
+                if args.modality:
+                    wanted={m.casefold().removesuffix('s') for m in args.modality}
+                    before=len(found)
+                    found=[r for r in found if wanted & {m.casefold().removesuffix('s') for m in r['modalities']}]
+                    report.update(modalities=args.modality,modality_withheld=before-len(found))
             elif source == 'hf_hub':
                 from .hf_hub import retrieve as fetch_source
-                found, report = fetch_source(args.cache, args.query, args.task, args.limit, args.offline, languages=args.language)
+                found, report = fetch_source(args.cache, args.query, args.task, args.limit, args.offline,
+                                             languages=args.language, modalities=args.modality, sort=args.sort)
             elif source == 'openalex':
                 from .openalex import retrieve as fetch_source
                 found, report = fetch_source(args.cache, args.query, args.limit, args.offline, languages=args.language)

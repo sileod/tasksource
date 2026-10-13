@@ -60,6 +60,8 @@ def test_previous_decisions_match_source_ids_and_do_not_block_other_views():
     assert list(decision_matches(dict(name='Renamed mirror',github=['https://github.com/Org/Data.git']),[record]))==[record]
     row=dict(name='New spelling',papers=[dict(title='Title',url='https://arxiv.org/pdf/1808.07036v2.pdf')])
     assert list(decision_matches(row,[record]))==[record]
+    record['papers']=[dict(url='https://arxiv.org/abs/1808.07036')]
+    assert list(decision_matches(row,[record]))==[record]
     result=list(match([row],{},{},[record]))[0]
     assert result['status']=='previously_reviewed' and result['previous_decisions'][0]['scope']=='task'
     assert result['previous_decisions'][0]['reviews']==record['reviews']
@@ -154,6 +156,11 @@ def test_hub_retrieval_snapshots_metadata_and_replays_without_api(tmp_path, monk
     english,filtered=hub.retrieve(tmp_path,queries=['Example','alternate'],limit=2,languages=['en'])
     assert english[0]['languages']==['en']
     assert calls[-1]['language']==['en'] and filtered['snapshot']!=manifest['snapshot']
+    info.tags.append('modality:image')
+    images,image_manifest=hub.retrieve(tmp_path,tasks=['multiple-choice'],modalities=['image'],sort='trending_score',limit=2)
+    assert calls[-1]['filter']==['modality:image'] and calls[-1]['sort']=='trending_score'
+    assert images[0]['modalities']==['image'] and image_manifest['modalities']==['image']
+    assert image_manifest['snapshot']!=manifest['snapshot']
     monkeypatch.setattr(hub,'HfApi',lambda:pytest.fail('Offline replay called Hub'))
     assert hub.retrieve(tmp_path,queries=['Example','alternate'],limit=2,offline=True)==(rows,manifest)
     with pytest.raises(FileNotFoundError):hub.retrieve(tmp_path,queries=['uncached'],offline=True)
@@ -203,6 +210,18 @@ def test_retrieve_combines_sources_through_same_cli_and_preserves_evidence(tmp_p
     assert rows[0]['train_status']=='unchecked'
     manifest=json.loads(output.with_suffix('.manifest.json').read_text())
     assert [s['source'] for s in manifest['sources']]==['hf_hub','openalex']
+
+
+def test_pwc_modality_filter_preserves_unknowns_as_withheld_count(tmp_path,monkeypatch):
+    import sys
+    from tasksource.task_discovery import __main__ as cli
+    rows=[dict(name='Image',modalities=['Images']),dict(name='Video',modalities=['Videos']),dict(name='Unknown',modalities=[])]
+    monkeypatch.setattr(cli,'retrieve',lambda **kwargs:(rows,dict(source='paperswithcode')))
+    output=tmp_path/'images.jsonl'
+    monkeypatch.setattr(sys,'argv',['discovery','retrieve','--source','paperswithcode','--modality','image','--output',str(output)])
+    cli.main()
+    assert [r['name'] for r in map(json.loads,output.read_text().splitlines())]==['Image']
+    assert json.loads(output.with_suffix('.manifest.json').read_text())['modality_withheld']==2
 
 
 def test_card_links_extract_repositories_and_papers_without_infrastructure():

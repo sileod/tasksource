@@ -251,3 +251,36 @@ paper/GitHub overlap hints for identity review; held rows stay in `matched.jsonl
 counts remain in the manifest. These holds do not declare a source unsuitable or
 prove every projection is already implemented. Titles/aliases and links remain
 imperfect, and unresolved train/resource evidence does not approve a prospect.
+
+## English image discovery queue
+
+```bash
+python -m tasksource.task_discovery.scheduled \
+  --stage multiple-choice --stage visual-question-answering --stage image-classification \
+  --modality image --batch-size 64 --output build/discovery/vision/hf-queue
+```
+
+This consumes each complete English-tagged, image-tagged Hub inventory in the
+requested order, deduplicating against the catalog, history, human queue and earlier
+stages. Tags only retrieve candidates: screening separately checks labeled training
+intent, accessible resources, native decision supervision, dataset language and label
+provenance. Free-form VQA needs a faithful closed-set projection; generated distractors
+or guessed labels do not qualify. Untagged sources remain outside this inventory.
+
+After the Hub stages, use the pinned PWC archive for explicitly image-tagged leads:
+
+```bash
+python -m tasksource.task_discovery retrieve --source paperswithcode \
+  --task 'visual question answering' --task 'image classification' --modality image \
+  --output build/discovery/vision/pwc.jsonl
+cat build/discovery/vision/hf-queue/*/matched.jsonl > build/discovery/vision/hf-identities.jsonl
+python -m tasksource.task_discovery.discover_task_prospects build/discovery/vision/pwc.jsonl \
+  --language en --hold-related --allow-verified-synthetic --limit 10000 \
+  --exclude build/discovery/vision/hf-identities.jsonl \
+  --model 'openrouter/~typesafe/jev-latest' --output build/discovery/vision/pwc-screen
+```
+
+PWC modality filtering uses its explicit metadata (`Images` → `image`); missing
+modality declarations are withheld and counted, not interpreted as non-image data.
+Its July 2025 archive cannot discover later releases. Results are prospects only;
+source identity, split safety, licenses and example correctness still need processing.

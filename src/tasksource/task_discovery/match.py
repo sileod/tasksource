@@ -81,7 +81,8 @@ def decision_matches(row, records):
         aliases = [record['name'], *record.get('aliases', [])]
         aliases += [repo.rsplit('/', 1)[-1] for repo in record.get('huggingface', [])]
         name_match = names.intersection(map(normalized, aliases))
-        id_match = any(identities[kind].intersection(source_id(v, kind) for v in record.get(kind, [])) for kind in identities)
+        id_match = any(identities[kind].intersection(source_id(v, kind) for v in record.get(kind, [])) for kind in ('huggingface','github'))
+        id_match |= bool(identities['papers'] & paper_ids(record.get('papers', [])))
         if name_match or id_match:
             yield record
 

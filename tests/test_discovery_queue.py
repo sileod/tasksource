@@ -63,6 +63,28 @@ def test_reviewer_control_quarantines_collapsed_question_answers(tmp_path,monkey
     assert [r['passed'] for r in data['results']]==[False,True]
 
 
+def test_visual_queue_uses_requested_order_and_image_filter(tmp_path,monkeypatch):
+    calls=[]
+    def retrieve(cache,**kwargs):
+        calls.append(kwargs)
+        return [],dict(candidates=0)
+    monkeypatch.setattr(queue,'retrieve',retrieve)
+    monkeypatch.setattr(queue,'catalog_index',lambda:({},{}))
+    monkeypatch.setattr(queue,'catalog_references',lambda:{})
+    monkeypatch.setattr(queue,'previous_decisions',lambda:[])
+    monkeypatch.setattr(queue,'queued_sources',lambda:{})
+    stages=['multiple-choice','visual-question-answering','image-classification']
+    monkeypatch.setattr(sys,'argv',['queue','--output',str(tmp_path),'--modality','image',
+        *[arg for stage in stages for arg in ('--stage',stage)]])
+    queue.main()
+    assert [c['tasks'][0] for c in calls]==stages
+    assert all(c['modalities']==['image'] and c['languages']==['en'] and c['limit'] is None for c in calls)
+    queue.main()
+    assert len(calls)==3
+    report=(tmp_path/'report.md').read_text()
+    assert [report.index('| '+s+' |') for s in stages]==sorted(report.index('| '+s+' |') for s in stages)
+
+
 def test_viewer_429_retry_is_bounded_cached_and_paced(tmp_path,monkeypatch):
     from importlib import import_module
     linker=import_module('tasksource.task_discovery.link')

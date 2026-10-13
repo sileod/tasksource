@@ -6,6 +6,9 @@ These are screening results, **not approved training sources or completed integr
 
 ## Published screening results
 
+- [October 13 English image multiple-choice pass](prospects/2026-10-13-vision-multiple-choice.md):
+  185 screened sources; 9 eligibility leads, with unresolved provenance or training-config checks.
+
 - [October 13 exhaustive HF category pass](prospects/2026-10-13.md): 142 shortlisted
   sources from 11,776 screened candidates; includes downloadable review records.
 - [October 12 exhaustive HF multiple-choice pass](prospects/2026-10-12-multiple-choice.md):

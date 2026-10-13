@@ -1,0 +1,96 @@
+{
+  "scope": "English-tagged image multiple-choice HF inventory; prospects only",
+  "retrieval": {
+    "candidates": 191,
+    "default_tasks": [],
+    "languages": [
+      "en"
+    ],
+    "limit": null,
+    "modalities": [
+      "image"
+    ],
+    "queries": [],
+    "retrieved_at": "2026-10-13T19:33:37.407477+00:00",
+    "snapshot": "build/discovery/vision-2026-10-13/cache/hf_hub-b582bb899901b7de685f923eecee65c0df7f31b4897e6ba5c2526f6287e7f1e1.json",
+    "snapshot_sha256": "5bbff58d59f0f64375017c8b00a013a3615c6da7288e18eb4c70b1342d55cfb3",
+    "source": "hf_hub",
+    "tasks": [
+      "multiple-choice"
+    ]
+  },
+  "screened": 185,
+  "status_counts": {
+    "needs_evidence": 104,
+    "not_suitable": 72,
+    "promising": 9
+  },
+  "provenance_filter_passes": 1,
+  "pipeline_audit_holds": [
+    "Anonymous1383/ship-dataset"
+  ],
+  "accepted_training_sources": 0,
+  "request_failures": 0,
+  "remaining_queue": [
+    "visual-question-answering",
+    "image-classification",
+    "paperswithcode"
+  ],
+  "queue_config": {
+    "batch_size": 64,
+    "exclusions": {},
+    "languages": [
+      "en"
+    ],
+    "modalities": [
+      "image"
+    ],
+    "models": [
+      "openrouter/~typesafe/jev-latest"
+    ],
+    "questions_sha256": "76818e0a401de008f18417eed7e8ac7bd71af8871ec5bc01e5f8f902f37d4df6",
+    "stages": {
+      "image-classification": [
+        "image-classification"
+      ],
+      "multiple-choice": [
+        "multiple-choice"
+      ],
+      "visual-question-answering": [
+        "visual-question-answering"
+      ]
+    }
+  },
+  "vision_index_refresh": {
+    "checked_on": "2026-10-13",
+    "catalog_sha256": "3239416f9e94c0b1d9cd10a226ba7c3058a853c45524e298d282712d5fa4e850",
+    "cards": 38,
+    "vision_tasks": 57,
+    "errors": 0,
+    "output_sha256": "797a427222982fdcc14e22548450d5b79ceeb76464c5b858ee9ae7b8014487f8",
+    "linked_sha256": "b6aabf9b200b90e247c8ff809865790725f3ca5b9c931a4570f94284f69b807e",
+    "semantic_scholar_errors": 0
+  },
+  "batch_manifests": {
+    "batches/0000/manifest.json": "0519b2225a051eaaf00bb8c9e28089159acc74c42f0932f620d300c6844a743d",
+    "batches/0001/manifest.json": "6006899e6ec9c1d844f62195f8bcbcca72057b21795d4d662dc28dc72295537f",
+    "batches/0002/manifest.json": "06ab826fb0aabcda799b5e9ea3c3ef7de6c91f7aa265b614c5424dd39d048b75"
+  },
+  "novelty_recheck": {
+    "already_queued": 0,
+    "catalog_matches": 6,
+    "catalog_sha256": "3cc8562c5caad6d5eb84cbbda332490731cb9c91078f63fb753ec34fb4e29a4f",
+    "human_queue_sha256": "f39bd54135f367873764e35bbe3b2e8915adc9938851d3231f4071347710c677",
+    "input_sha256": "d737cbb02288cd68e33aeeb65ce5efa1509a2d7bde75941138306f9b575d9d86",
+    "output_rows": 191,
+    "output_sha256": "ef1ea2a3f7e1aee465b4447f23dead1265e7187987ff3345bf764ef5d4962ee9",
+    "previous_decisions_sha256": "67084422cc76acae12c0a595cb590fac22a87ce8d219d38a30266368c74d3f7b",
+    "previously_reviewed": 0,
+    "reference_index_sha256": "b595fc8d20a9481edfbccaa235c3b1382d4e6076c21504f3e09bb1fbb8582c0d",
+    "related_sources": 8,
+    "unique_candidates": 191,
+    "unmatched_only": false,
+    "unreviewed_only": false
+  },
+  "output_sha256": "291cbeaae83df136582e5bdb8c553b4b81e803e2cc9679cb073d2f8d51574929"
+}

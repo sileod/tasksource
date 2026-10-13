@@ -22,6 +22,11 @@ STAGES={
     'sentence-similarity':('sentence-similarity',),
     'ranking':('text-ranking','text-retrieval'),
 }
+VISUAL_STAGES={
+    'multiple-choice':('multiple-choice',),
+    'visual-question-answering':('visual-question-answering',),
+    'image-classification':('image-classification',),
+}
 MODEL='openrouter/~typesafe/jev-latest'
 
 
@@ -60,11 +65,11 @@ def control(models,path):
     return accepted
 
 
-def report(output,state):
+def report(output,state,stages):
     save_json(output/'status.json',state)
     rows=[];lines=['# Exhaustive discovery queue','',f"Status: {state['status']}. Updated: {state['updated_at']}.",'',
                   '| Stage | Status | Inventory | Selected | Reviewed | Shortlist |', '|---|---|---:|---:|---:|---:|']
-    for stage in STAGES:
+    for stage in stages:
         info=state['stages'][stage]
         batches=sorted((output/stage/'batches').glob('*/manifest.json'))
         reviewed=shortlisted=0
@@ -85,6 +90,8 @@ def main():
     parser.add_argument('--model',action='append',help='Default Jev; every configured reviewer must pass the batch control')
     parser.add_argument('--batch-size',type=int,default=128)
     parser.add_argument('--cache',type=Path,default=Path('build/discovery/cache'))
+    parser.add_argument('--stage',action='append',choices=tuple(STAGES)+tuple(VISUAL_STAGES),help='Repeat to set the screening order; defaults to the text queue')
+    parser.add_argument('--modality',action='append',default=[],help='HF modality filter, e.g. image')
     args=parser.parse_args()
     if args.batch_size<1:parser.error('--batch-size must be positive')
     output=args.output;output.mkdir(parents=True,exist_ok=True)
@@ -92,29 +99,31 @@ def main():
     try:fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
     except BlockingIOError:parser.error('This queue is already running')
     models=args.model or [MODEL]
-    config=dict(stages=STAGES,languages=['en'],models=models,batch_size=args.batch_size,
+    stages={s:(STAGES|VISUAL_STAGES)[s] for s in args.stage} if args.stage else STAGES
+    config=dict(stages=stages,languages=['en'],models=models,batch_size=args.batch_size,
                 exclusions={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in args.exclude},
                 questions_sha256=hashlib.sha256(json.dumps(QUESTIONS,sort_keys=True).encode()).hexdigest())
+    if args.modality:config['modalities']=args.modality
     config=json.loads(json.dumps(config))
     if (output/'config.json').exists() and json.loads((output/'config.json').read_text())!=config:
         parser.error('Queue settings changed; use a new output directory')
     save_json(output/'config.json',config)
     state=json.loads((output/'status.json').read_text()) if (output/'status.json').exists() else dict(
-        stages={stage:dict(status='queued') for stage in STAGES})
+        stages={stage:dict(status='queued') for stage in stages})
     def update(status):
         state.update(status=status,pid=os.getpid(),updated_at=datetime.now(timezone.utc).isoformat())
-        report(output,state)
+        report(output,state,stages)
     previous=[row for path in args.exclude for row in read_rows(path)]
     update('running')
     try:
-        for stage,tags in STAGES.items():
+        for stage,tags in stages.items():
             directory=output/stage;directory.mkdir(exist_ok=True)
             info=state['stages'][stage]
             if info['status']=='complete':
                 previous.extend(read_rows(directory/'selected.jsonl'));continue
             info['status']='retrieving';update('running')
             if not (directory/'inventory.jsonl').exists() or not (directory/'inventory.manifest.json').exists():
-                rows,manifest=retrieve(args.cache,tasks=tags,limit=None,languages=['en'])
+                rows,manifest=retrieve(args.cache,tasks=tags,limit=None,languages=['en'],modalities=args.modality)
                 write_rows(directory/'inventory.jsonl',rows);save_json(directory/'inventory.manifest.json',manifest)
             inventory=read_rows(directory/'inventory.jsonl');info['inventory']=len(inventory)
             if not (directory/'selected.jsonl').exists():
@@ -134,6 +143,7 @@ def main():
                 write_rows(batch/'input.jsonl',selected[start:start+args.batch_size])
                 command=[sys.executable,'-u','-m','tasksource.task_discovery.discover_task_prospects',str(batch/'input.jsonl'),
                          '--limit',str(args.batch_size),'--output',str(batch),'--allow-verified-synthetic']
+                if args.modality:command+=['--language','en']
                 for model in healthy:command+=['--model',model]
                 save_json(batch/'command.json',command)
                 with (batch/'run.log').open('a') as log:
