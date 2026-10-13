@@ -3418,8 +3418,6 @@ newsmtsc = Classification(_newsmtsc_text, labels='polarity',
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['fhamborg/news_sentiment_newsmtsc'],'data_dir':'rw'})
 
 
-
-
 def _sentihood_opinions(row):
     for opinion in row['opinions']:
         target, aspect = opinion['target_entity'], opinion['aspect']

@@ -580,8 +580,8 @@ Browse the [example catalog](docs/examples.md): one real example per task.
 | 574 | [tab/identifier](src/tasksource/tasks.py#L3395) | Classification | [doshimit3015/text-anonymization-benchmark](https://hf.co/datasets/doshimit3015/text-anonymization-benchmark) | ✓ |
 
 | 575 | [newsmtsc](src/tasksource/tasks.py#L3410) | Classification | [fhamborg/news_sentiment_newsmtsc](https://hf.co/datasets/fhamborg/news_sentiment_newsmtsc) | ✓ |
-| 576 | [sentihood/sentiment](src/tasksource/tasks.py#L3440) | Classification | [bhavnicksm/sentihood](https://hf.co/datasets/bhavnicksm/sentihood) | ✓ |
-| 577 | [mams/atsa](src/tasksource/tasks.py#L3457) | Classification | [NEUDM/mams](https://hf.co/datasets/NEUDM/mams) | ✓ |
+| 576 | [sentihood/sentiment](src/tasksource/tasks.py#L3438) | Classification | [bhavnicksm/sentihood](https://hf.co/datasets/bhavnicksm/sentihood) | ✓ |
+| 577 | [mams/atsa](src/tasksource/tasks.py#L3455) | Classification | [NEUDM/mams](https://hf.co/datasets/NEUDM/mams) | ✓ |
 
 ## Soft labels
 

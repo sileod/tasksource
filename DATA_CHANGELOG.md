@@ -19,7 +19,7 @@ concise bullets on what changed in the data. `tasksource-jev-typed-decisions` re
 - Stable row order across rebuilds: shuffled by `example_id`, so row-level annotations stay valid.
 - Removed after manual review of random rows: `dair-ai/emotion`, CrowdFlower `text_emotion` and IndicGLUE ACTSA (many wrong labels). `app_reviews` drops reviews under four words.
 - DiscoSense states include the discourse connective; PropSegmEnt question fixed; PROST removed (test-only).
-- New: CEBaB, FABSA and TAB.
+- New: CEBaB, FABSA, TAB, NewsMTSC, SentiHood target/aspect sentiment and MAMS-ATSA.
 - Restores 57 sources missing from v2026.10.13 (MAUD, multidogo, WikiQA, OLID, TabFact and others), now built with the rest instead of appended.
 
 ## tasksource-jev-typed-decisions v2026.10.13.3
