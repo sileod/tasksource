@@ -46,8 +46,8 @@
 | 42 | [superclevr/shape](src/tasksource/vision_tasks.py#L546) | VisualClassification | [tasksource/superclevr](https://hf.co/datasets/tasksource/superclevr) |  |
 | 43 | [superclevr/size](src/tasksource/vision_tasks.py#L548) | VisualClassification | [tasksource/superclevr](https://hf.co/datasets/tasksource/superclevr) |  |
 | 44 | [superclevr/material](src/tasksource/vision_tasks.py#L550) | VisualClassification | [tasksource/superclevr](https://hf.co/datasets/tasksource/superclevr) |  |
-| 45 | [gameqa/mcq](src/tasksource/vision_tasks.py#L554) | VisualMultipleChoice | [tasksource/gameqa](https://hf.co/datasets/tasksource/gameqa) |  |
-| 46 | [valen-game/optimal-action](src/tasksource/vision_tasks.py#L558) | VisualClassification | [tasksource/valen-game](https://hf.co/datasets/tasksource/valen-game) | ✓ |
+| 45 | [gameqa/mcq](src/tasksource/vision_tasks.py#L568) | VisualMultipleChoice | [tasksource/gameqa](https://hf.co/datasets/tasksource/gameqa) |  |
+| 46 | [valen-game/optimal-action](src/tasksource/vision_tasks.py#L572) | VisualClassification | [tasksource/valen-game](https://hf.co/datasets/tasksource/valen-game) | ✓ |
 
 ### Candidate grounding
 
@@ -66,4 +66,4 @@ repackaged crop transformation using the same displayed-image box convention.
 
 ### Game decisions
 
-`gameqa/mcq` uses native GameQA options; `valen-game/optimal-action` asks whether each proposed direction is optimal, retaining every tied optimal action. Both use [reproducibly joined image mirrors](scripts/repackage_dataset/games.py), preserve native train/test partitions and encoded images, and exclude shared evaluation screenshots/layouts from training. See the [source and recast audit](docs/jev/game-expansion-audit.md).
+`gameqa/mcq` uses native GameQA options; `valen-game/optimal-action` asks whether each proposed direction is optimal, retaining every tied optimal action. Its Tasksource view selects English source rules before sampling (60,000 train / 896 test decisions); the mirror retains both source languages. Both use [reproducibly joined image mirrors](scripts/repackage_dataset/games.py), preserve native train/test partitions and encoded images, and exclude shared evaluation screenshots/layouts from training. See the [source and recast audit](docs/jev/game-expansion-audit.md).

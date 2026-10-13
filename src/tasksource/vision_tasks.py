@@ -551,11 +551,25 @@ superclevr__material = VisualClassification(**_SUPERCLEVR, task_id='superclevr/m
     pre_process=lambda ds: grouped_qa_rows(ds, 'material'), label_values=_MATERIAL)
 
 
+def gameqa_metadata(row):
+    metadata = json.loads(row['metadata'])
+    # Native question IDs are local to a source record, not unique per screenshot.
+    return {**metadata, 'source_question_id': metadata['question_id'],
+            'question_id': f"{metadata['id']}:{metadata['question_id']}"}
+
+
+def valen_english_rows(dataset):
+    rows = grouped_qa_rows(dataset)
+    return type(rows)({split: data.filter(lambda row:
+        json.loads(row['metadata'])['source_metadata']['language_bucket'] == 'en')
+        for split, data in rows.items()})
+
+
 gameqa__mcq = VisualMultipleChoice(dataset_name='tasksource/gameqa',task_id='gameqa/mcq',
-    choices_list='choices_list',metadata='metadata',pre_process=grouped_mc_rows,
+    choices_list='choices_list',metadata=gameqa_metadata,pre_process=grouped_mc_rows,
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/gameqa'],'streaming':True})
 
 valen_game__optimal_action = VisualClassification(dataset_name='tasksource/valen-game',task_id='valen-game/optimal-action',
-    metadata='metadata',pre_process=grouped_qa_rows,label_values=_YESNO,
+    metadata='metadata',pre_process=valen_english_rows,label_values=_YESNO,
     question='Is the proposed next action optimal?',
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/valen-game'],'streaming':True})

@@ -42,7 +42,7 @@ def test_gameqa_retains_literal_gold_and_excludes_unresolved_formats():
 
 
 def valen():
-    return dict(group_id='layout-1',assets=[dict(path='assets/a.png')],meta=dict(record_id='state-1',solution_actions=['up']),
+    return dict(group_id='layout-1',assets=[dict(path='assets/a.png')],meta=dict(record_id='state-1',solution_actions=['up'],language_bucket='en'),
         request=dict(state=dict(messages=[dict(role='user',content=[dict(type='text',text='Push boxes onto goals.'),
             dict(type='image_url',image_url=dict(url='assets/a.png'))])]),questions=dict(next_action=dict(
                 type='choice',criteria={a:a.title() for a in ('left','up','down','right')}))),
@@ -131,3 +131,25 @@ def test_shared_loader_jev_preserves_native_gold_and_images(task,monkeypatch):
     assert all(r['images'][0].size==(4,4) for r in rows)
     if task=='gameqa/mcq':assert rows[0]['criteria'][rows[0]['label']]=='7'
     else:assert sum(r['criteria'][r['label']]=='Yes' for r in rows)==2
+
+
+def test_gameqa_question_identity_includes_native_record():
+    from tasksource.vision_tasks import gameqa_metadata
+    first, _ = gameqa_record(game(), 1)
+    second, _ = gameqa_record(game(), 2)
+    assert gameqa_metadata(first)['question_id'] != gameqa_metadata(second)['question_id']
+    assert gameqa_metadata(first)['source_question_id'] == game()['question_id']
+
+
+def test_valen_language_filter_precedes_sampling_and_preserves_splits():
+    from tasksource.vision_tasks import valen_english_rows
+    en, zh = valen(), valen()
+    zh['meta']['language_bucket'] = 'zh'
+    data = DatasetDict({split: Dataset.from_list([dict(images=[dict(bytes=png('red'), path=None)],
+        image_group_id='image', qa=list(valen_records(en)) + list(valen_records(zh)))])
+        for split in ('train', 'test')})
+    selected = valen_english_rows(data)
+    assert set(selected) == {'train', 'test'}
+    assert all(len(rows) == 4 for rows in selected.values())
+    assert all(json.loads(row['metadata'])['source_metadata']['language_bucket'] == 'en'
+               for rows in selected.values() for row in rows)

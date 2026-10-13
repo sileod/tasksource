@@ -125,7 +125,7 @@ def run(args):
     candidates = concatenate_datasets(frames)
     selected, dropped = select_additions(list(candidates.select_columns(COLUMNS)),
                                          base['train'], base['evaluation'], args.cap)
-    addition = candidates.select(selected)
+    addition = candidates.select(selected).shuffle(seed=args.seed)
     validate_decisions(addition, 'train')
     if not len(addition):
         raise ValueError('No unseen eligible training rows')
@@ -140,6 +140,7 @@ def run(args):
         added_rows=len(addition), sources=dict(counts), exclusions=dropped, builds=records,
         evaluation='unchanged', preserved_parquets=base['parquets'],
         sampling='union of preserved rows and unseen seeded reservoir candidates; shared family cap',
+        ordering='new rows shuffled with the recorded seed; published shards unchanged',
         script_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest())
     dump(output / 'manifest.json', manifest)
     print('Staged', json.dumps(manifest), flush=True)
