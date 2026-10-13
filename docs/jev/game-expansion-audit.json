@@ -187,5 +187,45 @@
     "downloaded_append_matches_reviewed_build": true,
     "root_card_body_preserved": true,
     "implementation_git": "cf845df"
+  },
+  "expansion_20k": {
+    "revision": "bfb636a73eb3250e073fafbbb79b989141ca5517",
+    "tag": "v2026.10.13.3",
+    "baseline_revision": "0100b447ed4ee8b55bb9f89e725b62420ac71d2f",
+    "added_rows": 38000,
+    "sources_added": {
+      "vision/gameqa/mcq": 19000,
+      "vision/valen-game/optimal-action": 19000
+    },
+    "per_family_train_cap": 20000,
+    "vision_train_rows": 106085,
+    "validation": {
+      "checked_rows": 38000,
+      "sources": {
+        "vision/gameqa/mcq": 19000,
+        "vision/valen-game/optimal-action": 19000
+      },
+      "native_gold_alignment": true,
+      "encoded_image_hashes": true
+    },
+    "evaluation_shards": "unchanged",
+    "ordering": "new rows shuffled with the recorded seed; published shards unchanged",
+    "valen_languages": {
+      "en": 19493,
+      "zh": 507
+    },
+    "valen_language_policy": "English-only before sampling; original bilingual pilot preserved",
+    "gameqa_question_identity": "native record index plus native question ID",
+    "implementation_git": "e69d756",
+    "focused_tests_passed": 16,
+    "publication_verification": {
+      "revision": "bfb636a73eb3250e073fafbbb79b989141ca5517",
+      "parent_revision": "1e10f33c4cf4928806923c977bf2050383c46743",
+      "tag": "v2026.10.13.3",
+      "all_previous_parquet_blobs_preserved": true,
+      "downloaded_appends_match_reviewed_build": true,
+      "root_card_body_preserved": true,
+      "vision_train_rows": 106085
+    }
   }
 }

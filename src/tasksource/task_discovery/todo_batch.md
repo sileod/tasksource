@@ -133,3 +133,5 @@ Published to Jev `default` and `full` in [Hub commit 8fea8388](https://huggingfa
 | Valen-Team/Valen-Eval-Game | valen-game/optimal-action | Full native archive join hosted; 30,000 train / 500 test states, four action judgments per state, all tied optimal actions retained |
 
 [Source/recast audit](../../../docs/jev/game-expansion-audit.md). Pilot published to the Jev vision config in [0100b447](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/commit/0100b447ed4ee8b55bb9f89e725b62420ac71d2f): 1,000 training rows per task; existing rows and evaluation preserved.
+
+Expanded the two game families to **20,000 training rows each** in [v2026.10.13.3](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/commit/bfb636a73eb3250e073fafbbb79b989141ca5517). All 38,000 additions passed native-gold/image-hash checks; new Valen rows are English, new rows are shuffled with seed 0, and previous data/evaluation are preserved.
