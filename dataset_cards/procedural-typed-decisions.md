@@ -210,7 +210,7 @@ is not produced by or affiliated with TypeSafe or OpenJev.
 
 The `record_eligibility` state contains only a natural-language user request, prose record descriptions, and explicit evaluation semantics. Source facts and logical expression trees are kept in generator test metadata, not the published dataset. Unknown facts are not treated as violations; a known violated requirement dominates any unknown requirements. The first eligible record is defined by the displayed order, and the decisive requirement by the numbered constraints.
 
-Difficulty rises across five levels by increasing record count (4–6 to 25–27), requirement count (1 to 6), and the introduction of nested OR, conditional requirements, summed charges, near-threshold distractors and contradictory reports. Generator correctness and structural progression are tested, but model-calibrated Jev kappa has not yet been measured for this configuration.
+Difficulty rises across five levels by increasing record count (4–6 to 25–27), requirement count (1 to 6), and the introduction of nested OR, conditional requirements, summed charges, near-threshold distractors and contradictory reports.
 
 ## Schema
 
@@ -234,7 +234,7 @@ Level 0 is meant to be easy for a strong decision model and level 4 hard. The
 table gives Jev's chance-adjusted accuracy, kappa = (accuracy − chance) /
 (1 − chance), on 40 fresh states per level (every question of each state;
 `typesafe/jev-1.13-20260917`, September 2026; `jev-latest`, October 2026, for `event_triggered_execution`,
-`goal_directed_planning`, `graph_navigation` and `instruction_execution`). 1 is perfect, 0 is chance.
+`goal_directed_planning`, `graph_navigation`, `instruction_execution` and `record_eligibility`, 30 states per level). 1 is perfect, 0 is chance.
 
 | config | level 0 | 1 | 2 | 3 | 4 |
 |---|---|---|---|---|---|
@@ -252,6 +252,7 @@ table gives Jev's chance-adjusted accuracy, kappa = (accuracy − chance) /
 | `policy_applicability` | 0.73 | 0.60 | 0.53 | 0.64 | 0.35 |
 | `policy_under_uncertainty` | 0.35 | 0.42 | 0.38 | 0.57 | 0.39 |
 | `record_aggregation` | 0.99 | 0.96 | 0.84 | 0.75 | 0.70 |
+| `record_eligibility` | 0.97 | 0.94 | 0.74 | 0.56 | 0.53 |
 | `state_perturbation` | 0.95 | 0.89 | 0.44 | 0.63 | 0.50 |
 | `table_lookup` | 1.00 | 0.98 | 0.97 | 0.90 | 0.87 |
 | `taxonomy_routing` | 1.00 | 0.98 | 0.92 | 0.78 | 0.64 |
