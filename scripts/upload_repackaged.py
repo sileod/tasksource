@@ -26,10 +26,13 @@ from scripts.repackage_dataset.specialized_text import pubmed_rct
 from scripts.repackage_dataset.linguistic import semcor, streusle, spider
 from scripts.repackage_dataset.relations import matres
 from scripts.repackage_dataset.superclevr import superclevr
+from scripts.repackage_dataset.games import gameqa, valen_game
 from scripts.repackage_dataset.regions import coco_regions, doclaynet_region, bapps, spair71k_grid
 
 
-BUILDERS = {"discosense": ("tasksource/discosense", discosense),
+BUILDERS = {"gameqa": ("tasksource/gameqa", gameqa),
+            "valen_game": ("tasksource/valen-game", valen_game),
+            "discosense": ("tasksource/discosense", discosense),
             "matres": ("tasksource/matres", matres),
             "semcor": ("tasksource/semcor", semcor),
             "streusle": ("tasksource/streusle", streusle),
@@ -71,7 +74,8 @@ BUILDERS = {"discosense": ("tasksource/discosense", discosense),
 
 
 # license metadata for repackaged sets, as the originals state it
-LICENSES = {"tasksource/discosense": "apache-2.0",
+LICENSES = {"tasksource/gameqa": "mit", "tasksource/valen-game": "apache-2.0",
+            "tasksource/discosense": "apache-2.0",
             "tasksource/antique": "other", "tasksource/semcor": "other", "tasksource/streusle": "cc-by-sa-4.0",
             "tasksource/spider": "cc-by-sa-4.0", "tasksource/slurp": "cc-by-4.0", "tasksource/mcscript2": "other",
             "tasksource/pubmed-rct": "other",

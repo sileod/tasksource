@@ -11,6 +11,8 @@ by scripts/upload_repackaged.py) or a task switches to a mirror.
 """
 
 ORIGINALS = {
+    "tasksource/gameqa": ["OpenMOSS-Team/GameQA-140K"],
+    "tasksource/valen-game": ["Valen-Team/Valen-Eval-Game"],
     "EleutherAI/CEBaB": ["CEBaB/CEBaB"],
     "tasksource/discosense": ["prajjwal1/discosense"],
     "tasksource/antique": ["irds/antique", "irds/antique_train", "irds/antique_test"],
