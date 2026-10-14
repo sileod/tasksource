@@ -117,6 +117,10 @@ def test_scale_merges_image_groups_rejects_overlap_and_caps_distinct_questions(t
     assert [q['inputs'] for q in merged[0]['qa']]==['q','another']
     assert merged[0]['images'][0]['bytes']==b'one'
     assert excluded==dict(image_in_validation=1,duplicate_question=1,train_cap=1)
+    from datasets import IterableDataset
+    streamed=IterableDataset.from_generator(examples,gen_kwargs=dict(
+        directories=(str(first),str(second)),split='train',groups=groups['train']))
+    assert list(streamed)==merged
 
 
 def test_fresh_trace_split_identity_ignores_png_encoding():

@@ -122,7 +122,8 @@ def main():
         raise ValueError('Candidate budget exhausted before reaching distinct verified training target; checkpoints retained')
     from datasets import Dataset
     features = Dataset.from_parquet(str(Path(directories[0])/'train.parquet')).features
-    dataset = IterableDatasetDict({s:IterableDataset.from_generator(examples,gen_kwargs=dict(directories=directories,split=s,groups=g),features=features) for s,g in groups.items() if g})
+    # Datasets interprets list-valued gen_kwargs as shards; keep one iterator's dedup state.
+    dataset = IterableDatasetDict({s:IterableDataset.from_generator(examples,gen_kwargs=dict(directories=tuple(directories),split=s,groups=g),features=features) for s,g in groups.items() if g})
     report = json.loads((Path(directories[0])/'provenance.json').read_text())
     previous = Path.cwd()
     try:
@@ -139,6 +140,11 @@ def main():
                     'exclusion_counts':dict(sum((Counter(r.get('exclusion_counts',{})) for r in checkpoints),Counter())),
                     'parquet_sha256':{p.name:file_sha256(p) for p in release.glob('*.parquet')}}
         combined.pop('generation_exclusions',None)  # Full per-chunk reasons are in generation-checkpoints.json.
+        for split,info in combined['splits'].items():
+            if info['rows']!=len(groups[split]) or info['questions']!=len(fingerprints[split]):
+                raise ValueError('Materialized counts differ from the deduplicated checkpoint index')
+        if (root/'resume-correction.json').exists():
+            combined['resume_correction']=json.loads((root/'resume-correction.json').read_text())
         provenance.write_text(json.dumps(combined,indent=2)+'\n')
         if args.push:
             dataset = load_prepared(release,'tasksource/'+args.name)
