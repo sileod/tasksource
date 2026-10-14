@@ -96,3 +96,22 @@ and an observed ETA. Resume with exactly the same source, seed, cap and chunk si
 Changing worker count is safe. A candidate-budget failure leaves checkpoints intact
 and does not publish an undersized release. Add the source release to
 `DATA_CHANGELOG.md` before using `--push`.
+
+### TRACE at 100k
+
+`trace-expanded-mcq` retains the pinned native mirror and adds fresh verified
+training generations to reach 100,000 rows. It uses the original generator API,
+keeps the native validation partition and rejects decoded-pixel validation copies.
+Every generated instance is cached with an image checksum; the recipe cache key
+includes source/helper hashes, the native release, seed and rendering versions.
+
+```bash
+TASKSOURCE_GENERATOR_CACHE=/tmp python scripts/upload_repackaged.py trace-expanded-mcq \
+  --max-rows 100000 --max-rows-eval 2000 --workers 8
+```
+
+For a local native base, set `TASKSOURCE_TRACE_BASE` to its prepared release folder.
+The builder checks it against the pinned Hub release's provenance before using it.
+The [builder](trace_generate.py) otherwise downloads that immutable mirror through
+the normal Hub client. Native images and labels remain intact; recognized JSON
+output directives are removed from the question text. Original prompts stay in metadata.

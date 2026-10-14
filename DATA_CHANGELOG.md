@@ -6,6 +6,12 @@ concise bullets on what changed in the data. `tasksource-jev-typed-decisions` re
 
 
 
+## trace-mcq 2026-10-14.2
+
+- Retain the native release and add fresh procedural training instances to reach 100,000 verified QAs; native validation remains separate.
+- Use independent generation seeds and same-task native training answers as distractors. Exclude validation image copies by decoded pixels as well as repeated image/question/gold combinations.
+- Remove three additional standalone JSON-output directives from the MC questions while preserving source content, including chart labels named “Json”. Record fresh-generation seeds, rendering versions and resume checkpoints.
+
 ## mentis-oculi-paper-fold 2026-10-14
 
 - Expand fresh procedural paper-fold training to 100,000 distinct, geometrically verified QAs, retaining native five-panel images and choices.

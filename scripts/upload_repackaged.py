@@ -32,12 +32,14 @@ from scripts.repackage_dataset.visual_safety import t2i_safety
 from scripts.repackage_dataset.memes import memeqa
 from scripts.repackage_dataset.procedural.tron import tron_mc
 from scripts.repackage_dataset.procedural.trace import trace_mc
+from scripts.repackage_dataset.procedural.trace_generate import trace_expanded_mc
 from scripts.repackage_dataset.procedural.mentis import mentis_paper_fold
 from scripts.repackage_dataset.procedural.common import file_sha256
 from scripts.repackage_dataset.regions import coco_regions, doclaynet_region, bapps, spair71k_grid
 
 
 BUILDERS = {"tron-mcq": ("tasksource/tron-mcq", tron_mc),
+            "trace-expanded-mcq": ("tasksource/trace-mcq", trace_expanded_mc),
             "trace-mcq": ("tasksource/trace-mcq", trace_mc),
             "mentis-oculi-paper-fold": ("tasksource/mentis-oculi-paper-fold", mentis_paper_fold),
             "memeqa": ("tasksource/memeqa", memeqa),
@@ -135,6 +137,8 @@ def push_card(repo, build, directory=None):
         upstream = report.get('source_url') or report.get('source', '')
         if isinstance(upstream, str) and upstream.startswith(('https://', 'http://')):
             sources = ', '.join(filter(None, (sources, f'[original distribution]({upstream})')))
+        if report.get('verifier_source'):
+            sources += f", [upstream generator and verifier]({report['verifier_source']})"
     sources = f"Original data: {sources}. " if sources else ""  # an empty entry: the original is not on the Hub
     script = Path(inspect.getsourcefile(build)).resolve().relative_to(Path(__file__).resolve().parents[1]).as_posix()
     storage = 'native ImageFolder' if repo == 'tasksource/view2space' else 'parquet'
@@ -210,8 +214,9 @@ def main():
     parser.add_argument("--max-rows-eval", type=int, help="Rendered mirrors: maximum examples per native evaluation split (default 100)")
     parser.add_argument("--seed", type=int, help="Rendered mirrors: deterministic source annotation sampling seed")
     parser.add_argument("--generator-task", dest="task_ids", action="append", help="Procedural builders: restrict native task/environment IDs; repeat to select several")
+    parser.add_argument("--workers", type=int, help="Fresh TRACE generation: parallel workers")
     args = parser.parse_args()
-    options = {key: getattr(args, key) for key in ("max_rows", "max_rows_eval", "seed", "task_ids")
+    options = {key: getattr(args, key) for key in ("max_rows", "max_rows_eval", "seed", "task_ids", "workers")
                if getattr(args, key) is not None}
     if args.prepared and (len(args.names)!=1 or options or args.card_only or args.bad_examples or args.repairs):
         parser.error('--prepared requires one builder and no generation/card-only options')

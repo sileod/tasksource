@@ -56,10 +56,14 @@ def test_native_mc_preserves_content_and_rejects_opaque_or_multiple_golds():
     '<image>What is the area?\nReturn a JSON object with "answer" only.\nRequired answer format: set "answer" to the integer area in square units.\nExample JSON:\n{"answer":12}',
     '<image>What is the area?\nFinal answer format: set "answer" to the integer area in square units.\nExample JSON:\n{"answer":12}',
     'What is the area?\nReturn a JSON object.\nAnswer field: set "answer" to the integer area in square units.\nExample JSON:\n{"answer":12}',
+    'What is the area?\nReturn only a JSON object containing "answer".\nAnswer field: set "answer" to the integer area in square units.',
+    'What is the area?\nUse JSON only.\nAnswer field: set "answer" to the integer area in square units.',
+    'What is the area?\nRespond with JSON only.\nAnswer field: set "answer" to the integer area in square units.',
 ])
 def test_trace_prompt_keeps_units_without_image_tokens_or_example_answers(prompt):
     assert trace_question(prompt)=='What is the area?\nChoose the integer area in square units.'
     assert trace_question(prompt,'toggle_grid').startswith('Pressing a switch flips that cell and its orthogonal neighbors')
+    assert 'Json' in trace_question(prompt.replace('What is the area?','Find the Json series in the chart.'))
     with pytest.raises(ValueError,match='Unknown TRACE'):
         trace_question('Ambiguous output contract.')
 
@@ -113,3 +117,13 @@ def test_scale_merges_image_groups_rejects_overlap_and_caps_distinct_questions(t
     assert [q['inputs'] for q in merged[0]['qa']]==['q','another']
     assert merged[0]['images'][0]['bytes']==b'one'
     assert excluded==dict(image_in_validation=1,duplicate_question=1,train_cap=1)
+
+
+def test_fresh_trace_split_identity_ignores_png_encoding():
+    from scripts.repackage_dataset.procedural.trace_generate import pixel_hash
+    image=PILImage.new('RGB',(4,4),'red');first=io.BytesIO();second=io.BytesIO()
+    image.save(first,format='PNG',compress_level=0);image.save(second,format='PNG',compress_level=9)
+    assert first.getvalue()!=second.getvalue()
+    assert pixel_hash(first.getvalue())==pixel_hash(second.getvalue())
+    other=io.BytesIO();PILImage.new('RGB',(2,8),'red').save(other,format='PNG')
+    assert pixel_hash(other.getvalue())!=pixel_hash(first.getvalue())

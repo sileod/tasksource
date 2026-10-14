@@ -16,29 +16,29 @@
     "trace-mcq": {
       "splits": {
         "validation": {
-          "image_groups": 100,
-          "questions": 100,
+          "image_groups": 2000,
+          "questions": 2000,
           "gold_position_counts": {
-            "0": 28,
-            "1": 27,
-            "3": 25,
-            "2": 20
+            "0": 509,
+            "2": 508,
+            "3": 501,
+            "1": 482
           }
         },
         "train": {
-          "image_groups": 5000,
-          "questions": 5000,
+          "image_groups": 64000,
+          "questions": 64000,
           "gold_position_counts": {
-            "1": 1218,
-            "3": 1236,
-            "0": 1242,
-            "2": 1304
+            "1": 15984,
+            "0": 16141,
+            "3": 15958,
+            "2": 15917
           }
         }
       },
       "parquet_sha256": {
-        "train.parquet": "8bac69414d177bab8198e6e6a1e1454d62d7adf1656f72b6a959f4c4beb5c1ef",
-        "validation.parquet": "2b586e35664f720e2747de508694481d5a03663dad25b42b112165abf096f80e"
+        "train.parquet": "a1dfb82543d21d896fafca2320cff6c54b96ff845152c0860fbdeb5df6945bcc",
+        "validation.parquet": "8f99aabe3d0004f411f16902ebc2e1a78d5e428ffd9be3fd94f90d27d17b8156"
       },
       "source": "https://huggingface.co/datasets/maveryn/trace",
       "revision": "4f01a535f489cb1db71ca43d10cdbc38a1746b5c",
@@ -180,7 +180,7 @@
   ],
   "published_source_revisions": {
     "tasksource/tron-mcq": "afb935fe698d956e98ab3aa5ea1721d191c7b67f",
-    "tasksource/trace-mcq": "d3d7e647b8e8c363ad65c7597a507cc11a229f15",
+    "tasksource/trace-mcq": "d3a6da49e1ec3e1013f83e372124e61745564198",
     "tasksource/mentis-oculi-paper-fold": "2adf77777a89a86240c0fbd1266c5c770fe9b5ed"
   },
   "hub_load_task_jev_smoke": {
@@ -197,5 +197,18 @@
       "source image group preserved"
     ]
   },
-  "tests": "124 passed, 60 optional Hub downloads skipped"
+  "tests": "124 passed, 60 optional Hub downloads skipped",
+  "all_row_checks_on": "2026-10-14",
+  "full_trace_release": "All 64,000 native train and 2,000 validation QAs passed structural, image and split checks; visual spot checks remain coarse.",
+  "fresh_trace_pilot": {
+    "generated_and_verified": 16,
+    "manually_read": 3,
+    "status": "passed; bulk generation not yet published",
+    "findings": [
+      "OT = 58*sin(57 degrees) rounds to 48.6, agrees with gold.",
+      "Three scene icons match the reference tree shape, agrees with gold 3.",
+      "Marked Sudoku cell has only digit 3 allowed by its row and column, agrees with gold."
+    ],
+    "presentation_repair": "Three exact standalone JSON directives identified (675/64000 native questions). The expanded builder removes these and leaves chart labels named Json intact."
+  }
 }

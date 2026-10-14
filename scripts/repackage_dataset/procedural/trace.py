@@ -20,7 +20,8 @@ def trace_question(prompt, scene_id=None):
     """Keep the question and answer semantics, remove JSON demonstrations/contracts."""
     lines = prompt.removeprefix('<image>').strip().splitlines()
     contract = re.compile(r'^(?:Answer (?:field|format)|(?:Required|Final|Use this) answer format|Format for the "answer" field):\s*(?:set\s+"?answer"?\s+to\s+)?(.+)$',re.I)
-    start = next((i for i,line in enumerate(lines) if line.startswith(('Return a JSON object','Return JSON')) or contract.match(line)),None)
+    start = next((i for i,line in enumerate(lines) if line.startswith(('Return a JSON object','Return only a JSON object',
+        'Return JSON','Use JSON only.','Respond with JSON only.')) or contract.match(line)),None)
     if start is None:raise ValueError('Unknown TRACE output contract')
     question = '\n'.join(lines[:start])
     semantics = next((contract.match(line) for line in lines[start:] if contract.match(line)),None)
