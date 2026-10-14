@@ -1,0 +1,29 @@
+{
+  "inventory": 2044,
+  "screened": 1881,
+  "provisional_handoffs": 12,
+  "implemented": 0,
+  "modality": "image",
+  "language": "en",
+  "task_category": "visual-question-answering",
+  "inventory_manifest": {
+    "candidates": 2044,
+    "default_tasks": [],
+    "languages": [
+      "en"
+    ],
+    "limit": null,
+    "modalities": [
+      "image"
+    ],
+    "queries": [],
+    "retrieved_at": "2026-10-13T19:37:47.859786+00:00",
+    "snapshot": "build/discovery/vision-2026-10-13/cache/hf_hub-5b0eece408efb22a659667fdab3296ea5f28736ec647e244061243d3f0addc39.json",
+    "snapshot_sha256": "1964fda150d9e1b44488b30202f503d223766c1976b1f606d55177e630979643",
+    "source": "hf_hub",
+    "tasks": [
+      "visual-question-answering"
+    ]
+  },
+  "output_sha256": "da935027422cb2a736547bc3cc270b0be8ce7647ca53404086ac85d1454d382c"
+}

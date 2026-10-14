@@ -86,3 +86,5 @@ and leakage before a source enters a training catalog.
 The exhaustive English-tagged HF category queue completed on October 13; its
 [separate shortlist](prospects/2026-10-13.md) preserves the results without changing
 these earlier follow-up notes. These pages are dated snapshots, not live counters.
+
+- [English image VQA prospects (2026-10-14)](prospects/2026-10-14-vision-vqa.md): 12 provisional leads from 1,881 screened repositories; prospects only.
