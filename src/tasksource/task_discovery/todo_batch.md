@@ -173,4 +173,14 @@ These are user requests, separate from automatically discovered prospects.
 | TRON (YangTianze009/TRON) | Static MC exports from seeded generator/verifier pairs | Hosted tasksource/tron-mcq and registered tron/mcq: 100,000/83 train/validation QAs from five reviewed environments. Final materialization counts checked; rounded-measurement MC instructions repaired. |
 | TRACE (maveryn/trace) | Static MC view of native procedural training examples | Hosted tasksource/trace-mcq and registered trace/mcq: 100,000 train / 2,000 validation QAs, retaining 64k native training rows and adding 36k fresh verified generations. |
 | TACIT (tylerxdurden/TACIT-benchmark; danielxmed/tacit-benchmark) | Investigate reproducible procedural decision training | Access blocked: supplied GitHub repository and authenticated Hub metadata return 404. Recorded in decisions.json; reconsider after source access is restored. |
-| MentisOculi (Jana-Z/mentis-oculi) | Investigate reproducible procedural decision training | Hosted tasksource/mentis-oculi-paper-fold and registered mentis-oculi/paper-fold; 20/5 pilot validated, fresh 100,000-QA expansion running in resumable chunks. Other families remain outside this adapter; planning outputs need multiple-valid-plan handling. |
+| MentisOculi (Jana-Z/mentis-oculi) | Investigate reproducible procedural decision training | Hosted tasksource/mentis-oculi-paper-fold and registered mentis-oculi/paper-fold; 100,000/100 train/validation QAs hosted and pinned. Other families remain outside this adapter; planning outputs need multiple-valid-plan handling. |
+
+
+## Batch 14: additional procedural image sources (2026-10-14)
+
+| Source | Requested view | Status |
+|---|---|---|
+| SPHINX | Static visual MC | `sphinx/mcq` registered; fresh four-family pilot hosted; resumable 100k distinct-QA expansion running. Native same-scene choices and nearby count distractors. |
+| VisGym | Static decision view | `visgym/mcq` registered; 100,000 train / 100 validation QAs hosted. Unique shortest-path next moves; other interactive environments outside this static view. |
+| VisualSphinx | Visual puzzle MC | Existing `visualsphinx` uses curated RL-20K directly. Fresh generation needs LLM code synthesis/verification; no blind expansion from its raw corpus. |
+| Gym-V | Excluded | Excluded by explicit user request; recorded in decisions.json. No catalog registration or scale job. |

@@ -2409,5 +2409,20 @@
       }
     ],
     "reconsider_if": "The original data or generator becomes accessible; verify training use and native answer verification before implementing."
+  },
+  {
+    "name": "Gym-V",
+    "scope": "source",
+    "tasks": [],
+    "status": "excluded",
+    "reason_code": "user_excluded",
+    "reason": "User explicitly excluded Gym-V from the procedural image expansion on 2026-10-14.",
+    "huggingface": [],
+    "github": [
+      "https://github.com/ModalMinds/gym-v"
+    ],
+    "papers": [],
+    "checked_on": "2026-10-14",
+    "reconsider_if": "User explicitly requests inclusion again."
   }
 ]

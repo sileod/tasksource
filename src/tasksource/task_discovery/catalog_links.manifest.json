@@ -31,5 +31,12 @@
     "tasks": 3,
     "errors": 0,
     "output_sha256": "52e6722f2533bcbda48b903ab8467a6fdc1892e70ae3743dd8977800c3b2aad8"
+  },
+  "procedural_suite_refresh": {
+    "date": "2026-10-14",
+    "cards": 2,
+    "tasks": 2,
+    "errors": 0,
+    "output_sha256": "e01a8f2446dc7246fe25cabcfc7809a5d1ac6a21d2cc9219a6028c8015f51f41"
   }
 }

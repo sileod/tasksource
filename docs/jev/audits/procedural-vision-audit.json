@@ -101,34 +101,23 @@
     "mentis-oculi-paper-fold": {
       "splits": {
         "validation": {
-          "image_groups": 5,
-          "questions": 5,
-          "gold_position_counts": {
-            "4": 2,
-            "2": 1,
-            "3": 1,
-            "0": 1
-          }
+          "rows": 100,
+          "questions": 100
         },
         "train": {
-          "image_groups": 20,
-          "questions": 20,
-          "gold_position_counts": {
-            "4": 6,
-            "3": 4,
-            "0": 5,
-            "2": 3,
-            "1": 2
-          }
+          "rows": 100000,
+          "questions": 100000
         }
       },
       "parquet_sha256": {
-        "train.parquet": "39d57da0eae3e4d9ef71a47d59c734ca0e54d69954e0632f9af1f7c053d4b5a4",
-        "validation.parquet": "6ef19bbdc53a73a89a2b09c5c301596683c71f16b3974acd220ce07a10262acd"
+        "train.parquet": "d5922721b8ac3e2cea797cb6624c4605e6dc9b0528b8c2e1de4aab45346e307c",
+        "validation.parquet": "6e26f913d47cbfcdacb121a9a92aac7fb5ee8960d51d2650692fa398fc881b27"
       },
       "source": "https://github.com/Jana-Z/mentis-oculi",
       "revision": "ac6d97acf231767f408a9e5d75515872b90190d6",
-      "exclusion_counts": {},
+      "exclusion_counts": {
+        "Indistinguishable final unfolded choices": 1
+      },
       "image_overlap_excluded": 0
     }
   },
@@ -206,7 +195,7 @@
   "published_source_revisions": {
     "tasksource/tron-mcq": "bac9ea9f654d60a7c3dcdb5d0a278a3f4d4e3f9c",
     "tasksource/trace-mcq": "f8f53831dab3ae86f21931f4f45a225e1a9d3096",
-    "tasksource/mentis-oculi-paper-fold": "2adf77777a89a86240c0fbd1266c5c770fe9b5ed"
+    "tasksource/mentis-oculi-paper-fold": "2d8aa2cdf8c3e8028961511ca6e48dde22e34157"
   },
   "hub_load_task_jev_smoke": {
     "tasks": [
@@ -274,6 +263,20 @@
         "train": 64000
       },
       "generated_train": 36000
+    },
+    "tasksource/mentis-oculi-paper-fold": {
+      "repo": "tasksource/mentis-oculi-paper-fold",
+      "revision": "2d8aa2cdf8c3e8028961511ca6e48dde22e34157",
+      "splits": {
+        "validation": {
+          "rows": 100,
+          "questions": 100
+        },
+        "train": {
+          "rows": 100000,
+          "questions": 100000
+        }
+      }
     }
   },
   "materialization_fix": "A generator-sharding bug duplicated shared-image QA groups in local staging. Stopped before Hub commit; regression test and final count guard added. Published TRON has exactly 100000 QAs across 94157 image groups.",

@@ -11,6 +11,8 @@ by scripts/upload_repackaged.py) or a task switches to a mirror.
 """
 
 ORIGINALS = {
+    "tasksource/sphinx-mcq": ["maveryn/sphinx"],
+    "tasksource/visgym-mcq": [],
     'tasksource/tron-mcq': [],
     'tasksource/trace-mcq': ['maveryn/trace'],
     'tasksource/mentis-oculi-paper-fold': [],

@@ -35,10 +35,13 @@ from scripts.repackage_dataset.procedural.trace import trace_mc
 from scripts.repackage_dataset.procedural.trace_generate import trace_expanded_mc
 from scripts.repackage_dataset.procedural.mentis import mentis_paper_fold
 from scripts.repackage_dataset.procedural.common import file_sha256
+from scripts.repackage_dataset.procedural.suites import sphinx_mc, visgym_mc
 from scripts.repackage_dataset.regions import coco_regions, doclaynet_region, bapps, spair71k_grid
 
 
-BUILDERS = {"tron-mcq": ("tasksource/tron-mcq", tron_mc),
+BUILDERS = {"sphinx-mcq": ("tasksource/sphinx-mcq", sphinx_mc),
+            "visgym-mcq": ("tasksource/visgym-mcq", visgym_mc),
+            "tron-mcq": ("tasksource/tron-mcq", tron_mc),
             "tron-mcq-repair": ("tasksource/tron-mcq", repair_tron_mc),
             "trace-expanded-mcq": ("tasksource/trace-mcq", trace_expanded_mc),
             "trace-mcq": ("tasksource/trace-mcq", trace_mc),
@@ -90,7 +93,9 @@ BUILDERS = {"tron-mcq": ("tasksource/tron-mcq", tron_mc),
 
 
 # license metadata for repackaged sets, as the originals state it
-LICENSES = {"tasksource/tron-mcq": "other", "tasksource/trace-mcq": "cc-by-4.0",
+LICENSES = {"tasksource/sphinx-mcq": ["mit", "cc-by-4.0"],
+            "tasksource/visgym-mcq": "apache-2.0",
+            "tasksource/tron-mcq": "other", "tasksource/trace-mcq": "cc-by-4.0",
             "tasksource/mentis-oculi-paper-fold": "apache-2.0",
             "tasksource/memeqa": "other", "tasksource/gameqa": "mit", "tasksource/valen-game": "apache-2.0",
             "tasksource/uk-election": "cc-by-4.0",

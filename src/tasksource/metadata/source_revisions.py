@@ -1,9 +1,11 @@
 """Reviewed source snapshots; keep opaque revision IDs out of task annotations."""
 
 SOURCE_REVISIONS = {
+    "tasksource/sphinx-mcq": "b66101667cb7367ca4de9cbdd979dd586c132446",
+    "tasksource/visgym-mcq": "32629bf9a801cbf544753371c59d5c39ecbd2eff",
     "tasksource/tron-mcq": "bac9ea9f654d60a7c3dcdb5d0a278a3f4d4e3f9c",
     "tasksource/trace-mcq": "f8f53831dab3ae86f21931f4f45a225e1a9d3096",
-    "tasksource/mentis-oculi-paper-fold": "2adf77777a89a86240c0fbd1266c5c770fe9b5ed",
+    "tasksource/mentis-oculi-paper-fold": "2d8aa2cdf8c3e8028961511ca6e48dde22e34157",
 
     "tasksource/memeqa": "00de61bf1d903fdd1ad35b2bce4258578dd33b88",
     "Anthony3456347095/MET-Meme": "2c54b8634c70500d48115b2c05cab9fff97d4495",

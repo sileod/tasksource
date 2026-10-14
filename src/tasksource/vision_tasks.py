@@ -641,3 +641,16 @@ mentis_oculi__paper_fold = VisualMultipleChoice(
     metadata='metadata', pre_process=grouped_mc_rows,
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/mentis-oculi-paper-fold'],'streaming':True},
 )
+
+
+sphinx__mcq = VisualMultipleChoice(
+    dataset_name='tasksource/sphinx-mcq', task_id='sphinx/mcq', choices_list='choices_list',
+    metadata='metadata', pre_process=grouped_mc_rows,
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/sphinx-mcq'],'streaming':True},
+)
+
+visgym__mcq = VisualMultipleChoice(
+    dataset_name='tasksource/visgym-mcq', task_id='visgym/mcq', choices_list='choices_list',
+    metadata='metadata', pre_process=grouped_mc_rows,
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/visgym-mcq'],'streaming':True},
+)

@@ -6,6 +6,16 @@ concise bullets on what changed in the data. `tasksource-jev-typed-decisions` re
 
 
 
+## sphinx-mcq 2026-10-14
+
+- Add fresh static questions from four reviewed SPHINX families: pie ordering, transformation identification, transformation result selection and geometric counting; target 100,000 distinct training QAs.
+- Keep native same-scene distractors and image panel identities; use nearby count alternatives. Preserve source metadata, generation seeds, MIT code and CC BY 4.0 icon notices.
+
+## visgym-mcq 2026-10-14
+
+- Add 100,000 distinct fresh VisGym 2D maze training QAs and 100 validation QAs at three sizes. Select the unique shortest-path next move from four cardinal directions.
+- Preserve maze geometry and seed provenance; exclude tied or trivial states and cross-split image copies. Scope excludes photographic and simulator assets.
+
 ## tron-mcq 2026-10-14.2
 
 - Keep all 100,000 training QAs, original PNGs, choices and gold indices. Clarify numeric questions requesting two decimal places as choosing the closest offered value; some source geometry figures display rounded measurements while their gold uses hidden precision.

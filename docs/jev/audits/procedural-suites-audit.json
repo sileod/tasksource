@@ -1,0 +1,94 @@
+{
+  "checked_on": "2026-10-14",
+  "scope": "Coarse image/question/gold spot check; not a full semantic audit. Gym-V excluded from expansion by user request.",
+  "sources": {
+    "sphinx-mcq": {
+      "hub_revision": "b66101667cb7367ca4de9cbdd979dd586c132446",
+      "examples": [
+        {
+          "training_row": 0,
+          "gold": "V,L,T,C,Z,B",
+          "finding": "Pie shares visibly increase in this order. Native distractors permute the same categories; embedded source option list and answer-format instruction removed."
+        },
+        {
+          "training_row": 2,
+          "gold": "main-diagonal mirror",
+          "finding": "The dominant downward arrow maps to the right under the displayed diagonal reflection; native same-scene transformation candidates retained."
+        },
+        {
+          "training_row": 3,
+          "gold": "18",
+          "finding": "A 2-by-3 rectangular grid has 3 horizontal-boundary pairs times 6 vertical-boundary pairs = 18 rectangles. Nearby alternatives 15,16,17 require counting."
+        }
+      ],
+      "limits": [
+        "Four reviewed families, not all 25.",
+        "Native constructive labels and source uniqueness checks; no independent verifier for every SPHINX family.",
+        "Icon assets use CC BY 4.0 alongside MIT code."
+      ],
+      "pilot_counts": {
+        "validation": 8,
+        "train": 32
+      },
+      "jev_smoke": "load_task(vision=True,recast=\"jev\",max_rows=3,max_rows_eval=2) passed against pinned public pilot"
+    },
+    "visgym-mcq": {
+      "examples": [
+        {
+          "training_row": 0,
+          "gold": "Left",
+          "finding": "Readable 11x11 maze; left leads toward the goal along the unique shortest path. Native BFS and independent distance check agree."
+        },
+        {
+          "training_row": 1,
+          "gold": "Left",
+          "finding": "Readable 15x15 maze; first move left reaches the vertical passage toward the upper-left goal."
+        },
+        {
+          "training_row": 2,
+          "gold": "Up",
+          "finding": "Readable 19x19 maze; upward passage is the shortest-path next move. Source geometry and independent distance check agree."
+        }
+      ],
+      "limits": [
+        "Procedural 2D mazes only, not all 17 interactive environments.",
+        "Seed namespaces and exported image-copy checks do not establish unseen-family benchmark generalization."
+      ],
+      "pilot_counts": {
+        "validation": 8,
+        "train": 32
+      },
+      "jev_smoke": "load_task(vision=True,recast=\"jev\",max_rows=3,max_rows_eval=2) passed against pinned public pilot",
+      "reviewed_source_revision": "b88212610a6f6804d658707d952fe28ff65e23b8",
+      "published_revision": "32629bf9a801cbf544753371c59d5c39ecbd2eff",
+      "released_counts": {
+        "train": 100000,
+        "validation": 100
+      },
+      "full_release_checks": {
+        "validation": {
+          "questions": 100,
+          "image_groups": 100,
+          "gold_counts": {
+            "Up": 27,
+            "Left": 32,
+            "Right": 21,
+            "Down": 20
+          }
+        },
+        "train": {
+          "questions": 100000,
+          "image_groups": 100000,
+          "gold_counts": {
+            "Right": 25086,
+            "Up": 25063,
+            "Left": 25021,
+            "Down": 24830
+          }
+        }
+      },
+      "full_image_checks": "All 100100 PNGs decoded. Every rendered cell center matches stored wall/floor geometry, blue agent and red goal; train and validation image groups are disjoint."
+    }
+  },
+  "tests": "145 passed, 62 optional Hub smoke tests skipped; queue-table formatting repaired and failing regression rerun successfully."
+}

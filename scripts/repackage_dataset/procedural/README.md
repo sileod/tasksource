@@ -115,3 +115,35 @@ The builder checks it against the pinned Hub release's provenance before using i
 The [builder](trace_generate.py) otherwise downloads that immutable mirror through
 the normal Hub client. Native images and labels remain intact; recognized JSON
 output directives are removed from the question text. Original prompts stay in metadata.
+
+### SPHINX and VisGym
+
+The [static suite builders](suites.py) add two narrowly scoped sources using the
+same grouped mirror format. SPHINX covers pie ordering, transformation inference,
+transformation result selection and shape counting. Native choices refer to the
+same scene; count alternatives are within three of gold. SPHINX's constructive
+labels and native image-distinctness guards are retained, rather than claiming an
+independent semantic verifier. Code is MIT; shipped icons are CC BY 4.0.
+
+VisGym exports fresh 2D Wilson mazes at sizes 11, 15 and 19. A reachable intermediate
+state supplies a unique shortest-path next move from Right/Up/Left/Down. A native
+solver and a separate distance calculation check the decision; tied and trivial
+states are excluded. This scope uses no photographic, MuJoCo or benchmark assets.
+
+Use an isolated environment: SPHINX currently needs Pillow 11.3.0 because its
+renderer calls the removed `ImageMath.eval` API. VisGym uses its pinned Gymnasium
+fork, plus pygame. Set `SDL_VIDEODRIVER=dummy` on headless machines. The source
+checkouts are added only inside builders; normal Tasksource installs are unchanged.
+
+```bash
+TASKSOURCE_GENERATOR_CACHE=/tmp SDL_VIDEODRIVER=dummy python -m scripts.repackage_dataset.procedural.scale \
+  sphinx-mcq --output /tmp/tasksource-procedural/sphinx-100k --train 100000 --workers 8 --push
+TASKSOURCE_GENERATOR_CACHE=/tmp SDL_VIDEODRIVER=dummy python -m scripts.repackage_dataset.procedural.scale \
+  visgym-mcq --output /tmp/tasksource-procedural/visgym-100k --train 100000 --workers 8 --push
+```
+
+Gym-V is excluded at the user's request. VisualSphinx already has a direct
+`visualsphinx` task using its curated RL-20K release. Its fresh-generation pipeline
+requires LLM code synthesis and verification; it is not this deterministic static
+export path. The unfiltered raw release is not substituted for curated training
+merely to reach a row target.
