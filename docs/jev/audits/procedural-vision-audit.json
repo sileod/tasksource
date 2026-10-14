@@ -1,5 +1,5 @@
 {
-  "checked_on": "2026-10-13",
+  "checked_on": "2026-10-14",
   "reviewer": {
     "kind": "model",
     "model": "gpt-6.1-sol"
@@ -26,61 +26,77 @@
           }
         },
         "train": {
-          "image_groups": 64000,
-          "questions": 64000,
+          "image_groups": 100000,
+          "questions": 100000,
           "gold_position_counts": {
-            "1": 15984,
-            "0": 16141,
-            "3": 15958,
-            "2": 15917
+            "1": 25083,
+            "0": 25138,
+            "3": 24874,
+            "2": 24905
           }
         }
       },
       "parquet_sha256": {
-        "train.parquet": "a1dfb82543d21d896fafca2320cff6c54b96ff845152c0860fbdeb5df6945bcc",
-        "validation.parquet": "8f99aabe3d0004f411f16902ebc2e1a78d5e428ffd9be3fd94f90d27d17b8156"
+        "train.parquet": "4b18454fa2703724cbd1eaa7075b0172415f7c84005acd9914ee1b0c7d777733",
+        "validation.parquet": "48625a43b31aa4474b72ea2c7b39823ee31d6ea526e84adbf5f8f334ceaa2886"
       },
       "source": "https://huggingface.co/datasets/maveryn/trace",
       "revision": "4f01a535f489cb1db71ca43d10cdbc38a1746b5c",
-      "exclusion_counts": {},
-      "image_overlap_excluded": 0
+      "exclusion_counts": {
+        "RuntimeError: failed to generate node-link task instance for GraphRelationComponentSizeAfterEdgeEditTask": 2,
+        "RuntimeError: task_games__space_shooter__hit_enemy_ship_label failed to construct a valid space-shooter scene: hit_enemy_ship_label needs one hit ship and three non-hit candidate ships": 1,
+        "ValueError: failed to sample pipe exact-distance network": 2,
+        "RuntimeError: failed to generate node-link task instance for GraphPathShortestPathLengthTask": 2,
+        "RuntimeError: failed to generate node-link task instance for GraphCountingDegreeValueFilterCountTask": 4,
+        "ValueError: composite extremum is not unique": 1,
+        "RuntimeError: failed to generate node-link task instance for GraphPathLongestPathLengthTask": 2,
+        "RuntimeError: failed to generate node-link task instance for GraphCountingBridgeCountTask": 2,
+        "ValueError: y1 must be greater than or equal to y0": 1,
+        "RuntimeError: could not generate pixel-village river-side count: river-side object count 3 did not match requested count 5": 1
+      },
+      "image_overlap_excluded": 0,
+      "question_repairs": {}
     },
     "tron-mcq": {
       "splits": {
         "validation": {
-          "image_groups": 82,
-          "questions": 82,
+          "image_groups": 83,
+          "questions": 83,
           "gold_position_counts": {
+            "1": 15,
             "2": 21,
-            "0": 28,
-            "3": 11,
-            "1": 19,
-            "4": 3
+            "3": 24,
+            "0": 21,
+            "4": 2
           }
         },
         "train": {
-          "image_groups": 3975,
-          "questions": 4084,
+          "image_groups": 94157,
+          "questions": 100000,
           "gold_position_counts": {
-            "2": 1023,
-            "3": 902,
-            "1": 993,
-            "0": 1058,
-            "4": 108
+            "0": 25679,
+            "3": 21302,
+            "2": 25614,
+            "1": 25810,
+            "4": 1595
           }
         }
       },
       "parquet_sha256": {
-        "train.parquet": "97ffb43f045ec72ec4db64547366890f8d2100b28082914ce9942a8d016030cb",
-        "validation.parquet": "beb6faf0f29abf186e8bac3280bc99859254e8dee718aac0e82c255a8c18eeb2"
+        "train.parquet": "590799478644d5d4e5b4bef594a39b948f3b9c3ef7e04550844b27c84407bb0b",
+        "validation.parquet": "92bc63e1e36655a68d69c97e647baec66b9d5766c9e06404e83108ba3e488c39"
       },
       "source": "https://github.com/YangTianze009/TRON",
       "revision": "934f3928b7311ec70c080206d8199bbf3697b6c7",
       "exclusion_counts": {
-        "ValueError: Native letter answer without explicit unique text choices": 866,
-        "ValueError: Unrecognized output-format instruction": 62
+        "ValueError: Native letter answer without explicit unique text choices": 22929,
+        "ValueError: Unrecognized output-format instruction": 1903,
+        "ValueError: No verifier-rejected same-task distractors": 9
       },
-      "image_overlap_excluded": 6
+      "image_overlap_excluded": 126,
+      "question_repairs": {
+        "rounded_measurements": 26670
+      }
     },
     "mentis-oculi-paper-fold": {
       "splits": {
@@ -121,55 +137,64 @@
       "source": "tron-mcq",
       "id": "tron:angle_bisector:1350279207774242790",
       "gold": "9",
-      "finding": "Triangle area 18 with equal halves; area 9 agrees with the image. Clear but easy."
+      "finding": "Triangle area 18 with equal halves; area 9 agrees with the image. Clear but easy.",
+      "reviewed_source_revision": "afb935fe698d956e98ab3aa5ea1721d191c7b67f"
     },
     {
       "source": "tron-mcq",
       "id": "tron:aquarium_grid:6791805329145246672",
       "gold": "Water (W)",
-      "finding": "Target cell must contain water under the visible aquarium constraints. Text also transcribes the puzzle, so visual input is partly redundant."
+      "finding": "Target cell must contain water under the visible aquarium constraints. Text also transcribes the puzzle, so visual input is partly redundant.",
+      "reviewed_source_revision": "afb935fe698d956e98ab3aa5ea1721d191c7b67f"
     },
     {
       "source": "tron-mcq",
       "id": "tron:bar_chart_aggregate:1579016599683615781",
       "gold": "25",
-      "finding": "Visible bar values 40,30,20,10 average to 25. Removed opaque MC-letter donors from numeric pools and checked final options."
+      "finding": "Visible bar values 40,30,20,10 average to 25. Removed opaque MC-letter donors from numeric pools and checked final options.",
+      "reviewed_source_revision": "afb935fe698d956e98ab3aa5ea1721d191c7b67f"
     },
     {
       "source": "trace-mcq",
       "id": "blake3:d44d8b9f40a1adac9f2ef3b5cd507f8f9e5f9b951f360d289878ca7ce5e7be81",
       "gold": "5",
-      "finding": "Five cyan cells in the requested row, agrees with gold."
+      "finding": "Five cyan cells in the requested row, agrees with gold.",
+      "reviewed_source_revision": "d3a6da49e1ec3e1013f83e372124e61745564198"
     },
     {
       "source": "trace-mcq",
       "id": "blake3:6a30876a36fb64697c65b389cc7cec248a00ea452c38982062d400a5bc196f1a",
       "gold": "7",
-      "finding": "Following the displayed five Turing-machine steps yields seven ones, agrees with gold."
+      "finding": "Following the displayed five Turing-machine steps yields seven ones, agrees with gold.",
+      "reviewed_source_revision": "d3a6da49e1ec3e1013f83e372124e61745564198"
     },
     {
       "source": "trace-mcq",
       "id": "blake3:7af3c8f95c36f3a085b1a71dd9e8503ecbdc2c5298f157a19b2127523eae7209",
       "gold": "Label C",
-      "finding": "Native toggle-grid prompt omitted the transition rule. Added the pinned generator rule (cell and orthogonal neighbors); the visible difference is centered on C."
+      "finding": "Native toggle-grid prompt omitted the transition rule. Added the pinned generator rule (cell and orthogonal neighbors); the visible difference is centered on C.",
+      "reviewed_source_revision": "d3a6da49e1ec3e1013f83e372124e61745564198"
     },
     {
       "source": "mentis-oculi-paper-fold",
       "id": "mentis-paper-fold:16997172071560385846",
       "gold": "Panel E",
-      "finding": "Fold sequence and five panel labels readable; panel order matches source rendering. Native final hole-set verification has exactly one match. Manual review checks presentation rather than an independent reconstruction of every fold."
+      "finding": "Fold sequence and five panel labels readable; panel order matches source rendering. Native final hole-set verification has exactly one match. Manual review checks presentation rather than an independent reconstruction of every fold.",
+      "reviewed_source_revision": "2adf77777a89a86240c0fbd1266c5c770fe9b5ed"
     },
     {
       "source": "mentis-oculi-paper-fold",
       "id": "mentis-paper-fold:6762815600889461118",
       "gold": "Panel D",
-      "finding": "Fold sequence and five panel labels readable; panel order matches source rendering. Native final hole-set verification has exactly one match. Manual review checks presentation rather than an independent reconstruction of every fold."
+      "finding": "Fold sequence and five panel labels readable; panel order matches source rendering. Native final hole-set verification has exactly one match. Manual review checks presentation rather than an independent reconstruction of every fold.",
+      "reviewed_source_revision": "2adf77777a89a86240c0fbd1266c5c770fe9b5ed"
     },
     {
       "source": "mentis-oculi-paper-fold",
       "id": "mentis-paper-fold:17483717460696166096",
       "gold": "Panel A",
-      "finding": "Fold sequence and five panel labels readable; panel order matches source rendering. Native final hole-set verification has exactly one match. Manual review checks presentation rather than an independent reconstruction of every fold."
+      "finding": "Fold sequence and five panel labels readable; panel order matches source rendering. Native final hole-set verification has exactly one match. Manual review checks presentation rather than an independent reconstruction of every fold.",
+      "reviewed_source_revision": "2adf77777a89a86240c0fbd1266c5c770fe9b5ed"
     }
   ],
   "limits": [
@@ -179,8 +204,8 @@
     "Source licenses differ: TRON research-use, TRACE CC BY 4.0 plus asset notices, Mentis procedural paper-fold Apache-2.0."
   ],
   "published_source_revisions": {
-    "tasksource/tron-mcq": "afb935fe698d956e98ab3aa5ea1721d191c7b67f",
-    "tasksource/trace-mcq": "d3a6da49e1ec3e1013f83e372124e61745564198",
+    "tasksource/tron-mcq": "bac9ea9f654d60a7c3dcdb5d0a278a3f4d4e3f9c",
+    "tasksource/trace-mcq": "f8f53831dab3ae86f21931f4f45a225e1a9d3096",
     "tasksource/mentis-oculi-paper-fold": "2adf77777a89a86240c0fbd1266c5c770fe9b5ed"
   },
   "hub_load_task_jev_smoke": {
@@ -195,20 +220,78 @@
       "images preserved",
       "gold equals criterion at label index",
       "source image group preserved"
-    ]
+    ],
+    "scope": "Published pilots; expanded releases retain the schema and pass local prepared-data smoke tests."
   },
   "tests": "124 passed, 60 optional Hub downloads skipped",
   "all_row_checks_on": "2026-10-14",
-  "full_trace_release": "All 64,000 native train and 2,000 validation QAs passed structural, image and split checks; visual spot checks remain coarse.",
+  "full_trace_release": "All 100000 train and 2000 validation QAs passed choice, gold, prompt-contract and image-group split checks. Native 64000/2000 images were checked for decoding; fresh images are decoded during generation and pixel-overlap filtering. Visual spot checks remain coarse.",
   "fresh_trace_pilot": {
     "generated_and_verified": 16,
     "manually_read": 3,
-    "status": "passed; bulk generation not yet published",
+    "status": "passed; 36000 fresh training rows now published alongside 64000 native rows",
     "findings": [
       "OT = 58*sin(57 degrees) rounds to 48.6, agrees with gold.",
       "Three scene icons match the reference tree shape, agrees with gold 3.",
       "Marked Sudoku cell has only digit 3 allowed by its row and column, agrees with gold."
     ],
     "presentation_repair": "Three exact standalone JSON directives identified (675/64000 native questions). The expanded builder removes these and leaves chart labels named Json intact."
-  }
+  },
+  "100k_milestone": {
+    "tasksource/tron-mcq": {
+      "revision": "bac9ea9f654d60a7c3dcdb5d0a278a3f4d4e3f9c",
+      "splits": {
+        "train": {
+          "rows": 94157,
+          "questions": 100000
+        },
+        "validation": {
+          "rows": 83,
+          "questions": 83
+        }
+      },
+      "question_repairs": {
+        "rounded_measurements": 26670
+      },
+      "native_counts": null,
+      "generated_train": null
+    },
+    "tasksource/trace-mcq": {
+      "revision": "f8f53831dab3ae86f21931f4f45a225e1a9d3096",
+      "splits": {
+        "validation": {
+          "rows": 2000,
+          "questions": 2000
+        },
+        "train": {
+          "rows": 100000,
+          "questions": 100000
+        }
+      },
+      "question_repairs": null,
+      "native_counts": {
+        "validation": 2000,
+        "train": 64000
+      },
+      "generated_train": 36000
+    }
+  },
+  "materialization_fix": "A generator-sharding bug duplicated shared-image QA groups in local staging. Stopped before Hub commit; regression test and final count guard added. Published TRON has exactly 100000 QAs across 94157 image groups.",
+  "current_tron_examples": [
+    {
+      "id": "tron:angle_bisector:9890405951385917123",
+      "gold": "25.67",
+      "finding": "Displayed angle 51.3 implies 25.65; native gold retains hidden precision. Repaired MC instruction explicitly asks for the closest offered value, making 25.67 the unique best option."
+    },
+    {
+      "id": "tron:aquarium_grid:14547733253220740677",
+      "gold": "Water (W)",
+      "finding": "Bottom row clue requires water in the last cell; the text also transcribes the puzzle."
+    },
+    {
+      "id": "tron:bar_chart_aggregate:7730330514071830066",
+      "gold": "25",
+      "finding": "Visible values 30,40,20,10 average to 25. Distractors are numerically distant, so this low-level example is easy."
+    }
+  ]
 }
