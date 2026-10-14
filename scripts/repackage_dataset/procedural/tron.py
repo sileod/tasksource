@@ -157,7 +157,8 @@ def repair_tron_mc():
             if inputs!=qa['inputs']:changed['rounded_measurements']+=1
             questions.append(dict(qa,inputs=inputs))
         return dict(qa=questions)
-    result = _materialize(source.map(normalize,features=source['train'].features),'tron-mcq',SOURCE,REVISION,[],repair_tron_mc,
+    source = IterableDatasetDict({s:rows.map(normalize,features=rows.features) for s,rows in source.items()})
+    result = _materialize(source,'tron-mcq',SOURCE,REVISION,[],repair_tron_mc,
                           previous['license'],previous['license_url'])
     directory = Path('build/tron-mcq-release');path = directory/'provenance.json'
     (directory/'generation-checkpoints.json').write_bytes(Path(hf_hub_download('tasksource/tron-mcq',

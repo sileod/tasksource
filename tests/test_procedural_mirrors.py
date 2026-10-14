@@ -141,3 +141,25 @@ def test_fresh_trace_split_identity_ignores_png_encoding():
     assert pixel_hash(first.getvalue())==pixel_hash(second.getvalue())
     other=io.BytesIO();PILImage.new('RGB',(2,8),'red').save(other,format='PNG')
     assert pixel_hash(other.getvalue())!=pixel_hash(first.getvalue())
+
+
+def test_tron_repair_keeps_encoded_images_choices_labels_and_features(tmp_path,monkeypatch):
+    from datasets import Image,Sequence
+    from scripts.repackage_dataset.procedural.tron import repair_tron_mc
+    import huggingface_hub
+    monkeypatch.chdir(tmp_path)
+    image=io.BytesIO();PILImage.new('RGB',(3,3),'red').save(image,format='PNG')
+    original='Find half of the displayed angle. Round to 2 decimals.'
+    row=dict(id='native',image=image.getvalue(),inputs=original,choices_list=['25.67','3'],labels=0,
+             metadata=dict(original_question=original,verifier_scores=[1,0]))
+    write_static('tron-mcq',dict(train=[row]),dict(source='source',revision='pin',license='research use',license_url='terms'),write_static)
+    base=tmp_path/'build/tron-mcq-release';checkpoints=tmp_path/'checkpoints.json';checkpoints.write_text('[]')
+    monkeypatch.setenv('TASKSOURCE_TRON_BASE',str(base))
+    monkeypatch.setattr(huggingface_hub,'hf_hub_download',lambda repo,name,**kw:str(base/'provenance.json' if name=='provenance.json' else checkpoints))
+    result=repair_tron_mc();repaired=result['train'][0]
+    assert repaired['images'][0]['bytes']==image.getvalue()
+    assert result['train'].features['images']==Sequence(Image(decode=False))
+    qa=repaired['qa'][0]
+    assert qa['choices_list']==['25.67','3'] and qa['labels']==0
+    assert 'closest offered value' in qa['inputs'] and json.loads(qa['metadata'])['original_question']==original
+    assert json.loads((base/'provenance.json').read_text())['question_repairs']=={'rounded_measurements':1}
