@@ -30,7 +30,7 @@ from scripts.repackage_dataset.games import gameqa, valen_game
 from scripts.repackage_dataset.target_sentiment import uk_election
 from scripts.repackage_dataset.visual_safety import t2i_safety
 from scripts.repackage_dataset.memes import memeqa
-from scripts.repackage_dataset.procedural.tron import tron_mc
+from scripts.repackage_dataset.procedural.tron import tron_mc,repair_tron_mc
 from scripts.repackage_dataset.procedural.trace import trace_mc
 from scripts.repackage_dataset.procedural.trace_generate import trace_expanded_mc
 from scripts.repackage_dataset.procedural.mentis import mentis_paper_fold
@@ -39,6 +39,7 @@ from scripts.repackage_dataset.regions import coco_regions, doclaynet_region, ba
 
 
 BUILDERS = {"tron-mcq": ("tasksource/tron-mcq", tron_mc),
+            "tron-mcq-repair": ("tasksource/tron-mcq", repair_tron_mc),
             "trace-expanded-mcq": ("tasksource/trace-mcq", trace_expanded_mc),
             "trace-mcq": ("tasksource/trace-mcq", trace_mc),
             "mentis-oculi-paper-fold": ("tasksource/mentis-oculi-paper-fold", mentis_paper_fold),

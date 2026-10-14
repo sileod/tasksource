@@ -6,6 +6,11 @@ concise bullets on what changed in the data. `tasksource-jev-typed-decisions` re
 
 
 
+## tron-mcq 2026-10-14.2
+
+- Keep all 100,000 training QAs, original PNGs, choices and gold indices. Clarify two-decimal geometry questions as choosing the closest offered value because source figures display rounded measurements while their gold uses hidden precision.
+- Preserve original questions in metadata and record the repair against the pinned 100k release.
+
 ## trace-mcq 2026-10-14.2
 
 - Retain the native release and add fresh procedural training instances to reach 100,000 verified QAs; native validation remains separate.

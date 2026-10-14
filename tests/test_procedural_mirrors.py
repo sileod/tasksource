@@ -6,7 +6,7 @@ from PIL import Image as PILImage
 
 from scripts.repackage_dataset.procedural.common import seed_for, verified_choices, write_static
 from scripts.repackage_dataset.procedural.trace import trace_question
-from scripts.repackage_dataset.procedural.tron import clean_question, native_mc
+from scripts.repackage_dataset.procedural.tron import clean_question, native_mc,tron_question
 from tasksource import recast_jev
 from tasksource.preprocess import VisualMultipleChoice, disable_image_decoding
 from tasksource.vision_tasks import grouped_mc_rows
@@ -49,6 +49,16 @@ def test_native_mc_preserves_content_and_rejects_opaque_or_multiple_golds():
     with pytest.raises(ValueError,match='Ambiguous'):
         native_mc(question,'B',lambda a:1)
     assert clean_question('What is the area? Numeric answer in <answer>...</answer>.')=='What is the area?'
+
+
+def test_tron_rounded_measurements_use_closest_offered_value():
+    question='Find half of the shown angle. Round to 2 decimals.'
+    assert 'Round to 2 decimals' not in tron_question(question)
+    assert 'closest offered value' in tron_question(question)
+    assert tron_question('How many circles?')=='How many circles?'
+    # The source displays 51.3 degrees but derives its gold from hidden precision.
+    choices=[25.67,5.33,3,9]
+    assert min(range(len(choices)),key=lambda i:abs(choices[i]-51.3/2))==0
 
 
 @pytest.mark.parametrize('prompt',[

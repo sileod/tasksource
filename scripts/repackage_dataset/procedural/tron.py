@@ -3,14 +3,16 @@ from collections import Counter
 import importlib
 import importlib.metadata
 import io
+import json
 import os
+from pathlib import Path
 import random
 import re
 import sys
 
 import numpy as np
 
-from .common import checkout, seed_for, verified_choices, write_static
+from .common import checkout, file_sha256, seed_for, verified_choices, write_static
 
 SOURCE = 'https://github.com/YangTianze009/TRON'
 REVISION = '934f3928b7311ec70c080206d8199bbf3697b6c7'
@@ -44,6 +46,11 @@ def native_mc(question, gold, verify):
     label = letters.index(gold.upper())
     if scores != [int(i==label) for i in range(len(choices))]:raise ValueError('Ambiguous native gold')
     return clean_question(question[:markers[0].start()]),choices,label,dict(native_option_keys=letters,verifier_scores=scores)
+
+
+def tron_question(question):
+    return clean_question(question).replace('Round to 2 decimals.',
+        'Choose the closest offered value; measurements in the figure are rounded.')
 
 
 def tron_mc(max_rows=5000, max_rows_eval=100, seed=42, task_ids=(), levels=(0,3,6,9), pool_size=12):
@@ -96,6 +103,7 @@ def tron_mc(max_rows=5000, max_rows_eval=100, seed=42, task_ids=(), levels=(0,3,
                                 donors.append((answer,f'{task}:{other_seed}'))
                         choices,label,alignment = verified_choices(gold,donors,verify,instance_seed)
                         question,method = clean_question(original),'same_task_generated_answers'
+                    question = tron_question(question)
                     if not question:raise ValueError('Empty question')
                     if any(token in text for text in [question,*choices] for token in ('<answer>','\\boxed','Final answer:')):
                         raise ValueError('Unrecognized output-format instruction')
@@ -115,3 +123,48 @@ def tron_mc(max_rows=5000, max_rows_eval=100, seed=42, task_ids=(), levels=(0,3,
         rendering_versions={p:importlib.metadata.version(p) for p in ('Pillow','matplotlib','numpy')},
         generator_environment={k:v for k,v in os.environ.items() if k.startswith(('RLVE_','STANDALONE_'))})
     return write_static('tron-mcq',splits,report,tron_mc)
+
+
+def repair_tron_mc():
+    """TRON MC keeps native images, options and labels, clarifying rounded measurements.
+
+    Source: https://github.com/YangTianze009/TRON (research-use terms). Some geometry
+    figures display rounded measurements while their source gold retains additional
+    precision. Replace the exact two-decimal output request with a closest-offered-value
+    MC instruction. Original questions remain in metadata. This repairs the pinned
+    100,000-QA mirror without regenerating any images or changing supervision.
+    """
+    from datasets import IterableDatasetDict,load_dataset
+    from huggingface_hub import hf_hub_download
+    from tasksource.preprocess import disable_image_decoding
+    from scripts.upload_repackaged import load_prepared
+    from ..vision import _materialize
+    revision = '7da8ffc23dde85af9d985cabd2fc71c31b8f886d'
+    previous = json.loads(Path(hf_hub_download('tasksource/tron-mcq','provenance.json',
+        repo_type='dataset',revision=revision)).read_text())
+    local = os.environ.get('TASKSOURCE_TRON_BASE')
+    if local:
+        source = load_prepared(Path(local),'tasksource/tron-mcq')
+        if json.loads((Path(local)/'provenance.json').read_text())['parquet_sha256']!=previous['parquet_sha256']:
+            raise ValueError('Local TRON base differs from pinned release')
+        source = IterableDatasetDict({s:d.to_iterable_dataset() for s,d in source.items()})
+    else:source = load_dataset('tasksource/tron-mcq',revision=revision,streaming=True)
+    source = disable_image_decoding(source);changed = Counter()
+    def normalize(row):
+        questions = []
+        for qa in row['qa']:
+            inputs = tron_question(qa['inputs'])
+            if inputs!=qa['inputs']:changed['rounded_measurements']+=1
+            questions.append(dict(qa,inputs=inputs))
+        return dict(qa=questions)
+    result = _materialize(source.map(normalize,features=source['train'].features),'tron-mcq',SOURCE,REVISION,[],repair_tron_mc,
+                          previous['license'],previous['license_url'])
+    directory = Path('build/tron-mcq-release');path = directory/'provenance.json'
+    (directory/'generation-checkpoints.json').write_bytes(Path(hf_hub_download('tasksource/tron-mcq',
+        'generation-checkpoints.json',repo_type='dataset',revision=revision)).read_bytes())
+    report = {**previous,**json.loads(path.read_text()),'base_revision':revision,'question_repairs':dict(changed),
+        'repair_script_sha256':file_sha256(__file__),
+        'parquet_sha256':{p.name:file_sha256(p) for p in directory.glob('*.parquet')}}
+    if report['splits']!=previous['splits']:raise ValueError('Question repair changed row counts')
+    path.write_text(json.dumps(report,indent=2)+'\n')
+    return result
