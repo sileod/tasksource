@@ -1,15 +1,14 @@
 # Data changelog
 
-Changes that affect published data, newest first: one entry per publish, `## visgym-mcq 2026-10-14.2
-
-- Consolidate VisGym into one balanced release: 100,000 training QAs, exactly 25,000 each for mazes, equation repair, stick rotation and block legality; 25 validation QAs per family.
-- Deterministically shuffle the combined dataset, retaining verified native choices, original PNGs, family/geometry metadata and disjoint image groups. Replace the separate family registrations with `visgym/mcq`.
-
-## <dataset> <version>`, with a few
+Changes that affect published data, newest first: one entry per publish, `## <dataset> <version>`, with a few
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## visgym-mcq 2026-10-14.2
 
+- Consolidate VisGym into one balanced release: 100,000 training QAs, exactly 25,000 each for mazes, equation repair, stick rotation and block legality; 25 validation QAs per family.
+- Deterministically shuffle the combined dataset, retaining verified native choices, original PNGs, family/geometry metadata and disjoint image groups. Replace the separate family registrations with `visgym/mcq`.
+- Delete the superseded standalone equation, rotation and block Hub repositories after consolidation.
 
 ## zero-shot-label-nli 2026-10-14
 
