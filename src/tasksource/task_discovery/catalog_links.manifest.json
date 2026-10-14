@@ -1,12 +1,12 @@
 {
   "canonical_titles": 423,
   "card_snapshot_sha256": "84d07c750bca6242e91b072649abf1ce0ce1625a98b63cd53156d764970d1012",
-  "cards": 527,
+  "cards": 524,
   "catalog_sha256": "0c69e824e28e01eb7493274ec5615746bae61a8c8249afd8d8b61ab7d9376168",
   "errors": 14,
   "limit": null,
   "offline": true,
-  "output_sha256": "fff1143dedd857315df41eaff77acd2d2f16b0253c336c163673d53959473ad0",
+  "output_sha256": "276e19fc3432c66d8be111da92e43d597659aa6f4d5583f71a4e143210ea7d1c",
   "paper_standardization": {
     "input_sha256": "84d07c750bca6242e91b072649abf1ce0ce1625a98b63cd53156d764970d1012",
     "linked_candidates": 510,
@@ -45,5 +45,12 @@
     "new_tasks": 3,
     "errors": 0,
     "output_sha256": "fff1143dedd857315df41eaff77acd2d2f16b0253c336c163673d53959473ad0"
+  },
+  "visgym_balanced_refresh": {
+    "date": "2026-10-14",
+    "cards": 1,
+    "tasks": 1,
+    "retired_standalone_cards": 3,
+    "output_sha256": "276e19fc3432c66d8be111da92e43d597659aa6f4d5583f71a4e143210ea7d1c"
   }
 }

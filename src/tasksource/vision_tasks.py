@@ -654,21 +654,3 @@ visgym__mcq = VisualMultipleChoice(
     metadata='metadata', pre_process=grouped_mc_rows,
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/visgym-mcq'],'streaming':True},
 )
-
-visgym__equation = VisualMultipleChoice(
-    dataset_name='tasksource/visgym-equation-mcq', task_id='visgym/equation', choices_list='choices_list',
-    metadata='metadata', pre_process=grouped_mc_rows,
-    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/visgym-equation-mcq'],'streaming':True},
-)
-
-visgym__rotation = VisualMultipleChoice(
-    dataset_name='tasksource/visgym-rotation-mcq', task_id='visgym/rotation', choices_list='choices_list',
-    metadata='metadata', pre_process=grouped_mc_rows,
-    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/visgym-rotation-mcq'],'streaming':True},
-)
-
-visgym__block = VisualMultipleChoice(
-    dataset_name='tasksource/visgym-block-mcq', task_id='visgym/block-legality', choices_list='choices_list',
-    metadata='metadata', pre_process=grouped_mc_rows,
-    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/visgym-block-mcq'],'streaming':True},
-)

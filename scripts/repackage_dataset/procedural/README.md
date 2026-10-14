@@ -148,22 +148,29 @@ requires LLM code synthesis and verification; it is not this deterministic stati
 export path. The unfiltered raw release is not substituted for curated training
 merely to reach a row target.
 
-## Other static VisGym views
+## Balanced VisGym
 
-[The shared builders](visgym.py) add `visgym/equation`, `visgym/rotation` and
-`visgym/block-legality` using the same visual MC template. Equation distractors
-are true equations requiring more than one match transfer; rotation alternatives
-differ by 15 or 30 degrees; block alternatives collide despite staying in bounds.
-Native verifiers check every choice, with independent segment/occupancy checks
-for equations and blocks. These are fresh procedural images, not source benchmarks.
+One [`tasksource/visgym-mcq`](https://huggingface.co/datasets/tasksource/visgym-mcq)
+mirror and one `visgym/mcq` annotation combine mazes, equation repair, stick
+rotation and block legality. The default release contains 100,000 training QAs,
+exactly 25,000 per family, and 100 validation QAs, 25 per family. Both splits are
+shuffled deterministically. Family, seed and geometry remain in JSON metadata.
+
+[The balanced builder](balanced_visgym.py) reuses the
+[native instance/candidate verifiers](visgym.py) and
+[maze builder](suites.py). Equation distractors are true equations requiring extra
+match transfers; rotation alternatives are nearby angles; block alternatives
+collide while staying inside the board. No photographic or benchmark assets.
 
 ```bash
 TASKSOURCE_GENERATOR_CACHE=/tmp SDL_VIDEODRIVER=dummy \
-  python -m scripts.repackage_dataset.procedural.scale visgym-rotation-mcq \
-  --output build/visgym-rotation-100k --train 100000 --eval 100 --workers 8 --push
+  python scripts/upload_repackaged.py visgym-mcq --max-rows 100000 --max-rows-eval 100
 ```
 
-Replace the builder with `visgym-equation-mcq` or `visgym-block-mcq` for the other
-views. Use an isolated VisGym generator environment as above. Source/recipe hashes,
-seeds, geometry and exclusion counts accompany each release. The scale command
-fails rather than padding or publishing an undersized target. Gym-V is excluded.
+Use an isolated VisGym generator environment as above. To reuse verified
+checkpoints, pass `--checkpoints roots.json`, mapping `maze`, `equation`, `rotation`
+and `blocks` to their scale output directories. The builder verifies checksums,
+source revision, gold alignment, exact family counts and split image disjointness.
+Source/checkpoint provenance and recipe hashes accompany the combined release.
+The individual family scale commands prepare local checkpoints only; publication
+uses the single balanced builder. Gym-V is excluded.

@@ -36,15 +36,12 @@ from scripts.repackage_dataset.procedural.trace_generate import trace_expanded_m
 from scripts.repackage_dataset.procedural.mentis import mentis_paper_fold
 from scripts.repackage_dataset.procedural.common import file_sha256
 from scripts.repackage_dataset.procedural.suites import sphinx_mc, visgym_mc
-from scripts.repackage_dataset.procedural.visgym import visgym_equation, visgym_rotation, visgym_blocks
+from scripts.repackage_dataset.procedural.balanced_visgym import visgym_balanced
 from scripts.repackage_dataset.regions import coco_regions, doclaynet_region, bapps, spair71k_grid
 
 
-BUILDERS = {"visgym-equation-mcq": ("tasksource/visgym-equation-mcq", visgym_equation),
-            "visgym-rotation-mcq": ("tasksource/visgym-rotation-mcq", visgym_rotation),
-            "visgym-block-mcq": ("tasksource/visgym-block-mcq", visgym_blocks),
-            "sphinx-mcq": ("tasksource/sphinx-mcq", sphinx_mc),
-            "visgym-mcq": ("tasksource/visgym-mcq", visgym_mc),
+BUILDERS = {"sphinx-mcq": ("tasksource/sphinx-mcq", sphinx_mc),
+            "visgym-mcq": ("tasksource/visgym-mcq", visgym_balanced),
             "tron-mcq": ("tasksource/tron-mcq", tron_mc),
             "tron-mcq-repair": ("tasksource/tron-mcq", repair_tron_mc),
             "trace-expanded-mcq": ("tasksource/trace-mcq", trace_expanded_mc),
@@ -97,10 +94,7 @@ BUILDERS = {"visgym-equation-mcq": ("tasksource/visgym-equation-mcq", visgym_equ
 
 
 # license metadata for repackaged sets, as the originals state it
-LICENSES = {"tasksource/visgym-equation-mcq": "apache-2.0",
-            "tasksource/visgym-rotation-mcq": "apache-2.0",
-            "tasksource/visgym-block-mcq": "apache-2.0",
-            "tasksource/sphinx-mcq": ["mit", "cc-by-4.0"],
+LICENSES = {"tasksource/sphinx-mcq": ["mit", "cc-by-4.0"],
             "tasksource/visgym-mcq": "apache-2.0",
             "tasksource/tron-mcq": "other", "tasksource/trace-mcq": "cc-by-4.0",
             "tasksource/mentis-oculi-paper-fold": "apache-2.0",
@@ -227,9 +221,10 @@ def main():
     parser.add_argument("--max-rows-eval", type=int, help="Rendered mirrors: maximum examples per native evaluation split (default 100)")
     parser.add_argument("--seed", type=int, help="Rendered mirrors: deterministic source annotation sampling seed")
     parser.add_argument("--generator-task", dest="task_ids", action="append", help="Procedural builders: restrict native task/environment IDs; repeat to select several")
+    parser.add_argument("--checkpoints", type=Path, help="VisGym: JSON mapping of family names to verified checkpoint directories")
     parser.add_argument("--workers", type=int, help="Fresh TRACE generation: parallel workers")
     args = parser.parse_args()
-    options = {key: getattr(args, key) for key in ("max_rows", "max_rows_eval", "seed", "task_ids", "workers")
+    options = {key: getattr(args, key) for key in ("max_rows", "max_rows_eval", "seed", "task_ids", "workers", "checkpoints")
                if getattr(args, key) is not None}
     if args.prepared and (len(args.names)!=1 or options or args.card_only or args.bad_examples or args.repairs):
         parser.error('--prepared requires one builder and no generation/card-only options')

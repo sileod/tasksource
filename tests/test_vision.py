@@ -45,7 +45,7 @@ def test_catalog():
                              'clevr/material', 'intergps', 'clevr/count', 'tallyqa/count', 'vsr/yesno',
                              'rico-widget/grid7', 'rico-widget/element', 'lvis/region', 'coco/panoptic-region',
                              'doclaynet/region', 'bapps/preference', 'spair71k/grid7', 'superclevr/yesno', 'superclevr/count', 'superclevr/color',
-                             'superclevr/shape', 'superclevr/size', 'superclevr/material', 'gameqa/mcq', 'valen-game/optimal-action', 't2isafety/toxicity', 'met-meme/sentiment', 'met-meme/intention', 'met-meme/offensiveness', 'met-meme/metaphor', 'memeqa/mcq', 'tron/mcq', 'trace/mcq', 'mentis-oculi/paper-fold', 'sphinx/mcq', 'visgym/mcq', 'visgym/equation', 'visgym/rotation', 'visgym/block-legality']
+                             'superclevr/shape', 'superclevr/size', 'superclevr/material', 'gameqa/mcq', 'valen-game/optimal-action', 't2isafety/toxicity', 'met-meme/sentiment', 'met-meme/intention', 'met-meme/offensiveness', 'met-meme/metaphor', 'memeqa/mcq', 'tron/mcq', 'trace/mcq', 'mentis-oculi/paper-fold', 'sphinx/mcq', 'visgym/mcq']
     text = list_tasks()
     assert set(vision.id) & set(text.id) == {'mind2web/action'}
     assert not any(isinstance(mapping, (VisualClassification, VisualMultipleChoice))

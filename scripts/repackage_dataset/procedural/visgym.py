@@ -64,7 +64,7 @@ def visgym_equation(max_rows=1000,max_rows_eval=100,seed=42):
         return Image.fromarray(image),'Which equation can be obtained from the picture by moving exactly one matchstick from one symbol to a different symbol? All choices are arithmetically true. Use standard arithmetic precedence; * and / denote multiplication and division.',choices,label,dict(task='equation_repair',equation=''.join(start),
             verification='native_transitions_and_independent_segment_accounting',**alignment)
     return _export('visgym-equation-mcq',VISGYM,'apache-2.0',generate,max_rows,max_rows_eval,seed,
-                   dict(scope='one_match_equation_repair',max_search_states=300,max_distractor_depth=4,image_size=[900,180]))
+                   dict(scope='one_match_equation_repair',max_search_states=300,max_distractor_depth=4,image_size=[900,180]),builder=visgym_equation)
 
 
 def visgym_rotation(max_rows=1000,max_rows_eval=100,seed=42):
@@ -98,7 +98,7 @@ def visgym_rotation(max_rows=1000,max_rows_eval=100,seed=42):
         return Image.fromarray(image),'Which counterclockwise rotation makes the blue stick parallel to the red dashed stick? Ignore their positions. Zero degrees means no rotation.',[c+' degrees counterclockwise' for c in raw],label,dict(task='stick_rotation',geometry=geometry,
             verifier_answers=raw,verification='native_modulo_180_orientation_reward',**alignment)
     return _export('visgym-rotation-mcq',VISGYM,'apache-2.0',generate,max_rows,max_rows_eval,seed,
-                   dict(scope='stick_orientation',angle_step=15,minimum_separation=35,translation_ignored=True))
+                   dict(scope='stick_orientation',angle_step=15,minimum_separation=35,translation_ignored=True),builder=visgym_rotation)
 
 
 def block_move_legal(board, blocks, block_id, direction):
@@ -143,4 +143,4 @@ def visgym_blocks(max_rows=1000,max_rows_eval=100,seed=42):
             blocks=copy.deepcopy(env.blocks),candidate_moves=chosen,crop_xyxy=crop,random_walk_steps=walk,
             verifier_scores=[int(env._can_move(b,d)) for b,d in chosen],verification='native_placement_and_independent_occupancy')
     return _export('visgym-block-mcq',VISGYM,'apache-2.0',generate,max_rows,max_rows_eval,seed,
-                   dict(scope='sliding_block_legality',random_walk_steps=[128,512],crop='current_board_only'))
+                   dict(scope='sliding_block_legality',random_walk_steps=[128,512],crop='current_board_only'),builder=visgym_blocks)

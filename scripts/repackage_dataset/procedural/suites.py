@@ -65,7 +65,7 @@ def unique_maze_move(grid, start, target):
     return scores.index(1),scores
 
 
-def _export(name, source, license, generate, max_rows, max_rows_eval, seed, config):
+def _export(name, source, license, generate, max_rows, max_rows_eval, seed, config, builder=None):
     splits={};excluded=[]
     for split,limit in (('validation',max_rows_eval),('train',max_rows)):
         rows=[];splits[split]=rows
@@ -86,7 +86,7 @@ def _export(name, source, license, generate, max_rows, max_rows_eval, seed, conf
         split_policy='Fresh split-specific seeds; image copies excluded across splits. No released benchmark examples ingested.',
         generation_exclusions=excluded,exclusion_counts=dict(Counter(r['reason'] for r in excluded)))
     from scripts.upload_repackaged import BUILDERS
-    result=write_static(name,splits,report,BUILDERS[name][1])
+    result=write_static(name,splits,report,builder or BUILDERS[name][1])
     root,archive_sha=checkout(*source)
     folder=Path('build')/(name+'-release')
     notices={p.name:p.read_text() for p in (root/'LICENSE',root/'NOTICE') if p.exists()}
@@ -144,4 +144,4 @@ def visgym_mc(max_rows=1000,max_rows_eval=100,seed=42):
             return Image.fromarray(env.render()),'Move the blue dot toward the red square. Which first move is on the shortest path? Gray cells are walls; move one cell horizontally or vertically.',['Right','Up','Left','Down'],label,dict(task='maze2d_next_move',geometry=state,
                 verifier_scores=scores,verification='native_maze_solver_and_independent_distance_check')
         finally:env.close()
-    return _export('visgym-mcq',VISGYM,'apache-2.0',generate,max_rows,max_rows_eval,seed,dict(sizes=[11,15,19],scope='maze2d_next_move'))
+    return _export('visgym-mcq',VISGYM,'apache-2.0',generate,max_rows,max_rows_eval,seed,dict(sizes=[11,15,19],scope='maze2d_next_move'),builder=visgym_mc)

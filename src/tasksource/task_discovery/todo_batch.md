@@ -181,6 +181,6 @@ These are user requests, separate from automatically discovered prospects.
 | Source | Requested view | Status |
 |---|---|---|
 | SPHINX | Static visual MC | `sphinx/mcq` registered; 100,000 training QAs hosted across four families. Native same-scene choices and nearby count distractors. |
-| VisGym | Static decision view | `visgym/mcq` registered; 100,000 train / 100 validation QAs hosted. Unique shortest-path next moves; three non-maze pilots hosted (`visgym/equation`, `visgym/rotation`, `visgym/block-legality`), with separate resumable 100k builds running. |
+| VisGym | Static visual MC | One `visgym/mcq` mirror: 100,000 total training QAs, balanced 25,000 per family (maze/equation/rotation/blocks), plus 100 held-out QAs. Separate family registrations removed. |
 | VisualSphinx | Visual puzzle MC | Existing `visualsphinx` uses curated RL-20K directly. Fresh generation needs LLM code synthesis/verification; no blind expansion from its raw corpus. |
 | Gym-V | Excluded | Excluded by explicit user request; recorded in decisions.json. No catalog registration or scale job. |

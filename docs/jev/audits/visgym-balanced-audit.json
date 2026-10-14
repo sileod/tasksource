@@ -1,0 +1,28 @@
+{
+  "checked_on": "2026-10-14",
+  "repo": "tasksource/visgym-mcq",
+  "family_counts": {
+    "train": {
+      "maze": 25000,
+      "equation": 25000,
+      "rotation": 25000,
+      "blocks": 25000
+    },
+    "validation": {
+      "rotation": 25,
+      "maze": 25,
+      "equation": 25,
+      "blocks": 25
+    }
+  },
+  "image_group_counts": {
+    "train": 92114,
+    "validation": 100
+  },
+  "image_overlap": 0,
+  "gold_alignment": "All 100100 QAs checked against stored native verifier scores; native independent rule checks were recorded at generation.",
+  "image_integrity": "All images retain encoded PNG bytes; checkpoint Parquet checksums verified by the builder.",
+  "scope": "Structural audit of all rows; manual semantic spot checks are recorded in procedural-suites-audit.json.",
+  "hub_revision": "c2509824b3c403c21b689d24180dae1b9e8cd006",
+  "hub_tag": "v2026.10.14.2"
+}

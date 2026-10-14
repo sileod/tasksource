@@ -18,13 +18,22 @@ from datasets import IterableDataset, IterableDatasetDict
 from .common import file_sha256, seed_for
 from ..vision import _materialize
 
+def generator(name):
+    from .visgym import visgym_equation, visgym_rotation, visgym_blocks
+    from .suites import visgym_mc
+    from scripts.upload_repackaged import BUILDERS
+    native = {'visgym-mcq':visgym_mc, 'visgym-equation-mcq':visgym_equation,
+              'visgym-rotation-mcq':visgym_rotation, 'visgym-block-mcq':visgym_blocks}
+    return native[name] if name in native else BUILDERS[name][1]
+
+
 TRON_TASKS = ('aquarium_grid','angle_bisector','bar_chart_aggregate','before_after','overlapping_shape_count')
 
 
 def chunk(job):
     name,index,directory,settings = job
     from scripts.upload_repackaged import BUILDERS,load_prepared
-    builder = BUILDERS[name][1]
+    builder = generator(name)
     directory.mkdir(parents=True,exist_ok=True)
     previous = Path.cwd()
     try:
@@ -88,16 +97,19 @@ def main():
     parser.add_argument('--chunk-size',type=int,default=250)
     parser.add_argument('--workers',type=int,default=8)
     parser.add_argument('--seed',type=int,default=42)
+    parser.add_argument('--candidate-multiplier',type=int,default=2)
     parser.add_argument('--push',action='store_true')
     args = parser.parse_args()
-    if min(args.train,args.eval,args.chunk_size,args.workers)<1:parser.error('Counts must be positive')
+    if min(args.train,args.eval,args.chunk_size,args.workers,args.candidate_multiplier)<1:parser.error('Counts must be positive')
+    if args.push and args.name.startswith('visgym'):
+        parser.error('Publish the balanced VisGym release through upload_repackaged.py visgym-mcq')
     from scripts.upload_repackaged import BUILDERS,load_prepared,push_card
-    builder = BUILDERS[args.name][1]
+    builder = generator(args.name)
     root = args.output.resolve();root.mkdir(parents=True,exist_ok=True)
     files = [Path(__file__),Path(__file__).with_name('common.py'),Path(inspect.getsourcefile(builder))]
     if Path(inspect.getsourcefile(builder)).name=='visgym.py':files.append(Path(__file__).with_name('suites.py'))
     config = dict(source=args.name,train=args.train,eval=args.eval,chunk_size=args.chunk_size,seed=args.seed,
-                  task_ids=list(TRON_TASKS) if args.name=='tron-mcq' else [],scripts_sha256={p.name:file_sha256(p) for p in files})
+                  candidate_multiplier=args.candidate_multiplier,task_ids=list(TRON_TASKS) if args.name=='tron-mcq' else [],scripts_sha256={p.name:file_sha256(p) for p in files})
     manifest = root/'configuration.json'
     if manifest.exists() and json.loads(manifest.read_text())!=config:
         raise ValueError('Resume configuration changed; use a new output directory')
@@ -109,7 +121,7 @@ def main():
     started = time.monotonic();groups = {'validation':{},'train':{}};fingerprints = {s:set() for s in groups}
     directories = [chunk(job(0))];excluded = Counter()
     collect(directories[0],groups,fingerprints,args.train,excluded)
-    maximum = (2*args.train+args.chunk_size-1)//args.chunk_size
+    maximum = (args.candidate_multiplier*args.train+args.chunk_size-1)//args.chunk_size
     with ProcessPoolExecutor(args.workers,mp_context=multiprocessing.get_context('spawn')) as pool:
         for start in range(1,maximum,args.workers):
             if len(fingerprints['train'])>=args.train:break
