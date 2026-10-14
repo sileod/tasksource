@@ -3,7 +3,7 @@
   "scope": "Coarse image/question/gold spot check; not a full semantic audit. Gym-V excluded from expansion by user request.",
   "sources": {
     "sphinx-mcq": {
-      "hub_revision": "b66101667cb7367ca4de9cbdd979dd586c132446",
+      "hub_revision": "ac38a5b0448f2919c4565030f727ea5c2dcad59b",
       "examples": [
         {
           "training_row": 0,
@@ -30,7 +30,13 @@
         "validation": 8,
         "train": 32
       },
-      "jev_smoke": "load_task(vision=True,recast=\"jev\",max_rows=3,max_rows_eval=2) passed against pinned public pilot"
+      "jev_smoke": "Public pinned 100k release: load_task(vision=True,recast=\"jev\",max_rows=2,max_rows_eval=1) passed; images retained.",
+      "reviewed_pilot_revision": "b66101667cb7367ca4de9cbdd979dd586c132446",
+      "release_counts": {
+        "train": 100000,
+        "train_image_groups": 94135,
+        "validation": 100
+      }
     },
     "visgym-mcq": {
       "examples": [
@@ -88,6 +94,60 @@
         }
       },
       "full_image_checks": "All 100100 PNGs decoded. Every rendered cell center matches stored wall/floor geometry, blue agent and red goal; train and validation image groups are disjoint."
+    },
+    "visgym-equation-mcq": {
+      "examples": [
+        {
+          "training_row": 0,
+          "gold": "5+1*8=13",
+          "finding": "Move the top match of 7 onto the minus sign: 7 becomes 1 and minus becomes plus. All four choices are true equations."
+        },
+        {
+          "training_row": 1,
+          "gold": "55+88=143",
+          "finding": "Move the upper-right match of 9 onto the middle of 0. They become 5 and 8; the result sums correctly."
+        }
+      ],
+      "scope": "Coarse rendered-image check plus per-example candidate verifiers; not a full semantic audit.",
+      "source_revision": "927271d107ad0196ad6aa597095ca57d01c6ddbb",
+      "hub_revision": "c35facd1e6c7651923622fd7d43423827c075cfd",
+      "jev_smoke": "Public pinned source: 2 train and 1 validation rows loaded with vision=True,recast=\"jev\"; images retained."
+    },
+    "visgym-rotation-mcq": {
+      "examples": [
+        {
+          "training_row": 0,
+          "gold": "45 degrees counterclockwise",
+          "finding": "Blue orientation is 18 degrees and red is 63 degrees; nearby options 15,60,75 do not align."
+        },
+        {
+          "training_row": 1,
+          "gold": "135 degrees counterclockwise",
+          "finding": "Blue is 122 degrees and red is 77 degrees. Rotating by 135 degrees aligns their unoriented axes modulo 180."
+        }
+      ],
+      "scope": "Coarse rendered-image check plus per-example candidate verifiers; not a full semantic audit.",
+      "source_revision": "927271d107ad0196ad6aa597095ca57d01c6ddbb",
+      "hub_revision": "862bf295797925e70f4497492027cea0007abe23",
+      "jev_smoke": "Public pinned source: 2 train and 1 validation rows loaded with vision=True,recast=\"jev\"; images retained."
+    },
+    "visgym-block-mcq": {
+      "examples": [
+        {
+          "training_row": 0,
+          "gold": "Move block 9 one cell left",
+          "finding": "Block 9 has an empty cell directly left. Other offered moves collide with blocks 7,8,9."
+        },
+        {
+          "training_row": 1,
+          "gold": "Move block 9 one cell up",
+          "finding": "The cell above 9 is empty. Other offered moves hit blocks 10,1,3."
+        }
+      ],
+      "scope": "Coarse rendered-image check plus per-example candidate verifiers; not a full semantic audit.",
+      "source_revision": "927271d107ad0196ad6aa597095ca57d01c6ddbb",
+      "hub_revision": "03591d4171e73865debe26261bcd08020760999e",
+      "jev_smoke": "Public pinned source: 2 train and 1 validation rows loaded with vision=True,recast=\"jev\"; images retained."
     }
   },
   "tests": "145 passed, 62 optional Hub smoke tests skipped; queue-table formatting repaired and failing regression rerun successfully."

@@ -81,7 +81,7 @@ def examples(directories, split, groups):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('name',choices=('tron-mcq','mentis-oculi-paper-fold','sphinx-mcq','visgym-mcq'))
+    parser.add_argument('name',choices=('tron-mcq','mentis-oculi-paper-fold','sphinx-mcq','visgym-mcq','visgym-equation-mcq','visgym-rotation-mcq','visgym-block-mcq'))
     parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--train',type=int,default=100000)
     parser.add_argument('--eval',type=int,default=100)
@@ -95,6 +95,7 @@ def main():
     builder = BUILDERS[args.name][1]
     root = args.output.resolve();root.mkdir(parents=True,exist_ok=True)
     files = [Path(__file__),Path(__file__).with_name('common.py'),Path(inspect.getsourcefile(builder))]
+    if Path(inspect.getsourcefile(builder)).name=='visgym.py':files.append(Path(__file__).with_name('suites.py'))
     config = dict(source=args.name,train=args.train,eval=args.eval,chunk_size=args.chunk_size,seed=args.seed,
                   task_ids=list(TRON_TASKS) if args.name=='tron-mcq' else [],scripts_sha256={p.name:file_sha256(p) for p in files})
     manifest = root/'configuration.json'

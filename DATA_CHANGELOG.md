@@ -6,6 +6,21 @@ concise bullets on what changed in the data. `tasksource-jev-typed-decisions` re
 
 
 
+## visgym-equation-mcq 2026-10-14
+
+- Add a reviewed fresh procedural pilot for one-match equation repair. Every offered equation is arithmetically true, and exactly one is reachable with one match transfer.
+- Preserve generation seeds, geometry, Apache-2.0 source notices and native/independent candidate checks. Target a separate 100,000-QA verified training build; exclude cross-split image copies.
+
+## visgym-rotation-mcq 2026-10-14
+
+- Add a reviewed fresh procedural pilot for stick-orientation questions with nearby 15/30-degree alternatives, checked with the native orientation reward.
+- Preserve generation seeds, geometry, Apache-2.0 source notices and native/independent candidate checks. Target a separate 100,000-QA verified training build; exclude cross-split image copies.
+
+## visgym-block-mcq 2026-10-14
+
+- Add a reviewed fresh procedural pilot for sliding-block move legality. Distractors collide with another block; only the current board is displayed.
+- Preserve generation seeds, geometry, Apache-2.0 source notices and native/independent candidate checks. Target a separate 100,000-QA verified training build; exclude cross-split image copies.
+
 ## sphinx-mcq 2026-10-14
 
 - Add fresh static questions from four reviewed SPHINX families: pie ordering, transformation identification, transformation result selection and geometric counting; target 100,000 distinct training QAs.

@@ -32,3 +32,24 @@ def test_maze_target_and_unique_next_move_are_checked():
     assert label==0 and scores==[1,0,0,0]
     with pytest.raises(ValueError,match='Solved, unreachable or trivial'):
         unique_maze_move(grid,(3,3),(3,3))
+
+
+def test_one_match_requires_one_removed_and_one_added_segment():
+    from scripts.repackage_dataset.procedural.visgym import one_match_reachable
+    segments={'6':set('abcdef'),'8':set('abcdefg'),'+':set('hv'),'-':set('h'),'4':set('bcdg'),'=':set('xy'),'2':set('abdeg')}
+    assert one_match_reachable('6+4=4','8-4=4',segments)
+    assert not one_match_reachable('6+4=4','6-2=4',segments)
+    assert not one_match_reachable('6+4=4','6+4=4',segments)
+    assert not one_match_reachable('6+4=4','8-44=4',segments)
+
+
+def test_block_legality_rejects_collision_and_border_but_allows_self_overlap():
+    from scripts.repackage_dataset.procedural.visgym import block_move_legal
+    board=[[1,1,0],[0,0,2]]
+    blocks={1:dict(position=(0,0),size=(1,2)),2:dict(position=(1,2),size=(1,1))}
+    assert block_move_legal(board,blocks,1,1)
+    assert block_move_legal(board,blocks,1,2)
+    assert not block_move_legal(board,blocks,1,0)
+    assert not block_move_legal(board,blocks,2,1)
+    board[0][2]=2
+    assert not block_move_legal(board,blocks,1,1)

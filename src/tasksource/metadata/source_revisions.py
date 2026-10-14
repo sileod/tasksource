@@ -1,7 +1,11 @@
 """Reviewed source snapshots; keep opaque revision IDs out of task annotations."""
 
 SOURCE_REVISIONS = {
-    "tasksource/sphinx-mcq": "b66101667cb7367ca4de9cbdd979dd586c132446",
+    "tasksource/visgym-equation-mcq": "c35facd1e6c7651923622fd7d43423827c075cfd",
+    "tasksource/visgym-rotation-mcq": "862bf295797925e70f4497492027cea0007abe23",
+    "tasksource/visgym-block-mcq": "03591d4171e73865debe26261bcd08020760999e",
+
+    "tasksource/sphinx-mcq": "ac38a5b0448f2919c4565030f727ea5c2dcad59b",
     "tasksource/visgym-mcq": "32629bf9a801cbf544753371c59d5c39ecbd2eff",
     "tasksource/tron-mcq": "bac9ea9f654d60a7c3dcdb5d0a278a3f4d4e3f9c",
     "tasksource/trace-mcq": "f8f53831dab3ae86f21931f4f45a225e1a9d3096",

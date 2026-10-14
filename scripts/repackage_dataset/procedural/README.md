@@ -147,3 +147,23 @@ Gym-V is excluded at the user's request. VisualSphinx already has a direct
 requires LLM code synthesis and verification; it is not this deterministic static
 export path. The unfiltered raw release is not substituted for curated training
 merely to reach a row target.
+
+## Other static VisGym views
+
+[The shared builders](visgym.py) add `visgym/equation`, `visgym/rotation` and
+`visgym/block-legality` using the same visual MC template. Equation distractors
+are true equations requiring more than one match transfer; rotation alternatives
+differ by 15 or 30 degrees; block alternatives collide despite staying in bounds.
+Native verifiers check every choice, with independent segment/occupancy checks
+for equations and blocks. These are fresh procedural images, not source benchmarks.
+
+```bash
+TASKSOURCE_GENERATOR_CACHE=/tmp SDL_VIDEODRIVER=dummy \
+  python -m scripts.repackage_dataset.procedural.scale visgym-rotation-mcq \
+  --output build/visgym-rotation-100k --train 100000 --eval 100 --workers 8 --push
+```
+
+Replace the builder with `visgym-equation-mcq` or `visgym-block-mcq` for the other
+views. Use an isolated VisGym generator environment as above. Source/recipe hashes,
+seeds, geometry and exclusion counts accompany each release. The scale command
+fails rather than padding or publishing an undersized target. Gym-V is excluded.

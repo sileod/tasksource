@@ -10,7 +10,7 @@ SOURCE_LICENSE_EVIDENCE = {
                'url': 'https://github.com/maveryn/sphinx/blob/28ef6c43629ab4491491a204167ef2f52dcd8182/LICENSE',
                'additional_urls': ['https://github.com/maveryn/sphinx/blob/28ef6c43629ab4491491a204167ef2f52dcd8182/src/sphinx/icons/LICENSE.txt']},
     'visgym': {'license': 'apache-2.0', 'license_use': 'commercial', 'checked': '2026-10-14',
-               'scope': 'procedural Wilson mazes only; no photographic or simulator assets',
+               'scope': 'procedural mazes, matchstick equations, stick orientation and sliding blocks; no photographic or simulator assets',
                'url': 'https://github.com/visgym/visgym/blob/927271d107ad0196ad6aa597095ca57d01c6ddbb/LICENSE'},
 
     'tron': {'license': 'research-use', 'checked': '2026-10-13',
