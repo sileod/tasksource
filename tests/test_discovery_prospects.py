@@ -218,3 +218,47 @@ def test_large_review_documents_are_bounded_without_mutating_source_evidence():
     assert len(bounded[0]['source_document_json_excerpt'])==100
     assert len(docs[0]['metadata']['labels'][0])==10000
     assert jev_review.bounded_documents([{'text':'small'}])==[{'text':'small'}]
+
+
+def test_investigation_keeps_evidence_gaps_without_promoting_or_admitting_bad_fit(tmp_path):
+    row=reviewed('yes');row['review_languages']=['en']
+    answers=row['reviews'][0]['data']['answers']
+    answers['dataset_language']={'probabilities':{'yes':0.65,'unknown':0.35}}
+    answers['annotation_origin']={'probabilities':{'human':0.65,'unknown':0.35}}
+    discovery.save_prospects([row],tmp_path,['human','procedural'],True)
+    assert (tmp_path/'handoff.jsonl').read_text()==''
+    lead=json.loads((tmp_path/'investigate.jsonl').read_text())
+    assert lead['prospect_status']=='needs_evidence'
+    assert 'dataset_language below strict confidence' in lead['investigation_reasons']
+    answers['decision_fit']={'probabilities':{'yes':0.5,'unknown':0.5}}
+    discovery.save_prospects([row],tmp_path,['human','procedural'],True)
+    assert (tmp_path/'investigate.jsonl').read_text()==''
+
+
+def test_investigation_excludes_known_unverified_synthetic_and_reviewer_disagreement(tmp_path):
+    row=reviewed('yes')
+    row['reviews'][0]['data']['answers']['annotation_origin']={'probabilities':{'model':0.95}}
+    result=discovery.save_prospects([row],tmp_path,['human','procedural'],True)
+    assert result['handoff_count']==result['investigate_count']==0
+    row=reviewed('yes','no');row['prospect_status']='needs_evidence'
+    assert discovery.investigation_reasons(row)==[]
+
+
+def test_null_visual_preview_is_not_a_strict_handoff(tmp_path):
+    row=reviewed('yes')
+    row['evidence']=[{'url':'https://datasets-server.huggingface.co/rows?dataset=org/data',
+                     'sha256':'hash','metadata':{'features':[{'name':'image','type':{'_type':'Image'}}],
+                                               'rows':[{'row':{'image':None,'label':1}}]}}]
+    assert discovery.prospect_status(row)=='needs_evidence'
+    result=discovery.save_prospects([row],tmp_path)
+    assert result['handoff_count']==0 and result['investigate_count']==1
+    row['evidence'][0]['metadata']['rows'][0]['row']['image']={'src':'actual-image'}
+    assert discovery.prospect_status(row)=='promising'
+
+
+def test_documented_quality_concerns_hold_strong_handoff_without_erasing_lead(tmp_path):
+    row=reviewed('yes')
+    row['reviews'][0]['data']['answers']['supervision_quality']={'probabilities':{'concerns':0.95}}
+    result=discovery.save_prospects([row],tmp_path)
+    assert result['handoff_count']==0 and result['investigate_count']==1
+    assert 'documented supervision quality concerns' in json.loads((tmp_path/'investigate.jsonl').read_text())['investigation_reasons']

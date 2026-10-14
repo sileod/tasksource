@@ -56,6 +56,15 @@ def observed_resource(row):
                and d.get('sha256') and d.get('metadata',{}).get('rows') for d in row.get('evidence',[]))
 
 
+def missing_image_preview(row):
+    """An Image feature with only null sampled values is not usable-image evidence."""
+    for document in row.get('evidence',[]):
+        data=document.get('metadata',{})
+        columns=[f['name'] for f in data.get('features',[]) if f.get('type',{}).get('_type')=='Image']
+        if columns and data.get('rows') and not any(r.get('row',{}).get(c) for r in data['rows'] for c in columns):return True
+    return False
+
+
 def prospect_status(row):
     if row.get('review_status')=='failed' or not row.get('review_evidence_count'):return 'needs_evidence'
     answers=current_answers(row)
@@ -67,7 +76,8 @@ def prospect_status(row):
         if all(a.get(question,{}).get('probabilities',{}).get('no',0)>=0.8 for a in answers):return 'not_suitable'
     if row.get('train_status')=='not_listed' or (row.get('huggingface') and row.get('train_status')!='present'):
         return 'needs_evidence'
-    if row.get('training_check_errors'):return 'needs_evidence'
+    if row.get('training_check_errors') or missing_image_preview(row):return 'needs_evidence'
+    if any(a.get('supervision_quality',{}).get('probabilities',{}).get('concerns',0)>=0.8 for a in answers):return 'needs_evidence'
     if all(a.get(q,{}).get('probabilities',{}).get('yes',0)>=0.8 for a in answers
            for q in questions):return 'promising'
     return 'needs_evidence'
@@ -87,15 +97,48 @@ def origin_matches(row,allowed,allow_verified_synthetic=False):
     return bool(answers)
 
 
+def investigation_reasons(row,origins=(),allow_verified_synthetic=False):
+    """Recover credible leads with evidence gaps, without relaxing the handoff."""
+    answers=current_answers(row)
+    if not answers or row['prospect_status']=='not_suitable':return []
+    probability=lambda q,k:min(a.get(q,{}).get('probabilities',{}).get(k,0) for a in answers)
+    # Fit and training need positive support; missing metadata alone is not a lead.
+    if probability('decision_fit','yes')<0.8 or probability('train','yes')<0.8:return []
+    if any(a.get(q,{}).get('probabilities',{}).get('no',0)>=0.8
+           for a in answers for q in ('train','resources','decision_fit','dataset_language')):return []
+    if not observed_resource(row) and probability('resources','yes')<0.5:return []
+    if row.get('review_languages') and probability('dataset_language','yes')<0.5:return []
+    reasons=[]
+    if any(a.get('supervision_quality',{}).get('probabilities',{}).get('concerns',0)>=0.8 for a in answers):
+        reasons.append('documented supervision quality concerns')
+    if not origin_matches(row,origins,allow_verified_synthetic):
+        # Uncertain origin deserves research; known unverified model labels do not.
+        if any(sum(a.get('annotation_origin',{}).get('probabilities',{}).get(k,0)
+                   for k in ('model','mixed'))>=0.8 for a in answers):return []
+        if min(sum(a.get('annotation_origin',{}).get('probabilities',{}).get(k,0)
+                   for k in set(origins)) for a in answers)<0.5:return []
+        reasons.append('annotation provenance or verification needs evidence')
+    if row.get('huggingface') and row.get('train_status')!='present':reasons.append('training split not independently observed')
+    if row.get('training_check_errors'):reasons.append('training metadata request failed')
+    if missing_image_preview(row):reasons.append('sampled image is null; usable images not established')
+    questions=['train','decision_fit']+([] if observed_resource(row) else ['resources'])
+    if row.get('review_languages'):questions.append('dataset_language')
+    reasons.extend(q+' below strict confidence' for q in questions if probability(q,'yes')<0.8)
+    return reasons
+
+
 def save_prospects(rows,output,origins=(),allow_verified_synthetic=False):
     prospects=[dict(row,resource_observed=bool(observed_resource(row)),prospect_status=prospect_status(row)) for row in rows]
     promising=[r for r in prospects if r['prospect_status']=='promising']
     handoff=[r for r in promising if origin_matches(r,origins,allow_verified_synthetic)]
+    investigate=[dict(r,investigation_reasons=reasons) for r in prospects
+                 if (reasons:=investigation_reasons(r,origins,allow_verified_synthetic))]
+    write_rows(output/'investigate.jsonl',investigate)
     write_rows(output/'prospects.jsonl',prospects)
     write_rows(output/'handoff.jsonl',handoff)
     return dict(status_counts={s:sum(r['prospect_status']==s for r in prospects)
                                for s in ('promising','needs_evidence','not_suitable')},
-                annotation_origins=origins,allow_verified_synthetic=allow_verified_synthetic,handoff_count=len(handoff),annotation_filtered=len(promising)-len(handoff))
+                annotation_origins=origins,allow_verified_synthetic=allow_verified_synthetic,handoff_count=len(handoff),investigate_count=len(investigate),annotation_filtered=len(promising)-len(handoff))
 
 
 def language_priority(row, requested):
@@ -143,7 +186,7 @@ def main():
     rows=[json.loads(line) for path in args.inputs for line in path.read_text().splitlines() if line.strip()]
     if args.from_reviews:
         manifest=save_prospects(rows,args.output,args.annotation_origin,args.allow_verified_synthetic)
-        manifest.update(input_hashes={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in args.inputs},from_reviews=True)
+        manifest.update(input_hashes={str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in args.inputs},from_reviews=True,discovery_code_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest())
         (args.output/'manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
         print(json.dumps(manifest));return
     names,repos=catalog_index();references=catalog_references();history=previous_decisions();queue=queued_sources()

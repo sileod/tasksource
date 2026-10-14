@@ -1,0 +1,134 @@
+{
+  "summary": {
+    "multiple-choice": {
+      "status_counts": {
+        "promising": 9,
+        "needs_evidence": 104,
+        "not_suitable": 72
+      },
+      "annotation_origins": [
+        "human",
+        "procedural"
+      ],
+      "allow_verified_synthetic": true,
+      "handoff_count": 1,
+      "investigate_count": 4,
+      "annotation_filtered": 8
+    },
+    "visual-question-answering": {
+      "status_counts": {
+        "promising": 66,
+        "needs_evidence": 1475,
+        "not_suitable": 340
+      },
+      "annotation_origins": [
+        "human",
+        "procedural"
+      ],
+      "allow_verified_synthetic": true,
+      "handoff_count": 12,
+      "investigate_count": 42,
+      "annotation_filtered": 54
+    },
+    "image-classification": {
+      "status_counts": {
+        "promising": 29,
+        "needs_evidence": 1815,
+        "not_suitable": 66
+      },
+      "annotation_origins": [
+        "human",
+        "procedural"
+      ],
+      "allow_verified_synthetic": true,
+      "handoff_count": 8,
+      "investigate_count": 177,
+      "annotation_filtered": 21
+    },
+    "pwc": {
+      "status_counts": {
+        "promising": 2,
+        "needs_evidence": 346,
+        "not_suitable": 1
+      },
+      "annotation_origins": [
+        "human",
+        "procedural"
+      ],
+      "allow_verified_synthetic": true,
+      "handoff_count": 0,
+      "investigate_count": 2,
+      "annotation_filtered": 2
+    }
+  },
+  "input_hashes": {
+    "build/discovery/vision-2026-10-13/hf-queue/image-classification/batches/0000/prospects.jsonl": "79cbe58b6e5c13a7a8216bb0acf4897d322ec46037986982c90820e8aea1cffd",
+    "build/discovery/vision-2026-10-13/hf-queue/image-classification/batches/0001/prospects.jsonl": "0a9fe0c0eea2a5bfb17b36892e97b49e191ac9c63033bca73345e61e612c8cbb",
+    "build/discovery/vision-2026-10-13/hf-queue/image-classification/batches/0002/prospects.jsonl": "341319b6faa171c80621db5ca6dc614d740626244418d483bf0da3f0065bb748",
+    "build/discovery/vision-2026-10-13/hf-queue/image-classification/batches/0003/prospects.jsonl": "55d2648df63ced3e5e733a0832fc1e3ff53bfc35340128524c833e593a4661e7",
+    "build/discovery/vision-2026-10-13/hf-queue/image-classification/batches/0004/prospects.jsonl": "ff5aed2829b967a14b9aa939298405a58d7ad19018693d2e9cf55b584be6d63c",
+    "build/discovery/vision-2026-10-13/hf-queue/image-classification/batches/0005/prospects.jsonl": "5da83e40d397d84ddcec7214b04441ec7a75fd07896a78d83d87908d493544df",
+    "build/discovery/vision-2026-10-13/hf-queue/image-classification/batches/0006/prospects.jsonl": "467619579ac9ace388f27e04d7026db2a384db42efe97ebd7792a0e314728c6c",
+    "build/discovery/vision-2026-10-13/hf-queue/image-classification/batches/0007/prospects.jsonl": "d52892792d949ca138dabac3751c155bce5ee42d65e87a863258b80039651a46",
+    "build/discovery/vision-2026-10-13/hf-queue/image-classification/batches/0008/prospects.jsonl": "8c9d86a6f6c602bc3d01f76564485c275de83971612440f34db4175eb4703805",
+    "build/discovery/vision-2026-10-13/hf-queue/image-classification/batches/0009/prospects.jsonl": "e52dcbd58da26f0af38343e2d9d14dd9b61a69679d2425b0a9e8a232cd3f48f6",
+    "build/discovery/vision-2026-10-13/hf-queue/image-classification/batches/0010/prospects.jsonl": "9af35cf4416c952b384a60f939a12427b604a9872a7badf5243ae9699053e4d9",
+    "build/discovery/vision-2026-10-13/hf-queue/image-classification/batches/0011/prospects.jsonl": "adcd8cedbfee2f3ffe9f0572d38b5e6bf30ca347942282d5e0e8a32febc41a56",
+    "build/discovery/vision-2026-10-13/hf-queue/image-classification/batches/0012/prospects.jsonl": "e6479bedc2765db796ad6e9f06f592fbe27559963743fe37dc5a228897daac3f",
+    "build/discovery/vision-2026-10-13/hf-queue/image-classification/batches/0013/prospects.jsonl": "e8b0138f507c3c7952dc7f4110686fe28d793b46a683d82c888d19bc4f3103e0",
+    "build/discovery/vision-2026-10-13/hf-queue/image-classification/batches/0014/prospects.jsonl": "dc8b22820e1335f829e2fcfc30701a0639ae6f0784b4467543d29400826b7a74",
+    "build/discovery/vision-2026-10-13/hf-queue/image-classification/batches/0015/prospects.jsonl": "9424589f89b22eb3d4d142e3c605d50127ce353b6fb2bd0a9e22ac70852ad790",
+    "build/discovery/vision-2026-10-13/hf-queue/image-classification/batches/0016/prospects.jsonl": "e231575ec5c8d9926e888d97ce196f5781b35fef13c9cd6e913b63c2262d113e",
+    "build/discovery/vision-2026-10-13/hf-queue/image-classification/batches/0017/prospects.jsonl": "e9d353e41c3c5551a79b8adde37e72788e6d2c746da2f61d54c3cdd1ed092319",
+    "build/discovery/vision-2026-10-13/hf-queue/image-classification/batches/0018/prospects.jsonl": "789ace95fd17e88943b076d0a1d5bd5f1ba731c6d10367ccbf6f29ec516afeea",
+    "build/discovery/vision-2026-10-13/hf-queue/image-classification/batches/0019/prospects.jsonl": "3b24404453afd74193755ccc9e27adee792b102736ccbd4d919d0ceaa18f4a5f",
+    "build/discovery/vision-2026-10-13/hf-queue/image-classification/batches/0020/prospects.jsonl": "1089f5956ed54bec95d35242be91afde307e7584a5c3736684e2326fa745a78e",
+    "build/discovery/vision-2026-10-13/hf-queue/image-classification/batches/0021/prospects.jsonl": "d29ec3e678461d0d23bfe718c779c5b83442f0a73fc1e818a4eff338af0a2c7d",
+    "build/discovery/vision-2026-10-13/hf-queue/image-classification/batches/0022/prospects.jsonl": "be8738e79fa90db6e54f21a3ffdda16113054bb7ff68cb8397bd4103017c59c1",
+    "build/discovery/vision-2026-10-13/hf-queue/image-classification/batches/0023/prospects.jsonl": "5c8cd43e4ecab6cff89a0614c3ea2adafe0d6752261429a30791df6f06199255",
+    "build/discovery/vision-2026-10-13/hf-queue/image-classification/batches/0024/prospects.jsonl": "2ccc7068e35ea1dfba554b4d2ec3caf3c9774bab316ae4c7604dd3bbdfd33f8e",
+    "build/discovery/vision-2026-10-13/hf-queue/image-classification/batches/0025/prospects.jsonl": "92c295a6b254fe0370fa2ed23a0189f3533f6b433c27affca87488d537e4f721",
+    "build/discovery/vision-2026-10-13/hf-queue/image-classification/batches/0026/prospects.jsonl": "5a1761818bffac976a53e3a2214c2441c82f21eaf7c0a2184caa2178699597cb",
+    "build/discovery/vision-2026-10-13/hf-queue/image-classification/batches/0027/prospects.jsonl": "4d64a7ab6679840047217ef223b054ce57a5045ac75d938481be49666708329c",
+    "build/discovery/vision-2026-10-13/hf-queue/image-classification/batches/0028/prospects.jsonl": "af332a9c8541336f178de07c73e2075776f6dd774232537798206bfb9674f840",
+    "build/discovery/vision-2026-10-13/hf-queue/image-classification/batches/0029/prospects.jsonl": "359654dbcab5310ed6c901fee0448c35f4be822dc674efc6bc6058a4dfba85ae",
+    "build/discovery/vision-2026-10-13/hf-queue/multiple-choice/batches/0000/prospects.jsonl": "1db6c7c9895ddf8afa71386e8db8aac33954711f74709c71b0a5bbd8f356ef72",
+    "build/discovery/vision-2026-10-13/hf-queue/multiple-choice/batches/0001/prospects.jsonl": "b850a7615c1fc177221eb3b106c56eb5e4030180c42cb13830aa709342815836",
+    "build/discovery/vision-2026-10-13/hf-queue/multiple-choice/batches/0002/prospects.jsonl": "5301875d8749ad37791a7064d7e98c3d6bed4dc84d46cb8a1e53d4a581c268b9",
+    "build/discovery/vision-2026-10-13/hf-queue/visual-question-answering/batches/0000/prospects.jsonl": "8b4ffe15e8f869220d5d4bc02e385e468710254a6af65a8e62f2c41b2373adcb",
+    "build/discovery/vision-2026-10-13/hf-queue/visual-question-answering/batches/0001/prospects.jsonl": "893d6e0692825deaa54d2c8847e51ccb9060156e8036014b440bf6f139c9ed2e",
+    "build/discovery/vision-2026-10-13/hf-queue/visual-question-answering/batches/0002/prospects.jsonl": "bac9425afb8ff44a06e2d08cda98b12fc3521840eff8b06d784803f983a9afc8",
+    "build/discovery/vision-2026-10-13/hf-queue/visual-question-answering/batches/0003/prospects.jsonl": "4f8f7046c3554de5642a6a759d78f4c6626a232381643c77aa77d553f1d96353",
+    "build/discovery/vision-2026-10-13/hf-queue/visual-question-answering/batches/0004/prospects.jsonl": "f815f17c059bf864ac71515ee3d0ac70fe128f3aac5780e992ce7fe0e03de0d9",
+    "build/discovery/vision-2026-10-13/hf-queue/visual-question-answering/batches/0005/prospects.jsonl": "fab3e6da2e6d5b1915ff0dc26db13ed78b32e0fafaf9153447f9cc1c0fabfc57",
+    "build/discovery/vision-2026-10-13/hf-queue/visual-question-answering/batches/0006/prospects.jsonl": "60333a50102881bc4d41cf60c17ff7447c33c264a79343215f7215ae844e022e",
+    "build/discovery/vision-2026-10-13/hf-queue/visual-question-answering/batches/0007/prospects.jsonl": "48d7eba9ca9a1daba9df2a4cc2f2a2fd3eabc9f16ffc76ef9a2afd3702a1faa5",
+    "build/discovery/vision-2026-10-13/hf-queue/visual-question-answering/batches/0008/prospects.jsonl": "8a0e0a1e3729445f3474c87bf287b7567fcff3dc212eb6966c042822fd9372f5",
+    "build/discovery/vision-2026-10-13/hf-queue/visual-question-answering/batches/0009/prospects.jsonl": "c2a09f516818acc34240cacbb72f9cc47bcc8bdd4c15bdeeed56c59af7118d8f",
+    "build/discovery/vision-2026-10-13/hf-queue/visual-question-answering/batches/0010/prospects.jsonl": "cac83c1448ab7d78cc82ded70760c0546e0fe3021263c4660e74212604f809ef",
+    "build/discovery/vision-2026-10-13/hf-queue/visual-question-answering/batches/0011/prospects.jsonl": "52600ee58839aa64af4e7e90922bb54e3f484b5798e465d887292d4d9b400949",
+    "build/discovery/vision-2026-10-13/hf-queue/visual-question-answering/batches/0012/prospects.jsonl": "4e6f6c6fa290eb4dc98a235c5cb06307c53ac6b03d35541bce24c07e20d04d23",
+    "build/discovery/vision-2026-10-13/hf-queue/visual-question-answering/batches/0013/prospects.jsonl": "4ce7815481bca938f5debe135583ee4b5157a63f0dd363dc7e3fbac7c4525291",
+    "build/discovery/vision-2026-10-13/hf-queue/visual-question-answering/batches/0014/prospects.jsonl": "a51e0f5508279b385a359a5cd7d6b572e6ced105aebcdfdafb544c2eb2d85f73",
+    "build/discovery/vision-2026-10-13/hf-queue/visual-question-answering/batches/0015/prospects.jsonl": "7a4f64b0b99c9ea937684eb1ec0eeaf1a47b89548c661e44cd3814ced120e629",
+    "build/discovery/vision-2026-10-13/hf-queue/visual-question-answering/batches/0016/prospects.jsonl": "13d7c180588b88b97312278490a8b81187c4285d1f12a45b8a69e6ad4e20aff9",
+    "build/discovery/vision-2026-10-13/hf-queue/visual-question-answering/batches/0017/prospects.jsonl": "99a20047bdbffed5312610de17ae16d2c961b0579fbbf127e6e3be4e8e759abf",
+    "build/discovery/vision-2026-10-13/hf-queue/visual-question-answering/batches/0018/prospects.jsonl": "f2aac750b9987312ce26b5770baca71a7c2ef362126036e49b013a6a91fa3892",
+    "build/discovery/vision-2026-10-13/hf-queue/visual-question-answering/batches/0019/prospects.jsonl": "25135931684fd7369b2f43d8acf2e5bce2b0afdeb2a8ed34eeed857669500866",
+    "build/discovery/vision-2026-10-13/hf-queue/visual-question-answering/batches/0020/prospects.jsonl": "52c0de3a59c3827bf8731335d3bd631d2352d889f7cca48723cdb616636cfec4",
+    "build/discovery/vision-2026-10-13/hf-queue/visual-question-answering/batches/0021/prospects.jsonl": "d4311daebf49c39f223d79ef503d985cdd1806f4ab30a45819af4c977a237344",
+    "build/discovery/vision-2026-10-13/hf-queue/visual-question-answering/batches/0022/prospects.jsonl": "77ec43494138c509b6aa5af8df27e0aabb9dde21ac1ac7a71079841113e0b575",
+    "build/discovery/vision-2026-10-13/hf-queue/visual-question-answering/batches/0023/prospects.jsonl": "27ac703c63bd6e375e40f0c51af5899562ad760dab4b1445e7a20aa9895981b8",
+    "build/discovery/vision-2026-10-13/hf-queue/visual-question-answering/batches/0024/prospects.jsonl": "ef6a1f6a22858e24f24980698bed4d6d3cc19dd56e104d4e061659c32b496a47",
+    "build/discovery/vision-2026-10-13/hf-queue/visual-question-answering/batches/0025/prospects.jsonl": "97c52a42da4bc5d31fb401a4b7edf73b6b0539a8471cde5f84706961fd639e1b",
+    "build/discovery/vision-2026-10-13/hf-queue/visual-question-answering/batches/0026/prospects.jsonl": "5d5472f2eaa61f6ba36368635812b3ba9d6fed32a0b933e283f85ba4fb2fb650",
+    "build/discovery/vision-2026-10-13/hf-queue/visual-question-answering/batches/0027/prospects.jsonl": "2400603413ae1bd21deb7af62e676e79545216faf88b8876eb7c84f76657516d",
+    "build/discovery/vision-2026-10-13/hf-queue/visual-question-answering/batches/0028/prospects.jsonl": "2095b2cca2557de3437e0489846a7545467c438145830665017f6680cd84e3e6",
+    "build/discovery/vision-2026-10-13/hf-queue/visual-question-answering/batches/0029/prospects.jsonl": "c26e2e350dea5e8e491accb3ed86f3fc69f1ca14bec32fb546010a005ecdbab8",
+    "build/discovery/vision-2026-10-13/pwc/screen/prospects.jsonl": "b7eef118dcaec1addfc05a17b041e3108677e7af8ad4bd0473c0423718065df9"
+  },
+  "code_sha256": "082e905c6e0adedce6e9227aab48d5f0428eef65a751059959f67ee37d7bfabf",
+  "new_model_calls": 0,
+  "investigation_records": 225,
+  "scope": "Replay saved model judgments; investigation leads are not approved training datasets. Existing reviews predate the new supervision-quality question."
+}
