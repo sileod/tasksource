@@ -500,13 +500,13 @@ rico_widget_element = VisualMultipleChoice(
 lvis_region = VisualClassification(
     dataset_name='tasksource/coco-regions', config_name='lvis', task_id='lvis/region',
     metadata='metadata', question='What object category is highlighted in red?',
-    load_dataset_kwargs={'revision': '0ab5c2f908e4a4db268515869bcde3913de2bc91', 'streaming': False},
+    load_dataset_kwargs={'revision': 'a62626f12bea285d9a79d98c6b1914348f79e2f5', 'streaming': False},
 )
 
 coco_panoptic_region = VisualClassification(
     dataset_name='tasksource/coco-regions', config_name='panoptic', task_id='coco/panoptic-region',
     metadata='metadata', question='What category is the image segment highlighted in red?',
-    load_dataset_kwargs={'revision': '0ab5c2f908e4a4db268515869bcde3913de2bc91', 'streaming': False},
+    load_dataset_kwargs={'revision': 'a62626f12bea285d9a79d98c6b1914348f79e2f5', 'streaming': False},
 )
 
 doclaynet_region = VisualClassification(
