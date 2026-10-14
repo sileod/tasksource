@@ -5,6 +5,22 @@ concise bullets on what changed in the data. `tasksource-jev-typed-decisions` re
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
 
+
+## mentis-oculi-paper-fold 2026-10-14
+
+- Expand fresh procedural paper-fold training to 100,000 distinct, geometrically verified QAs, retaining native five-panel images and choices.
+- Preserve separate held-out seed namespaces, remove image overlap and repeated questions, and record all chunk seeds and exclusions. Original benchmark rows are not ingested.
+
+## trace-mcq 2026-10-14
+
+- Expand selection to the complete eligible native training release (64,000 source rows) and native validation partition (2,000 source rows), without duplication to reach an artificial 100,000-row target.
+- Keep original image bytes, same-task verifier-checked distractors, source partitions, repaired prompt contracts and asset attribution. Retained counts and exclusions are recorded in provenance.
+
+## tron-mcq 2026-10-14
+
+- Expand the five reviewed procedural environments to 100,000 distinct, verifier-checked training QAs.
+- Keep native PNGs and research-use terms. Remove repeated image/question/gold combinations and held-out image copies; record resumable generation chunks and actual seeds.
+
 ## tasksource-jev-typed-decisions v2026.10.13.6
 
 - `vision`: +191,169 training rows (118,649 → 309,818), up to 30,000 rows per source family: NLVR2, Visual7W, TallyQA, MapQA, A-OKVQA, RICO widgets, CLEVR, SPair-71k, GameQA, Valen game, AI2D, ScienceQA, TQA. Families without more unseen rows are unchanged; existing rows and evaluation splits are unchanged.

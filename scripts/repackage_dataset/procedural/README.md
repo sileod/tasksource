@@ -71,3 +71,28 @@ initial reviewed scope. Original prompts, seeds, donor IDs, verifier results and
 geometry stay in metadata, separate from model inputs. Licenses are source-specific:
 TRON states research-use terms; TRACE includes its original asset credits; MentisOculi
 paper-fold uses its Apache-licensed procedural shapes rather than photographic assets.
+
+## Larger generated releases
+
+The [scale runner](scale.py) generates bounded chunks in parallel, resumes checksummed
+chunks, groups shared images, removes repeated image/question/gold combinations and
+keeps held-out images out of training. It stops at the requested number of distinct,
+verified training QAs rather than padding a candidate cap. Use a fast scratch disk.
+
+```bash
+TASKSOURCE_GENERATOR_CACHE=/tmp python -m scripts.repackage_dataset.procedural.scale \
+  tron-mcq --output /tmp/tasksource-procedural/tron-100k --train 100000 --workers 8 --push
+# Run in MentisOculi's isolated Python 3.13 environment:
+TASKSOURCE_GENERATOR_CACHE=/tmp python -m scripts.repackage_dataset.procedural.scale \
+  mentis-oculi-paper-fold --output /tmp/tasksource-procedural/mentis-100k \
+  --train 100000 --workers 8 --push
+# TRACE already has native static data: use all eligible training rows, not fresh duplicates.
+python scripts/upload_repackaged.py trace-mcq --max-rows 100000 --max-rows-eval 2000
+```
+
+Each generated release includes per-chunk seeds and exclusions in
+`generation-checkpoints.json`; `status.json` in the output directory reports progress
+and an observed ETA. Resume with exactly the same source, seed, cap and chunk size.
+Changing worker count is safe. A candidate-budget failure leaves checkpoints intact
+and does not publish an undersized release. Add the source release to
+`DATA_CHANGELOG.md` before using `--push`.

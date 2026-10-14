@@ -145,6 +145,8 @@ def push_card(repo, build, directory=None):
         card.text += '\n[Conversion provenance](provenance.json): source revisions, hashes, configuration and exclusions.\n'
     if (directory / 'asset-notices.json').exists():
         card.text += '\n[Upstream asset credits and licenses](asset-notices.json) accompany the original rendered images.\n'
+    if (directory / 'generation-checkpoints.json').exists():
+        card.text += '\n[Generation checkpoints](generation-checkpoints.json) record each chunk’s seeds and exclusions. Reproduce with the [resumable scale script](https://github.com/sileod/tasksource/blob/main/scripts/repackage_dataset/procedural/scale.py).\n'
     if repo in ('tasksource/coco-regions', 'tasksource/doclaynet-region', 'tasksource/bapps', 'tasksource/spair71k-grid', 'tasksource/superclevr', 'tasksource/websrc'):
         report = json.loads((Path('build') / (repo.split('/')[1] + '-release') / 'provenance.json').read_text())
         reports = {'default': report} if 'splits' in report else report
@@ -160,7 +162,7 @@ def push_card(repo, build, directory=None):
     card.push_to_hub(repo)
     if provenance.exists() and repo != 'tasksource/webinstruct':
         from huggingface_hub import HfApi
-        for filename in ('provenance.json', 'excluded-questions.jsonl', 'asset-notices.json'):
+        for filename in ('provenance.json', 'excluded-questions.jsonl', 'asset-notices.json', 'generation-checkpoints.json'):
             if not (directory / filename).exists():continue
             HfApi().upload_file(path_or_fileobj=directory / filename, path_in_repo=filename,
                 repo_id=repo, repo_type='dataset', commit_message='Record visual conversion provenance and exclusions')

@@ -92,3 +92,24 @@ def test_static_image_groups_splits_and_jev_permutation(tmp_path,monkeypatch):
         assert r['answer']=='3'==r['criteria'][r['label']]
         assert r['images'][0]['bytes']==train['image']
         assert json.loads(r['metadata'])['task']=='native-task'
+
+
+def test_scale_merges_image_groups_rejects_overlap_and_caps_distinct_questions(tmp_path):
+    from collections import Counter
+    from datasets import Dataset
+    from scripts.repackage_dataset.procedural.scale import collect,examples
+    def row(image,question):
+        return dict(images=[dict(bytes=image.encode(),path=None)],image_group_id=image,qa=[dict(
+            inputs=question,choices_list=['wrong','gold'],labels=1,
+            metadata=json.dumps(dict(verifier_scores=[0,1])))])
+    first=tmp_path/'first';second=tmp_path/'second';first.mkdir();second.mkdir()
+    Dataset.from_list([row('heldout','v')]).to_parquet(first/'validation.parquet')
+    Dataset.from_list([row('one','q')]).to_parquet(first/'train.parquet')
+    Dataset.from_list([row('heldout','leak'),row('one','q'),row('one','another'),row('two','over cap')]).to_parquet(second/'train.parquet')
+    groups={'validation':{},'train':{}};fingerprints={s:set() for s in groups};excluded=Counter()
+    for directory in (first,second):collect(directory,groups,fingerprints,2,excluded)
+    merged=list(examples([first,second],'train',groups['train']))
+    assert len(merged)==1 and len(merged[0]['qa'])==2
+    assert [q['inputs'] for q in merged[0]['qa']]==['q','another']
+    assert merged[0]['images'][0]['bytes']==b'one'
+    assert excluded==dict(image_in_validation=1,duplicate_question=1,train_cap=1)
