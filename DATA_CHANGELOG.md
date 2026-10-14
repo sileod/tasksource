@@ -8,9 +8,9 @@ concise bullets on what changed in the data. `tasksource-jev-typed-decisions` re
 
 ## zero-shot-label-nli 2026-10-14
 
-- Rebuilt from the current catalog: 316 classification tasks (from 152), 1.95M training rows; `default` and `triplet` configs as before.
+- Rebuilt from the current catalog: 305 classification tasks (from 152), 1.84M training rows; `default` and `triplet` configs as before.
 - Per task, the majority label is at most 3× the others, and tasks with only true/false/yes/no labels are capped at 1,000 training rows.
-- Left out: tasks with NLI, numeric or annotator-agreement labels. Adds `license` and `license_use` columns.
+- Left out: tasks with NLI or annotator-agreement labels, or any bare-number label (e.g. HelpSteer scales). Adds `license` and `license_use` columns.
 
 ## visgym-equation-mcq 2026-10-14
 

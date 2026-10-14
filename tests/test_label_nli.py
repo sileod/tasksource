@@ -33,6 +33,7 @@ class LabelNliTest(unittest.TestCase):
         self.assertIsNone(eligible(["negative", "positive"]))
         self.assertTrue(eligible(["entailment", "not_entailment"]))
         self.assertTrue(eligible(["1", "2"]))
+        self.assertTrue(eligible(["0: not helpful", "1", "2", "3", "4: extremely helpful"]))
         self.assertTrue(eligible(["annotators agree", "annotators disagree"]))
 
     def test_balance(self):

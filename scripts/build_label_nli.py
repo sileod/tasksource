@@ -15,6 +15,7 @@ import argparse
 from collections import Counter
 import json
 import random
+import re
 import time
 import traceback
 from multiprocessing import Pool
@@ -54,12 +55,12 @@ def select_tasks(args):
 
 
 def eligible(names):
-    """Labels that read as classes of the text: named, not NLI labels already, not bare numbers."""
+    """Labels that read as classes of the text: named, not NLI labels already, no bare numbers."""
     if not names or len(names) < 2:
         return "labels have no names"
     if "entail" in " ".join(names).lower():
         return "already NLI"
-    if all(name.strip().lstrip("-").isdigit() for name in names):
+    if any(re.fullmatch(r"-?[\d.]+", name.strip()) for name in names):  # "This example is 2." says nothing
         return "numeric labels"
     if any("annotators" in name.lower() for name in names):
         return "labels describe the annotation, not the text"
