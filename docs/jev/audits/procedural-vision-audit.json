@@ -1,0 +1,201 @@
+{
+  "checked_on": "2026-10-13",
+  "reviewer": {
+    "kind": "model",
+    "model": "gpt-6.1-sol"
+  },
+  "scope": "Coarse manual review of three images per source, plus all-row structural checks; not a full semantic audit.",
+  "all_row_checks": [
+    "Encoded images decode successfully",
+    "At least two unique choices, valid gold index, exactly one native verifier acceptance",
+    "No answer wrappers or JSON demonstration prompts in inputs/options",
+    "No identical encoded images across exported train/validation",
+    "Prepared publication checks source identity and Parquet hashes"
+  ],
+  "sources": {
+    "trace-mcq": {
+      "splits": {
+        "validation": {
+          "image_groups": 100,
+          "questions": 100,
+          "gold_position_counts": {
+            "0": 28,
+            "1": 27,
+            "3": 25,
+            "2": 20
+          }
+        },
+        "train": {
+          "image_groups": 5000,
+          "questions": 5000,
+          "gold_position_counts": {
+            "1": 1218,
+            "3": 1236,
+            "0": 1242,
+            "2": 1304
+          }
+        }
+      },
+      "parquet_sha256": {
+        "train.parquet": "8bac69414d177bab8198e6e6a1e1454d62d7adf1656f72b6a959f4c4beb5c1ef",
+        "validation.parquet": "2b586e35664f720e2747de508694481d5a03663dad25b42b112165abf096f80e"
+      },
+      "source": "https://huggingface.co/datasets/maveryn/trace",
+      "revision": "4f01a535f489cb1db71ca43d10cdbc38a1746b5c",
+      "exclusion_counts": {},
+      "image_overlap_excluded": 0
+    },
+    "tron-mcq": {
+      "splits": {
+        "validation": {
+          "image_groups": 82,
+          "questions": 82,
+          "gold_position_counts": {
+            "2": 21,
+            "0": 28,
+            "3": 11,
+            "1": 19,
+            "4": 3
+          }
+        },
+        "train": {
+          "image_groups": 3975,
+          "questions": 4084,
+          "gold_position_counts": {
+            "2": 1023,
+            "3": 902,
+            "1": 993,
+            "0": 1058,
+            "4": 108
+          }
+        }
+      },
+      "parquet_sha256": {
+        "train.parquet": "97ffb43f045ec72ec4db64547366890f8d2100b28082914ce9942a8d016030cb",
+        "validation.parquet": "beb6faf0f29abf186e8bac3280bc99859254e8dee718aac0e82c255a8c18eeb2"
+      },
+      "source": "https://github.com/YangTianze009/TRON",
+      "revision": "934f3928b7311ec70c080206d8199bbf3697b6c7",
+      "exclusion_counts": {
+        "ValueError: Native letter answer without explicit unique text choices": 866,
+        "ValueError: Unrecognized output-format instruction": 62
+      },
+      "image_overlap_excluded": 6
+    },
+    "mentis-oculi-paper-fold": {
+      "splits": {
+        "validation": {
+          "image_groups": 5,
+          "questions": 5,
+          "gold_position_counts": {
+            "4": 2,
+            "2": 1,
+            "3": 1,
+            "0": 1
+          }
+        },
+        "train": {
+          "image_groups": 20,
+          "questions": 20,
+          "gold_position_counts": {
+            "4": 6,
+            "3": 4,
+            "0": 5,
+            "2": 3,
+            "1": 2
+          }
+        }
+      },
+      "parquet_sha256": {
+        "train.parquet": "39d57da0eae3e4d9ef71a47d59c734ca0e54d69954e0632f9af1f7c053d4b5a4",
+        "validation.parquet": "6ef19bbdc53a73a89a2b09c5c301596683c71f16b3974acd220ce07a10262acd"
+      },
+      "source": "https://github.com/Jana-Z/mentis-oculi",
+      "revision": "ac6d97acf231767f408a9e5d75515872b90190d6",
+      "exclusion_counts": {},
+      "image_overlap_excluded": 0
+    }
+  },
+  "visual_examples": [
+    {
+      "source": "tron-mcq",
+      "id": "tron:angle_bisector:1350279207774242790",
+      "gold": "9",
+      "finding": "Triangle area 18 with equal halves; area 9 agrees with the image. Clear but easy."
+    },
+    {
+      "source": "tron-mcq",
+      "id": "tron:aquarium_grid:6791805329145246672",
+      "gold": "Water (W)",
+      "finding": "Target cell must contain water under the visible aquarium constraints. Text also transcribes the puzzle, so visual input is partly redundant."
+    },
+    {
+      "source": "tron-mcq",
+      "id": "tron:bar_chart_aggregate:1579016599683615781",
+      "gold": "25",
+      "finding": "Visible bar values 40,30,20,10 average to 25. Removed opaque MC-letter donors from numeric pools and checked final options."
+    },
+    {
+      "source": "trace-mcq",
+      "id": "blake3:d44d8b9f40a1adac9f2ef3b5cd507f8f9e5f9b951f360d289878ca7ce5e7be81",
+      "gold": "5",
+      "finding": "Five cyan cells in the requested row, agrees with gold."
+    },
+    {
+      "source": "trace-mcq",
+      "id": "blake3:6a30876a36fb64697c65b389cc7cec248a00ea452c38982062d400a5bc196f1a",
+      "gold": "7",
+      "finding": "Following the displayed five Turing-machine steps yields seven ones, agrees with gold."
+    },
+    {
+      "source": "trace-mcq",
+      "id": "blake3:7af3c8f95c36f3a085b1a71dd9e8503ecbdc2c5298f157a19b2127523eae7209",
+      "gold": "Label C",
+      "finding": "Native toggle-grid prompt omitted the transition rule. Added the pinned generator rule (cell and orthogonal neighbors); the visible difference is centered on C."
+    },
+    {
+      "source": "mentis-oculi-paper-fold",
+      "id": "mentis-paper-fold:16997172071560385846",
+      "gold": "Panel E",
+      "finding": "Fold sequence and five panel labels readable; panel order matches source rendering. Native final hole-set verification has exactly one match. Manual review checks presentation rather than an independent reconstruction of every fold."
+    },
+    {
+      "source": "mentis-oculi-paper-fold",
+      "id": "mentis-paper-fold:6762815600889461118",
+      "gold": "Panel D",
+      "finding": "Fold sequence and five panel labels readable; panel order matches source rendering. Native final hole-set verification has exactly one match. Manual review checks presentation rather than an independent reconstruction of every fold."
+    },
+    {
+      "source": "mentis-oculi-paper-fold",
+      "id": "mentis-paper-fold:17483717460696166096",
+      "gold": "Panel A",
+      "finding": "Fold sequence and five panel labels readable; panel order matches source rendering. Native final hole-set verification has exactly one match. Manual review checks presentation rather than an independent reconstruction of every fold."
+    }
+  ],
+  "limits": [
+    "TRON initial scope is five tested environments, not all 520.",
+    "MentisOculi initial scope is fresh paper-fold instances only, not all five benchmark families.",
+    "Fresh seed namespaces do not imply unseen-family evaluation; unpublished benchmark images cannot be checked.",
+    "Source licenses differ: TRON research-use, TRACE CC BY 4.0 plus asset notices, Mentis procedural paper-fold Apache-2.0."
+  ],
+  "published_source_revisions": {
+    "tasksource/tron-mcq": "afb935fe698d956e98ab3aa5ea1721d191c7b67f",
+    "tasksource/trace-mcq": "d3d7e647b8e8c363ad65c7597a507cc11a229f15",
+    "tasksource/mentis-oculi-paper-fold": "2adf77777a89a86240c0fbd1266c5c770fe9b5ed"
+  },
+  "hub_load_task_jev_smoke": {
+    "tasks": [
+      "tron/mcq",
+      "trace/mcq",
+      "mentis-oculi/paper-fold"
+    ],
+    "train_per_task": 3,
+    "validation_per_task": 2,
+    "checks": [
+      "images preserved",
+      "gold equals criterion at label index",
+      "source image group preserved"
+    ]
+  },
+  "tests": "124 passed, 60 optional Hub downloads skipped"
+}

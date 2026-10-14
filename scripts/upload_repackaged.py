@@ -181,7 +181,7 @@ def push_card(repo, build, directory=None):
                                        repo_type='dataset', commit_message='Document WebInstruct presentation audit')
 
 def load_prepared(directory, repo):
-    """Publish exactly the reviewed split files without repeating expensive preparation."""
+    """Publish reviewed split data without repeating expensive preparation."""
     report = json.loads((directory / 'provenance.json').read_text())
     if report.get('mirror') != repo:raise ValueError('Prepared build belongs to another mirror')
     hashes = report.get('parquet_sha256', {})

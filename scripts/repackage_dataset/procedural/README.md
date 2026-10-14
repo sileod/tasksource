@@ -38,7 +38,7 @@ not all 520. Row arguments are candidate caps: unsupported formats, failed gener
 insufficient distractor diversity and ambiguous choices can reduce retained counts.
 
 Builds write Parquet data, provenance and exclusions under `build/<builder>-release/`.
-Publish exactly the reviewed split files without regenerating them:
+Publish the reviewed split data without regenerating examples:
 
 ```bash
 python scripts/upload_repackaged.py trace-mcq --prepared build/trace-mcq-release
