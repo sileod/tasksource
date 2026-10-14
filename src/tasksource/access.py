@@ -302,6 +302,9 @@ def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preproc
     ``prompted=True`` appends the annotation's ``question`` to the inputs;
     otherwise the instruct and Jev recasts use it as their instruction. The
     question is also available as ``dataset.question``.
+
+    ``recast`` is ``"instruct"``, ``"jev"`` or ``"label_nli"`` (classification as
+    "This example is <label>." entailment, for zero-shot classification).
     """
     query = dict_of(id, dataset_name, config_name, task_name,preprocessing_name)
     query = {k:v for k,v in query.items() if v}
@@ -392,6 +395,9 @@ def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preproc
                                            row_options=soft_labels and row_options,
                                            group="/".join(filter(None, [preprocessing.dataset_name,
                                                                         preprocessing.config_name])))
+    elif recast == "label_nli":
+        dataset = recast_module.recast_label_nli(dataset, task=id or preprocessing_name or preprocessing.dataset_name,
+                                                 seed=seed)
     elif recast is not None:
         raise ValueError(f"Unknown recast format: {recast!r}")
     return dataset

@@ -1,5 +1,5 @@
 import random
-from datasets import DatasetDict, Dataset
+from datasets import ClassLabel, DatasetDict, Dataset, Features, Value
 from sorcery import dict_of
 import string
 from .preprocess import classification_prompt
@@ -149,5 +149,33 @@ def recast_instruct(dataset, question=None, seed=0, options=False):
         dataset = dataset.cast_column('images', features['images'])
     return dataset
 
+
+def recast_label_nli(dataset, task, seed=0):
+    """Classification as NLI for zero-shot classification: the text as premise and "This example is
+    <label>." as hypothesis, entailed by the gold label and contradicted by another label of the task.
+    ``positive`` and ``negative`` keep both hypotheses (triplets). One RNG per example, as in instruct."""
+    labels = dataset['train'].features['labels']
+    names = [name.strip() for name in labels.names]
+
+    def convert(x, i, split):
+        rng = random.Random(f"{seed}/{split}/{i}")
+        gold = names[x['labels']]
+        negative = rng.choice([name for name in names if name != gold])
+        entailed = rng.random() < .5
+        premise = clean_text(x['sentence1'] + (f"\n{x['sentence2']}" if x.get('sentence2') else ""))
+        positive, negative = f"This example is {gold}.", f"This example is {negative}."
+        return {'premise': premise, 'hypothesis': positive if entailed else negative, 'positive': positive,
+                'negative': negative, 'labels': 0 if entailed else 2, 'task': task}
+
+    text = Value('string')
+    features = Features({'premise': text, 'hypothesis': text, 'positive': text, 'negative': text,
+                         'labels': ClassLabel(names=['entailment', 'neutral', 'contradiction']), 'task': text})
+    out = DatasetDict()
+    for split, rows in dataset.items():
+        rows = rows.filter(lambda y, x: y is not None and 0 <= y < len(names) and bool(x),
+                           input_columns=['labels', 'sentence1'])
+        out[split] = rows.map(convert, with_indices=True, fn_kwargs={'split': split},
+                              remove_columns=rows.column_names, features=features)
+    return out
 
 from .jev.recast import clean_text, recast_jev, render_typed_decision, render_typed_decision_group
