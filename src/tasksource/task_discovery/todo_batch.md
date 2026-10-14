@@ -170,7 +170,7 @@ These are user requests, separate from automatically discovered prospects.
 
 | Source | Requested view | Status |
 |---|---|---|
-| TRON (YangTianze009/TRON) | Static MC exports from seeded generator/verifier pairs | Implemented seeded static builder under scripts/repackage_dataset/procedural/; five-environment release under final validation. Native text choices or verified same-task distractors. |
-| TRACE (maveryn/trace) | Static MC view of native procedural training examples | Implemented verifier-checked static builder; 5,000/100 native train/validation pilot, original image bytes and asset credits preserved. |
+| TRON (YangTianze009/TRON) | Static MC exports from seeded generator/verifier pairs | Hosted tasksource/tron-mcq and registered tron/mcq; 4,084/82 pilot QAs validated. Resumable expansion to 100,000 distinct training QAs is running across five reviewed environments. |
+| TRACE (maveryn/trace) | Static MC view of native procedural training examples | Hosted tasksource/trace-mcq and registered trace/mcq; complete 64,000/2,000 native conversion validated and publishing, original bytes and asset credits retained. No duplicates added to reach 100k. |
 | TACIT (tylerxdurden/TACIT-benchmark; danielxmed/tacit-benchmark) | Investigate reproducible procedural decision training | Access blocked: supplied GitHub repository and authenticated Hub metadata return 404. Recorded in decisions.json; reconsider after source access is restored. |
-| MentisOculi (Jana-Z/mentis-oculi) | Investigate reproducible procedural decision training | Implemented fresh paper-fold pilot (20 train / 5 validation), native five-panel choices with final geometry verification. Other families remain outside this initial adapter; planning outputs need multiple-valid-plan handling. |
+| MentisOculi (Jana-Z/mentis-oculi) | Investigate reproducible procedural decision training | Hosted tasksource/mentis-oculi-paper-fold and registered mentis-oculi/paper-fold; 20/5 pilot validated, fresh 100,000-QA expansion running. Other families remain outside this adapter; planning outputs need multiple-valid-plan handling. |

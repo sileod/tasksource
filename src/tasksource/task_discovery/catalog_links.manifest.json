@@ -24,5 +24,12 @@
     "output_sha256": "797a427222982fdcc14e22548450d5b79ceeb76464c5b858ee9ae7b8014487f8",
     "linked_sha256": "b6aabf9b200b90e247c8ff809865790725f3ca5b9c931a4570f94284f69b807e",
     "semantic_scholar_errors": 0
+  },
+  "procedural_refresh": {
+    "date": "2026-10-14",
+    "cards": 3,
+    "tasks": 3,
+    "errors": 0,
+    "output_sha256": "52e6722f2533bcbda48b903ab8467a6fdc1892e70ae3743dd8977800c3b2aad8"
   }
 }
