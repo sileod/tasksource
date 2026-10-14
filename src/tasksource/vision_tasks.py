@@ -512,13 +512,13 @@ coco_panoptic_region = VisualClassification(
 doclaynet_region = VisualClassification(
     dataset_name='tasksource/doclaynet-region', task_id='doclaynet/region',
     metadata='metadata', question='What document layout category is highlighted in red?',
-    load_dataset_kwargs={'revision': 'ad3465ea6385871b9102308865554150358d5656', 'streaming': False},
+    load_dataset_kwargs={'revision': 'a023fe646d5ba2fc83fcc553f356f9bba58d06b1', 'streaming': False},
 )
 
 bapps_preference = VisualMultipleChoice(
     dataset_name='tasksource/bapps', task_id='bapps/preference', choices_list='choices_list',
     metadata='metadata', question='Which alternative image is closer to the reference?',
-    load_dataset_kwargs={'revision': 'cb0940d9a9dc43e6a4a03bf49627ad8bd18eb418', 'streaming': False},
+    load_dataset_kwargs={'revision': '3b08a5d3d0c02accadd90eaf1b19fe35da7b9145', 'streaming': False},
 )
 
 spair71k_grid7 = VisualClassification(
@@ -526,12 +526,12 @@ spair71k_grid7 = VisualClassification(
     metadata='metadata',
     question='Which cell of the second image contains the corresponding point? '
              'Rows r0–r6 run top to bottom; columns c0–c6 run left to right.',
-    load_dataset_kwargs={'revision': 'bb618c093d81057971b6f6ea49833a505ceb1228', 'streaming': False},
+    load_dataset_kwargs={'revision': '8348f09dbd8c5a6c02924eb9f5eab6a3f54337c9', 'streaming': False},
 )
 
 
 _SUPERCLEVR = dict(dataset_name='tasksource/superclevr', metadata='metadata',
-    load_dataset_kwargs={'revision': 'b1dcf17611d997e227ff13fd5692d3705fbf35a1', 'streaming': False})
+    load_dataset_kwargs={'revision': 'a50ef85cd8f88189228d6e7611503445ad5f94ed', 'streaming': False})
 _SUPERCLEVR_SHAPE = {v: v for v in ('airliner', 'articulated bus', 'biplane', 'chopper',
     'cruiser', 'dirtbike', 'double bus', 'fighter', 'jet', 'minivan', 'mountain bike',
     'regular bus', 'road bike', 'school bus', 'scooter', 'sedan', 'suv', 'tandem bike',
