@@ -241,6 +241,10 @@ dair_ai_emotion = Classification(sentence1="text", labels="label", dataset_name=
 crowdflower__text_emotion = Classification("text", labels="label", splits=["train", None, None],
     dataset_name="tasksource/crowdflower", config_name="text_emotion", question="What emotion does the text express?")
 
+civil_comments__severe_toxicity = Classification("text",
+    labels=lambda x: ["not severely toxic", "severely toxic"][x["severe_toxicity"] >= 0.5],
+    question="Would most raters flag this comment as severely toxic?", dataset_name="google/civil_comments")
+
 crowdflower__sentiment_nuclear_power = Classification("text", labels="label", splits=["train", None, None],
     dataset_name="tasksource/crowdflower", config_name="sentiment_nuclear_power",
     question="What is the tweet's sentiment toward nuclear energy, or is it unrelated?")
@@ -292,6 +296,7 @@ PARKED = {
     "dair_ai_emotion": ("unsound", "hashtag-derived emotion labels; a 2026 LLM screen flagged 25% (e.g. 'i didnt feel so hot' labeled love); go_emotions, tweet_eval/emotion and emo2019 cover emotion"),
     "crowdflower__text_emotion": ("unsound", "neutral tweets carry arbitrary emotion labels; 28% flagged; go_emotions covers emotion"),
     "crowdflower__sentiment_nuclear_power": ("low_value", "171 tweets, 85% neutral, with mislabels (a pro-nuclear tweet marked neutral); other sentiment tasks cover this"),
+    "civil_comments__severe_toxicity": ("low_value", "13 of 1.8M comments reach a majority flag, so samples hold no positives; civil_comments/toxicity covers toxicity"),
     "cos_e": ("duplicate", "CommonsenseQA v1.0 with 3 choices: 8,092 of its 8,560 questions are in commonsense_qa, which has 5"),
     "indic_glue__sentiment_actsa": ("unsound", "Telugu ACTSA sentiment labels often contradict the text; 43% flagged; inltkh.te and iitp Hindi sets cover Indic sentiment"),
     'maven_ere__temporal': ('unsound', 'Native BEFORE annotation places a 1487 defeat before the war outbreak; source d026ad27155a13c00d9b9812c98f4fc9, pair 26:2.'),

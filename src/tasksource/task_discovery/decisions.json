@@ -2905,5 +2905,27 @@
     "github": [],
     "papers": [],
     "annotation": "tasksource.parked.cos_e"
+  },
+  {
+    "name": "google/civil_comments",
+    "scope": "task",
+    "tasks": [
+      "civil_comments/severe_toxicity"
+    ],
+    "status": "parked",
+    "reason_code": "low_value",
+    "reason": "13 of 1.8M comments reach a majority flag, so samples hold no positives; civil_comments/toxicity covers toxicity",
+    "evidence": [
+      "https://huggingface.co/datasets/google/civil_comments"
+    ],
+    "checked_on": "2026-10-15",
+    "reconsider_if": "The covering task is removed.",
+    "huggingface": [
+      "google/civil_comments"
+    ],
+    "github": [],
+    "papers": [],
+    "annotation": "tasksource.parked.civil_comments__severe_toxicity",
+    "review_findings": "DeepSeek V4 Flash screened every published Jev example of the task (2026-10); a manual read of flagged samples confirmed the problem."
   }
 ]

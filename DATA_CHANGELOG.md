@@ -4,6 +4,11 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource 2026-10-15.11
+
+- civil_comments threat, sexual_explicit, obscene and identity_attack keep every majority-flagged comment and three clear negatives per positive (threat: 4,280 positives instead of about 80 per sample); severe_toxicity parked (13 positives in 1.8M comments).
+- Task questions for MultiRC, ethics/justice, ethics/virtue and dnd_style_intents; "Receive quest" label spelling.
+
 ## tasksource 2026-10-15.10
 
 - KnowRef-60K capped at 10,000 training rows: some sentences stay ambiguous despite 4/5 annotator agreement.
