@@ -1,0 +1,178 @@
+{
+  "checked_on": "2026-10-15",
+  "reviewer": "Codex (GPT-6 family)",
+  "scope": "Coarse native-example screening plus split/schema checks. No tasks implemented or published by this pass.",
+  "criteria": "Genuine train data; human or procedural supervision; model-generated inputs permitted when labels are human; no unverified distractors.",
+  "sources": {
+    "faithdial": {
+      "repo": "McGill-NLP/FaithDial",
+      "revision": "f0a79cdf1fbbdd06ce1850cdff81266e29cb6ae0",
+      "counts": {
+        "train": 18357,
+        "validation": 3417,
+        "test": 3539
+      },
+      "annotation_origin": "human",
+      "input_origin": "human Wizard of Wikipedia and human rewrites",
+      "decision": "ready_for_careful_integration",
+      "license": "mit",
+      "required_conversion": [
+        "Use original_response when present, otherwise the unchanged/already-faithful response. BEGIN describes the original response, not the rewritten response.",
+        "Any Hallucination component gives a negative grounding label; pure Entailment gives positive. Exclude Generic and Entailment+Uncooperative for the initial strict view.",
+        "Use canonical train/validation/test only; alternative random/topic evaluation splits are overlapping views, not additional independent examples.",
+        "Keep dialogue history, bot role and knowledge; personal-disclosure violations are included, so this is not exclusively factual-error detection."
+      ],
+      "strict_train_candidates": {
+        "grounded": 3755,
+        "hallucinated": 13507,
+        "total": 17262
+      },
+      "native_examples": [
+        {
+          "row": 12,
+          "finding": "Knowledge says women dominated brewing before commercialization; already-faithful response entails this."
+        },
+        {
+          "row": 38,
+          "finding": "Original response adds claims about personal travel and winter weather unsupported by the Baltic-states knowledge."
+        }
+      ],
+      "source": "https://huggingface.co/datasets/McGill-NLP/FaithDial"
+    },
+    "ragtruth": {
+      "repo": "wandb/RAGTruth-processed",
+      "revision": "eb4f4b9d1b68eb7092d3e1a61c0cd82d9808737b",
+      "counts": {
+        "train": 15090,
+        "test": 2700
+      },
+      "quality_good": {
+        "train": 14942,
+        "test": 2675
+      },
+      "annotation_origin": "human",
+      "input_origin": "LLM-generated",
+      "decision": "ready_for_careful_integration",
+      "license": "mit",
+      "source": "https://github.com/ParticleMedia/RAGTruth",
+      "checks": {
+        "span_text_mismatches": 0,
+        "train_test_context_overlap": 0
+      },
+      "required_conversion": [
+        "Use context and candidate output, with the native request where relevant; binary label derives from the original span annotations.",
+        "Initial view uses quality=good; preserve quality, model and span annotations/implicit_true/due_to_null flags in metadata.",
+        "Remove the known dangling output: suffix in Summary contexts (4758 train, 900 test); do not use input_str blindly.",
+        "Define evidence grounding rather than universal factual truth; preserve grouped responses sharing a source context."
+      ],
+      "native_examples": [
+        {
+          "row": 0,
+          "finding": "Unmarked summary agrees with the provided Anne Frank article."
+        },
+        {
+          "row": 2,
+          "finding": "Marked output invents February 7, 2022 and a corrected-statement announcement; the source discusses 1945 and no such announcement."
+        }
+      ]
+    },
+    "comve": {
+      "source": "https://github.com/wangcunxiang/SemEval2020-Task4-Commonsense-Validation-and-Explanation",
+      "revision": "c55b1a9e6cb66997675f85073e17a9522cf38c2c",
+      "counts": {
+        "train": 10000,
+        "validation": 997,
+        "test": 1000
+      },
+      "annotation_origin": "human",
+      "input_origin": "human-written commonsense pairs",
+      "license": "cc-by-sa-4.0 (original README)",
+      "decision": "ready_for_repackaging",
+      "checks": {
+        "identical_train_choices": 5,
+        "train_validation_pair_overlap": 5,
+        "train_test_pair_overlap": 3
+      },
+      "required_conversion": [
+        "Join official subtask A data and gold files by id; preserve native partitions, dropping malformed choices and conflicting split duplicates.",
+        "Native label identifies the nonsensical statement. Invert for a more-sensible-statement question.",
+        "Use relative commonsense plausibility, not strict physical impossibility. Avoid the model-derived faithfulness-comve copies."
+      ],
+      "native_examples": [
+        {
+          "id": "0",
+          "finding": "Milk on cereal is the intended sensible alternative to orange juice; both can physically occur."
+        },
+        {
+          "id": "1",
+          "finding": "Drinks milk is the sensible alternative to drinks apple."
+        },
+        {
+          "id": "4075",
+          "finding": "Identical cat-flying choices must be excluded."
+        }
+      ]
+    },
+    "aaac": {
+      "repo": "DebateLabKIT/aaac",
+      "revision": "6e8e9947c03e380226bb9b3e2e1839d8bd2c05d2",
+      "counts_per_version": {
+        "train": 16000,
+        "validation": 4000,
+        "test": 4000
+      },
+      "annotation_origin": "procedural formal arguments",
+      "input_origin": {
+        "aaac01": "procedural with 20% T5 paraphrasing",
+        "aaac02": "procedural with no model paraphrasing"
+      },
+      "license": "cc-by-sa-4.0",
+      "decision": "conditional_verified_conversion",
+      "findings": [
+        "Not native multiple choice. distractors are irrelevant statements inserted in argument_source, not a set of wrong conclusion options.",
+        "argument_source can explicitly state the gold conclusion or omit premises. Use the complete premises representation for a conclusion-selection task.",
+        "AAAC02 avoids the model paraphrasing step, but each derived distractor still requires a non-entailment check and unique-gold verification."
+      ],
+      "native_examples": [
+        {
+          "version": "aaac02",
+          "id": "b36ab99d-37bd-4338-a1f1-3365f6bacca9",
+          "finding": "The four complete premises entail Archaeopteryx succeeding Hadrosaurus. The irrelevant distractor is asserted in argument_source, so it cannot simply be treated as a false statement."
+        }
+      ],
+      "source": "https://huggingface.co/datasets/DebateLabKIT/aaac"
+    },
+    "glucose": {
+      "repo": "community-datasets/glucose",
+      "revision": "5841bc7e15e5c67d0712db400b460c085165818f",
+      "counts": {
+        "train": 65522,
+        "test": 500
+      },
+      "annotation_origin": "human",
+      "input_origin": "human stories/explanations",
+      "decision": "conditional_conversion",
+      "license": "cc-by-nc-4.0 (original LICENSE; HF card conflicts)",
+      "license_source": "https://github.com/ElementalCognition/glucose/blob/master/LICENSE",
+      "findings": [
+        "Native positive causal explanations only; random swaps do not establish false alternatives.",
+        "Consider native causal-dimension identification instead of invented plausibility negatives, using specific explanations and no category-name leakage.",
+        "Honor worker_quality_assessment and story-group identity; escaped means an absent annotation, not a label.",
+        "Verify interpretation of the quality scale before selecting a high-quality subset."
+      ],
+      "native_examples": [
+        {
+          "row": 0,
+          "quality": 3,
+          "finding": "Playing/getting out of bed for hours causes the child to tire and fall asleep; plausible."
+        },
+        {
+          "row": 1,
+          "quality": 1,
+          "finding": "Attending a football match is presented as causing the team to win; unsuitable causal supervision."
+        }
+      ],
+      "source": "https://github.com/ElementalCognition/glucose"
+    }
+  }
+}
