@@ -4,6 +4,10 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource-jev-typed-decisions v2026.10.15.1
+
+- `vision`: +150,000 training rows (479,826 → 629,826) from procedural visual puzzles, 30,000 each: TRON, TRACE, Mentis Oculi paper folding, SPHINX and VisGym. Existing rows and evaluation splits are unchanged.
+
 ## tasksource-jev-typed-decisions v2026.10.15
 
 - Append FaithDial original-response grounding, RAGTruth evidence-grounding judgments and ComVE commonsense statement choices to `full`, using human supervision and checked native labels.
