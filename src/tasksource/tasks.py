@@ -909,7 +909,7 @@ commonsense_qa = MultipleChoice(
 )
 mc_taco = Classification(
     lambda x: f'{x["sentence"]}\n{x["question"]}', "answer",
-    labels="label", question="Is this answer plausible?",
+    labels="label", question="Is this answer plausible?", label_values={0: "implausible answer", 1: "plausible answer"},
     splits=[ "validation",None,"test"],
     dataset_name="marcov/mc_taco_promptsource", task_id="mc_taco"
 )
@@ -1035,7 +1035,7 @@ logiqa = MultipleChoice(
 )
 
 
-wiki_qa = Classification("question","answer", name("label",['False','True']), question="Does this sentence answer the question?")
+wiki_qa = Classification("question","answer", name("label",['does not answer the question','answers the question']), question="Does this sentence answer the question?")
 
 cycic_classification = Classification("question",labels=name("correct_answer",['False','True']),
     dataset_name = "tasksource/cycic_classification")
@@ -1167,7 +1167,7 @@ tomi_nli = Classification("premise","hypothesis","label",
     dataset_name="tasksource/tomi-nli", pre_process=_tomi_pairs)
 
 avicenna = Classification("Premise 1","Premise 2","Syllogistic relation", question="Do the two premises form a syllogism?",
-    dataset_name="tasksource/avicenna")
+    label_values={"no": "not a syllogism", "yes": "syllogism"}, dataset_name="tasksource/avicenna")
 
 shp = MultipleChoice(
     lambda x: f"r/{x['domain'].rsplit('_', 1)[0]}: {x['history']}", question="Which reply did readers prefer?",
@@ -1344,7 +1344,7 @@ udep__deprel = TokenClassification(
     question="Assign each token its Universal Dependencies relation to its syntactic head; root marks the sentence root.")
 
 ambient= Classification("premise","hypothesis","hypothesis_ambiguous",dataset_name="tasksource/ambient",
-    question="Is the hypothesis ambiguous?")
+    question="Is the hypothesis ambiguous?", label_values={False: "unambiguous hypothesis", True: "ambiguous hypothesis"})
 
 # the source label marks the less natural path (it points to the longer, odder chain 60% of the time
 # and an LLM audit disagreed with it at kappa -0.35)
@@ -1370,7 +1370,7 @@ cloth = MultipleChoice("sentence", choices_list=lambda x:[x["answer"]]+x["distra
 dgen  = MultipleChoice("sentence", choices_list=lambda x:[x["answer"]]+x["distractors"],labels=constant(0), dataset_name="AndyChiang/dgen")
 
 i2d2 = Classification(
-    "sentence1", labels=name("label", ["False", "True"]),
+    "sentence1", labels=name("label", ["implausible statement", "plausible statement"]),
     question="Is this a plausible commonsense statement?",
     dataset_name="tasksource/I2D2")
 
@@ -1413,7 +1413,7 @@ sen_making__2 = MultipleChoice(lambda x: [x['sentence0'],x['sentence1']][x['fals
     question="Why is this statement implausible?", choices=['A','B','C'],labels=lambda x: 'ABC'.index(x['reason']), dataset_name="tasksource/sen-making")
 
 winowhy = Classification('sentence', lambda x: f'In "{x["wnli_sent1"]}", {x["wnli_sent2"]}',
-    labels=name('label',['False','True']), question="Is this explanation correct?", dataset_name="tasksource/winowhy")
+    labels=name('label',['incorrect explanation','correct explanation']), question="Is this explanation correct?", dataset_name="tasksource/winowhy")
 
 
 robustLR = Classification("context","statement","label", dataset_name="tasksource/robustLR")
@@ -1446,7 +1446,8 @@ sharc_classification = Classification("snippet",
     lambda x: "\n".join(part for part in (x["scenario"], x["question"], x["history"]) if part),
     labels="label", dataset_name="tasksource/sharc")
 
-conceptrules_v2 = Classification("context", "text", "label", question="Is the statement true given the context?", dataset_name="tasksource/conceptrules_v2")
+conceptrules_v2 = Classification("context", "text", "label", question="Is the statement true given the context?",
+    label_values={False: "false given the context", True: "true given the context"}, dataset_name="tasksource/conceptrules_v2")
 
 scidtb = Classification("unit1_txt","unit2_txt","label", dataset_name="multilingual-discourse-hub/disrpt",config_name='eng.dep.scidtb.rels',
     question="Which discourse relation links unit text_B to unit text_A?")
@@ -1508,7 +1509,8 @@ propsegment = Classification("hypothesis","premise",
 hatemoji = Classification('text',labels=name("label_gold", ['not-hate-speech','hate-speech']),
     dataset_name="HannahRoseKirk/HatemojiBuild")
 
-regset = Classification("context",labels="answer", question="Does the string match the regular expression?",dataset_name='tasksource/regset')
+regset = Classification("context",labels="answer", question="Does the string match the regular expression?",
+    label_values={"False": "does not match", "True": "matches"}, dataset_name='tasksource/regset')
 
 def _esci_product(x): # product_text writes missing fields as 'None' lines
     fields = ['product_title','product_brand','product_color','product_description','product_bullet_point']
@@ -1620,7 +1622,7 @@ ruletaker = Classification(
     labels="label", dataset_name="tasksource/ruletaker")
 
 para_rules = Classification(
-    "context", "question", question="Is the statement true? What is not explicitly stated as true is considered false.", labels=name("label",["False","True"]),
+    "context", "question", question="Is the statement true? What is not explicitly stated as true is considered false.", labels=name("label",["false under the rules","true under the rules"]),
     dataset_name="qbao775/PARARULE-Plus")
 
 proofwriter_deduction = Classification("theory","question","answer",
@@ -2194,6 +2196,7 @@ mip = Classification("items", "queried_item",
     labels=lambda x: x["y"].rstrip(".").lower(),
     pre_process=lambda ds: ds.map(_missing_item_pair),
     question="Does the list in text_A contain the item in text_B?",
+    label_values={"no": "item not in the list", "yes": "item in the list"},
     dataset_name="sileod/missing-item-prediction",config_name="contrastive")
 
 jigsaw_toxicity = Classification('comment_text',labels=name("toxic",["not toxic","toxic"]),
@@ -2629,12 +2632,12 @@ def _answerability_metadata(row):
 
 squad_v2__answerability = Classification('context','question',lambda r:'yes' if r['answers']['text'] else 'no',
     dataset_name='rajpurkar/squad_v2',task_id='squad-v2/answerability',complete_splits=False,
-    metadata=_answerability_metadata,label_values={'no':'no','yes':'yes'},
+    metadata=_answerability_metadata,label_values={'no':'not answerable from the passage','yes':'answerable from the passage'},
     question='Can the following question be answered using only the passage?\n{sentence2}',
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['rajpurkar/squad_v2']})
 cuad__answerability = Classification('context','question',lambda r:'yes' if r['answers']['text'] else 'no',
     dataset_name='theatticusproject/cuad-qa',task_id='cuad/answerability',complete_splits=False,
-    metadata=_answerability_metadata,label_values={'no':'no','yes':'yes'},
+    metadata=_answerability_metadata,label_values={'no':'not answered by the contract','yes':'answered by the contract'},
     question='Does the contract contain an answer to the following extraction request?\n{sentence2}',
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['theatticusproject/cuad-qa'],'name':'default','data_dir':'default'})
 
@@ -2697,7 +2700,7 @@ def _record_candidates(row):
 
 record__candidate = Classification('sentence1','sentence2','labels',dataset_name='aps/super_glue',
     config_name='record',task_id='record/candidate',metadata='metadata',complete_splits=False,
-    splits=['train','validation',None],label_values={'no':'no','yes':'yes'},
+    splits=['train','validation',None],label_values={'no':'incorrect replacement','yes':'correct replacement'},
     pre_process=lambda d:_flatten_text(DatasetDict({s:r for s,r in d.items() if s!='test'}),_record_candidates),
     question='Is the candidate a correct replacement for @placeholder in the cloze query, using passage text_A?',
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['aps/super_glue']})
@@ -2792,7 +2795,7 @@ _QUAC = dict(dataset_name='allenai/quac',config_name='plain_text',metadata='meta
 
 quac__answerability = Classification('sentence1','sentence2','labels',**_QUAC,task_id='quac/answerability',
     pre_process=lambda d:_flatten_text(d,_quac_records),
-    label_values={'no':'no','yes':'yes'},question='Can the following question be answered from the passage and earlier dialogue?\n{sentence2}')
+    label_values={'no':'not answerable from the passage and dialogue','yes':'answerable from the passage and dialogue'},question='Can the following question be answered from the passage and earlier dialogue?\n{sentence2}')
 def _hatexplain_majority(row):
     votes=[row['annotators']['label'].count(i) for i in range(3)]
     return votes.index(max(votes)) if votes.count(max(votes))==1 else None
@@ -3097,7 +3100,7 @@ preco__coreference = Classification('sentence1',sentence2=None,labels='labels',d
     task_id='preco/coreference',pre_process=lambda d:_flatten_text(_document_holdouts(d,
         lambda r:hashlib.sha256(' '.join(t for sentence in r['sentences'] for t in sentence).encode()).hexdigest()),_preco_pairs,paired=False),
     metadata='metadata',complete_splits=False,
-    label_values={'no':'no','yes':'yes'},question='Do marked mentions [A] and [B] refer to the same entity in this document?',
+    label_values={'no':'different entities','yes':'same entity'},question='Do marked mentions [A] and [B] refer to the same entity in this document?',
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['coref-data/preco_raw']})
 
 
@@ -3219,7 +3222,7 @@ matres__temporal = Classification('sentence1',labels='labels',dataset_name='task
 
 # The source card lists a missing test file; native labeled files are train/dev.
 causal_news = Classification('text',labels='label',dataset_name='thagen/CNCv2',config_name='causality detection',
-    task_id='causal-news',complete_splits=False,label_values={0:'no',1:'yes'},
+    task_id='causal-news',complete_splits=False,label_values={0:'no causal relation',1:'causal relation'},
     pre_process=lambda d:_unique_text_splits(d,lambda r:r['text'],'label'),
     metadata=lambda r:_decision_metadata(r['index'],r['index'].rsplit('_',3)[0]),
     question='Does this news text express a causal relation between events?',
@@ -3285,7 +3288,7 @@ def _wikiqa_rows(dataset):
 
 wikiqa = Classification(lambda r:f"Question: {r['question']}\nArticle: {r['document_title']}\nCandidate answer: {r['answer']}", labels='label',
     dataset_name='microsoft/wiki_qa', task_id='wikiqa', complete_splits=False,
-    pre_process=_wikiqa_rows, label_values={0:'no',1:'yes'}, metadata='metadata',
+    pre_process=_wikiqa_rows, label_values={0:'not relevant as an answer',1:'relevant as an answer'}, metadata='metadata',
     question='Is the candidate sentence relevant as an answer to the question?',
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['microsoft/wiki_qa']})
 

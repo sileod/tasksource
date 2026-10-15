@@ -4,6 +4,11 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource 2026-10-15.8
+
+- Self-describing labels for yes/no tasks with a fixed question, e.g. "plausible answer" (MC-TACO), "answerable from the passage" (SQuAD v2, QuAC, CUAD), "same entity" (PreCo), "causal relation" (causal-news), "correct replacement" (ReCoRD), and wiki_qa, wikiqa, avicenna, ambient, I2D2, winowhy, conceptrules_v2, regset, PARARULE-Plus, missing-item-prediction.
+- zero-shot-label-nli leaves out tasks whose labels are bare yes/no or true/false answers to a task question.
+
 ## tasksource-jev-typed-decisions v2026.10.15.2
 
 - Append CBT named-entity/common-noun cloze, ReCAM, high-agreement KnowRef-60K and native text-table TabMWP decisions to `full`, with all native choices retained.

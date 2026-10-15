@@ -54,10 +54,13 @@ def select_tasks(args):
     return frame.head(args.limit) if args.limit else frame
 
 
-def eligible(names):
-    """Labels that read as classes of the text: named, not NLI labels already, no bare numbers."""
+def eligible(names, question=None):
+    """Labels that read as classes of the text: named, not NLI labels already, no bare numbers,
+    and not bare answers to the task's question ("This example is yes." drops the question)."""
     if not names or len(names) < 2:
         return "labels have no names"
+    if question and {name.strip().lower() for name in names} <= GENERIC_LABELS:
+        return "labels answer the task question"
     if "entail" in " ".join(names).lower():
         return "already NLI"
     if any(re.fullmatch(r"-?[\d.]+", name.strip()) for name in names):  # "This example is 2." says nothing
@@ -74,7 +77,7 @@ def build_task(task, args):
     kwargs = dict(max_rows=args.max_rows, max_rows_eval=args.max_rows_eval, multilingual=args.multilingual,
                   data_file_pins=file_pins, **({"revision": revision} if revision else {}))
     dataset = load_task(task, **kwargs)
-    reason = eligible(getattr(dataset["train"].features["labels"], "names", None))
+    reason = eligible(getattr(dataset["train"].features["labels"], "names", None), dataset.question)
     if reason:
         return "skipped", reason, {}
     rows = {}

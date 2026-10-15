@@ -35,6 +35,9 @@ class LabelNliTest(unittest.TestCase):
         self.assertTrue(eligible(["1", "2"]))
         self.assertTrue(eligible(["0: not helpful", "1", "2", "3", "4: extremely helpful"]))
         self.assertTrue(eligible(["annotators agree", "annotators disagree"]))
+        self.assertIsNone(eligible(["no", "yes"]))
+        self.assertTrue(eligible(["no", "yes"], question="Is the claim supported?"))
+        self.assertIsNone(eligible(["negative", "positive"], question="What is the sentiment?"))
 
     def test_balance(self):
         skewed = recast_label_nli(classification([0] * 95 + [1] * 5), "toy")["train"]
