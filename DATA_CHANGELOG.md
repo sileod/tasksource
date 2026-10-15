@@ -4,6 +4,10 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource-jev-typed-decisions v2026.10.15.5
+
+- `vision`: removed the grid-cell grounding rows (rico-widget/grid7, spair71k/grid7); the coordinate-option views of v2026.10.15.4 replace them. Other rows and shards are unchanged.
+
 ## tasksource-jev-typed-decisions v2026.10.15.4
 
 - `vision`: coordinate grounding as multiple choice. RICO widgets and Mind2Web elements: pick the target's box among the screen's other element boxes, as 0–1000 `[x1, y1, x2, y2]`. SPair-71k: pick the corresponding point among the pair's other keypoints, as 0–1000 `(x, y)`.
