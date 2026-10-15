@@ -180,7 +180,7 @@ class MigratedLoaderHelperTest(unittest.TestCase):
             "valueeval_stance": "csv",
             "webgpt_comparisons": "heegyu/webgpt_comparisons_ko",
             "rumoureval_2019": "csv",
-            "blog_authorship_corpus__job": "tasksource/blog_authorship_corpus",
+            "blog_authorship_corpus__gender": "tasksource/blog_authorship_corpus",
             "emo": "oneonlee/cleansed_emocontext",
             "it_support_tickets": "tasksource/it-support-tickets",
             "twentyquestions": "tasksource/twentyquestions",
@@ -271,7 +271,7 @@ class MigratedLoaderHelperTest(unittest.TestCase):
                          "heegyu/webgpt_comparisons_ko")
         self.assertEqual(en_tasks.webgpt_comparisons.task_id,
                          "webgpt_comparisons")
-        self.assertEqual(en_tasks.blog_authorship_corpus__job.labels, "topic")
+        self.assertEqual(en_tasks.blog_authorship_corpus__gender.labels, "gender")
         # pragmeval/crowdflower rebuilt in place (same names, now data-only)
         self.assertEqual(en_tasks.pragmeval_1.dataset_name, "pragmeval")
         self.assertEqual(en_tasks.crowdflower.dataset_name,

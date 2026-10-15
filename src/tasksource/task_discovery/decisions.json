@@ -2555,5 +2555,355 @@
         "findings": "Human causal explanations are positives only. Random-swapped negatives would introduce unverified labels. Quality ratings need interpretation; the original license is CC BY-NC 4.0, unlike the Hub card."
       }
     ]
+  },
+  {
+    "name": "tasksource/brainteasers/SP",
+    "scope": "task",
+    "tasks": [
+      "brainteasers/SP"
+    ],
+    "status": "parked",
+    "reason_code": "malformed_source",
+    "reason": "tasksource/brainteasers SP files are a byte-identical copy of WP; needs a rebuilt mirror",
+    "evidence": [
+      "https://huggingface.co/datasets/tasksource/brainteasers"
+    ],
+    "checked_on": "2026-10-15",
+    "reconsider_if": "The covering task is removed.",
+    "huggingface": [
+      "tasksource/brainteasers"
+    ],
+    "github": [],
+    "papers": [],
+    "annotation": "tasksource.parked.brainteasers__SP"
+  },
+  {
+    "name": "tasksource/hlgd",
+    "scope": "task",
+    "tasks": [
+      "hlgd"
+    ],
+    "status": "parked",
+    "reason_code": "incorrect_labels",
+    "reason": "story-group labels are too loose: Snowden's passport and Obama's Manning decision, or Bolsonaro's stabbing and the Vale dam, count as the same event; 35% flagged by a 2026 LLM screen",
+    "evidence": [
+      "https://huggingface.co/datasets/tasksource/hlgd"
+    ],
+    "checked_on": "2026-10-15",
+    "reconsider_if": "A corrected or re-annotated release.",
+    "huggingface": [
+      "tasksource/hlgd"
+    ],
+    "github": [],
+    "papers": [],
+    "annotation": "tasksource.parked.hlgd",
+    "review_findings": "DeepSeek V4 Flash screened every published Jev example of the task (2026-10); a manual read of flagged samples confirmed the problem."
+  },
+  {
+    "name": "relbert/lexical_relation_classification/EVALution",
+    "scope": "task",
+    "tasks": [
+      "lexical_relation_classification/EVALution"
+    ],
+    "status": "parked",
+    "reason_code": "incorrect_labels",
+    "reason": "source relations are often wrong (disease/illness HasProperty, soap/water Antonym); 31% flagged; BLESS, K&H+N and ROOT09 cover lexical relations",
+    "evidence": [
+      "https://huggingface.co/datasets/relbert/lexical_relation_classification"
+    ],
+    "checked_on": "2026-10-15",
+    "reconsider_if": "A corrected or re-annotated release.",
+    "huggingface": [
+      "relbert/lexical_relation_classification"
+    ],
+    "github": [],
+    "papers": [],
+    "annotation": "tasksource.parked.lexical_relation_classification__EVALution",
+    "review_findings": "DeepSeek V4 Flash screened every published Jev example of the task (2026-10); a manual read of flagged samples confirmed the problem."
+  },
+  {
+    "name": "tasksource/blog_authorship_corpus",
+    "scope": "task",
+    "tasks": [
+      "blog_authorship_corpus/job"
+    ],
+    "status": "parked",
+    "reason_code": "incorrect_labels",
+    "reason": "the industry is rarely inferable from a post (Christmas shopping labeled Manufacturing); 24% flagged",
+    "evidence": [
+      "https://huggingface.co/datasets/tasksource/blog_authorship_corpus"
+    ],
+    "checked_on": "2026-10-15",
+    "reconsider_if": "A corrected or re-annotated release.",
+    "huggingface": [
+      "tasksource/blog_authorship_corpus"
+    ],
+    "github": [],
+    "papers": [],
+    "annotation": "tasksource.parked.blog_authorship_corpus__job",
+    "review_findings": "DeepSeek V4 Flash screened every published Jev example of the task (2026-10); a manual read of flagged samples confirmed the problem."
+  },
+  {
+    "name": "app_reviews",
+    "scope": "task",
+    "tasks": [
+      "app_reviews"
+    ],
+    "status": "parked",
+    "reason_code": "incorrect_labels",
+    "reason": "short, off-topic reviews with arbitrary star ratings even after the length filter; 24% flagged",
+    "evidence": [
+      "https://huggingface.co/datasets/app_reviews"
+    ],
+    "checked_on": "2026-10-15",
+    "reconsider_if": "A corrected or re-annotated release.",
+    "huggingface": [
+      "app_reviews"
+    ],
+    "github": [],
+    "papers": [],
+    "annotation": "tasksource.parked.app_reviews",
+    "review_findings": "DeepSeek V4 Flash screened every published Jev example of the task (2026-10); a manual read of flagged samples confirmed the problem."
+  },
+  {
+    "name": "sileod/pragmeval/mrda",
+    "scope": "task",
+    "tasks": [
+      "pragmeval/mrda"
+    ],
+    "status": "parked",
+    "reason_code": "incorrect_labels",
+    "reason": "single meeting utterances without their dialogue context; a 2026 LLM screen flagged 20% of dialogue-act labels",
+    "evidence": [
+      "https://huggingface.co/datasets/sileod/pragmeval"
+    ],
+    "checked_on": "2026-10-15",
+    "reconsider_if": "A corrected or re-annotated release.",
+    "huggingface": [
+      "sileod/pragmeval"
+    ],
+    "github": [],
+    "papers": [],
+    "annotation": "tasksource.parked.pragmeval__mrda",
+    "review_findings": "DeepSeek V4 Flash screened every published Jev example of the task (2026-10); a manual read of flagged samples confirmed the problem."
+  },
+  {
+    "name": "sileod/pragmeval/emobank-arousal",
+    "scope": "task",
+    "tasks": [
+      "pragmeval/emobank-arousal"
+    ],
+    "status": "parked",
+    "reason_code": "low_value",
+    "reason": "median split of continuous ratings: items near the middle are coin flips; emotion is covered by other tasks",
+    "evidence": [
+      "https://huggingface.co/datasets/sileod/pragmeval"
+    ],
+    "checked_on": "2026-10-15",
+    "reconsider_if": "The covering task is removed.",
+    "huggingface": [
+      "sileod/pragmeval"
+    ],
+    "github": [],
+    "papers": [],
+    "annotation": "tasksource.parked.pragmeval__emobank_arousal",
+    "review_findings": "DeepSeek V4 Flash screened every published Jev example of the task (2026-10); a manual read of flagged samples confirmed the problem."
+  },
+  {
+    "name": "sileod/pragmeval/emobank-valence",
+    "scope": "task",
+    "tasks": [
+      "pragmeval/emobank-valence"
+    ],
+    "status": "parked",
+    "reason_code": "low_value",
+    "reason": "median split of continuous ratings: items near the middle are coin flips; sentiment is covered by other tasks",
+    "evidence": [
+      "https://huggingface.co/datasets/sileod/pragmeval"
+    ],
+    "checked_on": "2026-10-15",
+    "reconsider_if": "The covering task is removed.",
+    "huggingface": [
+      "sileod/pragmeval"
+    ],
+    "github": [],
+    "papers": [],
+    "annotation": "tasksource.parked.pragmeval__emobank_valence",
+    "review_findings": "DeepSeek V4 Flash screened every published Jev example of the task (2026-10); a manual read of flagged samples confirmed the problem."
+  },
+  {
+    "name": "pietrolesci/gen_debiased_nli",
+    "scope": "task",
+    "tasks": [
+      "gen_debiased_nli/snli_seq_z"
+    ],
+    "status": "parked",
+    "reason_code": "incorrect_labels",
+    "reason": "generated hypotheses with model-filtered labels; 3-10% flagged by a 2026 LLM screen; human-labeled NLI covers this",
+    "evidence": [
+      "https://huggingface.co/datasets/pietrolesci/gen_debiased_nli"
+    ],
+    "checked_on": "2026-10-15",
+    "reconsider_if": "A corrected or re-annotated release.",
+    "huggingface": [
+      "pietrolesci/gen_debiased_nli"
+    ],
+    "github": [],
+    "papers": [],
+    "annotation": "tasksource.parked.gen_debiased_nli__snli_seq_z",
+    "review_findings": "DeepSeek V4 Flash screened every published Jev example of the task (2026-10); a manual read of flagged samples confirmed the problem."
+  },
+  {
+    "name": "pietrolesci/gen_debiased_nli",
+    "scope": "task",
+    "tasks": [
+      "gen_debiased_nli/snli_z_aug"
+    ],
+    "status": "parked",
+    "reason_code": "incorrect_labels",
+    "reason": "generated hypotheses with model-filtered labels; 3-10% flagged by a 2026 LLM screen; human-labeled NLI covers this",
+    "evidence": [
+      "https://huggingface.co/datasets/pietrolesci/gen_debiased_nli"
+    ],
+    "checked_on": "2026-10-15",
+    "reconsider_if": "A corrected or re-annotated release.",
+    "huggingface": [
+      "pietrolesci/gen_debiased_nli"
+    ],
+    "github": [],
+    "papers": [],
+    "annotation": "tasksource.parked.gen_debiased_nli__snli_z_aug",
+    "review_findings": "DeepSeek V4 Flash screened every published Jev example of the task (2026-10); a manual read of flagged samples confirmed the problem."
+  },
+  {
+    "name": "pietrolesci/gen_debiased_nli",
+    "scope": "task",
+    "tasks": [
+      "gen_debiased_nli/snli_par_z"
+    ],
+    "status": "parked",
+    "reason_code": "incorrect_labels",
+    "reason": "generated hypotheses with model-filtered labels; 3-10% flagged by a 2026 LLM screen; human-labeled NLI covers this",
+    "evidence": [
+      "https://huggingface.co/datasets/pietrolesci/gen_debiased_nli"
+    ],
+    "checked_on": "2026-10-15",
+    "reconsider_if": "A corrected or re-annotated release.",
+    "huggingface": [
+      "pietrolesci/gen_debiased_nli"
+    ],
+    "github": [],
+    "papers": [],
+    "annotation": "tasksource.parked.gen_debiased_nli__snli_par_z",
+    "review_findings": "DeepSeek V4 Flash screened every published Jev example of the task (2026-10); a manual read of flagged samples confirmed the problem."
+  },
+  {
+    "name": "pietrolesci/gen_debiased_nli",
+    "scope": "task",
+    "tasks": [
+      "gen_debiased_nli/mnli_par_z"
+    ],
+    "status": "parked",
+    "reason_code": "incorrect_labels",
+    "reason": "generated hypotheses with model-filtered labels; 3-10% flagged by a 2026 LLM screen; human-labeled NLI covers this",
+    "evidence": [
+      "https://huggingface.co/datasets/pietrolesci/gen_debiased_nli"
+    ],
+    "checked_on": "2026-10-15",
+    "reconsider_if": "A corrected or re-annotated release.",
+    "huggingface": [
+      "pietrolesci/gen_debiased_nli"
+    ],
+    "github": [],
+    "papers": [],
+    "annotation": "tasksource.parked.gen_debiased_nli__mnli_par_z",
+    "review_findings": "DeepSeek V4 Flash screened every published Jev example of the task (2026-10); a manual read of flagged samples confirmed the problem."
+  },
+  {
+    "name": "pietrolesci/gen_debiased_nli",
+    "scope": "task",
+    "tasks": [
+      "gen_debiased_nli/mnli_z_aug"
+    ],
+    "status": "parked",
+    "reason_code": "incorrect_labels",
+    "reason": "generated hypotheses with model-filtered labels; 3-10% flagged by a 2026 LLM screen; human-labeled NLI covers this",
+    "evidence": [
+      "https://huggingface.co/datasets/pietrolesci/gen_debiased_nli"
+    ],
+    "checked_on": "2026-10-15",
+    "reconsider_if": "A corrected or re-annotated release.",
+    "huggingface": [
+      "pietrolesci/gen_debiased_nli"
+    ],
+    "github": [],
+    "papers": [],
+    "annotation": "tasksource.parked.gen_debiased_nli__mnli_z_aug",
+    "review_findings": "DeepSeek V4 Flash screened every published Jev example of the task (2026-10); a manual read of flagged samples confirmed the problem."
+  },
+  {
+    "name": "pietrolesci/gen_debiased_nli",
+    "scope": "task",
+    "tasks": [
+      "gen_debiased_nli/mnli_seq_z"
+    ],
+    "status": "parked",
+    "reason_code": "incorrect_labels",
+    "reason": "generated hypotheses with model-filtered labels; 3-10% flagged by a 2026 LLM screen; human-labeled NLI covers this",
+    "evidence": [
+      "https://huggingface.co/datasets/pietrolesci/gen_debiased_nli"
+    ],
+    "checked_on": "2026-10-15",
+    "reconsider_if": "A corrected or re-annotated release.",
+    "huggingface": [
+      "pietrolesci/gen_debiased_nli"
+    ],
+    "github": [],
+    "papers": [],
+    "annotation": "tasksource.parked.gen_debiased_nli__mnli_seq_z",
+    "review_findings": "DeepSeek V4 Flash screened every published Jev example of the task (2026-10); a manual read of flagged samples confirmed the problem."
+  },
+  {
+    "name": "tasksource/crowdflower/sentiment_nuclear_power",
+    "scope": "task",
+    "tasks": [
+      "crowdflower/sentiment_nuclear_power"
+    ],
+    "status": "parked",
+    "reason_code": "low_value",
+    "reason": "171 tweets, 85% neutral, with mislabels (a pro-nuclear tweet marked neutral); other sentiment tasks cover this",
+    "evidence": [
+      "https://huggingface.co/datasets/tasksource/crowdflower"
+    ],
+    "checked_on": "2026-10-15",
+    "reconsider_if": "The covering task is removed.",
+    "huggingface": [
+      "tasksource/crowdflower"
+    ],
+    "github": [],
+    "papers": [],
+    "annotation": "tasksource.parked.crowdflower__sentiment_nuclear_power",
+    "review_findings": "DeepSeek V4 Flash screened every published Jev example of the task (2026-10); a manual read of flagged samples confirmed the problem."
+  },
+  {
+    "name": "Salesforce/cos_e/v1.0",
+    "scope": "task",
+    "tasks": [
+      "cos_e/v1.0"
+    ],
+    "status": "parked",
+    "reason_code": "duplicate",
+    "reason": "CommonsenseQA v1.0 with 3 choices: 8,092 of its 8,560 questions are in commonsense_qa, which has 5",
+    "evidence": [
+      "https://huggingface.co/datasets/Salesforce/cos_e"
+    ],
+    "checked_on": "2026-10-15",
+    "reconsider_if": "The covering task is removed.",
+    "huggingface": [
+      "Salesforce/cos_e"
+    ],
+    "github": [],
+    "papers": [],
+    "annotation": "tasksource.parked.cos_e"
   }
 ]

@@ -65,7 +65,10 @@ def queued_sources(path=None):
     for line in path.read_text().splitlines():
         if not line.startswith('| '):
             continue
-        name, views, status = (cell.strip() for cell in line.strip('|').split('|'))
+        cells = [cell.strip() for cell in line.strip('|').split('|')]
+        if len(cells) != 3:  # only Source | views | status tables form the queue
+            continue
+        name, views, status = cells
         if name == 'Source':
             continue
         sources[normalized(name)] = dict(name=name, views=views, status=status)

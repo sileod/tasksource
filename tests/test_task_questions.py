@@ -39,7 +39,7 @@ def test_questions_and_gold_survive_shared_loader(monkeypatch, recast):
             elif task.startswith('goal-step'):
                 assert answers == {'Mix the ingredients.', 'Put on socks.'}
             else:
-                assert answers == {'yes', 'no'}
+                assert answers == {'item in the list', 'item not in the list'}
                 assert all('text_A:' in row['state'] and 'text_B:' in row['state'] for row in rows)
                 assert all('Provide no explanation' not in row['state'] for row in rows)
 

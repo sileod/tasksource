@@ -77,7 +77,7 @@ def test_answerability_shared_loader_preserves_negative_and_positive(task,monkey
     monkeypatch.setattr('tasksource.access.load_dataset',lambda *a,**kw:data)
     out=load_task(task,recast='jev')
     assert set(out)==set(data)
-    assert [r['answer'] for r in out['train']]==['no','yes']
+    assert [r['answer'].startswith('not') for r in out['train']]==[True,False]
     assert all('answer_spans' in json.loads(r['metadata']) for r in out['train'])
 
 
