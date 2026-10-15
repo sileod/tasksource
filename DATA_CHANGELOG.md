@@ -4,6 +4,19 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource-jev-typed-decisions v2026.10.15.3
+
+- Rebuild of `default` and `full`. Rows keep their published `id` and `example_id` when their source example is unchanged, also where the content changed.
+- Removed sources with unreliable or redundant labels: gen_debiased_nli, hlgd, EVALution, blog_authorship/job, app_reviews, pragmeval mrda and EmoBank arousal/valence, brainteasers/SP, cos_e/v1.0, crowdflower nuclear sentiment.
+- At most 1,000 training rows from robust_nli, pragmeval scales, logical-fallacy, path-naturalness, crowdflower political media, recast_verbcorner and ReSQ; 10,000 from KnowRef-60K.
+- Readable option labels (e.g. "answerable from the passage", "e2 causes e1", TREC answer types) and task questions for MultiRC, ethics/justice, ethics/virtue and dnd_style_intents.
+- `default` now also draws on the sources appended to `full` since the last rebuild.
+
+## zero-shot-label-nli 2026-10-15
+
+- Removed the parked sources listed above, and tasks whose labels are bare yes/no or true/false answers to a task question.
+- Readable label hypotheses ("This example is answerable from the passage.") for the relabeled tasks; rare civil_comments attributes now include positives.
+
 ## tasksource 2026-10-15.11
 
 - civil_comments threat, sexual_explicit, obscene and identity_attack keep every majority-flagged comment and three clear negatives per positive, capped at 5,000 training rows (their labels follow keywords); severe_toxicity parked (13 positives in 1.8M comments).
