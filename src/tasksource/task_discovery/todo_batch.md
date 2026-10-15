@@ -219,13 +219,13 @@ TRIP checks and source caveats: [audit](../../../docs/jev/audits/trip-audit.json
 
 ## Batch 17: grounded dialogue and reasoning (2026-10-15)
 
-Human or procedural labels required; a model may generate inputs when humans supply the labels. Screened native examples and training partitions; nothing in this batch is implemented or uploaded yet.
+Human or procedural labels required; a model may generate inputs when humans supply the labels. Screened native examples and training partitions. FaithDial, RAGTruth and ComVE are implemented; the ComVE mirror is published. See the [recast checks](../../../docs/jev/audits/grounded-reasoning-recast.json).
 
 | Source | Requested view | Status |
 |---|---|---|
-| FaithDial | Knowledge-grounded original-response classification | Ready for careful integration via official HF Parquet. 18,357 native train wizard turns; 17,262 strict Hallucination/pure-Entailment candidates. BEGIN belongs to the original response; exclude Generic/Uncooperative cases initially. |
-| RAGTruth | Human-span-derived hallucination classification | Ready via usable wandb/RAGTruth-processed. 15,090 native train, 14,942 quality=good. Preserve spans/model flags; remove the known Summary context output: suffix. No context overlap with native test. |
-| ComVE subtask A | Two native statements, select the more sensible | Ready for official-file repackaging. 10,000 raw train, 997 validation, 1,000 test; five identical-choice train pairs and 5/3 train-evaluation pair overlaps need exclusion. Gold marks nonsense; invert for sensible selection. Original README CC BY-SA 4.0. |
+| FaithDial | Knowledge-grounded original-response classification | Added `faithdial/grounding` via official HF Parquet. 18,357 native train wizard turns; 17,262 strict Hallucination/pure-Entailment candidates. BEGIN belongs to the original response; exclude Generic/Uncooperative cases initially. |
+| RAGTruth | Human-span-derived hallucination classification | Added `ragtruth/grounding` via usable wandb/RAGTruth-processed. 15,090 native train, 14,942 quality=good. Preserve spans/model flags; remove the known Summary context output: suffix. No context overlap with native test. |
+| ComVE subtask A | Two native statements, select the more sensible | Added `comve` via official-file repackaging: 9,966 train, 997 validation, 999 test after QC. 10,000 raw train, 997 validation, 1,000 test; five identical-choice train pairs and 5/3 train-evaluation pair overlaps need exclusion. Gold marks nonsense; invert for sensible selection. Original README CC BY-SA 4.0. |
 | AAAC02 | Procedural valid-conclusion selection | Conditional: 16,000 native train. No model paraphrasing, unlike AAAC01. Not native MC; verify non-entailment of each derived distractor, and keep the conclusion out of the premises input. |
 | GLUCOSE | Causal decisions | Conditional: 65,522 native train annotations, positive only. No random-swap negatives. Explore native causal-dimension classification with quality filtering and story grouping. Original license is CC BY-NC 4.0, contradicting HF card. |
 

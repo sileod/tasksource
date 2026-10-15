@@ -1,4 +1,4 @@
-586 English tasks. Load one with `load_task(id)`; the annotations are in [tasks.py](src/tasksource/tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
+589 English tasks. Load one with `load_task(id)`; the annotations are in [tasks.py](src/tasksource/tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
 
 Browse the [example catalog](docs/examples.md): one real example per task.
 
@@ -591,6 +591,9 @@ Browse the [example catalog](docs/examples.md): one real example per task.
 | 584 | [trip/order](src/tasksource/tasks.py#L3543) | MultipleChoice | [sled-umich/TRIP](https://hf.co/datasets/sled-umich/TRIP) | ✓ |
 | 585 | [sbic/offensiveness](src/tasksource/tasks.py#L3553) | Classification | [tasksource/sbic](https://hf.co/datasets/tasksource/sbic) | ✓ |
 | 586 | [sbic/intent](src/tasksource/tasks.py#L3560) | Classification | [tasksource/sbic](https://hf.co/datasets/tasksource/sbic) | ✓ |
+| 587 | [faithdial/grounding](src/tasksource/tasks.py#L3582) | Classification | [McGill-NLP/FaithDial](https://hf.co/datasets/McGill-NLP/FaithDial) | ✓ |
+| 588 | [ragtruth/grounding](src/tasksource/tasks.py#L3599) | Classification | [wandb/RAGTruth-processed](https://hf.co/datasets/wandb/RAGTruth-processed) | ✓ |
+| 589 | [comve](src/tasksource/tasks.py#L3611) | MultipleChoice | [tasksource/comve](https://hf.co/datasets/tasksource/comve) |  |
 
 ## Soft labels
 

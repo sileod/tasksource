@@ -4,6 +4,12 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource-jev-typed-decisions v2026.10.15
+
+- Append FaithDial original-response grounding, RAGTruth evidence-grounding judgments and ComVE commonsense statement choices to `full`, using human supervision and checked native labels.
+- Preserve existing training shards and evaluation data. `default` includes these sources at the next canonical rebuild.
+- Retain annotation provenance and source license evidence; exclude generic/uncooperative FaithDial cases, low-quality RAGTruth outputs and invalid or conflicting ComVE pairs.
+
 ## tasksource 2026-10-15.4
 
 - Add FaithDial original-response grounding and RAGTruth human-span-derived grounding decisions. Keep annotation provenance separate from inputs, reserve native dialogue/source holdouts, and omit ambiguous or low-quality cases.

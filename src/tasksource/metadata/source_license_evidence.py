@@ -5,6 +5,10 @@ Keys are task families, shared by their visual classification/MC views.
 """
 
 SOURCE_LICENSE_EVIDENCE = {
+    'faithdial': {'license': 'mit', 'license_use': 'commercial', 'checked': '2026-10-15', 'scope': 'FaithDial human response-grounding annotations and rewrites', 'url': 'https://huggingface.co/datasets/McGill-NLP/FaithDial#licensing-information'},
+    'ragtruth': {'license': 'mit', 'license_use': 'commercial', 'checked': '2026-10-15', 'scope': 'RAGTruth human hallucination-span annotations over model-generated responses', 'url': 'https://github.com/ParticleMedia/RAGTruth/blob/main/LICENSE'},
+    'comve': {'license': 'cc-by-sa-4.0', 'license_use': 'commercial', 'checked': '2026-10-15', 'scope': 'Official ComVE commonsense validation and explanation data', 'url': 'https://github.com/wangcunxiang/SemEval2020-Task4-Commonsense-Validation-and-Explanation#license'},
+
     'sbic': {'license': 'cc-by-4.0', 'license_use': 'commercial', 'checked': '2026-10-15', 'scope': 'SBIC human annotations; original social-media posts retain their source terms', 'url': 'https://huggingface.co/datasets/allenai/social_bias_frames#licensing-information'},
     'trip': {'license': 'unknown', 'license_use': 'unspecified', 'checked': '2026-10-15', 'scope': 'No dataset license declared in the official Hub card or linked original repository; public access does not imply permission', 'url': 'https://huggingface.co/datasets/sled-umich/TRIP', 'additional_urls': ['https://github.com/sled-group/Verifiable-Coherent-NLU']},
     'quality': {'license': 'cc-by-4.0', 'license_use': 'commercial', 'checked': '2026-10-15', 'scope': 'QuALITY annotations; articles retain their original source terms', 'url': 'https://nyu-mll.github.io/quality/'},

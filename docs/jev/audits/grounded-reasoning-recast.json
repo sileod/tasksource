@@ -1,0 +1,116 @@
+{
+  "faithdial/grounding": {
+    "counts": {
+      "train": {
+        "unsupported": 13507,
+        "grounded": 3755
+      },
+      "validation": {
+        "unsupported": 2525,
+        "grounded": 643
+      },
+      "test": {
+        "unsupported": 2561,
+        "grounded": 736
+      }
+    },
+    "checked_gold": 50,
+    "examples": [
+      {
+        "question": "Is this bot response grounded in the supplied knowledge and dialogue, without unsupported claims or personal disclosures?",
+        "gold": "unsupported",
+        "state_preview": "Knowledge:\nSome studies found that drinking small quantities of alcohol (up to one standard drink per day for women and one to two drinks per day for men) is associated with a decreased risk of heart disease, stroke, diabetes mellitus, metabolic syndrome and early death.\n\nDialogue:\ndo you like red wine?\nNot really. Did you know that the red color comes from pigments present in the grape's skin?\nI didn't know that. I love red wine for its health b"
+      },
+      {
+        "question": "Is this bot response grounded in the supplied knowledge and dialogue, without unsupported claims or personal disclosures?",
+        "gold": "unsupported",
+        "state_preview": "Knowledge:\nThere is more arsenic in the bran, so brown rice contains more arsenic.\n\nDialogue:\nHi, I was just wondering what your favorite type of Sushi is?\nI don't have any or eat them as a bot. However, did you know that both brown and white rice can be used to make sushi?\nI see, what's the difference between the rice?\n\nBot response:\nMaybe it'll comfort you a little at least to know that brown rice actually has more arsenic!"
+      }
+    ]
+  },
+  "ragtruth/grounding": {
+    "counts": {
+      "train": {
+        "grounded": 8244,
+        "unsupported": 6698
+      },
+      "test": {
+        "grounded": 1732,
+        "unsupported": 943
+      }
+    },
+    "checked_gold": 40,
+    "examples": [
+      {
+        "question": "Is the candidate response grounded in the supplied source, or does it contain an unsupported or contradictory claim?",
+        "gold": "grounded",
+        "state_preview": "Request:\nSummarize the following news within 94 words:\n\nSource:\nChicago City Council Debates 'Sanctuary City' Status as Windy City Overrun with Migrants\nPritzker hopes other cities will help but says it's voluntary\nThe Chicago City Council's Committee on Immigrant and Refugee Rights convened at City Hall to discuss the ongoing arrival of migrants in the city, prompting a debate over Chicago's \"sanctuary city\" status. The meeting, held on Friday m"
+      },
+      {
+        "question": "Is the candidate response grounded in the supplied source, or does it contain an unsupported or contradictory claim?",
+        "gold": "grounded",
+        "state_preview": "Request:\niphone wont turn on from charging\n\nSource:\nIf your device still won't turn on or start up. Plug in your device and let it charge for up to 1 hour. After a few minutes, you should see the charging screen. If you don't see the charging screen within an hour, or you see the connect to power screen, check your connector, USB cable, and power adapter.lug in your device and let it charge for up to 1 hour. After a few minutes, you should see th"
+      }
+    ]
+  },
+  "comve": {
+    "source": "https://github.com/wangcunxiang/SemEval2020-Task4-Commonsense-Validation-and-Explanation",
+    "revision": "c55b1a9e6cb66997675f85073e17a9522cf38c2c",
+    "source_sha256": {
+      "ALL data/Training  Data/subtaskA_data_all.csv": "e0f0dca581e92d6f97a819f44a3157058741e1c9dc92fd036f91bf3adf382215",
+      "ALL data/Training  Data/subtaskA_answers_all.csv": "8a30a09dcfcdc536d03201bea976708dff3813691667a3c1a346af15bfabbc69",
+      "ALL data/Dev Data/subtaskA_dev_data.csv": "60f32177d667016e4ca2513fe75113f4e30b8336e3d3c5b8de4bcedfa53571bc",
+      "ALL data/Dev Data/subtaskA_gold_answers.csv": "405e8a28b1d79c19deb7855d44c46e9ac2e5d0d09dd2280476b21341fa492a95",
+      "ALL data/Test Data/subtaskA_test_data.csv": "801e49314f3d6b2dcb72f30cce58d1212b4d84c1fc9b7f1e1da27c6285a32814",
+      "ALL data/Test Data/subtaskA_gold_answers.csv": "a0fb5a54d788975168d87e058339aa490842e89c94d0719d2ca3016b47a39836"
+    },
+    "license": "cc-by-sa-4.0",
+    "annotation_origin": "human",
+    "native_counts": {
+      "train": 10000,
+      "validation": 997,
+      "test": 1000
+    },
+    "excluded_counts": {
+      "test": {
+        "duplicate_pair": 1
+      },
+      "validation": {},
+      "train": {
+        "duplicate_pair": 27,
+        "invalid_choices": 5,
+        "conflicting_gold": 2
+      }
+    },
+    "conversion_sha256": "ccc0a2f4fc29716c1bb140b511cfcf7210ab72e8958d6718635747e591a52f13",
+    "configuration": {
+      "gold": "invert native nonsensical index",
+      "split_policy": "native; test > validation > train"
+    },
+    "splits": {
+      "test": 999,
+      "validation": 997,
+      "train": 9966
+    },
+    "label_counts": {
+      "test": {
+        "1": 508,
+        "0": 491
+      },
+      "validation": {
+        "1": 518,
+        "0": 479
+      },
+      "train": {
+        "1": 4961,
+        "0": 5005
+      }
+    }
+  },
+  "scope": "Native split/label checks and coarse recast review; not an exhaustive relabeling.",
+  "caveats": [
+    "FaithDial uses stricter bot grounding than factual truth: personal disclosures and subjective additions can be marked unsupported even when its factual content is entailed. Human annotations can be debatable.",
+    "RAGTruth labels evidence grounding, not universal truth; preserve implicit_true and due_to_null span flags.",
+    "ComVE selects relative ordinary plausibility, not logical impossibility. Some choices exploit grammar or conventions."
+  ]
+}
