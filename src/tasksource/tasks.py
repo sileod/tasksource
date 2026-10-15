@@ -3458,3 +3458,93 @@ mams__atsa = Classification('sentence1','sentence2','labels',dataset_name='NEUDM
     pre_process=lambda d:_unique_text_splits(_flatten_text(_document_holdouts(d,lambda r:r['input'][0]),_mams_aspects),
         lambda r:(r['sentence1'],r['sentence2']),'labels'),
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['NEUDM/mams'],'data_dir':'Generation/ATSA'})
+
+
+quality = MultipleChoice(
+    inputs=lambda r:r['article']+'\n\nQuestion: '+r['question'],choices_list='options',labels='answer',
+    dataset_name='emozilla/quality',task_id='quality',complete_splits=False,metadata=lambda r:_decision_metadata(
+        hashlib.sha256((r['article']+'\0'+r['question']).encode()).hexdigest(),
+        hashlib.sha256(r['article'].encode()).hexdigest(),hard=r['hard'],annotation_origin='human'),
+    pre_process=lambda d:_document_holdouts(d,'article'),
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['emozilla/quality']})
+
+
+clear__readability = SoftLabeling('Excerpt',labels='BT_easiness',dataset_name='casey-martin/CommonLit-Ease-of-Readability',
+    task_id='clear/readability',kind='score',low=-4,high=2,options=[str(i) for i in range(-4,3)],
+    aggregation='mean',regression=True,complete_splits=False,
+    metadata=lambda r:_decision_metadata(r['ID'],r['ID'],standard_error=r['s.e.'],title=r['Title'],
+        author=r['Author'],excerpt_license=r['License'],annotation_origin='human_pairwise_judgments'),
+    question='Rate this passage’s reading ease on the CLEAR Bradley–Terry scale: higher scores mean easier reading (approximately -4 to 2).',
+    soft_question='How easy is this passage to read? Higher CLEAR scores mean easier reading.',
+    pre_process=lambda d:_document_holdouts(d,'Excerpt'),
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['casey-martin/CommonLit-Ease-of-Readability']})
+
+
+_ESCONV_STRATEGIES = ('Question','Restatement or Paraphrasing','Reflection of feelings','Self-disclosure',
+                     'Affirmation and Reassurance','Providing Suggestions','Information','Others')
+esconv__strategy = Classification('sentence1','sentence2','labels',dataset_name='tasksource/esconv',
+    task_id='esconv/strategy',metadata='metadata',complete_splits=False,
+    label_values={s:s.lower() for s in _ESCONV_STRATEGIES},
+    question='Which emotional-support strategy does the supporter use in the reply, given the earlier conversation?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/esconv']})
+
+
+def _prosocial_context(dataset):
+    output={}
+    for split,rows in dataset.items():
+        history={};texts=[];groups=[]
+        for row in rows:
+            prior=history.setdefault(row['dialogue_id'],[])
+            if row['response_id']!=len(prior)//2:raise ValueError('ProsocialDialog turns out of order')
+            texts.append('\n'.join(prior+['Speaker: '+row['context']]))
+            groups.append(hashlib.sha256((prior[0] if prior else 'Speaker: '+row['context']).encode()).hexdigest())
+            prior.extend(['Speaker: '+row['context'],'Listener: '+row['response']])
+        output[split]=rows.add_column('dialogue',texts).add_column('dialogue_group',groups).add_column('source_split',[split]*len(rows))
+    return _document_holdouts(DatasetDict(output),'dialogue_group')
+
+
+prosocial_dialog__safety = Classification('dialogue',labels='safety_label',dataset_name='allenai/prosocial-dialog',
+    task_id='prosocial-dialog/safety',pre_process=_prosocial_context,complete_splits=False,ordinal=True,
+    label_values={'__casual__':'casual: no caution needed',
+        '__possibly_needs_caution__':'possibly needs caution','__probably_needs_caution__':'probably needs caution',
+        '__needs_caution__':'needs caution','__needs_intervention__':'needs intervention'},
+    metadata=lambda r:_decision_metadata(f"{r['source_split']}:{r['dialogue_id']}:{r['response_id']}",r['dialogue_group'],
+        source_dialogue_id=r['dialogue_id'],votes=r['safety_annotations'],annotation_origin='human',input_origin='GPT-3'),
+    question='How much caution or intervention is warranted in response to the final speaker utterance?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['allenai/prosocial-dialog']})
+
+
+def _gap_text(row):
+    spans=[]
+    for marker,name in [('PRONOUN','Pronoun'),('A','A'),('B','B')]:
+        start=row[name+'-offset'];text=row[name]
+        if row['Text'][start:start+len(text)]!=text:raise ValueError('GAP span/text mismatch')
+        spans.append((marker,start,start+len(text)))
+    return _marked_spans(row['Text'],spans)
+
+
+gap = Classification(_gap_text,labels=lambda r:0 if r['A-coref'] else 1 if r['B-coref'] else 2,
+    dataset_name='coref-data/gap_raw',task_id='gap',complete_splits=False,label_values={0:'A',1:'B',2:'neither candidate'},
+    metadata=lambda r:_decision_metadata(r['ID'],r['URL'],source_url=r['URL'],native_partition=r['ID'].rsplit('-',1)[0]),
+    question='Does the marked [PRONOUN] refer to the person marked [A], the person marked [B], or neither candidate?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['coref-data/gap_raw']})
+
+
+# Use the author's Hub Parquet conversion; the legacy TRIP.py loader is unsupported.
+trip__cloze = MultipleChoice(inputs=lambda r:'Compare the two stories.',
+    choices_list=lambda r:['\n'.join(story['sentences']) for story in r['stories']],labels='label',
+    dataset_name='sled-umich/TRIP',task_id='trip/cloze',complete_splits=False,
+    question='Which story is more physically plausible?',
+    metadata=lambda r:_decision_metadata(r['example_id'],str(r['stories'][0]['story_id']),
+        source_view='cloze',annotation_origin='human'),
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['sled-umich/TRIP'],
+        'data_files':{s:f'default/Cloze{n}/*.parquet' for s,n in [('train','Train'),('validation','Dev'),('test','Test')]}})
+
+trip__order = MultipleChoice(inputs=lambda r:'Compare the two stories.',
+    choices_list=lambda r:['\n'.join(story['sentences']) for story in r['stories']],labels='label',
+    dataset_name='sled-umich/TRIP',task_id='trip/order',complete_splits=False,
+    question='Which story is more physically plausible?',
+    metadata=lambda r:_decision_metadata(r['example_id'],str(r['stories'][0]['story_id']),
+        source_view='order',annotation_origin='human'),
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['sled-umich/TRIP'],
+        'data_files':{s:f'default/Order{n}/*.parquet' for s,n in [('train','Train'),('validation','Dev'),('test','Test')]}})

@@ -1,6 +1,13 @@
 """Reviewed source snapshots; keep opaque revision IDs out of task annotations."""
 
 SOURCE_REVISIONS = {
+    "sled-umich/TRIP": "098fa27f44cf4e693e492102ce50d36bfd415143",
+    "emozilla/quality": "7142df0407e16a99e5cda9188edc7db01e8c151a",
+    "casey-martin/CommonLit-Ease-of-Readability": "b14ab30b0f4be072492c4483c0f1490eaae77f7a",
+    "tasksource/esconv": "5384809beecd0d30a98efd60a3ab6d2e6595780f",
+    "allenai/prosocial-dialog": "d77d7ad3c624c51030f2f32c83e892b3d620b3d4",
+    "coref-data/gap_raw": "b3cb9f80cfade3374e73ecea63da8957eb125b3c",
+
 
     "tasksource/sphinx-mcq": "ac38a5b0448f2919c4565030f727ea5c2dcad59b",
     "tasksource/visgym-mcq": "c2509824b3c403c21b689d24180dae1b9e8cd006",

@@ -1,0 +1,85 @@
+{
+  "checked_on": "2026-10-15",
+  "source": "sled-umich/TRIP",
+  "original_revision": "e8034abd1a23f948dc6bc68e1bceaa47d7e966c2",
+  "parquet_revision": "098fa27f44cf4e693e492102ce50d36bfd415143",
+  "original_repository": "https://github.com/sled-group/Verifiable-Coherent-NLU",
+  "license": "unspecified",
+  "counts": {
+    "trip/cloze": {
+      "train": 799,
+      "validation": 322,
+      "test": 351
+    },
+    "trip/order": {
+      "train": 2330,
+      "validation": 393,
+      "test": 408
+    }
+  },
+  "checks": {
+    "invalid_native_gold": 0,
+    "story_groups": {
+      "train": 370,
+      "validation": 152,
+      "test": 153
+    },
+    "within_view_split_overlap": 0,
+    "cross_view_train_test_overlap": 0
+  },
+  "reviewed": [
+    {
+      "view": "cloze",
+      "native_row": 1,
+      "gold": 1,
+      "finding": "An unplugged microwave cannot be turned on without another step; the gold story retains power."
+    },
+    {
+      "view": "cloze",
+      "native_row": 3,
+      "gold": 0,
+      "finding": "Gold eats the heated soup; alternative eats cereal already discarded."
+    },
+    {
+      "view": "order",
+      "native_row": 1,
+      "gold": 1,
+      "finding": "Gold puts soup in the microwave before turning it on. This is the intended conventional order, but the alternative is not strictly impossible."
+    },
+    {
+      "view": "order",
+      "native_row": 3,
+      "gold": 0,
+      "finding": "Alternative puts soup in the microwave before retrieving it from the fridge; gold preserves the causal order."
+    }
+  ],
+  "limits": [
+    "Original human physical-state annotations also support procedurally perturbed/augmented story variants; these are not independent scenarios.",
+    "Some gold labels rely on unstated conventional-action assumptions. Preserve native labels and describe the task as relative plausibility.",
+    "No license declared in the official Hub card or original repository; record unspecified, not an inferred software license."
+  ],
+  "build_smoke": {
+    "selected_tasks": 2,
+    "completed_tasks": 2,
+    "failed_tasks": 0,
+    "outdated_datasets": 0,
+    "parquet_files": 6,
+    "excluded_source_families": [
+      "bigbench/",
+      "mmlu/",
+      "blimp/",
+      "cladder"
+    ],
+    "build_fingerprint": "77186695fd270b60",
+    "shard_fingerprints": {
+      "77186695fd270b60": 2
+    },
+    "validated_typed_decisions": 70,
+    "rows_by_source": {
+      "trip/order": 32,
+      "trip/cloze": 38
+    },
+    "published": false
+  },
+  "focused_tests": "19 passed"
+}

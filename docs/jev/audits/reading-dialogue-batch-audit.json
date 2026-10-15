@@ -1,0 +1,183 @@
+{
+  "checked_on": "2026-10-15",
+  "scope": "Two native examples per new task, structural recast tests, and public normal/Jev loading smoke checks. This is not an exhaustive annotation audit.",
+  "sources": {
+    "quality": {
+      "repo": "emozilla/quality",
+      "native_counts": {
+        "train": 2523,
+        "validation": 2086
+      },
+      "annotation": "Human-written questions, validated by readers of the complete article.",
+      "reviewed": [
+        {
+          "native_row": 0,
+          "gold_index": 2,
+          "finding": "The article states that Si is the only trained pilot and a replacement needs months or over a year. The offered two-remaining-pilots alternative is false; Rod died."
+        },
+        {
+          "native_row": 1,
+          "gold_index": 3,
+          "finding": "Gubelin uniquely wears spectacles and favors old traditions, including the gold watch."
+        }
+      ],
+      "limits": [
+        "Original article terms remain distinct from the CC BY 4.0 annotation release."
+      ],
+      "revision": "7142df0407e16a99e5cda9188edc7db01e8c151a"
+    },
+    "clear/readability": {
+      "repo": "casey-martin/CommonLit-Ease-of-Readability",
+      "native_counts": {
+        "train": 3543,
+        "validation": 708,
+        "test": 473
+      },
+      "annotation": "Bradley–Terry reading-ease scores fitted to human teacher comparisons; not literal individual mean ratings.",
+      "reviewed": [
+        {
+          "native_row": 0,
+          "gold": -2.133114882,
+          "finding": "Long syntactic explanations and abstract grammatical terminology plausibly require difficult reading. Exact native scalar is preserved."
+        },
+        {
+          "native_row": 1,
+          "gold": -3.163356251,
+          "finding": "Archaic diction and dense historical allusions are consistent with greater difficulty; exact native scalar preserved."
+        }
+      ],
+      "limits": [
+        "A coarse read cannot independently validate a fitted psychometric score. Score distributions interpolate the scalar between adjacent -4..2 levels; they are not annotator vote shares.",
+        "CC BY-NC-SA 4.0 corpus; each excerpt retains its recorded original license."
+      ],
+      "revision": "b14ab30b0f4be072492c4483c0f1490eaae77f7a"
+    },
+    "esconv/strategy": {
+      "repo": "tasksource/esconv",
+      "native_counts": {
+        "test": 2895,
+        "validation": 2722,
+        "train": 12759
+      },
+      "annotation": "Human supporter strategy annotations; original dialogue partitions.",
+      "reviewed": [
+        {
+          "native_row": "train:0:3",
+          "gold": "Reflection of feelings",
+          "finding": "Losing a job is always anxious reflects the seeker’s expressed anxiety."
+        },
+        {
+          "native_row": "train:0:5",
+          "gold": "Question",
+          "finding": "Why do you think you will lose your job asks for the reason behind the concern."
+        }
+      ],
+      "limits": [
+        "Native strategy labels are imperfect/context-dependent: the first greeting Hi, good afternoon is labeled Question. Labels are not silently rewritten.",
+        "The mirror avoids the converted source’s merging of adjacent different strategies, and excludes future dialogue, surveys and label names from inputs."
+      ],
+      "revision": "5384809beecd0d30a98efd60a3ab6d2e6595780f"
+    },
+    "prosocial-dialog/safety": {
+      "repo": "allenai/prosocial-dialog",
+      "native_counts": {
+        "train": 120236,
+        "validation": 20416,
+        "test": 25029
+      },
+      "annotation": "Human safety votes over GPT-3-generated inputs; five native ordinal verdicts retained.",
+      "reviewed": [
+        {
+          "native_row": 2,
+          "gold": "needs intervention",
+          "finding": "Deliberately damaging contraception is harmful; two intervention votes and one caution vote support the native verdict."
+        },
+        {
+          "native_row": 3,
+          "gold": "needs intervention",
+          "finding": "Calling the prior sabotage a prank does not make it harmless; preceding dialogue is necessary and retained."
+        }
+      ],
+      "limits": [
+        "The intermediate caution labels encode annotator disagreement, not independently measured harm severity.",
+        "Current human response and annotation rationale are excluded from the decision input; earlier human responses supply legitimate conversation context. Native dialogue IDs are split-local."
+      ],
+      "revision": "d77d7ad3c624c51030f2f32c83e892b3d620b3d4",
+      "group_holdout": {
+        "retained": {
+          "train": 120067,
+          "validation": 20408,
+          "test": 25029
+        },
+        "excluded": {
+          "train": 169,
+          "validation": 8,
+          "test": 0
+        },
+        "policy": "Keep whole conversations with shared opening contexts in test, then validation, then train; exclude lower-priority duplicates."
+      }
+    },
+    "gap": {
+      "repo": "coref-data/gap_raw",
+      "native_counts": {
+        "train": 2000,
+        "validation": 454,
+        "test": 2000
+      },
+      "annotation": "Wikipedia-derived, human coreference judgments; native development used for model development.",
+      "reviewed": [
+        {
+          "native_row": 0,
+          "gold": "A",
+          "finding": "Her boyfriend refers to Cheryl Cassidy, the subject of the preceding description."
+        },
+        {
+          "native_row": 1,
+          "gold": "A",
+          "finding": "His pottery refers to MacKenzie, whose study with Bernard Leach is described."
+        }
+      ],
+      "limits": [
+        "This is a marked-mention A/B/neither projection, not the upstream end-to-end mention-detection task.",
+        "HF train is upstream development; official test is never turned into training."
+      ],
+      "revision": "b3cb9f80cfade3374e73ecea63da8957eb125b3c"
+    }
+  },
+  "blocked": {
+    "MedNLI": "Credentialed PhysioNet access and a signed agreement; no unrestricted public copy used."
+  },
+  "excluded": {
+    "LegalBench": "Explicit user exclusion."
+  },
+  "queued": [
+    "community-datasets/qa4mre"
+  ],
+  "build_smoke": {
+    "selected_tasks": 5,
+    "completed_tasks": 5,
+    "failed_tasks": 0,
+    "outdated_datasets": 0,
+    "parquet_files": 14,
+    "excluded_source_families": [
+      "bigbench/",
+      "mmlu/",
+      "blimp/",
+      "cladder"
+    ],
+    "build_fingerprint": "77186695fd270b60",
+    "shard_fingerprints": {
+      "77186695fd270b60": 5
+    },
+    "validated_typed_decisions": 366,
+    "rows_by_source": {
+      "prosocial-dialog/safety": 30,
+      "clear/readability": 30,
+      "gap": 36,
+      "quality": 231,
+      "esconv/strategy": 39
+    },
+    "published": false
+  },
+  "reviewer": "Codex (GPT-6 family)"
+}

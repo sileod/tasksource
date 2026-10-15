@@ -2424,5 +2424,40 @@
     "papers": [],
     "checked_on": "2026-10-14",
     "reconsider_if": "User explicitly requests inclusion again."
+  },
+  {
+    "name": "MedNLI",
+    "scope": "dataset",
+    "status": "deferred",
+    "reason_code": "restricted_access",
+    "reason": "Original MedNLI requires PhysioNet credentialing, approved training and a signed data-use agreement. Do not ingest unrestricted third-party copies or publicly redistribute clinical text.",
+    "huggingface": [
+      "bigbio/mednli"
+    ],
+    "github": [],
+    "papers": [
+      "arxiv:1808.06752"
+    ],
+    "evidence": [
+      "https://physionet.org/content/mednli/1.0.0/"
+    ],
+    "checked_on": "2026-10-15",
+    "reconsider_if": "An authorized workflow and original terms permit the intended use without public redistribution."
+  },
+  {
+    "name": "LegalBench",
+    "scope": "dataset",
+    "status": "deferred",
+    "reason_code": "user_excluded",
+    "reason": "User explicitly removed LegalBench from the human-curated queue on 2026-10-15.",
+    "huggingface": [
+      "nguha/legalbench"
+    ],
+    "github": [
+      "https://github.com/HazyResearch/legalbench"
+    ],
+    "papers": [],
+    "checked_on": "2026-10-15",
+    "reconsider_if": "User explicitly requests inclusion again."
   }
 ]

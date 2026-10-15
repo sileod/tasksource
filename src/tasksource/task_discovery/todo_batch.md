@@ -184,3 +184,23 @@ These are user requests, separate from automatically discovered prospects.
 | VisGym | Static visual MC | One `visgym/mcq` mirror: 100,000 total training QAs, balanced 25,000 per family (maze/equation/rotation/blocks), plus 100 held-out QAs. Separate family registrations removed. |
 | VisualSphinx | Visual puzzle MC | Existing `visualsphinx` uses curated RL-20K directly. Fresh generation needs LLM code synthesis/verification; no blind expansion from its raw corpus. |
 | Gym-V | Excluded | Excluded by explicit user request; recorded in decisions.json. No catalog registration or scale job. |
+
+
+## Batch 15: human-curated reading, dialogue and clinical sources (2026-10-15)
+
+| Source | Requested view | Status |
+|---|---|---|
+| QuALITY | Full-article native four-option MC | Added `quality` directly from emozilla/quality; 2,523 train / 2,086 validation QAs, zero-based native gold indices. |
+| CLEAR | Human-fitted reading-ease regression | Added `clear/readability` directly from casey-martin/CommonLit-Ease-of-Readability; preserve raw BT scores and native 3,543/708/473 splits. |
+| ESConv | Eight supporter strategies | Added `esconv/strategy` using the official-file tasksource/esconv mirror; consecutive differently annotated turns remain separate. |
+| ProsocialDialog | Five ordinal safety judgments | Added `prosocial-dialog/safety` directly; reconstruct earlier dialogue without current response/rationales. Inputs are GPT-3-generated; labels are human. |
+| MedNLI | Clinical NLI | Blocked: PhysioNet credentialing and signed data-use agreement; no public redistribution through Tasksource. Recorded in decisions.json. |
+| GAP | A/B/neither pronoun resolution | Added `gap` directly from coref-data/gap_raw; upstream development is the HF train split, allowed for model development. Official test remains test. |
+| TRIP (sled-umich/TRIP) | Physical-state plausibility MC | Added `trip/cloze` and `trip/order` directly from the official Hub Parquet conversion; 799 and 2,330 train pairs. Native story groups are split-disjoint, including across views. License unspecified. |
+| QA4MRE (community-datasets/qa4mre) | English main-track native MC | Queued next: verify genuinely labeled training partitions versus released evaluation questions; resolve original terms. |
+
+The seven catalog additions enter the next canonical text build automatically. Partial smoke builds are not publications and must not be uploaded over `full`/`default`.
+
+See the [source and recast audit](../../../docs/jev/audits/reading-dialogue-batch-audit.json) for native examples, caveats and the five-task build smoke results.
+
+TRIP checks and source caveats: [audit](../../../docs/jev/audits/trip-audit.json).

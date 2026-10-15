@@ -1,12 +1,12 @@
 {
   "canonical_titles": 423,
   "card_snapshot_sha256": "84d07c750bca6242e91b072649abf1ce0ce1625a98b63cd53156d764970d1012",
-  "cards": 524,
+  "cards": 530,
   "catalog_sha256": "0c69e824e28e01eb7493274ec5615746bae61a8c8249afd8d8b61ab7d9376168",
   "errors": 14,
   "limit": null,
   "offline": true,
-  "output_sha256": "276e19fc3432c66d8be111da92e43d597659aa6f4d5583f71a4e143210ea7d1c",
+  "output_sha256": "10b99033bae7fc3813c53bffe61191e9815988f2511c68d5cef8752eaf779598",
   "paper_standardization": {
     "input_sha256": "84d07c750bca6242e91b072649abf1ce0ce1625a98b63cd53156d764970d1012",
     "linked_candidates": 510,
@@ -52,5 +52,19 @@
     "tasks": 1,
     "retired_standalone_cards": 3,
     "output_sha256": "276e19fc3432c66d8be111da92e43d597659aa6f4d5583f71a4e143210ea7d1c"
+  },
+  "reading_dialogue_refresh": {
+    "date": "2026-10-15",
+    "cards": 6,
+    "tasks": 5,
+    "errors": 1,
+    "output_sha256": "10b99033bae7fc3813c53bffe61191e9815988f2511c68d5cef8752eaf779598"
+  },
+  "trip_refresh": {
+    "date": "2026-10-15",
+    "cards": 1,
+    "tasks": 2,
+    "errors": 0,
+    "output_sha256": "a2dd100cbdc88493553cab7b4c04a42e27b980c136311fe7088ec586343b5df9"
   }
 }

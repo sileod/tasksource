@@ -1,4 +1,4 @@
-577 English tasks. Load one with `load_task(id)`; the annotations are in [tasks.py](src/tasksource/tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
+584 English tasks. Load one with `load_task(id)`; the annotations are in [tasks.py](src/tasksource/tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
 
 Browse the [example catalog](docs/examples.md): one real example per task.
 
@@ -582,6 +582,13 @@ Browse the [example catalog](docs/examples.md): one real example per task.
 | 575 | [newsmtsc](src/tasksource/tasks.py#L3410) | Classification | [fhamborg/news_sentiment_newsmtsc](https://hf.co/datasets/fhamborg/news_sentiment_newsmtsc) | ✓ |
 | 576 | [sentihood/sentiment](src/tasksource/tasks.py#L3438) | Classification | [bhavnicksm/sentihood](https://hf.co/datasets/bhavnicksm/sentihood) | ✓ |
 | 577 | [mams/atsa](src/tasksource/tasks.py#L3455) | Classification | [NEUDM/mams](https://hf.co/datasets/NEUDM/mams) | ✓ |
+| 578 | [quality](src/tasksource/tasks.py#L3463) | MultipleChoice | [emozilla/quality](https://hf.co/datasets/emozilla/quality) |  |
+| 579 | [clear/readability](src/tasksource/tasks.py#L3472) | Classification | [casey-martin/CommonLit-Ease-of-Readability](https://hf.co/datasets/casey-martin/CommonLit-Ease-of-Readability) | ✓ |
+| 580 | [esconv/strategy](src/tasksource/tasks.py#L3485) | Classification | [tasksource/esconv](https://hf.co/datasets/tasksource/esconv) | ✓ |
+| 581 | [prosocial-dialog/safety](src/tasksource/tasks.py#L3506) | Classification | [allenai/prosocial-dialog](https://hf.co/datasets/allenai/prosocial-dialog) | ✓ |
+| 582 | [gap](src/tasksource/tasks.py#L3526) | Classification | [coref-data/gap_raw](https://hf.co/datasets/coref-data/gap_raw) | ✓ |
+| 583 | [trip/cloze](src/tasksource/tasks.py#L3534) | MultipleChoice | [sled-umich/TRIP](https://hf.co/datasets/sled-umich/TRIP) | ✓ |
+| 584 | [trip/order](src/tasksource/tasks.py#L3543) | MultipleChoice | [sled-umich/TRIP](https://hf.co/datasets/sled-umich/TRIP) | ✓ |
 
 ## Soft labels
 
@@ -652,3 +659,4 @@ Annotations whose label is a distribution (annotator votes, rater shares, survey
 | [oasst2/lang_mismatch](src/tasksource/tasks.py#L2416) | noul | votes | 3 |  | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) |
 | [scirepeval/search](src/tasksource/tasks.py#L2519) | score | mean |  | regression | [tasksource/scirepeval-search](https://hf.co/datasets/tasksource/scirepeval-search) |
 | [discogem/relation](src/tasksource/tasks.py#L2950) | choice | votes | 10 | Classification | [tasksource/discogem](https://hf.co/datasets/tasksource/discogem) |
+| [clear/readability](src/tasksource/tasks.py#L3472) | score | mean |  | regression | [casey-martin/CommonLit-Ease-of-Readability](https://hf.co/datasets/casey-martin/CommonLit-Ease-of-Readability) |

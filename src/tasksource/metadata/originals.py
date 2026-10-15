@@ -11,6 +11,7 @@ by scripts/upload_repackaged.py) or a task switches to a mirror.
 """
 
 ORIGINALS = {
+    "tasksource/esconv": ["thu-coai/esconv"],
     "tasksource/sphinx-mcq": ["maveryn/sphinx"],
     "tasksource/visgym-mcq": [],
     'tasksource/tron-mcq': [],

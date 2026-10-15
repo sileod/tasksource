@@ -5,6 +5,13 @@ Keys are task families, shared by their visual classification/MC views.
 """
 
 SOURCE_LICENSE_EVIDENCE = {
+    'trip': {'license': 'unknown', 'license_use': 'unspecified', 'checked': '2026-10-15', 'scope': 'No dataset license declared in the official Hub card or linked original repository; public access does not imply permission', 'url': 'https://huggingface.co/datasets/sled-umich/TRIP', 'additional_urls': ['https://github.com/sled-group/Verifiable-Coherent-NLU']},
+    'quality': {'license': 'cc-by-4.0', 'license_use': 'commercial', 'checked': '2026-10-15', 'scope': 'QuALITY annotations; articles retain their original source terms', 'url': 'https://nyu-mll.github.io/quality/'},
+    'clear': {'license': 'cc-by-nc-sa-4.0', 'license_use': 'non-commercial', 'checked': '2026-10-15', 'scope': 'CLEAR ratings and corpus; excerpts retain their individually recorded original licenses', 'url': 'https://github.com/scrosseye/CLEAR-Corpus/blob/main/README.md'},
+    'esconv': {'license': 'cc-by-nc-4.0', 'license_use': 'non-commercial', 'checked': '2026-10-15', 'scope': 'ESConv native dialogues and human strategy annotations', 'url': 'https://huggingface.co/datasets/thu-coai/esconv'},
+    'prosocial-dialog': {'license': 'cc-by-4.0', 'license_use': 'commercial', 'checked': '2026-10-15', 'scope': 'Human safety judgments and responses; potentially unsafe inputs generated with GPT-3', 'url': 'https://huggingface.co/datasets/allenai/prosocial-dialog'},
+    'gap': {'license': 'apache-2.0', 'license_use': 'commercial', 'checked': '2026-10-15', 'scope': 'GAP dataset release; Wikipedia snippets retain their source attribution requirements', 'url': 'https://github.com/google-research-datasets/gap-coreference/blob/master/LICENSE'},
+
     'sphinx': {'license': 'mit; cc-by-4.0 icons', 'license_use': 'commercial', 'checked': '2026-10-14',
                'scope': 'MIT generator code; rendered shipped icons retain their CC BY 4.0 notice',
                'url': 'https://github.com/maveryn/sphinx/blob/28ef6c43629ab4491491a204167ef2f52dcd8182/LICENSE',

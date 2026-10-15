@@ -4,6 +4,23 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource 2026-10-15.2
+
+- Add `trip/cloze` and `trip/order`: two native story choices with human physical-plausibility labels, using the official Hugging Face Parquet conversion directly.
+- Preserve the original 799/322/351 and 2,330/393/408 train/validation/test partitions. Story groups do not overlap across splits, including between views.
+- Record the original license as unspecified. These tasks enter the next canonical Jev text build; they have not been published to `full`/`default` yet.
+
+## tasksource 2026-10-15
+
+- Add `quality`, `clear/readability`, `esconv/strategy`, `prosocial-dialog/safety` and `gap` to the English catalog. Preserve full reading passages, native options, raw reading-ease scores and source partitions.
+- Keep earlier conversation context without future turns or annotation rationales; shared ProsocialDialog opening contexts favor evaluation splits. Preserve native marked pronoun spans and record human/model input provenance and original licenses.
+- MedNLI remains access-restricted; LegalBench is excluded by request. These catalog additions are queued for the next canonical text build, not yet published to the Jev `full`/`default` configs.
+
+## esconv 2026-10-15
+
+- Preserve the official train/validation/test dialogue partitions and every native supporter-strategy label in a data-only mirror.
+- Keep consecutive replies with different strategies separate. Classify the current reply using prior context only; retain conversation identity and source provenance. Original CC BY-NC 4.0 terms apply.
+
 ## tasksource-jev-typed-decisions v2026.10.13.7
 
 - `vision`: +170,008 training rows (309,818 → 479,826) from larger source mirrors, up to 30,000 rows per family: BAPPS, DocLayNet, LVIS and COCO panoptic regions (+29,000 each), SPair-71k (+25,008), Super-CLEVR (+29,000 across six views). Existing rows and evaluation splits are unchanged.

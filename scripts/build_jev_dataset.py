@@ -684,7 +684,7 @@ def diverse_cap(dataset, max_rows):
 # reserved; the other formats share the rest, and one short of rows passes its
 # unused share to them in proportion to theirs.
 # long-document tasks: few sources teach reading long inputs, so they keep 10x more rows
-LONG_DOCUMENT_TASKS = r"doc-nli|ConTRoL|mctest-nli|summ"
+LONG_DOCUMENT_TASKS = r"doc-nli|ConTRoL|mctest-nli|summ|^quality$"
 FORMAT_SHARES = {"Classification": 0.47, "MultipleChoice": 0.30, "TokenClassification": 0.03,
                  "graded": 0.10, "procedural": 0.10}
 RESERVED_FORMATS = ("graded", "procedural")

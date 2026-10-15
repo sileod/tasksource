@@ -20,7 +20,7 @@ from scripts.repackage_dataset.browser import websrc
 from scripts.repackage_dataset.mind2web import mind2web_dom
 from scripts.repackage_dataset.relevance import antique, sentfin, wands, scirepeval_search
 from scripts.repackage_dataset.specialized_text import acord, edos, evidence_inference
-from scripts.repackage_dataset.dialogue import slurp, mcscript2
+from scripts.repackage_dataset.dialogue import slurp, mcscript2, esconv
 from scripts.repackage_dataset.stance import vast, fnc1, perspectrum, ukpconvarg, discogem
 from scripts.repackage_dataset.specialized_text import pubmed_rct
 from scripts.repackage_dataset.linguistic import semcor, streusle, spider
@@ -40,7 +40,8 @@ from scripts.repackage_dataset.procedural.balanced_visgym import visgym_balanced
 from scripts.repackage_dataset.regions import coco_regions, doclaynet_region, bapps, spair71k_grid
 
 
-BUILDERS = {"sphinx-mcq": ("tasksource/sphinx-mcq", sphinx_mc),
+BUILDERS = {"esconv": ("tasksource/esconv", esconv),
+            "sphinx-mcq": ("tasksource/sphinx-mcq", sphinx_mc),
             "visgym-mcq": ("tasksource/visgym-mcq", visgym_balanced),
             "tron-mcq": ("tasksource/tron-mcq", tron_mc),
             "tron-mcq-repair": ("tasksource/tron-mcq", repair_tron_mc),
@@ -94,7 +95,8 @@ BUILDERS = {"sphinx-mcq": ("tasksource/sphinx-mcq", sphinx_mc),
 
 
 # license metadata for repackaged sets, as the originals state it
-LICENSES = {"tasksource/sphinx-mcq": ["mit", "cc-by-4.0"],
+LICENSES = {"tasksource/esconv": "cc-by-nc-4.0",
+            "tasksource/sphinx-mcq": ["mit", "cc-by-4.0"],
             "tasksource/visgym-mcq": "apache-2.0",
             "tasksource/tron-mcq": "other", "tasksource/trace-mcq": "cc-by-4.0",
             "tasksource/mentis-oculi-paper-fold": "apache-2.0",
