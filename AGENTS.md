@@ -16,6 +16,8 @@ Keep Hub root dataset cards focused on current usage, configs, schema and licens
 
 The text configs of `tasksource/tasksource-jev-typed-decisions` (`default`, `full`) come only from `scripts/build_jev_dataset.py`, and each publish replaces all their shards. New sources enter through the catalog and the build, not through one-off publication scripts.
 
+The `vision` config grows additively: declare and pin the task in `src/tasksource/vision_tasks.py`, add the changelog entry, then run `scripts/append_jev_vision.py --tasks TASK ... --cap N --push --release vYYYY.MM.DD.n` (see `docs/jev/README.md`). Existing shards stay byte-identical.
+
 # Changelog
 
 Every change that affects published data (new or removed sources, label fixes, sampling, schema) gets an entry in the root [`DATA_CHANGELOG.md`](DATA_CHANGELOG.md), newest first: `## <dataset> <version>` and a few concise, user-facing bullets on what changed in the data, not how it was done. Code-only changes need no entry. Keep history out of dataset cards.
