@@ -3683,3 +3683,19 @@ knowref60k = MultipleChoice(inputs='swapped_sentence',
 tabmwp = MultipleChoice(inputs='inputs',choices_list='choices_list',labels='labels',dataset_name='tasksource/tabmwp',
     task_id='tabmwp',preserve_choices=True,complete_splits=False,metadata='metadata',
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/tabmwp']})
+
+
+def _procedural_choices(dataset):
+    """Verified procedural answers among scorer-rejected options; near-correct options (score >= 0.9)
+    leave, so every remaining distractor is clearly wrong."""
+    def clean(row):
+        keep = [i for i, score in enumerate(row['option_scores']) if i == row['label'] or score < 0.9]
+        return {'options': [row['options'][i] for i in keep], 'label': keep.index(row['label'])}
+    return dataset.map(clean).filter(lambda options: len(options) >= 2, input_columns='options')
+
+# reasoning-core's procedural tasks and reasoning-gym, as multiple choice
+procedural_choices = MultipleChoice(inputs='prompt',choices_list='options',labels='label',
+    dataset_name='reasoning-core/procedural-choices',config_name=['reasoning_core','reasoning_gym'],
+    task_id='procedural-choices/{config_name}',preserve_choices=True,pre_process=_procedural_choices,
+    metadata=lambda r:_decision_metadata(r['id'],r['id'],task=r['task'],level=r['level'],annotation_origin='procedural'),
+    load_dataset_kwargs={'revision':'8b19ab6a5b85aab38f7cf8dc13b9ffa35c56aac3'})

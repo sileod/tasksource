@@ -12,6 +12,7 @@ concise bullets on what changed in the data. `tasksource-jev-typed-decisions` re
 
 ## tasksource 2026-10-15.12
 
+- New tasks `procedural-choices/reasoning_core` (54 tasks) and `procedural-choices/reasoning_gym` (68 tasks): verified procedural answers among options their scorer rejects, without near-correct options.
 - New visual tasks `rico-widget/box`, `mind2web/box` and `spair71k/point`: native candidate boxes or keypoints as 0–1000 coordinate options.
 
 ## tasksource-jev-typed-decisions v2026.10.15.3

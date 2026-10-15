@@ -1,4 +1,4 @@
-573 English tasks. Load one with `load_task(id)`; the annotations are in [tasks.py](src/tasksource/tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
+575 English tasks. Load one with `load_task(id)`; the annotations are in [tasks.py](src/tasksource/tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
 
 Browse the [example catalog](docs/examples.md): one real example per task.
 
@@ -264,8 +264,8 @@ Browse the [example catalog](docs/examples.md): one real example per task.
 | 258 | [webgpt_comparisons](src/tasksource/tasks.py#L1095) | MultipleChoice | [heegyu/webgpt_comparisons_ko](https://hf.co/datasets/heegyu/webgpt_comparisons_ko) | ✓ |
 | 259 | [synthetic-instruct-gptj-pairwise](src/tasksource/tasks.py#L1103) | MultipleChoice | [Dahoas/synthetic-instruct-gptj-pairwise](https://hf.co/datasets/Dahoas/synthetic-instruct-gptj-pairwise) | ✓ |
 | 260 | [scruples](src/tasksource/tasks.py#L1106) | Classification | [tasksource/scruples](https://hf.co/datasets/tasksource/scruples) | ✓ |
-| 261 | [defeasible-nli/snli](src/tasksource/tasks.py#L1111) | Classification | [tasksource/defeasible-nli](https://hf.co/datasets/tasksource/defeasible-nli) |  |
-| 262 | [defeasible-nli/atomic](src/tasksource/tasks.py#L1111) | Classification | [tasksource/defeasible-nli](https://hf.co/datasets/tasksource/defeasible-nli) |  |
+| 261 | [defeasible-nli/atomic](src/tasksource/tasks.py#L1111) | Classification | [tasksource/defeasible-nli](https://hf.co/datasets/tasksource/defeasible-nli) |  |
+| 262 | [defeasible-nli/snli](src/tasksource/tasks.py#L1111) | Classification | [tasksource/defeasible-nli](https://hf.co/datasets/tasksource/defeasible-nli) |  |
 | 263 | [defeasible-nli/social](src/tasksource/tasks.py#L1115) | Classification | [tasksource/defeasible-nli](https://hf.co/datasets/tasksource/defeasible-nli) |  |
 | 264 | [help-nli](src/tasksource/tasks.py#L1119) | Classification | [tasksource/help-nli](https://hf.co/datasets/tasksource/help-nli) |  |
 | 265 | [nli-veridicality-transitivity](src/tasksource/tasks.py#L1122) | Classification | [tasksource/nli-veridicality-transitivity](https://hf.co/datasets/tasksource/nli-veridicality-transitivity) |  |
@@ -310,9 +310,9 @@ Browse the [example catalog](docs/examples.md): one real example per task.
 | 304 | [oasst2_dense_flat/toxicity](src/tasksource/tasks.py#L1326) | Classification | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) | ✓ |
 | 305 | [oasst2_dense_flat/helpfulness](src/tasksource/tasks.py#L1328) | Classification | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) | ✓ |
 | 306 | [mindgames](src/tasksource/tasks.py#L1331) | Classification | [sileod/mindgames](https://hf.co/datasets/sileod/mindgames) |  |
-| 307 | [universal_dependencies/en_gum/deprel](src/tasksource/tasks.py#L1345) | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ✓ |
-| 308 | [universal_dependencies/en_ewt/deprel](src/tasksource/tasks.py#L1345) | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ✓ |
-| 309 | [universal_dependencies/en_lines/deprel](src/tasksource/tasks.py#L1345) | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ✓ |
+| 307 | [universal_dependencies/en_lines/deprel](src/tasksource/tasks.py#L1345) | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ✓ |
+| 308 | [universal_dependencies/en_gum/deprel](src/tasksource/tasks.py#L1345) | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ✓ |
+| 309 | [universal_dependencies/en_ewt/deprel](src/tasksource/tasks.py#L1345) | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ✓ |
 | 310 | [universal_dependencies/en_partut/deprel](src/tasksource/tasks.py#L1345) | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ✓ |
 | 311 | [ambient](src/tasksource/tasks.py#L1352) | Classification | [tasksource/ambient](https://hf.co/datasets/tasksource/ambient) | ✓ |
 | 312 | [path-naturalness-prediction](src/tasksource/tasks.py#L1357) | MultipleChoice | [tasksource/path-naturalness-prediction](https://hf.co/datasets/tasksource/path-naturalness-prediction) |  |
@@ -379,8 +379,8 @@ Browse the [example catalog](docs/examples.md): one real example per task.
 | 373 | [stepgame](src/tasksource/tasks.py#L1592) | Classification | [tasksource/stepgame](https://hf.co/datasets/tasksource/stepgame) |  |
 | 374 | [nlgraph](src/tasksource/tasks.py#L1600) | Classification | [tasksource/nlgraph](https://hf.co/datasets/tasksource/nlgraph) |  |
 | 375 | [oasst2_pairwise_rlhf_reward](src/tasksource/tasks.py#L1604) | MultipleChoice | [tasksource/oasst2_pairwise_rlhf_reward](https://hf.co/datasets/tasksource/oasst2_pairwise_rlhf_reward) | ✓ |
-| 376 | [hh-rlhf/helpful-rejection-sampled](src/tasksource/tasks.py#L1615) | MultipleChoice | [tasksource/hh-rlhf](https://hf.co/datasets/tasksource/hh-rlhf) | ✓ |
-| 377 | [hh-rlhf/helpful-online](src/tasksource/tasks.py#L1615) | MultipleChoice | [tasksource/hh-rlhf](https://hf.co/datasets/tasksource/hh-rlhf) | ✓ |
+| 376 | [hh-rlhf/helpful-online](src/tasksource/tasks.py#L1615) | MultipleChoice | [tasksource/hh-rlhf](https://hf.co/datasets/tasksource/hh-rlhf) | ✓ |
+| 377 | [hh-rlhf/helpful-rejection-sampled](src/tasksource/tasks.py#L1615) | MultipleChoice | [tasksource/hh-rlhf](https://hf.co/datasets/tasksource/hh-rlhf) | ✓ |
 | 378 | [hh-rlhf/helpful-base](src/tasksource/tasks.py#L1615) | MultipleChoice | [tasksource/hh-rlhf](https://hf.co/datasets/tasksource/hh-rlhf) | ✓ |
 | 379 | [hh-rlhf/harmless-base](src/tasksource/tasks.py#L1619) | MultipleChoice | [tasksource/hh-rlhf](https://hf.co/datasets/tasksource/hh-rlhf) | ✓ |
 | 380 | [ruletaker](src/tasksource/tasks.py#L1623) | Classification | [tasksource/ruletaker](https://hf.co/datasets/tasksource/ruletaker) | ✓ |
@@ -496,15 +496,15 @@ Browse the [example catalog](docs/examples.md): one real example per task.
 | 490 | [squad-v2/answerability](src/tasksource/tasks.py#L2636) | Classification | [rajpurkar/squad_v2](https://hf.co/datasets/rajpurkar/squad_v2) | ✓ |
 | 491 | [cuad/answerability](src/tasksource/tasks.py#L2641) | Classification | [theatticusproject/cuad-qa](https://hf.co/datasets/theatticusproject/cuad-qa) | ✓ |
 | 492 | [hallmarks-of-cancer/yesno](src/tasksource/tasks.py#L2660) | Classification | [bigbio/hallmarks_of_cancer](https://hf.co/datasets/bigbio/hallmarks_of_cancer) | ✓ |
-| 493 | [semeval2014-absa/restaurants](src/tasksource/tasks.py#L2682) | Classification | [alexcadillon/SemEval2014Task4](https://hf.co/datasets/alexcadillon/SemEval2014Task4) | ✓ |
-| 494 | [semeval2014-absa/laptops](src/tasksource/tasks.py#L2682) | Classification | [alexcadillon/SemEval2014Task4](https://hf.co/datasets/alexcadillon/SemEval2014Task4) | ✓ |
+| 493 | [semeval2014-absa/laptops](src/tasksource/tasks.py#L2682) | Classification | [alexcadillon/SemEval2014Task4](https://hf.co/datasets/alexcadillon/SemEval2014Task4) | ✓ |
+| 494 | [semeval2014-absa/restaurants](src/tasksource/tasks.py#L2682) | Classification | [alexcadillon/SemEval2014Task4](https://hf.co/datasets/alexcadillon/SemEval2014Task4) | ✓ |
 | 495 | [record/candidate](src/tasksource/tasks.py#L2704) | Classification | [aps/super_glue](https://hf.co/datasets/aps/super_glue) | ✓ |
-| 496 | [multidogo/finance/intent](src/tasksource/tasks.py#L2727) | Classification | [jpcorb20/multidogo](https://hf.co/datasets/jpcorb20/multidogo) | ✓ |
-| 497 | [multidogo/fastfood/intent](src/tasksource/tasks.py#L2727) | Classification | [jpcorb20/multidogo](https://hf.co/datasets/jpcorb20/multidogo) | ✓ |
-| 498 | [multidogo/airline/intent](src/tasksource/tasks.py#L2727) | Classification | [jpcorb20/multidogo](https://hf.co/datasets/jpcorb20/multidogo) | ✓ |
-| 499 | [multidogo/insurance/intent](src/tasksource/tasks.py#L2727) | Classification | [jpcorb20/multidogo](https://hf.co/datasets/jpcorb20/multidogo) | ✓ |
-| 500 | [multidogo/media/intent](src/tasksource/tasks.py#L2727) | Classification | [jpcorb20/multidogo](https://hf.co/datasets/jpcorb20/multidogo) | ✓ |
-| 501 | [multidogo/software/intent](src/tasksource/tasks.py#L2727) | Classification | [jpcorb20/multidogo](https://hf.co/datasets/jpcorb20/multidogo) | ✓ |
+| 496 | [multidogo/software/intent](src/tasksource/tasks.py#L2727) | Classification | [jpcorb20/multidogo](https://hf.co/datasets/jpcorb20/multidogo) | ✓ |
+| 497 | [multidogo/media/intent](src/tasksource/tasks.py#L2727) | Classification | [jpcorb20/multidogo](https://hf.co/datasets/jpcorb20/multidogo) | ✓ |
+| 498 | [multidogo/insurance/intent](src/tasksource/tasks.py#L2727) | Classification | [jpcorb20/multidogo](https://hf.co/datasets/jpcorb20/multidogo) | ✓ |
+| 499 | [multidogo/finance/intent](src/tasksource/tasks.py#L2727) | Classification | [jpcorb20/multidogo](https://hf.co/datasets/jpcorb20/multidogo) | ✓ |
+| 500 | [multidogo/fastfood/intent](src/tasksource/tasks.py#L2727) | Classification | [jpcorb20/multidogo](https://hf.co/datasets/jpcorb20/multidogo) | ✓ |
+| 501 | [multidogo/airline/intent](src/tasksource/tasks.py#L2727) | Classification | [jpcorb20/multidogo](https://hf.co/datasets/jpcorb20/multidogo) | ✓ |
 | 502 | [wikisql/aggregation](src/tasksource/tasks.py#L2755) | Classification | [Salesforce/wikisql](https://hf.co/datasets/Salesforce/wikisql) | ✓ |
 | 503 | [wikisql/column](src/tasksource/tasks.py#L2760) | MultipleChoice | [Salesforce/wikisql](https://hf.co/datasets/Salesforce/wikisql) | ✓ |
 | 504 | [wikisql/operator](src/tasksource/tasks.py#L2765) | Classification | [Salesforce/wikisql](https://hf.co/datasets/Salesforce/wikisql) | ✓ |
@@ -577,6 +577,8 @@ Browse the [example catalog](docs/examples.md): one real example per task.
 | 571 | [recam](src/tasksource/tasks.py#L3657) | MultipleChoice | [holylovenia/recam](https://hf.co/datasets/holylovenia/recam) | ✓ |
 | 572 | [knowref60k](src/tasksource/tasks.py#L3672) | MultipleChoice | [coref-data/knowref_60k_raw](https://hf.co/datasets/coref-data/knowref_60k_raw) | ✓ |
 | 573 | [tabmwp](src/tasksource/tasks.py#L3683) | MultipleChoice | [tasksource/tabmwp](https://hf.co/datasets/tasksource/tabmwp) |  |
+| 574 | [procedural-choices/reasoning_gym](src/tasksource/tasks.py#L3697) | MultipleChoice | [reasoning-core/procedural-choices](https://hf.co/datasets/reasoning-core/procedural-choices) |  |
+| 575 | [procedural-choices/reasoning_core](src/tasksource/tasks.py#L3697) | MultipleChoice | [reasoning-core/procedural-choices](https://hf.co/datasets/reasoning-core/procedural-choices) |  |
 
 ## Soft labels
 
