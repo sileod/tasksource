@@ -6,7 +6,7 @@ concise bullets on what changed in the data. `tasksource-jev-typed-decisions` re
 
 ## tasksource 2026-10-15.11
 
-- civil_comments threat, sexual_explicit, obscene and identity_attack keep every majority-flagged comment and three clear negatives per positive (threat: 4,280 positives instead of about 80 per sample); severe_toxicity parked (13 positives in 1.8M comments).
+- civil_comments threat, sexual_explicit, obscene and identity_attack keep every majority-flagged comment and three clear negatives per positive, capped at 5,000 training rows (their labels follow keywords); severe_toxicity parked (13 positives in 1.8M comments).
 - Task questions for MultiRC, ethics/justice, ethics/virtue and dnd_style_intents; "Receive quest" label spelling.
 
 ## tasksource 2026-10-15.10

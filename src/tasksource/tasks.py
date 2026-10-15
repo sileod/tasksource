@@ -1375,9 +1375,11 @@ def _civil_clear(dataset, attribute, negatives_per_positive=None):
     return DatasetDict(out)
 
 def _civil(attribute, negative, positive, flag, negatives_per_positive=None):
-    # attributes are the share of raters who flagged the comment; keep clear cases
+    # attributes are the share of raters who flagged the comment; keep clear cases. Rare attributes
+    # follow keywords ("hooked on killing" as a threat), hence their cap
     return Classification("text", labels=lambda x: [negative, positive][x[attribute] >= 0.5],
         question=f"Would most raters flag this comment as {flag}?",
+        max_examples=5000 if negatives_per_positive else None,
         pre_process=lambda ds: _civil_clear(ds, attribute, negatives_per_positive), dataset_name="google/civil_comments")
 
 civil_comments__toxicity = _civil("toxicity", "not toxic", "toxic", "toxic")
