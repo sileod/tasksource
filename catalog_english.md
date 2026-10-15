@@ -1,4 +1,4 @@
-580 English tasks. Load one with `load_task(id)`; the annotations are in [tasks.py](src/tasksource/tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
+578 English tasks. Load one with `load_task(id)`; the annotations are in [tasks.py](src/tasksource/tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
 
 Browse the [example catalog](docs/examples.md): one real example per task.
 
@@ -20,24 +20,24 @@ Browse the [example catalog](docs/examples.md): one real example per task.
 | 14 | [anli/a1](src/tasksource/tasks.py#L71) | Classification | [facebook/anli](https://hf.co/datasets/facebook/anli) |  |
 | 15 | [anli/a2](src/tasksource/tasks.py#L72) | Classification | [facebook/anli](https://hf.co/datasets/facebook/anli) |  |
 | 16 | [anli/a3](src/tasksource/tasks.py#L73) | Classification | [facebook/anli](https://hf.co/datasets/facebook/anli) |  |
-| 17 | [babi_nli/two-supporting-facts](src/tasksource/tasks.py#L76) | Classification | [tasksource/babi_nli](https://hf.co/datasets/tasksource/babi_nli) |  |
-| 18 | [babi_nli/basic-deduction](src/tasksource/tasks.py#L76) | Classification | [tasksource/babi_nli](https://hf.co/datasets/tasksource/babi_nli) |  |
-| 19 | [babi_nli/basic-coreference](src/tasksource/tasks.py#L76) | Classification | [tasksource/babi_nli](https://hf.co/datasets/tasksource/babi_nli) |  |
-| 20 | [babi_nli/yes-no-questions](src/tasksource/tasks.py#L76) | Classification | [tasksource/babi_nli](https://hf.co/datasets/tasksource/babi_nli) |  |
-| 21 | [babi_nli/counting](src/tasksource/tasks.py#L76) | Classification | [tasksource/babi_nli](https://hf.co/datasets/tasksource/babi_nli) |  |
-| 22 | [babi_nli/indefinite-knowledge](src/tasksource/tasks.py#L76) | Classification | [tasksource/babi_nli](https://hf.co/datasets/tasksource/babi_nli) |  |
-| 23 | [babi_nli/lists-sets](src/tasksource/tasks.py#L76) | Classification | [tasksource/babi_nli](https://hf.co/datasets/tasksource/babi_nli) |  |
-| 24 | [babi_nli/path-finding](src/tasksource/tasks.py#L76) | Classification | [tasksource/babi_nli](https://hf.co/datasets/tasksource/babi_nli) |  |
-| 25 | [babi_nli/compound-coreference](src/tasksource/tasks.py#L76) | Classification | [tasksource/babi_nli](https://hf.co/datasets/tasksource/babi_nli) |  |
-| 26 | [babi_nli/positional-reasoning](src/tasksource/tasks.py#L76) | Classification | [tasksource/babi_nli](https://hf.co/datasets/tasksource/babi_nli) |  |
-| 27 | [babi_nli/simple-negation](src/tasksource/tasks.py#L76) | Classification | [tasksource/babi_nli](https://hf.co/datasets/tasksource/babi_nli) |  |
-| 28 | [babi_nli/single-supporting-fact](src/tasksource/tasks.py#L76) | Classification | [tasksource/babi_nli](https://hf.co/datasets/tasksource/babi_nli) |  |
-| 29 | [babi_nli/size-reasoning](src/tasksource/tasks.py#L76) | Classification | [tasksource/babi_nli](https://hf.co/datasets/tasksource/babi_nli) |  |
-| 30 | [babi_nli/three-arg-relations](src/tasksource/tasks.py#L76) | Classification | [tasksource/babi_nli](https://hf.co/datasets/tasksource/babi_nli) |  |
-| 31 | [babi_nli/three-supporting-facts](src/tasksource/tasks.py#L76) | Classification | [tasksource/babi_nli](https://hf.co/datasets/tasksource/babi_nli) |  |
-| 32 | [babi_nli/time-reasoning](src/tasksource/tasks.py#L76) | Classification | [tasksource/babi_nli](https://hf.co/datasets/tasksource/babi_nli) |  |
-| 33 | [babi_nli/two-arg-relations](src/tasksource/tasks.py#L76) | Classification | [tasksource/babi_nli](https://hf.co/datasets/tasksource/babi_nli) |  |
-| 34 | [babi_nli/conjunction](src/tasksource/tasks.py#L76) | Classification | [tasksource/babi_nli](https://hf.co/datasets/tasksource/babi_nli) |  |
+| 17 | [babi_nli/positional-reasoning](src/tasksource/tasks.py#L76) | Classification | [tasksource/babi_nli](https://hf.co/datasets/tasksource/babi_nli) |  |
+| 18 | [babi_nli/path-finding](src/tasksource/tasks.py#L76) | Classification | [tasksource/babi_nli](https://hf.co/datasets/tasksource/babi_nli) |  |
+| 19 | [babi_nli/lists-sets](src/tasksource/tasks.py#L76) | Classification | [tasksource/babi_nli](https://hf.co/datasets/tasksource/babi_nli) |  |
+| 20 | [babi_nli/compound-coreference](src/tasksource/tasks.py#L76) | Classification | [tasksource/babi_nli](https://hf.co/datasets/tasksource/babi_nli) |  |
+| 21 | [babi_nli/basic-deduction](src/tasksource/tasks.py#L76) | Classification | [tasksource/babi_nli](https://hf.co/datasets/tasksource/babi_nli) |  |
+| 22 | [babi_nli/conjunction](src/tasksource/tasks.py#L76) | Classification | [tasksource/babi_nli](https://hf.co/datasets/tasksource/babi_nli) |  |
+| 23 | [babi_nli/simple-negation](src/tasksource/tasks.py#L76) | Classification | [tasksource/babi_nli](https://hf.co/datasets/tasksource/babi_nli) |  |
+| 24 | [babi_nli/basic-coreference](src/tasksource/tasks.py#L76) | Classification | [tasksource/babi_nli](https://hf.co/datasets/tasksource/babi_nli) |  |
+| 25 | [babi_nli/single-supporting-fact](src/tasksource/tasks.py#L76) | Classification | [tasksource/babi_nli](https://hf.co/datasets/tasksource/babi_nli) |  |
+| 26 | [babi_nli/indefinite-knowledge](src/tasksource/tasks.py#L76) | Classification | [tasksource/babi_nli](https://hf.co/datasets/tasksource/babi_nli) |  |
+| 27 | [babi_nli/three-arg-relations](src/tasksource/tasks.py#L76) | Classification | [tasksource/babi_nli](https://hf.co/datasets/tasksource/babi_nli) |  |
+| 28 | [babi_nli/three-supporting-facts](src/tasksource/tasks.py#L76) | Classification | [tasksource/babi_nli](https://hf.co/datasets/tasksource/babi_nli) |  |
+| 29 | [babi_nli/time-reasoning](src/tasksource/tasks.py#L76) | Classification | [tasksource/babi_nli](https://hf.co/datasets/tasksource/babi_nli) |  |
+| 30 | [babi_nli/two-arg-relations](src/tasksource/tasks.py#L76) | Classification | [tasksource/babi_nli](https://hf.co/datasets/tasksource/babi_nli) |  |
+| 31 | [babi_nli/two-supporting-facts](src/tasksource/tasks.py#L76) | Classification | [tasksource/babi_nli](https://hf.co/datasets/tasksource/babi_nli) |  |
+| 32 | [babi_nli/yes-no-questions](src/tasksource/tasks.py#L76) | Classification | [tasksource/babi_nli](https://hf.co/datasets/tasksource/babi_nli) |  |
+| 33 | [babi_nli/counting](src/tasksource/tasks.py#L76) | Classification | [tasksource/babi_nli](https://hf.co/datasets/tasksource/babi_nli) |  |
+| 34 | [babi_nli/size-reasoning](src/tasksource/tasks.py#L76) | Classification | [tasksource/babi_nli](https://hf.co/datasets/tasksource/babi_nli) |  |
 | 35 | [babi_nli/basic-induction](src/tasksource/tasks.py#L81) | Classification | [tasksource/babi_nli](https://hf.co/datasets/tasksource/babi_nli) | ✓ |
 | 36 | [sick/label](src/tasksource/tasks.py#L86) | Classification | [tasksource/sick](https://hf.co/datasets/tasksource/sick) |  |
 | 37 | [sick/relatedness](src/tasksource/tasks.py#L88) | Classification | [tasksource/sick](https://hf.co/datasets/tasksource/sick) | ✓ |
@@ -45,545 +45,543 @@ Browse the [example catalog](docs/examples.md): one real example per task.
 | 39 | [scitail/snli_format](src/tasksource/tasks.py#L149) | Classification | [allenai/scitail](https://hf.co/datasets/allenai/scitail) |  |
 | 40 | [hans](src/tasksource/tasks.py#L151) | Classification | [tasksource/hans](https://hf.co/datasets/tasksource/hans) |  |
 | 41 | [WANLI](src/tasksource/tasks.py#L154) | Classification | [alisawuffles/WANLI](https://hf.co/datasets/alisawuffles/WANLI) |  |
-| 42 | [recast/recast_verbcorner](src/tasksource/tasks.py#L156) | Classification | [tasksource/recast](https://hf.co/datasets/tasksource/recast) |  |
-| 43 | [recast/recast_verbnet](src/tasksource/tasks.py#L156) | Classification | [tasksource/recast](https://hf.co/datasets/tasksource/recast) |  |
-| 44 | [recast/recast_factuality](src/tasksource/tasks.py#L156) | Classification | [tasksource/recast](https://hf.co/datasets/tasksource/recast) |  |
-| 45 | [recast/recast_puns](src/tasksource/tasks.py#L156) | Classification | [tasksource/recast](https://hf.co/datasets/tasksource/recast) |  |
-| 46 | [recast/recast_sentiment](src/tasksource/tasks.py#L156) | Classification | [tasksource/recast](https://hf.co/datasets/tasksource/recast) |  |
-| 47 | [recast/recast_ner](src/tasksource/tasks.py#L156) | Classification | [tasksource/recast](https://hf.co/datasets/tasksource/recast) |  |
-| 48 | [recast/recast_megaveridicality](src/tasksource/tasks.py#L156) | Classification | [tasksource/recast](https://hf.co/datasets/tasksource/recast) |  |
-| 49 | [probability_words_nli/usnli](src/tasksource/tasks.py#L161) | Classification | [sileod/probability_words_nli](https://hf.co/datasets/sileod/probability_words_nli) | ✓ |
-| 50 | [probability_words_nli/reasoning_1hop](src/tasksource/tasks.py#L161) | Classification | [sileod/probability_words_nli](https://hf.co/datasets/sileod/probability_words_nli) | ✓ |
-| 51 | [probability_words_nli/reasoning_2hop](src/tasksource/tasks.py#L161) | Classification | [sileod/probability_words_nli](https://hf.co/datasets/sileod/probability_words_nli) | ✓ |
-| 52 | [nan-nli](src/tasksource/tasks.py#L166) | Classification | [joey234/nan-nli](https://hf.co/datasets/joey234/nan-nli) |  |
-| 53 | [nli_fever](src/tasksource/tasks.py#L169) | Classification | [pietrolesci/nli_fever](https://hf.co/datasets/pietrolesci/nli_fever) |  |
-| 54 | [breaking_nli](src/tasksource/tasks.py#L172) | Classification | [pietrolesci/breaking_nli](https://hf.co/datasets/pietrolesci/breaking_nli) |  |
-| 55 | [conj_nli](src/tasksource/tasks.py#L176) | Classification | [pietrolesci/conj_nli](https://hf.co/datasets/pietrolesci/conj_nli) |  |
-| 56 | [fracas](src/tasksource/tasks.py#L180) | Classification | [pietrolesci/fracas](https://hf.co/datasets/pietrolesci/fracas) |  |
-| 57 | [dialogue_nli](src/tasksource/tasks.py#L183) | Classification | [pietrolesci/dialogue_nli](https://hf.co/datasets/pietrolesci/dialogue_nli) | ✓ |
-| 58 | [mpe](src/tasksource/tasks.py#L186) | Classification | [pietrolesci/mpe](https://hf.co/datasets/pietrolesci/mpe) |  |
-| 59 | [dnc](src/tasksource/tasks.py#L190) | Classification | [pietrolesci/dnc](https://hf.co/datasets/pietrolesci/dnc) |  |
-| 60 | [recast_white/fnplus](src/tasksource/tasks.py#L194) | Classification | [pietrolesci/recast_white](https://hf.co/datasets/pietrolesci/recast_white) |  |
-| 61 | [recast_white/sprl](src/tasksource/tasks.py#L197) | Classification | [pietrolesci/recast_white](https://hf.co/datasets/pietrolesci/recast_white) |  |
-| 62 | [recast_white/dpr](src/tasksource/tasks.py#L200) | Classification | [pietrolesci/recast_white](https://hf.co/datasets/pietrolesci/recast_white) |  |
-| 63 | [joci](src/tasksource/tasks.py#L204) | Classification | [pietrolesci/joci](https://hf.co/datasets/pietrolesci/joci) | ✓ |
-| 64 | [robust_nli/IS_CS](src/tasksource/tasks.py#L212) | Classification | [pietrolesci/robust_nli](https://hf.co/datasets/pietrolesci/robust_nli) |  |
-| 65 | [robust_nli/LI_LI](src/tasksource/tasks.py#L214) | Classification | [pietrolesci/robust_nli](https://hf.co/datasets/pietrolesci/robust_nli) |  |
-| 66 | [robust_nli/ST_WO](src/tasksource/tasks.py#L216) | Classification | [pietrolesci/robust_nli](https://hf.co/datasets/pietrolesci/robust_nli) |  |
-| 67 | [robust_nli/PI_SP](src/tasksource/tasks.py#L218) | Classification | [pietrolesci/robust_nli](https://hf.co/datasets/pietrolesci/robust_nli) |  |
-| 68 | [robust_nli/PI_CD](src/tasksource/tasks.py#L220) | Classification | [pietrolesci/robust_nli](https://hf.co/datasets/pietrolesci/robust_nli) |  |
-| 69 | [robust_nli/ST_SE](src/tasksource/tasks.py#L222) | Classification | [pietrolesci/robust_nli](https://hf.co/datasets/pietrolesci/robust_nli) |  |
-| 70 | [robust_nli/ST_NE](src/tasksource/tasks.py#L224) | Classification | [pietrolesci/robust_nli](https://hf.co/datasets/pietrolesci/robust_nli) |  |
-| 71 | [robust_nli/ST_LM](src/tasksource/tasks.py#L226) | Classification | [pietrolesci/robust_nli](https://hf.co/datasets/pietrolesci/robust_nli) |  |
-| 72 | [robust_nli_is_sd](src/tasksource/tasks.py#L228) | Classification | [pietrolesci/robust_nli_is_sd](https://hf.co/datasets/pietrolesci/robust_nli_is_sd) |  |
-| 73 | [robust_nli_li_ts](src/tasksource/tasks.py#L231) | Classification | [pietrolesci/robust_nli_li_ts](https://hf.co/datasets/pietrolesci/robust_nli_li_ts) |  |
-| 74 | [add_one_rte](src/tasksource/tasks.py#L236) | Classification | [pietrolesci/add_one_rte](https://hf.co/datasets/pietrolesci/add_one_rte) |  |
-| 75 | [paws/labeled_final](src/tasksource/tasks.py#L240) | Classification | [google-research-datasets/paws](https://hf.co/datasets/google-research-datasets/paws) |  |
-| 76 | [paws/labeled_swap](src/tasksource/tasks.py#L241) | Classification | [google-research-datasets/paws](https://hf.co/datasets/google-research-datasets/paws) |  |
-| 77 | [medical_questions_pairs](src/tasksource/tasks.py#L243) | Classification | [curaihealth/medical_questions_pairs](https://hf.co/datasets/curaihealth/medical_questions_pairs) | ✓ |
-| 78 | [conll2003/pos_tags](src/tasksource/tasks.py#L249) | TokenClassification | [tomaarsen/conll2003](https://hf.co/datasets/tomaarsen/conll2003) | ✓ |
-| 79 | [conll2003/chunk_tags](src/tasksource/tasks.py#L251) | TokenClassification | [tomaarsen/conll2003](https://hf.co/datasets/tomaarsen/conll2003) | ✓ |
-| 80 | [conll2003/ner_tags](src/tasksource/tasks.py#L253) | TokenClassification | [tomaarsen/conll2003](https://hf.co/datasets/tomaarsen/conll2003) |  |
-| 81 | [fig-qa](src/tasksource/tasks.py#L259) | MultipleChoice | [nightingal3/fig-qa](https://hf.co/datasets/nightingal3/fig-qa) |  |
-| 82 | [cos_e/v1.0](src/tasksource/tasks.py#L268) | MultipleChoice | [Salesforce/cos_e](https://hf.co/datasets/Salesforce/cos_e) |  |
-| 83 | [cosmos_qa](src/tasksource/tasks.py#L273) | MultipleChoice | [Samsoup/cosmos_qa](https://hf.co/datasets/Samsoup/cosmos_qa) |  |
-| 84 | [dream](src/tasksource/tasks.py#L276) | MultipleChoice | [dataset-org/dream](https://hf.co/datasets/dataset-org/dream) |  |
-| 85 | [openbookqa](src/tasksource/tasks.py#L283) | MultipleChoice | [allenai/openbookqa](https://hf.co/datasets/allenai/openbookqa) |  |
-| 86 | [qasc](src/tasksource/tasks.py#L289) | MultipleChoice | [allenai/qasc](https://hf.co/datasets/allenai/qasc) |  |
-| 87 | [quartz](src/tasksource/tasks.py#L297) | MultipleChoice | [allenai/quartz](https://hf.co/datasets/allenai/quartz) |  |
-| 88 | [quail](src/tasksource/tasks.py#L302) | MultipleChoice | [textmachinelab/quail](https://hf.co/datasets/textmachinelab/quail) |  |
-| 89 | [head_qa/en](src/tasksource/tasks.py#L308) | MultipleChoice | [EleutherAI/headqa](https://hf.co/datasets/EleutherAI/headqa) |  |
-| 90 | [sciq](src/tasksource/tasks.py#L316) | MultipleChoice | [allenai/sciq](https://hf.co/datasets/allenai/sciq) |  |
-| 91 | [social_i_qa](src/tasksource/tasks.py#L321) | MultipleChoice | [tasksource/social_i_qa](https://hf.co/datasets/tasksource/social_i_qa) |  |
-| 92 | [wiki_hop/original](src/tasksource/tasks.py#L327) | MultipleChoice | [MoE-UNC/wikihop](https://hf.co/datasets/MoE-UNC/wikihop) |  |
-| 93 | [wiqa](src/tasksource/tasks.py#L340) | MultipleChoice | [allenai/wiqa](https://hf.co/datasets/allenai/wiqa) (`parquet` loader) |  |
-| 94 | [piqa](src/tasksource/tasks.py#L347) | MultipleChoice | [baber/piqa](https://hf.co/datasets/baber/piqa) |  |
-| 95 | [hellaswag](src/tasksource/tasks.py#L355) | MultipleChoice | [Rowan/hellaswag](https://hf.co/datasets/Rowan/hellaswag) |  |
-| 96 | [super_glue/copa](src/tasksource/tasks.py#L364) | MultipleChoice | [aps/super_glue](https://hf.co/datasets/aps/super_glue) |  |
-| 97 | [balanced-copa](src/tasksource/tasks.py#L366) | MultipleChoice | [pkavumba/balanced-copa](https://hf.co/datasets/pkavumba/balanced-copa) |  |
-| 98 | [e-CARE](src/tasksource/tasks.py#L369) | MultipleChoice | [12ml/e-CARE](https://hf.co/datasets/12ml/e-CARE) |  |
-| 99 | [art](src/tasksource/tasks.py#L372) | MultipleChoice | [allenai/art](https://hf.co/datasets/allenai/art) | ✓ |
-| 100 | [winogrande/winogrande_xl](src/tasksource/tasks.py#L380) | MultipleChoice | [allenai/winogrande](https://hf.co/datasets/allenai/winogrande) |  |
-| 101 | [codah/codah](src/tasksource/tasks.py#L383) | MultipleChoice | [jaredfern/codah](https://hf.co/datasets/jaredfern/codah) |  |
-| 102 | [ai2_arc/ARC-Easy/challenge](src/tasksource/tasks.py#L385) | MultipleChoice | [allenai/ai2_arc](https://hf.co/datasets/allenai/ai2_arc) |  |
-| 103 | [ai2_arc/ARC-Challenge/challenge](src/tasksource/tasks.py#L385) | MultipleChoice | [allenai/ai2_arc](https://hf.co/datasets/allenai/ai2_arc) |  |
-| 104 | [definite_pronoun_resolution](src/tasksource/tasks.py#L390) | MultipleChoice | [community-datasets/definite_pronoun_resolution](https://hf.co/datasets/community-datasets/definite_pronoun_resolution) |  |
-| 105 | [swag/regular](src/tasksource/tasks.py#L396) | MultipleChoice | [allenai/swag](https://hf.co/datasets/allenai/swag) |  |
-| 106 | [math_qa](src/tasksource/tasks.py#L402) | MultipleChoice | [tasksource/math_qa](https://hf.co/datasets/tasksource/math_qa) |  |
-| 107 | [glue/cola](src/tasksource/tasks.py#L411) | Classification | [nyu-mll/glue](https://hf.co/datasets/nyu-mll/glue) |  |
-| 108 | [glue/sst2](src/tasksource/tasks.py#L412) | Classification | [nyu-mll/glue](https://hf.co/datasets/nyu-mll/glue) |  |
-| 109 | [utilitarianism](src/tasksource/tasks.py#L426) | Classification | [hendrycks/ethics](https://hf.co/datasets/hendrycks/ethics) (`csv` loader) |  |
-| 110 | [amazon_counterfactual/en](src/tasksource/tasks.py#L434) | Classification | [mteb/amazon_counterfactual](https://hf.co/datasets/mteb/amazon_counterfactual) |  |
-| 111 | [insincere-questions](src/tasksource/tasks.py#L439) | Classification | [SetFit/insincere-questions](https://hf.co/datasets/SetFit/insincere-questions) |  |
-| 112 | [toxic_conversations](src/tasksource/tasks.py#L443) | Classification | [SetFit/toxic_conversations](https://hf.co/datasets/SetFit/toxic_conversations) |  |
-| 113 | [TuringBench](src/tasksource/tasks.py#L447) | Classification | [jana4/turingbench-humanized](https://hf.co/datasets/jana4/turingbench-humanized), [turingbench/TuringBench](https://hf.co/datasets/turingbench/TuringBench) (`csv` loader) | ✓ |
-| 114 | [trec](src/tasksource/tasks.py#L466) | Classification | [tasksource/trec](https://hf.co/datasets/tasksource/trec) | ✓ |
-| 115 | [vitaminc](src/tasksource/tasks.py#L470) | Classification | [tals/vitaminc](https://hf.co/datasets/tals/vitaminc) |  |
-| 116 | [hope_edi/english](src/tasksource/tasks.py#L472) | Classification | [dravidianlangtech/hope_edi](https://hf.co/datasets/dravidianlangtech/hope_edi) (`csv` loader) |  |
-| 117 | [rumoureval_2019/RumourEval2019](src/tasksource/tasks.py#L486) | Classification | [strombergnlp/rumoureval_2019](https://hf.co/datasets/strombergnlp/rumoureval_2019) (`csv` loader) |  |
-| 118 | [ethos/binary](src/tasksource/tasks.py#L500) | Classification | [SetFit/ethos_binary](https://hf.co/datasets/SetFit/ethos_binary) |  |
-| 119 | [ethos/multilabel](src/tasksource/tasks.py#L524) | Classification | [tasksource/ethos](https://hf.co/datasets/tasksource/ethos) |  |
-| 120 | [tweet_eval/sentiment](src/tasksource/tasks.py#L527) | Classification | [cardiffnlp/tweet_eval](https://hf.co/datasets/cardiffnlp/tweet_eval) |  |
-| 121 | [tweet_eval/emotion](src/tasksource/tasks.py#L527) | Classification | [cardiffnlp/tweet_eval](https://hf.co/datasets/cardiffnlp/tweet_eval) |  |
-| 122 | [tweet_eval/offensive](src/tasksource/tasks.py#L527) | Classification | [cardiffnlp/tweet_eval](https://hf.co/datasets/cardiffnlp/tweet_eval) |  |
-| 123 | [tweet_eval/hate](src/tasksource/tasks.py#L527) | Classification | [cardiffnlp/tweet_eval](https://hf.co/datasets/cardiffnlp/tweet_eval) |  |
-| 124 | [tweet_eval/emoji](src/tasksource/tasks.py#L527) | Classification | [cardiffnlp/tweet_eval](https://hf.co/datasets/cardiffnlp/tweet_eval) |  |
-| 125 | [tweet_eval/irony](src/tasksource/tasks.py#L527) | Classification | [cardiffnlp/tweet_eval](https://hf.co/datasets/cardiffnlp/tweet_eval) |  |
-| 126 | [tweet_eval/stance_abortion](src/tasksource/tasks.py#L542) | Classification | [cardiffnlp/tweet_eval](https://hf.co/datasets/cardiffnlp/tweet_eval) | ✓ |
-| 127 | [tweet_eval/stance_atheism](src/tasksource/tasks.py#L543) | Classification | [cardiffnlp/tweet_eval](https://hf.co/datasets/cardiffnlp/tweet_eval) | ✓ |
-| 128 | [tweet_eval/stance_climate](src/tasksource/tasks.py#L544) | Classification | [cardiffnlp/tweet_eval](https://hf.co/datasets/cardiffnlp/tweet_eval) | ✓ |
-| 129 | [tweet_eval/stance_feminist](src/tasksource/tasks.py#L545) | Classification | [cardiffnlp/tweet_eval](https://hf.co/datasets/cardiffnlp/tweet_eval) | ✓ |
-| 130 | [tweet_eval/stance_hillary](src/tasksource/tasks.py#L546) | Classification | [cardiffnlp/tweet_eval](https://hf.co/datasets/cardiffnlp/tweet_eval) | ✓ |
-| 131 | [discovery/discovery](src/tasksource/tasks.py#L549) | Classification | [sileod/discovery](https://hf.co/datasets/sileod/discovery) | ✓ |
-| 132 | [pragmeval/verifiability](src/tasksource/tasks.py#L552) | Classification | [sileod/pragmeval](https://hf.co/datasets/sileod/pragmeval) |  |
-| 133 | [pragmeval/switchboard](src/tasksource/tasks.py#L552) | Classification | [sileod/pragmeval](https://hf.co/datasets/sileod/pragmeval) |  |
-| 134 | [pragmeval/stac](src/tasksource/tasks.py#L556) | Classification | [sileod/pragmeval](https://hf.co/datasets/sileod/pragmeval) | ✓ |
-| 135 | [pragmeval/sarcasm](src/tasksource/tasks.py#L556) | Classification | [sileod/pragmeval](https://hf.co/datasets/sileod/pragmeval) | ✓ |
-| 136 | [pragmeval/persuasiveness-premisetype](src/tasksource/tasks.py#L556) | Classification | [sileod/pragmeval](https://hf.co/datasets/sileod/pragmeval) | ✓ |
-| 137 | [pragmeval/pdtb](src/tasksource/tasks.py#L556) | Classification | [sileod/pragmeval](https://hf.co/datasets/sileod/pragmeval) | ✓ |
-| 138 | [pragmeval/persuasiveness-claimtype](src/tasksource/tasks.py#L556) | Classification | [sileod/pragmeval](https://hf.co/datasets/sileod/pragmeval) | ✓ |
-| 139 | [pragmeval/gum](src/tasksource/tasks.py#L556) | Classification | [sileod/pragmeval](https://hf.co/datasets/sileod/pragmeval) | ✓ |
-| 140 | [pragmeval/emergent](src/tasksource/tasks.py#L556) | Classification | [sileod/pragmeval](https://hf.co/datasets/sileod/pragmeval) | ✓ |
-| 141 | [pragmeval/emobank-dominance](src/tasksource/tasks.py#L571) | Classification | [sileod/pragmeval](https://hf.co/datasets/sileod/pragmeval) |  |
-| 142 | [pragmeval/squinky-formality](src/tasksource/tasks.py#L572) | Classification | [sileod/pragmeval](https://hf.co/datasets/sileod/pragmeval) |  |
-| 143 | [pragmeval/squinky-implicature](src/tasksource/tasks.py#L573) | Classification | [sileod/pragmeval](https://hf.co/datasets/sileod/pragmeval) |  |
-| 144 | [pragmeval/squinky-informativeness](src/tasksource/tasks.py#L574) | Classification | [sileod/pragmeval](https://hf.co/datasets/sileod/pragmeval) |  |
-| 145 | [pragmeval/persuasiveness-eloquence](src/tasksource/tasks.py#L575) | Classification | [sileod/pragmeval](https://hf.co/datasets/sileod/pragmeval) |  |
-| 146 | [pragmeval/persuasiveness-relevance](src/tasksource/tasks.py#L576) | Classification | [sileod/pragmeval](https://hf.co/datasets/sileod/pragmeval) |  |
-| 147 | [pragmeval/persuasiveness-specificity](src/tasksource/tasks.py#L577) | Classification | [sileod/pragmeval](https://hf.co/datasets/sileod/pragmeval) |  |
-| 148 | [pragmeval/persuasiveness-strength](src/tasksource/tasks.py#L578) | Classification | [sileod/pragmeval](https://hf.co/datasets/sileod/pragmeval) |  |
-| 149 | [silicone/sem](src/tasksource/tasks.py#L580) | Classification | [tasksource/silicone](https://hf.co/datasets/tasksource/silicone) | ✓ |
-| 150 | [silicone/maptask](src/tasksource/tasks.py#L580) | Classification | [tasksource/silicone](https://hf.co/datasets/tasksource/silicone) | ✓ |
-| 151 | [silicone/meld_e](src/tasksource/tasks.py#L580) | Classification | [tasksource/silicone](https://hf.co/datasets/tasksource/silicone) | ✓ |
-| 152 | [silicone/oasis](src/tasksource/tasks.py#L580) | Classification | [tasksource/silicone](https://hf.co/datasets/tasksource/silicone) | ✓ |
-| 153 | [silicone/meld_s](src/tasksource/tasks.py#L580) | Classification | [tasksource/silicone](https://hf.co/datasets/tasksource/silicone) | ✓ |
-| 154 | [silicone/dyda_da](src/tasksource/tasks.py#L580) | Classification | [tasksource/silicone](https://hf.co/datasets/tasksource/silicone) | ✓ |
-| 155 | [silicone/dyda_e](src/tasksource/tasks.py#L580) | Classification | [tasksource/silicone](https://hf.co/datasets/tasksource/silicone) | ✓ |
-| 156 | [silicone/iemocap](src/tasksource/tasks.py#L590) | Classification | [tasksource/silicone](https://hf.co/datasets/tasksource/silicone) | ✓ |
-| 157 | [lex_glue/eurlex](src/tasksource/tasks.py#L600) | Classification | [coastalcph/lex_glue](https://hf.co/datasets/coastalcph/lex_glue) | ✓ |
-| 158 | [lex_glue/scotus](src/tasksource/tasks.py#L604) | Classification | [coastalcph/lex_glue](https://hf.co/datasets/coastalcph/lex_glue) |  |
-| 159 | [lex_glue/ledgar](src/tasksource/tasks.py#L607) | Classification | [coastalcph/lex_glue](https://hf.co/datasets/coastalcph/lex_glue) |  |
-| 160 | [lex_glue/unfair_tos](src/tasksource/tasks.py#L609) | Classification | [coastalcph/lex_glue](https://hf.co/datasets/coastalcph/lex_glue) | ✓ |
-| 161 | [lex_glue/case_hold](src/tasksource/tasks.py#L612) | MultipleChoice | [coastalcph/lex_glue](https://hf.co/datasets/coastalcph/lex_glue) |  |
-| 162 | [language-identification](src/tasksource/tasks.py#L620) | Classification | [papluca/language-identification](https://hf.co/datasets/papluca/language-identification) | ✓ |
-| 163 | [imdb](src/tasksource/tasks.py#L625) | Classification | [stanfordnlp/imdb](https://hf.co/datasets/stanfordnlp/imdb) |  |
-| 164 | [rotten_tomatoes](src/tasksource/tasks.py#L627) | Classification | [cornell-movie-review-data/rotten_tomatoes](https://hf.co/datasets/cornell-movie-review-data/rotten_tomatoes) |  |
-| 165 | [ag_news](src/tasksource/tasks.py#L629) | Classification | [fancyzhx/ag_news](https://hf.co/datasets/fancyzhx/ag_news) |  |
-| 166 | [yelp_review_full/yelp_review_full](src/tasksource/tasks.py#L631) | Classification | [Yelp/yelp_review_full](https://hf.co/datasets/Yelp/yelp_review_full) | ✓ |
-| 167 | [financial_phrasebank/sentences_allagree](src/tasksource/tasks.py#L636) | Classification | [ghbacct/financial-phrasebank-all-agree-classification](https://hf.co/datasets/ghbacct/financial-phrasebank-all-agree-classification) |  |
-| 168 | [poem_sentiment](src/tasksource/tasks.py#L641) | Classification | [google-research-datasets/poem_sentiment](https://hf.co/datasets/google-research-datasets/poem_sentiment) |  |
-| 169 | [dbpedia_14/dbpedia_14](src/tasksource/tasks.py#L643) | Classification | [fancyzhx/dbpedia_14](https://hf.co/datasets/fancyzhx/dbpedia_14) |  |
-| 170 | [amazon_polarity/amazon_polarity](src/tasksource/tasks.py#L645) | Classification | [fancyzhx/amazon_polarity](https://hf.co/datasets/fancyzhx/amazon_polarity) |  |
-| 171 | [hate_speech18](src/tasksource/tasks.py#L649) | Classification | [tasksource/hate_speech18](https://hf.co/datasets/tasksource/hate_speech18) |  |
-| 172 | [sms_spam](src/tasksource/tasks.py#L655) | Classification | [ucirvine/sms_spam](https://hf.co/datasets/ucirvine/sms_spam) |  |
-| 173 | [humicroedit/subtask-1](src/tasksource/tasks.py#L658) | Classification | [tasksource/humicroedit](https://hf.co/datasets/tasksource/humicroedit) | ✓ |
-| 174 | [humicroedit/subtask-2](src/tasksource/tasks.py#L664) | Classification | [tasksource/humicroedit](https://hf.co/datasets/tasksource/humicroedit) | ✓ |
-| 175 | [snips_built_in_intents](src/tasksource/tasks.py#L669) | Classification | [sonos-nlu-benchmark/snips_built_in_intents](https://hf.co/datasets/sonos-nlu-benchmark/snips_built_in_intents) |  |
-| 176 | [hate_speech_offensive](src/tasksource/tasks.py#L673) | Classification | [tdavidson/hate_speech_offensive](https://hf.co/datasets/tdavidson/hate_speech_offensive) |  |
-| 177 | [yahoo_answers_topics](src/tasksource/tasks.py#L675) | Classification | [community-datasets/yahoo_answers_topics](https://hf.co/datasets/community-datasets/yahoo_answers_topics) |  |
-| 178 | [stackoverflow-questions](src/tasksource/tasks.py#L679) | Classification | [pacovaldez/stackoverflow-questions](https://hf.co/datasets/pacovaldez/stackoverflow-questions) | ✓ |
-| 179 | [hyperpartisan_news](src/tasksource/tasks.py#L685) | Classification | [zapsdcn/hyperpartisan_news](https://hf.co/datasets/zapsdcn/hyperpartisan_news) |  |
-| 180 | [sciie](src/tasksource/tasks.py#L690) | Classification | [zapsdcn/sciie](https://hf.co/datasets/zapsdcn/sciie) |  |
-| 181 | [citation_intent](src/tasksource/tasks.py#L691) | Classification | [zapsdcn/citation_intent](https://hf.co/datasets/zapsdcn/citation_intent) |  |
-| 182 | [go_emotions/simplified](src/tasksource/tasks.py#L693) | Classification | [google-research-datasets/go_emotions](https://hf.co/datasets/google-research-datasets/go_emotions) |  |
-| 183 | [scicite](src/tasksource/tasks.py#L697) | Classification | [tasksource/scicite](https://hf.co/datasets/tasksource/scicite) |  |
-| 184 | [liar](src/tasksource/tasks.py#L699) | Classification | [tasksource/liar](https://hf.co/datasets/tasksource/liar) | ✓ |
-| 185 | [lexical_relation_classification/ROOT09](src/tasksource/tasks.py#L710) | Classification | [relbert/lexical_relation_classification](https://hf.co/datasets/relbert/lexical_relation_classification) (`json` loader) | ✓ |
-| 186 | [lexical_relation_classification/K&H+N](src/tasksource/tasks.py#L710) | Classification | [relbert/lexical_relation_classification](https://hf.co/datasets/relbert/lexical_relation_classification) (`json` loader) | ✓ |
-| 187 | [lexical_relation_classification/BLESS](src/tasksource/tasks.py#L710) | Classification | [relbert/lexical_relation_classification](https://hf.co/datasets/relbert/lexical_relation_classification) (`json` loader) | ✓ |
-| 188 | [lexical_relation_classification/CogALexV](src/tasksource/tasks.py#L736) | Classification | [relbert/lexical_relation_classification](https://hf.co/datasets/relbert/lexical_relation_classification) (`json` loader) | ✓ |
-| 189 | [linguisticprobing/subj_number](src/tasksource/tasks.py#L763) | Classification | [tasksource/linguisticprobing](https://hf.co/datasets/tasksource/linguisticprobing) |  |
-| 190 | [linguisticprobing/obj_number](src/tasksource/tasks.py#L764) | Classification | [tasksource/linguisticprobing](https://hf.co/datasets/tasksource/linguisticprobing) |  |
-| 191 | [linguisticprobing/past_present](src/tasksource/tasks.py#L765) | Classification | [tasksource/linguisticprobing](https://hf.co/datasets/tasksource/linguisticprobing) |  |
-| 192 | [linguisticprobing/top_constituents](src/tasksource/tasks.py#L766) | Classification | [tasksource/linguisticprobing](https://hf.co/datasets/tasksource/linguisticprobing) | ✓ |
-| 193 | [linguisticprobing/tree_depth](src/tasksource/tasks.py#L768) | Classification | [tasksource/linguisticprobing](https://hf.co/datasets/tasksource/linguisticprobing) | ✓ |
-| 194 | [linguisticprobing/coordination_inversion](src/tasksource/tasks.py#L769) | Classification | [tasksource/linguisticprobing](https://hf.co/datasets/tasksource/linguisticprobing) | ✓ |
-| 195 | [linguisticprobing/odd_man_out](src/tasksource/tasks.py#L771) | Classification | [tasksource/linguisticprobing](https://hf.co/datasets/tasksource/linguisticprobing) | ✓ |
-| 196 | [linguisticprobing/bigram_shift](src/tasksource/tasks.py#L772) | Classification | [tasksource/linguisticprobing](https://hf.co/datasets/tasksource/linguisticprobing) | ✓ |
-| 197 | [crowdflower/political-media-audience](src/tasksource/tasks.py#L774) | Classification | [tasksource/crowdflower](https://hf.co/datasets/tasksource/crowdflower) | ✓ |
-| 198 | [crowdflower/economic-news](src/tasksource/tasks.py#L774) | Classification | [tasksource/crowdflower](https://hf.co/datasets/tasksource/crowdflower) | ✓ |
-| 199 | [crowdflower/corporate-messaging](src/tasksource/tasks.py#L774) | Classification | [tasksource/crowdflower](https://hf.co/datasets/tasksource/crowdflower) | ✓ |
-| 200 | [crowdflower/airline-sentiment](src/tasksource/tasks.py#L774) | Classification | [tasksource/crowdflower](https://hf.co/datasets/tasksource/crowdflower) | ✓ |
-| 201 | [crowdflower/political-media-bias](src/tasksource/tasks.py#L774) | Classification | [tasksource/crowdflower](https://hf.co/datasets/tasksource/crowdflower) | ✓ |
-| 202 | [crowdflower/political-media-message](src/tasksource/tasks.py#L774) | Classification | [tasksource/crowdflower](https://hf.co/datasets/tasksource/crowdflower) | ✓ |
-| 203 | [crowdflower/sentiment_nuclear_power](src/tasksource/tasks.py#L774) | Classification | [tasksource/crowdflower](https://hf.co/datasets/tasksource/crowdflower) | ✓ |
-| 204 | [crowdflower/tweet_global_warming](src/tasksource/tasks.py#L774) | Classification | [tasksource/crowdflower](https://hf.co/datasets/tasksource/crowdflower) | ✓ |
-| 205 | [ethics/commonsense](src/tasksource/tasks.py#L808) | Classification | [hendrycks/ethics](https://hf.co/datasets/hendrycks/ethics) (`csv` loader) |  |
-| 206 | [ethics/deontology](src/tasksource/tasks.py#L816) | Classification | [hendrycks/ethics](https://hf.co/datasets/hendrycks/ethics) (`csv` loader) | ✓ |
-| 207 | [ethics/justice](src/tasksource/tasks.py#L825) | Classification | [hendrycks/ethics](https://hf.co/datasets/hendrycks/ethics) (`csv` loader) |  |
-| 208 | [ethics/virtue](src/tasksource/tasks.py#L833) | Classification | [hendrycks/ethics](https://hf.co/datasets/hendrycks/ethics) |  |
-| 209 | [emo/emo2019](src/tasksource/tasks.py#L842) | Classification | [oneonlee/cleansed_emocontext](https://hf.co/datasets/oneonlee/cleansed_emocontext) |  |
-| 210 | [google_wellformed_query](src/tasksource/tasks.py#L848) | Classification | [tasksource/google_wellformed_query](https://hf.co/datasets/tasksource/google_wellformed_query) | ✓ |
-| 211 | [tweets_hate_speech_detection](src/tasksource/tasks.py#L854) | Classification | [tweets-hate-speech-detection/tweets_hate_speech_detection](https://hf.co/datasets/tweets-hate-speech-detection/tweets_hate_speech_detection) |  |
-| 212 | [wnut_17/wnut_17](src/tasksource/tasks.py#L858) | TokenClassification | [flaitenberger/wnut_17](https://hf.co/datasets/flaitenberger/wnut_17) |  |
-| 213 | [ncbi_disease/ncbi_disease](src/tasksource/tasks.py#L861) | TokenClassification | [ncbi/ncbi_disease](https://hf.co/datasets/ncbi/ncbi_disease) | ✓ |
-| 214 | [acronym_identification](src/tasksource/tasks.py#L866) | TokenClassification | [amirveyseh/acronym_identification](https://hf.co/datasets/amirveyseh/acronym_identification) | ✓ |
-| 215 | [jnlpba/jnlpba](src/tasksource/tasks.py#L870) | TokenClassification | [jnlpba/jnlpba](https://hf.co/datasets/jnlpba/jnlpba) | ✓ |
-| 216 | [ontonotes_english/SpeedOfMagic--ontonotes_english](src/tasksource/tasks.py#L879) | TokenClassification | [SpeedOfMagic/ontonotes_english](https://hf.co/datasets/SpeedOfMagic/ontonotes_english) | ✓ |
-| 217 | [blog_authorship_corpus/gender](src/tasksource/tasks.py#L885) | Classification | [tasksource/blog_authorship_corpus](https://hf.co/datasets/tasksource/blog_authorship_corpus) | ✓ |
-| 218 | [blog_authorship_corpus/age](src/tasksource/tasks.py#L887) | Classification | [tasksource/blog_authorship_corpus](https://hf.co/datasets/tasksource/blog_authorship_corpus) | ✓ |
-| 219 | [open_question_type](src/tasksource/tasks.py#L898) | Classification | [Korea-MES/open_question_type](https://hf.co/datasets/Korea-MES/open_question_type) |  |
-| 220 | [health_fact](src/tasksource/tasks.py#L900) | Classification | [marcov/health_fact_promptsource](https://hf.co/datasets/marcov/health_fact_promptsource) |  |
-| 221 | [commonsense_qa](src/tasksource/tasks.py#L904) | MultipleChoice | [tau/commonsense_qa](https://hf.co/datasets/tau/commonsense_qa) |  |
-| 222 | [mc_taco](src/tasksource/tasks.py#L910) | Classification | [marcov/mc_taco_promptsource](https://hf.co/datasets/marcov/mc_taco_promptsource) | ✓ |
-| 223 | [ade_corpus_v2/Ade_corpus_v2_classification](src/tasksource/tasks.py#L917) | Classification | [ade-benchmark-corpus/ade_corpus_v2](https://hf.co/datasets/ade-benchmark-corpus/ade_corpus_v2) | ✓ |
-| 224 | [discosense](src/tasksource/tasks.py#L920) | MultipleChoice | [tasksource/discosense](https://hf.co/datasets/tasksource/discosense) | ✓ |
-| 225 | [circa](src/tasksource/tasks.py#L927) | Classification | [google-research-datasets/circa](https://hf.co/datasets/google-research-datasets/circa) |  |
-| 226 | [code_x_glue_cc_defect_detection](src/tasksource/tasks.py#L932) | Classification | [google/code_x_glue_cc_defect_detection](https://hf.co/datasets/google/code_x_glue_cc_defect_detection) | ✓ |
-| 227 | [phrase_similarity](src/tasksource/tasks.py#L937) | Classification | [Deehan1866/processed_phrase_similarity](https://hf.co/datasets/Deehan1866/processed_phrase_similarity) |  |
-| 228 | [scientific-exaggeration-detection](src/tasksource/tasks.py#L945) | Classification | [copenlu/scientific-exaggeration-detection](https://hf.co/datasets/copenlu/scientific-exaggeration-detection) |  |
-| 229 | [quarel](src/tasksource/tasks.py#L959) | MultipleChoice | [community-datasets/quarel](https://hf.co/datasets/community-datasets/quarel) | ✓ |
-| 230 | [fever-evidence-related](src/tasksource/tasks.py#L966) | Classification | [mwong/fever-evidence-related](https://hf.co/datasets/mwong/fever-evidence-related) |  |
-| 231 | [numer_sense](src/tasksource/tasks.py#L969) | Classification | [tasksource/numer_sense](https://hf.co/datasets/tasksource/numer_sense) |  |
-| 232 | [dynasent/dynabench.dynasent.r1.all/r1](src/tasksource/tasks.py#L976) | Classification | [tasksource/dynasent](https://hf.co/datasets/tasksource/dynasent) | ✓ |
-| 233 | [dynasent/dynabench.dynasent.r2.all/r2](src/tasksource/tasks.py#L980) | Classification | [tasksource/dynasent](https://hf.co/datasets/tasksource/dynasent) | ✓ |
-| 234 | [Sarcasm_News_Headline](src/tasksource/tasks.py#L985) | Classification | [raquiba/Sarcasm_News_Headline](https://hf.co/datasets/raquiba/Sarcasm_News_Headline) |  |
-| 235 | [sem_eval_2010_task_8](src/tasksource/tasks.py#L994) | Classification | [SemEvalWorkshop/sem_eval_2010_task_8](https://hf.co/datasets/SemEvalWorkshop/sem_eval_2010_task_8) |  |
-| 236 | [auditor_review](src/tasksource/tasks.py#L997) | Classification | [demo-org/auditor_review](https://hf.co/datasets/demo-org/auditor_review) |  |
-| 237 | [medmcqa](src/tasksource/tasks.py#L1001) | MultipleChoice | [openlifescienceai/medmcqa](https://hf.co/datasets/openlifescienceai/medmcqa) |  |
-| 238 | [Dynasent_Disagreement](src/tasksource/tasks.py#L1018) | Classification | [RuyuanWan/Dynasent_Disagreement](https://hf.co/datasets/RuyuanWan/Dynasent_Disagreement) | ✓ |
-| 239 | [Politeness_Disagreement](src/tasksource/tasks.py#L1020) | Classification | [RuyuanWan/Politeness_Disagreement](https://hf.co/datasets/RuyuanWan/Politeness_Disagreement) | ✓ |
-| 240 | [SBIC_Disagreement](src/tasksource/tasks.py#L1022) | Classification | [RuyuanWan/SBIC_Disagreement](https://hf.co/datasets/RuyuanWan/SBIC_Disagreement) | ✓ |
-| 241 | [SChem_Disagreement](src/tasksource/tasks.py#L1024) | Classification | [RuyuanWan/SChem_Disagreement](https://hf.co/datasets/RuyuanWan/SChem_Disagreement) | ✓ |
-| 242 | [Dilemmas_Disagreement](src/tasksource/tasks.py#L1026) | Classification | [RuyuanWan/Dilemmas_Disagreement](https://hf.co/datasets/RuyuanWan/Dilemmas_Disagreement) | ✓ |
-| 243 | [logiqa](src/tasksource/tasks.py#L1029) | MultipleChoice | [fireworks-ai/logiqa](https://hf.co/datasets/fireworks-ai/logiqa) |  |
-| 244 | [wiki_qa](src/tasksource/tasks.py#L1038) | Classification | [microsoft/wiki_qa](https://hf.co/datasets/microsoft/wiki_qa) | ✓ |
-| 245 | [cycic_classification](src/tasksource/tasks.py#L1040) | Classification | [tasksource/cycic_classification](https://hf.co/datasets/tasksource/cycic_classification) |  |
-| 246 | [cycic_multiplechoice](src/tasksource/tasks.py#L1042) | MultipleChoice | [tasksource/cycic_multiplechoice](https://hf.co/datasets/tasksource/cycic_multiplechoice) |  |
-| 247 | [sts-companion](src/tasksource/tasks.py#L1046) | Classification | [tasksource/sts-companion](https://hf.co/datasets/tasksource/sts-companion) |  |
-| 248 | [commonsense_qa_2.0](src/tasksource/tasks.py#L1049) | Classification | [tasksource/commonsense_qa_2.0](https://hf.co/datasets/tasksource/commonsense_qa_2.0) |  |
-| 249 | [lingnli](src/tasksource/tasks.py#L1052) | Classification | [tasksource/lingnli](https://hf.co/datasets/tasksource/lingnli) |  |
-| 250 | [monotonicity-entailment](src/tasksource/tasks.py#L1054) | Classification | [tasksource/monotonicity-entailment](https://hf.co/datasets/tasksource/monotonicity-entailment) |  |
-| 251 | [arct](src/tasksource/tasks.py#L1057) | MultipleChoice | [tasksource/arct](https://hf.co/datasets/tasksource/arct) |  |
-| 252 | [scinli](src/tasksource/tasks.py#L1060) | Classification | [tasksource/scinli](https://hf.co/datasets/tasksource/scinli) |  |
-| 253 | [naturallogic](src/tasksource/tasks.py#L1064) | Classification | [tasksource/naturallogic](https://hf.co/datasets/tasksource/naturallogic) |  |
-| 254 | [onestop_qa](src/tasksource/tasks.py#L1066) | MultipleChoice | [malmaud/onestop_qa](https://hf.co/datasets/malmaud/onestop_qa) |  |
-| 255 | [moral_stories/full](src/tasksource/tasks.py#L1069) | MultipleChoice | [LabHC/moral_stories](https://hf.co/datasets/LabHC/moral_stories) |  |
-| 256 | [dynahate](src/tasksource/tasks.py#L1073) | Classification | [tasksource/dynahate](https://hf.co/datasets/tasksource/dynahate) |  |
-| 257 | [syntactic-augmentation-nli](src/tasksource/tasks.py#L1075) | Classification | [tasksource/syntactic-augmentation-nli](https://hf.co/datasets/tasksource/syntactic-augmentation-nli) |  |
-| 258 | [autotnli](src/tasksource/tasks.py#L1077) | Classification | [tasksource/autotnli](https://hf.co/datasets/tasksource/autotnli) |  |
-| 259 | [CONDAQA](src/tasksource/tasks.py#L1079) | Classification | [lasha-nlp/CONDAQA](https://hf.co/datasets/lasha-nlp/CONDAQA) |  |
-| 260 | [webgpt_comparisons](src/tasksource/tasks.py#L1089) | MultipleChoice | [heegyu/webgpt_comparisons_ko](https://hf.co/datasets/heegyu/webgpt_comparisons_ko) | ✓ |
-| 261 | [synthetic-instruct-gptj-pairwise](src/tasksource/tasks.py#L1097) | MultipleChoice | [Dahoas/synthetic-instruct-gptj-pairwise](https://hf.co/datasets/Dahoas/synthetic-instruct-gptj-pairwise) | ✓ |
-| 262 | [scruples](src/tasksource/tasks.py#L1100) | Classification | [tasksource/scruples](https://hf.co/datasets/tasksource/scruples) | ✓ |
-| 263 | [defeasible-nli/snli](src/tasksource/tasks.py#L1105) | Classification | [tasksource/defeasible-nli](https://hf.co/datasets/tasksource/defeasible-nli) |  |
-| 264 | [defeasible-nli/atomic](src/tasksource/tasks.py#L1105) | Classification | [tasksource/defeasible-nli](https://hf.co/datasets/tasksource/defeasible-nli) |  |
-| 265 | [defeasible-nli/social](src/tasksource/tasks.py#L1109) | Classification | [tasksource/defeasible-nli](https://hf.co/datasets/tasksource/defeasible-nli) |  |
-| 266 | [help-nli](src/tasksource/tasks.py#L1113) | Classification | [tasksource/help-nli](https://hf.co/datasets/tasksource/help-nli) |  |
-| 267 | [nli-veridicality-transitivity](src/tasksource/tasks.py#L1116) | Classification | [tasksource/nli-veridicality-transitivity](https://hf.co/datasets/tasksource/nli-veridicality-transitivity) |  |
-| 268 | [lonli](src/tasksource/tasks.py#L1119) | Classification | [tasksource/lonli](https://hf.co/datasets/tasksource/lonli) |  |
-| 269 | [dadc-limit-nli](src/tasksource/tasks.py#L1122) | Classification | [tasksource/dadc-limit-nli](https://hf.co/datasets/tasksource/dadc-limit-nli) |  |
-| 270 | [FLUTE](src/tasksource/tasks.py#L1125) | Classification | [ColumbiaNLP/FLUTE](https://hf.co/datasets/ColumbiaNLP/FLUTE) |  |
-| 271 | [strategy-qa](src/tasksource/tasks.py#L1128) | Classification | [tasksource/strategy-qa](https://hf.co/datasets/tasksource/strategy-qa) |  |
-| 272 | [summarize_from_feedback/comparisons](src/tasksource/tasks.py#L1131) | MultipleChoice | [vwxyzjn/summarize_from_feedback_oai_preprocessing](https://hf.co/datasets/vwxyzjn/summarize_from_feedback_oai_preprocessing) | ✓ |
-| 273 | [folio](src/tasksource/tasks.py#L1139) | Classification | [tasksource/folio](https://hf.co/datasets/tasksource/folio) |  |
-| 274 | [tomi-nli](src/tasksource/tasks.py#L1166) | Classification | [tasksource/tomi-nli](https://hf.co/datasets/tasksource/tomi-nli) |  |
-| 275 | [avicenna](src/tasksource/tasks.py#L1169) | Classification | [tasksource/avicenna](https://hf.co/datasets/tasksource/avicenna) | ✓ |
-| 276 | [SHP](src/tasksource/tasks.py#L1172) | MultipleChoice | [stanfordnlp/SHP](https://hf.co/datasets/stanfordnlp/SHP) | ✓ |
-| 277 | [MedQA-USMLE-4-options-hf](src/tasksource/tasks.py#L1180) | MultipleChoice | [GBaker/MedQA-USMLE-4-options-hf](https://hf.co/datasets/GBaker/MedQA-USMLE-4-options-hf) |  |
-| 278 | [wikimedqa/medwiki](src/tasksource/tasks.py#L1183) | MultipleChoice | [sileod/wikimedqa](https://hf.co/datasets/sileod/wikimedqa) |  |
-| 279 | [cicero](src/tasksource/tasks.py#L1192) | MultipleChoice | [declare-lab/cicero](https://hf.co/datasets/declare-lab/cicero) |  |
-| 280 | [CREAK](src/tasksource/tasks.py#L1196) | Classification | [amydeng2000/CREAK](https://hf.co/datasets/amydeng2000/CREAK) |  |
-| 281 | [mutual](src/tasksource/tasks.py#L1199) | MultipleChoice | [tasksource/mutual](https://hf.co/datasets/tasksource/mutual) |  |
-| 282 | [implicatures](src/tasksource/tasks.py#L1204) | MultipleChoice | [tasksource/implicatures](https://hf.co/datasets/tasksource/implicatures) |  |
-| 283 | [race/high](src/tasksource/tasks.py#L1209) | MultipleChoice | [ehovy/race](https://hf.co/datasets/ehovy/race) |  |
-| 284 | [race/middle](src/tasksource/tasks.py#L1209) | MultipleChoice | [ehovy/race](https://hf.co/datasets/ehovy/race) |  |
-| 285 | [race-c](src/tasksource/tasks.py#L1213) | MultipleChoice | [tasksource/race-c](https://hf.co/datasets/tasksource/race-c) |  |
-| 286 | [spartqa-yn](src/tasksource/tasks.py#L1216) | Classification | [tasksource/spartqa-yn](https://hf.co/datasets/tasksource/spartqa-yn) |  |
-| 287 | [spartqa-mchoice](src/tasksource/tasks.py#L1219) | MultipleChoice | [tasksource/spartqa-mchoice](https://hf.co/datasets/tasksource/spartqa-mchoice) |  |
-| 288 | [temporal-nli](src/tasksource/tasks.py#L1222) | Classification | [tasksource/temporal-nli](https://hf.co/datasets/tasksource/temporal-nli) |  |
-| 289 | [riddle_sense](src/tasksource/tasks.py#L1225) | MultipleChoice | [jeggers/riddle_sense](https://hf.co/datasets/jeggers/riddle_sense) |  |
-| 290 | [clcd-english](src/tasksource/tasks.py#L1230) | Classification | [tasksource/clcd-english](https://hf.co/datasets/tasksource/clcd-english) |  |
-| 291 | [twentyquestions](src/tasksource/tasks.py#L1242) | Classification | [tasksource/twentyquestions](https://hf.co/datasets/tasksource/twentyquestions) |  |
-| 292 | [reclor](src/tasksource/tasks.py#L1247) | MultipleChoice | [tasksource/reclor](https://hf.co/datasets/tasksource/reclor) |  |
-| 293 | [counterfactually-augmented-imdb](src/tasksource/tasks.py#L1250) | Classification | [tasksource/counterfactually-augmented-imdb](https://hf.co/datasets/tasksource/counterfactually-augmented-imdb) |  |
-| 294 | [counterfactually-augmented-snli](src/tasksource/tasks.py#L1253) | Classification | [tasksource/counterfactually-augmented-snli](https://hf.co/datasets/tasksource/counterfactually-augmented-snli) |  |
-| 295 | [cnli](src/tasksource/tasks.py#L1256) | Classification | [tasksource/cnli](https://hf.co/datasets/tasksource/cnli) |  |
-| 296 | [boolq-natural-perturbations](src/tasksource/tasks.py#L1259) | Classification | [tasksource/boolq-natural-perturbations](https://hf.co/datasets/tasksource/boolq-natural-perturbations) |  |
-| 297 | [acceptability-prediction](src/tasksource/tasks.py#L1264) | Classification | [tasksource/acceptability-prediction](https://hf.co/datasets/tasksource/acceptability-prediction) | ✓ |
-| 298 | [equate](src/tasksource/tasks.py#L1290) | Classification | [tasksource/equate](https://hf.co/datasets/tasksource/equate) |  |
-| 299 | [ScienceQA_text_only](src/tasksource/tasks.py#L1293) | MultipleChoice | [tasksource/ScienceQA_text_only](https://hf.co/datasets/tasksource/ScienceQA_text_only) |  |
-| 300 | [ekar_english](src/tasksource/tasks.py#L1296) | MultipleChoice | [Jiangjie/ekar_english](https://hf.co/datasets/Jiangjie/ekar_english) | ✓ |
-| 301 | [implicit-hate-stg1](src/tasksource/tasks.py#L1300) | Classification | [tasksource/implicit-hate-stg1](https://hf.co/datasets/tasksource/implicit-hate-stg1) | ✓ |
-| 302 | [chaos-mnli-ambiguity](src/tasksource/tasks.py#L1304) | Classification | [tasksource/chaos-mnli-ambiguity](https://hf.co/datasets/tasksource/chaos-mnli-ambiguity) | ✓ |
-| 303 | [headline_cause/en_simple](src/tasksource/tasks.py#L1308) | Classification | [IlyaGusev/headline_cause](https://hf.co/datasets/IlyaGusev/headline_cause) (`json` loader) |  |
-| 304 | [logiqa-2.0-nli](src/tasksource/tasks.py#L1313) | Classification | [tasksource/logiqa-2.0-nli](https://hf.co/datasets/tasksource/logiqa-2.0-nli) |  |
-| 305 | [oasst2_dense_flat/quality](src/tasksource/tasks.py#L1318) | Classification | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) | ✓ |
-| 306 | [oasst2_dense_flat/toxicity](src/tasksource/tasks.py#L1320) | Classification | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) | ✓ |
-| 307 | [oasst2_dense_flat/helpfulness](src/tasksource/tasks.py#L1322) | Classification | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) | ✓ |
-| 308 | [mindgames](src/tasksource/tasks.py#L1325) | Classification | [sileod/mindgames](https://hf.co/datasets/sileod/mindgames) |  |
-| 309 | [universal_dependencies/en_lines/deprel](src/tasksource/tasks.py#L1339) | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ✓ |
-| 310 | [universal_dependencies/en_partut/deprel](src/tasksource/tasks.py#L1339) | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ✓ |
-| 311 | [universal_dependencies/en_gum/deprel](src/tasksource/tasks.py#L1339) | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ✓ |
-| 312 | [universal_dependencies/en_ewt/deprel](src/tasksource/tasks.py#L1339) | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ✓ |
-| 313 | [ambient](src/tasksource/tasks.py#L1346) | Classification | [tasksource/ambient](https://hf.co/datasets/tasksource/ambient) | ✓ |
-| 314 | [path-naturalness-prediction](src/tasksource/tasks.py#L1351) | MultipleChoice | [tasksource/path-naturalness-prediction](https://hf.co/datasets/tasksource/path-naturalness-prediction) |  |
-| 315 | [civil_comments/toxicity](src/tasksource/tasks.py#L1361) | Classification | [google/civil_comments](https://hf.co/datasets/google/civil_comments) | ✓ |
-| 316 | [civil_comments/severe_toxicity](src/tasksource/tasks.py#L1362) | Classification | [google/civil_comments](https://hf.co/datasets/google/civil_comments) | ✓ |
-| 317 | [civil_comments/obscene](src/tasksource/tasks.py#L1363) | Classification | [google/civil_comments](https://hf.co/datasets/google/civil_comments) | ✓ |
-| 318 | [civil_comments/threat](src/tasksource/tasks.py#L1364) | Classification | [google/civil_comments](https://hf.co/datasets/google/civil_comments) | ✓ |
-| 319 | [civil_comments/insult](src/tasksource/tasks.py#L1365) | Classification | [google/civil_comments](https://hf.co/datasets/google/civil_comments) | ✓ |
-| 320 | [civil_comments/identity_attack](src/tasksource/tasks.py#L1366) | Classification | [google/civil_comments](https://hf.co/datasets/google/civil_comments) | ✓ |
-| 321 | [civil_comments/sexual_explicit](src/tasksource/tasks.py#L1367) | Classification | [google/civil_comments](https://hf.co/datasets/google/civil_comments) | ✓ |
-| 322 | [cloth](src/tasksource/tasks.py#L1369) | MultipleChoice | [AndyChiang/cloth](https://hf.co/datasets/AndyChiang/cloth) |  |
-| 323 | [dgen](src/tasksource/tasks.py#L1370) | MultipleChoice | [AndyChiang/dgen](https://hf.co/datasets/AndyChiang/dgen) |  |
-| 324 | [I2D2](src/tasksource/tasks.py#L1372) | Classification | [tasksource/I2D2](https://hf.co/datasets/tasksource/I2D2) | ✓ |
-| 325 | [args_me](src/tasksource/tasks.py#L1377) | Classification | [webis/args_me](https://hf.co/datasets/webis/args_me) | ✓ |
-| 326 | [Touche23-ValueEval](src/tasksource/tasks.py#L1382) | Classification | [webis/Touche23-ValueEval](https://hf.co/datasets/webis/Touche23-ValueEval) (`csv` loader) | ✓ |
-| 327 | [starcon](src/tasksource/tasks.py#L1391) | Classification | [tasksource/starcon](https://hf.co/datasets/tasksource/starcon) | ✓ |
-| 328 | [banking77](src/tasksource/tasks.py#L1396) | Classification | [legacy-datasets/banking77](https://hf.co/datasets/legacy-datasets/banking77) |  |
-| 329 | [it-support-tickets](src/tasksource/tasks.py#L1398) | Classification | [tasksource/it-support-tickets](https://hf.co/datasets/tasksource/it-support-tickets) |  |
-| 330 | [ConTRoL-nli](src/tasksource/tasks.py#L1402) | Classification | [tasksource/ConTRoL-nli](https://hf.co/datasets/tasksource/ConTRoL-nli) |  |
-| 331 | [tracie](src/tasksource/tasks.py#L1404) | Classification | [tasksource/tracie](https://hf.co/datasets/tasksource/tracie) | ✓ |
-| 332 | [sherliic](src/tasksource/tasks.py#L1406) | Classification | [tasksource/sherliic](https://hf.co/datasets/tasksource/sherliic) |  |
-| 333 | [sen-making/1](src/tasksource/tasks.py#L1409) | MultipleChoice | [tasksource/sen-making](https://hf.co/datasets/tasksource/sen-making) |  |
-| 334 | [sen-making/2](src/tasksource/tasks.py#L1412) | MultipleChoice | [tasksource/sen-making](https://hf.co/datasets/tasksource/sen-making) | ✓ |
-| 335 | [winowhy](src/tasksource/tasks.py#L1415) | Classification | [tasksource/winowhy](https://hf.co/datasets/tasksource/winowhy) | ✓ |
-| 336 | [robustLR](src/tasksource/tasks.py#L1419) | Classification | [tasksource/robustLR](https://hf.co/datasets/tasksource/robustLR) |  |
-| 337 | [clutrr](src/tasksource/tasks.py#L1421) | Classification | [tasksource/clutrr](https://hf.co/datasets/tasksource/clutrr) |  |
-| 338 | [logical-fallacy](src/tasksource/tasks.py#L1423) | Classification | [tasksource/logical-fallacy](https://hf.co/datasets/tasksource/logical-fallacy) |  |
-| 339 | [parade](src/tasksource/tasks.py#L1426) | Classification | [tasksource/parade](https://hf.co/datasets/tasksource/parade) |  |
-| 340 | [subjectivity](src/tasksource/tasks.py#L1429) | Classification | [tasksource/subjectivity](https://hf.co/datasets/tasksource/subjectivity) | ✓ |
-| 341 | [MOH](src/tasksource/tasks.py#L1435) | Classification | [tasksource/MOH](https://hf.co/datasets/tasksource/MOH) | ✓ |
-| 342 | [VUAC](src/tasksource/tasks.py#L1436) | Classification | [tasksource/VUAC](https://hf.co/datasets/tasksource/VUAC) | ✓ |
-| 343 | [TroFi](src/tasksource/tasks.py#L1437) | Classification | [tasksource/TroFi](https://hf.co/datasets/tasksource/TroFi) (`parquet` loader) | ✓ |
-| 344 | [sharc](src/tasksource/tasks.py#L1445) | Classification | [tasksource/sharc](https://hf.co/datasets/tasksource/sharc) |  |
-| 345 | [conceptrules_v2](src/tasksource/tasks.py#L1449) | Classification | [tasksource/conceptrules_v2](https://hf.co/datasets/tasksource/conceptrules_v2) | ✓ |
-| 346 | [disrpt/eng.dep.scidtb.rels](src/tasksource/tasks.py#L1452) | Classification | [multilingual-discourse-hub/disrpt](https://hf.co/datasets/multilingual-discourse-hub/disrpt) | ✓ |
-| 347 | [conll2000](src/tasksource/tasks.py#L1455) | TokenClassification | [eriktks/conll2000](https://hf.co/datasets/eriktks/conll2000) |  |
-| 348 | [few-nerd/supervised](src/tasksource/tasks.py#L1458) | TokenClassification | [DFKI-SLT/few-nerd](https://hf.co/datasets/DFKI-SLT/few-nerd) |  |
-| 349 | [finer-139](src/tasksource/tasks.py#L1459) | TokenClassification | [nlpaueb/finer-139](https://hf.co/datasets/nlpaueb/finer-139) |  |
-| 350 | [zero-shot-label-nli](src/tasksource/tasks.py#L1462) | Classification | [tasksource/zero-shot-label-nli](https://hf.co/datasets/tasksource/zero-shot-label-nli) | ✓ |
-| 351 | [com2sense](src/tasksource/tasks.py#L1464) | Classification | [tasksource/com2sense](https://hf.co/datasets/tasksource/com2sense) |  |
-| 352 | [scone](src/tasksource/tasks.py#L1467) | Classification | [tasksource/scone](https://hf.co/datasets/tasksource/scone) |  |
-| 353 | [winodict](src/tasksource/tasks.py#L1469) | MultipleChoice | [tasksource/winodict](https://hf.co/datasets/tasksource/winodict) |  |
-| 354 | [fool-me-twice](src/tasksource/tasks.py#L1471) | Classification | [tasksource/fool-me-twice](https://hf.co/datasets/tasksource/fool-me-twice) |  |
-| 355 | [monli](src/tasksource/tasks.py#L1475) | Classification | [tasksource/monli](https://hf.co/datasets/tasksource/monli) |  |
-| 356 | [corr2cause](src/tasksource/tasks.py#L1477) | Classification | [tasksource/corr2cause](https://hf.co/datasets/tasksource/corr2cause) |  |
-| 357 | [lsat_qa/all](src/tasksource/tasks.py#L1479) | MultipleChoice | [lighteval/lsat_qa](https://hf.co/datasets/lighteval/lsat_qa) |  |
-| 358 | [apt](src/tasksource/tasks.py#L1481) | Classification | [tasksource/apt](https://hf.co/datasets/tasksource/apt) |  |
-| 359 | [twitter-financial-news-sentiment](src/tasksource/tasks.py#L1484) | Classification | [zeroshot/twitter-financial-news-sentiment](https://hf.co/datasets/zeroshot/twitter-financial-news-sentiment) |  |
-| 360 | [icl-symbol-tuning-instruct](src/tasksource/tasks.py#L1491) | Classification | [tasksource/icl-symbol-tuning-instruct](https://hf.co/datasets/tasksource/icl-symbol-tuning-instruct) | ✓ |
-| 361 | [SpaceNLI](src/tasksource/tasks.py#L1497) | Classification | [tasksource/SpaceNLI](https://hf.co/datasets/tasksource/SpaceNLI) |  |
-| 362 | [propsegment/nli](src/tasksource/tasks.py#L1499) | Classification | [sihaochen/propsegment](https://hf.co/datasets/sihaochen/propsegment) (`json` loader) | ✓ |
-| 363 | [HatemojiBuild](src/tasksource/tasks.py#L1509) | Classification | [HannahRoseKirk/HatemojiBuild](https://hf.co/datasets/HannahRoseKirk/HatemojiBuild) |  |
-| 364 | [regset](src/tasksource/tasks.py#L1512) | Classification | [tasksource/regset](https://hf.co/datasets/tasksource/regset) | ✓ |
-| 365 | [esci](src/tasksource/tasks.py#L1519) | Classification | [tasksource/esci](https://hf.co/datasets/tasksource/esci) |  |
-| 366 | [chatbot_arena_conversations](src/tasksource/tasks.py#L1540) | MultipleChoice | [lmsys/chatbot_arena_conversations](https://hf.co/datasets/lmsys/chatbot_arena_conversations) | ✓ |
-| 367 | [dnd_style_intents](src/tasksource/tasks.py#L1546) | Classification | [neurae/dnd_style_intents](https://hf.co/datasets/neurae/dnd_style_intents) |  |
-| 368 | [FLD.v2/default](src/tasksource/tasks.py#L1549) | Classification | [hitachi-nlp/FLD.v2](https://hf.co/datasets/hitachi-nlp/FLD.v2) | ✓ |
-| 369 | [FLD.v2/star](src/tasksource/tasks.py#L1553) | Classification | [hitachi-nlp/FLD.v2](https://hf.co/datasets/hitachi-nlp/FLD.v2) | ✓ |
-| 370 | [SDOH-NLI](src/tasksource/tasks.py#L1557) | Classification | [tasksource/SDOH-NLI](https://hf.co/datasets/tasksource/SDOH-NLI) |  |
-| 371 | [scifact_entailment](src/tasksource/tasks.py#L1560) | Classification | [tasksource/scifact_entailment](https://hf.co/datasets/tasksource/scifact_entailment) |  |
-| 372 | [feasibilityQA](src/tasksource/tasks.py#L1564) | Classification | [tasksource/feasibilityQA](https://hf.co/datasets/tasksource/feasibilityQA) |  |
-| 373 | [simple_pair](src/tasksource/tasks.py#L1567) | Classification | [tasksource/simple_pair](https://hf.co/datasets/tasksource/simple_pair) |  |
-| 374 | [AdjectiveScaleProbe-nli](src/tasksource/tasks.py#L1568) | Classification | [tasksource/AdjectiveScaleProbe-nli](https://hf.co/datasets/tasksource/AdjectiveScaleProbe-nli) |  |
-| 375 | [resnli](src/tasksource/tasks.py#L1569) | Classification | [tasksource/resnli](https://hf.co/datasets/tasksource/resnli) |  |
-| 376 | [SpaRTUN](src/tasksource/tasks.py#L1571) | MultipleChoice | [tasksource/SpaRTUN](https://hf.co/datasets/tasksource/SpaRTUN) |  |
-| 377 | [ReSQ](src/tasksource/tasks.py#L1576) | MultipleChoice | [tasksource/ReSQ](https://hf.co/datasets/tasksource/ReSQ) |  |
-| 378 | [semantic_fragments_nli](src/tasksource/tasks.py#L1581) | Classification | [tasksource/semantic_fragments_nli](https://hf.co/datasets/tasksource/semantic_fragments_nli) |  |
-| 379 | [dataset_train_nli](src/tasksource/tasks.py#L1584) | Classification | [MoritzLaurer/dataset_train_nli](https://hf.co/datasets/MoritzLaurer/dataset_train_nli) |  |
-| 380 | [stepgame](src/tasksource/tasks.py#L1589) | Classification | [tasksource/stepgame](https://hf.co/datasets/tasksource/stepgame) |  |
-| 381 | [nlgraph](src/tasksource/tasks.py#L1597) | Classification | [tasksource/nlgraph](https://hf.co/datasets/tasksource/nlgraph) |  |
-| 382 | [oasst2_pairwise_rlhf_reward](src/tasksource/tasks.py#L1601) | MultipleChoice | [tasksource/oasst2_pairwise_rlhf_reward](https://hf.co/datasets/tasksource/oasst2_pairwise_rlhf_reward) | ✓ |
-| 383 | [hh-rlhf/helpful-online](src/tasksource/tasks.py#L1612) | MultipleChoice | [tasksource/hh-rlhf](https://hf.co/datasets/tasksource/hh-rlhf) | ✓ |
-| 384 | [hh-rlhf/helpful-base](src/tasksource/tasks.py#L1612) | MultipleChoice | [tasksource/hh-rlhf](https://hf.co/datasets/tasksource/hh-rlhf) | ✓ |
-| 385 | [hh-rlhf/helpful-rejection-sampled](src/tasksource/tasks.py#L1612) | MultipleChoice | [tasksource/hh-rlhf](https://hf.co/datasets/tasksource/hh-rlhf) | ✓ |
-| 386 | [hh-rlhf/harmless-base](src/tasksource/tasks.py#L1616) | MultipleChoice | [tasksource/hh-rlhf](https://hf.co/datasets/tasksource/hh-rlhf) | ✓ |
-| 387 | [ruletaker](src/tasksource/tasks.py#L1620) | Classification | [tasksource/ruletaker](https://hf.co/datasets/tasksource/ruletaker) | ✓ |
-| 388 | [PARARULE-Plus](src/tasksource/tasks.py#L1624) | Classification | [qbao775/PARARULE-Plus](https://hf.co/datasets/qbao775/PARARULE-Plus) | ✓ |
-| 389 | [proofwriter](src/tasksource/tasks.py#L1628) | Classification | [tasksource/proofwriter](https://hf.co/datasets/tasksource/proofwriter) |  |
-| 390 | [logical-entailment](src/tasksource/tasks.py#L1631) | Classification | [tasksource/logical-entailment](https://hf.co/datasets/tasksource/logical-entailment) | ✓ |
-| 391 | [nope](src/tasksource/tasks.py#L1634) | Classification | [tasksource/nope](https://hf.co/datasets/tasksource/nope) |  |
-| 392 | [LogicNLI](src/tasksource/tasks.py#L1638) | Classification | [tasksource/LogicNLI](https://hf.co/datasets/tasksource/LogicNLI) | ✓ |
-| 393 | [contract-nli/contractnli_a/seg](src/tasksource/tasks.py#L1641) | Classification | [tasksource/contract-nli](https://hf.co/datasets/tasksource/contract-nli) |  |
-| 394 | [contract-nli/contractnli_b/full](src/tasksource/tasks.py#L1643) | Classification | [tasksource/contract-nli](https://hf.co/datasets/tasksource/contract-nli) |  |
-| 395 | [nli4ct_semeval2024](src/tasksource/tasks.py#L1645) | Classification | [AshtonIsNotHere/nli4ct_semeval2024](https://hf.co/datasets/AshtonIsNotHere/nli4ct_semeval2024) |  |
-| 396 | [lsat-ar](src/tasksource/tasks.py#L1648) | MultipleChoice | [tasksource/lsat-ar](https://hf.co/datasets/tasksource/lsat-ar) |  |
-| 397 | [lsat-rc](src/tasksource/tasks.py#L1653) | MultipleChoice | [tasksource/lsat-rc](https://hf.co/datasets/tasksource/lsat-rc) |  |
-| 398 | [biosift-nli](src/tasksource/tasks.py#L1658) | Classification | [AshtonIsNotHere/biosift-nli](https://hf.co/datasets/AshtonIsNotHere/biosift-nli) |  |
-| 399 | [brainteasers/WP](src/tasksource/tasks.py#L1662) | MultipleChoice | [tasksource/brainteasers](https://hf.co/datasets/tasksource/brainteasers) |  |
-| 400 | [toxigen-data/annotated](src/tasksource/tasks.py#L1668) | Classification | [skg/toxigen-data](https://hf.co/datasets/skg/toxigen-data) |  |
-| 401 | [persuasion](src/tasksource/tasks.py#L1679) | Classification | [Anthropic/persuasion](https://hf.co/datasets/Anthropic/persuasion) |  |
-| 402 | [AmbigNQ-clarifying-question](src/tasksource/tasks.py#L1685) | Classification | [erbacher/AmbigNQ-clarifying-question](https://hf.co/datasets/erbacher/AmbigNQ-clarifying-question) | ✓ |
-| 403 | [SIGA-nli](src/tasksource/tasks.py#L1690) | Classification | [tasksource/SIGA-nli](https://hf.co/datasets/tasksource/SIGA-nli) | ✓ |
-| 404 | [FOL-nli](src/tasksource/tasks.py#L1692) | Classification | [unigram/FOL-nli](https://hf.co/datasets/unigram/FOL-nli) |  |
-| 405 | [goal-step-wikihow/goal](src/tasksource/tasks.py#L1694) | MultipleChoice | [tasksource/goal-step-wikihow](https://hf.co/datasets/tasksource/goal-step-wikihow) |  |
-| 406 | [goal-step-wikihow/step](src/tasksource/tasks.py#L1697) | MultipleChoice | [tasksource/goal-step-wikihow](https://hf.co/datasets/tasksource/goal-step-wikihow) |  |
-| 407 | [goal-step-wikihow/order](src/tasksource/tasks.py#L1700) | MultipleChoice | [tasksource/goal-step-wikihow](https://hf.co/datasets/tasksource/goal-step-wikihow) | ✓ |
-| 408 | [PARADISE](src/tasksource/tasks.py#L1704) | MultipleChoice | [GGLab/PARADISE](https://hf.co/datasets/GGLab/PARADISE) |  |
-| 409 | [doc-nli](src/tasksource/tasks.py#L1707) | Classification | [tasksource/doc-nli](https://hf.co/datasets/tasksource/doc-nli) |  |
-| 410 | [mctest-nli](src/tasksource/tasks.py#L1709) | Classification | [tasksource/mctest-nli](https://hf.co/datasets/tasksource/mctest-nli) |  |
-| 411 | [patent-phrase-similarity](src/tasksource/tasks.py#L1711) | Classification | [tasksource/patent-phrase-similarity](https://hf.co/datasets/tasksource/patent-phrase-similarity) | ✓ |
-| 412 | [natural-language-satisfiability](src/tasksource/tasks.py#L1714) | Classification | [tasksource/natural-language-satisfiability](https://hf.co/datasets/tasksource/natural-language-satisfiability) |  |
-| 413 | [idioms-nli](src/tasksource/tasks.py#L1716) | Classification | [tasksource/idioms-nli](https://hf.co/datasets/tasksource/idioms-nli) |  |
-| 414 | [lifecycle-entailment](src/tasksource/tasks.py#L1718) | Classification | [tasksource/lifecycle-entailment](https://hf.co/datasets/tasksource/lifecycle-entailment) |  |
-| 415 | [safe-guard-prompt-injection](src/tasksource/tasks.py#L1725) | Classification | [xTRam1/safe-guard-prompt-injection](https://hf.co/datasets/xTRam1/safe-guard-prompt-injection) | ✓ |
-| 416 | [prompt-injections](src/tasksource/tasks.py#L1731) | Classification | [deepset/prompt-injections](https://hf.co/datasets/deepset/prompt-injections) | ✓ |
-| 417 | [prompt-injection-dataset](src/tasksource/tasks.py#L1737) | Classification | [S-Labs/prompt-injection-dataset](https://hf.co/datasets/S-Labs/prompt-injection-dataset) | ✓ |
-| 418 | [Prompt-injection-dataset/full](src/tasksource/tasks.py#L1743) | Classification | [neuralchemy/Prompt-injection-dataset](https://hf.co/datasets/neuralchemy/Prompt-injection-dataset) | ✓ |
-| 419 | [PromptShield](src/tasksource/tasks.py#L1749) | Classification | [hendzh/PromptShield](https://hf.co/datasets/hendzh/PromptShield) | ✓ |
-| 420 | [shell-safety-v2](src/tasksource/tasks.py#L1755) | Classification | [tomngdev/shell-safety-v2](https://hf.co/datasets/tomngdev/shell-safety-v2) | ✓ |
-| 421 | [agent_action_safety](src/tasksource/tasks.py#L1760) | Classification | [karanxa/agent-action-safety-dataset](https://hf.co/datasets/karanxa/agent-action-safety-dataset) (`json` loader) | ✓ |
-| 422 | [ShellRisk-Bench](src/tasksource/tasks.py#L1775) | Classification | [kontext-security/ShellRisk-Bench](https://hf.co/datasets/kontext-security/ShellRisk-Bench) | ✓ |
-| 423 | [wildguardmix-cleaned/prompt_harm](src/tasksource/tasks.py#L1800) | Classification | [bogdanminko/wildguardmix-cleaned](https://hf.co/datasets/bogdanminko/wildguardmix-cleaned) | ✓ |
-| 424 | [wildguardmix-cleaned/response_harm](src/tasksource/tasks.py#L1806) | Classification | [bogdanminko/wildguardmix-cleaned](https://hf.co/datasets/bogdanminko/wildguardmix-cleaned) | ✓ |
-| 425 | [wildguardmix-cleaned/response_refusal](src/tasksource/tasks.py#L1811) | Classification | [bogdanminko/wildguardmix-cleaned](https://hf.co/datasets/bogdanminko/wildguardmix-cleaned) | ✓ |
-| 426 | [BeaverTails](src/tasksource/tasks.py#L1827) | Classification | [PKU-Alignment/BeaverTails](https://hf.co/datasets/PKU-Alignment/BeaverTails) | ✓ |
-| 427 | [privacy-200k-Mistral-Large-3](src/tasksource/tasks.py#L1843) | Classification | [gabrielloiseau/privacy-200k-Mistral-Large-3](https://hf.co/datasets/gabrielloiseau/privacy-200k-Mistral-Large-3) | ✓ |
-| 428 | [toxic-chat/toxicchat0124/toxicity](src/tasksource/tasks.py#L1852) | Classification | [lmsys/toxic-chat](https://hf.co/datasets/lmsys/toxic-chat) | ✓ |
-| 429 | [toxic-chat/toxicchat0124/jailbreaking](src/tasksource/tasks.py#L1857) | Classification | [lmsys/toxic-chat](https://hf.co/datasets/lmsys/toxic-chat) | ✓ |
-| 430 | [clinc_oos/plus](src/tasksource/tasks.py#L1863) | Classification | [clinc/clinc_oos](https://hf.co/datasets/clinc/clinc_oos) |  |
-| 431 | [IntentGrasp/all](src/tasksource/tasks.py#L1881) | MultipleChoice | [yuweiyin/IntentGrasp](https://hf.co/datasets/yuweiyin/IntentGrasp) |  |
-| 432 | [few_rel/default](src/tasksource/tasks.py#L1919) | Classification | [tasksource/few_rel](https://hf.co/datasets/tasksource/few_rel) |  |
-| 433 | [docred](src/tasksource/tasks.py#L1997) | Classification | [YufeiHFUT/DocRED_origin](https://hf.co/datasets/YufeiHFUT/DocRED_origin), [thunlp/docred](https://hf.co/datasets/thunlp/docred) (`json` loader) |  |
-| 434 | [chemprot/chemprot_full_source](src/tasksource/tasks.py#L2032) | Classification | [bigbio/chemprot](https://hf.co/datasets/bigbio/chemprot) | ✓ |
-| 435 | [PKU-SafeRLHF/helpfulness](src/tasksource/tasks.py#L2038) | MultipleChoice | [PKU-Alignment/PKU-SafeRLHF](https://hf.co/datasets/PKU-Alignment/PKU-SafeRLHF) | ✓ |
-| 436 | [PKU-SafeRLHF/safety](src/tasksource/tasks.py#L2043) | MultipleChoice | [PKU-Alignment/PKU-SafeRLHF](https://hf.co/datasets/PKU-Alignment/PKU-SafeRLHF) | ✓ |
-| 437 | [HelpSteer/helpfulness](src/tasksource/tasks.py#L2065) | Classification | [nvidia/HelpSteer](https://hf.co/datasets/nvidia/HelpSteer) | ✓ |
-| 438 | [HelpSteer/correctness](src/tasksource/tasks.py#L2066) | Classification | [nvidia/HelpSteer](https://hf.co/datasets/nvidia/HelpSteer) | ✓ |
-| 439 | [HelpSteer/coherence](src/tasksource/tasks.py#L2067) | Classification | [nvidia/HelpSteer](https://hf.co/datasets/nvidia/HelpSteer) | ✓ |
-| 440 | [HelpSteer/complexity](src/tasksource/tasks.py#L2068) | Classification | [nvidia/HelpSteer](https://hf.co/datasets/nvidia/HelpSteer) | ✓ |
-| 441 | [HelpSteer/verbosity](src/tasksource/tasks.py#L2069) | Classification | [nvidia/HelpSteer](https://hf.co/datasets/nvidia/HelpSteer) | ✓ |
-| 442 | [HelpSteer2/helpfulness](src/tasksource/tasks.py#L2071) | Classification | [nvidia/HelpSteer2](https://hf.co/datasets/nvidia/HelpSteer2) | ✓ |
-| 443 | [HelpSteer2/correctness](src/tasksource/tasks.py#L2072) | Classification | [nvidia/HelpSteer2](https://hf.co/datasets/nvidia/HelpSteer2) | ✓ |
-| 444 | [HelpSteer2/coherence](src/tasksource/tasks.py#L2073) | Classification | [nvidia/HelpSteer2](https://hf.co/datasets/nvidia/HelpSteer2) | ✓ |
-| 445 | [HelpSteer2/complexity](src/tasksource/tasks.py#L2074) | Classification | [nvidia/HelpSteer2](https://hf.co/datasets/nvidia/HelpSteer2) | ✓ |
-| 446 | [HelpSteer2/verbosity](src/tasksource/tasks.py#L2075) | Classification | [nvidia/HelpSteer2](https://hf.co/datasets/nvidia/HelpSteer2) | ✓ |
-| 447 | [HelpSteer3/preference](src/tasksource/tasks.py#L2080) | MultipleChoice | [nvidia/HelpSteer3](https://hf.co/datasets/nvidia/HelpSteer3) | ✓ |
-| 448 | [HelpSteer3/preference_strength](src/tasksource/tasks.py#L2093) | Classification | [nvidia/HelpSteer3](https://hf.co/datasets/nvidia/HelpSteer3) | ✓ |
-| 449 | [HelpSteer3/principle](src/tasksource/tasks.py#L2105) | Classification | [nvidia/HelpSteer3](https://hf.co/datasets/nvidia/HelpSteer3) |  |
-| 450 | [HelpSteer3/edit_quality](src/tasksource/tasks.py#L2110) | MultipleChoice | [nvidia/HelpSteer3](https://hf.co/datasets/nvidia/HelpSteer3) | ✓ |
-| 451 | [HelpSteer3/feedback](src/tasksource/tasks.py#L2132) | Classification | [nvidia/HelpSteer3](https://hf.co/datasets/nvidia/HelpSteer3) | ✓ |
-| 452 | [MSciNLI](src/tasksource/tasks.py#L2138) | Classification | [sadat2307/MSciNLI](https://hf.co/datasets/sadat2307/MSciNLI) |  |
-| 453 | [UltraFeedback-paired](src/tasksource/tasks.py#L2141) | MultipleChoice | [pushpdeep/UltraFeedback-paired](https://hf.co/datasets/pushpdeep/UltraFeedback-paired) | ✓ |
-| 454 | [prm800k_dpo/solution](src/tasksource/tasks.py#L2145) | MultipleChoice | [tasksource/prm800k_dpo](https://hf.co/datasets/tasksource/prm800k_dpo) | ✓ |
-| 455 | [prm800k_dpo/step](src/tasksource/tasks.py#L2148) | MultipleChoice | [tasksource/prm800k_dpo](https://hf.co/datasets/tasksource/prm800k_dpo) | ✓ |
-| 456 | [AES2-essay-scoring](src/tasksource/tasks.py#L2152) | Classification | [tasksource/AES2-essay-scoring](https://hf.co/datasets/tasksource/AES2-essay-scoring) | ✓ |
-| 457 | [argument-feedback](src/tasksource/tasks.py#L2156) | Classification | [tasksource/argument-feedback](https://hf.co/datasets/tasksource/argument-feedback) | ✓ |
-| 458 | [english-grading/cohesion](src/tasksource/tasks.py#L2163) | Classification | [tasksource/english-grading](https://hf.co/datasets/tasksource/english-grading) | ✓ |
-| 459 | [english-grading/syntax](src/tasksource/tasks.py#L2164) | Classification | [tasksource/english-grading](https://hf.co/datasets/tasksource/english-grading) | ✓ |
-| 460 | [english-grading/vocabulary](src/tasksource/tasks.py#L2165) | Classification | [tasksource/english-grading](https://hf.co/datasets/tasksource/english-grading) | ✓ |
-| 461 | [english-grading/phraseology](src/tasksource/tasks.py#L2166) | Classification | [tasksource/english-grading](https://hf.co/datasets/tasksource/english-grading) | ✓ |
-| 462 | [english-grading/grammar](src/tasksource/tasks.py#L2167) | Classification | [tasksource/english-grading](https://hf.co/datasets/tasksource/english-grading) | ✓ |
-| 463 | [english-grading/conventions](src/tasksource/tasks.py#L2168) | Classification | [tasksource/english-grading](https://hf.co/datasets/tasksource/english-grading) | ✓ |
-| 464 | [wice](src/tasksource/tasks.py#L2170) | Classification | [tasksource/wice](https://hf.co/datasets/tasksource/wice) |  |
-| 465 | [hover](src/tasksource/tasks.py#L2173) | Classification | [Dzeniks/hover](https://hf.co/datasets/Dzeniks/hover) |  |
-| 466 | [hover-3way/nli](src/tasksource/tasks.py#L2177) | Classification | [Dzeniks/hover-3way](https://hf.co/datasets/Dzeniks/hover-3way) | ✓ |
-| 467 | [tasksource_dpo_pairs](src/tasksource/tasks.py#L2180) | MultipleChoice | [tasksource/tasksource_dpo_pairs](https://hf.co/datasets/tasksource/tasksource_dpo_pairs) | ✓ |
-| 468 | [seahorse_summarization_evaluation](src/tasksource/tasks.py#L2183) | Classification | [tasksource/seahorse_summarization_evaluation](https://hf.co/datasets/tasksource/seahorse_summarization_evaluation) |  |
-| 469 | [missing-item-prediction/contrastive](src/tasksource/tasks.py#L2195) | Classification | [sileod/missing-item-prediction](https://hf.co/datasets/sileod/missing-item-prediction) | ✓ |
-| 470 | [jigsaw_toxicity](src/tasksource/tasks.py#L2202) | Classification | [tasksource/jigsaw_toxicity](https://hf.co/datasets/tasksource/jigsaw_toxicity) |  |
-| 471 | [Pol_NLI](src/tasksource/tasks.py#L2205) | Classification | [mlburnham/Pol_NLI](https://hf.co/datasets/mlburnham/Pol_NLI) |  |
-| 472 | [synthetic-retrieval-NLI/position](src/tasksource/tasks.py#L2208) | Classification | [tasksource/synthetic-retrieval-NLI](https://hf.co/datasets/tasksource/synthetic-retrieval-NLI) |  |
-| 473 | [synthetic-retrieval-NLI/count](src/tasksource/tasks.py#L2208) | Classification | [tasksource/synthetic-retrieval-NLI](https://hf.co/datasets/tasksource/synthetic-retrieval-NLI) |  |
-| 474 | [synthetic-retrieval-NLI/binary](src/tasksource/tasks.py#L2208) | Classification | [tasksource/synthetic-retrieval-NLI](https://hf.co/datasets/tasksource/synthetic-retrieval-NLI) |  |
-| 475 | [github-issue-similarity](src/tasksource/tasks.py#L2217) | Classification | [WhereIsAI/github-issue-similarity](https://hf.co/datasets/WhereIsAI/github-issue-similarity) |  |
-| 476 | [webinstruct/mc](src/tasksource/tasks.py#L2422) | MultipleChoice | [tasksource/webinstruct](https://hf.co/datasets/tasksource/webinstruct) |  |
-| 477 | [webinstruct/binary](src/tasksource/tasks.py#L2424) | Classification | [tasksource/webinstruct](https://hf.co/datasets/tasksource/webinstruct) |  |
-| 478 | [weblinx/action](src/tasksource/tasks.py#L2488) | Classification | [McGill-NLP/WebLINX](https://hf.co/datasets/McGill-NLP/WebLINX) | ✓ |
-| 479 | [weblinx/dom-element](src/tasksource/tasks.py#L2491) | MultipleChoice | [McGill-NLP/WebLINX](https://hf.co/datasets/McGill-NLP/WebLINX) | ✓ |
-| 480 | [websrc/yesno](src/tasksource/tasks.py#L2497) | Classification | [tasksource/websrc](https://hf.co/datasets/tasksource/websrc) |  |
-| 481 | [websrc/element](src/tasksource/tasks.py#L2499) | MultipleChoice | [tasksource/websrc](https://hf.co/datasets/tasksource/websrc) | ✓ |
-| 482 | [mind2web/action](src/tasksource/tasks.py#L2506) | Classification | [tasksource/mind2web-dom](https://hf.co/datasets/tasksource/mind2web-dom) | ✓ |
-| 483 | [mind2web/dom-element](src/tasksource/tasks.py#L2509) | MultipleChoice | [tasksource/mind2web-dom](https://hf.co/datasets/tasksource/mind2web-dom) | ✓ |
-| 484 | [sentfin](src/tasksource/tasks.py#L2514) | Classification | [tasksource/sentfin](https://hf.co/datasets/tasksource/sentfin) | ✓ |
-| 485 | [wands](src/tasksource/tasks.py#L2518) | Classification | [tasksource/wands](https://hf.co/datasets/tasksource/wands) | ✓ |
-| 486 | [scirepeval/search](src/tasksource/tasks.py#L2522) | Classification | [tasksource/scirepeval-search](https://hf.co/datasets/tasksource/scirepeval-search) | ✓ |
-| 487 | [maud/consideration](src/tasksource/tasks.py#L2574) | Classification | [theatticusproject/maud](https://hf.co/datasets/theatticusproject/maud) | ✓ |
-| 488 | [maud/bringdown-timing](src/tasksource/tasks.py#L2578) | Classification | [theatticusproject/maud](https://hf.co/datasets/theatticusproject/maud) | ✓ |
-| 489 | [maud/ordinary-course-consent](src/tasksource/tasks.py#L2582) | Classification | [theatticusproject/maud](https://hf.co/datasets/theatticusproject/maud) | ✓ |
-| 490 | [maud/ordinary-course-efforts](src/tasksource/tasks.py#L2586) | Classification | [theatticusproject/maud](https://hf.co/datasets/theatticusproject/maud) | ✓ |
-| 491 | [maud/antitrust-efforts](src/tasksource/tasks.py#L2590) | Classification | [theatticusproject/maud](https://hf.co/datasets/theatticusproject/maud) | ✓ |
-| 492 | [maud/specific-performance](src/tasksource/tasks.py#L2594) | Classification | [theatticusproject/maud](https://hf.co/datasets/theatticusproject/maud) | ✓ |
-| 493 | [ddi/relation](src/tasksource/tasks.py#L2599) | Classification | [OpenMed/DDI-Corpus-Processed](https://hf.co/datasets/OpenMed/DDI-Corpus-Processed) | ✓ |
-| 494 | [patent-classification/abstract](src/tasksource/tasks.py#L2606) | Classification | [ccdv/patent-classification](https://hf.co/datasets/ccdv/patent-classification) | ✓ |
-| 495 | [tabfact](src/tasksource/tasks.py#L2613) | Classification | [wenhu/tab_fact](https://hf.co/datasets/wenhu/tab_fact) | ✓ |
-| 496 | [infotabs](src/tasksource/tasks.py#L2621) | Classification | [table-benchmark/infotabs](https://hf.co/datasets/table-benchmark/infotabs) | ✓ |
-| 497 | [squad-v2/answerability](src/tasksource/tasks.py#L2633) | Classification | [rajpurkar/squad_v2](https://hf.co/datasets/rajpurkar/squad_v2) | ✓ |
-| 498 | [cuad/answerability](src/tasksource/tasks.py#L2638) | Classification | [theatticusproject/cuad-qa](https://hf.co/datasets/theatticusproject/cuad-qa) | ✓ |
-| 499 | [hallmarks-of-cancer/yesno](src/tasksource/tasks.py#L2657) | Classification | [bigbio/hallmarks_of_cancer](https://hf.co/datasets/bigbio/hallmarks_of_cancer) | ✓ |
-| 500 | [semeval2014-absa/laptops](src/tasksource/tasks.py#L2679) | Classification | [alexcadillon/SemEval2014Task4](https://hf.co/datasets/alexcadillon/SemEval2014Task4) | ✓ |
-| 501 | [semeval2014-absa/restaurants](src/tasksource/tasks.py#L2679) | Classification | [alexcadillon/SemEval2014Task4](https://hf.co/datasets/alexcadillon/SemEval2014Task4) | ✓ |
-| 502 | [record/candidate](src/tasksource/tasks.py#L2701) | Classification | [aps/super_glue](https://hf.co/datasets/aps/super_glue) | ✓ |
-| 503 | [multidogo/software/intent](src/tasksource/tasks.py#L2724) | Classification | [jpcorb20/multidogo](https://hf.co/datasets/jpcorb20/multidogo) | ✓ |
-| 504 | [multidogo/insurance/intent](src/tasksource/tasks.py#L2724) | Classification | [jpcorb20/multidogo](https://hf.co/datasets/jpcorb20/multidogo) | ✓ |
-| 505 | [multidogo/media/intent](src/tasksource/tasks.py#L2724) | Classification | [jpcorb20/multidogo](https://hf.co/datasets/jpcorb20/multidogo) | ✓ |
-| 506 | [multidogo/airline/intent](src/tasksource/tasks.py#L2724) | Classification | [jpcorb20/multidogo](https://hf.co/datasets/jpcorb20/multidogo) | ✓ |
-| 507 | [multidogo/fastfood/intent](src/tasksource/tasks.py#L2724) | Classification | [jpcorb20/multidogo](https://hf.co/datasets/jpcorb20/multidogo) | ✓ |
-| 508 | [multidogo/finance/intent](src/tasksource/tasks.py#L2724) | Classification | [jpcorb20/multidogo](https://hf.co/datasets/jpcorb20/multidogo) | ✓ |
-| 509 | [wikisql/aggregation](src/tasksource/tasks.py#L2752) | Classification | [Salesforce/wikisql](https://hf.co/datasets/Salesforce/wikisql) | ✓ |
-| 510 | [wikisql/column](src/tasksource/tasks.py#L2757) | MultipleChoice | [Salesforce/wikisql](https://hf.co/datasets/Salesforce/wikisql) | ✓ |
-| 511 | [wikisql/operator](src/tasksource/tasks.py#L2762) | Classification | [Salesforce/wikisql](https://hf.co/datasets/Salesforce/wikisql) | ✓ |
-| 512 | [acord](src/tasksource/tasks.py#L2767) | Classification | [tasksource/acord](https://hf.co/datasets/tasksource/acord) | ✓ |
-| 513 | [edos](src/tasksource/tasks.py#L2771) | Classification | [tasksource/edos](https://hf.co/datasets/tasksource/edos) | ✓ |
-| 514 | [evidence-inference](src/tasksource/tasks.py#L2774) | Classification | [tasksource/evidence-inference](https://hf.co/datasets/tasksource/evidence-inference) | ✓ |
-| 515 | [quac/answerability](src/tasksource/tasks.py#L2796) | Classification | [allenai/quac](https://hf.co/datasets/allenai/quac) | ✓ |
-| 516 | [hatexplain/majority](src/tasksource/tasks.py#L2804) | Classification | [Hate-speech-CNERG/hatexplain](https://hf.co/datasets/Hate-speech-CNERG/hatexplain) | ✓ |
-| 517 | [hotpotqa/supporting-fact](src/tasksource/tasks.py#L2821) | Classification | [hotpotqa/hotpot_qa](https://hf.co/datasets/hotpotqa/hotpot_qa) | ✓ |
-| 518 | [multiwoz22/dialogue-act](src/tasksource/tasks.py#L2865) | Classification | [pfb30/multi_woz_v22](https://hf.co/datasets/pfb30/multi_woz_v22) | ✓ |
-| 519 | [multiwoz22/categorical-slot](src/tasksource/tasks.py#L2868) | Classification | [pfb30/multi_woz_v22](https://hf.co/datasets/pfb30/multi_woz_v22) | ✓ |
-| 520 | [schema-guided/intent](src/tasksource/tasks.py#L2871) | Classification | [google-research-datasets/schema_guided_dstc8](https://hf.co/datasets/google-research-datasets/schema_guided_dstc8) | ✓ |
-| 521 | [coqa/yesno](src/tasksource/tasks.py#L2888) | Classification | [stanfordnlp/coqa](https://hf.co/datasets/stanfordnlp/coqa) | ✓ |
-| 522 | [qasper/yesno](src/tasksource/tasks.py#L2909) | Classification | [allenai/qasper](https://hf.co/datasets/allenai/qasper) | ✓ |
-| 523 | [topv2/intent](src/tasksource/tasks.py#L2921) | Classification | [WillHeld/top_v2](https://hf.co/datasets/WillHeld/top_v2) | ✓ |
-| 524 | [slurp/intent](src/tasksource/tasks.py#L2929) | Classification | [tasksource/slurp](https://hf.co/datasets/tasksource/slurp) | ✓ |
-| 525 | [mcscript2](src/tasksource/tasks.py#L2933) | MultipleChoice | [tasksource/mcscript2](https://hf.co/datasets/tasksource/mcscript2) |  |
-| 526 | [fnc1/stance](src/tasksource/tasks.py#L2938) | Classification | [tasksource/fnc1](https://hf.co/datasets/tasksource/fnc1) | ✓ |
-| 527 | [perspectrum/stance](src/tasksource/tasks.py#L2943) | Classification | [tasksource/perspectrum](https://hf.co/datasets/tasksource/perspectrum) | ✓ |
-| 528 | [ukpconvarg/convincingness](src/tasksource/tasks.py#L2948) | MultipleChoice | [tasksource/ukpconvarg](https://hf.co/datasets/tasksource/ukpconvarg) | ✓ |
-| 529 | [discogem/relation](src/tasksource/tasks.py#L2953) | Classification | [tasksource/discogem](https://hf.co/datasets/tasksource/discogem) | ✓ |
-| 530 | [pubmed-rct/role](src/tasksource/tasks.py#L2961) | Classification | [tasksource/pubmed-rct](https://hf.co/datasets/tasksource/pubmed-rct) | ✓ |
-| 531 | [maven-arg/role](src/tasksource/tasks.py#L2989) | Classification | [mneb/maven-arg](https://hf.co/datasets/mneb/maven-arg) | ✓ |
-| 532 | [maven/event](src/tasksource/tasks.py#L3020) | Classification | [mneb/maven](https://hf.co/datasets/mneb/maven) | ✓ |
-| 533 | [empathetic-dialogues/emotion](src/tasksource/tasks.py#L3024) | Classification | [facebook/empathetic_dialogues](https://hf.co/datasets/facebook/empathetic_dialogues) | ✓ |
-| 534 | [olid/offensive](src/tasksource/tasks.py#L3032) | Classification | [christophsonntag/OLID](https://hf.co/datasets/christophsonntag/OLID) | ✓ |
-| 535 | [isarcasm/intended](src/tasksource/tasks.py#L3038) | Classification | [viethq1906/isarcasm_2022_taskA_En](https://hf.co/datasets/viethq1906/isarcasm_2022_taskA_En) | ✓ |
-| 536 | [magpie/idiomatic](src/tasksource/tasks.py#L3063) | Classification | [idioms-collaboration/magpie](https://hf.co/datasets/idioms-collaboration/magpie) | ✓ |
-| 537 | [preco/coreference](src/tasksource/tasks.py#L3099) | Classification | [coref-data/preco_raw](https://hf.co/datasets/coref-data/preco_raw) | ✓ |
-| 538 | [redial/preference](src/tasksource/tasks.py#L3119) | Classification | [community-datasets/re_dial](https://hf.co/datasets/community-datasets/re_dial) | ✓ |
-| 539 | [sst5](src/tasksource/tasks.py#L3124) | Classification | [SetFit/sst5](https://hf.co/datasets/SetFit/sst5) | ✓ |
-| 540 | [spider/column](src/tasksource/tasks.py#L3132) | MultipleChoice | [tasksource/spider](https://hf.co/datasets/tasksource/spider) | ✓ |
-| 541 | [semcor](src/tasksource/tasks.py#L3136) | MultipleChoice | [tasksource/semcor](https://hf.co/datasets/tasksource/semcor) | ✓ |
-| 542 | [streusle/noun](src/tasksource/tasks.py#L3139) | Classification | [tasksource/streusle](https://hf.co/datasets/tasksource/streusle) | ✓ |
-| 543 | [streusle/verb](src/tasksource/tasks.py#L3143) | Classification | [tasksource/streusle](https://hf.co/datasets/tasksource/streusle) | ✓ |
-| 544 | [maven-ere/causal](src/tasksource/tasks.py#L3186) | Classification | [Nofing/Maven-ERE-span](https://hf.co/datasets/Nofing/Maven-ERE-span) | ✓ |
-| 545 | [biored/relation](src/tasksource/tasks.py#L3208) | Classification | [gyorilab/BioRED](https://hf.co/datasets/gyorilab/BioRED) | ✓ |
-| 546 | [matres/temporal](src/tasksource/tasks.py#L3215) | Classification | [tasksource/matres](https://hf.co/datasets/tasksource/matres) | ✓ |
-| 547 | [causal-news](src/tasksource/tasks.py#L3224) | Classification | [thagen/CNCv2](https://hf.co/datasets/thagen/CNCv2) | ✓ |
-| 548 | [slurp/slot-type](src/tasksource/tasks.py#L3271) | Classification | [tasksource/slurp](https://hf.co/datasets/tasksource/slurp) | ✓ |
-| 549 | [topv2/slot-type](src/tasksource/tasks.py#L3276) | Classification | [WillHeld/top_v2](https://hf.co/datasets/WillHeld/top_v2) | ✓ |
-| 550 | [wikiqa](src/tasksource/tasks.py#L3289) | Classification | [microsoft/wiki_qa](https://hf.co/datasets/microsoft/wiki_qa) | ✓ |
-| 551 | [nevir](src/tasksource/tasks.py#L3304) | MultipleChoice | [orionweller/NevIR](https://hf.co/datasets/orionweller/NevIR) | ✓ |
-| 552 | [antique](src/tasksource/tasks.py#L3312) | Classification | [tasksource/antique](https://hf.co/datasets/tasksource/antique) | ✓ |
-| 553 | [causal-reasoning/transitivity](src/tasksource/tasks.py#L3338) | Classification | [ludwigw/causal-reasoning-benchmarks](https://hf.co/datasets/ludwigw/causal-reasoning-benchmarks) | ✓ |
-| 554 | [cebab/rating](src/tasksource/tasks.py#L3355) | Classification | [EleutherAI/CEBaB](https://hf.co/datasets/EleutherAI/CEBaB) | ✓ |
-| 555 | [cebab/food](src/tasksource/tasks.py#L3359) | Classification | [EleutherAI/CEBaB](https://hf.co/datasets/EleutherAI/CEBaB) | ✓ |
-| 556 | [cebab/ambiance](src/tasksource/tasks.py#L3362) | Classification | [EleutherAI/CEBaB](https://hf.co/datasets/EleutherAI/CEBaB) | ✓ |
-| 557 | [cebab/service](src/tasksource/tasks.py#L3365) | Classification | [EleutherAI/CEBaB](https://hf.co/datasets/EleutherAI/CEBaB) | ✓ |
-| 558 | [cebab/noise](src/tasksource/tasks.py#L3368) | Classification | [EleutherAI/CEBaB](https://hf.co/datasets/EleutherAI/CEBaB) | ✓ |
-| 559 | [fabsa/sentiment](src/tasksource/tasks.py#L3381) | Classification | [jordiclive/FABSA](https://hf.co/datasets/jordiclive/FABSA) | ✓ |
-| 560 | [tab/identifier](src/tasksource/tasks.py#L3398) | Classification | [doshimit3015/text-anonymization-benchmark](https://hf.co/datasets/doshimit3015/text-anonymization-benchmark) | ✓ |
-| 561 | [newsmtsc](src/tasksource/tasks.py#L3413) | Classification | [fhamborg/news_sentiment_newsmtsc](https://hf.co/datasets/fhamborg/news_sentiment_newsmtsc) | ✓ |
-| 562 | [sentihood/sentiment](src/tasksource/tasks.py#L3441) | Classification | [bhavnicksm/sentihood](https://hf.co/datasets/bhavnicksm/sentihood) | ✓ |
-| 563 | [mams/atsa](src/tasksource/tasks.py#L3458) | Classification | [NEUDM/mams](https://hf.co/datasets/NEUDM/mams) | ✓ |
-| 564 | [quality](src/tasksource/tasks.py#L3466) | MultipleChoice | [emozilla/quality](https://hf.co/datasets/emozilla/quality) |  |
-| 565 | [clear/readability](src/tasksource/tasks.py#L3475) | Classification | [casey-martin/CommonLit-Ease-of-Readability](https://hf.co/datasets/casey-martin/CommonLit-Ease-of-Readability) | ✓ |
-| 566 | [esconv/strategy](src/tasksource/tasks.py#L3488) | Classification | [tasksource/esconv](https://hf.co/datasets/tasksource/esconv) | ✓ |
-| 567 | [prosocial-dialog/safety](src/tasksource/tasks.py#L3509) | Classification | [allenai/prosocial-dialog](https://hf.co/datasets/allenai/prosocial-dialog) | ✓ |
-| 568 | [gap](src/tasksource/tasks.py#L3529) | Classification | [coref-data/gap_raw](https://hf.co/datasets/coref-data/gap_raw) | ✓ |
-| 569 | [trip/cloze](src/tasksource/tasks.py#L3537) | MultipleChoice | [sled-umich/TRIP](https://hf.co/datasets/sled-umich/TRIP) | ✓ |
-| 570 | [trip/order](src/tasksource/tasks.py#L3546) | MultipleChoice | [sled-umich/TRIP](https://hf.co/datasets/sled-umich/TRIP) | ✓ |
-| 571 | [sbic/offensiveness](src/tasksource/tasks.py#L3556) | Classification | [tasksource/sbic](https://hf.co/datasets/tasksource/sbic) | ✓ |
-| 572 | [sbic/intent](src/tasksource/tasks.py#L3563) | Classification | [tasksource/sbic](https://hf.co/datasets/tasksource/sbic) | ✓ |
-| 573 | [faithdial/grounding](src/tasksource/tasks.py#L3585) | Classification | [McGill-NLP/FaithDial](https://hf.co/datasets/McGill-NLP/FaithDial) | ✓ |
-| 574 | [ragtruth/grounding](src/tasksource/tasks.py#L3602) | Classification | [wandb/RAGTruth-processed](https://hf.co/datasets/wandb/RAGTruth-processed) | ✓ |
-| 575 | [comve](src/tasksource/tasks.py#L3614) | MultipleChoice | [tasksource/comve](https://hf.co/datasets/tasksource/comve) |  |
-| 576 | [cbt/ne](src/tasksource/tasks.py#L3631) | MultipleChoice | [cam-cst/cbt](https://hf.co/datasets/cam-cst/cbt) | ✓ |
-| 577 | [cbt/cn](src/tasksource/tasks.py#L3639) | MultipleChoice | [cam-cst/cbt](https://hf.co/datasets/cam-cst/cbt) | ✓ |
-| 578 | [recam](src/tasksource/tasks.py#L3654) | MultipleChoice | [holylovenia/recam](https://hf.co/datasets/holylovenia/recam) | ✓ |
-| 579 | [knowref60k](src/tasksource/tasks.py#L3669) | MultipleChoice | [coref-data/knowref_60k_raw](https://hf.co/datasets/coref-data/knowref_60k_raw) | ✓ |
-| 580 | [tabmwp](src/tasksource/tasks.py#L3679) | MultipleChoice | [tasksource/tabmwp](https://hf.co/datasets/tasksource/tabmwp) |  |
+| 42 | [recast/recast_megaveridicality](src/tasksource/tasks.py#L156) | Classification | [tasksource/recast](https://hf.co/datasets/tasksource/recast) |  |
+| 43 | [recast/recast_sentiment](src/tasksource/tasks.py#L156) | Classification | [tasksource/recast](https://hf.co/datasets/tasksource/recast) |  |
+| 44 | [recast/recast_ner](src/tasksource/tasks.py#L156) | Classification | [tasksource/recast](https://hf.co/datasets/tasksource/recast) |  |
+| 45 | [recast/recast_verbnet](src/tasksource/tasks.py#L156) | Classification | [tasksource/recast](https://hf.co/datasets/tasksource/recast) |  |
+| 46 | [recast/recast_factuality](src/tasksource/tasks.py#L156) | Classification | [tasksource/recast](https://hf.co/datasets/tasksource/recast) |  |
+| 47 | [recast/recast_puns](src/tasksource/tasks.py#L156) | Classification | [tasksource/recast](https://hf.co/datasets/tasksource/recast) |  |
+| 48 | [recast/recast_verbcorner](src/tasksource/tasks.py#L160) | Classification | [tasksource/recast](https://hf.co/datasets/tasksource/recast) |  |
+| 49 | [probability_words_nli/usnli](src/tasksource/tasks.py#L164) | Classification | [sileod/probability_words_nli](https://hf.co/datasets/sileod/probability_words_nli) | ✓ |
+| 50 | [probability_words_nli/reasoning_2hop](src/tasksource/tasks.py#L164) | Classification | [sileod/probability_words_nli](https://hf.co/datasets/sileod/probability_words_nli) | ✓ |
+| 51 | [probability_words_nli/reasoning_1hop](src/tasksource/tasks.py#L164) | Classification | [sileod/probability_words_nli](https://hf.co/datasets/sileod/probability_words_nli) | ✓ |
+| 52 | [nan-nli](src/tasksource/tasks.py#L169) | Classification | [joey234/nan-nli](https://hf.co/datasets/joey234/nan-nli) |  |
+| 53 | [nli_fever](src/tasksource/tasks.py#L172) | Classification | [pietrolesci/nli_fever](https://hf.co/datasets/pietrolesci/nli_fever) |  |
+| 54 | [breaking_nli](src/tasksource/tasks.py#L175) | Classification | [pietrolesci/breaking_nli](https://hf.co/datasets/pietrolesci/breaking_nli) |  |
+| 55 | [conj_nli](src/tasksource/tasks.py#L179) | Classification | [pietrolesci/conj_nli](https://hf.co/datasets/pietrolesci/conj_nli) |  |
+| 56 | [fracas](src/tasksource/tasks.py#L183) | Classification | [pietrolesci/fracas](https://hf.co/datasets/pietrolesci/fracas) |  |
+| 57 | [dialogue_nli](src/tasksource/tasks.py#L186) | Classification | [pietrolesci/dialogue_nli](https://hf.co/datasets/pietrolesci/dialogue_nli) | ✓ |
+| 58 | [mpe](src/tasksource/tasks.py#L189) | Classification | [pietrolesci/mpe](https://hf.co/datasets/pietrolesci/mpe) |  |
+| 59 | [dnc](src/tasksource/tasks.py#L193) | Classification | [pietrolesci/dnc](https://hf.co/datasets/pietrolesci/dnc) |  |
+| 60 | [recast_white/fnplus](src/tasksource/tasks.py#L197) | Classification | [pietrolesci/recast_white](https://hf.co/datasets/pietrolesci/recast_white) |  |
+| 61 | [recast_white/sprl](src/tasksource/tasks.py#L200) | Classification | [pietrolesci/recast_white](https://hf.co/datasets/pietrolesci/recast_white) |  |
+| 62 | [recast_white/dpr](src/tasksource/tasks.py#L203) | Classification | [pietrolesci/recast_white](https://hf.co/datasets/pietrolesci/recast_white) |  |
+| 63 | [joci](src/tasksource/tasks.py#L207) | Classification | [pietrolesci/joci](https://hf.co/datasets/pietrolesci/joci) | ✓ |
+| 64 | [robust_nli/IS_CS](src/tasksource/tasks.py#L215) | Classification | [pietrolesci/robust_nli](https://hf.co/datasets/pietrolesci/robust_nli) |  |
+| 65 | [robust_nli/LI_LI](src/tasksource/tasks.py#L217) | Classification | [pietrolesci/robust_nli](https://hf.co/datasets/pietrolesci/robust_nli) |  |
+| 66 | [robust_nli/ST_WO](src/tasksource/tasks.py#L219) | Classification | [pietrolesci/robust_nli](https://hf.co/datasets/pietrolesci/robust_nli) |  |
+| 67 | [robust_nli/PI_SP](src/tasksource/tasks.py#L221) | Classification | [pietrolesci/robust_nli](https://hf.co/datasets/pietrolesci/robust_nli) |  |
+| 68 | [robust_nli/PI_CD](src/tasksource/tasks.py#L223) | Classification | [pietrolesci/robust_nli](https://hf.co/datasets/pietrolesci/robust_nli) |  |
+| 69 | [robust_nli/ST_SE](src/tasksource/tasks.py#L225) | Classification | [pietrolesci/robust_nli](https://hf.co/datasets/pietrolesci/robust_nli) |  |
+| 70 | [robust_nli/ST_NE](src/tasksource/tasks.py#L227) | Classification | [pietrolesci/robust_nli](https://hf.co/datasets/pietrolesci/robust_nli) |  |
+| 71 | [robust_nli/ST_LM](src/tasksource/tasks.py#L229) | Classification | [pietrolesci/robust_nli](https://hf.co/datasets/pietrolesci/robust_nli) |  |
+| 72 | [robust_nli_is_sd](src/tasksource/tasks.py#L231) | Classification | [pietrolesci/robust_nli_is_sd](https://hf.co/datasets/pietrolesci/robust_nli_is_sd) |  |
+| 73 | [robust_nli_li_ts](src/tasksource/tasks.py#L234) | Classification | [pietrolesci/robust_nli_li_ts](https://hf.co/datasets/pietrolesci/robust_nli_li_ts) |  |
+| 74 | [add_one_rte](src/tasksource/tasks.py#L239) | Classification | [pietrolesci/add_one_rte](https://hf.co/datasets/pietrolesci/add_one_rte) |  |
+| 75 | [paws/labeled_final](src/tasksource/tasks.py#L243) | Classification | [google-research-datasets/paws](https://hf.co/datasets/google-research-datasets/paws) |  |
+| 76 | [paws/labeled_swap](src/tasksource/tasks.py#L244) | Classification | [google-research-datasets/paws](https://hf.co/datasets/google-research-datasets/paws) |  |
+| 77 | [medical_questions_pairs](src/tasksource/tasks.py#L246) | Classification | [curaihealth/medical_questions_pairs](https://hf.co/datasets/curaihealth/medical_questions_pairs) | ✓ |
+| 78 | [conll2003/pos_tags](src/tasksource/tasks.py#L252) | TokenClassification | [tomaarsen/conll2003](https://hf.co/datasets/tomaarsen/conll2003) | ✓ |
+| 79 | [conll2003/chunk_tags](src/tasksource/tasks.py#L254) | TokenClassification | [tomaarsen/conll2003](https://hf.co/datasets/tomaarsen/conll2003) | ✓ |
+| 80 | [conll2003/ner_tags](src/tasksource/tasks.py#L256) | TokenClassification | [tomaarsen/conll2003](https://hf.co/datasets/tomaarsen/conll2003) |  |
+| 81 | [fig-qa](src/tasksource/tasks.py#L262) | MultipleChoice | [nightingal3/fig-qa](https://hf.co/datasets/nightingal3/fig-qa) |  |
+| 82 | [cosmos_qa](src/tasksource/tasks.py#L272) | MultipleChoice | [Samsoup/cosmos_qa](https://hf.co/datasets/Samsoup/cosmos_qa) |  |
+| 83 | [dream](src/tasksource/tasks.py#L275) | MultipleChoice | [dataset-org/dream](https://hf.co/datasets/dataset-org/dream) |  |
+| 84 | [openbookqa](src/tasksource/tasks.py#L282) | MultipleChoice | [allenai/openbookqa](https://hf.co/datasets/allenai/openbookqa) |  |
+| 85 | [qasc](src/tasksource/tasks.py#L288) | MultipleChoice | [allenai/qasc](https://hf.co/datasets/allenai/qasc) |  |
+| 86 | [quartz](src/tasksource/tasks.py#L296) | MultipleChoice | [allenai/quartz](https://hf.co/datasets/allenai/quartz) |  |
+| 87 | [quail](src/tasksource/tasks.py#L301) | MultipleChoice | [textmachinelab/quail](https://hf.co/datasets/textmachinelab/quail) |  |
+| 88 | [head_qa/en](src/tasksource/tasks.py#L307) | MultipleChoice | [EleutherAI/headqa](https://hf.co/datasets/EleutherAI/headqa) |  |
+| 89 | [sciq](src/tasksource/tasks.py#L315) | MultipleChoice | [allenai/sciq](https://hf.co/datasets/allenai/sciq) |  |
+| 90 | [social_i_qa](src/tasksource/tasks.py#L320) | MultipleChoice | [tasksource/social_i_qa](https://hf.co/datasets/tasksource/social_i_qa) |  |
+| 91 | [wiki_hop/original](src/tasksource/tasks.py#L326) | MultipleChoice | [MoE-UNC/wikihop](https://hf.co/datasets/MoE-UNC/wikihop) |  |
+| 92 | [wiqa](src/tasksource/tasks.py#L339) | MultipleChoice | [allenai/wiqa](https://hf.co/datasets/allenai/wiqa) (`parquet` loader) |  |
+| 93 | [piqa](src/tasksource/tasks.py#L346) | MultipleChoice | [baber/piqa](https://hf.co/datasets/baber/piqa) |  |
+| 94 | [hellaswag](src/tasksource/tasks.py#L354) | MultipleChoice | [Rowan/hellaswag](https://hf.co/datasets/Rowan/hellaswag) |  |
+| 95 | [super_glue/copa](src/tasksource/tasks.py#L363) | MultipleChoice | [aps/super_glue](https://hf.co/datasets/aps/super_glue) |  |
+| 96 | [balanced-copa](src/tasksource/tasks.py#L365) | MultipleChoice | [pkavumba/balanced-copa](https://hf.co/datasets/pkavumba/balanced-copa) |  |
+| 97 | [e-CARE](src/tasksource/tasks.py#L368) | MultipleChoice | [12ml/e-CARE](https://hf.co/datasets/12ml/e-CARE) |  |
+| 98 | [art](src/tasksource/tasks.py#L371) | MultipleChoice | [allenai/art](https://hf.co/datasets/allenai/art) | ✓ |
+| 99 | [winogrande/winogrande_xl](src/tasksource/tasks.py#L379) | MultipleChoice | [allenai/winogrande](https://hf.co/datasets/allenai/winogrande) |  |
+| 100 | [codah/codah](src/tasksource/tasks.py#L382) | MultipleChoice | [jaredfern/codah](https://hf.co/datasets/jaredfern/codah) |  |
+| 101 | [ai2_arc/ARC-Easy/challenge](src/tasksource/tasks.py#L384) | MultipleChoice | [allenai/ai2_arc](https://hf.co/datasets/allenai/ai2_arc) |  |
+| 102 | [ai2_arc/ARC-Challenge/challenge](src/tasksource/tasks.py#L384) | MultipleChoice | [allenai/ai2_arc](https://hf.co/datasets/allenai/ai2_arc) |  |
+| 103 | [definite_pronoun_resolution](src/tasksource/tasks.py#L389) | MultipleChoice | [community-datasets/definite_pronoun_resolution](https://hf.co/datasets/community-datasets/definite_pronoun_resolution) |  |
+| 104 | [swag/regular](src/tasksource/tasks.py#L395) | MultipleChoice | [allenai/swag](https://hf.co/datasets/allenai/swag) |  |
+| 105 | [math_qa](src/tasksource/tasks.py#L401) | MultipleChoice | [tasksource/math_qa](https://hf.co/datasets/tasksource/math_qa) |  |
+| 106 | [glue/cola](src/tasksource/tasks.py#L410) | Classification | [nyu-mll/glue](https://hf.co/datasets/nyu-mll/glue) |  |
+| 107 | [glue/sst2](src/tasksource/tasks.py#L411) | Classification | [nyu-mll/glue](https://hf.co/datasets/nyu-mll/glue) |  |
+| 108 | [utilitarianism](src/tasksource/tasks.py#L425) | Classification | [hendrycks/ethics](https://hf.co/datasets/hendrycks/ethics) (`csv` loader) |  |
+| 109 | [amazon_counterfactual/en](src/tasksource/tasks.py#L433) | Classification | [mteb/amazon_counterfactual](https://hf.co/datasets/mteb/amazon_counterfactual) |  |
+| 110 | [insincere-questions](src/tasksource/tasks.py#L438) | Classification | [SetFit/insincere-questions](https://hf.co/datasets/SetFit/insincere-questions) |  |
+| 111 | [toxic_conversations](src/tasksource/tasks.py#L442) | Classification | [SetFit/toxic_conversations](https://hf.co/datasets/SetFit/toxic_conversations) |  |
+| 112 | [TuringBench](src/tasksource/tasks.py#L446) | Classification | [jana4/turingbench-humanized](https://hf.co/datasets/jana4/turingbench-humanized), [turingbench/TuringBench](https://hf.co/datasets/turingbench/TuringBench) (`csv` loader) | ✓ |
+| 113 | [trec](src/tasksource/tasks.py#L465) | Classification | [tasksource/trec](https://hf.co/datasets/tasksource/trec) | ✓ |
+| 114 | [vitaminc](src/tasksource/tasks.py#L469) | Classification | [tals/vitaminc](https://hf.co/datasets/tals/vitaminc) |  |
+| 115 | [hope_edi/english](src/tasksource/tasks.py#L471) | Classification | [dravidianlangtech/hope_edi](https://hf.co/datasets/dravidianlangtech/hope_edi) (`csv` loader) |  |
+| 116 | [rumoureval_2019/RumourEval2019](src/tasksource/tasks.py#L485) | Classification | [strombergnlp/rumoureval_2019](https://hf.co/datasets/strombergnlp/rumoureval_2019) (`csv` loader) |  |
+| 117 | [ethos/binary](src/tasksource/tasks.py#L499) | Classification | [SetFit/ethos_binary](https://hf.co/datasets/SetFit/ethos_binary) |  |
+| 118 | [ethos/multilabel](src/tasksource/tasks.py#L523) | Classification | [tasksource/ethos](https://hf.co/datasets/tasksource/ethos) |  |
+| 119 | [tweet_eval/sentiment](src/tasksource/tasks.py#L526) | Classification | [cardiffnlp/tweet_eval](https://hf.co/datasets/cardiffnlp/tweet_eval) |  |
+| 120 | [tweet_eval/irony](src/tasksource/tasks.py#L526) | Classification | [cardiffnlp/tweet_eval](https://hf.co/datasets/cardiffnlp/tweet_eval) |  |
+| 121 | [tweet_eval/hate](src/tasksource/tasks.py#L526) | Classification | [cardiffnlp/tweet_eval](https://hf.co/datasets/cardiffnlp/tweet_eval) |  |
+| 122 | [tweet_eval/emotion](src/tasksource/tasks.py#L526) | Classification | [cardiffnlp/tweet_eval](https://hf.co/datasets/cardiffnlp/tweet_eval) |  |
+| 123 | [tweet_eval/emoji](src/tasksource/tasks.py#L526) | Classification | [cardiffnlp/tweet_eval](https://hf.co/datasets/cardiffnlp/tweet_eval) |  |
+| 124 | [tweet_eval/offensive](src/tasksource/tasks.py#L526) | Classification | [cardiffnlp/tweet_eval](https://hf.co/datasets/cardiffnlp/tweet_eval) |  |
+| 125 | [tweet_eval/stance_abortion](src/tasksource/tasks.py#L541) | Classification | [cardiffnlp/tweet_eval](https://hf.co/datasets/cardiffnlp/tweet_eval) | ✓ |
+| 126 | [tweet_eval/stance_atheism](src/tasksource/tasks.py#L542) | Classification | [cardiffnlp/tweet_eval](https://hf.co/datasets/cardiffnlp/tweet_eval) | ✓ |
+| 127 | [tweet_eval/stance_climate](src/tasksource/tasks.py#L543) | Classification | [cardiffnlp/tweet_eval](https://hf.co/datasets/cardiffnlp/tweet_eval) | ✓ |
+| 128 | [tweet_eval/stance_feminist](src/tasksource/tasks.py#L544) | Classification | [cardiffnlp/tweet_eval](https://hf.co/datasets/cardiffnlp/tweet_eval) | ✓ |
+| 129 | [tweet_eval/stance_hillary](src/tasksource/tasks.py#L545) | Classification | [cardiffnlp/tweet_eval](https://hf.co/datasets/cardiffnlp/tweet_eval) | ✓ |
+| 130 | [discovery/discovery](src/tasksource/tasks.py#L548) | Classification | [sileod/discovery](https://hf.co/datasets/sileod/discovery) | ✓ |
+| 131 | [pragmeval/verifiability](src/tasksource/tasks.py#L551) | Classification | [sileod/pragmeval](https://hf.co/datasets/sileod/pragmeval) |  |
+| 132 | [pragmeval/switchboard](src/tasksource/tasks.py#L551) | Classification | [sileod/pragmeval](https://hf.co/datasets/sileod/pragmeval) |  |
+| 133 | [pragmeval/stac](src/tasksource/tasks.py#L555) | Classification | [sileod/pragmeval](https://hf.co/datasets/sileod/pragmeval) | ✓ |
+| 134 | [pragmeval/gum](src/tasksource/tasks.py#L555) | Classification | [sileod/pragmeval](https://hf.co/datasets/sileod/pragmeval) | ✓ |
+| 135 | [pragmeval/pdtb](src/tasksource/tasks.py#L555) | Classification | [sileod/pragmeval](https://hf.co/datasets/sileod/pragmeval) | ✓ |
+| 136 | [pragmeval/persuasiveness-claimtype](src/tasksource/tasks.py#L555) | Classification | [sileod/pragmeval](https://hf.co/datasets/sileod/pragmeval) | ✓ |
+| 137 | [pragmeval/persuasiveness-premisetype](src/tasksource/tasks.py#L555) | Classification | [sileod/pragmeval](https://hf.co/datasets/sileod/pragmeval) | ✓ |
+| 138 | [pragmeval/sarcasm](src/tasksource/tasks.py#L555) | Classification | [sileod/pragmeval](https://hf.co/datasets/sileod/pragmeval) | ✓ |
+| 139 | [pragmeval/emergent](src/tasksource/tasks.py#L555) | Classification | [sileod/pragmeval](https://hf.co/datasets/sileod/pragmeval) | ✓ |
+| 140 | [pragmeval/emobank-dominance](src/tasksource/tasks.py#L570) | Classification | [sileod/pragmeval](https://hf.co/datasets/sileod/pragmeval) |  |
+| 141 | [pragmeval/squinky-formality](src/tasksource/tasks.py#L571) | Classification | [sileod/pragmeval](https://hf.co/datasets/sileod/pragmeval) |  |
+| 142 | [pragmeval/squinky-implicature](src/tasksource/tasks.py#L572) | Classification | [sileod/pragmeval](https://hf.co/datasets/sileod/pragmeval) |  |
+| 143 | [pragmeval/squinky-informativeness](src/tasksource/tasks.py#L573) | Classification | [sileod/pragmeval](https://hf.co/datasets/sileod/pragmeval) |  |
+| 144 | [pragmeval/persuasiveness-eloquence](src/tasksource/tasks.py#L574) | Classification | [sileod/pragmeval](https://hf.co/datasets/sileod/pragmeval) |  |
+| 145 | [pragmeval/persuasiveness-relevance](src/tasksource/tasks.py#L575) | Classification | [sileod/pragmeval](https://hf.co/datasets/sileod/pragmeval) |  |
+| 146 | [pragmeval/persuasiveness-specificity](src/tasksource/tasks.py#L576) | Classification | [sileod/pragmeval](https://hf.co/datasets/sileod/pragmeval) |  |
+| 147 | [pragmeval/persuasiveness-strength](src/tasksource/tasks.py#L577) | Classification | [sileod/pragmeval](https://hf.co/datasets/sileod/pragmeval) |  |
+| 148 | [silicone/dyda_e](src/tasksource/tasks.py#L579) | Classification | [tasksource/silicone](https://hf.co/datasets/tasksource/silicone) | ✓ |
+| 149 | [silicone/dyda_da](src/tasksource/tasks.py#L579) | Classification | [tasksource/silicone](https://hf.co/datasets/tasksource/silicone) | ✓ |
+| 150 | [silicone/meld_e](src/tasksource/tasks.py#L579) | Classification | [tasksource/silicone](https://hf.co/datasets/tasksource/silicone) | ✓ |
+| 151 | [silicone/meld_s](src/tasksource/tasks.py#L579) | Classification | [tasksource/silicone](https://hf.co/datasets/tasksource/silicone) | ✓ |
+| 152 | [silicone/oasis](src/tasksource/tasks.py#L579) | Classification | [tasksource/silicone](https://hf.co/datasets/tasksource/silicone) | ✓ |
+| 153 | [silicone/sem](src/tasksource/tasks.py#L579) | Classification | [tasksource/silicone](https://hf.co/datasets/tasksource/silicone) | ✓ |
+| 154 | [silicone/maptask](src/tasksource/tasks.py#L579) | Classification | [tasksource/silicone](https://hf.co/datasets/tasksource/silicone) | ✓ |
+| 155 | [silicone/iemocap](src/tasksource/tasks.py#L589) | Classification | [tasksource/silicone](https://hf.co/datasets/tasksource/silicone) | ✓ |
+| 156 | [lex_glue/eurlex](src/tasksource/tasks.py#L599) | Classification | [coastalcph/lex_glue](https://hf.co/datasets/coastalcph/lex_glue) | ✓ |
+| 157 | [lex_glue/scotus](src/tasksource/tasks.py#L603) | Classification | [coastalcph/lex_glue](https://hf.co/datasets/coastalcph/lex_glue) |  |
+| 158 | [lex_glue/ledgar](src/tasksource/tasks.py#L606) | Classification | [coastalcph/lex_glue](https://hf.co/datasets/coastalcph/lex_glue) |  |
+| 159 | [lex_glue/unfair_tos](src/tasksource/tasks.py#L608) | Classification | [coastalcph/lex_glue](https://hf.co/datasets/coastalcph/lex_glue) | ✓ |
+| 160 | [lex_glue/case_hold](src/tasksource/tasks.py#L611) | MultipleChoice | [coastalcph/lex_glue](https://hf.co/datasets/coastalcph/lex_glue) |  |
+| 161 | [language-identification](src/tasksource/tasks.py#L619) | Classification | [papluca/language-identification](https://hf.co/datasets/papluca/language-identification) | ✓ |
+| 162 | [imdb](src/tasksource/tasks.py#L624) | Classification | [stanfordnlp/imdb](https://hf.co/datasets/stanfordnlp/imdb) |  |
+| 163 | [rotten_tomatoes](src/tasksource/tasks.py#L626) | Classification | [cornell-movie-review-data/rotten_tomatoes](https://hf.co/datasets/cornell-movie-review-data/rotten_tomatoes) |  |
+| 164 | [ag_news](src/tasksource/tasks.py#L628) | Classification | [fancyzhx/ag_news](https://hf.co/datasets/fancyzhx/ag_news) |  |
+| 165 | [yelp_review_full/yelp_review_full](src/tasksource/tasks.py#L630) | Classification | [Yelp/yelp_review_full](https://hf.co/datasets/Yelp/yelp_review_full) | ✓ |
+| 166 | [financial_phrasebank/sentences_allagree](src/tasksource/tasks.py#L635) | Classification | [ghbacct/financial-phrasebank-all-agree-classification](https://hf.co/datasets/ghbacct/financial-phrasebank-all-agree-classification) |  |
+| 167 | [poem_sentiment](src/tasksource/tasks.py#L640) | Classification | [google-research-datasets/poem_sentiment](https://hf.co/datasets/google-research-datasets/poem_sentiment) |  |
+| 168 | [dbpedia_14/dbpedia_14](src/tasksource/tasks.py#L642) | Classification | [fancyzhx/dbpedia_14](https://hf.co/datasets/fancyzhx/dbpedia_14) |  |
+| 169 | [amazon_polarity/amazon_polarity](src/tasksource/tasks.py#L644) | Classification | [fancyzhx/amazon_polarity](https://hf.co/datasets/fancyzhx/amazon_polarity) |  |
+| 170 | [hate_speech18](src/tasksource/tasks.py#L648) | Classification | [tasksource/hate_speech18](https://hf.co/datasets/tasksource/hate_speech18) |  |
+| 171 | [sms_spam](src/tasksource/tasks.py#L654) | Classification | [ucirvine/sms_spam](https://hf.co/datasets/ucirvine/sms_spam) |  |
+| 172 | [humicroedit/subtask-1](src/tasksource/tasks.py#L657) | Classification | [tasksource/humicroedit](https://hf.co/datasets/tasksource/humicroedit) | ✓ |
+| 173 | [humicroedit/subtask-2](src/tasksource/tasks.py#L663) | Classification | [tasksource/humicroedit](https://hf.co/datasets/tasksource/humicroedit) | ✓ |
+| 174 | [snips_built_in_intents](src/tasksource/tasks.py#L668) | Classification | [sonos-nlu-benchmark/snips_built_in_intents](https://hf.co/datasets/sonos-nlu-benchmark/snips_built_in_intents) |  |
+| 175 | [hate_speech_offensive](src/tasksource/tasks.py#L672) | Classification | [tdavidson/hate_speech_offensive](https://hf.co/datasets/tdavidson/hate_speech_offensive) |  |
+| 176 | [yahoo_answers_topics](src/tasksource/tasks.py#L674) | Classification | [community-datasets/yahoo_answers_topics](https://hf.co/datasets/community-datasets/yahoo_answers_topics) |  |
+| 177 | [stackoverflow-questions](src/tasksource/tasks.py#L678) | Classification | [pacovaldez/stackoverflow-questions](https://hf.co/datasets/pacovaldez/stackoverflow-questions) | ✓ |
+| 178 | [hyperpartisan_news](src/tasksource/tasks.py#L684) | Classification | [zapsdcn/hyperpartisan_news](https://hf.co/datasets/zapsdcn/hyperpartisan_news) |  |
+| 179 | [sciie](src/tasksource/tasks.py#L689) | Classification | [zapsdcn/sciie](https://hf.co/datasets/zapsdcn/sciie) |  |
+| 180 | [citation_intent](src/tasksource/tasks.py#L690) | Classification | [zapsdcn/citation_intent](https://hf.co/datasets/zapsdcn/citation_intent) |  |
+| 181 | [go_emotions/simplified](src/tasksource/tasks.py#L692) | Classification | [google-research-datasets/go_emotions](https://hf.co/datasets/google-research-datasets/go_emotions) |  |
+| 182 | [scicite](src/tasksource/tasks.py#L696) | Classification | [tasksource/scicite](https://hf.co/datasets/tasksource/scicite) |  |
+| 183 | [liar](src/tasksource/tasks.py#L698) | Classification | [tasksource/liar](https://hf.co/datasets/tasksource/liar) | ✓ |
+| 184 | [lexical_relation_classification/K&H+N](src/tasksource/tasks.py#L709) | Classification | [relbert/lexical_relation_classification](https://hf.co/datasets/relbert/lexical_relation_classification) (`json` loader) | ✓ |
+| 185 | [lexical_relation_classification/BLESS](src/tasksource/tasks.py#L709) | Classification | [relbert/lexical_relation_classification](https://hf.co/datasets/relbert/lexical_relation_classification) (`json` loader) | ✓ |
+| 186 | [lexical_relation_classification/ROOT09](src/tasksource/tasks.py#L709) | Classification | [relbert/lexical_relation_classification](https://hf.co/datasets/relbert/lexical_relation_classification) (`json` loader) | ✓ |
+| 187 | [lexical_relation_classification/CogALexV](src/tasksource/tasks.py#L735) | Classification | [relbert/lexical_relation_classification](https://hf.co/datasets/relbert/lexical_relation_classification) (`json` loader) | ✓ |
+| 188 | [linguisticprobing/subj_number](src/tasksource/tasks.py#L762) | Classification | [tasksource/linguisticprobing](https://hf.co/datasets/tasksource/linguisticprobing) |  |
+| 189 | [linguisticprobing/obj_number](src/tasksource/tasks.py#L763) | Classification | [tasksource/linguisticprobing](https://hf.co/datasets/tasksource/linguisticprobing) |  |
+| 190 | [linguisticprobing/past_present](src/tasksource/tasks.py#L764) | Classification | [tasksource/linguisticprobing](https://hf.co/datasets/tasksource/linguisticprobing) |  |
+| 191 | [linguisticprobing/top_constituents](src/tasksource/tasks.py#L765) | Classification | [tasksource/linguisticprobing](https://hf.co/datasets/tasksource/linguisticprobing) | ✓ |
+| 192 | [linguisticprobing/tree_depth](src/tasksource/tasks.py#L767) | Classification | [tasksource/linguisticprobing](https://hf.co/datasets/tasksource/linguisticprobing) | ✓ |
+| 193 | [linguisticprobing/coordination_inversion](src/tasksource/tasks.py#L768) | Classification | [tasksource/linguisticprobing](https://hf.co/datasets/tasksource/linguisticprobing) | ✓ |
+| 194 | [linguisticprobing/odd_man_out](src/tasksource/tasks.py#L770) | Classification | [tasksource/linguisticprobing](https://hf.co/datasets/tasksource/linguisticprobing) | ✓ |
+| 195 | [linguisticprobing/bigram_shift](src/tasksource/tasks.py#L771) | Classification | [tasksource/linguisticprobing](https://hf.co/datasets/tasksource/linguisticprobing) | ✓ |
+| 196 | [crowdflower/airline-sentiment](src/tasksource/tasks.py#L773) | Classification | [tasksource/crowdflower](https://hf.co/datasets/tasksource/crowdflower) | ✓ |
+| 197 | [crowdflower/tweet_global_warming](src/tasksource/tasks.py#L773) | Classification | [tasksource/crowdflower](https://hf.co/datasets/tasksource/crowdflower) | ✓ |
+| 198 | [crowdflower/corporate-messaging](src/tasksource/tasks.py#L773) | Classification | [tasksource/crowdflower](https://hf.co/datasets/tasksource/crowdflower) | ✓ |
+| 199 | [crowdflower/economic-news](src/tasksource/tasks.py#L773) | Classification | [tasksource/crowdflower](https://hf.co/datasets/tasksource/crowdflower) | ✓ |
+| 200 | [crowdflower/political-media-message](src/tasksource/tasks.py#L788) | Classification | [tasksource/crowdflower](https://hf.co/datasets/tasksource/crowdflower) | ✓ |
+| 201 | [crowdflower/political-media-audience](src/tasksource/tasks.py#L788) | Classification | [tasksource/crowdflower](https://hf.co/datasets/tasksource/crowdflower) | ✓ |
+| 202 | [crowdflower/political-media-bias](src/tasksource/tasks.py#L788) | Classification | [tasksource/crowdflower](https://hf.co/datasets/tasksource/crowdflower) | ✓ |
+| 203 | [ethics/commonsense](src/tasksource/tasks.py#L811) | Classification | [hendrycks/ethics](https://hf.co/datasets/hendrycks/ethics) (`csv` loader) |  |
+| 204 | [ethics/deontology](src/tasksource/tasks.py#L819) | Classification | [hendrycks/ethics](https://hf.co/datasets/hendrycks/ethics) (`csv` loader) | ✓ |
+| 205 | [ethics/justice](src/tasksource/tasks.py#L828) | Classification | [hendrycks/ethics](https://hf.co/datasets/hendrycks/ethics) (`csv` loader) |  |
+| 206 | [ethics/virtue](src/tasksource/tasks.py#L836) | Classification | [hendrycks/ethics](https://hf.co/datasets/hendrycks/ethics) |  |
+| 207 | [emo/emo2019](src/tasksource/tasks.py#L845) | Classification | [oneonlee/cleansed_emocontext](https://hf.co/datasets/oneonlee/cleansed_emocontext) |  |
+| 208 | [google_wellformed_query](src/tasksource/tasks.py#L851) | Classification | [tasksource/google_wellformed_query](https://hf.co/datasets/tasksource/google_wellformed_query) | ✓ |
+| 209 | [tweets_hate_speech_detection](src/tasksource/tasks.py#L857) | Classification | [tweets-hate-speech-detection/tweets_hate_speech_detection](https://hf.co/datasets/tweets-hate-speech-detection/tweets_hate_speech_detection) |  |
+| 210 | [wnut_17/wnut_17](src/tasksource/tasks.py#L861) | TokenClassification | [flaitenberger/wnut_17](https://hf.co/datasets/flaitenberger/wnut_17) |  |
+| 211 | [ncbi_disease/ncbi_disease](src/tasksource/tasks.py#L864) | TokenClassification | [ncbi/ncbi_disease](https://hf.co/datasets/ncbi/ncbi_disease) | ✓ |
+| 212 | [acronym_identification](src/tasksource/tasks.py#L869) | TokenClassification | [amirveyseh/acronym_identification](https://hf.co/datasets/amirveyseh/acronym_identification) | ✓ |
+| 213 | [jnlpba/jnlpba](src/tasksource/tasks.py#L873) | TokenClassification | [jnlpba/jnlpba](https://hf.co/datasets/jnlpba/jnlpba) | ✓ |
+| 214 | [ontonotes_english/SpeedOfMagic--ontonotes_english](src/tasksource/tasks.py#L882) | TokenClassification | [SpeedOfMagic/ontonotes_english](https://hf.co/datasets/SpeedOfMagic/ontonotes_english) | ✓ |
+| 215 | [blog_authorship_corpus/gender](src/tasksource/tasks.py#L888) | Classification | [tasksource/blog_authorship_corpus](https://hf.co/datasets/tasksource/blog_authorship_corpus) | ✓ |
+| 216 | [blog_authorship_corpus/age](src/tasksource/tasks.py#L890) | Classification | [tasksource/blog_authorship_corpus](https://hf.co/datasets/tasksource/blog_authorship_corpus) | ✓ |
+| 217 | [open_question_type](src/tasksource/tasks.py#L901) | Classification | [Korea-MES/open_question_type](https://hf.co/datasets/Korea-MES/open_question_type) |  |
+| 218 | [health_fact](src/tasksource/tasks.py#L903) | Classification | [marcov/health_fact_promptsource](https://hf.co/datasets/marcov/health_fact_promptsource) |  |
+| 219 | [commonsense_qa](src/tasksource/tasks.py#L907) | MultipleChoice | [tau/commonsense_qa](https://hf.co/datasets/tau/commonsense_qa) |  |
+| 220 | [mc_taco](src/tasksource/tasks.py#L913) | Classification | [marcov/mc_taco_promptsource](https://hf.co/datasets/marcov/mc_taco_promptsource) | ✓ |
+| 221 | [ade_corpus_v2/Ade_corpus_v2_classification](src/tasksource/tasks.py#L920) | Classification | [ade-benchmark-corpus/ade_corpus_v2](https://hf.co/datasets/ade-benchmark-corpus/ade_corpus_v2) | ✓ |
+| 222 | [discosense](src/tasksource/tasks.py#L923) | MultipleChoice | [tasksource/discosense](https://hf.co/datasets/tasksource/discosense) | ✓ |
+| 223 | [circa](src/tasksource/tasks.py#L930) | Classification | [google-research-datasets/circa](https://hf.co/datasets/google-research-datasets/circa) |  |
+| 224 | [code_x_glue_cc_defect_detection](src/tasksource/tasks.py#L935) | Classification | [google/code_x_glue_cc_defect_detection](https://hf.co/datasets/google/code_x_glue_cc_defect_detection) | ✓ |
+| 225 | [phrase_similarity](src/tasksource/tasks.py#L940) | Classification | [Deehan1866/processed_phrase_similarity](https://hf.co/datasets/Deehan1866/processed_phrase_similarity) |  |
+| 226 | [scientific-exaggeration-detection](src/tasksource/tasks.py#L948) | Classification | [copenlu/scientific-exaggeration-detection](https://hf.co/datasets/copenlu/scientific-exaggeration-detection) |  |
+| 227 | [quarel](src/tasksource/tasks.py#L962) | MultipleChoice | [community-datasets/quarel](https://hf.co/datasets/community-datasets/quarel) | ✓ |
+| 228 | [fever-evidence-related](src/tasksource/tasks.py#L969) | Classification | [mwong/fever-evidence-related](https://hf.co/datasets/mwong/fever-evidence-related) |  |
+| 229 | [numer_sense](src/tasksource/tasks.py#L972) | Classification | [tasksource/numer_sense](https://hf.co/datasets/tasksource/numer_sense) |  |
+| 230 | [dynasent/dynabench.dynasent.r1.all/r1](src/tasksource/tasks.py#L979) | Classification | [tasksource/dynasent](https://hf.co/datasets/tasksource/dynasent) | ✓ |
+| 231 | [dynasent/dynabench.dynasent.r2.all/r2](src/tasksource/tasks.py#L983) | Classification | [tasksource/dynasent](https://hf.co/datasets/tasksource/dynasent) | ✓ |
+| 232 | [Sarcasm_News_Headline](src/tasksource/tasks.py#L988) | Classification | [raquiba/Sarcasm_News_Headline](https://hf.co/datasets/raquiba/Sarcasm_News_Headline) |  |
+| 233 | [sem_eval_2010_task_8](src/tasksource/tasks.py#L997) | Classification | [SemEvalWorkshop/sem_eval_2010_task_8](https://hf.co/datasets/SemEvalWorkshop/sem_eval_2010_task_8) |  |
+| 234 | [auditor_review](src/tasksource/tasks.py#L1000) | Classification | [demo-org/auditor_review](https://hf.co/datasets/demo-org/auditor_review) |  |
+| 235 | [medmcqa](src/tasksource/tasks.py#L1004) | MultipleChoice | [openlifescienceai/medmcqa](https://hf.co/datasets/openlifescienceai/medmcqa) |  |
+| 236 | [Dynasent_Disagreement](src/tasksource/tasks.py#L1021) | Classification | [RuyuanWan/Dynasent_Disagreement](https://hf.co/datasets/RuyuanWan/Dynasent_Disagreement) | ✓ |
+| 237 | [Politeness_Disagreement](src/tasksource/tasks.py#L1023) | Classification | [RuyuanWan/Politeness_Disagreement](https://hf.co/datasets/RuyuanWan/Politeness_Disagreement) | ✓ |
+| 238 | [SBIC_Disagreement](src/tasksource/tasks.py#L1025) | Classification | [RuyuanWan/SBIC_Disagreement](https://hf.co/datasets/RuyuanWan/SBIC_Disagreement) | ✓ |
+| 239 | [SChem_Disagreement](src/tasksource/tasks.py#L1027) | Classification | [RuyuanWan/SChem_Disagreement](https://hf.co/datasets/RuyuanWan/SChem_Disagreement) | ✓ |
+| 240 | [Dilemmas_Disagreement](src/tasksource/tasks.py#L1029) | Classification | [RuyuanWan/Dilemmas_Disagreement](https://hf.co/datasets/RuyuanWan/Dilemmas_Disagreement) | ✓ |
+| 241 | [logiqa](src/tasksource/tasks.py#L1032) | MultipleChoice | [fireworks-ai/logiqa](https://hf.co/datasets/fireworks-ai/logiqa) |  |
+| 242 | [wiki_qa](src/tasksource/tasks.py#L1041) | Classification | [microsoft/wiki_qa](https://hf.co/datasets/microsoft/wiki_qa) | ✓ |
+| 243 | [cycic_classification](src/tasksource/tasks.py#L1043) | Classification | [tasksource/cycic_classification](https://hf.co/datasets/tasksource/cycic_classification) |  |
+| 244 | [cycic_multiplechoice](src/tasksource/tasks.py#L1045) | MultipleChoice | [tasksource/cycic_multiplechoice](https://hf.co/datasets/tasksource/cycic_multiplechoice) |  |
+| 245 | [sts-companion](src/tasksource/tasks.py#L1049) | Classification | [tasksource/sts-companion](https://hf.co/datasets/tasksource/sts-companion) |  |
+| 246 | [commonsense_qa_2.0](src/tasksource/tasks.py#L1052) | Classification | [tasksource/commonsense_qa_2.0](https://hf.co/datasets/tasksource/commonsense_qa_2.0) |  |
+| 247 | [lingnli](src/tasksource/tasks.py#L1055) | Classification | [tasksource/lingnli](https://hf.co/datasets/tasksource/lingnli) |  |
+| 248 | [monotonicity-entailment](src/tasksource/tasks.py#L1057) | Classification | [tasksource/monotonicity-entailment](https://hf.co/datasets/tasksource/monotonicity-entailment) |  |
+| 249 | [arct](src/tasksource/tasks.py#L1060) | MultipleChoice | [tasksource/arct](https://hf.co/datasets/tasksource/arct) |  |
+| 250 | [scinli](src/tasksource/tasks.py#L1063) | Classification | [tasksource/scinli](https://hf.co/datasets/tasksource/scinli) |  |
+| 251 | [naturallogic](src/tasksource/tasks.py#L1067) | Classification | [tasksource/naturallogic](https://hf.co/datasets/tasksource/naturallogic) |  |
+| 252 | [onestop_qa](src/tasksource/tasks.py#L1069) | MultipleChoice | [malmaud/onestop_qa](https://hf.co/datasets/malmaud/onestop_qa) |  |
+| 253 | [moral_stories/full](src/tasksource/tasks.py#L1072) | MultipleChoice | [LabHC/moral_stories](https://hf.co/datasets/LabHC/moral_stories) |  |
+| 254 | [dynahate](src/tasksource/tasks.py#L1076) | Classification | [tasksource/dynahate](https://hf.co/datasets/tasksource/dynahate) |  |
+| 255 | [syntactic-augmentation-nli](src/tasksource/tasks.py#L1078) | Classification | [tasksource/syntactic-augmentation-nli](https://hf.co/datasets/tasksource/syntactic-augmentation-nli) |  |
+| 256 | [autotnli](src/tasksource/tasks.py#L1080) | Classification | [tasksource/autotnli](https://hf.co/datasets/tasksource/autotnli) |  |
+| 257 | [CONDAQA](src/tasksource/tasks.py#L1082) | Classification | [lasha-nlp/CONDAQA](https://hf.co/datasets/lasha-nlp/CONDAQA) |  |
+| 258 | [webgpt_comparisons](src/tasksource/tasks.py#L1092) | MultipleChoice | [heegyu/webgpt_comparisons_ko](https://hf.co/datasets/heegyu/webgpt_comparisons_ko) | ✓ |
+| 259 | [synthetic-instruct-gptj-pairwise](src/tasksource/tasks.py#L1100) | MultipleChoice | [Dahoas/synthetic-instruct-gptj-pairwise](https://hf.co/datasets/Dahoas/synthetic-instruct-gptj-pairwise) | ✓ |
+| 260 | [scruples](src/tasksource/tasks.py#L1103) | Classification | [tasksource/scruples](https://hf.co/datasets/tasksource/scruples) | ✓ |
+| 261 | [defeasible-nli/atomic](src/tasksource/tasks.py#L1108) | Classification | [tasksource/defeasible-nli](https://hf.co/datasets/tasksource/defeasible-nli) |  |
+| 262 | [defeasible-nli/snli](src/tasksource/tasks.py#L1108) | Classification | [tasksource/defeasible-nli](https://hf.co/datasets/tasksource/defeasible-nli) |  |
+| 263 | [defeasible-nli/social](src/tasksource/tasks.py#L1112) | Classification | [tasksource/defeasible-nli](https://hf.co/datasets/tasksource/defeasible-nli) |  |
+| 264 | [help-nli](src/tasksource/tasks.py#L1116) | Classification | [tasksource/help-nli](https://hf.co/datasets/tasksource/help-nli) |  |
+| 265 | [nli-veridicality-transitivity](src/tasksource/tasks.py#L1119) | Classification | [tasksource/nli-veridicality-transitivity](https://hf.co/datasets/tasksource/nli-veridicality-transitivity) |  |
+| 266 | [lonli](src/tasksource/tasks.py#L1122) | Classification | [tasksource/lonli](https://hf.co/datasets/tasksource/lonli) |  |
+| 267 | [dadc-limit-nli](src/tasksource/tasks.py#L1125) | Classification | [tasksource/dadc-limit-nli](https://hf.co/datasets/tasksource/dadc-limit-nli) |  |
+| 268 | [FLUTE](src/tasksource/tasks.py#L1128) | Classification | [ColumbiaNLP/FLUTE](https://hf.co/datasets/ColumbiaNLP/FLUTE) |  |
+| 269 | [strategy-qa](src/tasksource/tasks.py#L1131) | Classification | [tasksource/strategy-qa](https://hf.co/datasets/tasksource/strategy-qa) |  |
+| 270 | [summarize_from_feedback/comparisons](src/tasksource/tasks.py#L1134) | MultipleChoice | [vwxyzjn/summarize_from_feedback_oai_preprocessing](https://hf.co/datasets/vwxyzjn/summarize_from_feedback_oai_preprocessing) | ✓ |
+| 271 | [folio](src/tasksource/tasks.py#L1142) | Classification | [tasksource/folio](https://hf.co/datasets/tasksource/folio) |  |
+| 272 | [tomi-nli](src/tasksource/tasks.py#L1169) | Classification | [tasksource/tomi-nli](https://hf.co/datasets/tasksource/tomi-nli) |  |
+| 273 | [avicenna](src/tasksource/tasks.py#L1172) | Classification | [tasksource/avicenna](https://hf.co/datasets/tasksource/avicenna) | ✓ |
+| 274 | [SHP](src/tasksource/tasks.py#L1175) | MultipleChoice | [stanfordnlp/SHP](https://hf.co/datasets/stanfordnlp/SHP) | ✓ |
+| 275 | [MedQA-USMLE-4-options-hf](src/tasksource/tasks.py#L1183) | MultipleChoice | [GBaker/MedQA-USMLE-4-options-hf](https://hf.co/datasets/GBaker/MedQA-USMLE-4-options-hf) |  |
+| 276 | [wikimedqa/medwiki](src/tasksource/tasks.py#L1186) | MultipleChoice | [sileod/wikimedqa](https://hf.co/datasets/sileod/wikimedqa) |  |
+| 277 | [cicero](src/tasksource/tasks.py#L1195) | MultipleChoice | [declare-lab/cicero](https://hf.co/datasets/declare-lab/cicero) |  |
+| 278 | [CREAK](src/tasksource/tasks.py#L1199) | Classification | [amydeng2000/CREAK](https://hf.co/datasets/amydeng2000/CREAK) |  |
+| 279 | [mutual](src/tasksource/tasks.py#L1202) | MultipleChoice | [tasksource/mutual](https://hf.co/datasets/tasksource/mutual) |  |
+| 280 | [implicatures](src/tasksource/tasks.py#L1207) | MultipleChoice | [tasksource/implicatures](https://hf.co/datasets/tasksource/implicatures) |  |
+| 281 | [race/middle](src/tasksource/tasks.py#L1212) | MultipleChoice | [ehovy/race](https://hf.co/datasets/ehovy/race) |  |
+| 282 | [race/high](src/tasksource/tasks.py#L1212) | MultipleChoice | [ehovy/race](https://hf.co/datasets/ehovy/race) |  |
+| 283 | [race-c](src/tasksource/tasks.py#L1216) | MultipleChoice | [tasksource/race-c](https://hf.co/datasets/tasksource/race-c) |  |
+| 284 | [spartqa-yn](src/tasksource/tasks.py#L1219) | Classification | [tasksource/spartqa-yn](https://hf.co/datasets/tasksource/spartqa-yn) |  |
+| 285 | [spartqa-mchoice](src/tasksource/tasks.py#L1222) | MultipleChoice | [tasksource/spartqa-mchoice](https://hf.co/datasets/tasksource/spartqa-mchoice) |  |
+| 286 | [temporal-nli](src/tasksource/tasks.py#L1225) | Classification | [tasksource/temporal-nli](https://hf.co/datasets/tasksource/temporal-nli) |  |
+| 287 | [riddle_sense](src/tasksource/tasks.py#L1228) | MultipleChoice | [jeggers/riddle_sense](https://hf.co/datasets/jeggers/riddle_sense) |  |
+| 288 | [clcd-english](src/tasksource/tasks.py#L1233) | Classification | [tasksource/clcd-english](https://hf.co/datasets/tasksource/clcd-english) |  |
+| 289 | [twentyquestions](src/tasksource/tasks.py#L1245) | Classification | [tasksource/twentyquestions](https://hf.co/datasets/tasksource/twentyquestions) |  |
+| 290 | [reclor](src/tasksource/tasks.py#L1250) | MultipleChoice | [tasksource/reclor](https://hf.co/datasets/tasksource/reclor) |  |
+| 291 | [counterfactually-augmented-imdb](src/tasksource/tasks.py#L1253) | Classification | [tasksource/counterfactually-augmented-imdb](https://hf.co/datasets/tasksource/counterfactually-augmented-imdb) |  |
+| 292 | [counterfactually-augmented-snli](src/tasksource/tasks.py#L1256) | Classification | [tasksource/counterfactually-augmented-snli](https://hf.co/datasets/tasksource/counterfactually-augmented-snli) |  |
+| 293 | [cnli](src/tasksource/tasks.py#L1259) | Classification | [tasksource/cnli](https://hf.co/datasets/tasksource/cnli) |  |
+| 294 | [boolq-natural-perturbations](src/tasksource/tasks.py#L1262) | Classification | [tasksource/boolq-natural-perturbations](https://hf.co/datasets/tasksource/boolq-natural-perturbations) |  |
+| 295 | [acceptability-prediction](src/tasksource/tasks.py#L1267) | Classification | [tasksource/acceptability-prediction](https://hf.co/datasets/tasksource/acceptability-prediction) | ✓ |
+| 296 | [equate](src/tasksource/tasks.py#L1293) | Classification | [tasksource/equate](https://hf.co/datasets/tasksource/equate) |  |
+| 297 | [ScienceQA_text_only](src/tasksource/tasks.py#L1296) | MultipleChoice | [tasksource/ScienceQA_text_only](https://hf.co/datasets/tasksource/ScienceQA_text_only) |  |
+| 298 | [ekar_english](src/tasksource/tasks.py#L1299) | MultipleChoice | [Jiangjie/ekar_english](https://hf.co/datasets/Jiangjie/ekar_english) | ✓ |
+| 299 | [implicit-hate-stg1](src/tasksource/tasks.py#L1303) | Classification | [tasksource/implicit-hate-stg1](https://hf.co/datasets/tasksource/implicit-hate-stg1) | ✓ |
+| 300 | [chaos-mnli-ambiguity](src/tasksource/tasks.py#L1307) | Classification | [tasksource/chaos-mnli-ambiguity](https://hf.co/datasets/tasksource/chaos-mnli-ambiguity) | ✓ |
+| 301 | [headline_cause/en_simple](src/tasksource/tasks.py#L1311) | Classification | [IlyaGusev/headline_cause](https://hf.co/datasets/IlyaGusev/headline_cause) (`json` loader) |  |
+| 302 | [logiqa-2.0-nli](src/tasksource/tasks.py#L1316) | Classification | [tasksource/logiqa-2.0-nli](https://hf.co/datasets/tasksource/logiqa-2.0-nli) |  |
+| 303 | [oasst2_dense_flat/quality](src/tasksource/tasks.py#L1321) | Classification | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) | ✓ |
+| 304 | [oasst2_dense_flat/toxicity](src/tasksource/tasks.py#L1323) | Classification | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) | ✓ |
+| 305 | [oasst2_dense_flat/helpfulness](src/tasksource/tasks.py#L1325) | Classification | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) | ✓ |
+| 306 | [mindgames](src/tasksource/tasks.py#L1328) | Classification | [sileod/mindgames](https://hf.co/datasets/sileod/mindgames) |  |
+| 307 | [universal_dependencies/en_partut/deprel](src/tasksource/tasks.py#L1342) | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ✓ |
+| 308 | [universal_dependencies/en_ewt/deprel](src/tasksource/tasks.py#L1342) | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ✓ |
+| 309 | [universal_dependencies/en_gum/deprel](src/tasksource/tasks.py#L1342) | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ✓ |
+| 310 | [universal_dependencies/en_lines/deprel](src/tasksource/tasks.py#L1342) | TokenClassification | [universal-dependencies/universal_dependencies](https://hf.co/datasets/universal-dependencies/universal_dependencies) | ✓ |
+| 311 | [ambient](src/tasksource/tasks.py#L1349) | Classification | [tasksource/ambient](https://hf.co/datasets/tasksource/ambient) | ✓ |
+| 312 | [path-naturalness-prediction](src/tasksource/tasks.py#L1354) | MultipleChoice | [tasksource/path-naturalness-prediction](https://hf.co/datasets/tasksource/path-naturalness-prediction) |  |
+| 313 | [civil_comments/toxicity](src/tasksource/tasks.py#L1364) | Classification | [google/civil_comments](https://hf.co/datasets/google/civil_comments) | ✓ |
+| 314 | [civil_comments/severe_toxicity](src/tasksource/tasks.py#L1365) | Classification | [google/civil_comments](https://hf.co/datasets/google/civil_comments) | ✓ |
+| 315 | [civil_comments/obscene](src/tasksource/tasks.py#L1366) | Classification | [google/civil_comments](https://hf.co/datasets/google/civil_comments) | ✓ |
+| 316 | [civil_comments/threat](src/tasksource/tasks.py#L1367) | Classification | [google/civil_comments](https://hf.co/datasets/google/civil_comments) | ✓ |
+| 317 | [civil_comments/insult](src/tasksource/tasks.py#L1368) | Classification | [google/civil_comments](https://hf.co/datasets/google/civil_comments) | ✓ |
+| 318 | [civil_comments/identity_attack](src/tasksource/tasks.py#L1369) | Classification | [google/civil_comments](https://hf.co/datasets/google/civil_comments) | ✓ |
+| 319 | [civil_comments/sexual_explicit](src/tasksource/tasks.py#L1370) | Classification | [google/civil_comments](https://hf.co/datasets/google/civil_comments) | ✓ |
+| 320 | [cloth](src/tasksource/tasks.py#L1372) | MultipleChoice | [AndyChiang/cloth](https://hf.co/datasets/AndyChiang/cloth) |  |
+| 321 | [dgen](src/tasksource/tasks.py#L1373) | MultipleChoice | [AndyChiang/dgen](https://hf.co/datasets/AndyChiang/dgen) |  |
+| 322 | [I2D2](src/tasksource/tasks.py#L1375) | Classification | [tasksource/I2D2](https://hf.co/datasets/tasksource/I2D2) | ✓ |
+| 323 | [args_me](src/tasksource/tasks.py#L1380) | Classification | [webis/args_me](https://hf.co/datasets/webis/args_me) | ✓ |
+| 324 | [Touche23-ValueEval](src/tasksource/tasks.py#L1385) | Classification | [webis/Touche23-ValueEval](https://hf.co/datasets/webis/Touche23-ValueEval) (`csv` loader) | ✓ |
+| 325 | [starcon](src/tasksource/tasks.py#L1394) | Classification | [tasksource/starcon](https://hf.co/datasets/tasksource/starcon) | ✓ |
+| 326 | [banking77](src/tasksource/tasks.py#L1399) | Classification | [legacy-datasets/banking77](https://hf.co/datasets/legacy-datasets/banking77) |  |
+| 327 | [it-support-tickets](src/tasksource/tasks.py#L1401) | Classification | [tasksource/it-support-tickets](https://hf.co/datasets/tasksource/it-support-tickets) |  |
+| 328 | [ConTRoL-nli](src/tasksource/tasks.py#L1405) | Classification | [tasksource/ConTRoL-nli](https://hf.co/datasets/tasksource/ConTRoL-nli) |  |
+| 329 | [tracie](src/tasksource/tasks.py#L1407) | Classification | [tasksource/tracie](https://hf.co/datasets/tasksource/tracie) | ✓ |
+| 330 | [sherliic](src/tasksource/tasks.py#L1409) | Classification | [tasksource/sherliic](https://hf.co/datasets/tasksource/sherliic) |  |
+| 331 | [sen-making/1](src/tasksource/tasks.py#L1412) | MultipleChoice | [tasksource/sen-making](https://hf.co/datasets/tasksource/sen-making) |  |
+| 332 | [sen-making/2](src/tasksource/tasks.py#L1415) | MultipleChoice | [tasksource/sen-making](https://hf.co/datasets/tasksource/sen-making) | ✓ |
+| 333 | [winowhy](src/tasksource/tasks.py#L1418) | Classification | [tasksource/winowhy](https://hf.co/datasets/tasksource/winowhy) | ✓ |
+| 334 | [robustLR](src/tasksource/tasks.py#L1422) | Classification | [tasksource/robustLR](https://hf.co/datasets/tasksource/robustLR) |  |
+| 335 | [clutrr](src/tasksource/tasks.py#L1424) | Classification | [tasksource/clutrr](https://hf.co/datasets/tasksource/clutrr) |  |
+| 336 | [logical-fallacy](src/tasksource/tasks.py#L1426) | Classification | [tasksource/logical-fallacy](https://hf.co/datasets/tasksource/logical-fallacy) |  |
+| 337 | [parade](src/tasksource/tasks.py#L1429) | Classification | [tasksource/parade](https://hf.co/datasets/tasksource/parade) |  |
+| 338 | [subjectivity](src/tasksource/tasks.py#L1432) | Classification | [tasksource/subjectivity](https://hf.co/datasets/tasksource/subjectivity) | ✓ |
+| 339 | [MOH](src/tasksource/tasks.py#L1438) | Classification | [tasksource/MOH](https://hf.co/datasets/tasksource/MOH) | ✓ |
+| 340 | [VUAC](src/tasksource/tasks.py#L1439) | Classification | [tasksource/VUAC](https://hf.co/datasets/tasksource/VUAC) | ✓ |
+| 341 | [TroFi](src/tasksource/tasks.py#L1440) | Classification | [tasksource/TroFi](https://hf.co/datasets/tasksource/TroFi) (`parquet` loader) | ✓ |
+| 342 | [sharc](src/tasksource/tasks.py#L1448) | Classification | [tasksource/sharc](https://hf.co/datasets/tasksource/sharc) |  |
+| 343 | [conceptrules_v2](src/tasksource/tasks.py#L1452) | Classification | [tasksource/conceptrules_v2](https://hf.co/datasets/tasksource/conceptrules_v2) | ✓ |
+| 344 | [disrpt/eng.dep.scidtb.rels](src/tasksource/tasks.py#L1455) | Classification | [multilingual-discourse-hub/disrpt](https://hf.co/datasets/multilingual-discourse-hub/disrpt) | ✓ |
+| 345 | [conll2000](src/tasksource/tasks.py#L1458) | TokenClassification | [eriktks/conll2000](https://hf.co/datasets/eriktks/conll2000) |  |
+| 346 | [few-nerd/supervised](src/tasksource/tasks.py#L1461) | TokenClassification | [DFKI-SLT/few-nerd](https://hf.co/datasets/DFKI-SLT/few-nerd) |  |
+| 347 | [finer-139](src/tasksource/tasks.py#L1462) | TokenClassification | [nlpaueb/finer-139](https://hf.co/datasets/nlpaueb/finer-139) |  |
+| 348 | [zero-shot-label-nli](src/tasksource/tasks.py#L1465) | Classification | [tasksource/zero-shot-label-nli](https://hf.co/datasets/tasksource/zero-shot-label-nli) | ✓ |
+| 349 | [com2sense](src/tasksource/tasks.py#L1467) | Classification | [tasksource/com2sense](https://hf.co/datasets/tasksource/com2sense) |  |
+| 350 | [scone](src/tasksource/tasks.py#L1470) | Classification | [tasksource/scone](https://hf.co/datasets/tasksource/scone) |  |
+| 351 | [winodict](src/tasksource/tasks.py#L1472) | MultipleChoice | [tasksource/winodict](https://hf.co/datasets/tasksource/winodict) |  |
+| 352 | [fool-me-twice](src/tasksource/tasks.py#L1474) | Classification | [tasksource/fool-me-twice](https://hf.co/datasets/tasksource/fool-me-twice) |  |
+| 353 | [monli](src/tasksource/tasks.py#L1478) | Classification | [tasksource/monli](https://hf.co/datasets/tasksource/monli) |  |
+| 354 | [corr2cause](src/tasksource/tasks.py#L1480) | Classification | [tasksource/corr2cause](https://hf.co/datasets/tasksource/corr2cause) |  |
+| 355 | [lsat_qa/all](src/tasksource/tasks.py#L1482) | MultipleChoice | [lighteval/lsat_qa](https://hf.co/datasets/lighteval/lsat_qa) |  |
+| 356 | [apt](src/tasksource/tasks.py#L1484) | Classification | [tasksource/apt](https://hf.co/datasets/tasksource/apt) |  |
+| 357 | [twitter-financial-news-sentiment](src/tasksource/tasks.py#L1487) | Classification | [zeroshot/twitter-financial-news-sentiment](https://hf.co/datasets/zeroshot/twitter-financial-news-sentiment) |  |
+| 358 | [icl-symbol-tuning-instruct](src/tasksource/tasks.py#L1494) | Classification | [tasksource/icl-symbol-tuning-instruct](https://hf.co/datasets/tasksource/icl-symbol-tuning-instruct) | ✓ |
+| 359 | [SpaceNLI](src/tasksource/tasks.py#L1500) | Classification | [tasksource/SpaceNLI](https://hf.co/datasets/tasksource/SpaceNLI) |  |
+| 360 | [propsegment/nli](src/tasksource/tasks.py#L1502) | Classification | [sihaochen/propsegment](https://hf.co/datasets/sihaochen/propsegment) (`json` loader) | ✓ |
+| 361 | [HatemojiBuild](src/tasksource/tasks.py#L1512) | Classification | [HannahRoseKirk/HatemojiBuild](https://hf.co/datasets/HannahRoseKirk/HatemojiBuild) |  |
+| 362 | [regset](src/tasksource/tasks.py#L1515) | Classification | [tasksource/regset](https://hf.co/datasets/tasksource/regset) | ✓ |
+| 363 | [esci](src/tasksource/tasks.py#L1522) | Classification | [tasksource/esci](https://hf.co/datasets/tasksource/esci) |  |
+| 364 | [chatbot_arena_conversations](src/tasksource/tasks.py#L1543) | MultipleChoice | [lmsys/chatbot_arena_conversations](https://hf.co/datasets/lmsys/chatbot_arena_conversations) | ✓ |
+| 365 | [dnd_style_intents](src/tasksource/tasks.py#L1549) | Classification | [neurae/dnd_style_intents](https://hf.co/datasets/neurae/dnd_style_intents) |  |
+| 366 | [FLD.v2/default](src/tasksource/tasks.py#L1552) | Classification | [hitachi-nlp/FLD.v2](https://hf.co/datasets/hitachi-nlp/FLD.v2) | ✓ |
+| 367 | [FLD.v2/star](src/tasksource/tasks.py#L1556) | Classification | [hitachi-nlp/FLD.v2](https://hf.co/datasets/hitachi-nlp/FLD.v2) | ✓ |
+| 368 | [SDOH-NLI](src/tasksource/tasks.py#L1560) | Classification | [tasksource/SDOH-NLI](https://hf.co/datasets/tasksource/SDOH-NLI) |  |
+| 369 | [scifact_entailment](src/tasksource/tasks.py#L1563) | Classification | [tasksource/scifact_entailment](https://hf.co/datasets/tasksource/scifact_entailment) |  |
+| 370 | [feasibilityQA](src/tasksource/tasks.py#L1567) | Classification | [tasksource/feasibilityQA](https://hf.co/datasets/tasksource/feasibilityQA) |  |
+| 371 | [simple_pair](src/tasksource/tasks.py#L1570) | Classification | [tasksource/simple_pair](https://hf.co/datasets/tasksource/simple_pair) |  |
+| 372 | [AdjectiveScaleProbe-nli](src/tasksource/tasks.py#L1571) | Classification | [tasksource/AdjectiveScaleProbe-nli](https://hf.co/datasets/tasksource/AdjectiveScaleProbe-nli) |  |
+| 373 | [resnli](src/tasksource/tasks.py#L1572) | Classification | [tasksource/resnli](https://hf.co/datasets/tasksource/resnli) |  |
+| 374 | [SpaRTUN](src/tasksource/tasks.py#L1574) | MultipleChoice | [tasksource/SpaRTUN](https://hf.co/datasets/tasksource/SpaRTUN) |  |
+| 375 | [ReSQ](src/tasksource/tasks.py#L1579) | MultipleChoice | [tasksource/ReSQ](https://hf.co/datasets/tasksource/ReSQ) |  |
+| 376 | [semantic_fragments_nli](src/tasksource/tasks.py#L1584) | Classification | [tasksource/semantic_fragments_nli](https://hf.co/datasets/tasksource/semantic_fragments_nli) |  |
+| 377 | [dataset_train_nli](src/tasksource/tasks.py#L1587) | Classification | [MoritzLaurer/dataset_train_nli](https://hf.co/datasets/MoritzLaurer/dataset_train_nli) |  |
+| 378 | [stepgame](src/tasksource/tasks.py#L1592) | Classification | [tasksource/stepgame](https://hf.co/datasets/tasksource/stepgame) |  |
+| 379 | [nlgraph](src/tasksource/tasks.py#L1600) | Classification | [tasksource/nlgraph](https://hf.co/datasets/tasksource/nlgraph) |  |
+| 380 | [oasst2_pairwise_rlhf_reward](src/tasksource/tasks.py#L1604) | MultipleChoice | [tasksource/oasst2_pairwise_rlhf_reward](https://hf.co/datasets/tasksource/oasst2_pairwise_rlhf_reward) | ✓ |
+| 381 | [hh-rlhf/helpful-rejection-sampled](src/tasksource/tasks.py#L1615) | MultipleChoice | [tasksource/hh-rlhf](https://hf.co/datasets/tasksource/hh-rlhf) | ✓ |
+| 382 | [hh-rlhf/helpful-base](src/tasksource/tasks.py#L1615) | MultipleChoice | [tasksource/hh-rlhf](https://hf.co/datasets/tasksource/hh-rlhf) | ✓ |
+| 383 | [hh-rlhf/helpful-online](src/tasksource/tasks.py#L1615) | MultipleChoice | [tasksource/hh-rlhf](https://hf.co/datasets/tasksource/hh-rlhf) | ✓ |
+| 384 | [hh-rlhf/harmless-base](src/tasksource/tasks.py#L1619) | MultipleChoice | [tasksource/hh-rlhf](https://hf.co/datasets/tasksource/hh-rlhf) | ✓ |
+| 385 | [ruletaker](src/tasksource/tasks.py#L1623) | Classification | [tasksource/ruletaker](https://hf.co/datasets/tasksource/ruletaker) | ✓ |
+| 386 | [PARARULE-Plus](src/tasksource/tasks.py#L1627) | Classification | [qbao775/PARARULE-Plus](https://hf.co/datasets/qbao775/PARARULE-Plus) | ✓ |
+| 387 | [proofwriter](src/tasksource/tasks.py#L1631) | Classification | [tasksource/proofwriter](https://hf.co/datasets/tasksource/proofwriter) |  |
+| 388 | [logical-entailment](src/tasksource/tasks.py#L1634) | Classification | [tasksource/logical-entailment](https://hf.co/datasets/tasksource/logical-entailment) | ✓ |
+| 389 | [nope](src/tasksource/tasks.py#L1637) | Classification | [tasksource/nope](https://hf.co/datasets/tasksource/nope) |  |
+| 390 | [LogicNLI](src/tasksource/tasks.py#L1641) | Classification | [tasksource/LogicNLI](https://hf.co/datasets/tasksource/LogicNLI) | ✓ |
+| 391 | [contract-nli/contractnli_a/seg](src/tasksource/tasks.py#L1644) | Classification | [tasksource/contract-nli](https://hf.co/datasets/tasksource/contract-nli) |  |
+| 392 | [contract-nli/contractnli_b/full](src/tasksource/tasks.py#L1646) | Classification | [tasksource/contract-nli](https://hf.co/datasets/tasksource/contract-nli) |  |
+| 393 | [nli4ct_semeval2024](src/tasksource/tasks.py#L1648) | Classification | [AshtonIsNotHere/nli4ct_semeval2024](https://hf.co/datasets/AshtonIsNotHere/nli4ct_semeval2024) |  |
+| 394 | [lsat-ar](src/tasksource/tasks.py#L1651) | MultipleChoice | [tasksource/lsat-ar](https://hf.co/datasets/tasksource/lsat-ar) |  |
+| 395 | [lsat-rc](src/tasksource/tasks.py#L1656) | MultipleChoice | [tasksource/lsat-rc](https://hf.co/datasets/tasksource/lsat-rc) |  |
+| 396 | [biosift-nli](src/tasksource/tasks.py#L1661) | Classification | [AshtonIsNotHere/biosift-nli](https://hf.co/datasets/AshtonIsNotHere/biosift-nli) |  |
+| 397 | [brainteasers/WP](src/tasksource/tasks.py#L1665) | MultipleChoice | [tasksource/brainteasers](https://hf.co/datasets/tasksource/brainteasers) |  |
+| 398 | [toxigen-data/annotated](src/tasksource/tasks.py#L1671) | Classification | [skg/toxigen-data](https://hf.co/datasets/skg/toxigen-data) |  |
+| 399 | [persuasion](src/tasksource/tasks.py#L1682) | Classification | [Anthropic/persuasion](https://hf.co/datasets/Anthropic/persuasion) |  |
+| 400 | [AmbigNQ-clarifying-question](src/tasksource/tasks.py#L1688) | Classification | [erbacher/AmbigNQ-clarifying-question](https://hf.co/datasets/erbacher/AmbigNQ-clarifying-question) | ✓ |
+| 401 | [SIGA-nli](src/tasksource/tasks.py#L1693) | Classification | [tasksource/SIGA-nli](https://hf.co/datasets/tasksource/SIGA-nli) | ✓ |
+| 402 | [FOL-nli](src/tasksource/tasks.py#L1695) | Classification | [unigram/FOL-nli](https://hf.co/datasets/unigram/FOL-nli) |  |
+| 403 | [goal-step-wikihow/goal](src/tasksource/tasks.py#L1697) | MultipleChoice | [tasksource/goal-step-wikihow](https://hf.co/datasets/tasksource/goal-step-wikihow) |  |
+| 404 | [goal-step-wikihow/step](src/tasksource/tasks.py#L1700) | MultipleChoice | [tasksource/goal-step-wikihow](https://hf.co/datasets/tasksource/goal-step-wikihow) |  |
+| 405 | [goal-step-wikihow/order](src/tasksource/tasks.py#L1703) | MultipleChoice | [tasksource/goal-step-wikihow](https://hf.co/datasets/tasksource/goal-step-wikihow) | ✓ |
+| 406 | [PARADISE](src/tasksource/tasks.py#L1707) | MultipleChoice | [GGLab/PARADISE](https://hf.co/datasets/GGLab/PARADISE) |  |
+| 407 | [doc-nli](src/tasksource/tasks.py#L1710) | Classification | [tasksource/doc-nli](https://hf.co/datasets/tasksource/doc-nli) |  |
+| 408 | [mctest-nli](src/tasksource/tasks.py#L1712) | Classification | [tasksource/mctest-nli](https://hf.co/datasets/tasksource/mctest-nli) |  |
+| 409 | [patent-phrase-similarity](src/tasksource/tasks.py#L1714) | Classification | [tasksource/patent-phrase-similarity](https://hf.co/datasets/tasksource/patent-phrase-similarity) | ✓ |
+| 410 | [natural-language-satisfiability](src/tasksource/tasks.py#L1717) | Classification | [tasksource/natural-language-satisfiability](https://hf.co/datasets/tasksource/natural-language-satisfiability) |  |
+| 411 | [idioms-nli](src/tasksource/tasks.py#L1719) | Classification | [tasksource/idioms-nli](https://hf.co/datasets/tasksource/idioms-nli) |  |
+| 412 | [lifecycle-entailment](src/tasksource/tasks.py#L1721) | Classification | [tasksource/lifecycle-entailment](https://hf.co/datasets/tasksource/lifecycle-entailment) |  |
+| 413 | [safe-guard-prompt-injection](src/tasksource/tasks.py#L1728) | Classification | [xTRam1/safe-guard-prompt-injection](https://hf.co/datasets/xTRam1/safe-guard-prompt-injection) | ✓ |
+| 414 | [prompt-injections](src/tasksource/tasks.py#L1734) | Classification | [deepset/prompt-injections](https://hf.co/datasets/deepset/prompt-injections) | ✓ |
+| 415 | [prompt-injection-dataset](src/tasksource/tasks.py#L1740) | Classification | [S-Labs/prompt-injection-dataset](https://hf.co/datasets/S-Labs/prompt-injection-dataset) | ✓ |
+| 416 | [Prompt-injection-dataset/full](src/tasksource/tasks.py#L1746) | Classification | [neuralchemy/Prompt-injection-dataset](https://hf.co/datasets/neuralchemy/Prompt-injection-dataset) | ✓ |
+| 417 | [PromptShield](src/tasksource/tasks.py#L1752) | Classification | [hendzh/PromptShield](https://hf.co/datasets/hendzh/PromptShield) | ✓ |
+| 418 | [shell-safety-v2](src/tasksource/tasks.py#L1758) | Classification | [tomngdev/shell-safety-v2](https://hf.co/datasets/tomngdev/shell-safety-v2) | ✓ |
+| 419 | [agent_action_safety](src/tasksource/tasks.py#L1763) | Classification | [karanxa/agent-action-safety-dataset](https://hf.co/datasets/karanxa/agent-action-safety-dataset) (`json` loader) | ✓ |
+| 420 | [ShellRisk-Bench](src/tasksource/tasks.py#L1778) | Classification | [kontext-security/ShellRisk-Bench](https://hf.co/datasets/kontext-security/ShellRisk-Bench) | ✓ |
+| 421 | [wildguardmix-cleaned/prompt_harm](src/tasksource/tasks.py#L1803) | Classification | [bogdanminko/wildguardmix-cleaned](https://hf.co/datasets/bogdanminko/wildguardmix-cleaned) | ✓ |
+| 422 | [wildguardmix-cleaned/response_harm](src/tasksource/tasks.py#L1809) | Classification | [bogdanminko/wildguardmix-cleaned](https://hf.co/datasets/bogdanminko/wildguardmix-cleaned) | ✓ |
+| 423 | [wildguardmix-cleaned/response_refusal](src/tasksource/tasks.py#L1814) | Classification | [bogdanminko/wildguardmix-cleaned](https://hf.co/datasets/bogdanminko/wildguardmix-cleaned) | ✓ |
+| 424 | [BeaverTails](src/tasksource/tasks.py#L1830) | Classification | [PKU-Alignment/BeaverTails](https://hf.co/datasets/PKU-Alignment/BeaverTails) | ✓ |
+| 425 | [privacy-200k-Mistral-Large-3](src/tasksource/tasks.py#L1846) | Classification | [gabrielloiseau/privacy-200k-Mistral-Large-3](https://hf.co/datasets/gabrielloiseau/privacy-200k-Mistral-Large-3) | ✓ |
+| 426 | [toxic-chat/toxicchat0124/toxicity](src/tasksource/tasks.py#L1855) | Classification | [lmsys/toxic-chat](https://hf.co/datasets/lmsys/toxic-chat) | ✓ |
+| 427 | [toxic-chat/toxicchat0124/jailbreaking](src/tasksource/tasks.py#L1860) | Classification | [lmsys/toxic-chat](https://hf.co/datasets/lmsys/toxic-chat) | ✓ |
+| 428 | [clinc_oos/plus](src/tasksource/tasks.py#L1866) | Classification | [clinc/clinc_oos](https://hf.co/datasets/clinc/clinc_oos) |  |
+| 429 | [IntentGrasp/all](src/tasksource/tasks.py#L1884) | MultipleChoice | [yuweiyin/IntentGrasp](https://hf.co/datasets/yuweiyin/IntentGrasp) |  |
+| 430 | [few_rel/default](src/tasksource/tasks.py#L1922) | Classification | [tasksource/few_rel](https://hf.co/datasets/tasksource/few_rel) |  |
+| 431 | [docred](src/tasksource/tasks.py#L2000) | Classification | [YufeiHFUT/DocRED_origin](https://hf.co/datasets/YufeiHFUT/DocRED_origin), [thunlp/docred](https://hf.co/datasets/thunlp/docred) (`json` loader) |  |
+| 432 | [chemprot/chemprot_full_source](src/tasksource/tasks.py#L2035) | Classification | [bigbio/chemprot](https://hf.co/datasets/bigbio/chemprot) | ✓ |
+| 433 | [PKU-SafeRLHF/helpfulness](src/tasksource/tasks.py#L2041) | MultipleChoice | [PKU-Alignment/PKU-SafeRLHF](https://hf.co/datasets/PKU-Alignment/PKU-SafeRLHF) | ✓ |
+| 434 | [PKU-SafeRLHF/safety](src/tasksource/tasks.py#L2046) | MultipleChoice | [PKU-Alignment/PKU-SafeRLHF](https://hf.co/datasets/PKU-Alignment/PKU-SafeRLHF) | ✓ |
+| 435 | [HelpSteer/helpfulness](src/tasksource/tasks.py#L2068) | Classification | [nvidia/HelpSteer](https://hf.co/datasets/nvidia/HelpSteer) | ✓ |
+| 436 | [HelpSteer/correctness](src/tasksource/tasks.py#L2069) | Classification | [nvidia/HelpSteer](https://hf.co/datasets/nvidia/HelpSteer) | ✓ |
+| 437 | [HelpSteer/coherence](src/tasksource/tasks.py#L2070) | Classification | [nvidia/HelpSteer](https://hf.co/datasets/nvidia/HelpSteer) | ✓ |
+| 438 | [HelpSteer/complexity](src/tasksource/tasks.py#L2071) | Classification | [nvidia/HelpSteer](https://hf.co/datasets/nvidia/HelpSteer) | ✓ |
+| 439 | [HelpSteer/verbosity](src/tasksource/tasks.py#L2072) | Classification | [nvidia/HelpSteer](https://hf.co/datasets/nvidia/HelpSteer) | ✓ |
+| 440 | [HelpSteer2/helpfulness](src/tasksource/tasks.py#L2074) | Classification | [nvidia/HelpSteer2](https://hf.co/datasets/nvidia/HelpSteer2) | ✓ |
+| 441 | [HelpSteer2/correctness](src/tasksource/tasks.py#L2075) | Classification | [nvidia/HelpSteer2](https://hf.co/datasets/nvidia/HelpSteer2) | ✓ |
+| 442 | [HelpSteer2/coherence](src/tasksource/tasks.py#L2076) | Classification | [nvidia/HelpSteer2](https://hf.co/datasets/nvidia/HelpSteer2) | ✓ |
+| 443 | [HelpSteer2/complexity](src/tasksource/tasks.py#L2077) | Classification | [nvidia/HelpSteer2](https://hf.co/datasets/nvidia/HelpSteer2) | ✓ |
+| 444 | [HelpSteer2/verbosity](src/tasksource/tasks.py#L2078) | Classification | [nvidia/HelpSteer2](https://hf.co/datasets/nvidia/HelpSteer2) | ✓ |
+| 445 | [HelpSteer3/preference](src/tasksource/tasks.py#L2083) | MultipleChoice | [nvidia/HelpSteer3](https://hf.co/datasets/nvidia/HelpSteer3) | ✓ |
+| 446 | [HelpSteer3/preference_strength](src/tasksource/tasks.py#L2096) | Classification | [nvidia/HelpSteer3](https://hf.co/datasets/nvidia/HelpSteer3) | ✓ |
+| 447 | [HelpSteer3/principle](src/tasksource/tasks.py#L2108) | Classification | [nvidia/HelpSteer3](https://hf.co/datasets/nvidia/HelpSteer3) |  |
+| 448 | [HelpSteer3/edit_quality](src/tasksource/tasks.py#L2113) | MultipleChoice | [nvidia/HelpSteer3](https://hf.co/datasets/nvidia/HelpSteer3) | ✓ |
+| 449 | [HelpSteer3/feedback](src/tasksource/tasks.py#L2135) | Classification | [nvidia/HelpSteer3](https://hf.co/datasets/nvidia/HelpSteer3) | ✓ |
+| 450 | [MSciNLI](src/tasksource/tasks.py#L2141) | Classification | [sadat2307/MSciNLI](https://hf.co/datasets/sadat2307/MSciNLI) |  |
+| 451 | [UltraFeedback-paired](src/tasksource/tasks.py#L2144) | MultipleChoice | [pushpdeep/UltraFeedback-paired](https://hf.co/datasets/pushpdeep/UltraFeedback-paired) | ✓ |
+| 452 | [prm800k_dpo/solution](src/tasksource/tasks.py#L2148) | MultipleChoice | [tasksource/prm800k_dpo](https://hf.co/datasets/tasksource/prm800k_dpo) | ✓ |
+| 453 | [prm800k_dpo/step](src/tasksource/tasks.py#L2151) | MultipleChoice | [tasksource/prm800k_dpo](https://hf.co/datasets/tasksource/prm800k_dpo) | ✓ |
+| 454 | [AES2-essay-scoring](src/tasksource/tasks.py#L2155) | Classification | [tasksource/AES2-essay-scoring](https://hf.co/datasets/tasksource/AES2-essay-scoring) | ✓ |
+| 455 | [argument-feedback](src/tasksource/tasks.py#L2159) | Classification | [tasksource/argument-feedback](https://hf.co/datasets/tasksource/argument-feedback) | ✓ |
+| 456 | [english-grading/cohesion](src/tasksource/tasks.py#L2166) | Classification | [tasksource/english-grading](https://hf.co/datasets/tasksource/english-grading) | ✓ |
+| 457 | [english-grading/syntax](src/tasksource/tasks.py#L2167) | Classification | [tasksource/english-grading](https://hf.co/datasets/tasksource/english-grading) | ✓ |
+| 458 | [english-grading/vocabulary](src/tasksource/tasks.py#L2168) | Classification | [tasksource/english-grading](https://hf.co/datasets/tasksource/english-grading) | ✓ |
+| 459 | [english-grading/phraseology](src/tasksource/tasks.py#L2169) | Classification | [tasksource/english-grading](https://hf.co/datasets/tasksource/english-grading) | ✓ |
+| 460 | [english-grading/grammar](src/tasksource/tasks.py#L2170) | Classification | [tasksource/english-grading](https://hf.co/datasets/tasksource/english-grading) | ✓ |
+| 461 | [english-grading/conventions](src/tasksource/tasks.py#L2171) | Classification | [tasksource/english-grading](https://hf.co/datasets/tasksource/english-grading) | ✓ |
+| 462 | [wice](src/tasksource/tasks.py#L2173) | Classification | [tasksource/wice](https://hf.co/datasets/tasksource/wice) |  |
+| 463 | [hover](src/tasksource/tasks.py#L2176) | Classification | [Dzeniks/hover](https://hf.co/datasets/Dzeniks/hover) |  |
+| 464 | [hover-3way/nli](src/tasksource/tasks.py#L2180) | Classification | [Dzeniks/hover-3way](https://hf.co/datasets/Dzeniks/hover-3way) | ✓ |
+| 465 | [tasksource_dpo_pairs](src/tasksource/tasks.py#L2183) | MultipleChoice | [tasksource/tasksource_dpo_pairs](https://hf.co/datasets/tasksource/tasksource_dpo_pairs) | ✓ |
+| 466 | [seahorse_summarization_evaluation](src/tasksource/tasks.py#L2186) | Classification | [tasksource/seahorse_summarization_evaluation](https://hf.co/datasets/tasksource/seahorse_summarization_evaluation) |  |
+| 467 | [missing-item-prediction/contrastive](src/tasksource/tasks.py#L2198) | Classification | [sileod/missing-item-prediction](https://hf.co/datasets/sileod/missing-item-prediction) | ✓ |
+| 468 | [jigsaw_toxicity](src/tasksource/tasks.py#L2205) | Classification | [tasksource/jigsaw_toxicity](https://hf.co/datasets/tasksource/jigsaw_toxicity) |  |
+| 469 | [Pol_NLI](src/tasksource/tasks.py#L2208) | Classification | [mlburnham/Pol_NLI](https://hf.co/datasets/mlburnham/Pol_NLI) |  |
+| 470 | [synthetic-retrieval-NLI/count](src/tasksource/tasks.py#L2211) | Classification | [tasksource/synthetic-retrieval-NLI](https://hf.co/datasets/tasksource/synthetic-retrieval-NLI) |  |
+| 471 | [synthetic-retrieval-NLI/position](src/tasksource/tasks.py#L2211) | Classification | [tasksource/synthetic-retrieval-NLI](https://hf.co/datasets/tasksource/synthetic-retrieval-NLI) |  |
+| 472 | [synthetic-retrieval-NLI/binary](src/tasksource/tasks.py#L2211) | Classification | [tasksource/synthetic-retrieval-NLI](https://hf.co/datasets/tasksource/synthetic-retrieval-NLI) |  |
+| 473 | [github-issue-similarity](src/tasksource/tasks.py#L2220) | Classification | [WhereIsAI/github-issue-similarity](https://hf.co/datasets/WhereIsAI/github-issue-similarity) |  |
+| 474 | [webinstruct/mc](src/tasksource/tasks.py#L2425) | MultipleChoice | [tasksource/webinstruct](https://hf.co/datasets/tasksource/webinstruct) |  |
+| 475 | [webinstruct/binary](src/tasksource/tasks.py#L2427) | Classification | [tasksource/webinstruct](https://hf.co/datasets/tasksource/webinstruct) |  |
+| 476 | [weblinx/action](src/tasksource/tasks.py#L2491) | Classification | [McGill-NLP/WebLINX](https://hf.co/datasets/McGill-NLP/WebLINX) | ✓ |
+| 477 | [weblinx/dom-element](src/tasksource/tasks.py#L2494) | MultipleChoice | [McGill-NLP/WebLINX](https://hf.co/datasets/McGill-NLP/WebLINX) | ✓ |
+| 478 | [websrc/yesno](src/tasksource/tasks.py#L2500) | Classification | [tasksource/websrc](https://hf.co/datasets/tasksource/websrc) |  |
+| 479 | [websrc/element](src/tasksource/tasks.py#L2502) | MultipleChoice | [tasksource/websrc](https://hf.co/datasets/tasksource/websrc) | ✓ |
+| 480 | [mind2web/action](src/tasksource/tasks.py#L2509) | Classification | [tasksource/mind2web-dom](https://hf.co/datasets/tasksource/mind2web-dom) | ✓ |
+| 481 | [mind2web/dom-element](src/tasksource/tasks.py#L2512) | MultipleChoice | [tasksource/mind2web-dom](https://hf.co/datasets/tasksource/mind2web-dom) | ✓ |
+| 482 | [sentfin](src/tasksource/tasks.py#L2517) | Classification | [tasksource/sentfin](https://hf.co/datasets/tasksource/sentfin) | ✓ |
+| 483 | [wands](src/tasksource/tasks.py#L2521) | Classification | [tasksource/wands](https://hf.co/datasets/tasksource/wands) | ✓ |
+| 484 | [scirepeval/search](src/tasksource/tasks.py#L2525) | Classification | [tasksource/scirepeval-search](https://hf.co/datasets/tasksource/scirepeval-search) | ✓ |
+| 485 | [maud/consideration](src/tasksource/tasks.py#L2577) | Classification | [theatticusproject/maud](https://hf.co/datasets/theatticusproject/maud) | ✓ |
+| 486 | [maud/bringdown-timing](src/tasksource/tasks.py#L2581) | Classification | [theatticusproject/maud](https://hf.co/datasets/theatticusproject/maud) | ✓ |
+| 487 | [maud/ordinary-course-consent](src/tasksource/tasks.py#L2585) | Classification | [theatticusproject/maud](https://hf.co/datasets/theatticusproject/maud) | ✓ |
+| 488 | [maud/ordinary-course-efforts](src/tasksource/tasks.py#L2589) | Classification | [theatticusproject/maud](https://hf.co/datasets/theatticusproject/maud) | ✓ |
+| 489 | [maud/antitrust-efforts](src/tasksource/tasks.py#L2593) | Classification | [theatticusproject/maud](https://hf.co/datasets/theatticusproject/maud) | ✓ |
+| 490 | [maud/specific-performance](src/tasksource/tasks.py#L2597) | Classification | [theatticusproject/maud](https://hf.co/datasets/theatticusproject/maud) | ✓ |
+| 491 | [ddi/relation](src/tasksource/tasks.py#L2602) | Classification | [OpenMed/DDI-Corpus-Processed](https://hf.co/datasets/OpenMed/DDI-Corpus-Processed) | ✓ |
+| 492 | [patent-classification/abstract](src/tasksource/tasks.py#L2609) | Classification | [ccdv/patent-classification](https://hf.co/datasets/ccdv/patent-classification) | ✓ |
+| 493 | [tabfact](src/tasksource/tasks.py#L2616) | Classification | [wenhu/tab_fact](https://hf.co/datasets/wenhu/tab_fact) | ✓ |
+| 494 | [infotabs](src/tasksource/tasks.py#L2624) | Classification | [table-benchmark/infotabs](https://hf.co/datasets/table-benchmark/infotabs) | ✓ |
+| 495 | [squad-v2/answerability](src/tasksource/tasks.py#L2636) | Classification | [rajpurkar/squad_v2](https://hf.co/datasets/rajpurkar/squad_v2) | ✓ |
+| 496 | [cuad/answerability](src/tasksource/tasks.py#L2641) | Classification | [theatticusproject/cuad-qa](https://hf.co/datasets/theatticusproject/cuad-qa) | ✓ |
+| 497 | [hallmarks-of-cancer/yesno](src/tasksource/tasks.py#L2660) | Classification | [bigbio/hallmarks_of_cancer](https://hf.co/datasets/bigbio/hallmarks_of_cancer) | ✓ |
+| 498 | [semeval2014-absa/restaurants](src/tasksource/tasks.py#L2682) | Classification | [alexcadillon/SemEval2014Task4](https://hf.co/datasets/alexcadillon/SemEval2014Task4) | ✓ |
+| 499 | [semeval2014-absa/laptops](src/tasksource/tasks.py#L2682) | Classification | [alexcadillon/SemEval2014Task4](https://hf.co/datasets/alexcadillon/SemEval2014Task4) | ✓ |
+| 500 | [record/candidate](src/tasksource/tasks.py#L2704) | Classification | [aps/super_glue](https://hf.co/datasets/aps/super_glue) | ✓ |
+| 501 | [multidogo/airline/intent](src/tasksource/tasks.py#L2727) | Classification | [jpcorb20/multidogo](https://hf.co/datasets/jpcorb20/multidogo) | ✓ |
+| 502 | [multidogo/insurance/intent](src/tasksource/tasks.py#L2727) | Classification | [jpcorb20/multidogo](https://hf.co/datasets/jpcorb20/multidogo) | ✓ |
+| 503 | [multidogo/fastfood/intent](src/tasksource/tasks.py#L2727) | Classification | [jpcorb20/multidogo](https://hf.co/datasets/jpcorb20/multidogo) | ✓ |
+| 504 | [multidogo/media/intent](src/tasksource/tasks.py#L2727) | Classification | [jpcorb20/multidogo](https://hf.co/datasets/jpcorb20/multidogo) | ✓ |
+| 505 | [multidogo/finance/intent](src/tasksource/tasks.py#L2727) | Classification | [jpcorb20/multidogo](https://hf.co/datasets/jpcorb20/multidogo) | ✓ |
+| 506 | [multidogo/software/intent](src/tasksource/tasks.py#L2727) | Classification | [jpcorb20/multidogo](https://hf.co/datasets/jpcorb20/multidogo) | ✓ |
+| 507 | [wikisql/aggregation](src/tasksource/tasks.py#L2755) | Classification | [Salesforce/wikisql](https://hf.co/datasets/Salesforce/wikisql) | ✓ |
+| 508 | [wikisql/column](src/tasksource/tasks.py#L2760) | MultipleChoice | [Salesforce/wikisql](https://hf.co/datasets/Salesforce/wikisql) | ✓ |
+| 509 | [wikisql/operator](src/tasksource/tasks.py#L2765) | Classification | [Salesforce/wikisql](https://hf.co/datasets/Salesforce/wikisql) | ✓ |
+| 510 | [acord](src/tasksource/tasks.py#L2770) | Classification | [tasksource/acord](https://hf.co/datasets/tasksource/acord) | ✓ |
+| 511 | [edos](src/tasksource/tasks.py#L2774) | Classification | [tasksource/edos](https://hf.co/datasets/tasksource/edos) | ✓ |
+| 512 | [evidence-inference](src/tasksource/tasks.py#L2777) | Classification | [tasksource/evidence-inference](https://hf.co/datasets/tasksource/evidence-inference) | ✓ |
+| 513 | [quac/answerability](src/tasksource/tasks.py#L2799) | Classification | [allenai/quac](https://hf.co/datasets/allenai/quac) | ✓ |
+| 514 | [hatexplain/majority](src/tasksource/tasks.py#L2807) | Classification | [Hate-speech-CNERG/hatexplain](https://hf.co/datasets/Hate-speech-CNERG/hatexplain) | ✓ |
+| 515 | [hotpotqa/supporting-fact](src/tasksource/tasks.py#L2824) | Classification | [hotpotqa/hotpot_qa](https://hf.co/datasets/hotpotqa/hotpot_qa) | ✓ |
+| 516 | [multiwoz22/dialogue-act](src/tasksource/tasks.py#L2868) | Classification | [pfb30/multi_woz_v22](https://hf.co/datasets/pfb30/multi_woz_v22) | ✓ |
+| 517 | [multiwoz22/categorical-slot](src/tasksource/tasks.py#L2871) | Classification | [pfb30/multi_woz_v22](https://hf.co/datasets/pfb30/multi_woz_v22) | ✓ |
+| 518 | [schema-guided/intent](src/tasksource/tasks.py#L2874) | Classification | [google-research-datasets/schema_guided_dstc8](https://hf.co/datasets/google-research-datasets/schema_guided_dstc8) | ✓ |
+| 519 | [coqa/yesno](src/tasksource/tasks.py#L2891) | Classification | [stanfordnlp/coqa](https://hf.co/datasets/stanfordnlp/coqa) | ✓ |
+| 520 | [qasper/yesno](src/tasksource/tasks.py#L2912) | Classification | [allenai/qasper](https://hf.co/datasets/allenai/qasper) | ✓ |
+| 521 | [topv2/intent](src/tasksource/tasks.py#L2924) | Classification | [WillHeld/top_v2](https://hf.co/datasets/WillHeld/top_v2) | ✓ |
+| 522 | [slurp/intent](src/tasksource/tasks.py#L2932) | Classification | [tasksource/slurp](https://hf.co/datasets/tasksource/slurp) | ✓ |
+| 523 | [mcscript2](src/tasksource/tasks.py#L2936) | MultipleChoice | [tasksource/mcscript2](https://hf.co/datasets/tasksource/mcscript2) |  |
+| 524 | [fnc1/stance](src/tasksource/tasks.py#L2941) | Classification | [tasksource/fnc1](https://hf.co/datasets/tasksource/fnc1) | ✓ |
+| 525 | [perspectrum/stance](src/tasksource/tasks.py#L2946) | Classification | [tasksource/perspectrum](https://hf.co/datasets/tasksource/perspectrum) | ✓ |
+| 526 | [ukpconvarg/convincingness](src/tasksource/tasks.py#L2951) | MultipleChoice | [tasksource/ukpconvarg](https://hf.co/datasets/tasksource/ukpconvarg) | ✓ |
+| 527 | [discogem/relation](src/tasksource/tasks.py#L2956) | Classification | [tasksource/discogem](https://hf.co/datasets/tasksource/discogem) | ✓ |
+| 528 | [pubmed-rct/role](src/tasksource/tasks.py#L2964) | Classification | [tasksource/pubmed-rct](https://hf.co/datasets/tasksource/pubmed-rct) | ✓ |
+| 529 | [maven-arg/role](src/tasksource/tasks.py#L2992) | Classification | [mneb/maven-arg](https://hf.co/datasets/mneb/maven-arg) | ✓ |
+| 530 | [maven/event](src/tasksource/tasks.py#L3023) | Classification | [mneb/maven](https://hf.co/datasets/mneb/maven) | ✓ |
+| 531 | [empathetic-dialogues/emotion](src/tasksource/tasks.py#L3027) | Classification | [facebook/empathetic_dialogues](https://hf.co/datasets/facebook/empathetic_dialogues) | ✓ |
+| 532 | [olid/offensive](src/tasksource/tasks.py#L3035) | Classification | [christophsonntag/OLID](https://hf.co/datasets/christophsonntag/OLID) | ✓ |
+| 533 | [isarcasm/intended](src/tasksource/tasks.py#L3041) | Classification | [viethq1906/isarcasm_2022_taskA_En](https://hf.co/datasets/viethq1906/isarcasm_2022_taskA_En) | ✓ |
+| 534 | [magpie/idiomatic](src/tasksource/tasks.py#L3066) | Classification | [idioms-collaboration/magpie](https://hf.co/datasets/idioms-collaboration/magpie) | ✓ |
+| 535 | [preco/coreference](src/tasksource/tasks.py#L3102) | Classification | [coref-data/preco_raw](https://hf.co/datasets/coref-data/preco_raw) | ✓ |
+| 536 | [redial/preference](src/tasksource/tasks.py#L3122) | Classification | [community-datasets/re_dial](https://hf.co/datasets/community-datasets/re_dial) | ✓ |
+| 537 | [sst5](src/tasksource/tasks.py#L3127) | Classification | [SetFit/sst5](https://hf.co/datasets/SetFit/sst5) | ✓ |
+| 538 | [spider/column](src/tasksource/tasks.py#L3135) | MultipleChoice | [tasksource/spider](https://hf.co/datasets/tasksource/spider) | ✓ |
+| 539 | [semcor](src/tasksource/tasks.py#L3139) | MultipleChoice | [tasksource/semcor](https://hf.co/datasets/tasksource/semcor) | ✓ |
+| 540 | [streusle/noun](src/tasksource/tasks.py#L3142) | Classification | [tasksource/streusle](https://hf.co/datasets/tasksource/streusle) | ✓ |
+| 541 | [streusle/verb](src/tasksource/tasks.py#L3146) | Classification | [tasksource/streusle](https://hf.co/datasets/tasksource/streusle) | ✓ |
+| 542 | [maven-ere/causal](src/tasksource/tasks.py#L3189) | Classification | [Nofing/Maven-ERE-span](https://hf.co/datasets/Nofing/Maven-ERE-span) | ✓ |
+| 543 | [biored/relation](src/tasksource/tasks.py#L3211) | Classification | [gyorilab/BioRED](https://hf.co/datasets/gyorilab/BioRED) | ✓ |
+| 544 | [matres/temporal](src/tasksource/tasks.py#L3218) | Classification | [tasksource/matres](https://hf.co/datasets/tasksource/matres) | ✓ |
+| 545 | [causal-news](src/tasksource/tasks.py#L3227) | Classification | [thagen/CNCv2](https://hf.co/datasets/thagen/CNCv2) | ✓ |
+| 546 | [slurp/slot-type](src/tasksource/tasks.py#L3274) | Classification | [tasksource/slurp](https://hf.co/datasets/tasksource/slurp) | ✓ |
+| 547 | [topv2/slot-type](src/tasksource/tasks.py#L3279) | Classification | [WillHeld/top_v2](https://hf.co/datasets/WillHeld/top_v2) | ✓ |
+| 548 | [wikiqa](src/tasksource/tasks.py#L3292) | Classification | [microsoft/wiki_qa](https://hf.co/datasets/microsoft/wiki_qa) | ✓ |
+| 549 | [nevir](src/tasksource/tasks.py#L3307) | MultipleChoice | [orionweller/NevIR](https://hf.co/datasets/orionweller/NevIR) | ✓ |
+| 550 | [antique](src/tasksource/tasks.py#L3315) | Classification | [tasksource/antique](https://hf.co/datasets/tasksource/antique) | ✓ |
+| 551 | [causal-reasoning/transitivity](src/tasksource/tasks.py#L3341) | Classification | [ludwigw/causal-reasoning-benchmarks](https://hf.co/datasets/ludwigw/causal-reasoning-benchmarks) | ✓ |
+| 552 | [cebab/rating](src/tasksource/tasks.py#L3358) | Classification | [EleutherAI/CEBaB](https://hf.co/datasets/EleutherAI/CEBaB) | ✓ |
+| 553 | [cebab/food](src/tasksource/tasks.py#L3362) | Classification | [EleutherAI/CEBaB](https://hf.co/datasets/EleutherAI/CEBaB) | ✓ |
+| 554 | [cebab/ambiance](src/tasksource/tasks.py#L3365) | Classification | [EleutherAI/CEBaB](https://hf.co/datasets/EleutherAI/CEBaB) | ✓ |
+| 555 | [cebab/service](src/tasksource/tasks.py#L3368) | Classification | [EleutherAI/CEBaB](https://hf.co/datasets/EleutherAI/CEBaB) | ✓ |
+| 556 | [cebab/noise](src/tasksource/tasks.py#L3371) | Classification | [EleutherAI/CEBaB](https://hf.co/datasets/EleutherAI/CEBaB) | ✓ |
+| 557 | [fabsa/sentiment](src/tasksource/tasks.py#L3384) | Classification | [jordiclive/FABSA](https://hf.co/datasets/jordiclive/FABSA) | ✓ |
+| 558 | [tab/identifier](src/tasksource/tasks.py#L3401) | Classification | [doshimit3015/text-anonymization-benchmark](https://hf.co/datasets/doshimit3015/text-anonymization-benchmark) | ✓ |
+| 559 | [newsmtsc](src/tasksource/tasks.py#L3416) | Classification | [fhamborg/news_sentiment_newsmtsc](https://hf.co/datasets/fhamborg/news_sentiment_newsmtsc) | ✓ |
+| 560 | [sentihood/sentiment](src/tasksource/tasks.py#L3444) | Classification | [bhavnicksm/sentihood](https://hf.co/datasets/bhavnicksm/sentihood) | ✓ |
+| 561 | [mams/atsa](src/tasksource/tasks.py#L3461) | Classification | [NEUDM/mams](https://hf.co/datasets/NEUDM/mams) | ✓ |
+| 562 | [quality](src/tasksource/tasks.py#L3469) | MultipleChoice | [emozilla/quality](https://hf.co/datasets/emozilla/quality) |  |
+| 563 | [clear/readability](src/tasksource/tasks.py#L3478) | Classification | [casey-martin/CommonLit-Ease-of-Readability](https://hf.co/datasets/casey-martin/CommonLit-Ease-of-Readability) | ✓ |
+| 564 | [esconv/strategy](src/tasksource/tasks.py#L3491) | Classification | [tasksource/esconv](https://hf.co/datasets/tasksource/esconv) | ✓ |
+| 565 | [prosocial-dialog/safety](src/tasksource/tasks.py#L3512) | Classification | [allenai/prosocial-dialog](https://hf.co/datasets/allenai/prosocial-dialog) | ✓ |
+| 566 | [gap](src/tasksource/tasks.py#L3532) | Classification | [coref-data/gap_raw](https://hf.co/datasets/coref-data/gap_raw) | ✓ |
+| 567 | [trip/cloze](src/tasksource/tasks.py#L3540) | MultipleChoice | [sled-umich/TRIP](https://hf.co/datasets/sled-umich/TRIP) | ✓ |
+| 568 | [trip/order](src/tasksource/tasks.py#L3549) | MultipleChoice | [sled-umich/TRIP](https://hf.co/datasets/sled-umich/TRIP) | ✓ |
+| 569 | [sbic/offensiveness](src/tasksource/tasks.py#L3559) | Classification | [tasksource/sbic](https://hf.co/datasets/tasksource/sbic) | ✓ |
+| 570 | [sbic/intent](src/tasksource/tasks.py#L3566) | Classification | [tasksource/sbic](https://hf.co/datasets/tasksource/sbic) | ✓ |
+| 571 | [faithdial/grounding](src/tasksource/tasks.py#L3588) | Classification | [McGill-NLP/FaithDial](https://hf.co/datasets/McGill-NLP/FaithDial) | ✓ |
+| 572 | [ragtruth/grounding](src/tasksource/tasks.py#L3605) | Classification | [wandb/RAGTruth-processed](https://hf.co/datasets/wandb/RAGTruth-processed) | ✓ |
+| 573 | [comve](src/tasksource/tasks.py#L3617) | MultipleChoice | [tasksource/comve](https://hf.co/datasets/tasksource/comve) |  |
+| 574 | [cbt/ne](src/tasksource/tasks.py#L3634) | MultipleChoice | [cam-cst/cbt](https://hf.co/datasets/cam-cst/cbt) | ✓ |
+| 575 | [cbt/cn](src/tasksource/tasks.py#L3642) | MultipleChoice | [cam-cst/cbt](https://hf.co/datasets/cam-cst/cbt) | ✓ |
+| 576 | [recam](src/tasksource/tasks.py#L3657) | MultipleChoice | [holylovenia/recam](https://hf.co/datasets/holylovenia/recam) | ✓ |
+| 577 | [knowref60k](src/tasksource/tasks.py#L3672) | MultipleChoice | [coref-data/knowref_60k_raw](https://hf.co/datasets/coref-data/knowref_60k_raw) | ✓ |
+| 578 | [tabmwp](src/tasksource/tasks.py#L3682) | MultipleChoice | [tasksource/tabmwp](https://hf.co/datasets/tasksource/tabmwp) |  |
 
 ## Soft labels
 
@@ -593,65 +591,65 @@ Annotations whose label is a distribution (annotator votes, rater shares, survey
 |---|---|---|--:|---|---|
 | [glue/stsb](src/tasksource/tasks.py#L49) | score | mean |  | regression | [nyu-mll/glue](https://hf.co/datasets/nyu-mll/glue) |
 | [sick/relatedness](src/tasksource/tasks.py#L88) | score | mean | 10 | regression | [tasksource/sick](https://hf.co/datasets/tasksource/sick) |
-| [google_wellformed_query](src/tasksource/tasks.py#L848) | noul | votes | 5 | Classification | [tasksource/google_wellformed_query](https://hf.co/datasets/tasksource/google_wellformed_query) |
-| [sts-companion](src/tasksource/tasks.py#L1046) | score | mean |  | regression | [tasksource/sts-companion](https://hf.co/datasets/tasksource/sts-companion) |
-| [acceptability-prediction/rating_votes](src/tasksource/tasks.py#L1279) | score | votes | 15 |  | [tasksource/acceptability-prediction](https://hf.co/datasets/tasksource/acceptability-prediction) |
-| [acceptability-prediction/binary_votes](src/tasksource/tasks.py#L1284) | noul | votes | 15 |  | [tasksource/acceptability-prediction](https://hf.co/datasets/tasksource/acceptability-prediction) |
-| [HelpSteer3/individual_preferences](src/tasksource/tasks.py#L2099) | score | votes | 3 |  | [nvidia/HelpSteer3](https://hf.co/datasets/nvidia/HelpSteer3) |
-| [HelpSteer3/feedback](src/tasksource/tasks.py#L2132) | score | votes | 3 | Classification | [nvidia/HelpSteer3](https://hf.co/datasets/nvidia/HelpSteer3) |
-| [proto_qa/proto_qa](src/tasksource/tasks.py#L2227) | choice | votes | 100 |  | [community-datasets/proto_qa](https://hf.co/datasets/community-datasets/proto_qa) |
-| [UNLI](src/tasksource/tasks.py#L2241) | noul | mean | 2 |  | [Zhengping/UNLI](https://hf.co/datasets/Zhengping/UNLI) |
-| [chaos-mnli-ambiguity/votes](src/tasksource/tasks.py#L2245) | choice | votes | 100 |  | [tasksource/chaos-mnli-ambiguity](https://hf.co/datasets/tasksource/chaos-mnli-ambiguity) |
-| [hate_speech_offensive/votes](src/tasksource/tasks.py#L2249) | choice | votes | 3 |  | [tdavidson/hate_speech_offensive](https://hf.co/datasets/tdavidson/hate_speech_offensive) |
-| [scruples/verdict_votes](src/tasksource/tasks.py#L2257) | choice | votes | 8 |  | [tasksource/scruples](https://hf.co/datasets/tasksource/scruples) |
-| [BeaverTails/unsafe_votes](src/tasksource/tasks.py#L2271) | noul | votes | 3 |  | [PKU-Alignment/BeaverTails](https://hf.co/datasets/PKU-Alignment/BeaverTails) |
-| [dynasent/r1_votes](src/tasksource/tasks.py#L2282) | choice | votes | 5 |  | [dynabench/dynasent](https://hf.co/datasets/dynabench/dynasent) |
-| [dynasent/r2_votes](src/tasksource/tasks.py#L2286) | choice | votes | 5 |  | [dynabench/dynasent](https://hf.co/datasets/dynabench/dynasent) |
-| [hatexplain/votes](src/tasksource/tasks.py#L2291) | choice | votes | 3 |  | [Hate-speech-CNERG/hatexplain](https://hf.co/datasets/Hate-speech-CNERG/hatexplain) |
-| [measuring-hate-speech/sentiment](src/tasksource/tasks.py#L2306) | score | votes | 3 |  | [tasksource/measuring-hate-speech-votes](https://hf.co/datasets/tasksource/measuring-hate-speech-votes) |
-| [measuring-hate-speech/respect](src/tasksource/tasks.py#L2308) | score | votes | 3 |  | [tasksource/measuring-hate-speech-votes](https://hf.co/datasets/tasksource/measuring-hate-speech-votes) |
-| [measuring-hate-speech/insult](src/tasksource/tasks.py#L2310) | score | votes | 3 |  | [tasksource/measuring-hate-speech-votes](https://hf.co/datasets/tasksource/measuring-hate-speech-votes) |
-| [measuring-hate-speech/humiliate](src/tasksource/tasks.py#L2311) | score | votes | 3 |  | [tasksource/measuring-hate-speech-votes](https://hf.co/datasets/tasksource/measuring-hate-speech-votes) |
-| [measuring-hate-speech/status](src/tasksource/tasks.py#L2312) | score | votes | 3 |  | [tasksource/measuring-hate-speech-votes](https://hf.co/datasets/tasksource/measuring-hate-speech-votes) |
-| [measuring-hate-speech/dehumanize](src/tasksource/tasks.py#L2314) | score | votes | 3 |  | [tasksource/measuring-hate-speech-votes](https://hf.co/datasets/tasksource/measuring-hate-speech-votes) |
-| [measuring-hate-speech/violence](src/tasksource/tasks.py#L2316) | score | votes | 3 |  | [tasksource/measuring-hate-speech-votes](https://hf.co/datasets/tasksource/measuring-hate-speech-votes) |
-| [measuring-hate-speech/genocide](src/tasksource/tasks.py#L2317) | score | votes | 3 |  | [tasksource/measuring-hate-speech-votes](https://hf.co/datasets/tasksource/measuring-hate-speech-votes) |
-| [measuring-hate-speech/attack_defend](src/tasksource/tasks.py#L2319) | score | votes | 3 |  | [tasksource/measuring-hate-speech-votes](https://hf.co/datasets/tasksource/measuring-hate-speech-votes) |
-| [measuring-hate-speech/hatespeech](src/tasksource/tasks.py#L2321) | choice | votes | 3 |  | [tasksource/measuring-hate-speech-votes](https://hf.co/datasets/tasksource/measuring-hate-speech-votes) |
-| [wikipedia-detox/attack](src/tasksource/tasks.py#L2333) | choice | votes | 10 |  | [tasksource/wikipedia-detox-votes](https://hf.co/datasets/tasksource/wikipedia-detox-votes) |
-| [wikipedia-detox/aggression](src/tasksource/tasks.py#L2335) | choice | votes | 10 |  | [tasksource/wikipedia-detox-votes](https://hf.co/datasets/tasksource/wikipedia-detox-votes) |
-| [wikipedia-detox/aggression_score](src/tasksource/tasks.py#L2337) | score | votes | 10 |  | [tasksource/wikipedia-detox-votes](https://hf.co/datasets/tasksource/wikipedia-detox-votes) |
-| [wikipedia-detox/toxicity](src/tasksource/tasks.py#L2341) | choice | votes | 10 |  | [tasksource/wikipedia-detox-votes](https://hf.co/datasets/tasksource/wikipedia-detox-votes) |
-| [wikipedia-detox/toxicity_score](src/tasksource/tasks.py#L2343) | score | votes | 10 |  | [tasksource/wikipedia-detox-votes](https://hf.co/datasets/tasksource/wikipedia-detox-votes) |
-| [lewidi/md_agreement](src/tasksource/tasks.py#L2358) | noul | votes | 5 |  | [tasksource/lewidi](https://hf.co/datasets/tasksource/lewidi) |
-| [lewidi/hs_brexit](src/tasksource/tasks.py#L2359) | noul | votes | 6 |  | [tasksource/lewidi](https://hf.co/datasets/tasksource/lewidi) |
-| [lewidi/armis](src/tasksource/tasks.py#L2361) | noul | votes | 3 |  | [tasksource/lewidi](https://hf.co/datasets/tasksource/lewidi) |
-| [lewidi/conv_abuse](src/tasksource/tasks.py#L2363) | noul | votes | 3 |  | [tasksource/lewidi](https://hf.co/datasets/tasksource/lewidi) |
-| [lewidi/mp](src/tasksource/tasks.py#L2365) | noul | votes | 5 |  | [tasksource/lewidi](https://hf.co/datasets/tasksource/lewidi) |
-| [lewidi/csc](src/tasksource/tasks.py#L2366) | score | votes | 4 |  | [tasksource/lewidi](https://hf.co/datasets/tasksource/lewidi) |
-| [lewidi/varierrnli/entailment](src/tasksource/tasks.py#L2374) | noul | votes | 4 |  | [tasksource/lewidi](https://hf.co/datasets/tasksource/lewidi) |
-| [lewidi/varierrnli/neutral](src/tasksource/tasks.py#L2375) | noul | votes | 4 |  | [tasksource/lewidi](https://hf.co/datasets/tasksource/lewidi) |
-| [lewidi/varierrnli/contradiction](src/tasksource/tasks.py#L2376) | noul | votes | 4 |  | [tasksource/lewidi](https://hf.co/datasets/tasksource/lewidi) |
-| [civil_comments/toxicity_share](src/tasksource/tasks.py#L2384) | noul | votes | 6 |  | [google/civil_comments](https://hf.co/datasets/google/civil_comments) |
-| [civil_comments/severe_toxicity_share](src/tasksource/tasks.py#L2385) | noul | votes | 6 |  | [google/civil_comments](https://hf.co/datasets/google/civil_comments) |
-| [civil_comments/obscene_share](src/tasksource/tasks.py#L2386) | noul | votes | 6 |  | [google/civil_comments](https://hf.co/datasets/google/civil_comments) |
-| [civil_comments/threat_share](src/tasksource/tasks.py#L2387) | noul | votes | 6 |  | [google/civil_comments](https://hf.co/datasets/google/civil_comments) |
-| [civil_comments/insult_share](src/tasksource/tasks.py#L2388) | noul | votes | 6 |  | [google/civil_comments](https://hf.co/datasets/google/civil_comments) |
-| [civil_comments/identity_attack_share](src/tasksource/tasks.py#L2389) | noul | votes | 6 |  | [google/civil_comments](https://hf.co/datasets/google/civil_comments) |
-| [civil_comments/sexual_explicit_share](src/tasksource/tasks.py#L2390) | noul | votes | 6 |  | [google/civil_comments](https://hf.co/datasets/google/civil_comments) |
-| [oasst2/quality](src/tasksource/tasks.py#L2407) | score | mean | 3 |  | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) |
-| [oasst2/helpfulness](src/tasksource/tasks.py#L2408) | score | mean | 3 |  | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) |
-| [oasst2/creativity](src/tasksource/tasks.py#L2409) | score | mean | 3 |  | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) |
-| [oasst2/humor](src/tasksource/tasks.py#L2410) | score | mean | 3 |  | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) |
-| [oasst2/toxicity](src/tasksource/tasks.py#L2411) | score | mean | 3 |  | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) |
-| [oasst2/violence](src/tasksource/tasks.py#L2412) | score | mean | 3 |  | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) |
-| [oasst2/spam](src/tasksource/tasks.py#L2413) | noul | votes | 3 |  | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) |
-| [oasst2/fails_task](src/tasksource/tasks.py#L2414) | noul | votes | 3 |  | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) |
-| [oasst2/not_appropriate](src/tasksource/tasks.py#L2415) | noul | votes | 3 |  | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) |
-| [oasst2/hate_speech](src/tasksource/tasks.py#L2416) | noul | votes | 3 |  | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) |
-| [oasst2/sexual_content](src/tasksource/tasks.py#L2417) | noul | votes | 3 |  | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) |
-| [oasst2/pii](src/tasksource/tasks.py#L2418) | noul | votes | 3 |  | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) |
-| [oasst2/lang_mismatch](src/tasksource/tasks.py#L2419) | noul | votes | 3 |  | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) |
-| [scirepeval/search](src/tasksource/tasks.py#L2522) | score | mean |  | regression | [tasksource/scirepeval-search](https://hf.co/datasets/tasksource/scirepeval-search) |
-| [discogem/relation](src/tasksource/tasks.py#L2953) | choice | votes | 10 | Classification | [tasksource/discogem](https://hf.co/datasets/tasksource/discogem) |
-| [clear/readability](src/tasksource/tasks.py#L3475) | score | mean |  | regression | [casey-martin/CommonLit-Ease-of-Readability](https://hf.co/datasets/casey-martin/CommonLit-Ease-of-Readability) |
+| [google_wellformed_query](src/tasksource/tasks.py#L851) | noul | votes | 5 | Classification | [tasksource/google_wellformed_query](https://hf.co/datasets/tasksource/google_wellformed_query) |
+| [sts-companion](src/tasksource/tasks.py#L1049) | score | mean |  | regression | [tasksource/sts-companion](https://hf.co/datasets/tasksource/sts-companion) |
+| [acceptability-prediction/rating_votes](src/tasksource/tasks.py#L1282) | score | votes | 15 |  | [tasksource/acceptability-prediction](https://hf.co/datasets/tasksource/acceptability-prediction) |
+| [acceptability-prediction/binary_votes](src/tasksource/tasks.py#L1287) | noul | votes | 15 |  | [tasksource/acceptability-prediction](https://hf.co/datasets/tasksource/acceptability-prediction) |
+| [HelpSteer3/individual_preferences](src/tasksource/tasks.py#L2102) | score | votes | 3 |  | [nvidia/HelpSteer3](https://hf.co/datasets/nvidia/HelpSteer3) |
+| [HelpSteer3/feedback](src/tasksource/tasks.py#L2135) | score | votes | 3 | Classification | [nvidia/HelpSteer3](https://hf.co/datasets/nvidia/HelpSteer3) |
+| [proto_qa/proto_qa](src/tasksource/tasks.py#L2230) | choice | votes | 100 |  | [community-datasets/proto_qa](https://hf.co/datasets/community-datasets/proto_qa) |
+| [UNLI](src/tasksource/tasks.py#L2244) | noul | mean | 2 |  | [Zhengping/UNLI](https://hf.co/datasets/Zhengping/UNLI) |
+| [chaos-mnli-ambiguity/votes](src/tasksource/tasks.py#L2248) | choice | votes | 100 |  | [tasksource/chaos-mnli-ambiguity](https://hf.co/datasets/tasksource/chaos-mnli-ambiguity) |
+| [hate_speech_offensive/votes](src/tasksource/tasks.py#L2252) | choice | votes | 3 |  | [tdavidson/hate_speech_offensive](https://hf.co/datasets/tdavidson/hate_speech_offensive) |
+| [scruples/verdict_votes](src/tasksource/tasks.py#L2260) | choice | votes | 8 |  | [tasksource/scruples](https://hf.co/datasets/tasksource/scruples) |
+| [BeaverTails/unsafe_votes](src/tasksource/tasks.py#L2274) | noul | votes | 3 |  | [PKU-Alignment/BeaverTails](https://hf.co/datasets/PKU-Alignment/BeaverTails) |
+| [dynasent/r1_votes](src/tasksource/tasks.py#L2285) | choice | votes | 5 |  | [dynabench/dynasent](https://hf.co/datasets/dynabench/dynasent) |
+| [dynasent/r2_votes](src/tasksource/tasks.py#L2289) | choice | votes | 5 |  | [dynabench/dynasent](https://hf.co/datasets/dynabench/dynasent) |
+| [hatexplain/votes](src/tasksource/tasks.py#L2294) | choice | votes | 3 |  | [Hate-speech-CNERG/hatexplain](https://hf.co/datasets/Hate-speech-CNERG/hatexplain) |
+| [measuring-hate-speech/sentiment](src/tasksource/tasks.py#L2309) | score | votes | 3 |  | [tasksource/measuring-hate-speech-votes](https://hf.co/datasets/tasksource/measuring-hate-speech-votes) |
+| [measuring-hate-speech/respect](src/tasksource/tasks.py#L2311) | score | votes | 3 |  | [tasksource/measuring-hate-speech-votes](https://hf.co/datasets/tasksource/measuring-hate-speech-votes) |
+| [measuring-hate-speech/insult](src/tasksource/tasks.py#L2313) | score | votes | 3 |  | [tasksource/measuring-hate-speech-votes](https://hf.co/datasets/tasksource/measuring-hate-speech-votes) |
+| [measuring-hate-speech/humiliate](src/tasksource/tasks.py#L2314) | score | votes | 3 |  | [tasksource/measuring-hate-speech-votes](https://hf.co/datasets/tasksource/measuring-hate-speech-votes) |
+| [measuring-hate-speech/status](src/tasksource/tasks.py#L2315) | score | votes | 3 |  | [tasksource/measuring-hate-speech-votes](https://hf.co/datasets/tasksource/measuring-hate-speech-votes) |
+| [measuring-hate-speech/dehumanize](src/tasksource/tasks.py#L2317) | score | votes | 3 |  | [tasksource/measuring-hate-speech-votes](https://hf.co/datasets/tasksource/measuring-hate-speech-votes) |
+| [measuring-hate-speech/violence](src/tasksource/tasks.py#L2319) | score | votes | 3 |  | [tasksource/measuring-hate-speech-votes](https://hf.co/datasets/tasksource/measuring-hate-speech-votes) |
+| [measuring-hate-speech/genocide](src/tasksource/tasks.py#L2320) | score | votes | 3 |  | [tasksource/measuring-hate-speech-votes](https://hf.co/datasets/tasksource/measuring-hate-speech-votes) |
+| [measuring-hate-speech/attack_defend](src/tasksource/tasks.py#L2322) | score | votes | 3 |  | [tasksource/measuring-hate-speech-votes](https://hf.co/datasets/tasksource/measuring-hate-speech-votes) |
+| [measuring-hate-speech/hatespeech](src/tasksource/tasks.py#L2324) | choice | votes | 3 |  | [tasksource/measuring-hate-speech-votes](https://hf.co/datasets/tasksource/measuring-hate-speech-votes) |
+| [wikipedia-detox/attack](src/tasksource/tasks.py#L2336) | choice | votes | 10 |  | [tasksource/wikipedia-detox-votes](https://hf.co/datasets/tasksource/wikipedia-detox-votes) |
+| [wikipedia-detox/aggression](src/tasksource/tasks.py#L2338) | choice | votes | 10 |  | [tasksource/wikipedia-detox-votes](https://hf.co/datasets/tasksource/wikipedia-detox-votes) |
+| [wikipedia-detox/aggression_score](src/tasksource/tasks.py#L2340) | score | votes | 10 |  | [tasksource/wikipedia-detox-votes](https://hf.co/datasets/tasksource/wikipedia-detox-votes) |
+| [wikipedia-detox/toxicity](src/tasksource/tasks.py#L2344) | choice | votes | 10 |  | [tasksource/wikipedia-detox-votes](https://hf.co/datasets/tasksource/wikipedia-detox-votes) |
+| [wikipedia-detox/toxicity_score](src/tasksource/tasks.py#L2346) | score | votes | 10 |  | [tasksource/wikipedia-detox-votes](https://hf.co/datasets/tasksource/wikipedia-detox-votes) |
+| [lewidi/md_agreement](src/tasksource/tasks.py#L2361) | noul | votes | 5 |  | [tasksource/lewidi](https://hf.co/datasets/tasksource/lewidi) |
+| [lewidi/hs_brexit](src/tasksource/tasks.py#L2362) | noul | votes | 6 |  | [tasksource/lewidi](https://hf.co/datasets/tasksource/lewidi) |
+| [lewidi/armis](src/tasksource/tasks.py#L2364) | noul | votes | 3 |  | [tasksource/lewidi](https://hf.co/datasets/tasksource/lewidi) |
+| [lewidi/conv_abuse](src/tasksource/tasks.py#L2366) | noul | votes | 3 |  | [tasksource/lewidi](https://hf.co/datasets/tasksource/lewidi) |
+| [lewidi/mp](src/tasksource/tasks.py#L2368) | noul | votes | 5 |  | [tasksource/lewidi](https://hf.co/datasets/tasksource/lewidi) |
+| [lewidi/csc](src/tasksource/tasks.py#L2369) | score | votes | 4 |  | [tasksource/lewidi](https://hf.co/datasets/tasksource/lewidi) |
+| [lewidi/varierrnli/entailment](src/tasksource/tasks.py#L2377) | noul | votes | 4 |  | [tasksource/lewidi](https://hf.co/datasets/tasksource/lewidi) |
+| [lewidi/varierrnli/neutral](src/tasksource/tasks.py#L2378) | noul | votes | 4 |  | [tasksource/lewidi](https://hf.co/datasets/tasksource/lewidi) |
+| [lewidi/varierrnli/contradiction](src/tasksource/tasks.py#L2379) | noul | votes | 4 |  | [tasksource/lewidi](https://hf.co/datasets/tasksource/lewidi) |
+| [civil_comments/toxicity_share](src/tasksource/tasks.py#L2387) | noul | votes | 6 |  | [google/civil_comments](https://hf.co/datasets/google/civil_comments) |
+| [civil_comments/severe_toxicity_share](src/tasksource/tasks.py#L2388) | noul | votes | 6 |  | [google/civil_comments](https://hf.co/datasets/google/civil_comments) |
+| [civil_comments/obscene_share](src/tasksource/tasks.py#L2389) | noul | votes | 6 |  | [google/civil_comments](https://hf.co/datasets/google/civil_comments) |
+| [civil_comments/threat_share](src/tasksource/tasks.py#L2390) | noul | votes | 6 |  | [google/civil_comments](https://hf.co/datasets/google/civil_comments) |
+| [civil_comments/insult_share](src/tasksource/tasks.py#L2391) | noul | votes | 6 |  | [google/civil_comments](https://hf.co/datasets/google/civil_comments) |
+| [civil_comments/identity_attack_share](src/tasksource/tasks.py#L2392) | noul | votes | 6 |  | [google/civil_comments](https://hf.co/datasets/google/civil_comments) |
+| [civil_comments/sexual_explicit_share](src/tasksource/tasks.py#L2393) | noul | votes | 6 |  | [google/civil_comments](https://hf.co/datasets/google/civil_comments) |
+| [oasst2/quality](src/tasksource/tasks.py#L2410) | score | mean | 3 |  | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) |
+| [oasst2/helpfulness](src/tasksource/tasks.py#L2411) | score | mean | 3 |  | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) |
+| [oasst2/creativity](src/tasksource/tasks.py#L2412) | score | mean | 3 |  | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) |
+| [oasst2/humor](src/tasksource/tasks.py#L2413) | score | mean | 3 |  | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) |
+| [oasst2/toxicity](src/tasksource/tasks.py#L2414) | score | mean | 3 |  | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) |
+| [oasst2/violence](src/tasksource/tasks.py#L2415) | score | mean | 3 |  | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) |
+| [oasst2/spam](src/tasksource/tasks.py#L2416) | noul | votes | 3 |  | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) |
+| [oasst2/fails_task](src/tasksource/tasks.py#L2417) | noul | votes | 3 |  | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) |
+| [oasst2/not_appropriate](src/tasksource/tasks.py#L2418) | noul | votes | 3 |  | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) |
+| [oasst2/hate_speech](src/tasksource/tasks.py#L2419) | noul | votes | 3 |  | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) |
+| [oasst2/sexual_content](src/tasksource/tasks.py#L2420) | noul | votes | 3 |  | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) |
+| [oasst2/pii](src/tasksource/tasks.py#L2421) | noul | votes | 3 |  | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) |
+| [oasst2/lang_mismatch](src/tasksource/tasks.py#L2422) | noul | votes | 3 |  | [tasksource/oasst2_dense_flat](https://hf.co/datasets/tasksource/oasst2_dense_flat) |
+| [scirepeval/search](src/tasksource/tasks.py#L2525) | score | mean |  | regression | [tasksource/scirepeval-search](https://hf.co/datasets/tasksource/scirepeval-search) |
+| [discogem/relation](src/tasksource/tasks.py#L2956) | choice | votes | 10 | Classification | [tasksource/discogem](https://hf.co/datasets/tasksource/discogem) |
+| [clear/readability](src/tasksource/tasks.py#L3478) | score | mean |  | regression | [casey-martin/CommonLit-Ease-of-Readability](https://hf.co/datasets/casey-martin/CommonLit-Ease-of-Readability) |

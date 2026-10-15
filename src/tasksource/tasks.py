@@ -155,7 +155,10 @@ wanli = Classification('premise','hypothesis','gold', dataset_name="alisawuffles
 
 recast_nli = Classification(sentence1="context", sentence2="hypothesis", labels="label", dataset_name="tasksource/recast",
     config_name=['recast_puns', 'recast_factuality', 'recast_verbnet',
-    'recast_verbcorner', 'recast_ner', 'recast_sentiment', 'recast_megaveridicality'])
+    'recast_ner', 'recast_sentiment', 'recast_megaveridicality'])
+# templated sentences with invented verbs: valid but repetitive
+recast_verbcorner = Classification(sentence1="context", sentence2="hypothesis", labels="label", dataset_name="tasksource/recast",
+    config_name=['recast_verbcorner'], max_examples=1000)
 
 
 probability_words_nli = Classification(sentence1="context", sentence2="hypothesis", labels="label",
@@ -265,10 +268,6 @@ fig_qa = MultipleChoice(
 )
 
 
-cos_e = MultipleChoice('question',
-    choices_list='choices',
-    labels= lambda x: x['choices_list'].index(x['answer']),
-    config_name='v1.0')
 
 cosmos_qa = MultipleChoice(cat(['context','question']),regen('answer[0-3]'),'label',
     dataset_name="Samsoup/cosmos_qa")
@@ -773,24 +772,28 @@ linguisticprobing___bigram_shift = _probing("bigram_shift", {"O": "original word
 
 crowdflower = Classification("text", labels="label",
  splits=["train", None, None], dataset_name="tasksource/crowdflower",
- config_name=['sentiment_nuclear_power',
-            'tweet_global_warming',
+ config_name=['tweet_global_warming',
             'airline-sentiment',
             'corporate-messaging',
-            'economic-news',
-            'political-media-audience',
-            'political-media-bias',
-            'political-media-message'],
+            'economic-news'],
  question={
-     "sentiment_nuclear_power": "What is the tweet's sentiment toward nuclear energy, or is it unrelated?",
      "tweet_global_warming": "Does the tweet indicate that the author believes global warming is occurring?",
      "airline-sentiment": "What sentiment does the tweet express about the airline?",
      "corporate-messaging": "What type of corporate social-media message is this?",
      "economic-news": "Is this article relevant to the U.S. economy?",
+ },
+)
+
+# subjective calls on politicians' posts (8-13% flagged by a 2026 LLM screen)
+crowdflower_political_media = Classification("text", labels="label",
+ splits=["train", None, None], dataset_name="tasksource/crowdflower",
+ config_name=['political-media-audience', 'political-media-bias', 'political-media-message'],
+ question={
      "political-media-audience": "Is this political message aimed at a constituency or a national audience?",
      "political-media-bias": "Is this political message partisan or neutral?",
      "political-media-message": "What type of political message is this?",
  },
+ max_examples=1000,
 )
 
 def _ethics_binary_label(x):
@@ -1576,7 +1579,7 @@ spartun=MultipleChoice(cat(["story","question"]),choices_list="candidate_answers
 resq=MultipleChoice(cat(["story","question"]),choices_list="candidate_answers",
     labels=lambda x: [c.lower() for c in x['choices_list']].index(x["answer"][0].lower()),
     pre_process=lambda ds:ds.filter(lambda x:len(x['answer'])==1),
-    dataset_name="tasksource/ReSQ")
+    dataset_name="tasksource/ReSQ", max_examples=1000)  # questions often ask about objects the story never mentions
 
 semantic_fragments_nli = Classification("sentence1","sentence2","gold_label",
     dataset_name="tasksource/semantic_fragments_nli")

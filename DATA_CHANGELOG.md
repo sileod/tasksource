@@ -4,6 +4,11 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource 2026-10-15.9
+
+- Parked cos_e/v1.0 (its questions are CommonsenseQA's, with fewer choices) and crowdflower/sentiment_nuclear_power (171 mostly neutral tweets, some mislabeled).
+- Capped at 1,000 training rows: crowdflower political-media audience, bias and message (subjective labels), recast_verbcorner (templated) and ReSQ (questions about objects the story omits).
+
 ## tasksource 2026-10-15.8
 
 - Self-describing labels for yes/no tasks with a fixed question, e.g. "plausible answer" (MC-TACO), "answerable from the passage" (SQuAD v2, QuAC, CUAD), "same entity" (PreCo), "causal relation" (causal-news), "correct replacement" (ReCoRD), and wiki_qa, wikiqa, avicenna, ambient, I2D2, winowhy, conceptrules_v2, regset, PARARULE-Plus, missing-item-prediction.
