@@ -15,7 +15,7 @@ from .metadata.configs import UNIVERSAL_DEPENDENCIES
 from .preprocess import SoftLabeling, Preprocessing, VisualClassification, constant, get, Classification, TokenClassification, MultipleChoice
 
 from .metadata.source_revisions import SOURCE_REVISIONS
-from .tasks import _document_holdouts, _unique_text_splits, _decision_metadata, _probing, _SENTENCE_LENGTH
+from .tasks import _pragmeval_scale, NLI_LABEL_VALUES, _document_holdouts, _unique_text_splits, _decision_metadata, _probing, _SENTENCE_LENGTH
 from .tasks import _MAVEN_ERE, _MAVEN_ERE_TEMPORAL, _maven_ere_splits, _maven_ere_records, _flatten_text
 import hashlib
 import json
@@ -23,6 +23,22 @@ import json
 maven_ere__temporal = Classification('sentence1',labels='labels',**_MAVEN_ERE,task_id='maven-ere/temporal',
     pre_process=lambda d:_flatten_text(_maven_ere_splits(d),lambda r:_maven_ere_records(r,_MAVEN_ERE_TEMPORAL),paired=False),
     label_values=_MAVEN_ERE_TEMPORAL,question='What temporal relation connects the marked events [A] and [B]?')
+
+pragmeval__mrda = Classification("sentence", labels="label", dataset_name="pragmeval", config_name="mrda")
+pragmeval__emobank_arousal = _pragmeval_scale("emobank-arousal", "emotional arousal", "sentence")
+pragmeval__emobank_valence = _pragmeval_scale("emobank-valence", "valence (pleasantness)", "sentence")
+gen_debiased_nli__snli_seq_z = Classification("premise","hypothesis","label",
+	dataset_name="pietrolesci/gen_debiased_nli", splits=["snli_seq_z",None,None], label_values=NLI_LABEL_VALUES)
+gen_debiased_nli__snli_z_aug = Classification("premise","hypothesis","label",
+	dataset_name="pietrolesci/gen_debiased_nli", splits=["snli_z_aug",None,None], label_values=NLI_LABEL_VALUES)
+gen_debiased_nli__snli_par_z = Classification("premise","hypothesis","label",
+	dataset_name="pietrolesci/gen_debiased_nli", splits=["snli_par_z",None,None], label_values=NLI_LABEL_VALUES)
+gen_debiased_nli__mnli_par_z = Classification("premise","hypothesis","label",
+	dataset_name="pietrolesci/gen_debiased_nli", splits=["mnli_par_z",None,None], label_values=NLI_LABEL_VALUES)
+gen_debiased_nli__mnli_z_aug = Classification("premise","hypothesis","label",
+	dataset_name="pietrolesci/gen_debiased_nli", splits=["mnli_z_aug",None,None], label_values=NLI_LABEL_VALUES)
+gen_debiased_nli__mnli_seq_z = Classification("premise","hypothesis","label",
+	dataset_name="pietrolesci/gen_debiased_nli", splits=["mnli_seq_z",None,None], label_values=NLI_LABEL_VALUES)
 
 wouldyourather = SoftLabeling(constant(''), labels=lambda x: [x['votes_a'], x['votes_b']],
     options=lambda x: [x['option_a'], x['option_b']], hard=2/3, annotators=1000,
@@ -229,6 +245,15 @@ KINDS = {
 }
 
 PARKED = {
+    "pragmeval__mrda": ("unsound", "single meeting utterances without their dialogue context; a 2026 LLM screen flagged 20% of dialogue-act labels"),
+    "pragmeval__emobank_arousal": ("low_value", "median split of continuous ratings: items near the middle are coin flips; emotion is covered by other tasks"),
+    "pragmeval__emobank_valence": ("low_value", "median split of continuous ratings: items near the middle are coin flips; sentiment is covered by other tasks"),
+    "gen_debiased_nli__snli_seq_z": ("unsound", "generated hypotheses with model-filtered labels; 3-10% flagged by a 2026 LLM screen; human-labeled NLI covers this"),
+    "gen_debiased_nli__snli_z_aug": ("unsound", "generated hypotheses with model-filtered labels; 3-10% flagged by a 2026 LLM screen; human-labeled NLI covers this"),
+    "gen_debiased_nli__snli_par_z": ("unsound", "generated hypotheses with model-filtered labels; 3-10% flagged by a 2026 LLM screen; human-labeled NLI covers this"),
+    "gen_debiased_nli__mnli_par_z": ("unsound", "generated hypotheses with model-filtered labels; 3-10% flagged by a 2026 LLM screen; human-labeled NLI covers this"),
+    "gen_debiased_nli__mnli_z_aug": ("unsound", "generated hypotheses with model-filtered labels; 3-10% flagged by a 2026 LLM screen; human-labeled NLI covers this"),
+    "gen_debiased_nli__mnli_seq_z": ("unsound", "generated hypotheses with model-filtered labels; 3-10% flagged by a 2026 LLM screen; human-labeled NLI covers this"),
     'uk_election__sentiment': ('unsound', 'Coarse source review found unsupported topic sentiment (VAT negative in a list of policy topics); retain native mirror but defer training pending an annotation audit.'),
     "dair_ai_emotion": ("unsound", "hashtag-derived emotion labels; a 2026 LLM screen flagged 25% (e.g. 'i didnt feel so hot' labeled love); go_emotions, tweet_eval/emotion and emo2019 cover emotion"),
     "crowdflower__text_emotion": ("unsound", "neutral tweets carry arbitrary emotion labels; 28% flagged; go_emotions covers emotion"),

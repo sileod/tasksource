@@ -208,7 +208,7 @@ joci = Classification("context","hypothesis", labels="original_label", ordinal=T
     dataset_name="pietrolesci/joci",splits=['full',None,None])
 
 
-# Templated stress tests and generated NLI: robustness signal, little new content; capped.
+# Templated stress tests: robustness signal, little new content; capped.
 robust_nli__IS_CS = Classification("premise","hypothesis","label",
 	dataset_name="pietrolesci/robust_nli", splits=["IS_CS",None,None], label_values=NLI_LABEL_VALUES, max_examples=1000)
 robust_nli__LI_LI = Classification("premise","hypothesis","label",
@@ -232,18 +232,6 @@ robust_nli_li_ts = Classification("premise","hypothesis","label",
     dataset_name="pietrolesci/robust_nli_li_ts", max_examples=1000,
     label_values={0: "non-contradiction", 1: "contradiction"})
 
-gen_debiased_nli__snli_seq_z = Classification("premise","hypothesis","label",
-	dataset_name="pietrolesci/gen_debiased_nli", splits=["snli_seq_z",None,None], label_values=NLI_LABEL_VALUES, max_examples=1000)
-gen_debiased_nli__snli_z_aug = Classification("premise","hypothesis","label",
-	dataset_name="pietrolesci/gen_debiased_nli", splits=["snli_z_aug",None,None], label_values=NLI_LABEL_VALUES, max_examples=1000)
-gen_debiased_nli__snli_par_z = Classification("premise","hypothesis","label",
-	dataset_name="pietrolesci/gen_debiased_nli", splits=["snli_par_z",None,None], label_values=NLI_LABEL_VALUES, max_examples=1000)
-gen_debiased_nli__mnli_par_z = Classification("premise","hypothesis","label",
-	dataset_name="pietrolesci/gen_debiased_nli", splits=["mnli_par_z",None,None], label_values=NLI_LABEL_VALUES, max_examples=1000)
-gen_debiased_nli__mnli_z_aug = Classification("premise","hypothesis","label",
-	dataset_name="pietrolesci/gen_debiased_nli", splits=["mnli_z_aug",None,None], label_values=NLI_LABEL_VALUES, max_examples=1000)
-gen_debiased_nli__mnli_seq_z = Classification("premise","hypothesis","label",
-	dataset_name="pietrolesci/gen_debiased_nli", splits=["mnli_seq_z",None,None], label_values=NLI_LABEL_VALUES, max_examples=1000)
 
 add_one_rte = Classification("premise","hypothesis","label",
     dataset_name="pietrolesci/add_one_rte",splits=["train","dev","test"],
@@ -557,7 +545,7 @@ discovery = Classification("sentence1", "sentence2", labels="label", config_name
 
 pragmeval_1 = Classification("sentence",labels="label",
     dataset_name="pragmeval",
-    config_name= ["switchboard","mrda","verifiability"])
+    config_name= ["switchboard","verifiability"])
 
 pragmeval_2 = Classification("sentence1","sentence2",labels="label",
     dataset_name="pragmeval",
@@ -574,9 +562,7 @@ def _pragmeval_scale(config, scale, *inputs):
         max_examples=1000,
         label_values={0: f"low {scale}", 1: f"high {scale}"})
 
-pragmeval__emobank_arousal = _pragmeval_scale("emobank-arousal", "emotional arousal", "sentence")
 pragmeval__emobank_dominance = _pragmeval_scale("emobank-dominance", "dominance (sense of control)", "sentence")
-pragmeval__emobank_valence = _pragmeval_scale("emobank-valence", "valence (pleasantness)", "sentence")
 pragmeval__squinky_formality = _pragmeval_scale("squinky-formality", "formality", "sentence")
 pragmeval__squinky_implicature = _pragmeval_scale("squinky-implicature", "implicature (implied beyond what is said)", "sentence")
 pragmeval__squinky_informativeness = _pragmeval_scale("squinky-informativeness", "informativeness", "sentence")

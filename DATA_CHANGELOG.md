@@ -17,7 +17,8 @@ concise bullets on what changed in the data. `tasksource-jev-typed-decisions` re
 ## tasksource 2026-10-15.5
 
 - New `max_examples` task annotation caps training rows for valid but low-signal sources; every consumer (Jev `full`, recasts) respects it.
-- Capped at 1,000 training rows: the robust_nli stress tests, the six gen_debiased_nli variants and the ten median-split pragmeval scales (EmoBank, Squinky, persuasiveness).
+- Capped at 1,000 training rows: the robust_nli stress tests and the median-split pragmeval scales (EmoBank dominance, Squinky, persuasiveness).
+- Parked: the six gen_debiased_nli variants (generated hypotheses, model-filtered labels), pragmeval/mrda (context-free meeting dialogue acts) and the EmoBank arousal/valence median splits.
 
 ## tasksource 2026-10-15.4
 
