@@ -16,7 +16,7 @@ import random
 import subprocess
 import sys
 from collections import Counter
-from concurrent.futures import ProcessPoolExecutor, as_completed
+from multiprocessing import Pool
 from pathlib import Path
 
 MODEL = 'albert/deepseek-v4-flash-0731'
@@ -87,15 +87,17 @@ def collect(args, tasks):
     done = {json.loads(line)['task'] for line in path.open()} if path.exists() else set()
     todo = [(task, ml) for task, ml in tasks if task not in done]
     print(f'{len(done)} described, {len(todo)} to load', flush=True)
-    with ProcessPoolExecutor(args.workers, max_tasks_per_child=4) as pool, path.open('a') as out:
-        futures = {pool.submit(describe, task, ml, args.per_task, args.seed): task for task, ml in todo}
-        for future in as_completed(futures):
-            task = futures[future]
-            try:
-                record = future.result()
-            except Exception as error:
-                record = {'task': task, 'error': f'{type(error).__name__}: {error}'[:500]}
+    with Pool(args.workers, maxtasksperchild=4) as pool, path.open('a') as out:
+        jobs = [(task, ml, args.per_task, args.seed) for task, ml in todo]
+        for record in pool.imap_unordered(describe_safely, jobs):
             out.write(json.dumps(record, ensure_ascii=False) + '\n'); out.flush()
+
+
+def describe_safely(job):
+    try:
+        return describe(*job)
+    except Exception as error:
+        return {'task': job[0], 'error': f'{type(error).__name__}: {error}'[:500]}
 
 
 def render(record):
