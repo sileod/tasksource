@@ -4,6 +4,17 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource 2026-10-15.4
+
+- Add FaithDial original-response grounding and RAGTruth human-span-derived grounding decisions. Keep annotation provenance separate from inputs, reserve native dialogue/source holdouts, and omit ambiguous or low-quality cases.
+- Add ComVE native two-statement commonsense choices; invert the source's nonsense index to select the more sensible statement. Exclude duplicate choices, repeated pairs and conflicting judgments.
+- AAAC and GLUCOSE remain deferred: their proposed MC conversions need verified negatives rather than arbitrary distractors.
+
+## comve 2026-10-15
+
+- Publish official human-written subtask-A statement pairs as a data-only mirror, with native splits, original answer indices, per-file hashes and exclusion reasons.
+- Preserve CC BY-SA 4.0 licensing and link the original release and reproducible packaging script.
+
 ## tasksource 2026-10-15.3
 
 - Add `sbic/offensiveness` and `sbic/intent` from the audited aggregate, with 11,692 and 8,647 accepted training judgments respectively. Preserve native uncertainty categories and labeling details in metadata.

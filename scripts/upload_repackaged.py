@@ -22,6 +22,7 @@ from scripts.repackage_dataset.relevance import antique, sentfin, wands, scirepe
 from scripts.repackage_dataset.specialized_text import acord, edos, evidence_inference
 from scripts.repackage_dataset.dialogue import slurp, mcscript2, esconv
 from scripts.repackage_dataset.sbic import sbic
+from scripts.repackage_dataset.comve import comve
 from scripts.repackage_dataset.stance import vast, fnc1, perspectrum, ukpconvarg, discogem
 from scripts.repackage_dataset.specialized_text import pubmed_rct
 from scripts.repackage_dataset.linguistic import semcor, streusle, spider
@@ -41,7 +42,8 @@ from scripts.repackage_dataset.procedural.balanced_visgym import visgym_balanced
 from scripts.repackage_dataset.regions import coco_regions, doclaynet_region, bapps, spair71k_grid
 
 
-BUILDERS = {"sbic": ("tasksource/sbic", sbic),
+BUILDERS = {"comve": ("tasksource/comve", comve),
+            "sbic": ("tasksource/sbic", sbic),
             "esconv": ("tasksource/esconv", esconv),
             "sphinx-mcq": ("tasksource/sphinx-mcq", sphinx_mc),
             "visgym-mcq": ("tasksource/visgym-mcq", visgym_balanced),
@@ -97,7 +99,8 @@ BUILDERS = {"sbic": ("tasksource/sbic", sbic),
 
 
 # license metadata for repackaged sets, as the originals state it
-LICENSES = {"tasksource/sbic": "cc-by-4.0",
+LICENSES = {"tasksource/comve": "cc-by-sa-4.0",
+            "tasksource/sbic": "cc-by-4.0",
             "tasksource/esconv": "cc-by-nc-4.0",
             "tasksource/sphinx-mcq": ["mit", "cc-by-4.0"],
             "tasksource/visgym-mcq": "apache-2.0",
