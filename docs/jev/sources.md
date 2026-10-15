@@ -115,6 +115,13 @@ checks all 35 changed Parquet hashes, 56 unchanged Parquet files (including all
 
 ## GUI decisions
 
+Jev uses coordinate options for grounding: `rico-widget/box` and `mind2web/box` offer the
+target box among the screen's other native element boxes, and `spair71k/point` the
+corresponding point among the pair's other keypoints, as 0–1000 integers (`[x1, y1, x2, y2]`,
+`(x, y)`). The grid-cell and axis-bin views below stay in the catalog but are excluded from Jev
+builds (`JEV_EXCLUDED_SOURCES`): they are coarser than most elements and match no model's
+click output.
+
 The visual catalog includes six annotations of the pinned
 [`osunlp/Multimodal-Mind2Web`](https://huggingface.co/datasets/osunlp/Multimodal-Mind2Web/tree/1b4c6a8cf9f77b7a5e0d641959935c80c4a05889)
 source: `mind2web/action`, `mind2web/element`, `mind2web/x10`, `mind2web/y10`,
