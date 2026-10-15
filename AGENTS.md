@@ -1,4 +1,15 @@
+# What enters the catalog
+
+A source becomes a training task only if all three hold:
+- it has a genuine training split (test-only benchmarks go to `eval_only.py`);
+- it is a decision: classification, multiple choice or token labeling, not open-ended answers;
+- its labels are human, procedural (solver, verifier, construction) or otherwise demonstrably reliable; unverified model labels do not qualify.
+
+Valid but low-signal sources get `max_examples`; systematically unreliable ones go to `parked.py`.
+
 # Dataset sources
+
+Reading an existing dataset with a mapping or a little code is an annotation: declare it in the task catalog on the original Hugging Face dataset. Heavy preprocessing is a repackage. Renaming or dropping columns is not a reason to mirror.
 
 Use existing Hugging Face datasets directly when `datasets.load_dataset` provides usable data. Keep task mappings declarative and reuse the existing templates and shared loader.
 
