@@ -5,7 +5,7 @@ import math
 import re
 from datasets import Features, Image, Sequence, Value, IterableDataset
 from .preprocess import VisualClassification, VisualMultipleChoice
-from .grounding import grid_labels, grid_center
+from .grounding import grid_labels, grid_center, coordinate_choices
 from .metadata.source_license_evidence import SOURCE_LICENSE_EVIDENCE
 from .metadata.source_revisions import SOURCE_REVISIONS
 
@@ -218,6 +218,35 @@ mind2web_element = VisualMultipleChoice(
     **_MIND2WEB, task_id='mind2web/element', choices_list='choices_list', labels='labels',
     question='Which candidate element should be acted on next?',
     metadata=mind2web_element_metadata,
+)
+
+def box_choice_rows(dataset, boxes):
+    """Coordinate options in place of element descriptions: ``boxes(row)`` gives the target box
+    and the other native candidate boxes, normalized xyxy."""
+    def convert(metadata, choices):  # reads no image column
+        target, others = boxes({'metadata': metadata, 'choices_list': choices})
+        info = json.loads(metadata)
+        picked = coordinate_choices(target, others, key=info.get('source_row') or metadata)
+        if picked is None:
+            return {'choices_list': [], 'labels': -1}
+        info.update(target_bbox=target, bbox_units='normalized_xyxy', coordinate_units='0-1000 xyxy')
+        return {'choices_list': picked[0], 'labels': picked[1], 'metadata': json.dumps(info, sort_keys=True)}
+    return type(dataset)({split: rows.map(convert, input_columns=['metadata', 'choices_list'])
+                          .filter(lambda label: label >= 0, input_columns='labels')
+                          for split, rows in dataset.items()})
+
+
+def _mind2web_boxes(row):
+    info = mind2web_element_metadata(row)
+    target = info['target_bbox']
+    return target, [box for box in info['candidate_boxes'] if box != target]
+
+# superseded by coordinate options: a grid cell or axis bin is coarser than most elements and
+# matches no model's click output (gold cell centers fell inside the element 2/10 times for 7x7)
+mind2web_box = VisualMultipleChoice(
+    **_MIND2WEB, task_id='mind2web/box', choices_list='choices_list', labels='labels', metadata='metadata',
+    pre_process=lambda ds: box_choice_rows(ds, _mind2web_boxes),
+    question='Which box contains the element to act on next? Boxes are [x1, y1, x2, y2] with coordinates from 0 to 1000 over the full screenshot, x rightward and y downward.',
 )
 
 mind2web_x10 = VisualClassification(
@@ -497,6 +526,21 @@ rico_widget_element = VisualMultipleChoice(
 )
 
 
+def _rico_boxes(row):
+    info = json.loads(row['metadata'])
+    target = info['target_bbox']
+    return target, [box for box in info['candidate_boxes'] if box != target]
+
+rico_widget_box = VisualMultipleChoice(
+    dataset_name='bevaya/RICO-WidgetCaptioning', task_id='rico-widget/box',
+    splits=('train', 'val', 'test'), choices_list='choices_list', labels='labels', metadata='metadata',
+    pre_process=lambda ds: box_choice_rows(rico_widget_rows(ds, elements=True), _rico_boxes),
+    question='Which box contains the described element? Boxes are [x1, y1, x2, y2] with coordinates from 0 to 1000 over the displayed image, x rightward and y downward.',
+    load_dataset_kwargs={'revision': '6ec57b56bebd722b9c646c78d0f34e1199b6d7a9', 'streaming': True,
+                         'columns': ['screenId', 'image', 'bbox', 'captions', 'semantic_annotations']},
+)
+
+
 lvis_region = VisualClassification(
     dataset_name='tasksource/coco-regions', config_name='lvis', task_id='lvis/region',
     metadata='metadata', question='What object category is highlighted in red?',
@@ -526,6 +570,39 @@ spair71k_grid7 = VisualClassification(
     metadata='metadata',
     question='Which cell of the second image contains the corresponding point? '
              'Rows r0–r6 run top to bottom; columns c0–c6 run left to right.',
+    load_dataset_kwargs={'revision': '8348f09dbd8c5a6c02924eb9f5eab6a3f54337c9', 'streaming': False},
+)
+
+
+def spair_point_rows(dataset):
+    """The other annotated keypoints of the same image pair are the distractor points."""
+    out = {}
+    for split, rows in dataset.items():
+        points = {}
+        for info in map(json.loads, rows['metadata']):
+            width, height = info['target_image_size']
+            points.setdefault(info['pair'], []).append(
+                (info['keypoint'], (info['target_point'][0] / width, info['target_point'][1] / height)))
+
+        def convert(metadata):  # reads no image column
+            info = json.loads(metadata)
+            width, height = info['target_image_size']
+            target = (info['target_point'][0] / width, info['target_point'][1] / height)
+            others = [point for keypoint, point in points[info['pair']] if keypoint != info['keypoint']]
+            picked = coordinate_choices(target, others, key=info['source_row'])
+            if picked is None:
+                return {'choices_list': [], 'labels': -1}
+            info['coordinate_units'] = '0-1000 xy over the second image'
+            return {'choices_list': picked[0], 'labels': picked[1], 'metadata': json.dumps(info, sort_keys=True)}
+        out[split] = (rows.remove_columns(['labels']).map(convert, input_columns='metadata')
+                      .filter(lambda label: label >= 0, input_columns='labels'))
+    return type(dataset)(out)
+
+spair71k_point = VisualMultipleChoice(
+    dataset_name='tasksource/spair71k-grid', task_id='spair71k/point',
+    choices_list='choices_list', labels='labels', metadata='metadata', pre_process=spair_point_rows,
+    question='Which point of the second image corresponds to the marked keypoint? Points are (x, y) '
+             'with coordinates from 0 to 1000 over the second image, x rightward and y downward.',
     load_dataset_kwargs={'revision': '8348f09dbd8c5a6c02924eb9f5eab6a3f54337c9', 'streaming': False},
 )
 

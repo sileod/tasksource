@@ -4,6 +4,16 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource-jev-typed-decisions v2026.10.15.4
+
+- `vision`: coordinate grounding as multiple choice. RICO widgets and Mind2Web elements: pick the target's box among the screen's other element boxes, as 0–1000 `[x1, y1, x2, y2]`. SPair-71k: pick the corresponding point among the pair's other keypoints, as 0–1000 `(x, y)`.
+- `vision`: Mind2Web training actions (next action type, element choice, box choice); its test splits stay out.
+- Grid-cell and axis-bin grounding views no longer enter Jev builds; the rows already published leave at the next vision rebuild.
+
+## tasksource 2026-10-15.12
+
+- New visual tasks `rico-widget/box`, `mind2web/box` and `spair71k/point`: native candidate boxes or keypoints as 0–1000 coordinate options.
+
 ## tasksource-jev-typed-decisions v2026.10.15.3
 
 - Rebuild of `default` and `full`. Rows keep their published `id` and `example_id` when their source example is unchanged, also where the content changed.

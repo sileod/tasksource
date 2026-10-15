@@ -86,6 +86,37 @@ def grounding_row(images, instruction, target_bbox, *, metadata, candidates=None
     return row
 
 
+def coordinate_text(geometry):
+    """Normalized geometry as 0–1000 integers, the convention of current grounding models:
+    a box is ``[x1, y1, x2, y2]``, a point ``(x, y)``."""
+    values = [min(1000, max(0, round(v * 1000))) for v in geometry]
+    return f"[{', '.join(map(str, values))}]" if len(values) == 4 else f"({values[0]}, {values[1]})"
+
+
+def coordinate_choices(target, others, key, max_options=8, min_distance=0.03):
+    """Gold geometry and up to ``max_options - 1`` native distractors as coordinate options.
+
+    Distractors are other annotated boxes or points of the same image, never generated ones;
+    those whose center lies within ``min_distance`` of the gold center, or that print the same,
+    are dropped. Selection and order are stable per ``key``. Returns ``(choices, label)``, or
+    ``None`` when no distractor remains."""
+    def center(g):
+        return ((g[0] + g[2]) / 2, (g[1] + g[3]) / 2) if len(g) == 4 else tuple(g)
+    gold, gold_center = coordinate_text(target), center(target)
+    seen, pool = {gold}, []
+    for geometry in others:
+        text = coordinate_text(geometry)
+        if text not in seen and math.dist(center(geometry), gold_center) >= min_distance:
+            seen.add(text)
+            pool.append(text)
+    if not pool:
+        return None
+    rng = random.Random(int(hashlib.sha256(str(key).encode()).hexdigest(), 16))
+    choices = rng.sample(pool, min(len(pool), max_options - 1)) + [gold]
+    rng.shuffle(choices)
+    return choices, choices.index(gold)
+
+
 def check_grounding_splits(dataset):
     """Reject shared screenshots or trajectories across preserved native splits."""
     seen = {}

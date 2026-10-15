@@ -70,7 +70,11 @@ JEV_EXCLUDED_SOURCES = {"silicone/iemocap", "silicone/meld_e", "silicone/meld_s"
                         # relevance to the U.S. economy: a Dow rally after a Fed hike as not relevant
                         "crowdflower/economic-news",
                         # depths from one parser's conventions, off by one from any reader's tree
-                        "linguisticprobing/tree_depth"}
+                        "linguisticprobing/tree_depth",
+                        # grid cells and axis bins: coarser than most GUI elements and unlike any model's
+                        # click output; the coordinate-option views (*/box, spair71k/point) replace them
+                        "vision/mind2web/x10", "vision/mind2web/y10", "vision/mind2web/grid5",
+                        "vision/mind2web/grid7", "vision/rico-widget/grid7", "vision/spair71k/grid7"}
 
 
 # Vote shares from fewer annotators than this are coarse (one of three is 0.33): such
@@ -1437,6 +1441,7 @@ def build_vision(args):
     if args.limit:
         catalog = catalog.head(args.limit)
     catalog = catalog.assign(source_id='vision/' + catalog.id)
+    catalog = catalog[~catalog.source_id.isin(JEV_EXCLUDED_SOURCES)]
     licenses = source_licenses(list(catalog.source_id))
     allowed_uses = getattr(args, 'license_use', None) or list(LICENSE_USES)
     rejected = {source: info['license_use'] for source, info in licenses.items()
