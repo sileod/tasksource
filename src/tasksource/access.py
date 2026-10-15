@@ -1,4 +1,4 @@
-from .preprocess import Preprocessing, MultipleChoiceFields, SoftLabeling, add_question, disable_image_decoding, reservoir_sample, dataset_from_rows
+from .preprocess import Preprocessing, MultipleChoiceFields, SoftLabeling, add_question, disable_image_decoding, reservoir_sample, dataset_from_rows, capped_rows
 from .jev.options import JEV_MAX_MC_OPTIONS
 import re
 import ast
@@ -353,7 +353,7 @@ def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preproc
         pre_processed = True
         materialized = {}
         for split, rows in dataset.items():
-            limit = max_rows if split == "train" else max_rows_eval
+            limit = capped_rows(preprocessing, max_rows) if split == "train" else max_rows_eval
             if vision and limit:
                 selected = reservoir_sample(rows, limit, seed)
             elif limit:

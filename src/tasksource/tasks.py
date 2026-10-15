@@ -208,41 +208,42 @@ joci = Classification("context","hypothesis", labels="original_label", ordinal=T
     dataset_name="pietrolesci/joci",splits=['full',None,None])
 
 
+# Templated stress tests and generated NLI: robustness signal, little new content; capped.
 robust_nli__IS_CS = Classification("premise","hypothesis","label",
-	dataset_name="pietrolesci/robust_nli", splits=["IS_CS",None,None], label_values=NLI_LABEL_VALUES)
+	dataset_name="pietrolesci/robust_nli", splits=["IS_CS",None,None], label_values=NLI_LABEL_VALUES, max_examples=1000)
 robust_nli__LI_LI = Classification("premise","hypothesis","label",
-	dataset_name="pietrolesci/robust_nli", splits=["LI_LI",None,None], label_values=NLI_LABEL_VALUES)
+	dataset_name="pietrolesci/robust_nli", splits=["LI_LI",None,None], label_values=NLI_LABEL_VALUES, max_examples=1000)
 robust_nli__ST_WO = Classification("premise","hypothesis","label",
-	dataset_name="pietrolesci/robust_nli", splits=["ST_WO",None,None], label_values=NLI_LABEL_VALUES)
+	dataset_name="pietrolesci/robust_nli", splits=["ST_WO",None,None], label_values=NLI_LABEL_VALUES, max_examples=1000)
 robust_nli__PI_SP = Classification("premise","hypothesis","label",
-	dataset_name="pietrolesci/robust_nli", splits=["PI_SP",None,None], label_values=NLI_LABEL_VALUES)
+	dataset_name="pietrolesci/robust_nli", splits=["PI_SP",None,None], label_values=NLI_LABEL_VALUES, max_examples=1000)
 robust_nli__PI_CD = Classification("premise","hypothesis","label",
-	dataset_name="pietrolesci/robust_nli", splits=["PI_CD",None,None], label_values=NLI_LABEL_VALUES)
+	dataset_name="pietrolesci/robust_nli", splits=["PI_CD",None,None], label_values=NLI_LABEL_VALUES, max_examples=1000)
 robust_nli__ST_SE = Classification("premise","hypothesis","label",
-	dataset_name="pietrolesci/robust_nli", splits=["ST_SE",None,None], label_values=NLI_LABEL_VALUES)
+	dataset_name="pietrolesci/robust_nli", splits=["ST_SE",None,None], label_values=NLI_LABEL_VALUES, max_examples=1000)
 robust_nli__ST_NE = Classification("premise","hypothesis","label",
-	dataset_name="pietrolesci/robust_nli", splits=["ST_NE",None,None], label_values=NLI_LABEL_VALUES)
+	dataset_name="pietrolesci/robust_nli", splits=["ST_NE",None,None], label_values=NLI_LABEL_VALUES, max_examples=1000)
 robust_nli__ST_LM = Classification("premise","hypothesis","label",
-	dataset_name="pietrolesci/robust_nli", splits=["ST_LM",None,None], label_values=NLI_LABEL_VALUES)
+	dataset_name="pietrolesci/robust_nli", splits=["ST_LM",None,None], label_values=NLI_LABEL_VALUES, max_examples=1000)
 robust_nli_is_sd = Classification("premise","hypothesis","label",
-    dataset_name="pietrolesci/robust_nli_is_sd",
+    dataset_name="pietrolesci/robust_nli_is_sd", max_examples=1000,
     label_values={0: "non-entailment", 1: "entailment"})
 robust_nli_li_ts = Classification("premise","hypothesis","label",
-    dataset_name="pietrolesci/robust_nli_li_ts",
+    dataset_name="pietrolesci/robust_nli_li_ts", max_examples=1000,
     label_values={0: "non-contradiction", 1: "contradiction"})
 
 gen_debiased_nli__snli_seq_z = Classification("premise","hypothesis","label",
-	dataset_name="pietrolesci/gen_debiased_nli", splits=["snli_seq_z",None,None], label_values=NLI_LABEL_VALUES)
+	dataset_name="pietrolesci/gen_debiased_nli", splits=["snli_seq_z",None,None], label_values=NLI_LABEL_VALUES, max_examples=1000)
 gen_debiased_nli__snli_z_aug = Classification("premise","hypothesis","label",
-	dataset_name="pietrolesci/gen_debiased_nli", splits=["snli_z_aug",None,None], label_values=NLI_LABEL_VALUES)
+	dataset_name="pietrolesci/gen_debiased_nli", splits=["snli_z_aug",None,None], label_values=NLI_LABEL_VALUES, max_examples=1000)
 gen_debiased_nli__snli_par_z = Classification("premise","hypothesis","label",
-	dataset_name="pietrolesci/gen_debiased_nli", splits=["snli_par_z",None,None], label_values=NLI_LABEL_VALUES)
+	dataset_name="pietrolesci/gen_debiased_nli", splits=["snli_par_z",None,None], label_values=NLI_LABEL_VALUES, max_examples=1000)
 gen_debiased_nli__mnli_par_z = Classification("premise","hypothesis","label",
-	dataset_name="pietrolesci/gen_debiased_nli", splits=["mnli_par_z",None,None], label_values=NLI_LABEL_VALUES)
+	dataset_name="pietrolesci/gen_debiased_nli", splits=["mnli_par_z",None,None], label_values=NLI_LABEL_VALUES, max_examples=1000)
 gen_debiased_nli__mnli_z_aug = Classification("premise","hypothesis","label",
-	dataset_name="pietrolesci/gen_debiased_nli", splits=["mnli_z_aug",None,None], label_values=NLI_LABEL_VALUES)
+	dataset_name="pietrolesci/gen_debiased_nli", splits=["mnli_z_aug",None,None], label_values=NLI_LABEL_VALUES, max_examples=1000)
 gen_debiased_nli__mnli_seq_z = Classification("premise","hypothesis","label",
-	dataset_name="pietrolesci/gen_debiased_nli", splits=["mnli_seq_z",None,None], label_values=NLI_LABEL_VALUES)
+	dataset_name="pietrolesci/gen_debiased_nli", splits=["mnli_seq_z",None,None], label_values=NLI_LABEL_VALUES, max_examples=1000)
 
 add_one_rte = Classification("premise","hypothesis","label",
     dataset_name="pietrolesci/add_one_rte",splits=["train","dev","test"],
@@ -566,9 +567,11 @@ pragmeval_2 = Classification("sentence1","sentence2",labels="label",
               "stac": "Which dialogue act relation links text_B to text_A?"},
     config_name= ["emergent", "gum", "pdtb", "persuasiveness-claimtype", "persuasiveness-premisetype", "sarcasm","stac"])
 
-# low/high scales over the same inputs: the label names the scale
+# low/high scales over the same inputs: the label names the scale. Median splits of ratings,
+# so items near the middle are coin flips: capped.
 def _pragmeval_scale(config, scale, *inputs):
     return Classification(*inputs, labels="label", dataset_name="pragmeval", config_name=config, task_id=f"pragmeval/{config}",
+        max_examples=1000,
         label_values={0: f"low {scale}", 1: f"high {scale}"})
 
 pragmeval__emobank_arousal = _pragmeval_scale("emobank-arousal", "emotional arousal", "sentence")

@@ -71,3 +71,12 @@ def test_fix_splits_keeps_empty_native_evaluation():
     ds = DatasetDict(train=rows(), validation=rows(()))
     assert fix_splits(ds) is ds
     assert len(ds['validation']) == 0
+
+
+@pytest.mark.parametrize("max_rows, expected", [(None, 10), (50, 10), (4, 4)])
+def test_max_examples_caps_training_rows(max_rows, expected):
+    rows = Dataset.from_dict({"text": [f"t{i}" for i in range(40)], "label": [i % 2 for i in range(40)]})
+    task = Classification("text", labels="label", max_examples=10)
+    data = task(DatasetDict(train=rows, validation=rows.select(range(20))), max_rows=max_rows, max_rows_eval=None)
+    assert len(data["train"]) == expected
+    assert len(data["validation"]) + len(data["test"]) == 20  # evaluation splits are not capped

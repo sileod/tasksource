@@ -57,6 +57,11 @@ def sample_dataset(dataset,n=10000, n_eval=1000,seed=0):
     return dataset
 
 
+def capped_rows(preprocessing, max_rows):
+    cap = getattr(preprocessing, 'max_examples', None)
+    return min(max_rows, cap) if cap and max_rows else (cap or max_rows)
+
+
 def reservoir_sample(rows, limit, seed=0):
     """Uniform sample of an entire iterable, with bounded memory and stable row order."""
     if limit <= 0:
@@ -114,6 +119,7 @@ class Preprocessing(DotWiz):
 
         Empty training splits raise ValueError; empty evaluation splits retain the canonical schema.
         """
+        max_rows = capped_rows(self, max_rows)
         visual = "images" in self.to_dict()
         if visual:
             dataset = disable_image_decoding(dataset)
@@ -383,6 +389,7 @@ class SharedFields:
     ordinal: bool = False  # labels are an ordered scale, listed in order (Jev asks part as score)
     score_only: bool = False  # explicitly request score decisions for an ordered label set
     complete_splits: bool = True  # opt out for source-grouped native partitions
+    max_examples: int = None  # training rows at most: valid but redundant or low-signal sources
     #language:str="en"
     
 

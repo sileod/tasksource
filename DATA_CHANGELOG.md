@@ -14,6 +14,11 @@ concise bullets on what changed in the data. `tasksource-jev-typed-decisions` re
 - Preserve existing training shards and evaluation data. `default` includes these sources at the next canonical rebuild.
 - Retain annotation provenance and source license evidence; exclude generic/uncooperative FaithDial cases, low-quality RAGTruth outputs and invalid or conflicting ComVE pairs.
 
+## tasksource 2026-10-15.5
+
+- New `max_examples` task annotation caps training rows for valid but low-signal sources; every consumer (Jev `full`, recasts) respects it.
+- Capped at 1,000 training rows: the robust_nli stress tests, the six gen_debiased_nli variants and the ten median-split pragmeval scales (EmoBank, Squinky, persuasiveness).
+
 ## tasksource 2026-10-15.4
 
 - Add FaithDial original-response grounding and RAGTruth human-span-derived grounding decisions. Keep annotation provenance separate from inputs, reserve native dialogue/source holdouts, and omit ambiguous or low-quality cases.
