@@ -2927,5 +2927,93 @@
     "papers": [],
     "annotation": "tasksource.parked.civil_comments__severe_toxicity",
     "review_findings": "DeepSeek V4 Flash screened every published Jev example of the task (2026-10); a manual read of flagged samples confirmed the problem."
+  },
+  {
+    "name": "google/civil_comments",
+    "scope": "task",
+    "tasks": [
+      "civil_comments/obscene"
+    ],
+    "status": "parked",
+    "reason_code": "low_value",
+    "reason": "0.6% positives, flagged by keyword ('fuck 12'); civil_comments/toxicity and the obscene rater shares cover this",
+    "evidence": [
+      "https://huggingface.co/datasets/google/civil_comments"
+    ],
+    "checked_on": "2026-10-15",
+    "reconsider_if": "The covering task is removed.",
+    "huggingface": [
+      "google/civil_comments"
+    ],
+    "github": [],
+    "papers": [],
+    "annotation": "tasksource.parked.civil_comments__obscene",
+    "review_findings": "DeepSeek V4 Flash screened every published Jev example of the task (2026-10); a manual read of flagged samples confirmed the problem."
+  },
+  {
+    "name": "google/civil_comments",
+    "scope": "task",
+    "tasks": [
+      "civil_comments/threat"
+    ],
+    "status": "parked",
+    "reason_code": "incorrect_labels",
+    "reason": "0.25% positives that follow keywords: 'Hopelessly hooked on killing. Sad.' and boxing talk count as threats",
+    "evidence": [
+      "https://huggingface.co/datasets/google/civil_comments"
+    ],
+    "checked_on": "2026-10-15",
+    "reconsider_if": "A corrected or re-annotated release.",
+    "huggingface": [
+      "google/civil_comments"
+    ],
+    "github": [],
+    "papers": [],
+    "annotation": "tasksource.parked.civil_comments__threat",
+    "review_findings": "DeepSeek V4 Flash screened every published Jev example of the task (2026-10); a manual read of flagged samples confirmed the problem."
+  },
+  {
+    "name": "google/civil_comments",
+    "scope": "task",
+    "tasks": [
+      "civil_comments/identity_attack"
+    ],
+    "status": "parked",
+    "reason_code": "low_value",
+    "reason": "0.8% positives; civil_comments/toxicity and the identity-attack rater shares cover this",
+    "evidence": [
+      "https://huggingface.co/datasets/google/civil_comments"
+    ],
+    "checked_on": "2026-10-15",
+    "reconsider_if": "The covering task is removed.",
+    "huggingface": [
+      "google/civil_comments"
+    ],
+    "github": [],
+    "papers": [],
+    "annotation": "tasksource.parked.civil_comments__identity_attack",
+    "review_findings": "DeepSeek V4 Flash screened every published Jev example of the task (2026-10); a manual read of flagged samples confirmed the problem."
+  },
+  {
+    "name": "google/civil_comments",
+    "scope": "task",
+    "tasks": [
+      "civil_comments/sexual_explicit"
+    ],
+    "status": "parked",
+    "reason_code": "low_value",
+    "reason": "0.3% positives, flagged by keyword ('Just old and anal lol'); the rater shares cover this",
+    "evidence": [
+      "https://huggingface.co/datasets/google/civil_comments"
+    ],
+    "checked_on": "2026-10-15",
+    "reconsider_if": "The covering task is removed.",
+    "huggingface": [
+      "google/civil_comments"
+    ],
+    "github": [],
+    "papers": [],
+    "annotation": "tasksource.parked.civil_comments__sexual_explicit",
+    "review_findings": "DeepSeek V4 Flash screened every published Jev example of the task (2026-10); a manual read of flagged samples confirmed the problem."
   }
 ]

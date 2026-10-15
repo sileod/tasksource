@@ -1358,38 +1358,14 @@ path_naturalness = MultipleChoice(constant("Which chain of relations is more nat
     labels=lambda x: 1 - x["label"], max_examples=1000,
     dataset_name="tasksource/path-naturalness-prediction")
 
-def _civil_clear(dataset, attribute, negatives_per_positive=None):
-    """Clear cases only; for rare attributes, a stable sample of negatives so a training sample
-    holds positives."""
-    def keep(scores, texts):
-        return [score >= 0.5 or (score < 0.1 and (rate >= 1 or
-                int(hashlib.sha1(text.encode()).hexdigest()[:8], 16) / 0xFFFFFFFF < rate))
-                for score, text in zip(scores, texts)]
-    out = {}
-    for split, rows in dataset.items():
-        scores = rows[attribute]
-        positives = sum(score >= 0.5 for score in scores)
-        negatives = sum(score < 0.1 for score in scores)
-        rate = negatives_per_positive * positives / max(negatives, 1) if negatives_per_positive else 1
-        out[split] = rows.filter(keep, input_columns=[attribute, "text"], batched=True)
-    return DatasetDict(out)
-
-def _civil(attribute, negative, positive, flag, negatives_per_positive=None):
-    # attributes are the share of raters who flagged the comment; keep clear cases. Rare attributes
-    # follow keywords ("hooked on killing" as a threat), hence their cap
+def _civil(attribute, negative, positive, flag):
+    # attributes are the share of raters who flagged the comment; keep clear cases
     return Classification("text", labels=lambda x: [negative, positive][x[attribute] >= 0.5],
         question=f"Would most raters flag this comment as {flag}?",
-        max_examples=5000 if negatives_per_positive else None,
-        pre_process=lambda ds: _civil_clear(ds, attribute, negatives_per_positive), dataset_name="google/civil_comments")
+        pre_process=lambda ds: ds.filter(lambda x: not 0.1 <= x[attribute] < 0.5), dataset_name="google/civil_comments")
 
 civil_comments__toxicity = _civil("toxicity", "not toxic", "toxic", "toxic")
-civil_comments__obscene = _civil("obscene", "not obscene", "obscene", "obscene", negatives_per_positive=3)
-civil_comments__threat = _civil("threat", "no threat", "threat", "a threat", negatives_per_positive=3)
 civil_comments__insult = _civil("insult", "not insulting", "insulting", "insulting")
-civil_comments__identity_attack = _civil("identity_attack", "no identity attack", "identity attack", "an identity attack",
-                                         negatives_per_positive=3)
-civil_comments__sexual_explicit = _civil("sexual_explicit", "not sexually explicit", "sexually explicit", "sexually explicit",
-                                         negatives_per_positive=3)
 
 cloth = MultipleChoice("sentence", choices_list=lambda x:[x["answer"]]+x["distractors"],labels=constant(0), dataset_name="AndyChiang/cloth")
 dgen  = MultipleChoice("sentence", choices_list=lambda x:[x["answer"]]+x["distractors"],labels=constant(0), dataset_name="AndyChiang/dgen")

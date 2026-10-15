@@ -15,7 +15,7 @@ from .metadata.configs import UNIVERSAL_DEPENDENCIES
 from .preprocess import SoftLabeling, Preprocessing, VisualClassification, constant, get, Classification, TokenClassification, MultipleChoice
 
 from .metadata.source_revisions import SOURCE_REVISIONS
-from .tasks import _cast_blog_topics, LEXICAL_RELATIONS, LEXICAL_RELATION_QUESTION, _pragmeval_scale, NLI_LABEL_VALUES, _document_holdouts, _unique_text_splits, _decision_metadata, _probing, _SENTENCE_LENGTH
+from .tasks import _civil, _cast_blog_topics, LEXICAL_RELATIONS, LEXICAL_RELATION_QUESTION, _pragmeval_scale, NLI_LABEL_VALUES, _document_holdouts, _unique_text_splits, _decision_metadata, _probing, _SENTENCE_LENGTH
 from .tasks import _MAVEN_ERE, _MAVEN_ERE_TEMPORAL, _maven_ere_splits, _maven_ere_records, _flatten_text
 import hashlib
 import json
@@ -241,9 +241,11 @@ dair_ai_emotion = Classification(sentence1="text", labels="label", dataset_name=
 crowdflower__text_emotion = Classification("text", labels="label", splits=["train", None, None],
     dataset_name="tasksource/crowdflower", config_name="text_emotion", question="What emotion does the text express?")
 
-civil_comments__severe_toxicity = Classification("text",
-    labels=lambda x: ["not severely toxic", "severely toxic"][x["severe_toxicity"] >= 0.5],
-    question="Would most raters flag this comment as severely toxic?", dataset_name="google/civil_comments")
+civil_comments__severe_toxicity = _civil("severe_toxicity", "not severely toxic", "severely toxic", "severely toxic")
+civil_comments__obscene = _civil("obscene", "not obscene", "obscene", "obscene")
+civil_comments__threat = _civil("threat", "no threat", "threat", "a threat")
+civil_comments__identity_attack = _civil("identity_attack", "no identity attack", "identity attack", "an identity attack")
+civil_comments__sexual_explicit = _civil("sexual_explicit", "not sexually explicit", "sexually explicit", "sexually explicit")
 
 crowdflower__sentiment_nuclear_power = Classification("text", labels="label", splits=["train", None, None],
     dataset_name="tasksource/crowdflower", config_name="sentiment_nuclear_power",
@@ -297,6 +299,10 @@ PARKED = {
     "crowdflower__text_emotion": ("unsound", "neutral tweets carry arbitrary emotion labels; 28% flagged; go_emotions covers emotion"),
     "crowdflower__sentiment_nuclear_power": ("low_value", "171 tweets, 85% neutral, with mislabels (a pro-nuclear tweet marked neutral); other sentiment tasks cover this"),
     "civil_comments__severe_toxicity": ("low_value", "13 of 1.8M comments reach a majority flag, so samples hold no positives; civil_comments/toxicity covers toxicity"),
+    "civil_comments__obscene": ("low_value", "0.6% positives, flagged by keyword ('fuck 12'); civil_comments/toxicity and the obscene rater shares cover this"),
+    "civil_comments__threat": ("unsound", "0.25% positives that follow keywords: 'Hopelessly hooked on killing. Sad.' and boxing talk count as threats"),
+    "civil_comments__identity_attack": ("low_value", "0.8% positives; civil_comments/toxicity and the identity-attack rater shares cover this"),
+    "civil_comments__sexual_explicit": ("low_value", "0.3% positives, flagged by keyword ('Just old and anal lol'); the rater shares cover this"),
     "cos_e": ("duplicate", "CommonsenseQA v1.0 with 3 choices: 8,092 of its 8,560 questions are in commonsense_qa, which has 5"),
     "indic_glue__sentiment_actsa": ("unsound", "Telugu ACTSA sentiment labels often contradict the text; 43% flagged; inltkh.te and iitp Hindi sets cover Indic sentiment"),
     'maven_ere__temporal': ('unsound', 'Native BEFORE annotation places a 1487 defeat before the war outbreak; source d026ad27155a13c00d9b9812c98f4fc9, pair 26:2.'),

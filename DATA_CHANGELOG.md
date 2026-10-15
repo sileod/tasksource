@@ -15,11 +15,11 @@ concise bullets on what changed in the data. `tasksource-jev-typed-decisions` re
 ## zero-shot-label-nli 2026-10-15
 
 - Removed the parked sources listed above, and tasks whose labels are bare yes/no or true/false answers to a task question.
-- Readable label hypotheses ("This example is answerable from the passage.") for the relabeled tasks; rare civil_comments attributes now include positives.
+- Readable label hypotheses ("This example is answerable from the passage.") for the relabeled tasks; rare civil_comments attributes removed.
 
 ## tasksource 2026-10-15.11
 
-- civil_comments threat, sexual_explicit, obscene and identity_attack keep every majority-flagged comment and three clear negatives per positive, capped at 5,000 training rows (their labels follow keywords); severe_toxicity parked (13 positives in 1.8M comments).
+- civil_comments threat, sexual_explicit, obscene, identity_attack and severe_toxicity parked: few positives, flagged by keyword. toxicity, insult and the rater-share tasks remain.
 - Task questions for MultiRC, ethics/justice, ethics/virtue and dnd_style_intents; "Receive quest" label spelling.
 
 ## tasksource 2026-10-15.10
