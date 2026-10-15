@@ -8,12 +8,14 @@ from collections import Counter, defaultdict, deque
 import hashlib
 import json
 import math
+import multiprocessing
 from pathlib import Path
 import re
 from types import SimpleNamespace
 
 from datasets import concatenate_datasets, disable_progress_bars, load_from_disk
 from huggingface_hub import CommitOperationAdd, DatasetCard, HfApi, HfFileSystem, hf_hub_download
+import numpy
 import pyarrow.parquet as pq
 import yaml
 
@@ -73,6 +75,14 @@ def select_additions(candidates, baseline, evaluation, cap):
     return sorted(selected), dict(dropped)
 
 
+def write_shards(job):
+    directories, shards = job
+    data = concatenate_datasets([load_from_disk(d)['train'] for d in directories])
+    for path, rows in shards:
+        data.select(rows).to_parquet(path + '.tmp')
+        Path(path + '.tmp').rename(path)
+
+
 def run(args):
     output = args.output.resolve(); output.mkdir(parents=True, exist_ok=True)
     api, fs = HfApi(), HfFileSystem()
@@ -96,7 +106,7 @@ def run(args):
         raise ValueError('Resume requires the original cap and seed')
     sources = (['vision/' + task.removeprefix('vision/') for task in args.tasks]
                if getattr(args, 'tasks', None) else sorted({row['source'] for row in base['train']}))
-    records, frames = {}, []
+    records, frames, directories = {}, [], []
     for source in sources:
         directory = output / 'candidates' / slug(source)
         complete = directory / 'dataset' / 'dataset_dict.json'
@@ -113,7 +123,7 @@ def run(args):
                     excluded_sources=[], license_use=None, limit=None, max_rows=args.cap,
                     max_rows_eval=1, seed=args.seed, repo_id=REPO, upload=False,
                     grounding_probabilities=None))
-            frames.append(data['train'])
+            frames.append(data['train']); directories.append(str(directory / 'dataset'))
             records[source] = {'status': 'ok', 'candidate_rows': len(data['train']),
                 'provenance': yaml.safe_load((directory / 'sources.yaml').read_text())['sources'][source],
                 'build_manifest': json.loads((directory / 'build-manifest.json').read_text())}
@@ -135,10 +145,21 @@ def run(args):
         raise ValueError('No unseen eligible training rows')
     stamp = hashlib.sha256((base['revision'] + str(args.cap) + str(args.seed) + '\n'.join(sources)).encode()).hexdigest()[:12]
     files = []; count = max(1, math.ceil(addition.data.nbytes / 256_000_000))
-    for index in range(count):
-        path = output / f'train-append-{stamp}-{index:05d}-of-{count:05d}.parquet'
-        addition.shard(count, index, contiguous=True).to_parquet(path)
-        files.append(path)
+    paths = [output / f'train-append-{stamp}-{index:05d}-of-{count:05d}.parquet' for index in range(count)]
+    if (addition._indices is not None and all(frame._indices is None for frame in frames)
+            and all(Path(d, 'dataset_dict.json').exists() for d in directories)):
+        # Short-lived workers write the shards: reading shuffled rows through one long-lived memory map
+        # grows the process RSS past the machine's per-process limit. Same contiguous shards as shard().
+        rows = numpy.array_split(addition._indices.column(0).to_numpy(), count)
+        jobs = [(directories, [(str(p), r) for p, r in zip(paths[i:i + 8], rows[i:i + 8]) if not p.exists()])
+                for i in range(0, count, 8)]
+        with multiprocessing.get_context('spawn').Pool(4, maxtasksperchild=1) as pool:
+            list(pool.imap_unordered(write_shards, [job for job in jobs if job[1]]))
+    else:
+        for index, path in enumerate(paths):
+            if not path.exists():
+                addition.shard(count, index, contiguous=True).to_parquet(path)
+    files = paths
     counts = Counter(addition['source'])
     manifest = dict(baseline_revision=base['revision'], cap=args.cap, seed=args.seed,
         added_rows=len(addition), sources=dict(counts), exclusions=dropped, builds=records,
