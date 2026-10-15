@@ -48,7 +48,7 @@ def retrieve(cache, queries=(), tasks=(), limit=100, offline=False, languages=()
         papers = [dict(url='https://arxiv.org/abs/'+t[6:]) for t in tags if t.startswith('arxiv:')]
         links = repository_links(json.dumps(card))
         rows.append(dict(name=repo, aliases=[repo.rsplit('/', 1)[-1]],
-            sources=[dict(source='hf_hub', url=url)], dataset_urls=[url], huggingface=[repo], github=links['github'],
+            sources=[dict(source='hf_hub', url=url)], hub_tags=tags, dataset_urls=[url], huggingface=[repo], github=links['github'],
             papers=papers, tasks=tasks, decision_tasks=[t for t in tasks if any(k in t.replace('-', ' ') for k in DECISION_TASKS)],
             languages=([card['language']] if isinstance(card.get('language'), str) else card.get('language'))
                       or [t.split(':', 1)[1] for t in tags if t.startswith('language:')],

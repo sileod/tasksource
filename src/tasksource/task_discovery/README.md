@@ -23,6 +23,22 @@ The public [prospects list](../../../docs/prospects.md) summarizes screened sour
 and outstanding checks. `todo_batch.md` is an internal maintainer work queue,
 not the public discovery results. Discovery never rewrites it.
 
+## Ranked prospect search
+
+The default way to look for missing tasks. Exhaustive tag screening spent model reviews on the Hub's long tail and on re-uploads of implemented tasks; `prospect` spends cheap signals first and reviews only the head of a ranking:
+
+```bash
+python -m tasksource.task_discovery.fingerprint                  # content index from Jev `full`
+python -m tasksource.task_discovery.prospect --output build/discovery/prospect-YYYY-MM-DD --probe 6000 --review 600
+```
+
+1. **Identity.** Beyond names, Hub links and the catalog paper/GitHub index, two indexes catch re-uploads: hashed text segments of every implemented source's Jev rows (`fingerprint.py`), and dataset signatures from the viewer `/info` of catalog repositories: two split sizes of one configuration, a split size with its label vocabulary, or a large label vocabulary.
+2. **Prior.** Downloads, likes, a linked paper and age (capped), minus generated/placeholder names and tags and bulk uploaders whose datasets nobody uses. These weights separate catalog sources from the tag inventory at cross-validated AUC 0.96.
+3. **Structure.** For the top `--probe`: a train split of at least `--min-train` rows, a discrete label column checked on the 100 preview rows (not free text or continuous scores), no content or signature match, and no duplicate of a higher-ranked candidate.
+4. **Review.** Jev-style decision models answer the existing evidence questions plus a sampled-row quality question. Ranking uses the least favourable reviewer and penalizes model-made labels.
+
+`report.md` and `ranked.jsonl` are a reading list; implementation still follows "What enters the catalog" in `AGENTS.md`.
+
 ## Interchangeable retrieval sources
 
 Use `--source paperswithcode`, `--source hf_hub`, `--source hf_papers`, or `--source openalex`. Repeat `--source` to combine retrievals into one deduplicated JSONL; all outputs feed the same `match` and `link` commands.
