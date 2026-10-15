@@ -1638,7 +1638,7 @@ biosift_nli = Classification("Abstract","Hypothesis",
 brainteasers = MultipleChoice("question",
     choices_list=lambda x:eval(x["choice_list"]),
     labels="label",
-    dataset_name="tasksource/brainteasers",config_name=['WP','SP'])
+    dataset_name="tasksource/brainteasers",config_name=['WP'])  # the mirror's SP files are a copy of WP
 
 # toxicity_human is a 1-5 mean rating; the ambiguous middle is dropped
 toxigen = Classification("text", labels=lambda x: ["benign", "toxic"][x["toxicity_human"] >= 4],

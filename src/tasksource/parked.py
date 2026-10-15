@@ -57,6 +57,9 @@ lexical_relation_classification__EVALution = Classification(sentence1="head", se
     load_dataset_kwargs={"data_files": {split: f"hf://datasets/relbert/lexical_relation_classification/dataset/EVALution/{name}.jsonl"
                                         for split, name in [("train", "train"), ("validation", "val"), ("test", "test")]}})
 
+brainteasers__SP = MultipleChoice("question", choices_list=lambda x: eval(x["choice_list"]), labels="label",
+    dataset_name="tasksource/brainteasers", config_name="SP")
+
 wouldyourather = SoftLabeling(constant(''), labels=lambda x: [x['votes_a'], x['votes_b']],
     options=lambda x: [x['option_a'], x['option_b']], hard=2/3, annotators=1000,
     question="Which would most people rather do?",
@@ -262,6 +265,7 @@ KINDS = {
 }
 
 PARKED = {
+    "brainteasers__SP": ("unavailable", "tasksource/brainteasers SP files are a byte-identical copy of WP; needs a rebuilt mirror"),
     "hlgd": ("unsound", "story-group labels are too loose: Snowden's passport and Obama's Manning decision, or Bolsonaro's stabbing and the Vale dam, count as the same event; 35% flagged by a 2026 LLM screen"),
     "lexical_relation_classification__EVALution": ("unsound", "source relations are often wrong (disease/illness HasProperty, soap/water Antonym); 31% flagged; BLESS, K&H+N and ROOT09 cover lexical relations"),
     "blog_authorship_corpus__job": ("unsound", "the industry is rarely inferable from a post (Christmas shopping labeled Manufacturing); 24% flagged"),

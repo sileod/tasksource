@@ -8,6 +8,7 @@ concise bullets on what changed in the data. `tasksource-jev-typed-decisions` re
 
 - Parked after checking flagged examples against the raw sources: hlgd (loose story groupings), EVALution lexical relations (wrong source relations), blog_authorship/job (industry not inferable) and app_reviews (arbitrary ratings on short reviews).
 - logical-fallacy capped at 1,000 training rows (noisy labels).
+- brainteasers/SP removed: the mirror's sentence-puzzle files were a copy of the word puzzles.
 
 ## tasksource 2026-10-15.5
 
