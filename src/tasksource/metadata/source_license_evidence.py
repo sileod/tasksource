@@ -5,6 +5,10 @@ Keys are task families, shared by their visual classification/MC views.
 """
 
 SOURCE_LICENSE_EVIDENCE = {
+    'recam': {'license': 'unknown', 'license_use': 'unspecified', 'checked': '2026-10-15', 'scope': 'No license declared in the original ReCAM data repository or usable Hub card; source news/article rights remain applicable', 'url': 'https://github.com/boyuanzheng010/SemEval2021-Reading-Comprehension-of-Abstract-Meaning'},
+    'knowref60k': {'license': 'cc-by-4.0', 'license_use': 'commercial', 'checked': '2026-10-15', 'scope': 'CC BY 4.0 declared by the Hub copy; original web text retains its source terms', 'url': 'https://huggingface.co/datasets/coref-data/knowref_60k_raw'},
+    'tabmwp': {'license': 'cc-by-nc-sa-4.0', 'license_use': 'non-commercial', 'checked': '2026-10-15', 'scope': 'TabMWP dataset terms, distinct from PromptPG MIT code', 'url': 'https://github.com/lupantech/PromptPG#license'},
+
     'faithdial': {'license': 'mit', 'license_use': 'commercial', 'checked': '2026-10-15', 'scope': 'FaithDial human response-grounding annotations and rewrites', 'url': 'https://huggingface.co/datasets/McGill-NLP/FaithDial#licensing-information'},
     'ragtruth': {'license': 'mit', 'license_use': 'commercial', 'checked': '2026-10-15', 'scope': 'RAGTruth human hallucination-span annotations over model-generated responses', 'url': 'https://github.com/ParticleMedia/RAGTruth/blob/main/LICENSE'},
     'comve': {'license': 'cc-by-sa-4.0', 'license_use': 'commercial', 'checked': '2026-10-15', 'scope': 'Official ComVE commonsense validation and explanation data', 'url': 'https://github.com/wangcunxiang/SemEval2020-Task4-Commonsense-Validation-and-Explanation#license'},

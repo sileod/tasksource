@@ -235,13 +235,13 @@ Published FaithDial, RAGTruth and ComVE to Jev `full` in [v2026.10.15](https://h
 
 ## Batch 18: cloze, reference resolution and table arithmetic (2026-10-15)
 
-Human-curated queue; screen source examples and label semantics before integration. Prefer a usable existing Hub release over another mirror. Preserve every native MC option.
+Processed the human-curated queue. Native choices only; no generated distractors. All five views passed Jev smoke builds and sampled source-gold comparisons; two examples per view were reviewed. See the [source/recast audit](../../../docs/jev/audits/cloze-batch-recast.json).
 
-| Source | Requested view | Status / checks |
-|---|---|---|
-| Children's Book Test (CBT) | Named-entity and common-noun cloze, ten native candidates | Queued. Check community-datasets/cbt and official release before assuming hosting is needed; retain full context, all ten choices and native train/evaluation partitions. BookTest is a related larger follow-up, not automatically included. |
-| ReCAM (SemEval-2021 Task 4) | Abstract-word cloze, five native options | Queued. A holylovenia/recam Hub source exists; check completeness against the official release, train labels and source terms. |
-| KnowRef-60K | Candidate-0 / candidate-1 / neither reference resolution | Queued via coref-data/knowref_60k_raw. Check what annotation_strength actually measures, every native label (including error rows), and name-swapped pair grouping before accepting claimed counts. |
-| TabMWP (listed as abMWP) | Native option-bearing table math problems | Queued. The 38,431-example count matches lupantech/PromptPG; check existing sionic-ai/tabmwp or zyhang1998/tabmwp before repackaging. Validate full textual tables, native options/answers, dataset terms (separate from code) and split grouping. Exclude generation-only rows. |
+| Source | Added views | Retained train / validation / test | Source and quality checks |
+|---|---|---|---|
+| Children's Book Test | `cbt/ne`, `cbt/cn` | NE: 108,500 / 1,996 / 2,486; CN: 120,767 / 2,000 / 2,500 | Direct cam-cst/cbt Parquet. Preserve all ten candidates; omit blank/duplicate choices. Native books are partitioned by the source; checked context groups are disjoint across splits. BookTest remains a related larger follow-up, not part of this batch. |
+| ReCAM | `recam` | 6,403 / 1,656 / — | Direct holylovenia/recam, verified byte-decoded rows against official train/dev JSON. Reserve shared articles and original unlabeled-test articles using the reproducible scripts/audit_recam.py manifest. No public test labels; original dataset license unspecified. |
+| KnowRef-60K | `knowref60k` | 29,838 / 15,953 / 3,061 | Direct coref-data/knowref_60k_raw. Five human annotators according to the paper; keep native agreement strengths 4/5, exclude error rows, preserve neither and annotation strength. Reserve original sentences across name swaps. Some terse Reddit contexts remain ambiguous. |
+| TabMWP | `tabmwp` | 5,317 / 1,830 / 1,992 | tasksource/tabmwp mirrors the original option-bearing JSON questions with full text tables. Reserve all native held-out tables, including free-answer questions; solutions stay in metadata. Dataset CC BY-NC-SA 4.0, distinct from MIT code. |
 
-[Preliminary Hub checks](../../../docs/jev/audits/cloze-source-screen.json). ReCAM and KnowRef load directly; do not assume their data needs hosting. The inspected TabMWP mirror is an image/conversation conversion, so it is not a faithful source for the requested native text view.
+`preserve_choices=True` is a small opt-in on the existing MC template; ordinary text tasks keep their existing defaults. ReCAM's original test is protected but never treated as labeled data. No new task type or loader.

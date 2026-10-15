@@ -48,6 +48,8 @@ balance, prompt styling, licenses) and drops rows already published in train or 
 shards stay byte-identical; `default` is re-mixed at the next full rebuild. Changing a published source
 needs a full rebuild.
 
+Use `preserve_choices=True` on multiple-choice annotations that need every native option. This also keeps source order and pads shorter rows when loading the ordinary Tasksource view.
+
 Smoke test, without publishing:
 
 ```bash

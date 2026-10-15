@@ -278,6 +278,8 @@ class MultipleChoiceFields(Preprocessing):
     def __call__(self,dataset, *args, gold_first=True, max_options=MAX_MC_OPTIONS, **kwargs):
         """``gold_first=False`` keeps source option order and, with
         ``max_options=None``, every option (padding short rows with None)."""
+        if getattr(self, 'preserve_choices', False):
+            gold_first, max_options = False, None
         dataset = super().__call__(dataset, *args, **kwargs)
         if self.choices_list:
             dataset = dataset.filter(lambda x: x['choices_list'] is not None and 1<len(x['choices_list']))
@@ -397,7 +399,8 @@ class SharedFields:
 class Classification(SharedFields, ClassificationFields): pass
 
 @dataclass
-class MultipleChoice(SharedFields, MultipleChoiceFields): pass
+class MultipleChoice(SharedFields, MultipleChoiceFields):
+    preserve_choices: bool = False  # retain native order and every option, padding short rows
 
 @dataclass
 class VisualClassification(SharedFields, Preprocessing):

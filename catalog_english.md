@@ -1,4 +1,4 @@
-575 English tasks. Load one with `load_task(id)`; the annotations are in [tasks.py](src/tasksource/tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
+580 English tasks. Load one with `load_task(id)`; the annotations are in [tasks.py](src/tasksource/tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
 
 Browse the [example catalog](docs/examples.md): one real example per task.
 
@@ -579,6 +579,11 @@ Browse the [example catalog](docs/examples.md): one real example per task.
 | 573 | [faithdial/grounding](src/tasksource/tasks.py#L3560) | Classification | [McGill-NLP/FaithDial](https://hf.co/datasets/McGill-NLP/FaithDial) | ✓ |
 | 574 | [ragtruth/grounding](src/tasksource/tasks.py#L3577) | Classification | [wandb/RAGTruth-processed](https://hf.co/datasets/wandb/RAGTruth-processed) | ✓ |
 | 575 | [comve](src/tasksource/tasks.py#L3589) | MultipleChoice | [tasksource/comve](https://hf.co/datasets/tasksource/comve) |  |
+| 576 | [cbt/ne](src/tasksource/tasks.py#L3606) | MultipleChoice | [cam-cst/cbt](https://hf.co/datasets/cam-cst/cbt) | ✓ |
+| 577 | [cbt/cn](src/tasksource/tasks.py#L3614) | MultipleChoice | [cam-cst/cbt](https://hf.co/datasets/cam-cst/cbt) | ✓ |
+| 578 | [recam](src/tasksource/tasks.py#L3629) | MultipleChoice | [holylovenia/recam](https://hf.co/datasets/holylovenia/recam) | ✓ |
+| 579 | [knowref60k](src/tasksource/tasks.py#L3644) | MultipleChoice | [coref-data/knowref_60k_raw](https://hf.co/datasets/coref-data/knowref_60k_raw) | ✓ |
+| 580 | [tabmwp](src/tasksource/tasks.py#L3654) | MultipleChoice | [tasksource/tabmwp](https://hf.co/datasets/tasksource/tabmwp) |  |
 
 ## Soft labels
 

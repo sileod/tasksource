@@ -3589,3 +3589,68 @@ ragtruth__grounding = Classification(
 comve = MultipleChoice(inputs='inputs',choices_list='choices_list',labels='labels',
     dataset_name='tasksource/comve',task_id='comve',metadata='metadata',complete_splits=False,
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/comve']})
+
+
+# Stable document identities for cloze and name-swapped reference questions.
+def _text_hash(text):
+    return hashlib.sha256(' '.join(text.casefold().split()).encode()).hexdigest()
+
+
+def _cbt_rows(dataset):
+    return _document_holdouts(dataset,lambda r:_text_hash(' '.join(r['sentences']))).filter(lambda r:
+        len(r['options'])==10 and all(o.strip() for o in r['options']) and
+        len({_text_hash(o) for o in r['options']})==10 and r['options'].count(r['answer'])==1 and
+        r['question'].count('XXXXX')==1)
+
+
+cbt__ne = MultipleChoice(inputs=lambda r:'Passage:\n'+'\n'.join(r['sentences'])+'\n\nCloze: '+r['question'],
+    choices_list='options',labels=lambda r:r['choices_list'].index(r['answer']),
+    dataset_name='cam-cst/cbt',config_name='NE',task_id='cbt/ne',preserve_choices=True,complete_splits=False,
+    pre_process=_cbt_rows,question='Which candidate fills XXXXX in the cloze sentence, using the passage?',
+    metadata=lambda r:_decision_metadata(_text_hash(' '.join(r['sentences'])+r['question']),
+        _text_hash(' '.join(r['sentences'])),annotation_origin='procedural'),
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['cam-cst/cbt']})
+
+cbt__cn = MultipleChoice(inputs=lambda r:'Passage:\n'+'\n'.join(r['sentences'])+'\n\nCloze: '+r['question'],
+    choices_list='options',labels=lambda r:r['choices_list'].index(r['answer']),
+    dataset_name='cam-cst/cbt',config_name='CN',task_id='cbt/cn',preserve_choices=True,complete_splits=False,
+    pre_process=_cbt_rows,question='Which candidate fills XXXXX in the cloze sentence, using the passage?',
+    metadata=lambda r:_decision_metadata(_text_hash(' '.join(r['sentences'])+r['question']),
+        _text_hash(' '.join(r['sentences'])),annotation_origin='procedural'),
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['cam-cst/cbt']})
+
+
+def _recam_rows(dataset):
+    from .metadata.recam_test_overlap import RECAM_TEST_OVERLAP
+    return _document_holdouts(dataset,lambda r:_text_hash(r['article'])).filter(lambda r:
+        _text_hash(r['article']) not in RECAM_TEST_OVERLAP and r['question'].count('@placeholder')==1)
+
+
+recam = MultipleChoice(inputs=lambda r:'Passage:\n'+r['article']+'\n\nCloze: '+r['question'],
+    choices=regen(r'option_[0-4]'),labels='label',dataset_name='holylovenia/recam',task_id='recam',
+    preserve_choices=True,complete_splits=False,pre_process=_recam_rows,
+    question='Which candidate fills @placeholder in the cloze sentence, using the passage?',
+    metadata=lambda r:_decision_metadata(_text_hash(r['article']+r['question']),_text_hash(r['article']),
+        annotation_origin='procedural'),load_dataset_kwargs={'revision':SOURCE_REVISIONS['holylovenia/recam']})
+
+
+def _knowref_rows(dataset):
+    return _document_holdouts(dataset,lambda r:_text_hash(r['original_sentence'])).filter(lambda r:
+        r['correct_candidate'] in ('candidate_0','candidate_1','neither') and r['annotation_strength'] in ('4','5') and
+        len(re.findall(r'\[[^\[\]]+\]',r['swapped_sentence']))==1 and
+        all(r[c].strip() for c in ('candidate0','candidate1')) and _text_hash(r['candidate0'])!=_text_hash(r['candidate1']))
+
+
+knowref60k = MultipleChoice(inputs='swapped_sentence',
+    choices_list=lambda r:[r['candidate0'],r['candidate1'],'neither candidate'],
+    labels=lambda r:('candidate_0','candidate_1','neither').index(r['correct_candidate']),
+    dataset_name='coref-data/knowref_60k_raw',task_id='knowref60k',preserve_choices=True,complete_splits=False,
+    pre_process=_knowref_rows,question='Who is the most likely referent of the pronoun in square brackets? Choose neither only if it refers to someone else.',
+    metadata=lambda r:_decision_metadata(_text_hash(r['inputs']),_text_hash(r['original_sentence']),
+        annotation_strength=r['annotation_strength'],native_label=r['correct_candidate'],annotation_origin='human'),
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['coref-data/knowref_60k_raw']})
+
+
+tabmwp = MultipleChoice(inputs='inputs',choices_list='choices_list',labels='labels',dataset_name='tasksource/tabmwp',
+    task_id='tabmwp',preserve_choices=True,complete_splits=False,metadata='metadata',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/tabmwp']})

@@ -4,6 +4,12 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource-jev-typed-decisions v2026.10.15.2
+
+- Append CBT named-entity/common-noun cloze, ReCAM, high-agreement KnowRef-60K and native text-table TabMWP decisions to `full`, with all native choices retained.
+- Exclude malformed choices, error/low-agreement labels and shared source holdouts, including ReCAM's unlabeled-test articles. Add source/license provenance and keep solutions out of model inputs.
+- Preserve existing training shards and evaluation data. `default` gains these sources at the next canonical rebuild.
+
 ## tasksource 2026-10-15.6
 
 - Parked after checking flagged examples against the raw sources: hlgd (loose story groupings), EVALution lexical relations (wrong source relations), blog_authorship/job (industry not inferable) and app_reviews (arbitrary ratings on short reviews).

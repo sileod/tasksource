@@ -1,0 +1,364 @@
+{
+  "cbt/ne": {
+    "native_rows": {
+      "train": 108719,
+      "test": 2500,
+      "validation": 2000
+    },
+    "retained_rows": {
+      "train": 108500,
+      "test": 2486,
+      "validation": 1996
+    },
+    "dropped_rows": {
+      "train": 219,
+      "test": 14,
+      "validation": 4
+    },
+    "checked_gold": 45,
+    "examples": [
+      {
+        "source_index": "train:75876",
+        "state": "Passage:\nSo Mother Ceres set her torch in a corner -LRB- where it kept burning all the while -RRB- , and took up her abode in the palace of King Cereus , as nurse to the little Prince Demophoon .\nShe treated him as if he were her own child , and allowed neither the king nor the queen to say whether he should be bathed in warm or cold water , or what he should eat , or how often he should take the air , or when he should be put to bed .\nYou would hardly believe me , if I were to tell how quickly the baby prince got rid of his ailments , and grew fat , and rosy , and strong , and how he had two rows of ivory teeth in less time than any other little fellow , before or since .\nInstead of the palest , and wretchedest , and puniest imp in the world -LRB- as his own mother confessed him to be , when Ceres first took him in charge -RRB- , he was now a strapping baby , crowing , laughing , kicking up his heels , and rolling from one end of the room to the other .\nAll the good women of the neighborhood crowded to the palace , and held up their hands , in unutterable amazement , at the beauty and wholesomeness of this darling little prince .\nTheir wonder was the greater , because he was never seen to taste any food ; not even so much as a cup of milk .\n`` Pray , nurse , '' the queen kept saying , `` how is it that you make the child thrive so ? ''\n`` I was a mother once , '' Ceres always replied ; `` and having nursed my own child , I know what other children need . ''\nBut Queen Metanira , as was very natural , had a great curiosity to know precisely what the nurse did to her child .\nOne night , therefore , she hid herself in the chamber where Ceres and the little prince were accustomed to sleep .\nThere was a fire in the chimney , and it had now crumbled into great coals and embers , which lay glowing on the hearth , with a blaze flickering up now and then , and flinging a warm and ruddy light upon the walls .\nCeres sat before the hearth with the child in her lap , and the firelight making her shadow dance upon the ceiling overhead .\nShe undressed the little prince , and bathed him all over with some fragrant liquid out of a vase .\nThe next thing she did was to rake back the red embers , and make a hollow place among them , just where the backlog had been .\nAt last , while the baby was crowing , and clapping its fat little hands , and laughing in the nurse 's face -LRB- just as you may have seen your little brother or sister do before going into its warm bath -RRB- , Ceres suddenly laid him , all naked as he was , in the hollow among the red-hot embers .\nShe then raked the ashes over him , and turned quietly away .\nYou may imagine , if you can , how Queen Metanira shrieked , thinking nothing less than that her dear child would be burned to a cinder .\nShe burst forth from her hiding-place , and running to the hearth , raked open the fire , and snatched up poor little Prince Demophoon out of his bed of live coals , one of which he was gripping in each of his fists .\nHe immediately set up a grievous cry , as babies are apt to do , when rudely startled out of a sound sleep .\nTo the queen 's astonishment and joy , she could perceive no token of the child 's being injured by the hot fire in which he had lain .\n\nCloze: She now turned to Mother XXXXX , and asked her to explain the mystery .",
+        "question": "Which candidate fills XXXXX in the cloze sentence, using the passage?",
+        "choices": [
+          "Demophoon",
+          "hiding-place",
+          "Metanira",
+          "Ceres",
+          "first",
+          "Cereus",
+          "embers",
+          "fire",
+          "wretchedest",
+          "imp"
+        ],
+        "gold": "Ceres"
+      },
+      {
+        "source_index": "train:45950",
+        "state": "Passage:\nFour years of earnest , happy work ... and then the guerdon of a useful knowledge gained and a sweet heart won .\nBehind them in the garden the little stone house brooded among the shadows .\nIt was lonely but not forsaken .\nIt had not yet done with dreams and laughter and the joy of life ; there were to be future summers for the little stone house ; meanwhile , it could wait .\nCHAPTER I. Mrs. Rachel Lynde is Surprised Mrs. Rachel Lynde lived just where the Avonlea main road dipped down into a little hollow , fringed with alders and ladies ' eardrops and traversed by a brook that had its source away back in the woods of the old Cuthbert place ; it was reputed to be an intricate , headlong brook in its earlier course through those woods , with dark secrets of pool and cascade ; but by the time it reached Lynde 's Hollow it was a quiet , well-conducted little stream , for not even a brook could run past Mrs. Rachel Lynde 's door without due regard for decency and decorum ; it probably was conscious that Mrs. Rachel was sitting at her window , keeping a sharp eye on everything that passed , from brooks and children up , and that if she noticed anything odd or out of place she would never rest until she had ferreted out the whys and wherefores thereof .\nThere are plenty of people in Avonlea and out of it , who can attend closely to their neighbor 's business by dint of neglecting their own ; but Mrs. Rachel Lynde was one of those capable creatures who can manage their own concerns and those of other folks into the bargain .\nShe was a notable housewife ; her work was always done and well done ; she `` ran '' the Sewing Circle , helped run the Sunday-school , and was the strongest prop of the Church Aid Society and Foreign Missions Auxiliary .\nYet with all this Mrs. Rachel found abundant time to sit for hours at her kitchen window , knitting `` cotton warp '' quilts -- she had knitted sixteen of them , as Avonlea housekeepers were wont to tell in awed voices -- and keeping a sharp eye on the main road that crossed the hollow and wound up the steep red hill beyond .\nSince Avonlea occupied a little triangular peninsula jutting out into the Gulf of St. Lawrence with water on two sides of it , anybody who went out of it or into it had to pass over that hill road and so run the unseen gauntlet of Mrs. Rachel 's all-seeing eye .\nShe was sitting there one afternoon in early June .\nThe sun was coming in at the window warm and bright ; the orchard on the slope below the house was in a bridal flush of pinky-white bloom , hummed over by a myriad of bees .\nThomas Lynde -- a meek little man whom Avonlea people called `` Rachel Lynde 's husband '' -- was sowing his late turnip seed on the hill field beyond the barn ; and Matthew Cuthbert ought to have been sowing his on the big red brook field away over by Green Gables .\nMrs. Rachel knew that he ought because she had heard him tell Peter Morrison the evening before in William J. Blair 's store over at Carmody that he meant to sow his turnip seed the next afternoon .\nPeter had asked him , of course , for Matthew Cuthbert had never been known to volunteer information about anything in his whole life .\nAnd yet here was Matthew Cuthbert , at half-past three on the afternoon of a busy day , placidly driving over the hollow and up the hill ; moreover , he wore a white collar and his best suit of clothes , which was plain proof that he was going out of Avonlea ; and he had the buggy and the sorrel mare , which betokened that he was going a considerable distance .\nNow , where was Matthew Cuthbert going and why was he going there ?\nHad it been any other man in Avonlea , Mrs. Rachel , deftly putting this and that together , might have given a pretty good guess as to both questions .\nBut Matthew so rarely went from home that it must be something pressing and unusual which was taking him ; he was the shyest man alive and hated to have to go among strangers or to any place where he might have to talk .\nMatthew , dressed up with a white collar and driving in a buggy , was something that did n't happen often .\nMrs. Rachel , ponder as she might , could make nothing of it and her afternoon 's enjoyment was spoiled .\n\nCloze: `` I 'll just step over to Green XXXXX after tea and find out from Marilla where he 's gone and why , '' the worthy woman finally concluded .",
+        "question": "Which candidate fills XXXXX in the cloze sentence, using the passage?",
+        "choices": [
+          "Rachel",
+          "hours",
+          "day",
+          "Matthew",
+          "dint",
+          "years",
+          "housekeepers",
+          "Cuthbert",
+          "early",
+          "Gables"
+        ],
+        "gold": "Gables"
+      }
+    ],
+    "excluded_reasons": {
+      "train": {
+        "duplicate_candidate": 207,
+        "blank_candidate": 12
+      },
+      "test": {
+        "duplicate_candidate": 10,
+        "blank_candidate": 4
+      },
+      "validation": {
+        "duplicate_candidate": 4
+      }
+    }
+  },
+  "cbt/cn": {
+    "native_rows": {
+      "train": 120769,
+      "test": 2500,
+      "validation": 2000
+    },
+    "retained_rows": {
+      "train": 120767,
+      "test": 2500,
+      "validation": 2000
+    },
+    "dropped_rows": {
+      "train": 2,
+      "test": 0,
+      "validation": 0
+    },
+    "checked_gold": 45,
+    "examples": [
+      {
+        "source_index": "train:103713",
+        "state": "Passage:\n`` I should have killed that man , '' I answered . '\n`` Kill him now , '' he said .\n`` He will not move a limb . '' '\n`` No , '' I said .\n`` You 've taken my men out of my command .\nI should only be your butcher if I killed him now . ''\nDo you see what I meant ? '\nParnesius turned to Dan .\n` Yes , ' said Dan .\n` It would n't have been fair , somehow . '\n` That was what I thought , ' said Parnesius .\n` But Maximus frowned .\n`` You 'll never be an Emperor , '' he said .\n`` Not even a General will you be . '' '\nI was silent , but my Father seemed pleased . '\n`` I came here to see the last of you , '' he said . '\n`` You have seen it , '' said Maximus .\n`` I shall never need your son any more .\nHe will live and he will die an officer of a Legion -- and he might have been Prefect of one of my Provinces .\nNow eat and drink with us , '' he said .\n\nCloze: `` Your XXXXX will wait till you have finished . ''",
+        "question": "Which candidate fills XXXXX in the cloze sentence, using the passage?",
+        "choices": [
+          "turned",
+          "man",
+          "men",
+          "eat",
+          "Provinces",
+          "command",
+          "limb",
+          "butcher",
+          "son",
+          "officer"
+        ],
+        "gold": "men"
+      },
+      {
+        "source_index": "train:55489",
+        "state": "Passage:\nBless us , how fine we are ! ''\nand Kitty stepped in , feeling that only one thing more was needed to make her cup overflow .\nThat one thing was speedily vouchsafed , for before her skirts were smoothly settled , Jack called out , in his hearty way , -- `` How are you , Fletcher ?\nIf you are bound for Chapel I 'll take you up . ''\n`` Thanks ; good-morning , Miss Heath . ''\nIt was all done in an instant , and the next thing Kitty knew she was rolling away with the elegant Horace sitting opposite .\nHow little it takes to make a young girl happy !\nA pretty dress , sunshine , and somebody opposite , and they are blest .\nKitty 's face glowed and dimpled with pleasure as she glanced about her , especially when she , sitting in state with two gentlemen all to herself , passed `` those girls '' walking in the dust with a beardless boy ; she felt that she could forgive past slights , and did so with a magnanimous smile and bow .\nBoth Jack and Fletcher had graduated the year before , but still took an interest in their old haunts , and patronized the fellows who were not yet through the mill , at least the Seniors and Juniors ; of Sophs and Freshs they were sublimely unconscious .\nGreeted by frequent slaps on the shoulder , and hearty `` How are you , old fellows , '' they piloted Kitty to a seat in the chapel .\nAn excellent place , but the girl 's satisfaction was marred by Fletcher 's desertion , and she could not see anything attractive about the dashing young lady in the pink bonnet to whom he devoted himself , `` because she was a stranger , '' Kitty said .\nEverybody knows what goes on in the Chapel , after the fight and scramble are over .\nThe rustle and buzz , the music , the oratory and the poem , during which the men cheer and the girls simper ; the professors yawn , and the poet 's friends pronounce him a second Longfellow .\nThen the closing flourishes , the grand crush , and general scattering .\nThen the fun really begins , as far as the young folks are concerned .\nThey do n't mind swarming up and down stairs in a solid phalanx ; they can enjoy half a dozen courses of salad , ice and strawberries , with stout gentlemen crushing their feet , anxious mammas sticking sharp elbows into their sides , and absent-minded tutors walking over them .\nThey can flirt vigorously in a torrid atmosphere of dinner , dust , and din ; can smile with hot coffee running down their backs , small avalanches of ice-cream descending upon their best bonnets , and sandwiches , butter-side down , reposing on their delicate silks .\nThey know that it is a costly rapture , but they carefully refrain from thinking of the morrow , and energetically illustrate the Yankee maxim which bids us enjoy ourselves in our early bloom .\nKitty did have `` a rousing good time ; '' for Jack was devoted , taking her everywhere , showing her everything , feeding and fanning her , and festooning her train with untiring patience .\n\nCloze: How many forcible expressions he mentally indulged in as he walked on that unlucky XXXXX we will not record ; he smiled and skipped and talked of treading on flowers in a way that would have charmed Kitty , if some one else had not been hovering about `` The Daisy , '' as Fletcher called her .",
+        "question": "Which candidate fills XXXXX in the cloze sentence, using the passage?",
+        "choices": [
+          "state",
+          "Thanks",
+          "poem",
+          "gentlemen",
+          "interest",
+          "thing",
+          "train",
+          "sunshine",
+          "feeding",
+          "somebody"
+        ],
+        "gold": "train"
+      }
+    ],
+    "excluded_reasons": {
+      "train": {
+        "duplicate_candidate": 2
+      },
+      "test": {},
+      "validation": {}
+    }
+  },
+  "recam": {
+    "native_rows": {
+      "train": 6545,
+      "validation": 1688
+    },
+    "retained_rows": {
+      "train": 6403,
+      "validation": 1656
+    },
+    "dropped_rows": {
+      "train": 142,
+      "validation": 32
+    },
+    "checked_gold": 35,
+    "examples": [
+      {
+        "source_index": "train:5193",
+        "state": "Passage:\nThe tweet, the first in a series of three, quoted Nelson Mandela and was accompanied by a picture of Mr Obama smiling with a group of children from different racial backgrounds. It has been liked almost three million times since it was posted on 13 August following the attack in Charlottesville, Virginia. The milestone was reached at approximately 01:07 GMT, Twitter told the BBC. It overtook a tweet posted by Ariana Grande expressing condolences after the Manchester terror attack in May. Over three tweets, Mr Obama quoted a passage from Mr Mandela’s autobiography, The Long Walk To Freedom. \"No one is born hating another person because of the colour of his skin or his background or his religion,” the quote reads. End of Twitter post  by @BarackObama \"People must learn to hate, and if they can learn to hate, they can be taught to love, for love comes more naturally to the human heart than its opposite.” The picture shows Mr Obama in 2011 visiting a day care centre in Bethesda, Maryland. It was taken by the then-White House photographer, Pete Souza. Since President Trump election win, Mr Souza has been posting topical images on Instagram, mostly highlighting Mr Obama's approach to the presidency in comparison to his successor.\n\nCloze: It may be President Trump 's @placeholder tool of choice - but it 's a tweet by former President Barack Obama that has become the most liked in Twitter 's history .",
+        "question": "Which candidate fills @placeholder in the cloze sentence, using the passage?",
+        "choices": [
+          "lump",
+          "home",
+          "communication",
+          "twitter",
+          "defining"
+        ],
+        "gold": "communication"
+      },
+      {
+        "source_index": "train:2952",
+        "state": "Passage:\nSuleyman Soylu told Turkish TV that explosives had been planted in a tunnel dug beneath the police headquarters. Three people died in Tuesday's blast in the mainly Kurdish south-eastern city. The outlawed militant group the Kurdistan Workers' Party (PKK) later claimed responsibility for the attack. In a statement, the PKK was quoted as saying the attack was to avenge the treatment of Kurds, particularly those in jail, by the authorities. It said its militants had planted the explosives and then returned safely to base afterwards. Diyarbakir has repeatedly been hit by militants targeting security services, but nonetheless Tuesday's blast was spectacular - leaving a large crater and drawing crowds of onlookers on to the streets. It ratcheted up tensions four days before a key referendum on granting President Recep Tayyip Erdogan sweeping new powers. Why is Turkey holding a referendum? \"It turned out that the explosion was the result of a terrorist attack,\" Mr Soylu was quoted as telling Haberturk television. \"The attack was carried out through a tunnel dug from the outside. They dug a tunnel and placed the explosives in the ground.\" He said the surroundings of police buildings were inspected about once a month, so the tunnel must have been dug quickly. Pictures on Hurriyet news website appeared to show bags of soil stacked atop one another inside the police headquarters. In a statement, the governor's office said the tunnel was 30m (100 feet) long and its entrance had been in an adjacent building. It said one tonne of explosives was planted. It said five suspects were detained on Tuesday and a further 172 on Wednesday. On Tuesday, Mr Soylu said the blast occurred from a vehicle under repair, and appeared to be an accident. South-eastern Turkey has seen frequent clashes between the PKK and Turkish security forces since a fragile truce collapsed in the summer of 2015. There have also been bloody attacks in Turkey blamed on so-called Islamic State (IS). The jihadists are hostile to both the Turkish state and the Kurdish rebels, who are battling for territory and influence inside Syria. Who are Kurdistan Workers' Party (PKK) rebels? Why is Islamic State group attacking Turkey?\n\nCloze: A big explosion in the Turkish city of Diyarbakir which @placeholder appeared to be an accident was actually the result of a terror attack , the interior minister has said .",
+        "question": "Which candidate fills @placeholder in the cloze sentence, using the passage?",
+        "choices": [
+          "briefly",
+          "mysteriously",
+          "later",
+          "originally",
+          "also"
+        ],
+        "gold": "originally"
+      }
+    ],
+    "source_validation": {
+      "source": "boyuanzheng010/SemEval2021-Reading-Comprehension-of-Abstract-Meaning",
+      "revision": "93dff63af52d031980da8a8c8ea71f5a399031dc",
+      "hub_revision": "1061da9ff8290ae64d2ab4659eccd5c78407ff13",
+      "verified_hub_copy": true,
+      "test_overlap_articles": 121,
+      "source_sha256": {
+        "data/training_data/Task_1_train.jsonl": "e18ca829d5748d43b8d5fc90a70f481fed7be99a4844abf88be978b00e165bba",
+        "data/training_data/Task_1_dev.jsonl": "99710dd16cc732fa57a6119b10253aada1cbd2813441d212de772ca4ef69f38b",
+        "data/test_data/Task_1_test.jsonl": "0156c2e6496a42e99e503daea608c159098712ff1fb72f75df1f4e06229e8f1b",
+        "data/training_data/Task_2_train.jsonl": "b4e72b6f02660049b7b2f993db572c7b6eccc46706e54de3c4aad9a75ef5f618",
+        "data/training_data/Task_2_dev.jsonl": "5f04400551163843e6ac5225cf4bfe4a93026e52f4d00c4dd4fad9019ed01954",
+        "data/test_data/Task_2_test.jsonl": "96c615739b94a3b69e037d2d142f41715cd4f5fe9c65f00bdbbdd481db236666"
+      }
+    },
+    "excluded_reasons": {
+      "validation": {
+        "native_unlabeled_test_article": 32
+      },
+      "train": {
+        "heldout_source_group": 48,
+        "native_unlabeled_test_article": 94
+      }
+    }
+  },
+  "knowref60k": {
+    "native_rows": {
+      "train": 39999,
+      "validation": 21241,
+      "test": 3061
+    },
+    "retained_rows": {
+      "train": 29838,
+      "validation": 15953,
+      "test": 3061
+    },
+    "dropped_rows": {
+      "train": 10161,
+      "validation": 5288,
+      "test": 0
+    },
+    "checked_gold": 45,
+    "examples": [
+      {
+        "source_index": "train:17526",
+        "state": "Donald comes out to soften up Clyde so [he] can cash in after the win , also gets squashed .",
+        "question": "Who is the most likely referent of the pronoun in square brackets? Choose neither only if it refers to someone else.",
+        "choices": [
+          "Clyde",
+          "neither candidate",
+          "Donald"
+        ],
+        "gold": "Donald"
+      },
+      {
+        "source_index": "train:28663",
+        "state": "Samuel was awesome at doing the same to John when [he] was party leader .",
+        "question": "Who is the most likely referent of the pronoun in square brackets? Choose neither only if it refers to someone else.",
+        "choices": [
+          "Samuel",
+          "John",
+          "neither candidate"
+        ],
+        "gold": "Samuel"
+      }
+    ],
+    "annotation_policy": "Five annotators; require native agreement strength 4 or 5. Drop explicit error labels and reserve source sentences across name swaps.",
+    "annotation_evidence": "https://aclanthology.org/2020.coling-main.515.pdf#page=8",
+    "excluded_reasons": {
+      "test": {},
+      "validation": {
+        "low_agreement": 5235,
+        "error_label": 53
+      },
+      "train": {
+        "low_agreement": 10021,
+        "error_label": 139,
+        "heldout_source_group": 1
+      }
+    }
+  },
+  "tabmwp": {
+    "provenance": {
+      "source": "https://github.com/lupantech/PromptPG",
+      "revision": "5a1a52214521590b075f545b76a4f5ce666345e3",
+      "source_sha256": {
+        "data/tabmwp/problems_train.json": "63e57d9a212740f080d4e08657d7aeda3d9f95b26c74a1bdfd9c576846d9b828",
+        "data/tabmwp/problems_dev.json": "e20fa61be57f66fb574c7fe97e8ef958d8589bfe10371947d7214ac3bf51e904",
+        "data/tabmwp/problems_test.json": "c47607dad36477725087cb4e5317fe1e89a69dfed404eca430673bda36fda45c"
+      },
+      "license": "cc-by-nc-sa-4.0",
+      "annotation_origin": "human",
+      "native_counts": {
+        "train": 23059,
+        "validation": 7686,
+        "test": 7686
+      },
+      "excluded_counts": {
+        "test": {
+          "not_multiple_choice": 5694
+        },
+        "validation": {
+          "not_multiple_choice": 5710,
+          "heldout_table": 146
+        },
+        "train": {
+          "not_multiple_choice": 17315,
+          "heldout_table": 427
+        }
+      },
+      "conversion_sha256": "16cd299e3bb4fa08017529b05c17aa11bbf0bab4a32d2e4533476213457587ec",
+      "configuration": {
+        "view": "native multiple choice, textual table",
+        "split_policy": "native; test > validation > train by table"
+      },
+      "splits": {
+        "test": 1992,
+        "validation": 1830,
+        "train": 5317
+      },
+      "label_counts": {
+        "test": {
+          "1": 791,
+          "0": 774,
+          "3": 216,
+          "2": 210,
+          "4": 1
+        },
+        "validation": {
+          "1": 707,
+          "3": 196,
+          "2": 231,
+          "0": 696
+        },
+        "train": {
+          "0": 2007,
+          "1": 2075,
+          "3": 612,
+          "2": 619,
+          "4": 4
+        }
+      }
+    },
+    "checked_gold": 45,
+    "examples": [
+      {
+        "source_index": "train:2984",
+        "state": "Table: Tour boat schedule\nSea Town | 8:00 A.M. | 8:30 A.M. | 9:00 A.M.\nWhale Watch Harbor | 9:30 A.M. | 10:00 A.M. | 10:30 A.M.\nSurfing Beach | 10:00 A.M. | 10:30 A.M. | 11:00 A.M.\nSea Lion Docks | 10:45 A.M. | 11:15 A.M. | 11:45 A.M.\nLobster Pier | 11:30 A.M. | 12:00 P.M. | 12:30 P.M.\nKite Coast | 11:45 A.M. | 12:15 P.M. | 12:45 P.M.\nOyster Lighthouse | 12:00 P.M. | 12:30 P.M. | 1:00 P.M.\n\nQuestion: Look at the following schedule. Rosa is at Sea Lion Docks at 11.00 A.M. How soon can she get to Kite Coast?",
+        "question": "Choose the criterion that best answers the question.",
+        "choices": [
+          "11:45 A.M.",
+          "12:15 P.M.",
+          "11:15 A.M.",
+          "12:00 P.M."
+        ],
+        "gold": "12:15 P.M."
+      },
+      {
+        "source_index": "train:1888",
+        "state": "Table: Cups of lemonade sold\nDay | Number of cups\nFriday | 19\nSaturday | 18\nSunday | 17\nMonday | 12\n\nQuestion: Erica wrote down how many cups of lemonade she sold in the past 4 days. On which day did the stand sell the most lemonade?",
+        "question": "Choose the criterion that best answers the question.",
+        "choices": [
+          "Monday",
+          "Sunday",
+          "Saturday",
+          "Friday"
+        ],
+        "gold": "Friday"
+      }
+    ]
+  },
+  "review": {
+    "checked_on": "2026-10-15",
+    "scope": "Two manually reviewed recast examples per view, source/format/split checks and sampled native gold comparisons. No exhaustive semantic relabeling.",
+    "findings": [
+      "Native choices only; no generated distractors.",
+      "CBT gold is the original authored word, not a guarantee that no other completion is plausible.",
+      "KnowRef Reddit sentences can be terse/context-dependent; agreement filtering reduces but does not eliminate ambiguity. Neither means a referent outside the two candidates.",
+      "ReCAM copied rows exactly match official labeled files; the original test has no public labels and is excluded.",
+      "TabMWP table schedules and comparisons in reviewed examples are answerable and gold answers check out."
+    ],
+    "licenses": {
+      "cbt": "Hub card declares GFDL 1.3; source literary texts retain their own terms. No independent blanket license inferred.",
+      "recam": "Unspecified: no original dataset license found.",
+      "knowref60k": "Hub card CC BY 4.0; original web text retains source terms.",
+      "tabmwp": "Original dataset CC BY-NC-SA 4.0, distinct from MIT code."
+    }
+  }
+}

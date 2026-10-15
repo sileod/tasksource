@@ -1,6 +1,11 @@
 """Reviewed source snapshots; keep opaque revision IDs out of task annotations."""
 
 SOURCE_REVISIONS = {
+    'cam-cst/cbt': '72b5c46b1248e3316360f0f2f0b2c39e773b68e4',
+    'holylovenia/recam': '1061da9ff8290ae64d2ab4659eccd5c78407ff13',
+    'coref-data/knowref_60k_raw': '7bcc7a154dbf145524e86621a2d45b4ba57e0c04',
+    'tasksource/tabmwp': 'aa424e83d052dfef920547d5079375121ca92d55',
+
     'tasksource/comve': '3bf449686b1f3c2867aafecb2237ae5c9027e240',
     'McGill-NLP/FaithDial': 'f0a79cdf1fbbdd06ce1850cdff81266e29cb6ae0',
     'wandb/RAGTruth-processed': 'eb4f4b9d1b68eb7092d3e1a61c0cd82d9808737b',
