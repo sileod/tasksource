@@ -15,7 +15,7 @@ from .metadata.configs import UNIVERSAL_DEPENDENCIES
 from .preprocess import SoftLabeling, Preprocessing, VisualClassification, constant, get, Classification, TokenClassification, MultipleChoice
 
 from .metadata.source_revisions import SOURCE_REVISIONS
-from .tasks import _pragmeval_scale, NLI_LABEL_VALUES, _document_holdouts, _unique_text_splits, _decision_metadata, _probing, _SENTENCE_LENGTH
+from .tasks import _cast_blog_topics, LEXICAL_RELATIONS, LEXICAL_RELATION_QUESTION, _pragmeval_scale, NLI_LABEL_VALUES, _document_holdouts, _unique_text_splits, _decision_metadata, _probing, _SENTENCE_LENGTH
 from .tasks import _MAVEN_ERE, _MAVEN_ERE_TEMPORAL, _maven_ere_splits, _maven_ere_records, _flatten_text
 import hashlib
 import json
@@ -39,6 +39,23 @@ gen_debiased_nli__mnli_z_aug = Classification("premise","hypothesis","label",
 	dataset_name="pietrolesci/gen_debiased_nli", splits=["mnli_z_aug",None,None], label_values=NLI_LABEL_VALUES)
 gen_debiased_nli__mnli_seq_z = Classification("premise","hypothesis","label",
 	dataset_name="pietrolesci/gen_debiased_nli", splits=["mnli_seq_z",None,None], label_values=NLI_LABEL_VALUES)
+
+hlgd = Classification("headline_a", "headline_b", labels="label", dataset_name="tasksource/hlgd",
+    # HLGD groups headlines by story timeline (a mutiny, then the new prime minister)
+    question="Do the two headlines belong to the same developing news story?")
+app_reviews = Classification("review", labels="star", splits=["train", None, None], ordinal=True,
+    question="How many stars did the reviewer give the app?",
+    # about 30% of reviews are 1-3 words, often only the reviewer's name, which cannot support a rating
+    pre_process=lambda ds: ds.filter(lambda r: len((r["review"] or "").split()) >= 4),
+    label_values={star: f"{star} star" + "s" * (star > 1) for star in range(1, 6)})
+blog_authorship_corpus__job       = Classification(sentence1="text",labels="topic", question="In which industry does the blogger work?",
+    dataset_name="tasksource/blog_authorship_corpus",
+    pre_process=lambda ds: _cast_blog_topics(ds))
+lexical_relation_classification__EVALution = Classification(sentence1="head", sentence2="tail",
+    labels=lambda x: LEXICAL_RELATIONS.get(x["relation"], x["relation"]), question=LEXICAL_RELATION_QUESTION,
+    dataset_name="json", config_name="EVALution", task_id="lexical_relation_classification/EVALution",
+    load_dataset_kwargs={"data_files": {split: f"hf://datasets/relbert/lexical_relation_classification/dataset/EVALution/{name}.jsonl"
+                                        for split, name in [("train", "train"), ("validation", "val"), ("test", "test")]}})
 
 wouldyourather = SoftLabeling(constant(''), labels=lambda x: [x['votes_a'], x['votes_b']],
     options=lambda x: [x['option_a'], x['option_b']], hard=2/3, annotators=1000,
@@ -245,6 +262,10 @@ KINDS = {
 }
 
 PARKED = {
+    "hlgd": ("unsound", "story-group labels are too loose: Snowden's passport and Obama's Manning decision, or Bolsonaro's stabbing and the Vale dam, count as the same event; 35% flagged by a 2026 LLM screen"),
+    "lexical_relation_classification__EVALution": ("unsound", "source relations are often wrong (disease/illness HasProperty, soap/water Antonym); 31% flagged; BLESS, K&H+N and ROOT09 cover lexical relations"),
+    "blog_authorship_corpus__job": ("unsound", "the industry is rarely inferable from a post (Christmas shopping labeled Manufacturing); 24% flagged"),
+    "app_reviews": ("unsound", "short, off-topic reviews with arbitrary star ratings even after the length filter; 24% flagged"),
     "pragmeval__mrda": ("unsound", "single meeting utterances without their dialogue context; a 2026 LLM screen flagged 20% of dialogue-act labels"),
     "pragmeval__emobank_arousal": ("low_value", "median split of continuous ratings: items near the middle are coin flips; emotion is covered by other tasks"),
     "pragmeval__emobank_valence": ("low_value", "median split of continuous ratings: items near the middle are coin flips; sentiment is covered by other tasks"),

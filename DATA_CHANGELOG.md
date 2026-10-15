@@ -4,6 +4,11 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource 2026-10-15.6
+
+- Parked after checking flagged examples against the raw sources: hlgd (loose story groupings), EVALution lexical relations (wrong source relations), blog_authorship/job (industry not inferable) and app_reviews (arbitrary ratings on short reviews).
+- logical-fallacy capped at 1,000 training rows (noisy labels).
+
 ## tasksource 2026-10-15.5
 
 - Add CBT named-entity/common-noun cloze, ReCAM abstract-word cloze, KnowRef-60K pronoun resolution and native TabMWP text-table multiple choice.

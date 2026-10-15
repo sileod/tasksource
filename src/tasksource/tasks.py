@@ -237,10 +237,6 @@ add_one_rte = Classification("premise","hypothesis","label",
     dataset_name="pietrolesci/add_one_rte",splits=["train","dev","test"],
     label_values=ENTAILMENT_LABEL_VALUES)
 
-hlgd = Classification("headline_a", "headline_b", labels="label", dataset_name="tasksource/hlgd",
-    # HLGD groups headlines by story timeline (a mutiny, then the new prime minister)
-    question="Do the two headlines belong to the same developing news story?")
-
 paws___labeled_final   = Classification("sentence1", "sentence2", name('label',['not_paraphrase','paraphrase']))
 paws___labeled_swap    = Classification("sentence1", "sentence2", name('label',['not_paraphrase','paraphrase']), splits=["train", None, None])
 
@@ -638,11 +634,6 @@ dbpedia_14 = Classification(sentence1="content", labels="label", splits=["train"
 
 amazon_polarity = Classification(sentence1="content", labels="label", splits=["train", None, "test"], config_name=["amazon_polarity"])
 
-app_reviews = Classification("review", labels="star", splits=["train", None, None], ordinal=True,
-    question="How many stars did the reviewer give the app?",
-    # about 30% of reviews are 1-3 words, often only the reviewer's name, which cannot support a rating
-    pre_process=lambda ds: ds.filter(lambda r: len((r["review"] or "").split()) >= 4),
-    label_values={star: f"{star} star" + "s" * (star > 1) for star in range(1, 6)})
 
 
 hate_speech18 = Classification(sentence1="text", labels="label", splits=["train", None, None],
@@ -709,7 +700,7 @@ LEXICAL_RELATION_QUESTION = "How is the second word related to the first?"
 relbert_lexical_relation_classification = Classification(sentence1="head", sentence2="tail",
  labels=lambda x: LEXICAL_RELATIONS.get(x["relation"], x["relation"]), question=LEXICAL_RELATION_QUESTION,
  dataset_name="json",
- config_name=["BLESS","EVALution","K&H+N","ROOT09"],
+ config_name=["BLESS","K&H+N","ROOT09"],
  task_id="lexical_relation_classification/{config_name}",
  load_dataset_kwargs={"data_files": {
      "train": "hf://datasets/relbert/lexical_relation_classification/dataset/{config_name}/train.jsonl",
@@ -886,9 +877,6 @@ blog_authorship_corpus__gender    = Classification(sentence1="text",labels="gend
 blog_authorship_corpus__age       = Classification(sentence1="text", question="What is the blogger's age group?",
     labels=lambda x: "13-17" if x["age"] <= 17 else "23-27" if x["age"] <= 27 else "33-48",  # the corpus age groups
     dataset_name="tasksource/blog_authorship_corpus")
-blog_authorship_corpus__job       = Classification(sentence1="text",labels="topic", question="In which industry does the blogger work?",
-    dataset_name="tasksource/blog_authorship_corpus",
-    pre_process=lambda ds: _cast_blog_topics(ds))
 
 def _cast_blog_topics(dataset):
     labels = sorted(set(dataset["train"]["topic"]))
@@ -1413,7 +1401,8 @@ robustLR = Classification("context","statement","label", dataset_name="tasksourc
 
 cluttr = Classification("story", "query", "label", dataset_name="tasksource/clutrr")
 
-logical_fallacy = Classification("source_article", labels="logical_fallacies", dataset_name="tasksource/logical-fallacy")
+logical_fallacy = Classification("source_article", labels="logical_fallacies", dataset_name="tasksource/logical-fallacy",
+    max_examples=1000)  # noisy labels ("intentional", "fallacy of relevance" on plain data); about 20% flagged
 
 parade = Classification("Definition1","Definition2", labels=name('Binary labels',["not-paraphrase","paraphrase"]), dataset_name="tasksource/parade")
 
