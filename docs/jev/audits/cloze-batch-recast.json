@@ -252,6 +252,17 @@
         "error_label": 139,
         "heldout_source_group": 1
       }
+    },
+    "additional_native_example": {
+      "swapped_sentence": "Jason was a huge influence on Harry , but Stalin basically went off and did [his] own thing which had little to do with Harry .",
+      "choices": [
+        "Jason",
+        "Harry",
+        "neither candidate"
+      ],
+      "gold": "neither candidate",
+      "annotation_strength": 5,
+      "review": "The marked possessive refers to Stalin, who is outside the two candidates."
     }
   },
   "tabmwp": {
@@ -360,5 +371,26 @@
       "knowref60k": "Hub card CC BY 4.0; original web text retains source terms.",
       "tabmwp": "Original dataset CC BY-NC-SA 4.0, distinct from MIT code."
     }
+  },
+  "publication": {
+    "revision": "263e8c75c6a90c8bb43e2c8993b7f911e1ee5722",
+    "config": "full",
+    "added_rows": 112154,
+    "sources": {
+      "knowref60k": 32809,
+      "cbt/cn": 33065,
+      "cbt/ne": 33119,
+      "tabmwp": 6093,
+      "recam": 7068
+    },
+    "dropped_overlap": {
+      "built": 112154,
+      "train": 0,
+      "evaluation": 0
+    },
+    "version": "v2026.10.15.2",
+    "existing_shards": "byte-identical; checked by append publisher",
+    "evaluation": "unchanged",
+    "default": "unchanged until next canonical rebuild"
   }
 }

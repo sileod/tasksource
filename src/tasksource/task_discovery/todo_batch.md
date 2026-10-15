@@ -245,3 +245,5 @@ Processed the human-curated queue. Native choices only; no generated distractors
 | TabMWP | `tabmwp` | 5,317 / 1,830 / 1,992 | tasksource/tabmwp mirrors the original option-bearing JSON questions with full text tables. Reserve all native held-out tables, including free-answer questions; solutions stay in metadata. Dataset CC BY-NC-SA 4.0, distinct from MIT code. |
 
 `preserve_choices=True` is a small opt-in on the existing MC template; ordinary text tasks keep their existing defaults. ReCAM's original test is protected but never treated as labeled data. No new task type or loader.
+
+Published all five views to Jev `full` in [v2026.10.15.2](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/commit/263e8c75c6a90c8bb43e2c8993b7f911e1ee5722): **112,154 additional training decisions including augmentations**. Existing shards and evaluation are unchanged; `default` gains these at the next canonical rebuild.
