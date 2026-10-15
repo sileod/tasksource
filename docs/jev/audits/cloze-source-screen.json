@@ -1,0 +1,47 @@
+{
+  "checked_on": "2026-10-15",
+  "scope": "Preliminary source discovery only; no tasks implemented or published.",
+  "sources": {
+    "cbt": {
+      "status": "queued",
+      "hub_candidate": "community-datasets/cbt",
+      "hub_status": "404; inspect official release or another faithful Hub copy"
+    },
+    "recam": {
+      "status": "queued",
+      "repo": "holylovenia/recam",
+      "revision": "1061da9ff8290ae64d2ab4659eccd5c78407ff13",
+      "splits": [
+        "train",
+        "validation"
+      ],
+      "format": "CSV",
+      "findings": [
+        "Both Task_1 and Task_2 train/dev files load; verify labels, native options, source terms and passage grouping before integration."
+      ]
+    },
+    "knowref-60k": {
+      "status": "queued",
+      "repo": "coref-data/knowref_60k_raw",
+      "revision": "7bcc7a154dbf145524e86621a2d45b4ba57e0c04",
+      "splits": [
+        "train",
+        "validation",
+        "test"
+      ],
+      "findings": [
+        "Usable direct source with swapped_sentence, correct_candidate, annotation_strength, candidate0 and candidate1.",
+        "Examples contain a bracket-marked pronoun. Audit error/neither labels and original/name-swapped group overlap."
+      ]
+    },
+    "tabmwp": {
+      "status": "queued",
+      "source": "https://github.com/lupantech/PromptPG",
+      "findings": [
+        "The requested 38,431 total matches TabMWP.",
+        "sionic-ai/tabmwp loads but exposes image/conversations in a single train split; it does not supply the desired native textual-table/MC schema.",
+        "zyhang1998/tabmwp returns 404. Inspect official source or another faithful native mirror."
+      ]
+    }
+  }
+}
