@@ -1329,8 +1329,8 @@ ambient= Classification("premise","hypothesis","hypothesis_ambiguous",dataset_na
 
 # the source label marks the less natural path (it points to the longer, odder chain 60% of the time
 # and an LLM audit disagreed with it at kappa -0.35)
-path_naturalness = MultipleChoice(constant(''),choices=['choice1','choice2'],labels=lambda x: 1 - x["label"],
-    question="Which chain of relations is more natural?",
+path_naturalness = MultipleChoice(constant("Which chain of relations is more natural?"),choices=['choice1','choice2'],
+    labels=lambda x: 1 - x["label"], max_examples=1000,
     dataset_name="tasksource/path-naturalness-prediction")
 
 def _civil(attribute, negative, positive, flag):
@@ -1386,8 +1386,8 @@ tracie = Classification("premise","hypothesis","answer",dataset_name='tasksource
     question="Given the story in text_A, is the temporal relation stated in text_B likely true?")
 sherliic = Classification("premise","hypothesis","label",dataset_name='tasksource/sherliic')
 
-sen_making__1 = MultipleChoice(constant(''), choices=['sentence0','sentence1'],labels='false',
-    question="Which statement is against common sense?",
+# the choices are bare statements: the prompt is the input
+sen_making__1 = MultipleChoice(constant("Which statement is against common sense?"), choices=['sentence0','sentence1'],labels='false',
     dataset_name="tasksource/sen-making")
 
 sen_making__2 = MultipleChoice(lambda x: [x['sentence0'],x['sentence1']][x['false']],

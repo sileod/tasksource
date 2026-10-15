@@ -9,11 +9,12 @@ concise bullets on what changed in the data. `tasksource-jev-typed-decisions` re
 - Parked after checking flagged examples against the raw sources: hlgd (loose story groupings), EVALution lexical relations (wrong source relations), blog_authorship/job (industry not inferable) and app_reviews (arbitrary ratings on short reviews).
 - logical-fallacy capped at 1,000 training rows (noisy labels).
 - brainteasers/SP removed: the mirror's sentence-puzzle files were a copy of the word puzzles.
+- path-naturalness-prediction capped at 1,000 training rows. sen-making/1 and path-naturalness-prediction carry their question as the input instead of an empty one.
 
 ## tasksource 2026-10-15.5
 
 - Add CBT named-entity/common-noun cloze, ReCAM abstract-word cloze, KnowRef-60K pronoun resolution and native TabMWP text-table multiple choice.
-- Preserve all native choices, including CBT's ten and ReCAM's five. Filter CBT's malformed candidates and KnowRef's error labels; retain annotation provenance separately from prompts.
+- Preserve all native choices, including CBT's ten and ReCAM's five. Filter CBT's malformed candidates and KnowRef's error/low-agreement labels (require 4/5); retain annotation provenance separately from prompts.
 - Reserve shared passages/tables for source holdouts, including ReCAM's original unlabeled test articles. Keep available native partitions and do not fabricate new splits.
 
 ## tabmwp 2026-10-15
