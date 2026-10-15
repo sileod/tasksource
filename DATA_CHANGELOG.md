@@ -4,6 +4,10 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource-jev-typed-decisions v2026.10.13.7
+
+- `vision`: +170,008 training rows (309,818 → 479,826) from larger source mirrors, up to 30,000 rows per family: BAPPS, DocLayNet, LVIS and COCO panoptic regions (+29,000 each), SPair-71k (+25,008), Super-CLEVR (+29,000 across six views). Existing rows and evaluation splits are unchanged.
+
 ## visgym-mcq 2026-10-14.2
 
 - Consolidate VisGym into one balanced release: 100,000 training QAs, exactly 25,000 each for mazes, equation repair, stick rotation and block legality; 25 validation QAs per family.
