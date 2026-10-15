@@ -230,3 +230,14 @@ Human or procedural labels required; a model may generate inputs when humans sup
 | GLUCOSE | Causal decisions | Conditional: 65,522 native train annotations, positive only. No random-swap negatives. Explore native causal-dimension classification with quality filtering and story grouping. Original license is CC BY-NC 4.0, contradicting HF card. |
 
 [Screening evidence and native-example notes](../../../docs/jev/audits/grounded-reasoning-screen.json). Prefer direct usable HF sources; repackage the official ComVE CSV join and any future verified conversion that warrants it.
+
+## Batch 18: cloze, reference resolution and table arithmetic (2026-10-15)
+
+Human-curated queue; screen source examples and label semantics before integration. Prefer a usable existing Hub release over another mirror. Preserve every native MC option.
+
+| Source | Requested view | Status / checks |
+|---|---|---|
+| Children's Book Test (CBT) | Named-entity and common-noun cloze, ten native candidates | Queued. Check community-datasets/cbt and official release before assuming hosting is needed; retain full context, all ten choices and native train/evaluation partitions. BookTest is a related larger follow-up, not automatically included. |
+| ReCAM (SemEval-2021 Task 4) | Abstract-word cloze, five native options | Queued. A holylovenia/recam Hub source exists; check completeness against the official release, train labels and source terms. |
+| KnowRef-60K | Candidate-0 / candidate-1 / neither reference resolution | Queued via coref-data/knowref_60k_raw. Check what annotation_strength actually measures, every native label (including error rows), and name-swapped pair grouping before accepting claimed counts. |
+| TabMWP (listed as abMWP) | Native option-bearing table math problems | Queued. The 38,431-example count matches lupantech/PromptPG; check existing sionic-ai/tabmwp or zyhang1998/tabmwp before repackaging. Validate full textual tables, native options/answers, dataset terms (separate from code) and split grouping. Exclude generation-only rows. |
