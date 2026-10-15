@@ -2499,5 +2499,61 @@
     ],
     "checked_on": "2026-10-15",
     "reconsider_if": "Group-target semantics are clarified or a corrected annotation source is available."
+  },
+  {
+    "name": "AAAC02",
+    "scope": "dataset",
+    "status": "deferred",
+    "reason_code": "conversion_needs_validation",
+    "reason": "Source is not native multiple choice. Its distractors are irrelevant statements asserted alongside the argument, not verified false conclusions; AAAC01 also includes model paraphrases.",
+    "reconsider_if": "Use AAAC02 only after a conversion verifies complete premises, unique entailment and non-entailment of every distractor.",
+    "checked_on": "2026-10-15",
+    "huggingface": [
+      "DebateLabKIT/aaac"
+    ],
+    "github": [],
+    "papers": [],
+    "evidence": [
+      "docs/jev/audits/grounded-reasoning-screen.json"
+    ],
+    "reviews": [
+      {
+        "reviewer": {
+          "kind": "model",
+          "model": "Codex (GPT-6 family)"
+        },
+        "checked_on": "2026-10-15",
+        "verdict": "defer",
+        "findings": "Source is not native multiple choice. Its distractors are irrelevant statements asserted alongside the argument, not verified false conclusions; AAAC01 also includes model paraphrases."
+      }
+    ]
+  },
+  {
+    "name": "GLUCOSE",
+    "scope": "dataset",
+    "status": "deferred",
+    "reason_code": "conversion_needs_validation",
+    "reason": "Human causal explanations are positives only. Random-swapped negatives would introduce unverified labels. Quality ratings need interpretation; the original license is CC BY-NC 4.0, unlike the Hub card.",
+    "reconsider_if": "Validate native causal-dimension classification with worker-quality filtering and story-group splits, or supply independently verified negatives.",
+    "checked_on": "2026-10-15",
+    "huggingface": [
+      "community-datasets/glucose"
+    ],
+    "github": [],
+    "papers": [],
+    "evidence": [
+      "docs/jev/audits/grounded-reasoning-screen.json"
+    ],
+    "reviews": [
+      {
+        "reviewer": {
+          "kind": "model",
+          "model": "Codex (GPT-6 family)"
+        },
+        "checked_on": "2026-10-15",
+        "verdict": "defer",
+        "findings": "Human causal explanations are positives only. Random-swapped negatives would introduce unverified labels. Quality ratings need interpretation; the original license is CC BY-NC 4.0, unlike the Hub card."
+      }
+    ]
   }
 ]
