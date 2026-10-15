@@ -3676,6 +3676,7 @@ knowref60k = MultipleChoice(inputs='swapped_sentence',
     pre_process=_knowref_rows,question='Who is the most likely referent of the pronoun in square brackets? Choose neither only if it refers to someone else.',
     metadata=lambda r:_decision_metadata(_text_hash(r['inputs']),_text_hash(r['original_sentence']),
         annotation_strength=r['annotation_strength'],native_label=r['correct_candidate'],annotation_origin='human'),
+    max_examples=10000,  # some sentences stay ambiguous despite 4/5 agreement
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['coref-data/knowref_60k_raw']})
 
 

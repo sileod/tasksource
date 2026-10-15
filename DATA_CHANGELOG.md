@@ -4,6 +4,10 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource 2026-10-15.10
+
+- KnowRef-60K capped at 10,000 training rows: some sentences stay ambiguous despite 4/5 annotator agreement.
+
 ## tasksource 2026-10-15.9
 
 - Parked cos_e/v1.0 (its questions are CommonsenseQA's, with fewer choices) and crowdflower/sentiment_nuclear_power (171 mostly neutral tweets, some mislabeled).
