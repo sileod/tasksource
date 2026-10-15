@@ -69,3 +69,22 @@ def test_existing_disagreement_holdouts_do_not_leak_into_new_views():
     assert excluded[0]['conflicting_splits']==['test']
     output,_,_=aggregate_sbic(dataset,reserved_splits={'train':{text_key('A post.')}})
     assert len(output['train'])==1
+
+
+@pytest.mark.parametrize('task,column,gold',[
+    ('sbic/offensiveness','offensiveness','offensive'),
+    ('sbic/intent','intent','definitely intended to offend'),
+])
+def test_recast_filters_unreliable_labels_and_keeps_annotations_out_of_prompt(monkeypatch,task,column,gold):
+    from datasets import Dataset,DatasetDict
+    from tasksource import access,load_task
+    metadata=json.dumps({'annotations':[{'targetStereotype':'SECRET_ANNOTATION'}],'aggregation':{column:{'counts':{'1.0':3}}}})
+    raw=DatasetDict(train=Dataset.from_list([
+        dict(sentence1='A native post.',offensiveness=None,intent=None,metadata=metadata),
+        dict(sentence1='The accepted post.',offensiveness='offensive',intent='definitely intended to offend',metadata=metadata)]))
+    monkeypatch.setattr(access,'load_dataset',lambda *args,**kwargs:raw)
+    ds=load_task(task,recast='jev');assert set(ds)=={'train'} and len(ds['train'])==1
+    row=ds['train'][0]
+    assert row['criteria'][row['label']]==gold
+    assert row['state']=='The accepted post.' and 'SECRET_ANNOTATION' not in row['instructions']
+    assert json.loads(row['metadata'])['annotations'][0]['targetStereotype']=='SECRET_ANNOTATION'

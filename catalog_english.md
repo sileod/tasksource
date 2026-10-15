@@ -1,4 +1,4 @@
-584 English tasks. Load one with `load_task(id)`; the annotations are in [tasks.py](src/tasksource/tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
+586 English tasks. Load one with `load_task(id)`; the annotations are in [tasks.py](src/tasksource/tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
 
 Browse the [example catalog](docs/examples.md): one real example per task.
 
@@ -589,6 +589,8 @@ Browse the [example catalog](docs/examples.md): one real example per task.
 | 582 | [gap](src/tasksource/tasks.py#L3526) | Classification | [coref-data/gap_raw](https://hf.co/datasets/coref-data/gap_raw) | ✓ |
 | 583 | [trip/cloze](src/tasksource/tasks.py#L3534) | MultipleChoice | [sled-umich/TRIP](https://hf.co/datasets/sled-umich/TRIP) | ✓ |
 | 584 | [trip/order](src/tasksource/tasks.py#L3543) | MultipleChoice | [sled-umich/TRIP](https://hf.co/datasets/sled-umich/TRIP) | ✓ |
+| 585 | [sbic/offensiveness](src/tasksource/tasks.py#L3553) | Classification | [tasksource/sbic](https://hf.co/datasets/tasksource/sbic) | ✓ |
+| 586 | [sbic/intent](src/tasksource/tasks.py#L3560) | Classification | [tasksource/sbic](https://hf.co/datasets/tasksource/sbic) | ✓ |
 
 ## Soft labels
 

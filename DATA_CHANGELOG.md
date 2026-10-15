@@ -4,6 +4,12 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource 2026-10-15.3
+
+- Add `sbic/offensiveness` and `sbic/intent` from the audited aggregate, with 11,692 and 8,647 accepted training judgments respectively. Preserve native uncertainty categories and labeling details in metadata.
+- Keep SBIC_Disagreement unchanged. Group-target supervision is withheld; its original annotations remain available in metadata.
+- The source mirror is published; these text tasks enter Jev `full`/`default` only through the canonical rebuild, not a partial append.
+
 ## sbic 2026-10-15
 
 - Aggregate SBIC crowd judgments once per post and worker, preserving native categorical ratings and all labeling provenance in metadata.

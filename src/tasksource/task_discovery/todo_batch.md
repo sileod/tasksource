@@ -204,3 +204,14 @@ The seven catalog additions enter the next canonical text build automatically. P
 See the [source and recast audit](../../../docs/jev/audits/reading-dialogue-batch-audit.json) for native examples, caveats and the five-task build smoke results.
 
 TRIP checks and source caveats: [audit](../../../docs/jev/audits/trip-audit.json).
+
+
+## Batch 16: SBIC quality aggregation (2026-10-15)
+
+| Source | Requested view | Status |
+|---|---|---|
+| Social Bias Frames | Offensiveness and perceived intent | Added `sbic/offensiveness` (11,692 train) and `sbic/intent` (8,647 train) via tasksource/sbic. Three distinct workers and 75% categorical agreement; native ratings and worker/source-row provenance retained in metadata. Split conflicts with existing SBIC_Disagreement are excluded. |
+| Social Bias Frames | Identity-group targeting | Withheld: a questionable unanimous negative in the coarse source audit. Original group annotations remain in metadata. |
+| ErnestSDavis/winograd_wsc | Pronoun resolution MC | Excluded from training: only 273/285-example native test sets; no training split. |
+
+[Source and recast audit](../../../docs/jev/audits/sbic-audit.json). The mirror is published; Jev `full`/`default` require the canonical text rebuild. No partial text append.

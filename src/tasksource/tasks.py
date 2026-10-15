@@ -3548,3 +3548,19 @@ trip__order = MultipleChoice(inputs=lambda r:'Compare the two stories.',
         source_view='order',annotation_origin='human'),
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['sled-umich/TRIP'],
         'data_files':{s:f'default/Order{n}/*.parquet' for s,n in [('train','Train'),('validation','Dev'),('test','Test')]}})
+
+
+sbic__offensiveness = Classification('sentence1',labels='offensiveness',dataset_name='tasksource/sbic',
+    task_id='sbic/offensiveness',metadata='metadata',complete_splits=False,
+    label_values={v:v for v in ('not offensive','uncertain','offensive')},
+    question='Under SBIC’s US-cultural annotation guidelines, could this post be considered offensive or disrespectful?',
+    pre_process=lambda d:d.filter(lambda r:r['offensiveness'] is not None),
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/sbic']})
+
+sbic__intent = Classification('sentence1',labels='intent',dataset_name='tasksource/sbic',
+    task_id='sbic/intent',metadata='metadata',complete_splits=False,
+    label_values={v:v for v in ('definitely not intended to offend','probably not intended to offend',
+                               'probably intended to offend','definitely intended to offend')},
+    question='Under SBIC’s annotation guidelines, does this post appear intended to offend or disrespect someone?',
+    pre_process=lambda d:d.filter(lambda r:r['intent'] is not None),
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/sbic']})

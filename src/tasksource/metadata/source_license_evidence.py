@@ -5,6 +5,7 @@ Keys are task families, shared by their visual classification/MC views.
 """
 
 SOURCE_LICENSE_EVIDENCE = {
+    'sbic': {'license': 'cc-by-4.0', 'license_use': 'commercial', 'checked': '2026-10-15', 'scope': 'SBIC human annotations; original social-media posts retain their source terms', 'url': 'https://huggingface.co/datasets/allenai/social_bias_frames#licensing-information'},
     'trip': {'license': 'unknown', 'license_use': 'unspecified', 'checked': '2026-10-15', 'scope': 'No dataset license declared in the official Hub card or linked original repository; public access does not imply permission', 'url': 'https://huggingface.co/datasets/sled-umich/TRIP', 'additional_urls': ['https://github.com/sled-group/Verifiable-Coherent-NLU']},
     'quality': {'license': 'cc-by-4.0', 'license_use': 'commercial', 'checked': '2026-10-15', 'scope': 'QuALITY annotations; articles retain their original source terms', 'url': 'https://nyu-mll.github.io/quality/'},
     'clear': {'license': 'cc-by-nc-sa-4.0', 'license_use': 'non-commercial', 'checked': '2026-10-15', 'scope': 'CLEAR ratings and corpus; excerpts retain their individually recorded original licenses', 'url': 'https://github.com/scrosseye/CLEAR-Corpus/blob/main/README.md'},

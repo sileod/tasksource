@@ -1,6 +1,7 @@
 """Reviewed source snapshots; keep opaque revision IDs out of task annotations."""
 
 SOURCE_REVISIONS = {
+    "tasksource/sbic": "44f66509c77a4ed86ea178bca707c4ff488a2512",
     "sled-umich/TRIP": "098fa27f44cf4e693e492102ce50d36bfd415143",
     "emozilla/quality": "7142df0407e16a99e5cda9188edc7db01e8c151a",
     "casey-martin/CommonLit-Ease-of-Readability": "b14ab30b0f4be072492c4483c0f1490eaae77f7a",

@@ -2459,5 +2459,45 @@
     "papers": [],
     "checked_on": "2026-10-15",
     "reconsider_if": "User explicitly requests inclusion again."
+  },
+  {
+    "name": "Winograd Schema Challenge",
+    "scope": "source",
+    "status": "deferred",
+    "reason_code": "evaluation_only",
+    "reason": "ErnestSDavis/winograd_wsc provides only test sets (wsc273/wsc285). User excludes sources without genuine training data.",
+    "huggingface": [
+      "ErnestSDavis/winograd_wsc"
+    ],
+    "github": [],
+    "papers": [],
+    "evidence": [
+      "https://huggingface.co/datasets/ErnestSDavis/winograd_wsc#data-splits"
+    ],
+    "checked_on": "2026-10-15",
+    "reconsider_if": "An independently collected genuine training partition becomes available."
+  },
+  {
+    "name": "SBIC identity-group targeting",
+    "scope": "task",
+    "tasks": [
+      "sbic/group-target"
+    ],
+    "status": "deferred",
+    "reason_code": "ambiguous_supervision",
+    "reason": "A post with an apparent gender stereotype has a unanimous negative target-group rating. Preserve native annotations in metadata but withhold this view; consensus is not a correctness guarantee.",
+    "huggingface": [
+      "allenai/social_bias_frames",
+      "tasksource/sbic"
+    ],
+    "github": [],
+    "papers": [
+      "https://aclanthology.org/2020.acl-main.486/"
+    ],
+    "evidence": [
+      "docs/jev/audits/sbic-audit.json"
+    ],
+    "checked_on": "2026-10-15",
+    "reconsider_if": "Group-target semantics are clarified or a corrected annotation source is available."
   }
 ]
