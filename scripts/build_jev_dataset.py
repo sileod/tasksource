@@ -25,6 +25,7 @@ from huggingface_hub.utils import EntryNotFoundError, RepositoryNotFoundError
 import numpy as np
 import pandas as pd
 import pyarrow.compute as pc
+import pyarrow.parquet as pq
 import yaml
 from tasksource import list_tasks, load_task, task_provenance, tasks
 from tasksource.access import lmtasks, load_preprocessing
@@ -761,6 +762,64 @@ def exclude_publish_sources(
     return dataset if len(keep) == len(dataset) else dataset.select(keep)
 
 
+def published_identities(repo_id, revision="main"):
+    """Ids of a published release: each source row's id prefix, and each prefix's ``example_id``.
+    Empty for a repository that does not exist yet."""
+    from huggingface_hub import HfFileSystem
+    fs = HfFileSystem()
+    try:
+        paths = fs.glob(f"datasets/{repo_id}@{revision}/full/*.parquet")
+    except (FileNotFoundError, RepositoryNotFoundError):
+        paths = []
+    rows, owners, examples, ambiguous = {}, {}, {}, set()
+    for path in paths:
+        table = pq.read_table(fs.open(path), columns=["id", "source", SOURCE_INDEX, "example_id"]).to_pydict()
+        for identifier, source, index, example in zip(table["id"], table["source"], table[SOURCE_INDEX],
+                                                      table["example_id"]):
+            base = source_row_group(identifier)
+            owners[base] = (source, index)
+            examples[base] = example
+            if index is not None and rows.setdefault((source, index), base) != base:
+                ambiguous.add((source, index))
+    for key in ambiguous:
+        del rows[key]
+    return {"rows": rows, "owners": owners, "examples": examples}
+
+
+def carry_published_ids(dataset, published):
+    """Keep each source row's published id across rebuilds, also when resampling moved its position,
+    so row-level annotations of earlier releases still apply. A row the release did not have never
+    takes an id it gave another row."""
+    if not published or not published["owners"]:
+        return dataset
+    rows, owners = published["rows"], published["owners"]
+
+    def convert(identifiers, sources, indices):
+        out = []
+        for identifier, source, index in zip(identifiers, sources, indices):
+            parts = identifier.split(":", 3)
+            base = ":".join(parts[:3])
+            carried = rows.get((source, index)) if index is not None else None
+            if carried is None and owners.get(base, (source, index)) != (source, index):
+                carried = f"{parts[0]}:{parts[1]}:src-{str(index).replace(':', '-')}"
+            out.append(":".join([carried or base, *parts[3:]]))
+        return {"id": out}
+
+    return dataset.map(convert, input_columns=["id", "source", SOURCE_INDEX], batched=True,
+                       batch_size=50_000, desc="Published ids")
+
+
+def carry_published_example_ids(dataset, published):
+    """A carried row keeps its published ``example_id`` even when its content changed."""
+    if not published or not published["examples"]:
+        return dataset
+    examples = published["examples"]
+    return dataset.map(
+        lambda identifiers, keys: {"example_id": [examples.get(source_row_group(i), k)
+                                                  for i, k in zip(identifiers, keys)]},
+        input_columns=["id", "example_id"], batched=True, batch_size=50_000, desc="Published example ids")
+
+
 def add_question_groups(dataset):
     """Backfill grouping metadata in preexisting Parquet shards."""
     if "group_id" in dataset.column_names:
@@ -954,8 +1013,10 @@ def bad_examples(path=BAD_EXAMPLES):
 
 def publish_dataset(
     output, repo_id, pretty_rows=1_000, publish_rows=1_000_000, eval_rows=15_000,
-    allowed_sources=None, procedural_share=0.1, mix_rows=1_000_000,
+    allowed_sources=None, procedural_share=0.1, mix_rows=1_000_000, published=None,
 ):
+    """``published``: identities of the current release (``published_identities``), kept by rows that
+    are still in it."""
     data_files = {}
     for split in ("train", "validation", "test"):
         files = sorted((output / "data").glob(f"{split}-*.parquet"))
@@ -972,13 +1033,14 @@ def publish_dataset(
         for split, split_dataset in dataset.items()
     })
     origins = source_indices(output)
-    dataset = DatasetDict({split: add_source_indices(rows, origins) for split, rows in dataset.items()})
+    dataset = DatasetDict({split: carry_published_ids(add_source_indices(rows, origins), published)
+                           for split, rows in dataset.items()})
     dataset = DatasetDict({split: rows.filter(lambda states: [state is not None for state in states],
                                               input_columns="state", batched=True, desc="Empty states")
                            for split, rows in dataset.items()})
     bad = bad_examples()
     dataset = DatasetDict({
-        split: add_example_ids(rows).filter(
+        split: carry_published_example_ids(add_example_ids(rows), published).filter(
             lambda key: key not in bad, input_columns="example_id", desc="Bad examples")
         for split, rows in dataset.items()
     })
@@ -1723,6 +1785,7 @@ def build(args):
             allowed_sources=set(tasks.source_id),
             procedural_share=args.procedural_share,
             mix_rows=args.mix_rows,
+            published=published_identities(args.repo_id),
         )
 
 
