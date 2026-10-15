@@ -16,7 +16,7 @@ Keep Hub root dataset cards focused on current usage, configs, schema and licens
 
 The text configs of `tasksource/tasksource-jev-typed-decisions` (`default`, `full`) come only from `scripts/build_jev_dataset.py`, and each publish replaces all their shards. New sources enter through the catalog and the build, not through one-off publication scripts.
 
-The `vision` config grows additively: declare and pin the task in `src/tasksource/vision_tasks.py`, add the changelog entry, then run `scripts/append_jev_vision.py --tasks TASK ... --cap N --push --release vYYYY.MM.DD.n` (see `docs/jev/README.md`). Existing shards stay byte-identical.
+To add sources without a rebuild, declare and pin them in the catalog, add the changelog entry, then run `python -m scripts.append_jev --config full|vision --tasks TASK ... --push --release vYYYY.MM.DD.n` (see `docs/jev/README.md`). It appends training rows only; published shards stay byte-identical, and `default` changes at the next full rebuild.
 
 # Changelog
 

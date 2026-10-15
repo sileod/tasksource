@@ -37,6 +37,17 @@ caps sources, removes evaluation rows overlapping train, and pushes `full` (ever
 Each publish is a release: add a `## tasksource-jev-typed-decisions vYYYY.MM.DD[.n]` entry to
 [`DATA_CHANGELOG.md`](../../DATA_CHANGELOG.md) first; the build publishes the dataset's entries and tags the Hub revision. Never pass `--upload` to a partial build (`--tasks`): it would replace the release.
 
+To add new sources without republishing, append them to `full` (text) or `vision`:
+
+```bash
+python -m scripts.append_jev --config full --tasks TASK ... --push --release vYYYY.MM.DD.n
+```
+
+The append builds the sources with this builder, applies the release row pipeline (bad examples, label
+balance, prompt styling, licenses) and drops rows already published in train or evaluation. Existing
+shards stay byte-identical; `default` is re-mixed at the next full rebuild. Changing a published source
+needs a full rebuild.
+
 Smoke test, without publishing:
 
 ```bash
@@ -51,7 +62,7 @@ non-commercial source families. New visual tasks are added to the published trai
 resampling existing rows:
 
 ```bash
-python -m scripts.append_jev_vision --tasks TASK ... --cap 20000 --output build/vision-append --push --release vYYYY.MM.DD.n
+python -m scripts.append_jev --config vision --tasks TASK ... --cap 30000 --push --release vYYYY.MM.DD.n
 ```
 
 Existing training and evaluation files stay byte-identical; evaluation images and duplicate option
