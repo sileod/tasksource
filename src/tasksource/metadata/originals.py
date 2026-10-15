@@ -11,6 +11,7 @@ by scripts/upload_repackaged.py) or a task switches to a mirror.
 """
 
 ORIGINALS = {
+    "tasksource/tabmwp": [],  # native PromptPG JSON distributions linked in mirror provenance
     "tasksource/comve": [],  # original official CSV distribution linked in mirror provenance
     "tasksource/sbic": ["allenai/social_bias_frames"],
     "tasksource/esconv": ["thu-coai/esconv"],

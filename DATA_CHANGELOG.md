@@ -4,6 +4,17 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource 2026-10-15.5
+
+- Add CBT named-entity/common-noun cloze, ReCAM abstract-word cloze, KnowRef-60K pronoun resolution and native TabMWP text-table multiple choice.
+- Preserve all native choices, including CBT's ten and ReCAM's five. Filter CBT's malformed candidates and KnowRef's error labels; retain annotation provenance separately from prompts.
+- Reserve shared passages/tables for source holdouts, including ReCAM's original unlabeled test articles. Keep available native partitions and do not fabricate new splits.
+
+## tabmwp 2026-10-15
+
+- Publish native multiple-choice questions with complete textual tables, original answer options and solutions kept in metadata. Retain 5,317 train, 1,830 validation and 1,992 test questions after table-group protection.
+- Preserve original CC BY-NC-SA 4.0 dataset terms, native source IDs, file hashes and reproducible conversion/exclusion records.
+
 ## tasksource-jev-typed-decisions v2026.10.15.1
 
 - `vision`: +150,000 training rows (479,826 → 629,826) from procedural visual puzzles, 30,000 each: TRON, TRACE, Mentis Oculi paper folding, SPHINX and VisGym. Existing rows and evaluation splits are unchanged.
