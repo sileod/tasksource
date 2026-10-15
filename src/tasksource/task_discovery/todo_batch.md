@@ -231,6 +231,8 @@ Human or procedural labels required; a model may generate inputs when humans sup
 
 [Screening evidence and native-example notes](../../../docs/jev/audits/grounded-reasoning-screen.json). Prefer direct usable HF sources; repackage the official ComVE CSV join and any future verified conversion that warrants it.
 
+Published FaithDial, RAGTruth and ComVE to Jev `full` in [v2026.10.15](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/commit/17e817ed907bdb790aac2a0d1128b017d3329817): **48,419 additional training rows including augmentations** (18,838 / 18,155 / 11,426). Existing shards and evaluation are unchanged; `default` gains these at the next canonical rebuild.
+
 ## Batch 18: cloze, reference resolution and table arithmetic (2026-10-15)
 
 Human-curated queue; screen source examples and label semantics before integration. Prefer a usable existing Hub release over another mirror. Preserve every native MC option.

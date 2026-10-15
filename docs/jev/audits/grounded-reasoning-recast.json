@@ -112,5 +112,24 @@
     "FaithDial uses stricter bot grounding than factual truth: personal disclosures and subjective additions can be marked unsupported even when its factual content is entailed. Human annotations can be debatable.",
     "RAGTruth labels evidence grounding, not universal truth; preserve implicit_true and due_to_null span flags.",
     "ComVE selects relative ordinary plausibility, not logical impossibility. Some choices exploit grammar or conventions."
-  ]
+  ],
+  "publication": {
+    "revision": "17e817ed907bdb790aac2a0d1128b017d3329817",
+    "config": "full",
+    "added_rows": 48419,
+    "sources": {
+      "ragtruth/grounding": 18155,
+      "comve": 11426,
+      "faithdial/grounding": 18838
+    },
+    "dropped_overlap": {
+      "built": 48419,
+      "train": 0,
+      "evaluation": 0
+    },
+    "version": "v2026.10.15",
+    "existing_shards": "byte-identical; checked by append publisher",
+    "evaluation": "unchanged",
+    "default": "unchanged until next canonical rebuild"
+  }
 }
