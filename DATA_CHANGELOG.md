@@ -10,6 +10,10 @@ concise bullets on what changed in the data. `tasksource-jev-typed-decisions` re
 - Exclude malformed choices, error/low-agreement labels and shared source holdouts, including ReCAM's unlabeled-test articles. Add source/license provenance and keep solutions out of model inputs.
 - Preserve existing training shards and evaluation data. `default` gains these sources at the next canonical rebuild.
 
+## tasksource 2026-10-15.7
+
+- Readable labels where codes or bare words hid the judgment: TREC answer types (with a question), SemEval-2010 relations ("e2 causes e1"), FewRel ("the relation holds"), ESCI query relevance, defeasible-nli ("strengthens the hypothesis", with premise and hypothesis marked), com2sense ("makes sense"), and negative/positive, not spam, not hate for IMDb, Rotten Tomatoes, SMS spam and hate_speech18.
+
 ## tasksource 2026-10-15.6
 
 - Parked after checking flagged examples against the raw sources: hlgd (loose story groupings), EVALution lexical relations (wrong source relations), blog_authorship/job (industry not inferable) and app_reviews (arbitrary ratings on short reviews).

@@ -454,7 +454,17 @@ turingbench = Classification("Generation", labels="label",
     }}, splits=["train","validation",None])
 
 
-trec = Classification(sentence1="text", labels="fine_label",
+TREC_TYPES = ["abbreviation", "expansion of an abbreviation", "animal", "body part", "color", "creative work",
+    "currency", "disease or medicine", "event", "food", "musical instrument", "language", "letter or character",
+    "other entity", "plant", "product", "religion", "sport", "substance or element", "symbol or sign",
+    "technique or method", "equivalent term", "vehicle", "word with a special property", "definition",
+    "description", "manner of an action", "reason", "group or organization", "individual person",
+    "title of a person", "description of a person", "city", "country", "mountain", "other location",
+    "state or province", "code (postcode, phone number)", "count", "date", "distance", "price or money",
+    "rank or order", "other number", "duration", "percentage", "speed", "temperature", "size, area or volume",
+    "weight"]  # the 50 fine TREC classes, in label order
+trec = Classification(sentence1="text", labels="fine_label", label_values=dict(enumerate(TREC_TYPES)),
+    question="What type of answer does this question ask for?",
     dataset_name="tasksource/trec")
 
 tals_vitaminc = Classification('claim','evidence','label', dataset_name="tals/vitaminc")
@@ -612,9 +622,9 @@ language_identification = Classification("text",labels=lambda x: language_name(x
 
 ################ Automatically generated (verified)##########
 
-imdb = Classification(sentence1="text", labels="label", splits=["train", None, "test"])
+imdb = Classification(sentence1="text", labels="label", splits=["train", None, "test"], label_values={0: "negative", 1: "positive"})
 
-rotten_tomatoes = Classification(sentence1="text", labels="label")
+rotten_tomatoes = Classification(sentence1="text", labels="label", label_values={0: "negative", 1: "positive"})
 
 ag_news = Classification(sentence1="text", labels="label", splits=["train", None, "test"])
 
@@ -640,9 +650,9 @@ hate_speech18 = Classification(sentence1="text", labels="label", splits=["train"
     dataset_name="tasksource/hate_speech18",
     # idk/skip are skipped items; relation is hate only in context of neighbouring sentences
     pre_process=lambda ds: ds.filter(lambda x: x["label"] in (0, 1)),
-    post_process=lambda ds: ds.cast_column("labels", ClassLabel(names=["noHate", "hate"])))
+    post_process=lambda ds: ds.cast_column("labels", ClassLabel(names=["not hate", "hate"])))
 
-sms_spam = Classification(sentence1="sms", labels="label", splits=["train", None, None])
+sms_spam = Classification(sentence1="sms", labels="label", splits=["train", None, None], label_values={0: "not spam", 1: "spam"})
 
 # meanGrade averages five 0-3 funniness grades
 humicroedit___subtask_1 = Classification(lambda x: f"Original: {x['headline']}", lambda x: f"Edited: {x['edited']}",
@@ -975,7 +985,14 @@ dynasent___r2 = Classification(
 sarcasm_news = Classification("headline", labels=name("is_sarcastic", ["not sarcastic", "sarcastic"]),
     dataset_name="raquiba/Sarcasm_News_Headline")
 
-sem_eval_2010_task_8 = Classification("sentence",labels="relation")
+_SEMEVAL_RELATIONS = [("causes", "e1", "e2"), ("causes", "e2", "e1"), ("is a component of", "e1", "e2"),
+    ("is a component of", "e2", "e1"), ("is inside", "e1", "e2"), ("is inside", "e2", "e1"),
+    ("moves into", "e1", "e2"), ("moves into", "e2", "e1"), ("comes from", "e1", "e2"), ("comes from", "e2", "e1"),
+    ("is an instrument used by", "e1", "e2"), ("is an instrument used by", "e2", "e1"),
+    ("is a member of", "e1", "e2"), ("is a member of", "e2", "e1"), ("is a message about", "e1", "e2"),
+    ("is a message about", "e2", "e1"), ("is a product of", "e1", "e2"), ("is a product of", "e2", "e1")]
+sem_eval_2010_task_8 = Classification("sentence", labels="relation",  # Cause-Effect(e2,e1) -> "e2 causes e1"
+    label_values={**{i: f"{a} {r} {b}" for i, (r, a, b) in enumerate(_SEMEVAL_RELATIONS)}, 18: "other or no relation"})
 
 auditor_review = Classification(sentence1="sentence",
     labels=name("label",['negative','neutral','positive']),
@@ -1085,10 +1102,12 @@ scruples = Classification("text",labels="binarized_label", question="Was the aut
 # poll vote shares; at least 100 votes, and the hard view keeps two-to-one majorities
 
 
-defeasible_nli = Classification(cat(["Premise","Hypothesis"]),"Update",labels="UpdateType",
+defeasible_nli = Classification(lambda x: f"Premise: {x['Premise']}\nHypothesis: {x['Hypothesis']}", "Update", labels="UpdateType",
+    label_values={"strengthener": "strengthens the hypothesis", "weakener": "weakens the hypothesis"},
     dataset_name="tasksource/defeasible-nli",config_name=['atomic', 'snli'])
 
 defeasible_nli_social = Classification("Hypothesis", "Update", labels="UpdateType",
+    label_values={"strengthener": "strengthens the hypothesis", "weakener": "weakens the hypothesis"},
     dataset_name="tasksource/defeasible-nli", config_name='social')  # social has no premise
 
 help_nli = Classification("ori_sentence","new_sentence","gold_label",
@@ -1441,7 +1460,8 @@ finer = TokenClassification('tokens','ner_tags',dataset_name='nlpaueb/finer-139'
 
 label_nli = Classification("premise","hypothesis","labels",dataset_name='tasksource/zero-shot-label-nli', question=NLI_QUESTION)
 
-com2sense = Classification("sent",labels="label",dataset_name="tasksource/com2sense",splits=['train',"validation",None])
+com2sense = Classification("sent",labels="label",dataset_name="tasksource/com2sense",splits=['train',"validation",None],
+    label_values={"False": "does not make sense", "True": "makes sense"})
 
 scone = Classification('sentence1_edited','sentence2_edited','gold_label_edited',dataset_name="tasksource/scone")
 
@@ -1495,6 +1515,8 @@ def _esci_product(x): # product_text writes missing fields as 'None' lines
     return "\n".join(str(x[f]) for f in fields if x[f] not in (None, "", "None"))
 
 esci = Classification('query',_esci_product,'esci_label',
+    label_values={"Exact": "exact match for the query", "Substitute": "substitute for what the query asks",
+                  "Complement": "complement to what the query asks", "Irrelevant": "irrelevant to the query"},
     dataset_name="tasksource/esci",
     pre_process=lambda ds:ds.filter(lambda x:x['product_locale']=='us'))
 
@@ -1889,7 +1911,7 @@ def _fewrel_relation_match(dataset):
                 {"text": text, "relation": negative, "label": 0},
             ]
         rows[split] = Dataset.from_list(examples).cast_column(
-            "label", ClassLabel(names=["negative", "positive"]))
+            "label", ClassLabel(names=["the relation does not hold", "the relation holds"]))
     return DatasetDict(rows)
 
 fewrel = Classification(
