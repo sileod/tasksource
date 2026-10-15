@@ -4,6 +4,12 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## sbic 2026-10-15
+
+- Aggregate SBIC crowd judgments once per post and worker, preserving native categorical ratings and all labeling provenance in metadata.
+- Require at least three valid workers and 75% agreement per label. Keep only posts with a reliable offensiveness or intent judgment; missing answers never count as negatives.
+- Preserve native splits, assigning duplicate posts to their highest-priority source holdout. Exclude posts conflicting with the existing SBIC_Disagreement partitions. Retain original group-target annotations in metadata, with their correct mapping documented; the group-target task is withheld after a questionable unanimous negative in the source audit.
+
 ## tasksource 2026-10-15.2
 
 - Add `trip/cloze` and `trip/order`: two native story choices with human physical-plausibility labels, using the official Hugging Face Parquet conversion directly.

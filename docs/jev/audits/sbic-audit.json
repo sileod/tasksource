@@ -1,0 +1,46 @@
+{
+  "checked_on": "2026-10-15",
+  "reviewer": "Codex (GPT-6 family)",
+  "counts": {
+    "train": {
+      "offensiveness": 11692,
+      "intent": 8647
+    },
+    "validation": {
+      "offensiveness": 1713,
+      "intent": 1251
+    },
+    "test": {
+      "offensiveness": 1721,
+      "intent": 1274
+    }
+  },
+  "aggregation": "At least three distinct workers and 75% agreement on the same native categorical rating; conflicting worker ratings abstain.",
+  "all_retained_rows_validated": true,
+  "within_mirror_split_overlap": 0,
+  "existing_disagreement_cross_split_overlap": 0,
+  "manual_review": [
+    {
+      "native_example": "train post with an explicit racial insult toward LeBron",
+      "finding": "Three distinct workers agree on offensive and definitely intended to offend. Repeated stereotype rows count once."
+    },
+    {
+      "native_example": "train post quoting Rihanna lyrics",
+      "finding": "Three workers agree on not offensive. Plausible as lyrics/slang, but illustrates cultural context and subjectivity."
+    },
+    {
+      "native_example": "train post advertising Saturday humor",
+      "finding": "Three workers agree on probably not intended to offend. This remains a native categorical judgment, not a calibrated probability."
+    }
+  ],
+  "withheld": {
+    "view": "group targeting",
+    "native_group_id": "05c0297af2210595ff4d537bb3509232e37e18822516b29e44a1d11a0640545a",
+    "reason": "A post with an apparent gender stereotype has a unanimous negative group-target rating. Preserve annotations in metadata; no group-target task."
+  },
+  "limits": [
+    "Consensus filters consistency, not objective correctness; offensiveness and perceived intent are culturally situated judgments.",
+    "Original posts can contain slang, handles, links and missing context. This is a coarse source audit, not exhaustive semantic verification.",
+    "Overlap checks use normalized case/whitespace text, not semantic near-duplicate detection."
+  ]
+}
