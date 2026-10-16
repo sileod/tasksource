@@ -1472,7 +1472,13 @@ def build_vision(args):
         dataset = disable_image_decoding(dataset)
         counts = {}
         for split, rows in dataset.items():
-            converted = []
+            # Converted rows carry image bytes: spill bounded chunks to parquet and memory-map them,
+            # so a split never sits in RAM (two marked images per row exceed 80 GB at 60k rows).
+            converted, parts = [], output / 'parts' / f'{split}-{slug(source)}'
+            shutil.rmtree(parts, ignore_errors=True)
+            parts.mkdir(parents=True)
+            spill = lambda: (dataset_from_rows(converted, features=features).to_parquet(
+                parts / f'{len(list(parts.iterdir())):05d}.parquet'), converted.clear())
             for index, example in enumerate(rows):
                 row = to_training_row(example, index, source, split)
                 row['state'] = row['state'] or ''  # Image-only decisions need no text state.
@@ -1500,9 +1506,15 @@ def build_vision(args):
                 row['metadata'] = json.dumps(metadata, ensure_ascii=False, sort_keys=True)
                 row.update({key: licenses[source][key] for key in ('license', 'license_use')})
                 converted.append(row)
-            if not converted:
+                if len(converted) == 2000:
+                    spill()
+            if converted:
+                spill()
+            files = sorted(map(str, parts.iterdir()))
+            if not files:
                 continue
-            training = dataset_from_rows(converted, features=features)
+            training = load_dataset('parquet', data_files=files, split='train', features=features,
+                                    cache_dir=str(output / 'cache'))
             training = merge_identical_inputs(training)
             training = training.map(lambda row: {'example_id': hashlib.sha256(('\x1f'.join(
                 image_keys(row['images'])) + example_key(source, row['state'], row['options'], row['target'])).encode()).hexdigest()[:24]})

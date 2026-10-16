@@ -6,6 +6,9 @@ These are screening results, **not approved training sources or completed integr
 
 ## Published screening results
 
+- [October 16 ranked English search](prospects/2026-10-16.md): 600 reviewed of 791 structural
+  survivors among 24,049 Hub datasets unknown to the catalog; top 60 listed.
+
 - [October 13 English image multiple-choice pass](prospects/2026-10-13-vision-multiple-choice.md):
   185 screened sources; 9 eligibility leads, with unresolved provenance or training-config checks.
 
