@@ -10,7 +10,10 @@ Stages, each cached under ``--output`` and resumable:
    enough rows, a label-like column, and no text segments shared with the catalog
    (``fingerprint.py``) or with a higher-ranked candidate.
 5. review: Jev-style decision models on the top ``--review`` with sampled rows as evidence.
-6. ranking: ``ranked.jsonl`` and ``report.md``; nothing enters the catalog automatically.
+6. ranking: ``ranked.jsonl`` and ``report.md``; nothing enters the catalog automatically. Sources the
+   reviewers doubt have a training partition (benchmarks uploaded as one split) go to
+   ``eval_only.jsonl`` instead; without ``--media``, image/video/audio sources are set aside in
+   ``media.jsonl`` for a vision run.
 """
 import argparse
 from concurrent.futures import ThreadPoolExecutor
@@ -145,6 +148,23 @@ def review_score(row, extra=()):
     return round(score, 3)
 
 
+def train_doubted(row):
+    """A reviewer finds no training partition more likely than the least favorable one finds one."""
+    answers = current_answers(row)
+    no = max((a.get('train', {}).get('probabilities', {}).get('no', 0) for a in answers), default=0)
+    yes = min((a.get('train', {}).get('probabilities', {}).get('yes', 0) for a in answers), default=0)
+    return no >= 0.25 and no > yes
+
+
+MEDIA_TASK = re.compile(r'task_categories:.*(image|visual|video|audio|speech|object-detection|depth)')
+
+
+def is_media(row):
+    """Image, video or audio by modality tag or by task category (CSV/JSON uploads are tagged text)."""
+    return bool({'image', 'video', 'audio'} & set(row.get('modalities') or [])) or any(
+        MEDIA_TASK.match(t) for t in row.get('hub_tags') or [])
+
+
 def origin(row):
     votes = [max(p, key=p.get) for a in current_answers(row) if (p := a.get('annotation_origin', {}).get('probabilities'))]
     return '/'.join(dict.fromkeys(votes))
@@ -218,8 +238,11 @@ def main():
     for r in pool:
         r['prior'], r['flags'] = prior(r, authors)
         r['known'] = bool(known(r))
+    media = []
     if not args.media:
-        pool = [r for r in pool if not {'image', 'video', 'audio'} & set(r.get('modalities') or [])]
+        media = sorted((r for r in pool if is_media(r) and not r['known']), key=lambda r: -r['prior'])
+        pool = [r for r in pool if not is_media(r)]
+        write_rows(out / 'media.jsonl', media)
     agent = lambda r: any(s.get('source') == 'web_agent' for s in r.get('sources', []))
     pool.sort(key=lambda r: (not agent(r), -r['prior']))  # agent finds were chosen by meaning, not popularity
     head = pool[:args.probe + sum(map(agent, pool))]
@@ -287,7 +310,10 @@ def main():
     for r in reviewed:
         r['review_score'] = review_score(r, extra)
     ranked = sorted(reviewed, key=lambda r: -((r['review_score'] or 0) + 0.1 * r['prior']))
+    eval_only = [r for r in ranked if train_doubted(r)]
+    ranked = [r for r in ranked if not train_doubted(r)]
     write_rows(out / 'ranked.jsonl', ranked)
+    write_rows(out / 'eval_only.jsonl', eval_only)
     lines = [f'# Prospects {datetime.now(timezone.utc).date()}', '',
              f'Inventory {len(rows)}, unknown to the catalog {sum(not known(r) for r in matched)}, probed {len(head)}, '
              f'structural survivors {len(survivors)}, reviewed {len(reviewed)}.', '',
@@ -295,6 +321,15 @@ def main():
     for i, r in enumerate(ranked[:100], 1):
         lines.append(f"| {i} | [{r['name']}](https://huggingface.co/datasets/{r['name']}) | {r['review_score']} | {r['prior']} | "
                      f"{r['structure']['train_rows']} | {', '.join(r['structure']['labels'][:3])} | {origin(r)} |")
+    if eval_only:
+        lines += ['', f'## Probably evaluation-only ({len(eval_only)})', '',
+                  'Reviewers doubt a training partition; candidates for `eval_only.py`, not training.', '']
+        lines += [f"- [{r['name']}](https://huggingface.co/datasets/{r['name']}) ({r['structure']['train_rows']} rows, "
+                  f"splits: {', '.join(r['structure']['splits'])})" for r in eval_only]
+    if media:
+        lines += ['', f'## Image, video or audio, set aside ({len(media)})', '',
+                  'Not probed in a text run; rerun with `--media` (and `--candidates media.jsonl`) for the vision catalog.', '']
+        lines += [f"- [{r['name']}](https://huggingface.co/datasets/{r['name']})" for r in media[:30]]
     (out / 'report.md').write_text('\n'.join(lines) + '\n')
     print('\n'.join(lines[:30]))
 

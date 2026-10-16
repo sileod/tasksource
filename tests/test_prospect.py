@@ -82,3 +82,18 @@ def test_llm_endpoint_is_standard_openai_env(monkeypatch):
     monkeypatch.delenv('OPENAI_MODEL')
     with pytest.raises(SystemExit):
         llm.model()
+
+
+def test_train_doubt_gate():
+    from tasksource.task_discovery.prospect import train_doubted
+    def review(no, yes):
+        answers = dict(train=dict(probabilities=dict(no=no, yes=yes, unknown=1 - no - yes)))
+        return dict(reviews=[dict(reviewer='jev_review', data=dict(answers=answers))])
+    assert train_doubted(review(0.36, 0.03)) and not train_doubted(review(0.1, 0.4))
+
+
+def test_media_by_task_category():
+    from tasksource.task_discovery.prospect import is_media
+    assert is_media(dict(modalities=['text'], hub_tags=['task_categories:visual-question-answering']))
+    assert is_media(dict(modalities=['image']))
+    assert not is_media(dict(modalities=['text'], hub_tags=['task_categories:text-classification']))
