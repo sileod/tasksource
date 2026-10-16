@@ -4,6 +4,15 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource-jev-typed-decisions v2026.10.16
+
+- `vision`: add `spatial-dise/mcq` with native spatial-reasoning choices and original composite images. Training excludes generator families reserved by validation, test or the separate Spatial-DISE benchmark.
+- Retain folding, rotation, combination and hidden-face questions. Projection is omitted after an image audit found missing direction cues and panel labels. Source terms are CC BY-NC-SA 4.0 with original third-party asset rights retained.
+
+## tasksource 2026-10-16
+
+- Add `spatial-dise/mcq` through a reproducible image-archive mirror: 3,405 train, 1,039 validation and 1,405 test questions. Native answer panels remain identifiable after option permutation; no fabricated choices.
+
 ## tasksource-jev-typed-decisions v2026.10.15.5
 
 - `vision`: removed the grid-cell grounding rows (rico-widget/grid7: 15,180; spair71k/grid7: 30,000); the coordinate-option views of v2026.10.15.4 replace them. Other rows and shards are unchanged; vision train has 659,904 rows.

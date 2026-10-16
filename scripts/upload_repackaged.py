@@ -24,6 +24,7 @@ from scripts.repackage_dataset.dialogue import slurp, mcscript2, esconv
 from scripts.repackage_dataset.sbic import sbic
 from scripts.repackage_dataset.comve import comve
 from scripts.repackage_dataset.tabmwp import tabmwp
+from scripts.repackage_dataset.spatial_dise import spatial_dise
 from scripts.repackage_dataset.stance import vast, fnc1, perspectrum, ukpconvarg, discogem
 from scripts.repackage_dataset.specialized_text import pubmed_rct
 from scripts.repackage_dataset.linguistic import semcor, streusle, spider
@@ -43,7 +44,8 @@ from scripts.repackage_dataset.procedural.balanced_visgym import visgym_balanced
 from scripts.repackage_dataset.regions import coco_regions, doclaynet_region, bapps, spair71k_grid
 
 
-BUILDERS = {"tabmwp": ("tasksource/tabmwp", tabmwp),
+BUILDERS = {"spatial-dise": ("tasksource/spatial-dise", spatial_dise),
+            "tabmwp": ("tasksource/tabmwp", tabmwp),
             "comve": ("tasksource/comve", comve),
             "sbic": ("tasksource/sbic", sbic),
             "esconv": ("tasksource/esconv", esconv),
@@ -101,7 +103,8 @@ BUILDERS = {"tabmwp": ("tasksource/tabmwp", tabmwp),
 
 
 # license metadata for repackaged sets, as the originals state it
-LICENSES = {"tasksource/tabmwp": "cc-by-nc-sa-4.0",
+LICENSES = {"tasksource/spatial-dise": "cc-by-nc-sa-4.0",
+            "tasksource/tabmwp": "cc-by-nc-sa-4.0",
             "tasksource/comve": "cc-by-sa-4.0",
             "tasksource/sbic": "cc-by-4.0",
             "tasksource/esconv": "cc-by-nc-4.0",

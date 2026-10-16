@@ -1,4 +1,4 @@
-57 visual tasks. Load one with `load_task(id, vision=True)`; the annotations are in [vision_tasks.py](src/tasksource/vision_tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
+58 visual tasks. Load one with `load_task(id, vision=True)`; the annotations are in [vision_tasks.py](src/tasksource/vision_tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
 
 | # | id | type | dataset | question |
 |--:|---|---|---|:-:|
@@ -59,6 +59,7 @@
 | 55 | [mentis-oculi/paper-fold](src/tasksource/vision_tasks.py#L639) | VisualMultipleChoice | [tasksource/mentis-oculi-paper-fold](https://hf.co/datasets/tasksource/mentis-oculi-paper-fold) |  |
 | 56 | [sphinx/mcq](src/tasksource/vision_tasks.py#L646) | VisualMultipleChoice | [tasksource/sphinx-mcq](https://hf.co/datasets/tasksource/sphinx-mcq) |  |
 | 57 | [visgym/mcq](src/tasksource/vision_tasks.py#L652) | VisualMultipleChoice | [tasksource/visgym-mcq](https://hf.co/datasets/tasksource/visgym-mcq) |  |
+| 58 | [spatial-dise/mcq](src/tasksource/vision_tasks.py#L736) | VisualMultipleChoice | [tasksource/spatial-dise](https://hf.co/datasets/tasksource/spatial-dise) |  |
 
 ### Candidate grounding
 
@@ -96,3 +97,5 @@ repackaged crop transformation using the same displayed-image box convention.
 Initial scope: five TRON environments (100,000/83 train/validation QAs), TRACE (100,000/2,000), and Mentis paper folding (100,000/100). The Mentis pilot does not ingest published benchmark puzzles. Licenses differ: TRON research-use, TRACE CC BY 4.0 with asset credits, Mentis procedural paper-fold Apache-2.0. See the [coarse visual and recast audit](docs/jev/audits/procedural-vision-audit.json).
 
 SPHINX adds a fresh four-family MC view (`sphinx/mcq`, 100,000/100 QAs). VisGym adds uniquely solved 2D maze next moves (`visgym/mcq`, 100,000/100). See the [suite builders](scripts/repackage_dataset/procedural/suites.py) and [coarse image/recast audit](docs/jev/audits/procedural-suites-audit.json). SPHINX retains native same-scene choices and close count alternatives; VisGym retains its four cardinal actions. Neither imports generator dependencies during normal Tasksource loading. VisualSphinx remains the existing curated RL-20K task; Gym-V is excluded from expansion.
+
+`spatial-dise/mcq` adds native folding, rotation, combination and hidden-face choices through a [reproducible archive join](scripts/repackage_dataset/spatial_dise.py). It retains 3,405/1,039/1,405 train/validation/test questions with original pixels and benchmark-reserved generator families. Projection is excluded after missing viewing cues and panel labels were found. [Coarse audit](docs/jev/audits/spatial-dise-recast.json); CC BY-NC-SA 4.0 plus original asset terms.

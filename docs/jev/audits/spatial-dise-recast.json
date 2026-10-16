@@ -1,0 +1,68 @@
+{
+  "source": "TACPS-liv/Spatial-DISE",
+  "revision": "c1067b763ab4199d0dd481efefeae384b738f9fd",
+  "checked_on": "2026-10-16",
+  "scope": "Coarse visual source/recast audit; not a row-by-row answer correctness certification",
+  "included_categories": [
+    "3D Folding",
+    "3D Rotation",
+    "3D Combination",
+    "3D Shape Finding"
+  ],
+  "retained_counts": {
+    "train": 3405,
+    "validation": 1039,
+    "test": 1405
+  },
+  "split_policy": "Reserve the separate 559-row benchmark, then test, validation and train, by category + generator ID across difficulty. Native rows are removed, never reassigned.",
+  "excluded_counts": {
+    "unaudited_category": 2500,
+    "heldout_source_group": 4002,
+    "invalid_choices": 4
+  },
+  "image_policy": "Original merged images, including native lettered answer panels; textual Panel A ... references survive Jev criterion permutation.",
+  "source_review": [
+    {
+      "image": "images/synthetic/merged/3D_folding/medium/merged_question_0200_meta.png",
+      "native_gold": "B",
+      "finding": "Readable cube net and all four panel labels. B uses the original adjacent faces; A duplicates the airport face and C/D introduce absent faces."
+    },
+    {
+      "image": "images/synthetic/merged/3D_rotation/hard/merged_question_0200.png",
+      "native_gold": "C",
+      "finding": "Readable block geometry and all four labels. C preserves the two tall columns and base structure; sampled distractors differ."
+    },
+    {
+      "image": "images/synthetic/merged/3D_shape_finding/easy/merged_question_question_0200.png",
+      "native_gold": "D",
+      "finding": "Three source views and all four choices are readable. D is consistent with the hidden face after rotating the depicted cube."
+    },
+    {
+      "image": "images/synthetic/merged/3D_combination/easy/merged_question_0200.png",
+      "native_gold": "C",
+      "finding": "Both source views and four component sets are readable; native C is plausible. No independent 3D solver was run."
+    },
+    {
+      "image": "images/wild/cem_100.jpg",
+      "native_gold": "B",
+      "finding": "Readable target and four lowercase panel letters. B supplies the tall column and horizontal bars; letter case does not change panel identity."
+    }
+  ],
+  "excluded_review": {
+    "image": "images/synthetic/merged/3D_projection/easy/merged_question_0200.png",
+    "native_gold": "C",
+    "finding": "Question refers to an arrow that is absent; B/C/D labels are missing. Entire projection category omitted rather than guessing a viewing direction or repairing pixels."
+  },
+  "license": {
+    "license": "cc-by-nc-sa-4.0",
+    "url": "https://huggingface.co/datasets/TACPS-liv/Spatial-DISE#license",
+    "additional_terms": "Paper notes Icons8 textures and third-party aptitude-test material; source rights remain applicable."
+  },
+  "packaging_script": "scripts/repackage_dataset/spatial_dise.py",
+  "automated_checks": {
+    "rows": 5849,
+    "image_integrity": "Every retained encoded image passes Pillow verification and matches its SHA-256 image_group_id.",
+    "gold": "Every retained gold index matches the native CSV answer.",
+    "split_groups": "All retained generator family IDs are disjoint across source splits and the separate benchmark."
+  }
+}

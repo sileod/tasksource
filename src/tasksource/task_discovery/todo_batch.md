@@ -247,3 +247,7 @@ Processed the human-curated queue. Native choices only; no generated distractors
 `preserve_choices=True` is a small opt-in on the existing MC template; ordinary text tasks keep their existing defaults. ReCAM's original test is protected but never treated as labeled data. No new task type or loader.
 
 Published all five views to Jev `full` in [v2026.10.15.2](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/commit/263e8c75c6a90c8bb43e2c8993b7f911e1ee5722): **112,154 additional training decisions including augmentations**. Existing shards and evaluation are unchanged; `default` gains these at the next canonical rebuild.
+
+## Spatial-DISE (2026-10-16)
+
+Added `spatial-dise/mcq`: native rotation, folding, combination and hidden-face questions, via the [reproducible archive join](../../../scripts/repackage_dataset/spatial_dise.py). Retained 3,405 train / 1,039 validation / 1,405 test rows after reserving generator families across splits and the separate benchmark. Original composite pixels and native choices are preserved. Projection is deferred with a structured reason: sampled source questions omit a required arrow and panel labels. [Coarse image/recast audit](../../../docs/jev/audits/spatial-dise-recast.json); CC BY-NC-SA 4.0 plus original asset terms.

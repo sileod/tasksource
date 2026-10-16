@@ -731,3 +731,10 @@ visgym__mcq = VisualMultipleChoice(
     metadata='metadata', pre_process=grouped_mc_rows,
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/visgym-mcq'],'streaming':True},
 )
+
+
+spatial_dise__mcq = VisualMultipleChoice(
+    dataset_name='tasksource/spatial-dise', task_id='spatial-dise/mcq', choices_list='choices_list',
+    metadata='metadata', pre_process=grouped_mc_rows,
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/spatial-dise'],'streaming':True},
+)

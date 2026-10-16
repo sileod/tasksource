@@ -5,6 +5,10 @@ Keys are task families, shared by their visual classification/MC views.
 """
 
 SOURCE_LICENSE_EVIDENCE = {
+    'spatial-dise': {'license': 'cc-by-nc-sa-4.0', 'license_use': 'non-commercial', 'checked': '2026-10-16',
+        'scope': 'Spatial-DISE release; Icons8 textures and collected aptitude-test images retain original third-party terms',
+        'url': 'https://huggingface.co/datasets/TACPS-liv/Spatial-DISE#license',
+        'additional_urls': ['https://arxiv.org/html/2510.13394v1#A3', 'https://arxiv.org/html/2510.13394v1#A4']},
     'recam': {'license': 'unknown', 'license_use': 'unspecified', 'checked': '2026-10-15', 'scope': 'No license declared in the original ReCAM data repository or usable Hub card; source news/article rights remain applicable', 'url': 'https://github.com/boyuanzheng010/SemEval2021-Reading-Comprehension-of-Abstract-Meaning'},
     'knowref60k': {'license': 'cc-by-4.0', 'license_use': 'commercial', 'checked': '2026-10-15', 'scope': 'CC BY 4.0 declared by the Hub copy; original web text retains its source terms', 'url': 'https://huggingface.co/datasets/coref-data/knowref_60k_raw'},
     'tabmwp': {'license': 'cc-by-nc-sa-4.0', 'license_use': 'non-commercial', 'checked': '2026-10-15', 'scope': 'TabMWP dataset terms, distinct from PromptPG MIT code', 'url': 'https://github.com/lupantech/PromptPG#license'},

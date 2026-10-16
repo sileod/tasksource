@@ -3015,5 +3015,32 @@
     "papers": [],
     "annotation": "tasksource.parked.civil_comments__sexual_explicit",
     "review_findings": "DeepSeek V4 Flash screened every published Jev example of the task (2026-10); a manual read of flagged samples confirmed the problem."
+  },
+  {
+    "name": "Spatial-DISE projection",
+    "scope": "task",
+    "tasks": [
+      "spatial-dise/projection"
+    ],
+    "status": "deferred",
+    "reason_code": "missing_context",
+    "reason": "Question refers to an arrow that is absent; B/C/D labels are missing. Entire projection category omitted rather than guessing a viewing direction or repairing pixels.",
+    "evidence": [
+      "https://huggingface.co/datasets/TACPS-liv/Spatial-DISE",
+      "images/synthetic/merged/3D_projection/easy/merged_question_0200.png",
+      "docs/jev/audits/spatial-dise-recast.json"
+    ],
+    "checked_on": "2026-10-16",
+    "reconsider_if": "A corrected source release supplies the required viewing direction and unambiguous answer panel references.",
+    "huggingface": [
+      "TACPS-liv/Spatial-DISE"
+    ],
+    "github": [],
+    "papers": [
+      "arxiv:2510.13394"
+    ],
+    "source_revisions": {
+      "TACPS-liv/Spatial-DISE": "c1067b763ab4199d0dd481efefeae384b738f9fd"
+    }
   }
 ]
