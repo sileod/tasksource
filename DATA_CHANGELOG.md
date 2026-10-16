@@ -1,6 +1,13 @@
 # Data changelog
 
-Changes that affect published data, newest first: one entry per publish, `## <dataset> <version>`, with a few
+Changes that affect published data, newest first: one entry per publish, `## tasksource/refcoco-grounding v2026.10.16
+
+- Add 100,000 training, 24,527 validation and 30,903 test referring-expression decisions from RefCOCO, RefCOCO+ and RefCOCOg.
+- Share unchanged COCO2014 images across the three views. Choices are native object boxes; no synthetic distractors.
+- Reserve held-out photographs across variants by both image ID and image hash. Preserve original split names in metadata; native test subsets share the canonical test split.
+- Record original per-image Flickr licenses and source revisions. Noncommercial and unresolved terms are retained explicitly.
+
+## <dataset> <version>`, with a few
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
