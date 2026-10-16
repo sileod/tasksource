@@ -4,6 +4,12 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource/flickr30k-grounding v2026.10.16
+
+- Add 100,000 human-labeled training phrase-to-box decisions, 11,232 validation questions and 11,560 test questions, grouped by unchanged Flickr30k image.
+- Preserve native image partitions; require one native target box and distinct annotated-region choices. Exclude the publisher’s known unrelated captions and multi-box/no-box targets.
+- Record original noncommercial research/education and Flickr image terms, source revisions and conversion hashes.
+
 ## tasksource-jev-typed-decisions v2026.10.16.1
 
 - `vision`: add RefCOCO, RefCOCO+ and RefCOCOg object-box decisions, sharing the existing 20k training-row family budget. The source mirror contains 100k training QAs.

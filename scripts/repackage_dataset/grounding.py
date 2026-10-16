@@ -1,5 +1,6 @@
 """Pinned native grounding joins; canonical MC QAs share unchanged encoded images."""
 import hashlib
+import inspect
 import json
 import zipfile
 from collections import Counter, defaultdict
@@ -64,8 +65,9 @@ def grounding_qa(instruction, target, candidates, metadata, view, excluded):
             'metadata': json.dumps(metadata, ensure_ascii=False, sort_keys=True)}
 
 
-def materialize(generators, name, sources, excluded, conversion, license_url, max_rows, seed):
-    fingerprint = hashlib.sha256(json.dumps([name, sources, max_rows, seed, file_sha256(Path(__file__))]).encode()).hexdigest()
+def materialize(generators, name, sources, excluded, conversion, license_url, max_rows, seed, provenance=None):
+    script_hash = file_sha256(Path(inspect.getsourcefile(conversion)))
+    fingerprint = hashlib.sha256(json.dumps([name, sources, max_rows, seed, script_hash, file_sha256(Path(__file__))]).encode()).hexdigest()
     result = _materialize(generators, name, sources[0][0], sources[0][1], excluded, conversion, 'other', license_url,
                           features=FEATURES, fingerprint=fingerprint)
     directory = Path('build') / (name + '-release')
@@ -74,13 +76,14 @@ def materialize(generators, name, sources, excluded, conversion, license_url, ma
     report.update({'mirror': 'tasksource/' + name, 'sources': dict(sources), 'max_train_questions': max_rows,
         'seed': seed, 'selection': 'stable hash order of source image groups; cap counts QAs, not images',
         'excluded_by_reason': dict(Counter(row['reason'] for row in excluded)),
-        'conversion_file_sha256': file_sha256(Path(__file__)),
+        'conversion_file_sha256': script_hash, 'grounding_helpers_sha256': file_sha256(Path(__file__)),
         'parquet_sha256': {p.name: file_sha256(p) for p in directory.glob('*.parquet')},
         'representation': 'canonical grouped MC; original images, native candidate boxes, no synthetic negatives',
         'choice_config': {'max_options': 8, 'min_center_distance': 0.03, 'units': '0–1000'}})
     if name == 'refcoco-grounding':
         report['annotation_archive'] = {'url': COCO_ANNOTATIONS_URL, 'sha256': COCO_ANNOTATIONS_SHA256}
         report['split_policy'] = 'native test subsets merged; held-out images reserved by both COCO ID and encoded-image SHA256 across variants'
+    report.update(provenance or {})
     path.write_text(json.dumps(report, indent=2) + '\n')
     return result
 

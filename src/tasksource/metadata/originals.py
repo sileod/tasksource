@@ -11,6 +11,8 @@ by scripts/upload_repackaged.py) or a task switches to a mirror.
 """
 
 ORIGINALS = {
+    "tasksource/flickr30k-grounding": ["nlphuji/flickr30k"],
+    "tasksource/weblinx-grounding": ["McGill-NLP/WebLINX", "McGill-NLP/WebLINX-full"],
     "tasksource/refcoco-grounding": ["jxu124/refcoco", "jxu124/refcocoplus", "jxu124/refcocog", "Untitled111/refcoco-train2014-assets"],
     "tasksource/spatial-dise": ["TACPS-liv/Spatial-DISE"],
     "tasksource/tabmwp": [],  # native PromptPG JSON distributions linked in mirror provenance

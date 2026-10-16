@@ -260,3 +260,10 @@ Published 2,410 training decisions to Jev `vision` in [v2026.10.16](https://hugg
 - ShowUI-web: publication deferred after a visual audit found a search-bar instruction targeting a sorting dropdown. [Evidence](../../../docs/jev/audits/showui-grounding-source.json); require reproducible instruction verification before retrying.
 - Visual WebLINX: next; validate screenshot coordinate frames and candidate UID joins against native replay state, retaining demonstration splits.
 - Flickr30k Entities: next; single-box phrases with full caption context, exclude the official unrelated-caption list, preserve native image splits and original noncommercial image terms. Reuse a usable Hub source where available.
+
+### Next grounding batch — user requested 2026-10-16
+
+After WebLINX and Flickr30k Entities:
+
+1. ShapeWorld: verify native target-box supervision, procedural correctness, controllable difficulty and original data/asset terms. Use existing visual templates; static repackaging only if necessary, capped at 100k training QAs.
+2. CLEVR-Ref+: inspect prebuilt image/expression/target releases and genuine training partitions. Verify data and image terms separately from the BSD code license; preserve native splits and use the same grounding representation and 100k cap.

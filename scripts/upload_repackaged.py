@@ -26,6 +26,8 @@ from scripts.repackage_dataset.comve import comve
 from scripts.repackage_dataset.tabmwp import tabmwp
 from scripts.repackage_dataset.spatial_dise import spatial_dise
 from scripts.repackage_dataset.grounding import refcoco_grounding
+from scripts.repackage_dataset.flickr_grounding import flickr30k_grounding
+from scripts.repackage_dataset.weblinx_grounding import weblinx_grounding
 from scripts.repackage_dataset.stance import vast, fnc1, perspectrum, ukpconvarg, discogem
 from scripts.repackage_dataset.specialized_text import pubmed_rct
 from scripts.repackage_dataset.linguistic import semcor, streusle, spider
@@ -45,7 +47,9 @@ from scripts.repackage_dataset.procedural.balanced_visgym import visgym_balanced
 from scripts.repackage_dataset.regions import coco_regions, doclaynet_region, bapps, spair71k_grid
 
 
-BUILDERS = {"refcoco-grounding": ("tasksource/refcoco-grounding", refcoco_grounding),
+BUILDERS = {"flickr30k-grounding": ("tasksource/flickr30k-grounding", flickr30k_grounding),
+            "weblinx-grounding": ("tasksource/weblinx-grounding", weblinx_grounding),
+            "refcoco-grounding": ("tasksource/refcoco-grounding", refcoco_grounding),
             "spatial-dise": ("tasksource/spatial-dise", spatial_dise),
             "tabmwp": ("tasksource/tabmwp", tabmwp),
             "comve": ("tasksource/comve", comve),
@@ -105,7 +109,9 @@ BUILDERS = {"refcoco-grounding": ("tasksource/refcoco-grounding", refcoco_ground
 
 
 # license metadata for repackaged sets, as the originals state it
-LICENSES = {"tasksource/refcoco-grounding": "other",
+LICENSES = {"tasksource/flickr30k-grounding": "other",
+            "tasksource/weblinx-grounding": "cc-by-nc-sa-4.0",
+            "tasksource/refcoco-grounding": "other",
             "tasksource/spatial-dise": "cc-by-nc-sa-4.0",
             "tasksource/tabmwp": "cc-by-nc-sa-4.0",
             "tasksource/comve": "cc-by-sa-4.0",
@@ -152,6 +158,8 @@ def push_card(repo, build, directory=None):
     provenance = directory / 'provenance.json'
     if provenance.exists():
         report = json.loads(provenance.read_text())
+        for field in ('language', 'task_categories'):
+            if field in report:setattr(card.data, field, report[field])
         if report.get('annotation_origin') == 'procedural':
             card.data.language = ['en']
             card.data.task_categories = ['multiple-choice', 'visual-question-answering']

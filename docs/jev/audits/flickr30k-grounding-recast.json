@@ -1,0 +1,103 @@
+{
+  "checked_on": "2026-10-16",
+  "source": "tasksource/flickr30k-grounding",
+  "splits": {
+    "train": {
+      "images": 8780,
+      "questions": 100000,
+      "views": {
+        "flickr30k": 100000
+      }
+    },
+    "validation": {
+      "images": 984,
+      "questions": 11232,
+      "views": {
+        "flickr30k": 11232
+      }
+    },
+    "test": {
+      "images": 977,
+      "questions": 11560,
+      "views": {
+        "flickr30k": 11560
+      }
+    }
+  },
+  "automated_checks": "Every QA: unique native choices, gold/geometry agreement, dimensions and native split; every image: encoded-image verification; no shared image IDs or bytes across splits.",
+  "samples": [
+    {
+      "view": "flickr30k",
+      "source_row": "flickr30k:5172704250:1:0",
+      "image_group_id": "flickr30k:5172704250",
+      "inputs": "Caption: [PHRASE]A white man[/PHRASE] and a black woman standing behind food service areas are separated by disposable plates as they wear red aprons with their logo upon it .",
+      "choices": [
+        "[600, 243, 854, 727]",
+        "[634, 363, 792, 730]",
+        "[690, 492, 726, 556]",
+        "[2, 556, 998, 1000]",
+        "[14, 616, 186, 682]",
+        "[136, 523, 174, 589]",
+        "[98, 429, 252, 793]",
+        "[610, 709, 832, 850]"
+      ],
+      "gold": 0,
+      "target_bbox": [
+        0.6,
+        0.24324324324324326,
+        0.854,
+        0.7267267267267268
+      ],
+      "audit_image": "/tmp/flickr-audit-0.png"
+    },
+    {
+      "view": "flickr30k",
+      "source_row": "flickr30k:5172704250:1:36",
+      "image_group_id": "flickr30k:5172704250",
+      "inputs": "Caption: A white man and [PHRASE]a black woman[/PHRASE] standing behind food service areas are separated by disposable plates as they wear red aprons with their logo upon it .",
+      "choices": [
+        "[612, 682, 868, 835]",
+        "[0, 778, 1000, 1000]",
+        "[74, 309, 276, 697]",
+        "[2, 556, 998, 1000]",
+        "[600, 243, 854, 727]",
+        "[690, 492, 726, 556]",
+        "[98, 429, 252, 793]",
+        "[634, 363, 792, 730]"
+      ],
+      "gold": 2,
+      "target_bbox": [
+        0.074,
+        0.30930930930930933,
+        0.276,
+        0.6966966966966966
+      ],
+      "audit_image": "/tmp/flickr-audit-1.png"
+    },
+    {
+      "view": "flickr30k",
+      "source_row": "flickr30k:5172704250:1:86",
+      "image_group_id": "flickr30k:5172704250",
+      "inputs": "Caption: A white man and a black woman standing behind [PHRASE]food service areas[/PHRASE] are separated by disposable plates as they wear red aprons with their logo upon it .",
+      "choices": [
+        "[690, 492, 726, 556]",
+        "[600, 243, 854, 727]",
+        "[634, 363, 792, 730]",
+        "[0, 778, 1000, 1000]",
+        "[2, 556, 998, 1000]",
+        "[272, 682, 538, 874]",
+        "[610, 709, 832, 850]",
+        "[136, 523, 174, 589]"
+      ],
+      "gold": 4,
+      "target_bbox": [
+        0.002,
+        0.5555555555555556,
+        0.998,
+        1.0
+      ],
+      "audit_image": "/tmp/flickr-audit-2.png"
+    }
+  ],
+  "visual_review": "Three native QAs on one image: marked man, woman and food-service region are visible and agree with their native gold boxes. Candidate geometry and caption references survive conversion. Coarse visual check only; the publisher notes its unrelated-caption list is incomplete."
+}
