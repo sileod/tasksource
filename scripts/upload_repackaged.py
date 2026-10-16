@@ -42,12 +42,14 @@ from scripts.repackage_dataset.procedural.trace import trace_mc
 from scripts.repackage_dataset.procedural.trace_generate import trace_expanded_mc
 from scripts.repackage_dataset.procedural.mentis import mentis_paper_fold
 from scripts.repackage_dataset.procedural.common import file_sha256
+from scripts.repackage_dataset.procedural.shapeworld_grounding import shapeworld_grounding
 from scripts.repackage_dataset.procedural.suites import sphinx_mc, visgym_mc
 from scripts.repackage_dataset.procedural.balanced_visgym import visgym_balanced
 from scripts.repackage_dataset.regions import coco_regions, doclaynet_region, bapps, spair71k_grid
 
 
-BUILDERS = {"flickr30k-grounding": ("tasksource/flickr30k-grounding", flickr30k_grounding),
+BUILDERS = {"shapeworld-grounding": ("tasksource/shapeworld-grounding", shapeworld_grounding),
+            "flickr30k-grounding": ("tasksource/flickr30k-grounding", flickr30k_grounding),
             "weblinx-grounding": ("tasksource/weblinx-grounding", weblinx_grounding),
             "refcoco-grounding": ("tasksource/refcoco-grounding", refcoco_grounding),
             "spatial-dise": ("tasksource/spatial-dise", spatial_dise),
@@ -109,7 +111,8 @@ BUILDERS = {"flickr30k-grounding": ("tasksource/flickr30k-grounding", flickr30k_
 
 
 # license metadata for repackaged sets, as the originals state it
-LICENSES = {"tasksource/flickr30k-grounding": "other",
+LICENSES = {"tasksource/shapeworld-grounding": "mit",
+            "tasksource/flickr30k-grounding": "other",
             "tasksource/weblinx-grounding": "cc-by-nc-sa-4.0",
             "tasksource/refcoco-grounding": "other",
             "tasksource/spatial-dise": "cc-by-nc-sa-4.0",

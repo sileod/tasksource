@@ -269,3 +269,12 @@ After WebLINX and Flickr30k Entities:
 2. CLEVR-Ref+: inspect prebuilt image/expression/target releases and genuine training partitions. Verify data and image terms separately from the BSD code license; preserve native splits and use the same grounding representation and 100k cap.
 
 - EMS-MCQA (`Xueren/EMS-MCQA`): user-requested next addition after the grounding queue (2026-10-16). Verify genuine training split, English decision format, annotation provenance and coarse native-gold examples before catalog integration. Prefer the original Hub source when directly usable.
+
+### Grounding preparation status — 2026-10-16
+
+- RefCOCO family: 100k-QA mirror and three box views published; Jev vision append added 20,000 training rows in `v2026.10.16.1`, prior shards preserved.
+- Flickr30k Entities: 100k training / 11,232 validation / 11,560 test QAs published; `flickr30k/box` plain, Jev and SoM checks passed. The 20k Jev append is running as `v2026.10.16.2`.
+- WebLINX: replay/screenshot join running; native candidate CSS geometry checked against screenshot dimensions and raw event geometry. Missing native files are counted as exclusions; demonstration partitions stay native. Three pilot screenshots inspected.
+- ShapeWorld: native MIT renderer/scene boxes validated on pilot images. CPU build targets 100k training QAs plus 1k per held-out split. Spatial references must disambiguate repeated color/shape descriptions. Publication waits for full checks.
+- CLEVR-Ref+: official prebuilt archive currently returns 404; no matching directly usable Hub source found. Continue looking for a faithful prebuilt release before considering expensive scene regeneration.
+- EMS-MCQA: next after grounding; original paper reports human-collected practice questions and a 100-item EMT expert review, with 13,021 public training questions. Check native multi-answer and option-reference cases before mapping to single-choice decisions.

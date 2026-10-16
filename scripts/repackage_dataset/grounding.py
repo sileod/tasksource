@@ -67,7 +67,7 @@ def grounding_qa(instruction, target, candidates, metadata, view, excluded):
 
 def materialize(generators, name, sources, excluded, conversion, license_url, max_rows, seed, provenance=None):
     script_hash = file_sha256(Path(inspect.getsourcefile(conversion)))
-    fingerprint = hashlib.sha256(json.dumps([name, sources, max_rows, seed, script_hash, file_sha256(Path(__file__))]).encode()).hexdigest()
+    fingerprint = hashlib.sha256(json.dumps([name, sources, max_rows, seed, script_hash, file_sha256(Path(__file__)), provenance]).encode()).hexdigest()
     result = _materialize(generators, name, sources[0][0], sources[0][1], excluded, conversion, 'other', license_url,
                           features=FEATURES, fingerprint=fingerprint)
     directory = Path('build') / (name + '-release')
