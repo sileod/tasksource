@@ -6,12 +6,13 @@ concise bullets on what changed in the data. `tasksource-jev-typed-decisions` re
 
 ## tasksource-jev-typed-decisions v2026.10.15.5
 
-- `vision`: removed the grid-cell grounding rows (rico-widget/grid7, spair71k/grid7); the coordinate-option views of v2026.10.15.4 replace them. Other rows and shards are unchanged.
+- `vision`: removed the grid-cell grounding rows (rico-widget/grid7: 15,180; spair71k/grid7: 30,000); the coordinate-option views of v2026.10.15.4 replace them. Other rows and shards are unchanged; vision train has 659,904 rows.
 
 ## tasksource-jev-typed-decisions v2026.10.15.4
 
 - `vision`: coordinate grounding as multiple choice. RICO widgets and Mind2Web elements: pick the target's box among the screen's other element boxes, as 0–1000 `[x1, y1, x2, y2]`. SPair-71k: pick the corresponding point among the pair's other keypoints, as 0–1000 `(x, y)`.
 - `vision`: Mind2Web training actions (next action type, element choice, box choice); its test splits stay out.
+- 75,258 training rows added: rico-widget/box 30,000, spair71k/point 30,000, and 5,086 each for Mind2Web box, element and action.
 - Grid-cell and axis-bin grounding views no longer enter Jev builds; the rows already published leave at the next vision rebuild.
 
 ## tasksource 2026-10-15.12
