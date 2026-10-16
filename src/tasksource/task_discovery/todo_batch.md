@@ -251,3 +251,5 @@ Published all five views to Jev `full` in [v2026.10.15.2](https://huggingface.co
 ## Spatial-DISE (2026-10-16)
 
 Added `spatial-dise/mcq`: native rotation, combination and hidden-face questions, via the [reproducible archive join](../../../scripts/repackage_dataset/spatial_dise.py). Retained 2,410 train / 793 validation / 1,065 test rows after reserving generator families across splits and the separate benchmark. Original composite pixels and native choices are preserved. Projection is deferred for missing viewing cues, and folding for a sampled ambiguous answer set; both have structured reasons. [Coarse image/recast audit](../../../docs/jev/audits/spatial-dise-recast.json); CC BY-NC-SA 4.0 plus original asset terms.
+
+Published 2,410 training decisions to Jev `vision` in [v2026.10.16](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions/commit/37f86bbbe869a5ae1fffeaca61fd494cf1276faa). Vision now has 662,314 train rows; every previous shard and evaluation split is unchanged.

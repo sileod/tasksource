@@ -62,32 +62,50 @@
     "rows": 4268,
     "image_integrity": "Every retained encoded image passes Pillow verification and matches its SHA-256 image_group_id.",
     "gold": "Every retained gold index matches the native CSV answer.",
-    "split_groups": "All retained generator family IDs are disjoint across source splits and the separate benchmark."
+    "split_groups": "All retained generator family IDs are disjoint across source splits and the separate benchmark.",
+    "jev_gold_alignment": 2410,
+    "native_option_counts": {
+      "4": 2364,
+      "6": 46
+    }
   },
   "recast_examples": [
     {
-      "source_image": "images/synthetic/merged/3D_rotation/medium/merged_question_0913.png",
-      "category": "3D Rotation",
-      "state": "The 3D object in the question is shown from a specific viewpoint. One of the options below is the same object, just rotated. Which one is the most likely one?\nChoose the image panel identified by the answer text.",
+      "source_image": "images/synthetic/merged/3D_shape_finding/hard/merged_question_question_0710.png",
+      "category": "3D Shape Finding",
+      "state": "The images above show two different views of the same cube. According to these views, what is the most likely image on the blue face (marked in the third view)? Select the most likely one from the options below.\nChoose the image panel identified by the answer text.",
       "question": "Choose the criterion that best answers the question.",
       "options": [
         "Panel B",
         "Panel A",
+        "Panel D",
+        "Panel C"
+      ],
+      "gold": "Panel C"
+    },
+    {
+      "source_image": "images/synthetic/merged/3D_rotation/hard/merged_question_0980.png",
+      "category": "3D Rotation",
+      "state": "The 3D object in the question is shown from a specific viewpoint. One of the options below is the same object, just rotated. Which one is the most likely one?\nChoose the image panel identified by the answer text.",
+      "question": "Choose the criterion that best answers the question.",
+      "options": [
+        "Panel A",
+        "Panel B",
         "Panel C",
         "Panel D"
       ],
-      "gold": "Panel A"
+      "gold": "Panel C"
     },
     {
-      "source_image": "images/synthetic/merged/3D_shape_finding/hard/merged_question_question_0328.png",
-      "category": "3D Shape Finding",
-      "state": "Given the two views of the cube above, which image is most likely to be on the blue face as shown in the third view? Select the most likely one.\nChoose the image panel identified by the answer text.",
+      "source_image": "images/synthetic/merged/3D_combination/easy/merged_question_0859.png",
+      "category": "3D Combination",
+      "state": "The two images above show a 3D structure from different angles. Which one of the options below could be constructed to appear the same as both given views when observed from the corresponding perspectives without rotation and overlaps? Select the most likely one.\nChoose the image panel identified by the answer text.",
       "question": "Choose the criterion that best answers the question.",
       "options": [
         "Panel C",
+        "Panel B",
         "Panel D",
-        "Panel A",
-        "Panel B"
+        "Panel A"
       ],
       "gold": "Panel C"
     }
@@ -105,5 +123,16 @@
     ],
     "gold": "Panel D",
     "finding": "A and B look identical, and native gold D shows the same three compatible face textures under a slightly different projection. Unique correct choice cannot be established; folding excluded as a category pending an upstream verifier or corrected release."
+  },
+  "mirror_revision": "6d597407f3b15b86cf2c323373ac9bf1c5065da9",
+  "publication": {
+    "repository": "tasksource/tasksource-jev-typed-decisions",
+    "config": "vision",
+    "release": "v2026.10.16",
+    "commit": "37f86bbbe869a5ae1fffeaca61fd494cf1276faa",
+    "added_train": 2410,
+    "total_train": 662314,
+    "preserved_shards": 937,
+    "evaluation": "unchanged"
   }
 }

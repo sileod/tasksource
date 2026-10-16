@@ -7,6 +7,7 @@ concise bullets on what changed in the data. `tasksource-jev-typed-decisions` re
 ## tasksource-jev-typed-decisions v2026.10.16
 
 - `vision`: add `spatial-dise/mcq` with native spatial-reasoning choices and original composite images. Training excludes generator families reserved by validation, test or the separate Spatial-DISE benchmark.
+- Added 2,410 training decisions; `vision` now has 662,314 train rows. Existing shards and evaluation are unchanged.
 - Retain rotation, combination and hidden-face questions. Projection is omitted for missing viewing cues; folding for a sampled ambiguous answer set. Source terms are CC BY-NC-SA 4.0 with original third-party asset rights retained.
 
 ## tasksource/spatial-dise v2026.10.16.1
