@@ -273,7 +273,7 @@ After WebLINX and Flickr30k Entities:
 ### Grounding preparation status — 2026-10-16
 
 - RefCOCO family: 100k-QA mirror and three box views published; Jev vision append added 20,000 training rows in `v2026.10.16.1`, prior shards preserved.
-- Flickr30k Entities: 100k training / 11,232 validation / 11,560 test QAs published; `flickr30k/box` plain, Jev and SoM checks passed. The 20k Jev append is running as `v2026.10.16.2`.
+- Flickr30k Entities: 100k training / 11,232 validation / 11,560 test QAs published; `flickr30k/box` plain, Jev and SoM checks passed. The 20k Jev append is published as `v2026.10.16.2`, bringing vision training to 702,314 rows; all 983 prior vision Parquet blobs were verified unchanged.
 - WebLINX: replay/screenshot join running; native candidate CSS geometry checked against screenshot dimensions and raw event geometry. Missing native files are counted as exclusions; demonstration partitions stay native. Three pilot screenshots inspected.
 - ShapeWorld: native MIT renderer/scene boxes validated on pilot images. CPU build targets 100k training QAs plus 1k per held-out split. Spatial references must disambiguate repeated color/shape descriptions. Publication waits for full checks.
 - CLEVR-Ref+: official prebuilt archive currently returns 404; no matching directly usable Hub source found. Continue looking for a faithful prebuilt release before considering expensive scene regeneration.

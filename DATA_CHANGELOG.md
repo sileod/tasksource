@@ -6,7 +6,7 @@ concise bullets on what changed in the data. `tasksource-jev-typed-decisions` re
 
 ## tasksource-jev-typed-decisions v2026.10.16.2
 
-- `vision`: add Flickr30k Entities phrase grounding, capped at 20k training rows from the 100k-QA mirror. Full captions identify the queried phrase; options are native annotated regions.
+- `vision`: add Flickr30k Entities phrase grounding, capped at 20k training rows from the 100k-QA mirror. Full captions identify the queried phrase; options are native annotated regions. Published 20,000 new rows, bringing vision training to 702,314 rows.
 - Preserve existing training and evaluation shards; exclude images already present in published evaluation. Record original noncommercial image terms.
 
 ## tasksource/flickr30k-grounding v2026.10.16
