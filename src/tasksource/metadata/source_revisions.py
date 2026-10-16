@@ -1,6 +1,7 @@
 """Reviewed source snapshots; keep opaque revision IDs out of task annotations."""
 
 SOURCE_REVISIONS = {
+    "tasksource/refcoco-grounding": "4746222a3d41f2717308d66b7ae2d14766d0619e",
     "tasksource/spatial-dise": "6d597407f3b15b86cf2c323373ac9bf1c5065da9",
     'cam-cst/cbt': '72b5c46b1248e3316360f0f2f0b2c39e773b68e4',
     'holylovenia/recam': '1061da9ff8290ae64d2ab4659eccd5c78407ff13',

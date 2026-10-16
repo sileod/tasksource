@@ -739,3 +739,14 @@ spatial_dise__mcq = VisualMultipleChoice(
     metadata='metadata', pre_process=grouped_mc_rows,
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/spatial-dise'],'streaming':True},
 )
+
+
+_REFCOCO_GROUNDING = dict(dataset_name='tasksource/refcoco-grounding', choices_list='choices_list', metadata='metadata',
+    question='Which box contains the described object? Boxes are [x1, y1, x2, y2] with coordinates from 0 to 1000 over the displayed image, x rightward and y downward.',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/refcoco-grounding'],'streaming':True})
+refcoco__box = VisualMultipleChoice(**_REFCOCO_GROUNDING, task_id='refcoco/box',
+    pre_process=lambda ds: grouped_qa_rows(ds, view='refcoco', multiple_choice=True))
+refcoco_plus_box = VisualMultipleChoice(**_REFCOCO_GROUNDING, task_id='refcoco/plus/box',
+    pre_process=lambda ds: grouped_qa_rows(ds, view='refcocoplus', multiple_choice=True))
+refcoco_g_box = VisualMultipleChoice(**_REFCOCO_GROUNDING, task_id='refcoco/g/box',
+    pre_process=lambda ds: grouped_qa_rows(ds, view='refcocog', multiple_choice=True))

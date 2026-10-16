@@ -170,6 +170,11 @@ def push_card(repo, build, directory=None):
     card.text = (f"\n# {repo.split('/')[1]}\n\n{inspect.cleandoc(build.__doc__)}\n\n{sources}"
                  f"Repackaged as {storage} for [tasksource](https://github.com/sileod/tasksource) by "
                  f"[{script}](https://github.com/sileod/tasksource/blob/main/{script}#L{inspect.getsourcelines(build)[1]}).\n")
+    if provenance.exists() and 'splits' in report and any(
+            count.get('questions', count['rows']) != count['rows'] for count in report['splits'].values()):
+        counts = ', '.join(f"{split}: {count.get('questions', count['rows']):,} questions / {count['rows']:,} image groups"
+                           for split, count in report['splits'].items())
+        card.text += f'\nImages are stored once with grouped `qa` records: {counts}.\n'
     if provenance.exists():
         card.text += '\n[Conversion provenance](provenance.json): source revisions, hashes, configuration and exclusions.\n'
     if (directory / 'asset-notices.json').exists():
@@ -235,7 +240,7 @@ def main():
     parser.add_argument("--prepared", type=Path, help="Publish a reviewed, checksummed default-config build without regenerating it")
     parser.add_argument("--bad-examples", type=Path, help="WebInstruct only: confirmed-removal manifest")
     parser.add_argument("--repairs", type=Path, help="WebInstruct only: verified presentation repairs")
-    parser.add_argument("--max-rows", type=int, help="Rendered mirrors: maximum training examples (default 5000)")
+    parser.add_argument("--max-rows", type=int, help="Maximum training examples; the default depends on the builder")
     parser.add_argument("--max-rows-eval", type=int, help="Rendered mirrors: maximum examples per native evaluation split (default 100)")
     parser.add_argument("--seed", type=int, help="Rendered mirrors: deterministic source annotation sampling seed")
     parser.add_argument("--generator-task", dest="task_ids", action="append", help="Procedural builders: restrict native task/environment IDs; repeat to select several")

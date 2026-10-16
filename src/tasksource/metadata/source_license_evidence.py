@@ -5,6 +5,10 @@ Keys are task families, shared by their visual classification/MC views.
 """
 
 SOURCE_LICENSE_EVIDENCE = {
+    'refcoco': {'license': 'mixed/unspecified', 'license_use': 'unspecified', 'checked': '2026-10-16',
+        'scope': 'Human referring expressions and COCO boxes; Flickr photographs retain individual licenses recorded in row metadata. API code licensing is separate from data terms.',
+        'url': 'https://cocodataset.org/#termsofuse',
+        'additional_urls': ['https://github.com/lichengunc/refer']},
     'spatial-dise': {'license': 'cc-by-nc-sa-4.0', 'license_use': 'non-commercial', 'checked': '2026-10-16',
         'scope': 'Spatial-DISE release; Icons8 textures and collected aptitude-test images retain original third-party terms',
         'url': 'https://huggingface.co/datasets/TACPS-liv/Spatial-DISE#license',

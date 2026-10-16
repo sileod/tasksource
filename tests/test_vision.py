@@ -45,7 +45,7 @@ def test_catalog():
                              'clevr/material', 'intergps', 'clevr/count', 'tallyqa/count', 'vsr/yesno',
                              'rico-widget/grid7', 'rico-widget/element', 'rico-widget/box', 'lvis/region', 'coco/panoptic-region',
                              'doclaynet/region', 'bapps/preference', 'spair71k/grid7', 'spair71k/point', 'superclevr/yesno', 'superclevr/count', 'superclevr/color',
-                             'superclevr/shape', 'superclevr/size', 'superclevr/material', 'gameqa/mcq', 'valen-game/optimal-action', 't2isafety/toxicity', 'met-meme/sentiment', 'met-meme/intention', 'met-meme/offensiveness', 'met-meme/metaphor', 'memeqa/mcq', 'tron/mcq', 'trace/mcq', 'mentis-oculi/paper-fold', 'sphinx/mcq', 'visgym/mcq', 'spatial-dise/mcq']
+                             'superclevr/shape', 'superclevr/size', 'superclevr/material', 'gameqa/mcq', 'valen-game/optimal-action', 't2isafety/toxicity', 'met-meme/sentiment', 'met-meme/intention', 'met-meme/offensiveness', 'met-meme/metaphor', 'memeqa/mcq', 'tron/mcq', 'trace/mcq', 'mentis-oculi/paper-fold', 'sphinx/mcq', 'visgym/mcq', 'spatial-dise/mcq', 'refcoco/box', 'refcoco/plus/box', 'refcoco/g/box']
     text = list_tasks()
     assert set(vision.id) & set(text.id) == {'mind2web/action'}
     assert not any(isinstance(mapping, (VisualClassification, VisualMultipleChoice))

@@ -1,0 +1,173 @@
+{
+  "checked_on": "2026-10-16",
+  "source": "tasksource/refcoco-grounding",
+  "splits": {
+    "train": {
+      "images": 8526,
+      "questions": 100000,
+      "views": {
+        "refcoco": 37493,
+        "refcocoplus": 37260,
+        "refcocog": 25247
+      }
+    },
+    "validation": {
+      "images": 2566,
+      "questions": 24527,
+      "views": {
+        "refcoco": 9979,
+        "refcocoplus": 9887,
+        "refcocog": 4661
+      }
+    },
+    "test": {
+      "images": 3980,
+      "questions": 30903,
+      "views": {
+        "refcoco": 10717,
+        "refcocoplus": 10590,
+        "refcocog": 9596
+      }
+    }
+  },
+  "automated_checks": "Every QA: unique native choices, gold/geometry agreement, dimensions and native split; every image: encoded-image verification; no shared image IDs or bytes across splits.",
+  "samples": [
+    {
+      "view": "refcoco",
+      "source_row": "refcoco:123294",
+      "image_group_id": "coco:75910",
+      "inputs": "upper person in brown",
+      "choices": [
+        "[555, 458, 571, 478]",
+        "[0, 7, 115, 244]",
+        "[237, 2, 495, 494]",
+        "[516, 49, 797, 530]",
+        "[90, 636, 481, 975]",
+        "[537, 446, 559, 487]",
+        "[58, 0, 206, 153]",
+        "[522, 520, 978, 1000]"
+      ],
+      "gold": 2,
+      "target_bbox": [
+        0.23726562499999998,
+        0.0022588235294117645,
+        0.4954375,
+        0.4943764705882353
+      ],
+      "visual_finding": "The upper person in brown is the person enclosed by the gold box."
+    },
+    {
+      "view": "refcocoplus",
+      "source_row": "refcocoplus:122845",
+      "image_group_id": "coco:75910",
+      "inputs": "grey sweater",
+      "choices": [
+        "[67, 673, 469, 984]",
+        "[522, 520, 978, 1000]",
+        "[555, 458, 571, 478]",
+        "[58, 0, 206, 153]",
+        "[237, 2, 495, 494]",
+        "[516, 49, 797, 530]",
+        "[804, 833, 984, 1000]",
+        "[0, 389, 301, 750]"
+      ],
+      "gold": 4,
+      "target_bbox": [
+        0.23726562499999998,
+        0.0022588235294117645,
+        0.4954375,
+        0.4943764705882353
+      ],
+      "visual_finding": "The grey sweater expression selects the sweater-wearing person; other people have different clothing."
+    },
+    {
+      "view": "refcocog",
+      "source_row": "refcocog:53824",
+      "image_group_id": "coco:301603",
+      "inputs": "a train chair across from two men looking at a laptop",
+      "choices": [
+        "[30, 647, 161, 754]",
+        "[370, 372, 428, 503]",
+        "[425, 5, 989, 778]",
+        "[0, 135, 252, 875]",
+        "[137, 498, 703, 986]",
+        "[350, 341, 402, 421]",
+        "[2, 748, 210, 998]",
+        "[660, 283, 750, 493]"
+      ],
+      "gold": 3,
+      "target_bbox": [
+        0.0,
+        0.13501333333333335,
+        0.25204,
+        0.8751466666666667
+      ],
+      "visual_finding": "The train chair across from the two men is enclosed by the gold box."
+    }
+  ],
+  "visual_review": "pass",
+  "scope": "Full schema/geometry/split checks, plus one manually viewed example per variant (two variants share the same audited photograph); not a full semantic label audit.",
+  "source_revisions": {
+    "jxu124/refcocog": "55319436ad54b9480cefda6b9d64397de92456dd",
+    "jxu124/refcoco": "9fba8200c5326e996f789191f095bd464ef1d09e",
+    "jxu124/refcocoplus": "12e20b0b6039fbf656e89e2f26597e84c1037847",
+    "Untitled111/refcoco-train2014-assets": "5daa32cfe87ea355fab400b5ec5a8a9bb476ffd2"
+  },
+  "load_task_checks": [
+    {
+      "task": "refcoco/box",
+      "recast": null,
+      "splits": {
+        "test": 2,
+        "train": 3,
+        "validation": 2
+      }
+    },
+    {
+      "task": "refcoco/box",
+      "recast": "jev",
+      "splits": {
+        "test": 2,
+        "train": 3,
+        "validation": 2
+      }
+    },
+    {
+      "task": "refcoco/plus/box",
+      "recast": null,
+      "splits": {
+        "test": 2,
+        "train": 3,
+        "validation": 2
+      }
+    },
+    {
+      "task": "refcoco/plus/box",
+      "recast": "jev",
+      "splits": {
+        "test": 2,
+        "train": 3,
+        "validation": 2
+      }
+    },
+    {
+      "task": "refcoco/g/box",
+      "recast": null,
+      "splits": {
+        "test": 2,
+        "train": 3,
+        "validation": 0
+      }
+    },
+    {
+      "task": "refcoco/g/box",
+      "recast": "jev",
+      "splits": {
+        "test": 2,
+        "train": 3,
+        "validation": 0
+      }
+    }
+  ],
+  "som_jev_gold_alignment": "pass for all three task views"
+}
