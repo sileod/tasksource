@@ -173,6 +173,8 @@ def main():
     parser.add_argument('--language', action='append', help='Dataset language (default en); judged on the evidence')
     parser.add_argument('--untagged', action='store_true',
                         help='Also keep datasets without language tags (most GUI data); other declared languages stay out')
+    parser.add_argument('--candidates', type=Path, action='append', default=[],
+                        help='Extra candidate JSONL, e.g. from web_agent.py; always probed, ahead of the prior')
     parser.add_argument('--target', help='Regex of extra target columns accepted without a discreteness check, e.g. bbox|point|action')
     parser.add_argument('--question', action='append', default=[], metavar='NAME=TEXT',
                         help='Extra yes/no judge question, added to the review score; repeat')
@@ -191,13 +193,18 @@ def main():
 
     # 1-2. inventory and identity
     rows = {}
-    searches = [dict(queries=[q]) for q in args.query] + [dict(tasks=[t]) for t in args.tag or ([] if args.query else TAGS)]
+    searches = [dict(queries=[q]) for q in args.query] + [dict(tasks=[t]) for t in args.tag or ([] if args.query or args.candidates else TAGS)]
     for search in searches:
         search.update(limit=None, languages=[] if args.untagged else languages)
         found, _ = retrieve(args.cache, offline=not args.refresh and _cached(args.cache, search), **search)
         for r in found:
             if language_priority(r, languages) < 2:  # untagged kept, explicit other languages dropped
                 rows.setdefault(r['name'], r)
+    for path in args.candidates:
+        for line in path.read_text().splitlines():
+            row = json.loads(line)
+            if language_priority(row, languages) < 2:
+                rows[row['name']] = dict(row, sources=rows.get(row['name'], {}).get('sources', []) + row['sources'])
     names, repos = catalog_index()
     matched = list(match(rows.values(), names, repos, previous_decisions(), queued_sources(), catalog_references()))
     known = lambda r: r['status'] != 'candidate' or r.get('related_matches')
@@ -213,8 +220,9 @@ def main():
         r['known'] = bool(known(r))
     if not args.media:
         pool = [r for r in pool if not {'image', 'video', 'audio'} & set(r.get('modalities') or [])]
-    pool.sort(key=lambda r: -r['prior'])
-    head = pool[:args.probe]
+    agent = lambda r: any(s.get('source') == 'web_agent' for s in r.get('sources', []))
+    pool.sort(key=lambda r: (not agent(r), -r['prior']))  # agent finds were chosen by meaning, not popularity
+    head = pool[:args.probe + sum(map(agent, pool))]
 
     # 4. structure and content identity
     with ThreadPoolExecutor(max_workers=4) as executor:
