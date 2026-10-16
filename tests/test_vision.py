@@ -38,13 +38,13 @@ def template(mc=False, two=False):
 def test_catalog():
     vision = list_tasks(vision=True)
     assert list(vision.id) == ['nlvr2', 'aokvqa', 'scienceqa-img', 'ai2d', 'figureqa',
-                             'mind2web/action', 'mind2web/element', 'mind2web/x10',
+                             'mind2web/action', 'mind2web/element', 'mind2web/box', 'mind2web/x10',
                              'mind2web/y10', 'mind2web/grid5', 'mind2web/grid7',
                              'm3cot', 'exams-v', 'visualsphinx', 'muslr/tfu', 'muslr/mc', 'iconqa/text', 'view2space/mcq', 'visual7w', 'clevr/yesno', 'mapqa/yesno',
                              'tqa', 'hateful-memes', 'clevr/color', 'clevr/shape', 'clevr/size',
                              'clevr/material', 'intergps', 'clevr/count', 'tallyqa/count', 'vsr/yesno',
-                             'rico-widget/grid7', 'rico-widget/element', 'lvis/region', 'coco/panoptic-region',
-                             'doclaynet/region', 'bapps/preference', 'spair71k/grid7', 'superclevr/yesno', 'superclevr/count', 'superclevr/color',
+                             'rico-widget/grid7', 'rico-widget/element', 'rico-widget/box', 'lvis/region', 'coco/panoptic-region',
+                             'doclaynet/region', 'bapps/preference', 'spair71k/grid7', 'spair71k/point', 'superclevr/yesno', 'superclevr/count', 'superclevr/color',
                              'superclevr/shape', 'superclevr/size', 'superclevr/material', 'gameqa/mcq', 'valen-game/optimal-action', 't2isafety/toxicity', 'met-meme/sentiment', 'met-meme/intention', 'met-meme/offensiveness', 'met-meme/metaphor', 'memeqa/mcq', 'tron/mcq', 'trace/mcq', 'mentis-oculi/paper-fold', 'sphinx/mcq', 'visgym/mcq']
     text = list_tasks()
     assert set(vision.id) & set(text.id) == {'mind2web/action'}
@@ -354,6 +354,7 @@ def test_gui_builder_keeps_action_groups(tmp_path, monkeypatch):
     monkeypatch.setattr(access, 'load_dataset', lambda *a, **kw: mind2web_mirror())
     monkeypatch.setattr(builder, 'source_licenses', lambda sources: {
         source: {'license': 'openrail', 'license_use': 'unspecified'} for source in sources})
+    monkeypatch.setattr(builder, 'JEV_EXCLUDED_SOURCES', set())  # axis bins are out of Jev; grouping still applies
     args = SimpleNamespace(output=tmp_path, tasks=['mind2web/x10', 'mind2web/y10'], limit=None,
                            max_rows=10, max_rows_eval=10, repo_id='test/repo', upload=False)
     ds = builder.build_vision(args)
