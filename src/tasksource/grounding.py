@@ -93,28 +93,32 @@ def coordinate_text(geometry):
     return f"[{', '.join(map(str, values))}]" if len(values) == 4 else f"({values[0]}, {values[1]})"
 
 
-def coordinate_choices(target, others, key, max_options=8, min_distance=0.03):
+def coordinate_choices(target, others, key, max_options=8, min_distance=0.03, return_geometry=False):
     """Gold geometry and up to ``max_options - 1`` native distractors as coordinate options.
 
     Distractors are other annotated boxes or points of the same image, never generated ones;
     those whose center lies within ``min_distance`` of the gold center, or that print the same,
     are dropped. Selection and order are stable per ``key``. Returns ``(choices, label)``, or
-    ``None`` when no distractor remains."""
+    ``None`` when no distractor remains. With ``return_geometry``, also return the
+    exact selected geometries in choice order, for aligned image marks."""
     def center(g):
         return ((g[0] + g[2]) / 2, (g[1] + g[3]) / 2) if len(g) == 4 else tuple(g)
     gold, gold_center = coordinate_text(target), center(target)
     seen, pool = {gold}, []
+    geometries = {gold: target}
     for geometry in others:
         text = coordinate_text(geometry)
         if text not in seen and math.dist(center(geometry), gold_center) >= min_distance:
             seen.add(text)
             pool.append(text)
+            geometries[text] = geometry
     if not pool:
         return None
     rng = random.Random(int(hashlib.sha256(str(key).encode()).hexdigest(), 16))
     choices = rng.sample(pool, min(len(pool), max_options - 1)) + [gold]
     rng.shuffle(choices)
-    return choices, choices.index(gold)
+    result = (choices, choices.index(gold))
+    return (*result, [geometries[choice] for choice in choices]) if return_geometry else result
 
 
 def check_grounding_splits(dataset):

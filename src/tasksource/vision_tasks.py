@@ -226,10 +226,11 @@ def box_choice_rows(dataset, boxes):
     def convert(metadata, choices):  # reads no image column
         target, others = boxes({'metadata': metadata, 'choices_list': choices})
         info = json.loads(metadata)
-        picked = coordinate_choices(target, others, key=info.get('source_row') or metadata)
+        picked = coordinate_choices(target, others, key=info.get('source_row') or metadata, return_geometry=True)
         if picked is None:
             return {'choices_list': [], 'labels': -1}
-        info.update(target_bbox=target, bbox_units='normalized_xyxy', coordinate_units='0-1000 xyxy')
+        info.update(target_bbox=target, candidate_boxes=picked[2],
+                    bbox_units='normalized_xyxy', coordinate_units='0-1000 xyxy')
         return {'choices_list': picked[0], 'labels': picked[1], 'metadata': json.dumps(info, sort_keys=True)}
     return type(dataset)({split: rows.map(convert, input_columns=['metadata', 'choices_list'])
                           .filter(lambda label: label >= 0, input_columns='labels')
