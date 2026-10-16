@@ -22,23 +22,6 @@ is a short, readable function from a dataset to its standardized form.
 pip install tasksource
 ```
 
-If you use tasksource, its standardized task annotations, or datasets derived from them in published research, please cite the tasksource paper (Sileo, LREC-COLING 2024). GitHub's "Cite this repository" button gives the same reference ([`CITATION.cff`](CITATION.cff)).
-
-```bib
-@inproceedings{sileo-2024-tasksource,
-    title = "tasksource: A Large Collection of {NLP} tasks with a Structured Dataset Preprocessing Framework",
-    author = "Sileo, Damien",
-    booktitle = "Proceedings of the 2024 Joint International Conference on Computational Linguistics, Language Resources and Evaluation (LREC-COLING 2024)",
-    month = may,
-    year = "2024",
-    address = "Torino, Italia",
-    publisher = "ELRA and ICCL",
-    url = "https://aclanthology.org/2024.lrec-main.1361",
-    doi = "10.63317/2h4pkr685mkq",
-    pages = "15655--15684",
-}
-```
-
 ```python
 from tasksource import list_tasks, load_task
 
@@ -142,6 +125,21 @@ winogrande = MultipleChoice('sentence',['option1','option2'],'answer',
 tasks = [winogrande.load(), codah.load()]  # aligned datasets (same columns) can be used interchangeably
 ```
 
-### Contact
+### Citation and contact
 
+For more details, refer to the [article](https://arxiv.org/abs/2301.05948):
+```bib
+@inproceedings{sileo-2024-tasksource,
+    title = "tasksource: A Large Collection of {NLP} tasks with a Structured Dataset Preprocessing Framework",
+    author = "Sileo, Damien",
+    booktitle = "Proceedings of the 2024 Joint International Conference on Computational Linguistics, Language Resources and Evaluation (LREC-COLING 2024)",
+    month = may,
+    year = "2024",
+    address = "Torino, Italia",
+    publisher = "ELRA and ICCL",
+    url = "https://aclanthology.org/2024.lrec-main.1361",
+    doi = "10.63317/2h4pkr685mkq",
+    pages = "15655--15684",
+}
+```
 For help integrating tasksource into your experiments, please contact [damien.sileo@inria.fr](mailto:damien.sileo@inria.fr).
