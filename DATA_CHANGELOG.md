@@ -1,6 +1,12 @@
 # Data changelog
 
-Changes that affect published data, newest first: one entry per publish, `## tasksource/refcoco-grounding v2026.10.16
+Changes that affect published data, newest first: one entry per publish, `## tasksource-jev-typed-decisions v2026.10.16.1
+
+- `vision`: add RefCOCO, RefCOCO+ and RefCOCOg object-box decisions, sharing the existing 20k training-row family budget. The source mirror contains 100k training QAs.
+- Native object boxes provide the choices; images, grounding geometry, source identities and original license evidence remain available.
+- Append training rows only, excluding images already in published evaluation. Existing training and evaluation shards remain unchanged.
+
+## tasksource/refcoco-grounding v2026.10.16
 
 - Add 100,000 training, 24,527 validation and 30,903 test referring-expression decisions from RefCOCO, RefCOCO+ and RefCOCOg.
 - Share unchanged COCO2014 images across the three views. Choices are native object boxes; no synthetic distractors.
