@@ -37,6 +37,15 @@ python -m tasksource.task_discovery.prospect --output build/discovery/prospect-Y
 3. **Structure.** For the top `--probe`: a train split of at least `--min-train` rows, a discrete label column checked on the 100 preview rows (not free text or continuous scores), no content or signature match, and no duplicate of a higher-ranked candidate.
 4. **Review.** Jev-style decision models answer the existing evidence questions plus a sampled-row quality question. Ranking uses the least favourable reviewer and penalizes model-made labels.
 
+The defaults search English text decision tags. Other kinds of task reuse the same stages through arguments: `--query` adds Hub name searches, `--tag` replaces the task tags, `--untagged` keeps datasets without language tags (the language is then judged from the evidence), `--media` keeps image/video/audio sources, `--target` accepts extra target columns such as boxes or actions, and `--question NAME=TEXT` adds a judge question to the score. A survivor still needs a class or multiple-choice column, or a requested target column. For GUI grounding and actions:
+
+```bash
+python -m tasksource.task_discovery.prospect --output build/discovery/prospect-gui \
+  --query screenshot --query gui --query android --query mind2web --tag image-text-to-text \
+  --untagged --media --target 'bbox|point|coord|click|action|element' \
+  --question "gui=Are the inputs GUI screenshots with targets that locate or choose interface elements or actions?"
+```
+
 `report.md` and `ranked.jsonl` are a reading list; implementation still follows "What enters the catalog" in `AGENTS.md`.
 
 ## Interchangeable retrieval sources

@@ -23,7 +23,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from urllib.parse import urlencode
 
-from .discover_task_prospects import current_answers, write_rows
+from .discover_task_prospects import current_answers, language_priority, write_rows
 from .fingerprint import DatasetIndex, Index, row_segments, signature
 from .hf_hub import retrieve
 from .identifiers import normalized
@@ -89,7 +89,7 @@ def discrete(name, features, preview):
     return len(distinct) <= max(12, len(values) // 4) and all(len(v) <= 40 for v in distinct)
 
 
-def structure(repo, cache):
+def structure(repo, cache, target=None):
     """Train rows, label columns and preview rows of the largest configuration with a train split."""
     try:
         info = cached_json(VIEWER + 'info?' + urlencode(dict(dataset=repo)), cache)['data']
@@ -113,6 +113,8 @@ def structure(repo, cache):
     except (OSError, ValueError, KeyError):
         rows = []
     best['labels'] = [name for name in best['labels'] if discrete(name, info['dataset_info'][best['config']].get('features'), rows)]
+    if target:  # requested target kinds (boxes, points, actions) need no discreteness check
+        best['labels'] += [name for name in best['columns'] if name not in best['labels'] and re.search(target, name, re.I)]
     return dict(best, viewer='ok', preview=rows)
 
 
@@ -126,7 +128,7 @@ def short(value, limit=300):
     return value
 
 
-def review_score(row):
+def review_score(row, extra=()):
     """Least favorable reviewer on fit, train, sampled-row quality, supervision and label origin."""
     answers = current_answers(row)
     if not answers:
@@ -137,6 +139,9 @@ def review_score(row):
                  for a in answers)
     score = least('decision_fit', 'yes') + least('train', 'yes') + 2 * least('sample_quality', 'yes')
     score += least('supervision_quality', 'usable') + origin - 2 * most('annotation_origin', 'model')
+    score += sum(2 * least(question, 'yes') for question in extra)
+    if any('dataset_language' in a for a in answers):
+        score += 2 * least('dataset_language', 'yes') - 2
     return round(score, 3)
 
 
@@ -153,13 +158,24 @@ QUALITY = dict(type='choice', criteria={
     'answerable from a keyword or surface pattern), and rows not repetitive template or model-generated filler?')
 
 
+def question(text):
+    return dict(QUALITY, instructions='Use the supplied evidence and sampled rows, not the dataset name. ' + text)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--cache', type=Path, default=Path('build/discovery/cache'))
     parser.add_argument('--index', type=Path, default=Path('build/discovery/index/jev-segments.npz'))
     parser.add_argument('--signatures', type=Path, default=Path('build/discovery/index/catalog-signatures.json'))
-    parser.add_argument('--tag', action='append', help='Hub task tag; repeat (default: decision tags)')
+    parser.add_argument('--tag', action='append', default=[], help='Hub task tag; repeat (default: decision tags unless --query)')
+    parser.add_argument('--query', action='append', default=[], help='Hub name search, e.g. screenshot; repeat for OR')
+    parser.add_argument('--language', action='append', help='Dataset language (default en); judged on the evidence')
+    parser.add_argument('--untagged', action='store_true',
+                        help='Also keep datasets without language tags (most GUI data); other declared languages stay out')
+    parser.add_argument('--target', help='Regex of extra target columns accepted without a discreteness check, e.g. bbox|point|action')
+    parser.add_argument('--question', action='append', default=[], metavar='NAME=TEXT',
+                        help='Extra yes/no judge question, added to the review score; repeat')
     parser.add_argument('--probe', type=int, default=1500, help='Structure checks for the top of the prior')
     parser.add_argument('--review', type=int, default=300, help='Model reviews for the top structural survivors')
     parser.add_argument('--min-train', type=int, default=500)
@@ -169,13 +185,19 @@ def main():
     parser.add_argument('--refresh', action='store_true', help='Fetch new Hub listings instead of cached snapshots')
     args = parser.parse_args()
     out = args.output; out.mkdir(parents=True, exist_ok=True)
+    languages = args.language or ['en']
+    extra = dict(item.split('=', 1) for item in args.question)
+    (out / 'command.json').write_text(json.dumps(vars(args), default=str, indent=2) + '\n')
 
     # 1-2. inventory and identity
     rows = {}
-    for tag in args.tag or TAGS:
-        found, _ = retrieve(args.cache, tasks=[tag], limit=None, languages=['en'], offline=not args.refresh and _cached(args.cache, tag))
+    searches = [dict(queries=[q]) for q in args.query] + [dict(tasks=[t]) for t in args.tag or ([] if args.query else TAGS)]
+    for search in searches:
+        search.update(limit=None, languages=[] if args.untagged else languages)
+        found, _ = retrieve(args.cache, offline=not args.refresh and _cached(args.cache, search), **search)
         for r in found:
-            rows.setdefault(r['name'], r)
+            if language_priority(r, languages) < 2:  # untagged kept, explicit other languages dropped
+                rows.setdefault(r['name'], r)
     names, repos = catalog_index()
     matched = list(match(rows.values(), names, repos, previous_decisions(), queued_sources(), catalog_references()))
     known = lambda r: r['status'] != 'candidate' or r.get('related_matches')
@@ -196,7 +218,7 @@ def main():
 
     # 4. structure and content identity
     with ThreadPoolExecutor(max_workers=4) as executor:
-        probed = list(executor.map(lambda r: structure(r['name'], args.cache), head))
+        probed = list(executor.map(lambda r: structure(r['name'], args.cache, args.target), head))
     index = Index(args.index) if args.index.exists() else None
     signatures = DatasetIndex(args.signatures) if args.signatures.exists() else None
     claimed = {}
@@ -240,6 +262,7 @@ def main():
     if args.review and survivors:
         from . import jev_review
         jev_review.QUESTIONS['sample_quality'] = QUALITY
+        jev_review.QUESTIONS.update({name: question(text) for name, text in extra.items()})
         batch = []
         for r in survivors[:args.review]:
             s = r['structure']
@@ -249,12 +272,12 @@ def main():
             batch.append(dict(r, evidence=evidence, train_status='present', source_splits=sorted(s['splits']),
                               split_policy='multiple_splits' if len(s['splits']) > 1 else 'train_only'))
         jev_review.run(batch, out / 'review', args.cache, args.model or [jev_review.MODEL, 'openrouter/~typesafe/jev-latest'],
-                       languages=['en'])
+                       languages=languages)
         reviewed = [json.loads(l) for l in (out / 'review/reviews.jsonl').read_text().splitlines()]
 
     # 6. ranking
     for r in reviewed:
-        r['review_score'] = review_score(r)
+        r['review_score'] = review_score(r, extra)
     ranked = sorted(reviewed, key=lambda r: -((r['review_score'] or 0) + 0.1 * r['prior']))
     write_rows(out / 'ranked.jsonl', ranked)
     lines = [f'# Prospects {datetime.now(timezone.utc).date()}', '',
@@ -268,9 +291,9 @@ def main():
     print('\n'.join(lines[:30]))
 
 
-def _cached(cache, tag):
+def _cached(cache, search):
     try:
-        retrieve(cache, tasks=[tag], limit=None, languages=['en'], offline=True)
+        retrieve(cache, offline=True, **search)
         return True
     except FileNotFoundError:
         return False
