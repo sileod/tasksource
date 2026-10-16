@@ -3099,5 +3099,33 @@
       "showlab/ShowUI-web": "bee5990bfb31515ba3492fe74e85569448fea03c",
       "Voxel51/ShowUI_Web": "6ce4d9ac114cee39e01059cc0ff774d1eafd1a79"
     }
+  },
+  {
+    "name": "CLEVR-Ref+",
+    "scope": "dataset",
+    "tasks": [
+      "clevr-ref/box"
+    ],
+    "status": "deferred",
+    "reason_code": "unavailable_assets",
+    "reason": "The official prebuilt archive linked by the authors returns HTTP 404. No matching directly usable Hugging Face referring-expression/box release was found. Regenerating rendered scenes is substantially heavier than a data join; do not substitute unrelated CLEVR QA or guessed boxes.",
+    "evidence": [
+      "https://github.com/ccvl/iep-ref#step-1-download-the-data",
+      "https://cs.jhu.edu/~cxliu/data/clevr_ref+_1.0.zip"
+    ],
+    "checked_on": "2026-10-16",
+    "reconsider_if": "A faithful prebuilt release with native training expressions, object boxes and image terms is available, or a separately reviewed reproducible regeneration is justified.",
+    "huggingface": [],
+    "github": [
+      "ccvl/iep-ref",
+      "ccvl/clevr-refplus-dataset-gen"
+    ],
+    "papers": [
+      "arxiv:1901.00850"
+    ],
+    "source_revisions": {
+      "ccvl/iep-ref": "6fb7d669632b11bc59032a4dd229177f45313701",
+      "ccvl/clevr-refplus-dataset-gen": "a024ce4aa1bfd0ba51fc621bd254e15881959c48"
+    }
   }
 ]
