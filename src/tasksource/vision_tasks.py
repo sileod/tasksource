@@ -750,3 +750,10 @@ refcoco_plus_box = VisualMultipleChoice(**_REFCOCO_GROUNDING, task_id='refcoco/p
     pre_process=lambda ds: grouped_qa_rows(ds, view='refcocoplus', multiple_choice=True))
 refcoco_g_box = VisualMultipleChoice(**_REFCOCO_GROUNDING, task_id='refcoco/g/box',
     pre_process=lambda ds: grouped_qa_rows(ds, view='refcocog', multiple_choice=True))
+
+
+flickr30k__box = VisualMultipleChoice(
+    dataset_name='tasksource/flickr30k-grounding', task_id='flickr30k/box', choices_list='choices_list',
+    metadata='metadata', pre_process=grouped_mc_rows,
+    question='Which box corresponds to the phrase marked [PHRASE] in the caption? Boxes are [x1, y1, x2, y2] with coordinates from 0 to 1000 over the displayed image, x rightward and y downward.',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/flickr30k-grounding'],'streaming':True})

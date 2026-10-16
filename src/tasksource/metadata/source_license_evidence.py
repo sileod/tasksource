@@ -5,6 +5,10 @@ Keys are task families, shared by their visual classification/MC views.
 """
 
 SOURCE_LICENSE_EVIDENCE = {
+    'flickr30k': {'license': 'original noncommercial research/education and Flickr image terms',
+        'license_use': 'non-commercial', 'checked': '2026-10-16',
+        'scope': 'Human phrase/box annotations; photograph copyrights remain with their owners, not the dataset publishers.',
+        'url': 'https://github.com/BryanPlummer/flickr30k_entities#flickr30k-entities-dataset'},
     'refcoco': {'license': 'mixed/unspecified', 'license_use': 'unspecified', 'checked': '2026-10-16',
         'scope': 'Human referring expressions and COCO boxes; Flickr photographs retain individual licenses recorded in row metadata. API code licensing is separate from data terms.',
         'url': 'https://cocodataset.org/#termsofuse',

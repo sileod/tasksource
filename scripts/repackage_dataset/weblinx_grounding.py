@@ -8,6 +8,7 @@ from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 
 from PIL import Image
+from huggingface_hub.errors import RemoteEntryNotFoundError
 from tasksource.tasks import weblinx_record
 from .grounding import grounding_qa, hub_file, materialize, ordered, xywh_box
 
@@ -87,7 +88,9 @@ def weblinx_grounding(max_rows=100000, seed=0):
                 if demo in ownership and ownership[demo]!=split:raise ValueError('Native demonstration crosses splits')
                 ownership[demo]=split;query['source_split']=native;by_demo[demo].append(query)
     def prepare(demo):
-        path=hub_file(RAW,f'demonstrations/{demo}/replay.json')
+        try:path=hub_file(RAW,f'demonstrations/{demo}/replay.json')
+        except RemoteEntryNotFoundError:
+            excluded.extend(dict(source_row=q['source_row'],reason='missing_native_replay') for q in by_demo[demo]);return []
         replay=weblinx.Replay(json.loads(path.read_text()),demo_name=demo,base_dir=path.parent.parent)
         groups={}
         for query in by_demo[demo]:
@@ -96,7 +99,9 @@ def weblinx_grounding(max_rows=100000, seed=0):
             state=turn.get('state') or {};screenshot=state.get('screenshot')
             if not screenshot or state.get('screenshot_status')!='good':
                 excluded.append(dict(source_row=query['source_row'],reason='missing_or_broken_screenshot'));continue
-            image=hub_file(RAW,f'demonstrations/{demo}/screenshots/{screenshot}')
+            try:image=hub_file(RAW,f'demonstrations/{demo}/screenshots/{screenshot}')
+            except RemoteEntryNotFoundError:
+                excluded.append(dict(source_row=query['source_row'],reason='missing_native_screenshot'));continue
             with Image.open(image) as header:size=list(header.size)
             qa=visual_query(query,turn,size,screenshot,excluded)
             if qa is None:continue

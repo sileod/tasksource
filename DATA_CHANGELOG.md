@@ -4,6 +4,11 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource-jev-typed-decisions v2026.10.16.2
+
+- `vision`: add Flickr30k Entities phrase grounding, capped at 20k training rows from the 100k-QA mirror. Full captions identify the queried phrase; options are native annotated regions.
+- Preserve existing training and evaluation shards; exclude images already present in published evaluation. Record original noncommercial image terms.
+
 ## tasksource/flickr30k-grounding v2026.10.16
 
 - Add 100,000 human-labeled training phrase-to-box decisions, 11,232 validation questions and 11,560 test questions, grouped by unchanged Flickr30k image.
@@ -12,7 +17,7 @@ concise bullets on what changed in the data. `tasksource-jev-typed-decisions` re
 
 ## tasksource-jev-typed-decisions v2026.10.16.1
 
-- `vision`: add RefCOCO, RefCOCO+ and RefCOCOg object-box decisions, sharing the existing 20k training-row family budget. The source mirror contains 100k training QAs.
+- `vision`: add RefCOCO, RefCOCO+ and RefCOCOg object-box decisions, sharing the existing 20k training-row family budget. The source mirror contains 100k training QAs. Published 20,000 new rows (6,665 / 6,650 / 6,685 respectively), bringing vision training to 682,314 rows.
 - Native object boxes provide the choices; images, grounding geometry, source identities and original license evidence remain available.
 - Append training rows only, excluding images already in published evaluation. Existing training and evaluation shards remain unchanged.
 

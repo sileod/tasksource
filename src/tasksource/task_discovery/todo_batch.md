@@ -267,3 +267,5 @@ After WebLINX and Flickr30k Entities:
 
 1. ShapeWorld: verify native target-box supervision, procedural correctness, controllable difficulty and original data/asset terms. Use existing visual templates; static repackaging only if necessary, capped at 100k training QAs.
 2. CLEVR-Ref+: inspect prebuilt image/expression/target releases and genuine training partitions. Verify data and image terms separately from the BSD code license; preserve native splits and use the same grounding representation and 100k cap.
+
+- EMS-MCQA (`Xueren/EMS-MCQA`): user-requested next addition after the grounding queue (2026-10-16). Verify genuine training split, English decision format, annotation provenance and coarse native-gold examples before catalog integration. Prefer the original Hub source when directly usable.

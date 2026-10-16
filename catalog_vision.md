@@ -1,4 +1,4 @@
-61 visual tasks. Load one with `load_task(id, vision=True)`; the annotations are in [vision_tasks.py](src/tasksource/vision_tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
+62 visual tasks. Load one with `load_task(id, vision=True)`; the annotations are in [vision_tasks.py](src/tasksource/vision_tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
 
 | # | id | type | dataset | question |
 |--:|---|---|---|:-:|
@@ -63,6 +63,7 @@
 | 59 | [refcoco/box](src/tasksource/vision_tasks.py#L747) | VisualMultipleChoice | [tasksource/refcoco-grounding](https://hf.co/datasets/tasksource/refcoco-grounding) | ✓ |
 | 60 | [refcoco/plus/box](src/tasksource/vision_tasks.py#L749) | VisualMultipleChoice | [tasksource/refcoco-grounding](https://hf.co/datasets/tasksource/refcoco-grounding) | ✓ |
 | 61 | [refcoco/g/box](src/tasksource/vision_tasks.py#L751) | VisualMultipleChoice | [tasksource/refcoco-grounding](https://hf.co/datasets/tasksource/refcoco-grounding) | ✓ |
+| 62 | [flickr30k/box](src/tasksource/vision_tasks.py#L755) | VisualMultipleChoice | [tasksource/flickr30k-grounding](https://hf.co/datasets/tasksource/flickr30k-grounding) | ✓ |
 
 ### Candidate grounding
 
@@ -104,3 +105,5 @@ SPHINX adds a fresh four-family MC view (`sphinx/mcq`, 100,000/100 QAs). VisGym 
 `spatial-dise/mcq` adds native rotation, combination and hidden-face choices through a [reproducible archive join](scripts/repackage_dataset/spatial_dise.py). It retains 2,410/793/1,065 train/validation/test questions with original pixels and benchmark-reserved generator families. Projection is excluded for missing viewing cues; folding for a sampled ambiguous answer set. [Coarse audit](docs/jev/audits/spatial-dise-recast.json); CC BY-NC-SA 4.0 plus original asset terms.
 
 RefCOCO, RefCOCO+ and RefCOCOg share a [100k-training-QA mirror](https://huggingface.co/datasets/tasksource/refcoco-grounding), with original COCO images stored once per group and native box choices. The three views share one export family. Held-out images are reserved across variants by image ID and encoded-image hash. [Packager](scripts/repackage_dataset/grounding.py); [coarse source/recast audit](docs/jev/audits/refcoco-grounding-recast.json). Original per-image licenses remain in metadata.
+
+Flickr30k Entities: 100k training phrase-to-box QAs with full-caption context, native annotated-region choices and image-level splits. [Packager](scripts/repackage_dataset/flickr_grounding.py), [coarse audit](docs/jev/audits/flickr30k-grounding-recast.json). Original noncommercial photograph terms apply.
