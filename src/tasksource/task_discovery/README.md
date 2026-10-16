@@ -46,6 +46,14 @@ python -m tasksource.task_discovery.prospect --output build/discovery/prospect-g
   --question "gui=Are the inputs GUI screenshots with targets that locate or choose interface elements or actions?"
 ```
 
+Tag listings miss untagged and recent datasets. `web_agent.py` is a second source: an Albert deepseek-v4-flash agent searches the web (Exa, Parallel or Firecrawl, chosen at random per query), reads pages and the Hub, and checks names against the catalog, recorded decisions and earlier finds. Each of `--rounds` excludes everything found before; `--known` adds earlier outputs to that pile. Its Hub finds feed `prospect.py --candidates`, which always probes them; other links are kept as leads for repackaging.
+
+```bash
+python -m tasksource.task_discovery.web_agent --output build/discovery/web-agent/gui.jsonl --rounds 4 \
+  --brief "English GUI grounding or computer-use datasets with element boxes, click points or actions and a training split"
+python -m tasksource.task_discovery.prospect --output build/discovery/prospect-gui --candidates build/discovery/web-agent/gui.jsonl ...
+```
+
 `report.md` and `ranked.jsonl` are a reading list; implementation still follows "What enters the catalog" in `AGENTS.md`.
 
 ## Interchangeable retrieval sources

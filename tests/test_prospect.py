@@ -57,3 +57,17 @@ def test_discrete_rejects_free_text_and_continuous_scores():
     preview = [dict(answer=f'Answer number {i} is long enough', score=i / 7, rating=i % 5, choices=['a', 'b', 'c'],
                     stance='pro' if i % 2 else 'con') for i in range(40)]
     assert [n for n in ('answer', 'score', 'rating', 'choices', 'stance') if discrete(n, {}, preview)] == ['rating', 'choices', 'stance']
+
+
+def test_web_agent_known_pile_grows(monkeypatch, tmp_path):
+    from tasksource.task_discovery import match, web_agent
+    monkeypatch.setattr(match, 'catalog_index', lambda: ({'snli': {'snli'}}, {'stanfordnlp/snli': {'snli'}}))
+    monkeypatch.setattr(match, 'previous_decisions', lambda: [dict(name='Some-Parked', huggingface=['org/some-parked'])])
+    (tmp_path / 'earlier.jsonl').write_text(json.dumps(dict(name='lab/found-before')) + '\n')
+    known = web_agent.Known([tmp_path / 'earlier.jsonl'])
+    known.add('https://huggingface.co/datasets/lab/new-gui', 'found earlier')
+    assert known.check(['https://huggingface.co/datasets/stanfordnlp/snli', 'SNLI', 'other/some-parked',
+                        'lab/found-before', 'lab/new-gui', 'lab/unseen']) == {
+        'https://huggingface.co/datasets/stanfordnlp/snli': 'in tasksource', 'SNLI': 'in tasksource',
+        'other/some-parked': 'reviewed and declined or parked', 'lab/found-before': 'found earlier',
+        'lab/new-gui': 'found earlier', 'lab/unseen': 'new'}
