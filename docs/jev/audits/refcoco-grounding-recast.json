@@ -169,5 +169,6 @@
       }
     }
   ],
-  "som_jev_gold_alignment": "pass for all three task views"
+  "som_jev_gold_alignment": "pass for all three task views",
+  "load_task_scope": "Two real image groups per split, tested from the pinned Hub and the checksummed local mirror; a prefix may contain no QAs for one variant. Full split counts and geometry were checked separately."
 }
