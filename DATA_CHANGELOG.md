@@ -1,6 +1,10 @@
 # Data changelog
 
-Changes that affect published data, newest first: one entry per publish, `## tasksource-jev-typed-decisions v2026.10.16.1
+Changes that affect published data, newest first: one entry per publish, `## <dataset> <version>`, with a few
+concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
+(`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
+
+## tasksource-jev-typed-decisions v2026.10.16.1
 
 - `vision`: add RefCOCO, RefCOCO+ and RefCOCOg object-box decisions, sharing the existing 20k training-row family budget. The source mirror contains 100k training QAs.
 - Native object boxes provide the choices; images, grounding geometry, source identities and original license evidence remain available.
@@ -12,10 +16,6 @@ Changes that affect published data, newest first: one entry per publish, `## tas
 - Share unchanged COCO2014 images across the three views. Choices are native object boxes; no synthetic distractors.
 - Reserve held-out photographs across variants by both image ID and image hash. Preserve original split names in metadata; native test subsets share the canonical test split.
 - Record original per-image Flickr licenses and source revisions. Noncommercial and unresolved terms are retained explicitly.
-
-## <dataset> <version>`, with a few
-concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
-(`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
 ## tasksource-jev-typed-decisions v2026.10.16
 
