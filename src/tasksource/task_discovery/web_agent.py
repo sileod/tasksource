@@ -1,4 +1,4 @@
-"""Web search agent as a candidate source: Albert's deepseek-v4-flash with search tools.
+"""Web search agent as a candidate source: a tool-calling chat model with search tools.
 
     PYTHONPATH=src python -m tasksource.task_discovery.web_agent --output build/discovery/web-gui.jsonl \
         --brief "English GUI grounding or computer-use action datasets with a training split"
@@ -9,9 +9,10 @@ search, page reading, Hub search). Submitted Hub repositories become ordinary ca
 ``prospect.py --candidates``; other links (GitHub, papers) are kept as leads, since they need a
 repackage. The agent only searches and reads: it has no shell or file access.
 
-Keys: ``ALBERT_API_KEY`` (``~/.jev_synth.env``) and ``EXA_API_KEY``, ``PARALLEL_API_KEY``,
-``FIRECRAWL_API_KEY`` (``~/.config/tasksource/search_keys.env``), read from the environment or
-those files. Nothing is sent but the queries and URLs the agent chooses.
+The model is any OpenAI-compatible endpoint (``tasksource.llm``: ``OPENAI_BASE_URL``, ``OPENAI_API_KEY``,
+``OPENAI_MODEL`` or ``--model``). Search keys: ``EXA_API_KEY``, ``PARALLEL_API_KEY``, ``FIRECRAWL_API_KEY``,
+from the environment or ``~/.config/tasksource/search_keys.env``. Nothing is sent but the queries and
+URLs the agent chooses.
 """
 import argparse
 from concurrent.futures import ThreadPoolExecutor
@@ -28,12 +29,11 @@ import urllib.request
 
 from huggingface_hub import HfApi
 
+from .. import llm
 from .discover_task_prospects import write_rows
 from .hf_hub import hub_record, hub_row
 
-ALBERT = 'https://albert.api.etalab.gouv.fr/v1'
-MODEL = 'deepseek-v4-flash-0731'
-KEY_FILES = (Path.home() / '.jev_synth.env', Path.home() / '.config/tasksource/search_keys.env')
+KEY_FILE = Path.home() / '.config/tasksource/search_keys.env'
 REPO = re.compile(r'huggingface\.co/datasets/([\w.-]+/[\w.-]+)')
 
 SYSTEM = '''You find datasets that could become supervised training tasks for Tasksource, a collection of \
@@ -65,12 +65,11 @@ TOOLS = [
 
 
 def load_keys():
-    for path in KEY_FILES:
-        if path.exists():
-            for line in path.read_text().splitlines():
-                match = re.match(r'^(?:export\s+)?([A-Z_0-9]+)=["\']?([^"\'\s]+)', line)
-                if match and match.group(1) in ('ALBERT_API_KEY', 'EXA_API_KEY', 'PARALLEL_API_KEY', 'FIRECRAWL_API_KEY'):
-                    os.environ.setdefault(*match.groups())
+    if KEY_FILE.exists():
+        for line in KEY_FILE.read_text().splitlines():
+            match = re.match(r'^(?:export\s+)?([A-Z_0-9]+)=["\']?([^"\'\s]+)', line)
+            if match and match.group(1) in ('EXA_API_KEY', 'PARALLEL_API_KEY', 'FIRECRAWL_API_KEY'):
+                os.environ.setdefault(*match.groups())
 
 
 def post(url, body, headers, timeout=120):
@@ -80,19 +79,22 @@ def post(url, body, headers, timeout=120):
         return json.load(response)
 
 
-class Albert:
-    """Albert allows 50 requests/minute across all workers: space calls, retry with backoff."""
+class Chat:
+    """Calls are spaced to ``rpm`` across all workers (endpoints rate-limit per key); retry with backoff."""
     lock, last = threading.Lock(), 0.0
+
+    def __init__(self, model, rpm=40):
+        self.model, self.interval = model, 60 / rpm
 
     def chat(self, messages, tool_choice='auto'):
         for attempt in range(5):
-            with Albert.lock:
-                time.sleep(max(0, 1.5 - (time.monotonic() - Albert.last)))
-                Albert.last = time.monotonic()
+            with Chat.lock:
+                time.sleep(max(0, self.interval - (time.monotonic() - Chat.last)))
+                Chat.last = time.monotonic()
             try:
-                # Without an explicit tool_choice this model answers in text and never calls a tool.
-                return post(ALBERT + '/chat/completions', dict(model=MODEL, messages=messages, tools=TOOLS,
-                            tool_choice=tool_choice, temperature=0.3), {'Authorization': 'Bearer ' + os.environ['ALBERT_API_KEY']},
+                # tool_choice is explicit: some models answer in text and never call a tool without it.
+                return post(llm.base_url() + '/chat/completions', dict(model=self.model, messages=messages, tools=TOOLS,
+                            tool_choice=tool_choice, temperature=0.3), {'Authorization': 'Bearer ' + os.environ[llm.KEY_ENV]},
                             timeout=300)['choices'][0]['message']
             except (urllib.error.URLError, TimeoutError, KeyError) as error:
                 if attempt == 4:
@@ -159,13 +161,13 @@ class Known:
         return {value: next((self.entries[k] for k in self.keys(value) if k in self.entries), 'new') for value in datasets}
 
 
-def session(brief, known, max_steps=40, log=None):
+def session(brief, known, chat, max_steps=40, log=None):
     """One agent session; returns the submitted datasets and the transcript."""
     messages = [dict(role='system', content=SYSTEM), dict(role='user', content=brief)]
-    albert, submitted, read = Albert(), None, []
+    submitted, read = None, []
     for step in range(max_steps):
         last = step == max_steps - 1 and submitted is None
-        message = albert.chat(messages, {'type': 'function', 'function': {'name': 'submit'}} if last else 'auto')
+        message = chat.chat(messages, {'type': 'function', 'function': {'name': 'submit'}} if last else 'auto')
         messages.append({k: v for k, v in message.items() if k in ('role', 'content', 'tool_calls')})
         calls = message.get('tool_calls') or []
         if not calls:
@@ -224,8 +226,11 @@ def main():
     parser.add_argument('--rounds', type=int, default=1, help='Rounds; each excludes everything found before')
     parser.add_argument('--known', type=Path, action='append', default=[], help='Earlier candidate JSONL to exclude too')
     parser.add_argument('--max-steps', type=int, default=40)
+    parser.add_argument('--model', help='Chat model with tool calling (default: OPENAI_MODEL)')
+    parser.add_argument('--rpm', type=float, default=40, help='Request starts per minute, all sessions together')
     args = parser.parse_args()
     load_keys()
+    chat = Chat(llm.model(args.model), args.rpm)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     stem = str(args.output.with_suffix(''))
     known, rows, leads, transcripts = Known(args.known), {}, [], []
@@ -235,7 +240,7 @@ def main():
             '\n\nAlready found by earlier rounds (do not resubmit; look elsewhere, with different queries and angles): '
             + ', '.join(found_names))
         with open(stem + '.tools.jsonl', 'a') as log, ThreadPoolExecutor(max_workers=4) as pool:  # ≤4: shared rate limit
-            results = list(pool.map(lambda brief: (brief, *session(prompt(brief), known, args.max_steps, log)), args.brief))
+            results = list(pool.map(lambda brief: (brief, *session(prompt(brief), known, chat, args.max_steps, log)), args.brief))
         new = 0
         for brief, found, messages in results:
             transcripts.append(dict(round=round_, brief=brief, messages=messages))
@@ -253,7 +258,7 @@ def main():
     write_rows(Path(stem + '.leads.jsonl'), leads)
     write_rows(Path(stem + '.transcripts.jsonl'), transcripts)
     Path(stem + '.manifest.json').write_text(json.dumps(dict(
-        model=MODEL, briefs=args.brief, rounds=args.rounds, known=[str(p) for p in args.known],
+        model=chat.model, briefs=args.brief, rounds=args.rounds, known=[str(p) for p in args.known],
         created=datetime.now(timezone.utc).isoformat(), candidates=len(rows), leads=len(leads)), indent=2) + '\n')
     print(f'{len(rows)} Hub candidates, {len(leads)} other leads -> {args.output}')
 

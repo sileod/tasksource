@@ -31,6 +31,7 @@ import os
 import random
 from pathlib import Path
 
+from ... import llm as endpoint
 from . import providers
 from .annotate import annotate_bundle_jev
 from .config import AnnotatorConfig, ProviderConfig
@@ -253,8 +254,7 @@ def confident_disagreement(kind: str, a: list[float], b: list[float], confidence
 
 async def run(args) -> None:
     out = Path(args.out)
-    provider = ProviderConfig(name="albert", api_key_env="ALBERT_API_KEY", optional_api_key_envs=["ALBERT_API_KEY_2"],
-                              base_url="https://albert.api.etalab.gouv.fr/v1", model=args.model)
+    provider = ProviderConfig(model=endpoint.model(args.model))
     llm = LLM(provider, out / "cache" / "llm", args.concurrency)
     annotator = AnnotatorConfig(name="jev", version=args.jev, base_url="https://openrouter.ai",
                                 api_key_env=args.jev_key_env, model=args.jev)
@@ -305,7 +305,7 @@ def main(argv=None) -> None:
     parser.add_argument("--workflows", type=int, default=8)
     parser.add_argument("--states", type=int, default=6, help="states per workflow")
     parser.add_argument("--seed", type=int, default=0)
-    parser.add_argument("--model", default="deepseek-v4-flash-0731")
+    parser.add_argument("--model", help="chat model of the OpenAI-compatible endpoint (default: OPENAI_MODEL)")
     parser.add_argument("--jev", default="typesafe/jev-1.13", help="empty to skip Jev labels")
     parser.add_argument("--jev-key-env", default="JEV_OPENROUTER_API_KEY")
     parser.add_argument("--concurrency", type=int, default=16)

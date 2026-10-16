@@ -8,7 +8,6 @@
 Rows the detectors doubt (gold probability below ``--doubt``) are written with their content, so
 ``jev_error_pass.py --confirm`` can confirm them like DeepSeek's flags.
 
-    set -a; . ~/.jev_synth.env; set +a
     PYTHONPATH=.:src python scripts/jev_second_detector.py --model jev
     PYTHONPATH=.:src python scripts/jev_second_detector.py --model mercury
 """

@@ -1,4 +1,4 @@
-"""Error detection over the published tasksource-jev-typed-decisions: DeepSeek V4 Flash (Albert) checks
+"""Error detection over the published tasksource-jev-typed-decisions: a chat model (DeepSeek V4 Flash) checks
 the gold of every source example, several examples of one source per prompt.
 
 One direct row per `example_id` is checked, examples of the `default` config first. Verdicts go to
@@ -12,7 +12,6 @@ MAX_BAD_RATE bad is listed for review instead of losing its examples. The remova
 build/jev-error-pass/bad-examples.csv; once reviewed, copying them to
 src/tasksource/metadata/jev_bad_examples.csv makes the build drop them.
 
-    set -a; . ~/.jev_synth.env; set +a
     PYTHONPATH=.:src python scripts/jev_error_pass.py --limit 2000   # probe
     PYTHONPATH=.:src python scripts/jev_error_pass.py                # everything
     PYTHONPATH=.:src python scripts/jev_error_pass.py --confirm
@@ -253,9 +252,9 @@ def confirm(args):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--out", type=Path, default=Path("build/jev-error-pass"))
-    parser.add_argument("--model", default="albert/deepseek-v4-flash-0731")
-    parser.add_argument("--keys", nargs="+", default=sorted(k for k in os.environ if re.fullmatch(r"ALBERT_API_KEY(_\d+)?", k)))
-    parser.add_argument("--rpm", type=float, default=45, help="per key; Albert allows 50")
+    parser.add_argument("--model", help="OpenAI-compatible chat model (default: OPENAI_MODEL)")
+    parser.add_argument("--keys", nargs="+", default=["OPENAI_API_KEY"], help="interchangeable key variables")
+    parser.add_argument("--rpm", type=float, default=45, help="per key")
     parser.add_argument("--concurrency", type=int, default=12, help="per key")
     parser.add_argument("--max-items", type=int, default=16)
     parser.add_argument("--max-chars", type=int, default=16_000, help="text per request; longer states go alone")
@@ -268,6 +267,8 @@ def main():
                         f"copy them to {BAD.name} once reviewed, and the build drops them)")
     args = parser.parse_args()
     from litlm import Failure, complete
+    from tasksource import llm
+    args.model = llm.litlm_model(args.model)
     if args.confirm:
         args.bad = args.bad or args.out / "bad-examples.csv"
         return confirm(args)

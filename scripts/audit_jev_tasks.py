@@ -263,13 +263,16 @@ def main():
     parser.add_argument("--budget-usd", type=float, default=5.0)
     parser.add_argument("--concurrency", type=int, default=16)
     parser.add_argument("--chunk", type=int, default=2000)
-    parser.add_argument("--adjudicator", default="albert/deepseek-v4-flash-0731")
+    parser.add_argument("--adjudicator", help="OpenAI-compatible chat model (default: OPENAI_MODEL)")
     parser.add_argument("--adjudicator-max-tokens", type=int, default=4000)
     parser.add_argument("--adjudicator-concurrency", type=int, default=4)
-    parser.add_argument("--adjudicator-rpm", type=float, default=20)  # Albert allows 50, shared with other uses of the key
+    parser.add_argument("--adjudicator-rpm", type=float, default=20)
     parser.add_argument("--adjudicate-per-task", type=int, default=40)
     parser.add_argument("--skip-adjudication", action="store_true")
     args = parser.parse_args()
+    if not args.skip_adjudication:
+        from tasksource import llm
+        args.adjudicator = llm.litlm_model(args.adjudicator)
     args.out.mkdir(parents=True, exist_ok=True)
 
     rows = sample_rows(args.shards, args.per_task, args.seed, args.tasks, args.splits)

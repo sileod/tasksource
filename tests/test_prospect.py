@@ -1,3 +1,4 @@
+import pytest
 """Prospect search: metadata prior, label detection and catalog identity fingerprints."""
 import json
 
@@ -71,3 +72,13 @@ def test_web_agent_known_pile_grows(monkeypatch, tmp_path):
         'https://huggingface.co/datasets/stanfordnlp/snli': 'in tasksource', 'SNLI': 'in tasksource',
         'other/some-parked': 'reviewed and declined or parked', 'lab/found-before': 'found earlier',
         'lab/new-gui': 'found earlier', 'lab/unseen': 'new'}
+
+
+def test_llm_endpoint_is_standard_openai_env(monkeypatch):
+    from tasksource import llm
+    monkeypatch.setenv('OPENAI_MODEL', 'some-model')
+    assert llm.litlm_model() == 'direct/openai/some-model'
+    assert llm.litlm_model('openrouter/x/y') == 'openrouter/x/y'
+    monkeypatch.delenv('OPENAI_MODEL')
+    with pytest.raises(SystemExit):
+        llm.model()

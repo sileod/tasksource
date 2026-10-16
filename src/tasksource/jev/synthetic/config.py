@@ -9,13 +9,14 @@ import yaml
 
 @dataclass
 class ProviderConfig:
-    name: str = "albert"
-    api_key_env: str = "ALBERT_API_KEY"
+    # Any OpenAI-compatible endpoint; an empty base_url lets the client read OPENAI_BASE_URL.
+    name: str = "openai"
+    api_key_env: str = "OPENAI_API_KEY"
     # Extra environment variables are used only when set. Secrets never enter
     # configs or manifests; requests rotate across distinct supplied keys.
     optional_api_key_envs: list[str] = field(default_factory=list)
-    base_url: str = "https://albert.api.etalab.gouv.fr/v1"
-    model: str = "DeepSeek-V4-Flash"
+    base_url: str = ""
+    model: str = "deepseek-v4-flash"
 
 
 @dataclass

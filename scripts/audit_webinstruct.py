@@ -4,7 +4,7 @@
     PYTHONPATH=../litlm:.:src python scripts/audit_webinstruct.py --output build/webinstruct-audit
     PYTHONPATH=../litlm:.:src python scripts/audit_webinstruct.py --stage confirm --output build/webinstruct-audit
 
-Credentials come from KEY, KEY_2, KEY_3, KEY_4 (override --key-envs).
+The model is any OpenAI-compatible endpoint (``tasksource.llm``); keys from --key-envs.
 Raw model replies and validated verdicts are checkpointed separately. Screening
 flags alone never remove a row. Only individually confirmed clear problems go
 to bad-examples.jsonl; uncertain answers and disagreements stay in the dataset. Confirmed repairable
@@ -23,7 +23,7 @@ from pathlib import Path
 from datasets import Dataset
 from scripts.build_webinstruct import OPTION_MARKERS
 
-MODEL = 'albert/deepseek-v4-flash-0731'
+MODEL = None  # set from --model / OPENAI_MODEL in main
 VERDICTS = {'answerable', 'malformed', 'ambiguous', 'uncertain'}
 BAD = {'wrong', 'malformed', 'ambiguous'}
 PRESENTATION = """Check whether each dataset example is self-contained and correctly presented.
@@ -305,9 +305,13 @@ def main():
     parser.add_argument('--audit', choices=['presentation', 'correctness'], default='presentation')
     parser.add_argument('--limit', type=int)
     parser.add_argument('--output', type=Path, default=Path('build/webinstruct-audit'))
-    parser.add_argument('--key-envs', default='KEY,KEY_2,KEY_3,KEY_4')
+    parser.add_argument('--model', help='default: OPENAI_MODEL')
+    parser.add_argument('--key-envs', default='OPENAI_API_KEY', help='comma-separated interchangeable keys')
     parser.add_argument('--rpm', type=float, default=35)
     args = parser.parse_args()
+    global MODEL
+    from tasksource import llm
+    MODEL = llm.litlm_model(args.model)
     args.output.mkdir(parents=True, exist_ok=True)
     rows = source_rows()
     if args.stage == 'screen':
