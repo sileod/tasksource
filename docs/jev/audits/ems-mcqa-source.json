@@ -1,0 +1,68 @@
+{
+  "source": "Xueren/EMS-MCQA",
+  "revision": "dd0a05836786cb8c2de489916b13505531323d8e",
+  "splits": {
+    "train": {
+      "rows": 13021,
+      "flags": {
+        "all_none_above": 167,
+        "not_single_answer": 5,
+        "unexpected_prefix": 8
+      },
+      "answers": {
+        "d": 2284,
+        "c": 2933,
+        "b": 4446,
+        "a": 3278,
+        "e": 70,
+        "f": 5,
+        "['a', 'b']": 1,
+        "['a', 'b', 'c']": 2,
+        "['b', 'd']": 2
+      }
+    },
+    "validation": {
+      "rows": 1860,
+      "flags": {
+        "all_none_above": 23,
+        "not_single_answer": 1,
+        "unexpected_prefix": 1
+      },
+      "answers": {
+        "b": 587,
+        "c": 443,
+        "d": 348,
+        "a": 471,
+        "['a', 'b', 'e']": 1,
+        "e": 10
+      }
+    },
+    "test": {
+      "rows": 3721,
+      "flags": {
+        "all_none_above": 44,
+        "not_single_answer": 1
+      },
+      "answers": {
+        "a": 939,
+        "c": 908,
+        "b": 1207,
+        "d": 655,
+        "['a', 'b', 'c']": 1,
+        "e": 11
+      }
+    }
+  },
+  "checked_on": "2026-10-16",
+  "status": "source screened; catalog conversion queued after grounding",
+  "annotation_provenance": "Collected practice-test questions, human proofreading and subject labels; paper reports an EMT expert review of 100 stratified questions. This does not establish expert verification of every training row.",
+  "paper": "https://arxiv.org/html/2511.10900v1",
+  "source_card": "https://huggingface.co/datasets/Xueren/EMS-MCQA",
+  "conversion_requirements": [
+    "Use only native train/validation/test; full_data includes held-out records and train_woNA duplicates a subset.",
+    "Preserve all native choices, including five- and six-option rows.",
+    "Exclude native multi-answer records from a single-choice view; validate sequential option prefixes.",
+    "Handle option references before deterministic permutation; keep source URL, level, category and rationale in metadata only."
+  ],
+  "review_scope": "Mechanical scan of all native train/validation/test records; three deterministic random training examples read. No exhaustive clinical correctness review."
+}
