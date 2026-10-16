@@ -1,7 +1,7 @@
 """Reviewed source snapshots; keep opaque revision IDs out of task annotations."""
 
 SOURCE_REVISIONS = {
-    "tasksource/spatial-dise": "71ea591a2e7f3a3a3d749c44734b35cf3804aa05",
+    "tasksource/spatial-dise": "6d597407f3b15b86cf2c323373ac9bf1c5065da9",
     'cam-cst/cbt': '72b5c46b1248e3316360f0f2f0b2c39e773b68e4',
     'holylovenia/recam': '1061da9ff8290ae64d2ab4659eccd5c78407ff13',
     'coref-data/knowref_60k_raw': '7bcc7a154dbf145524e86621a2d45b4ba57e0c04',

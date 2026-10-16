@@ -7,11 +7,15 @@ concise bullets on what changed in the data. `tasksource-jev-typed-decisions` re
 ## tasksource-jev-typed-decisions v2026.10.16
 
 - `vision`: add `spatial-dise/mcq` with native spatial-reasoning choices and original composite images. Training excludes generator families reserved by validation, test or the separate Spatial-DISE benchmark.
-- Retain folding, rotation, combination and hidden-face questions. Projection is omitted after an image audit found missing direction cues and panel labels. Source terms are CC BY-NC-SA 4.0 with original third-party asset rights retained.
+- Retain rotation, combination and hidden-face questions. Projection is omitted for missing viewing cues; folding for a sampled ambiguous answer set. Source terms are CC BY-NC-SA 4.0 with original third-party asset rights retained.
+
+## tasksource/spatial-dise v2026.10.16.1
+
+- Remove cube-folding questions after a sampled hard example had multiple visually compatible answers. The approved mirror retains 2,410 train, 793 validation and 1,065 test questions.
 
 ## tasksource 2026-10-16
 
-- Add `spatial-dise/mcq` through a reproducible image-archive mirror: 3,405 train, 1,039 validation and 1,405 test questions. Native answer panels remain identifiable after option permutation; no fabricated choices.
+- Add `spatial-dise/mcq` through a reproducible image-archive mirror: 2,410 train, 793 validation and 1,065 test questions. Native answer panels remain identifiable after option permutation; no fabricated choices.
 
 ## tasksource-jev-typed-decisions v2026.10.15.5
 

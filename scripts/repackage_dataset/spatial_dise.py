@@ -13,7 +13,7 @@ SOURCE = 'TACPS-liv/Spatial-DISE'
 REVISION = 'c1067b763ab4199d0dd481efefeae384b738f9fd'
 FILES = {'train':'dataset/train.csv', 'validation':'dataset/val.csv',
          'test':'dataset/test.csv', 'benchmark':'DISE-bench/DISE-benchmark.csv'}
-CATEGORIES = {'3D Rotation', '3D Folding', '3D Shape Finding', '3D Combination'}
+CATEGORIES = {'3D Rotation', '3D Shape Finding', '3D Combination'}
 
 
 def source_group(row):
@@ -46,8 +46,8 @@ def select_rows(splits):
 def spatial_dise():
     """Spatial-DISE native spatial MC questions, with unchanged composite image bytes.
 
-    Includes rotation, folding, combination and hidden-face tasks. Projection is
-    excluded after a source-image audit found missing arrow and option labels.
+    Includes rotation, combination and hidden-face tasks. Projection is excluded
+    for missing viewing cues; folding for a sampled ambiguous set of answer panels.
     Original train/validation/test partitions are retained, removing generator-ID
     families shared with a held-out split or the separate 559-question benchmark.
     Answer choices name the image's panels; Jev may reorder these references without

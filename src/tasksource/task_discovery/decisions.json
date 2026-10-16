@@ -3042,5 +3042,32 @@
     "source_revisions": {
       "TACPS-liv/Spatial-DISE": "c1067b763ab4199d0dd481efefeae384b738f9fd"
     }
+  },
+  {
+    "name": "Spatial-DISE folding",
+    "scope": "task",
+    "tasks": [
+      "spatial-dise/folding"
+    ],
+    "status": "deferred",
+    "reason_code": "ambiguous_supervision",
+    "reason": "A and B look identical, and native gold D shows the same three compatible face textures under a slightly different projection. Unique correct choice cannot be established; folding excluded as a category pending an upstream verifier or corrected release.",
+    "evidence": [
+      "https://huggingface.co/datasets/TACPS-liv/Spatial-DISE",
+      "images/synthetic/merged/3D_folding/hard/merged_question_0441_meta.png",
+      "docs/jev/audits/spatial-dise-recast.json"
+    ],
+    "checked_on": "2026-10-16",
+    "reconsider_if": "A corrected release or independently checked solver establishes exactly one visually compatible answer per question.",
+    "huggingface": [
+      "TACPS-liv/Spatial-DISE"
+    ],
+    "github": [],
+    "papers": [
+      "arxiv:2510.13394"
+    ],
+    "source_revisions": {
+      "TACPS-liv/Spatial-DISE": "c1067b763ab4199d0dd481efefeae384b738f9fd"
+    }
   }
 ]

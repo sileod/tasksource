@@ -8,25 +8,25 @@ from tasksource import access, load_task
 from scripts.repackage_dataset.spatial_dise import select_rows, source_group
 
 
-def row(number, category='3D Folding', difficulty='easy', answer='D', options='A, B, C, D'):
-    return dict(category=category, source='synthetic', difficulty=difficulty, question='Which cube folds from this net?',
+def row(number, category='3D Rotation', difficulty='easy', answer='D', options='A, B, C, D'):
+    return dict(category=category, source='synthetic', difficulty=difficulty, question='Which rotated block matches the source?',
                 image=f'images/synthetic/merged/{category}/{difficulty}/merged_question_{number:04d}.png',
                 answer=answer, options=options)
 
 
 def test_native_holdouts_and_benchmark_reserve_all_difficulty_variants():
-    splits=dict(benchmark=[row(1)], test=[row(1),row(2)], validation=[row(2,'3D Folding','hard'),row(3)],
-                train=[row(3,'3D Folding','medium'),row(4),row(5,'3D Projection'),row(6,answer='E')])
+    splits=dict(benchmark=[row(1)], test=[row(1),row(2)], validation=[row(2,'3D Rotation','hard'),row(3)],
+                train=[row(3,'3D Rotation','medium'),row(4),row(5,'3D Projection'),row(6,answer='E')])
     selected,excluded=select_rows(splits)
     assert {s:[source_group(r) for r in rs] for s,rs in selected.items()}=={
-        'test':['3D Folding:0002'],'validation':['3D Folding:0003'],'train':['3D Folding:0004']}
+        'test':['3D Rotation:0002'],'validation':['3D Rotation:0003'],'train':['3D Rotation:0004']}
     assert sorted(r['reason'] for r in excluded)==[
         'heldout_source_group','heldout_source_group','heldout_source_group','invalid_choices','unaudited_category']
 
 
 def test_duplicate_or_noncontiguous_panel_references_are_rejected():
     selected,_=select_rows(dict(benchmark=[],test=[],validation=[],train=[
-        row(1,options='A, A, C, D'),row(2,options='A, C, D'),row(3,options='A, B',answer='B')]))
+        row(4,category='3D Folding'),row(1,options='A, A, C, D'),row(2,options='A, C, D'),row(3,options='A, B',answer='B')]))
     assert [r['answer'] for r in selected['train']]==['B']
 
 

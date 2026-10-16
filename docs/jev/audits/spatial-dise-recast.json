@@ -4,20 +4,19 @@
   "checked_on": "2026-10-16",
   "scope": "Coarse visual source/recast audit; not a row-by-row answer correctness certification",
   "included_categories": [
-    "3D Folding",
     "3D Rotation",
     "3D Combination",
     "3D Shape Finding"
   ],
   "retained_counts": {
-    "train": 3405,
-    "validation": 1039,
-    "test": 1405
+    "test": 1065,
+    "validation": 793,
+    "train": 2410
   },
   "split_policy": "Reserve the separate 559-row benchmark, then test, validation and train, by category + generator ID across difficulty. Native rows are removed, never reassigned.",
   "excluded_counts": {
-    "unaudited_category": 2500,
-    "heldout_source_group": 4002,
+    "unaudited_category": 5018,
+    "heldout_source_group": 3065,
     "invalid_choices": 4
   },
   "image_policy": "Original merged images, including native lettered answer panels; textual Panel A ... references survive Jev criterion permutation.",
@@ -60,9 +59,51 @@
   },
   "packaging_script": "scripts/repackage_dataset/spatial_dise.py",
   "automated_checks": {
-    "rows": 5849,
+    "rows": 4268,
     "image_integrity": "Every retained encoded image passes Pillow verification and matches its SHA-256 image_group_id.",
     "gold": "Every retained gold index matches the native CSV answer.",
     "split_groups": "All retained generator family IDs are disjoint across source splits and the separate benchmark."
+  },
+  "recast_examples": [
+    {
+      "source_image": "images/synthetic/merged/3D_rotation/medium/merged_question_0913.png",
+      "category": "3D Rotation",
+      "state": "The 3D object in the question is shown from a specific viewpoint. One of the options below is the same object, just rotated. Which one is the most likely one?\nChoose the image panel identified by the answer text.",
+      "question": "Choose the criterion that best answers the question.",
+      "options": [
+        "Panel B",
+        "Panel A",
+        "Panel C",
+        "Panel D"
+      ],
+      "gold": "Panel A"
+    },
+    {
+      "source_image": "images/synthetic/merged/3D_shape_finding/hard/merged_question_question_0328.png",
+      "category": "3D Shape Finding",
+      "state": "Given the two views of the cube above, which image is most likely to be on the blue face as shown in the third view? Select the most likely one.\nChoose the image panel identified by the answer text.",
+      "question": "Choose the criterion that best answers the question.",
+      "options": [
+        "Panel C",
+        "Panel D",
+        "Panel A",
+        "Panel B"
+      ],
+      "gold": "Panel C"
+    }
+  ],
+  "excluded_recast_example": {
+    "source_image": "images/synthetic/merged/3D_folding/hard/merged_question_0441_meta.png",
+    "category": "3D Folding",
+    "state": "The image above shows the six faces of a cube in an unfolded (net) layout. If you fold the net inward along the edges to form a cube, which option below corresponds to the resulting cube? Select the most likely one.\nChoose the image panel identified by the answer text.",
+    "question": "Choose the criterion that best answers the question.",
+    "options": [
+      "Panel C",
+      "Panel B",
+      "Panel A",
+      "Panel D"
+    ],
+    "gold": "Panel D",
+    "finding": "A and B look identical, and native gold D shows the same three compatible face textures under a slightly different projection. Unique correct choice cannot be established; folding excluded as a category pending an upstream verifier or corrected release."
   }
 }
