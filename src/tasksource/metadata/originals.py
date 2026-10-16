@@ -11,6 +11,7 @@ by scripts/upload_repackaged.py) or a task switches to a mirror.
 """
 
 ORIGINALS = {
+    "tasksource/refcoco-grounding": ["jxu124/refcoco", "jxu124/refcocoplus", "jxu124/refcocog", "Untitled111/refcoco-train2014-assets"],
     "tasksource/spatial-dise": ["TACPS-liv/Spatial-DISE"],
     "tasksource/tabmwp": [],  # native PromptPG JSON distributions linked in mirror provenance
     "tasksource/comve": [],  # original official CSV distribution linked in mirror provenance

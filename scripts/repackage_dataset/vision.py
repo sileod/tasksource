@@ -250,7 +250,8 @@ def view2space():
 
 
 
-def _materialize(dataset, name, source, revision, excluded, conversion, license, license_url):
+def _materialize(dataset, name, source, revision, excluded, conversion, license, license_url,
+                 features=None, fingerprint=None):
     """Write bounded-memory Parquet conversions and their reproducibility evidence."""
     output = Path('build') / (name + '-release')
     output.mkdir(parents=True, exist_ok=True)
@@ -260,9 +261,9 @@ def _materialize(dataset, name, source, revision, excluded, conversion, license,
     result, counts = {}, {}
     for split, rows in dataset.items():
         def examples(rows=rows):
-            yield from rows
-        result[split] = Dataset.from_generator(examples, features=rows.features,
-            cache_dir=cache)
+            yield from rows() if callable(rows) else rows
+        result[split] = Dataset.from_generator(examples, features=features or rows.features,
+            cache_dir=cache, fingerprint=f"{fingerprint}-{split}" if fingerprint else None)
         result[split].to_parquet(str(output / (split + '.parquet')))
         counts[split] = {'rows': len(result[split]), 'questions': sum(len(qas) for qas in result[split]['qa'])
                          if 'qa' in result[split].features else len(result[split])}

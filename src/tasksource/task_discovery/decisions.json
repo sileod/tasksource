@@ -3069,5 +3069,35 @@
     "source_revisions": {
       "TACPS-liv/Spatial-DISE": "c1067b763ab4199d0dd481efefeae384b738f9fd"
     }
+  },
+  {
+    "name": "ShowUI-web grounding",
+    "scope": "task",
+    "tasks": [
+      "showui-web/box"
+    ],
+    "status": "deferred",
+    "reason_code": "ambiguous_supervision",
+    "reason": "Coarse image inspection found Search Bar targeting a Best Match sorting dropdown; DOM geometry alone does not verify instruction semantics.",
+    "evidence": [
+      "docs/jev/audits/showui-grounding-source.json",
+      "https://huggingface.co/datasets/showlab/ShowUI-web"
+    ],
+    "checked_on": "2026-10-16",
+    "reconsider_if": "A reproducible visible-text/semantic verification excludes incorrect generic instructions; re-audit before publishing.",
+    "huggingface": [
+      "showlab/ShowUI-web",
+      "Voxel51/ShowUI_Web"
+    ],
+    "github": [
+      "https://github.com/showlab/ShowUI"
+    ],
+    "papers": [
+      "arxiv:2411.17465"
+    ],
+    "source_revisions": {
+      "showlab/ShowUI-web": "bee5990bfb31515ba3492fe74e85569448fea03c",
+      "Voxel51/ShowUI_Web": "6ce4d9ac114cee39e01059cc0ff774d1eafd1a79"
+    }
   }
 ]

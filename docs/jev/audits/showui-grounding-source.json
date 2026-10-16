@@ -1,0 +1,40 @@
+{
+  "checked_on": "2026-10-16",
+  "scope": "Coarse source inspection; three ShowUI screenshots, not a statistical audit",
+  "source_revisions": {
+    "showlab/ShowUI-web": "bee5990bfb31515ba3492fe74e85569448fea03c",
+    "Voxel51/ShowUI_Web": "6ce4d9ac114cee39e01059cc0ff774d1eafd1a79"
+  },
+  "examples": [
+    {
+      "source_image": "data/data_18/screenshot-8-2066.png",
+      "instruction": "Sony ULT WEAR 900N Wireless Noise Canceling Bluetooth Headphones - Black",
+      "verdict": "pass",
+      "finding": "Box matches the visible product title."
+    },
+    {
+      "source_image": "data/data_18/screenshot-6-2672.png",
+      "instruction": "Search Bar",
+      "native_element_type": "ComboBox",
+      "bbox_xywh": [
+        0.3515625,
+        0.8064814814814815,
+        0.2427083333333333,
+        0.037962962962962976
+      ],
+      "image_size": [
+        1920,
+        1080
+      ],
+      "verdict": "fail",
+      "finding": "Box encloses the Best Match sort dropdown, not a search input."
+    },
+    {
+      "source_image": "data/data_17/screenshot-7-2249.png",
+      "instruction": "View Bio",
+      "verdict": "pass",
+      "finding": "Box matches the visible View Bio link."
+    }
+  ],
+  "decision": "Hold publication until a reproducible semantic/visibility check removes unreliable instructions; no mirror or Jev rows uploaded."
+}
