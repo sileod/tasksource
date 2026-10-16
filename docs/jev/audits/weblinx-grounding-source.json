@@ -1,0 +1,63 @@
+{
+  "checked_on": "2026-10-16",
+  "source": "McGill-NLP/WebLINX-full",
+  "revisions": {
+    "McGill-NLP/WebLINX": "a30ff2cbecb75f2d04fac75a2b92721c6c9e3f13",
+    "McGill-NLP/WebLINX-full": "36ef9f79b43df50e25b7f3b68e5c9f6ccf4160e8"
+  },
+  "review_scope": "Three native training demonstrations, first eligible query per demonstration. Original screenshot and native gold region visually inspected. Full build and split/hash audit remain pending.",
+  "samples": [
+    {
+      "source_row": "weblinx:cptbbef:30",
+      "gold": 3,
+      "target_bbox": [
+        0.6499348958333333,
+        0.04147982062780269,
+        0.7280598958333333,
+        0.06950672645739911
+      ],
+      "image_size": [
+        1920,
+        892
+      ],
+      "css_to_image_scale": 1.25,
+      "finding": "Visible traveler/cabin selector agrees with the native click after the preceding cabin-class discussion."
+    },
+    {
+      "source_row": "weblinx:lgqpvah:5",
+      "gold": 0,
+      "target_bbox": [
+        0.9032812500000001,
+        0.03741685144124168,
+        0.932109375,
+        0.06735033259423504
+      ],
+      "image_size": [
+        1920,
+        902
+      ],
+      "css_to_image_scale": 1.5,
+      "finding": "Visible Log In control agrees with the request to sign in."
+    },
+    {
+      "source_row": "weblinx:wrkuqxa:7",
+      "gold": 0,
+      "target_bbox": [
+        0.7423133235724744,
+        0.0121765601217656,
+        0.8887262079062958,
+        0.060882800608828
+      ],
+      "image_size": [
+        1366,
+        657
+      ],
+      "css_to_image_scale": 1.0,
+      "finding": "Visible Search field agrees with the request to search for Annotations."
+    }
+  ],
+  "geometry": "Candidate CSS boxes scaled to original screenshot; dimensions and zoom-scaled raw event target corroborate gold. Reject mismatched frames rather than infer missing geometry.",
+  "input_policy": "Pre-action dialogue/actions and operation only. No current action arguments, future actions or gold descriptions in the input. Source instruction control tokens removed.",
+  "source_file_policy": "Missing pinned replay/screenshot paths are explicit exclusions; network and other preparation errors stop the build.",
+  "license": "cc-by-nc-sa-4.0 (original WebLINX data terms)"
+}
