@@ -80,7 +80,7 @@ def materialize(generators, name, sources, excluded, conversion, license_url, ma
         'choice_config': {'max_options': 8, 'min_center_distance': 0.03, 'units': '0–1000'}})
     if name == 'refcoco-grounding':
         report['annotation_archive'] = {'url': COCO_ANNOTATIONS_URL, 'sha256': COCO_ANNOTATIONS_SHA256}
-        report['split_policy'] = 'native test subsets merged; all test images excluded from validation; all held-out images excluded from train across variants'
+        report['split_policy'] = 'native test subsets merged; held-out images reserved by both COCO ID and encoded-image SHA256 across variants'
     path.write_text(json.dumps(report, indent=2) + '\n')
     return result
 
@@ -91,8 +91,9 @@ def refcoco_grounding(max_rows=100000, seed=0):
     One shared image cache and mirror; views retain their native question identities.
     The union of all held-out image IDs is reserved from training across variants;
     overlapping validation/test images stay in test only. Original split names and
-    per-image Flickr licenses are recorded. No-derivatives images are excluded because
-    optional Set-of-Mark annotation changes pixels. Other license scopes remain mixed.
+    per-image Flickr licenses are recorded without excluding noncommercial or
+    unresolved sources. Original images are redistributed unchanged; optional pixel
+    augmentations remain subject to each image's original terms.
     Only native COCO object boxes supply options; no invented distractors.
     """
     from urllib.request import urlretrieve
@@ -123,6 +124,12 @@ def refcoco_grounding(max_rows=100000, seed=0):
                 if canonical == 'test':tests.add(row['image_id'])
     archive_path = Path('build/grounding-assets/train2014.zip')
     if not archive_path.exists():archive_path = hub_file(COCO, 'train2014.zip')
+    # COCO contains duplicate photographs under different image IDs. Reserve bytes too.
+    with zipfile.ZipFile(archive_path) as archive:
+        image_hashes = {image_id: hashlib.sha256(archive.read('train2014/' + images[image_id]['file_name'])).hexdigest()
+                        for image_id in grouped}
+    heldout_hashes = {image_hashes[key] for key in heldout}
+    test_hashes = {image_hashes[key] for key in tests}
     excluded, generators = [], {}
     for split in ('train', 'validation', 'test'):
         def examples(split=split):
@@ -131,12 +138,11 @@ def refcoco_grounding(max_rows=100000, seed=0):
                 for image_id in ordered(grouped, seed):
                     rows = [item for item in grouped[image_id] if item[0] == split]
                     if not rows:continue
-                    if split == 'train' and image_id in heldout or split == 'validation' and image_id in tests:
+                    if (split == 'train' and image_hashes[image_id] in heldout_hashes
+                            or split == 'validation' and image_hashes[image_id] in test_hashes):
                         excluded.append({'source_row': f'{split}:coco:{image_id}', 'reason': 'cross_variant_heldout_image'});continue
                     info = images[image_id]
                     license = licenses[info['license']]
-                    if 'nd/' in license['url'].lower() or 'NoDerivs' in license['name']:
-                        excluded.append({'source_row': f'coco:{image_id}', 'reason': 'image_license_no_derivatives'});continue
                     width, height = info['width'], info['height']
                     pool = {}
                     for ann_id, item in objects[image_id].items():
