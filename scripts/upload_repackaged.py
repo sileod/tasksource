@@ -9,6 +9,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from datasets import Dataset, DatasetDict
 from huggingface_hub import DatasetCard
+from tasksource.citation import with_citation
 from tasksource.metadata.originals import ORIGINALS
 from scripts.repackage_dataset.text import (
     sharc, numer_sense, clutrr, wellformed, humicroedit, ethos,
@@ -182,6 +183,7 @@ def push_card(repo, build, directory=None):
         prepared_card = Path('build/webinstruct-release/README.md')
         source_card = prepared_card if prepared_card.exists() else Path(__file__).resolve().parents[1] / 'dataset_cards/webinstruct.md'
         card.text = source_card.read_text().split('---', 2)[2]
+    card.text = with_citation(card.text)
     card.push_to_hub(repo)
     if provenance.exists() and repo != 'tasksource/webinstruct':
         from huggingface_hub import HfApi

@@ -293,7 +293,7 @@ Generators live in `src/tasksource/jev/procedural/`.
 
 ## Citation
 
-Generated with [tasksource](https://github.com/sileod/tasksource); please cite:
+If you use tasksource, its standardized task annotations, or datasets derived from them in published research, please cite the tasksource paper (Sileo, LREC-COLING 2024).
 
 ```bibtex
 @inproceedings{sileo-2024-tasksource,
@@ -305,6 +305,7 @@ Generated with [tasksource](https://github.com/sileod/tasksource); please cite:
     address = "Torino, Italia",
     publisher = "ELRA and ICCL",
     url = "https://aclanthology.org/2024.lrec-main.1361",
+    doi = "10.63317/2h4pkr685mkq",
     pages = "15655--15684",
 }
 ```

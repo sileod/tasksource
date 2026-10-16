@@ -22,6 +22,23 @@ is a short, readable function from a dataset to its standardized form.
 pip install tasksource
 ```
 
+If you use tasksource, its standardized task annotations, or datasets derived from them in published research, please cite the tasksource paper (Sileo, LREC-COLING 2024). GitHub's "Cite this repository" button gives the same reference ([`CITATION.cff`](CITATION.cff)).
+
+```bib
+@inproceedings{sileo-2024-tasksource,
+    title = "tasksource: A Large Collection of {NLP} tasks with a Structured Dataset Preprocessing Framework",
+    author = "Sileo, Damien",
+    booktitle = "Proceedings of the 2024 Joint International Conference on Computational Linguistics, Language Resources and Evaluation (LREC-COLING 2024)",
+    month = may,
+    year = "2024",
+    address = "Torino, Italia",
+    publisher = "ELRA and ICCL",
+    url = "https://aclanthology.org/2024.lrec-main.1361",
+    doi = "10.63317/2h4pkr685mkq",
+    pages = "15655--15684",
+}
+```
+
 ```python
 from tasksource import list_tasks, load_task
 
@@ -58,6 +75,11 @@ lists them. By default, `load_task(id)` gives the majority label on rows with cl
 `list_tasks(license_use="commercial")` keeps tasks whose sources allow commercial use (also
 `non-commercial`, `unspecified`, or a list), and `task_licenses()` gives each task's licenses and their
 sources. This is a best-effort filter, not legal advice.
+
+The tasksource code is under the [BSD 3-Clause license](LICENSE). Original documentation and the task
+annotations we write (mappings, questions, label names, recasts) are under [CC BY 4.0](LICENSE-CC-BY-4.0).
+Third-party datasets, including the sources that tasksource loads and our mirrors or repackages of
+them, keep their own licenses, which `task_licenses()` reports.
 
 ### tasksource-jev-typed-decisions
 
@@ -120,20 +142,6 @@ winogrande = MultipleChoice('sentence',['option1','option2'],'answer',
 tasks = [winogrande.load(), codah.load()]  # aligned datasets (same columns) can be used interchangeably
 ```
 
-### Citation and contact
+### Contact
 
-For more details, refer to the [article](https://arxiv.org/abs/2301.05948):
-```bib
-@inproceedings{sileo-2024-tasksource,
-    title = "tasksource: A Large Collection of {NLP} tasks with a Structured Dataset Preprocessing Framework",
-    author = "Sileo, Damien",
-    booktitle = "Proceedings of the 2024 Joint International Conference on Computational Linguistics, Language Resources and Evaluation (LREC-COLING 2024)",
-    month = may,
-    year = "2024",
-    address = "Torino, Italia",
-    publisher = "ELRA and ICCL",
-    url = "https://aclanthology.org/2024.lrec-main.1361",
-    pages = "15655--15684",
-}
-```
 For help integrating tasksource into your experiments, please contact [damien.sileo@inria.fr](mailto:damien.sileo@inria.fr).

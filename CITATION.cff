@@ -1,9 +1,28 @@
-cff-version: 1.1.0
-message: "If you use this work, please cite it as below."
+cff-version: 1.2.0
+message: "If you use tasksource, its standardized task annotations, or datasets derived from them in published research, please cite the tasksource paper."
+title: "tasksource"
+type: software
 authors:
   - family-names: "Sileo"
     given-names: "Damien"
-title: "tasksource: A Dataset Harmonization Framework for Streamlined NLP Multi-Task Learning and Evaluation"
-version: "1.0.0"
-date-released: 2023-01-01
-url: "https://arxiv.org/abs/2301.05948"
+repository-code: "https://github.com/sileod/tasksource"
+license: BSD-3-Clause
+preferred-citation:
+  type: conference-paper
+  title: "tasksource: A Large Collection of NLP tasks with a Structured Dataset Preprocessing Framework"
+  authors:
+    - family-names: "Sileo"
+      given-names: "Damien"
+  collection-title: "Proceedings of the 2024 Joint International Conference on Computational Linguistics, Language Resources and Evaluation (LREC-COLING 2024)"
+  conference:
+    name: "LREC-COLING 2024"
+    city: "Torino"
+    country: "IT"
+  publisher:
+    name: "ELRA and ICCL"
+  year: 2024
+  month: 5
+  start: 15655
+  end: 15684
+  doi: "10.63317/2h4pkr685mkq"
+  url: "https://aclanthology.org/2024.lrec-main.1361"
