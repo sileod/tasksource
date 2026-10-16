@@ -112,22 +112,3 @@ Tasksource, its default MC preprocessing shuffles options and keeps the gold plu
 up to three distractors. Use `gold_first=False, max_options=None` when calling the
 MC annotation directly to retain source order and all options. Tasksource also
 creates a validation split from the prepared training set using its standard seed.
-
-## Citation
-
-If you use tasksource, its standardized task annotations, or datasets derived from them in published research, please cite the tasksource paper (Sileo, LREC-COLING 2024).
-
-```bibtex
-@inproceedings{sileo-2024-tasksource,
-    title = "tasksource: A Large Collection of {NLP} tasks with a Structured Dataset Preprocessing Framework",
-    author = "Sileo, Damien",
-    booktitle = "Proceedings of the 2024 Joint International Conference on Computational Linguistics, Language Resources and Evaluation (LREC-COLING 2024)",
-    month = may,
-    year = "2024",
-    address = "Torino, Italia",
-    publisher = "ELRA and ICCL",
-    url = "https://aclanthology.org/2024.lrec-main.1361",
-    doi = "10.63317/2h4pkr685mkq",
-    pages = "15655--15684",
-}
-```
