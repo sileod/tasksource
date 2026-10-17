@@ -19,6 +19,14 @@ SPLITS = {'train':'train', 'validation':'valid', 'test':'test_iid',
           **{key:key for key in ('test_cat','test_geo','test_vis','test_web')}}
 
 
+def canonical_demo(name, split, partitions):
+    """Resolve chat export prefixes only against the raw release's native split IDs."""
+    candidate=name.rsplit('_',1)[-1]
+    for identity in (name,candidate):
+        if identity in partitions[split]:return identity
+    raise ValueError(f'Chat demonstration {name!r} is absent from native split {split!r}')
+
+
 def native_query(row, excluded):
     """Reuse native UID supervision, retaining only pre-action context and CSS geometry."""
     record, reason = weblinx_record({**row, 'clean_html':''}, elements=True)
@@ -52,7 +60,10 @@ def visual_query(query, turn, image_size, screenshot, excluded):
         try:boxes[uid]=xywh_box([value*scale for value in box],width,height)
         except ValueError:continue
     target=boxes.get(query['target_id'])
-    original=(turn.element or {}).get('bbox')
+    element=turn.element or {}
+    if element.get('attributes',{}).get('data-webtasks-id')!=query['target_id']:
+        reject('native_target_uid_mismatch');return
+    original=element.get('bbox')
     if target is None or not original or not {'left','right','top','bottom'}<=original.keys():
         reject('invisible_or_unverified_target');return
     center=[(original['left']+original['right'])/2/width,(original['top']+original['bottom'])/2/height]
@@ -62,7 +73,7 @@ def visual_query(query, turn, image_size, screenshot, excluded):
         image_group_id=f"weblinx:{query['demo']}:{screenshot}",image_size=image_size,viewport_css=[vw,vh],
         css_to_image_scale=scale,target_id=query['target_id'],native_target_bbox=original,
         source_dataset=RAW[0],source_revision=RAW[1],chat_revision=CHAT[1],annotation_origin='human browser interaction',
-        screenshot=screenshot,input_view='visual')
+        screenshot=screenshot,input_view='visual',chat_demo=query.get('chat_demo',query['demo']))
     return grounding_qa(query['inputs'],target,boxes.values(),metadata,'weblinx',excluded)
 
 
@@ -78,13 +89,16 @@ def weblinx_grounding(max_rows=100000, seed=0):
     """
     import weblinx
     if weblinx.__version__!='0.3.2':raise ValueError('Preparation requires weblinx==0.3.2')
+    partitions=json.loads(hub_file(RAW,'splits.json').read_text())
     excluded,by_demo,ownership = [],defaultdict(list),{}
     for split,native in SPLITS.items():
         with gzip.open(hub_file(CHAT,f'data/chat/{native}.json.gz'),'rt') as stream:
             for line in stream:
                 query=native_query(json.loads(line),excluded)
                 if query is None:continue
-                demo=query['demo']
+                query['chat_demo']=query['demo']
+                demo=canonical_demo(query['demo'],native,partitions)
+                query['demo']=demo;query['source_row']=f"weblinx:{demo}:{query['turn']}"
                 if demo in ownership and ownership[demo]!=split:raise ValueError('Native demonstration crosses splits')
                 ownership[demo]=split;query['source_split']=native;by_demo[demo].append(query)
     def prepare(demo):
@@ -136,4 +150,4 @@ def weblinx_grounding(max_rows=100000, seed=0):
         excluded,weblinx_grounding,'https://huggingface.co/datasets/McGill-NLP/WebLINX-full',max_rows,seed,
         provenance=dict(license='cc-by-nc-sa-4.0',source_url='https://mcgill-nlp.github.io/weblinx/',annotation_origin='human',
             language=['en'],task_categories=['multiple-choice','visual-question-answering'],
-            preparation_dependencies={'weblinx':'0.3.2'},box_convention='native CSS boxes scaled to the matching screenshot; raw event geometry corroborates gold'))
+            preparation_dependencies={'weblinx':'0.3.2'},demonstration_ids='Chat export prefixes resolved against pinned raw split manifest; target UID must agree with replay.',box_convention='native CSS boxes scaled to the matching screenshot; raw event geometry corroborates gold'))
