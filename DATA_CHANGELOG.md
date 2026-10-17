@@ -12,7 +12,7 @@ concise bullets on what changed in the data. `tasksource-jev-typed-decisions` re
 
 ## tasksource-jev-typed-decisions v2026.10.17
 
-- `vision`: add ShapeWorld object-box grounding, capped at 20k training rows from the 100k-QA procedural mirror. Native scene models verify every unique target and spatial relation.
+- `vision`: add ShapeWorld object-box grounding, capped at 20k training rows from the 100k-QA procedural mirror. Native scene models verify every unique target and spatial relation. Published 20,000 training rows, bringing vision to 722,314 training rows.
 - Preserve existing training and evaluation shards and exclude images already present in published evaluation. Keep generator seeds, geometry and original MIT license evidence.
 
 ## tasksource/shapeworld-grounding v2026.10.17
