@@ -7,13 +7,15 @@ an LLM (litlm, any OpenAI-compatible endpoint, see ``tasksource.llm``) reads a f
 proposes natural field names and task-specific instructions in each style of
 ``tasksource.jev.task_prompts.STYLES``. A review pass renders real rows with every instruction, shows
 the gold option, and keeps an instruction only if it asks what the gold option answers, fits every
-option, matches its style and neither leaks nor implies the answer. Sources that lose instructions are
-redrafted once with the reviewer's reasons and reviewed again. Labels, options and targets never change.
+option, matches its style and neither leaks nor implies the answer; instructions naming an option are
+dropped before review. Sources with a fixed label set also get model-written label definitions, each
+reviewed on its own. Sources that lose instructions are redrafted once with the reviewer's reasons and
+reviewed again. Options and targets never change.
 
-``--output`` keeps ``examples.jsonl`` (the seeded sample of single-question rows) and ``reviews.jsonl``
-(every draft with its per-instruction verdicts). Calls use temperature 0 and the litlm cache, so an
-interrupted run resumes and a rerun with the same data, model and prompts reproduces the sidecar,
-which records all three.
+The build is resumable and auditable rather than bit-reproducible (temperature 0 is not deterministic
+on most servers): ``--output`` keeps the seeded sample of rows and ``reviews.jsonl`` with every draft
+and verdict, the litlm cache replays finished calls, and the sidecar records the build arguments, a
+hash of the sample and a hash of the prompt templates.
 """
 import argparse
 import glob
@@ -21,11 +23,11 @@ import hashlib
 import json
 import random
 import re
-from collections import defaultdict
+from collections import Counter, defaultdict
 from datetime import date
 from pathlib import Path
 
-from tasksource.jev.task_prompts import STYLES, describe_options, task_style
+from tasksource.jev.task_prompts import STYLES, task_style
 
 FIELD = re.compile(r"^([A-Za-z_][A-Za-z0-9_ ]{0,30}):", re.M)
 STYLE_GUIDE = """Styles (examples are for other datasets):
@@ -59,7 +61,8 @@ Published examples (gold option marked with ->):
 Write natural names for the state fields and {n} different instructions in each style. Every instruction is specific
 to this task and consistent with every option. Do not list the options, give or hint at the answer, or mention the
 dataset name. When the options are a fixed label set (the same labels in every example), also define each
-label in one short sentence that holds for this task; otherwise leave "labels" empty.{feedback}
+label in one short sentence that holds for this task; otherwise leave "labels" empty. Instructions must not name or
+paraphrase the labels.{feedback}
 
 Return JSON: {{"fields": {{<each state field>: <natural name, e.g. "Premise", "Post", "Question">}},
 "text_name": <name for the whole state when it has no fields, e.g. "Review", "Tweet"; null otherwise>,
@@ -75,10 +78,14 @@ Each candidate is shown with its style and real examples rendered with it; the g
 {rendered}
 
 For each candidate, judge: does it ask exactly what the gold options answer (right polarity and direction), fit every
-option, match its style, and avoid leaking or implying the answer? Wording preferences are not a reason to reject.
-Label definitions are shown with the options: if one is wrong for these examples, reject every candidate and say why.
+option, match its style, and avoid leaking or implying the answer, listing or paraphrasing the options? Wording
+preferences are not a reason to reject.
 
-Return JSON: {{"reviews": [{{"candidate": <index>, "ok": true|false, "reason": "at most 25 words"}}, ...]}}"""
+Label definitions (judge each: is it correct for these examples and does it match the label's own meaning?):
+{labels}
+
+Return JSON: {{"reviews": [{{"candidate": <index>, "ok": true|false, "reason": "at most 25 words"}}, ...],
+"labels": [{{"label": <label>, "ok": true|false, "reason": "at most 25 words"}}, ...]}}"""
 
 
 def fields(state):
@@ -99,6 +106,14 @@ def example_lines(examples):
     return "\n\n".join(lines)
 
 
+ENUMERATION = re.compile(r"\b[\w-]+(?: [\w-]+)?, [\w -]+,? or [\w -]+")
+
+
+def names_option(instruction, options):
+    """Whether the instruction names one of the (word-like) options or enumerates three or more choices."""
+    return bool(ENUMERATION.search(instruction)) or any(re.search(r"\b%s\b" % re.escape(o.lower()), instruction.lower()) for o in options if re.fullmatch(r"[A-Za-z][\w ._-]{2,}", o))
+
+
 def candidates(spec):
     """``[(style, instruction)]`` in a fixed order."""
     return [(style, s) for style in STYLES for s in spec["styles"].get(style, [])]
@@ -106,7 +121,7 @@ def candidates(spec):
 
 def collect(args):
     """Seeded sample of single-question rows per source from the published Parquet shards."""
-    out = args.output / "examples.jsonl"
+    out = args.output / f"examples_seed{args.seed}_n{args.per_source}.jsonl"
     if out.exists():
         return [json.loads(line) for line in out.open()]
     import pyarrow.parquet as pq
@@ -123,7 +138,9 @@ def collect(args):
         if not pool:
             continue
         sample = rng.sample(pool, min(args.per_source, len(pool)))
-        records.append({"source": source, "fields": fields(sample[0]["state"]),
+        counts = Counter(name for r in sample for name in fields(r["state"]))  # a field seen once is likely text
+        names = [n for n, c in counts.items() if c >= 2] if sum(map(bool, map(fields, (r["state"] for r in sample)))) * 2 > len(sample) else []
+        records.append({"source": source, "fields": names,
                         "examples": [{k: r[k] for k in ("state", "question", "options", "target")} for r in sample]})
     out.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in records))
     return records
@@ -157,10 +174,11 @@ def draft(args, records, feedback=None):
     drafts = {}
     for r, d in zip(todo, complete(args, prompts)):
         names = {k: str(v).strip() for k, v in (d.get("fields") or {}).items() if k in r["fields"] and str(v).strip()}
-        styles = {style: [s.strip() for s in (d.get("styles") or {}).get(style) or [] if isinstance(s, str) and s.strip()][:args.per_style]
-                  for style in STYLES}
         label_set = {o for e in r["examples"] for o in e["options"]}
         fixed = all(set(e["options"]) == label_set for e in r["examples"])
+        styles = {style: [s.strip() for s in (d.get("styles") or {}).get(style) or []
+                          if isinstance(s, str) and s.strip() and not (fixed and names_option(s, label_set))][:args.per_style]
+                  for style in STYLES}
         labels = {k: str(v).strip() for k, v in (d.get("labels") or {}).items() if k in label_set and str(v).strip()}
         if any(styles.values()) and set(names) == set(r["fields"]):
             drafts[r["source"]] = {"fields": names, "text_name": None if r["fields"] else str(d.get("text_name") or "Text"),
@@ -169,7 +187,7 @@ def draft(args, records, feedback=None):
 
 
 def review(args, records, drafts):
-    """Keep the instructions the reviewer accepts; returns (accepted, reasons for the rejected ones)."""
+    """Keep the instructions and label definitions the reviewer accepts; returns (accepted, reasons for rejections)."""
     todo = [r for r in records if r["source"] in drafts]
     prompts = []
     for r in todo:
@@ -179,22 +197,25 @@ def review(args, records, drafts):
             shown = []
             for e in r["examples"][:args.shown]:
                 rendered = task_style(e["state"], r["source"], 0.0, layout="inline", prompts=one)
-                options = describe_options(e["options"], r["source"], prompts=one)
-                shown.append(dict(e, state="(empty)", question=rendered[1], options=options) if rendered else e)
+                shown.append(dict(e, state="(empty)", question=rendered[1]) if rendered else e)
             blocks.append(f"### Candidate {i} ({style}): {instruction}\n{example_lines(shown)}")
-        prompts.append(REVIEW.format(source=r["source"], guide=STYLE_GUIDE, rendered="\n\n".join(blocks)))
+        labels = "\n".join(f"- {k}: {v}" for k, v in spec.get("labels", {}).items()) or "(none)"
+        prompts.append(REVIEW.format(source=r["source"], guide=STYLE_GUIDE, rendered="\n\n".join(blocks), labels=labels))
     accepted, rejected, log = {}, {}, []
     for r, d in zip(todo, complete(args, prompts)):
         spec = drafts[r["source"]]
         verdicts = {v.get("candidate"): v for v in d.get("reviews") or [] if isinstance(v, dict)}
+        label_ok = {v.get("label"): v.get("ok") is True for v in d.get("labels") or [] if isinstance(v, dict)}
         keep = defaultdict(list)
         for i, (style, instruction) in enumerate(candidates(spec)):
             if (verdicts.get(i) or {}).get("ok") is True:
                 keep[style].append(instruction)
         reasons = [str(v.get("reason", "")) for v in verdicts.values() if v.get("ok") is False]
-        log.append({"source": r["source"], "draft": spec, "reviews": list(verdicts.values())})
-        if keep:
-            accepted[r["source"]] = dict(spec, styles=dict(keep))
+        log.append({"source": r["source"], "draft": spec, "reviews": list(verdicts.values()), "labels": d.get("labels")})
+        if keep:  # options are described only when every label definition passed
+            labels = spec.get("labels", {})
+            accepted[r["source"]] = {**{k: v for k, v in spec.items() if k != "labels"}, "styles": dict(keep),
+                                     **({"labels": labels} if labels and all(label_ok.get(k) for k in labels) else {})}
         if sum(map(len, keep.values())) < len(candidates(spec)):
             rejected[r["source"]] = reasons or ["no review returned"]
     with (args.output / "reviews.jsonl").open("a") as f:
@@ -202,10 +223,19 @@ def review(args, records, drafts):
     return accepted, rejected
 
 
+def merge(first, again, per_style):
+    """Add redrafted instructions to a first-round spec; a redraft that renamed fields replaces it."""
+    if first is None or (first["fields"], first["text_name"]) != (again["fields"], again["text_name"]):
+        return again
+    styles = {style: list(dict.fromkeys(first["styles"].get(style, []) + again["styles"].get(style, [])))[:per_style]
+              for style in STYLES}
+    return dict(first, styles={k: v for k, v in styles.items() if v})
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--data", required=True, help="directory of the published train-*.parquet shards (default or full config)")
-    parser.add_argument("--revision", required=True, help="Hub revision of those shards, recorded in the sidecar")
+    parser.add_argument("--revision", required=True, help="Hub revision of those shards, recorded in the sidecar (not checked; examples_sha256 pins the sampled rows)")
     parser.add_argument("--output", type=Path, default=Path("build/jev-task-prompts"))
     parser.add_argument("--sidecar", type=Path, default=Path("src/tasksource/jev/task_prompts.json"))
     parser.add_argument("--sources", nargs="*", help="only these sources (smoke runs; the sidecar then holds only them)")
@@ -226,14 +256,12 @@ def main():
     if rejected:  # one redraft round for sources that lost instructions
         again, _ = review(args, records, draft(args, records, feedback=rejected))
         for source, spec in again.items():
-            styles = accepted.get(source, {}).get("styles", {})
-            merged = {style: list(dict.fromkeys(styles.get(style, []) + spec["styles"].get(style, [])))[:args.per_style]
-                      for style in STYLES}
-            accepted[source] = dict(spec, styles={k: v for k, v in merged.items() if v})
+            accepted[source] = merge(accepted.get(source), spec, args.per_style)
 
     digest = hashlib.sha256((DRAFT + REVIEW + STYLE_GUIDE).encode()).hexdigest()[:12]
     meta = {"dataset": "tasksource/tasksource-jev-typed-decisions", "revision": args.revision, "model": args.model,
-            "prompts_sha256": digest, "seed": args.seed, "styles": list(STYLES), "created": date.today().isoformat()}
+            "prompts_sha256": digest, "examples_sha256": hashlib.sha256(json.dumps(records, sort_keys=True).encode()).hexdigest()[:12],
+            "seed": args.seed, "per_source": args.per_source, "shown": args.shown, "per_style": args.per_style, "labels_by": "model", "styles": list(STYLES), "created": date.today().isoformat()}
     args.sidecar.write_text(json.dumps({**meta, "tasks": dict(sorted(accepted.items()))}, indent=1, ensure_ascii=False) + "\n")
     counts = {style: sum(len(s["styles"].get(style, [])) for s in accepted.values()) for style in STYLES}
     print(f"{len(accepted)}/{len(records)} sources with reviewed prompts -> {args.sidecar}; instructions per style: {counts}")

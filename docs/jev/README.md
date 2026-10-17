@@ -64,6 +64,7 @@ Most Jev rows phrase their decision with a few generic instructions over generic
 names and reviewed task-specific instructions tagged by style (`directive`, `question`, `explained`, `terse`, `conversational`, `annotation`,
 `grounded`, `system`) plus label definitions for fixed label sets. `task_style` renders a row with them, inline after
 the instruction or as a JSON state, and `describe_options` renders options as `label: definition`.
+Label definitions are written by the build model and reviewed one by one, not taken from dataset cards; use them opt-in.
 Consumers choose the styles, layouts and share of rows, so phrasings can be compared in controlled runs. The published
 data is unchanged.
 

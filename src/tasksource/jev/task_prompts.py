@@ -33,10 +33,15 @@ LAYOUTS = ("inline", "fields")
 
 
 @lru_cache(maxsize=None)
+def load_sidecar(path=PROMPTS_PATH):
+    """The whole sidecar: build metadata (Jev ``revision``, ``model``, ...) and ``tasks``."""
+    return json.loads(Path(path).read_text(encoding="utf-8"))
+
+
 def load_task_prompts(path=PROMPTS_PATH):
     """``{source: {"fields": {state_field: natural_name}, "text_name": str | None, "styles": {style: [str]},
-    "labels": {label: definition}}}`` (``labels`` only for fixed label sets)."""
-    return json.loads(Path(path).read_text(encoding="utf-8"))["tasks"]
+    "labels": {label: definition}}}`` (``labels`` only for fixed label sets, written by the build model)."""
+    return load_sidecar(path)["tasks"]
 
 
 def state_fields(state, names):
@@ -54,7 +59,10 @@ def task_style(state, source, choice, layout="inline", styles=STYLES, prompts=No
 
     ``choice`` in [0, 1) picks one instruction among those of the selected ``styles``; ``layout`` is
     ``inline`` or ``fields`` (see the module docstring). Returns ``(state, question)``, or ``None`` when
-    the source has no reviewed instruction in these styles or its state does not match its fields.
+    the source has no reviewed instruction in these styles or its state does not match its fields;
+    callers then keep the row's own Jev question. States that repeat a field (dialogue turns) are
+    always rendered inline, since a JSON object would keep one value per name. ``system`` instructions
+    are role prompts ("You are ...") rendered as the question; leave the style out to avoid them.
 
     Apply it to single-question rows: on a state shared by several questions, the task instruction
     would replace questions it does not describe."""
@@ -71,11 +79,8 @@ def task_style(state, source, choice, layout="inline", styles=STYLES, prompts=No
         named = [(spec["fields"][name], value) for name, value in named]
     else:
         named = [(spec["text_name"], state.strip())]
-    named = [(name, value) for name, value in named if value]
     instruction = instructions[min(int(choice * len(instructions)), len(instructions) - 1)]
-    if not named:
-        return "", instruction
-    if layout == "inline":
+    if layout == "inline" or len({name for name, _ in named}) < len(named):
         body = named[0][1] if not spec["fields"] else "\n".join(f"{name}: {value}" for name, value in named)
         return "", f"{instruction}\n{body}"
     return json.dumps(dict(named), ensure_ascii=False), instruction

@@ -49,3 +49,23 @@ def test_describe_options_needs_every_label():
     assert describe_options(["negative", "positive"], "single", prompts=PROMPTS) == ["negative: The reviewer disliked it.", "positive: The reviewer liked it."]
     assert describe_options(["negative", "mixed"], "single", prompts=PROMPTS) == ["negative", "mixed"]
     assert describe_options(["yes"], "pairs", prompts=PROMPTS) == ["yes"]
+
+
+def test_repeated_fields_stay_inline_and_empty_values_are_kept():
+    prompts = {"chat": {"fields": {"A": "Recommender", "B": "Seeker"}, "text_name": None, "styles": {"question": ["Did the seeker like it?"]}}}
+    state = "A: hi\nB: I liked Up.\nA: why?\nB:"
+    for layout in ("inline", "fields"):
+        assert task_style(state, "chat", 0.0, layout=layout, prompts=prompts) == (
+            "", "Did the seeker like it?\nRecommender: hi\nSeeker: I liked Up.\nRecommender: why?\nSeeker: ")
+
+
+def test_build_fields_union_option_check_and_merge():
+    from scripts.build_jev_task_prompts import fields, merge, names_option
+    assert fields("text_A: x\ntext_B: y") == ["text_A", "text_B"] and fields("free text") == []
+    assert names_option("Label it as entailment or neutral.", ["entailment", "neutral", "contradiction"])
+    assert not names_option("Is the claim supported?", ["entailment", "1"])
+    first = {"fields": {"A": "Premise"}, "text_name": None, "styles": {"question": ["q1"]}, "labels": {"x": "d"}}
+    again = {"fields": {"A": "Premise"}, "text_name": None, "styles": {"question": ["q2"], "terse": ["t"]}}
+    assert merge(first, again, 2) == dict(first, styles={"question": ["q1", "q2"], "terse": ["t"]})
+    renamed = dict(again, fields={"A": "Context"})
+    assert merge(first, renamed, 2) == renamed and merge(None, again, 2) == again
