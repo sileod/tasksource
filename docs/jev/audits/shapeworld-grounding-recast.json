@@ -1,0 +1,96 @@
+{
+  "checked_on": "2026-10-17",
+  "source": "tasksource/shapeworld-grounding",
+  "splits": {
+    "train": {
+      "images": 83190,
+      "questions": 100000,
+      "views": {
+        "shapeworld": 100000
+      }
+    },
+    "validation": {
+      "images": 834,
+      "questions": 1000,
+      "views": {
+        "shapeworld": 1000
+      }
+    },
+    "test": {
+      "images": 828,
+      "questions": 1000,
+      "views": {
+        "shapeworld": 1000
+      }
+    }
+  },
+  "automated_checks": "Every QA: unique native choices, gold/geometry agreement, dimensions and native split; every image: encoded-image verification; no shared image IDs or bytes across splits. Every QA is also checked against the complete saved native scene: unique referent and candidate membership.",
+  "samples": [
+    {
+      "view": "shapeworld",
+      "source_row": "shapeworld:train:1:0",
+      "image_group_id": "shapeworld:train:1",
+      "inputs": "Locate the green pentagon.",
+      "choices": [
+        "[738, 630, 914, 762]",
+        "[41, 328, 239, 407]",
+        "[644, 519, 821, 691]",
+        "[736, 366, 879, 509]",
+        "[281, 621, 489, 833]",
+        "[65, 758, 222, 861]"
+      ],
+      "gold": 4,
+      "target_bbox": [
+        0.2811479409742028,
+        0.6214532190019284,
+        0.48885692708897477,
+        0.8332269740778713
+      ],
+      "audit_image": "/tmp/shapeworld-full-audit-0.png"
+    },
+    {
+      "view": "shapeworld",
+      "source_row": "shapeworld:train:6:1",
+      "image_group_id": "shapeworld:train:6",
+      "inputs": "Locate the green square above the magenta ellipse.",
+      "choices": [
+        "[782, 433, 966, 618]",
+        "[221, 727, 407, 913]",
+        "[95, 797, 189, 909]",
+        "[797, 70, 954, 225]",
+        "[482, 85, 823, 425]",
+        "[616, 527, 826, 737]"
+      ],
+      "gold": 4,
+      "target_bbox": [
+        0.48227416480168295,
+        0.08463541168789321,
+        0.8230194413466853,
+        0.42538068823289554
+      ],
+      "audit_image": "/tmp/shapeworld-full-audit-1.png"
+    },
+    {
+      "view": "shapeworld",
+      "source_row": "shapeworld:train:7:0",
+      "image_group_id": "shapeworld:train:7",
+      "inputs": "Locate the red circle.",
+      "choices": [
+        "[603, 636, 798, 825]",
+        "[628, 315, 840, 546]",
+        "[238, 745, 471, 984]",
+        "[66, 43, 315, 160]",
+        "[55, 327, 279, 551]"
+      ],
+      "gold": 4,
+      "target_bbox": [
+        0.05484607092791895,
+        0.32742940276146926,
+        0.27863188984697695,
+        0.5512152216805273
+      ],
+      "audit_image": "/tmp/shapeworld-full-audit-2.png"
+    }
+  ],
+  "visual_review": "Three full-build examples inspected: green pentagon, green square above magenta ellipse (repeated green squares require the relation), and red circle. Visible referents agree with native gold boxes. Coarse sample only."
+}

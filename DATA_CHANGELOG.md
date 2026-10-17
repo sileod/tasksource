@@ -4,6 +4,12 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource/shapeworld-grounding v2026.10.17
+
+- Add 100,000 procedurally verified training grounding questions, plus 1,000 validation and 1,000 test questions, from pinned ShapeWorld scenes.
+- Use native object boxes as choices; spatial queries distinguish repeated color/shape descriptions. Save scene models, generation seeds and geometry in metadata.
+- Generated image hashes are disjoint across splits. Source code and generated geometric assets use the original MIT terms.
+
 ## tasksource-jev-typed-decisions v2026.10.16.2
 
 - `vision`: add Flickr30k Entities phrase grounding, capped at 20k training rows from the 100k-QA mirror. Full captions identify the queried phrase; options are native annotated regions. Published 20,000 new rows, bringing vision training to 702,314 rows.
