@@ -101,5 +101,10 @@
       "label": 0
     }
   ],
-  "coarse_review": "Three native Jev examples inspected: interest-rate fragment not prioritized; numerical employment claim prioritized; conversational suggestion not prioritized. Question, criteria and native gold align."
+  "coarse_review": "Three native Jev examples inspected: interest-rate fragment not prioritized; numerical employment claim prioritized; conversational suggestion not prioritized. Question, criteria and native gold align.",
+  "annotation_evidence": {
+    "url": "https://checkthat.gitlab.io/clef2024/pdf/CLEF_2024_CheckThat_LNCS_draft.pdf",
+    "section": "4.1",
+    "finding": "English debate sentences were annotated by human annotators; the overview cites Arslan et al. (2020). Native Hub labels match the official train/dev/dev-test labels exactly."
+  }
 }
