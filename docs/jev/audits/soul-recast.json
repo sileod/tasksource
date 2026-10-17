@@ -1,0 +1,72 @@
+{
+  "task": "soul",
+  "native_rows": {
+    "train": 8834,
+    "validation": 1481,
+    "test": 4713
+  },
+  "retained_rows": {
+    "train": 8827,
+    "validation": 1481,
+    "test": 4712
+  },
+  "labels": {
+    "train": {
+      "false": 2998,
+      "true": 3671,
+      "not-given": 2158
+    },
+    "validation": {
+      "not-given": 361,
+      "true": 617,
+      "false": 503
+    },
+    "test": {
+      "true": 1956,
+      "not-given": 1093,
+      "false": 1663
+    }
+  },
+  "checked_on": "2026-10-17",
+  "source": "DAMO-NLP-SG/SOUL",
+  "revision": "aef002daaa10d151457958a28b162fc996825023",
+  "paper": "https://aclanthology.org/2023.emnlp-main.538/",
+  "annotation": "Human-authored statements, labels and justifications; independent re-labeling and expert adjudication.",
+  "split_policy": "Native review IDs are disjoint. Four training rows share normalized review text with held-out data and are excluded.",
+  "conflicting_identical_review_statement_pairs": 1,
+  "limitations": "Opinion interpretation is pragmatic rather than strict formal entailment; some native labels can be debatable. Three recast examples inspected; this is not a row-by-row audit.",
+  "input_policy": "Review in state, statement in question; justification remains metadata only.",
+  "examples": [
+    {
+      "state": "About a year ago I got back into comic books. I haven't read many since I was a kid but I've still followed many storylines and happenings. When I decided I wanted to give it a go again, I remembered this place from when I was a kid. Now, I come back every week (sometimes a couple times a week) to pick up the new issue of whatever I'm reading at the time and maybe pick up some back issues. They have a great selection out on the floor and there's a good possibility that if you're looking for something that you don't see, they'll have it in their archives. Great place to hang out and meet some other comic fans. Great place to get advice on what's a good new read. Great place to make new friends.",
+      "instructions": "Assess this statement about the reviewer's opinions as true, false, or not given based on the review.\nThe reviewer said the place was potential for finding new friends and sharing ideas.",
+      "criteria": [
+        "true according to the review",
+        "false according to the review",
+        "not addressed by the review"
+      ],
+      "label": 0
+    },
+    {
+      "state": "This effort was like a glitzy TV movie...I don't recall this ever being released in theaters...If so, it must've died a quick death. Watching the DVD, in the comfort of our bedroom, it was obvious this film was meant for not much more...Ed Lauter an art critic with a greed streak? What a fun turn that must've been...I haven't seen Ed since \"The Longest Yard\"...Everyone else pretty much acted by the numbers, led by Baldwin, except for Pompeo...She had zero charisma and seemed to be sleepwalking thru most of the picture...Pompeo's daughter had one dimension...she played every scene like a lovable little puppy...slowest line delivery of any 3 year old I've seen yet...\n\nThe chase scenes gave my wife and I headaches...too much quick-cutting and angle-bashing...If you 're going to shoot a chase scene in Barcelona, you might want a few WIDE shots to exploit the beauty of your backdrop, right? The whole story was pretty implausible and far-fetched, but hey, we liked it better than \"The Life Aquatic...\"",
+      "instructions": "Assess this statement about the reviewer's opinions as true, false, or not given based on the review.\nThe reviewer was satisfied with Ellen Pompeo's performance.",
+      "criteria": [
+        "true according to the review",
+        "false according to the review",
+        "not addressed by the review"
+      ],
+      "label": 1
+    },
+    {
+      "state": "This movie has a very hard-to-swallow premise, even by this genre's standards. We are asked to accept not only that a record played backwards can bring a dead man back to life, but that the record also contains hidden messages aimed SPECIFICALLY at one kid, when the singer had no connection to the boy when he was alive, and of course no way of knowing at whose hands the record would end up. Anyway, the film is fun for a while, but eventually the silliness and the pointlessness reign supreme. If they were really trying to create a new Freddy-like horror icon, they were way off: the villain here has no personality, no motivation, and no variety. (*1/2)",
+      "instructions": "Assess this statement about the reviewer's opinions as true, false, or not given based on the review.\nThe reviewer is satisfied with the villain character.",
+      "criteria": [
+        "true according to the review",
+        "false according to the review",
+        "not addressed by the review"
+      ],
+      "label": 1
+    }
+  ],
+  "duplicate_policy": "Exclude both labels of the one contradictory identical review/statement pair; deduplicate repeated decisions with held-out priority."
+}

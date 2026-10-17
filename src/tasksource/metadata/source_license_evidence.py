@@ -5,6 +5,13 @@ Keys are task families, shared by their visual classification/MC views.
 """
 
 SOURCE_LICENSE_EVIDENCE = {
+    'soul': {'license': 'mit (publisher); original review terms', 'license_use': 'unspecified', 'checked': '2026-10-17',
+        'scope': 'Publisher declares MIT for SOUL annotations; third-party Yelp/IMDb review rights are not established by that declaration.',
+        'url': 'https://huggingface.co/datasets/DAMO-NLP-SG/SOUL',
+        'additional_urls': ['https://aclanthology.org/2023.emnlp-main.538/']},
+    'checkthat2024': {'license': 'unknown', 'license_use': 'unspecified', 'checked': '2026-10-17',
+        'scope': 'No English data license found in the pinned task README, archive or Hub card. No license inferred from baseline code.',
+        'url': 'https://gitlab.com/checkthat_lab/clef2024-checkthat-lab/-/tree/3508f4a847b4471135e407c6ec73f9aef39f450f/task1/data'},
     'ems-mcqa': {'license': 'mit', 'license_use': 'commercial', 'checked': '2026-10-17',
         'scope': 'Publisher-declared MIT for the released public practice-question subset; source websites remain identified per row. Expert review covered 100 questions, not every training label.',
         'url': 'https://huggingface.co/datasets/Xueren/EMS-MCQA',

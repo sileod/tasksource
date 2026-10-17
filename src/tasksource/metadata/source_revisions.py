@@ -1,6 +1,8 @@
 """Reviewed source snapshots; keep opaque revision IDs out of task annotations."""
 
 SOURCE_REVISIONS = {
+    'OpenFact/CLEF24-CheckThat-Task1-en-all': 'c02a329c67e4a9201f8bc450f3c5033a60398176',
+    "DAMO-NLP-SG/SOUL": "aef002daaa10d151457958a28b162fc996825023",
     "Xueren/EMS-MCQA": "dd0a05836786cb8c2de489916b13505531323d8e",
     "tasksource/shapeworld-grounding": "fe3756236e56d627072f4809a04ee962f4b92af4",
     "tasksource/flickr30k-grounding": "024250d93aabffb523589bec658b2a3bf0406bd3",

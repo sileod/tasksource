@@ -1,4 +1,4 @@
-576 English tasks. Load one with `load_task(id)`; the annotations are in [tasks.py](src/tasksource/tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
+578 English tasks. Load one with `load_task(id)`; the annotations are in [tasks.py](src/tasksource/tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
 
 Browse the [example catalog](docs/examples.md): one real example per task.
 
@@ -580,6 +580,8 @@ Browse the [example catalog](docs/examples.md): one real example per task.
 | 574 | [procedural-choices/reasoning_gym](src/tasksource/tasks.py#L3697) | MultipleChoice | [reasoning-core/procedural-choices](https://hf.co/datasets/reasoning-core/procedural-choices) |  |
 | 575 | [procedural-choices/reasoning_core](src/tasksource/tasks.py#L3697) | MultipleChoice | [reasoning-core/procedural-choices](https://hf.co/datasets/reasoning-core/procedural-choices) |  |
 | 576 | [ems-mcqa](src/tasksource/tasks.py#L3724) | MultipleChoice | [Xueren/EMS-MCQA](https://hf.co/datasets/Xueren/EMS-MCQA) | ✓ |
+| 577 | [soul](src/tasksource/tasks.py#L3734) | Classification | [DAMO-NLP-SG/SOUL](https://hf.co/datasets/DAMO-NLP-SG/SOUL) | ✓ |
+| 578 | [checkthat2024/check-worthiness](src/tasksource/tasks.py#L3746) | Classification | [OpenFact/CLEF24-CheckThat-Task1-en-all](https://hf.co/datasets/OpenFact/CLEF24-CheckThat-Task1-en-all) | ✓ |
 
 ## Soft labels
 

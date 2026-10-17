@@ -1,0 +1,105 @@
+{
+  "task": "checkthat2024",
+  "native_rows": {
+    "train": 22501,
+    "dev": 1032,
+    "dev_test": 318,
+    "test": 341
+  },
+  "retained_rows": {
+    "train": 22384,
+    "dev": 1031,
+    "dev_test": 318
+  },
+  "labels": {
+    "train": {
+      "0": 16989,
+      "1": 5395
+    },
+    "dev": {
+      "0": 793,
+      "1": 238
+    },
+    "dev_test": {
+      "0": 210,
+      "1": 108
+    }
+  },
+  "checked_on": "2026-10-17",
+  "source": "OpenFact/CLEF24-CheckThat-Task1-en-all",
+  "revision": "c02a329c67e4a9201f8bc450f3c5033a60398176",
+  "official": {
+    "project": "checkthat_lab/clef2024-checkthat-lab",
+    "revision": "3508f4a847b4471135e407c6ec73f9aef39f450f"
+  },
+  "source_checks": {
+    "train": {
+      "rows": 22501,
+      "official_id_text_match": true,
+      "official_label_match": true,
+      "hub_labels": {
+        "0": 17088,
+        "1": 5413
+      }
+    },
+    "dev": {
+      "rows": 1032,
+      "official_id_text_match": true,
+      "official_label_match": true,
+      "hub_labels": {
+        "0": 794,
+        "1": 238
+      }
+    },
+    "dev_test": {
+      "rows": 318,
+      "official_id_text_match": true,
+      "official_label_match": true,
+      "hub_labels": {
+        "0": 210,
+        "1": 108
+      }
+    },
+    "test": {
+      "rows": 341,
+      "official_id_text_match": true,
+      "official_label_match": false,
+      "hub_labels": {
+        "9": 341
+      }
+    }
+  },
+  "policy": "Use native label_ct, never derived label_true/verdict/quality. Exclude unlabeled test and curated/model-derived aliases; preserve dev_test under its native name, dev becomes validation. Deduplicate identical texts with held-out priority and exclude contradictory duplicate labels.",
+  "limitations": "Text-only check-worthiness includes subjective prioritization and occasional context-dependent debate fragments. No truth verification is implied.",
+  "license": "Unspecified: no English data license found in the pinned release or Hub card.",
+  "examples": [
+    {
+      "state": "Obviously it has a lot to do with interest rates --",
+      "instructions": "Based only on this text, is the claim worth prioritizing for fact-checking? Judge check-worthiness, rather than whether the claim is true.",
+      "criteria": [
+        "not worth prioritizing for fact-checking",
+        "worth prioritizing for fact-checking"
+      ],
+      "label": 0
+    },
+    {
+      "state": "Of the nine million people put to work in new jobs since I've been in office, 1.3 million of those has been among black Americans, and another million among those who speak Spanish.",
+      "instructions": "Based only on this text, is the claim worth prioritizing for fact-checking? Judge check-worthiness, rather than whether the claim is true.",
+      "criteria": [
+        "not worth prioritizing for fact-checking",
+        "worth prioritizing for fact-checking"
+      ],
+      "label": 1
+    },
+    {
+      "state": "Now maybe it's better just to get together and sit down and talk.",
+      "instructions": "Based only on this text, is the claim worth prioritizing for fact-checking? Judge check-worthiness, rather than whether the claim is true.",
+      "criteria": [
+        "not worth prioritizing for fact-checking",
+        "worth prioritizing for fact-checking"
+      ],
+      "label": 0
+    }
+  ],
+  "coarse_review": "Three native Jev examples inspected: interest-rate fragment not prioritized; numerical employment claim prioritized; conversational suggestion not prioritized. Question, criteria and native gold align."
+}

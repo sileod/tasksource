@@ -3729,3 +3729,28 @@ ems_mcqa = MultipleChoice(inputs='question', choices_list=lambda r:[c[2:].strip(
         source_url=r['link'],level=r['level'],category=r['category'],native_answer=r['answer'],
         explanation=r['explanation'],annotation_origin='collected practice-test questions; human proofreading'),
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['Xueren/EMS-MCQA']})
+
+
+soul = Classification('review_text','statement',labels='label',dataset_name='DAMO-NLP-SG/SOUL',
+    task_id='soul',complete_splits=False,
+    label_values={'true':'true according to the review','false':'false according to the review',
+                  'not-given':'not addressed by the review'},
+    pre_process=lambda d:_unique_text_splits(_document_holdouts(d,lambda r:_text_hash(r['review_text'])),
+        lambda r:(_text_hash(r['review_text']),_text_hash(r['statement'])),'label'),
+    question="Assess this statement about the reviewer's opinions as true, false, or not given based on the review.\n{sentence2}",
+    metadata=lambda r:_decision_metadata(r['rid']+':'+_text_hash(r['sentence2']),r['rid'],
+        justification=r['justification'],annotation_origin='human statements and labels; independent validation and expert adjudication'),
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['DAMO-NLP-SG/SOUL']})
+
+
+checkthat2024__check_worthiness = Classification('text',labels='label_ct',
+    dataset_name='OpenFact/CLEF24-CheckThat-Task1-en-all',task_id='checkthat2024/check-worthiness',
+    splits=('train','dev',None),complete_splits=False,
+    label_values={0:'not worth prioritizing for fact-checking',1:'worth prioritizing for fact-checking'},
+    pre_process=lambda d:_unique_text_splits(DatasetDict({s:d[s] for s in ('train','dev','dev_test')}),
+        lambda r:_text_hash(r['text']),'label_ct'),
+    question='Based only on this text, is the claim worth prioritizing for fact-checking? Judge check-worthiness, rather than whether the claim is true.',
+    metadata=lambda r:_decision_metadata(str(r['sentence_id']),str(r['file_id']),
+        native_split=r['original_split'],line_number=r['line_number'],speaker=r['speaker'],
+        annotation_origin='native CLEF 2024 English check-worthiness labels; verified against the official release'),
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['OpenFact/CLEF24-CheckThat-Task1-en-all']})

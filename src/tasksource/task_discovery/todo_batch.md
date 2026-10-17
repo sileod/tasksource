@@ -286,3 +286,9 @@ After WebLINX and Flickr30k Entities:
 
 - EMS-MCQA: implemented directly from `Xueren/EMS-MCQA` as `ems-mcqa`; 12,805 / 1,828 / 3,669 eligible native train/validation/test rows. Full choices preserved; multi-answer, duplicate/malformed and positional options excluded. Collection aliases excluded. Native Hub loading and exact-gold Jev smoke passed; three recast examples inspected. `full` append queued as `v2026.10.17.1`; `default` updates at its next rebuild.
 - SOUL and CLEF 2024 CheckThat check-worthiness remain separate, user-curated next sources, pending native label/split and source/recast review.
+
+### SOUL and CheckThat — 2026-10-17
+
+- SOUL: accepted directly from the original Hub source; 8,827 / 1,481 / 4,712 native train/validation/test decisions after review-overlap and duplicate/conflict filtering. Human opinion judgments, not formal NLI. Three recast examples read; rationales remain metadata.
+- CheckThat 2024 English: accepted directly from OpenFact's Hub conversion after every train/dev/dev-test ID, text and native label matched the official pinned TSVs. Retain 22,384 / 1,031 / 318 decisions; dev becomes validation and dev_test retains its native name. Hub test labels are all placeholder 9 and excluded, along with Russian and model-curated aliases. Three recast examples read; labels concern check-worthiness, not truth.
+- Both use existing Classification, native splits and shared loading; no repackaging needed. License limitations are recorded explicitly. Queue the protocol full append as v2026.10.17.2 after EMS; default changes at its next rebuild.
