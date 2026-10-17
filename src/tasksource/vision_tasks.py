@@ -757,3 +757,10 @@ flickr30k__box = VisualMultipleChoice(
     metadata='metadata', pre_process=grouped_mc_rows,
     question='Which box corresponds to the phrase marked [PHRASE] in the caption? Boxes are [x1, y1, x2, y2] with coordinates from 0 to 1000 over the displayed image, x rightward and y downward.',
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/flickr30k-grounding'],'streaming':True})
+
+
+shapeworld__box = VisualMultipleChoice(
+    dataset_name='tasksource/shapeworld-grounding', task_id='shapeworld/box', choices_list='choices_list',
+    metadata='metadata', pre_process=grouped_mc_rows,
+    question='Which box contains the requested shape? Boxes are [x1, y1, x2, y2] with coordinates from 0 to 1000 over the displayed image, x rightward and y downward.',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/shapeworld-grounding'],'streaming':True})

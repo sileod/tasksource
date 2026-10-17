@@ -278,3 +278,6 @@ After WebLINX and Flickr30k Entities:
 - ShapeWorld: native MIT renderer/scene boxes validated on pilot images. CPU build targets 100k training QAs plus 1k per held-out split. Spatial references must disambiguate repeated color/shape descriptions. Publication waits for full checks.
 - CLEVR-Ref+: official prebuilt archive currently returns 404; no matching directly usable Hub source found. Continue looking for a faithful prebuilt release before considering expensive scene regeneration.
 - EMS-MCQA: next after grounding; original paper reports human-collected practice questions and a 100-item EMT expert review, with 13,021 public training questions. Check native multi-answer and option-reference cases before mapping to single-choice decisions.
+
+- SOUL (`DAMO-NLP-SG/SOUL`): user-requested next after EMS-MCQA (2026-10-17). Review-conditioned true/false/not-given classification; verify human annotation, native training split and review-ID separation. Prefer direct Hub loading.
+- CLEF 2024 CheckThat check-worthiness: user-requested next after SOUL (2026-10-17). Find the official English training distribution, verify native labels and preserve official evaluation splits; exclude evaluation-only subsets.

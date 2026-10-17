@@ -1,6 +1,7 @@
 """Reviewed source snapshots; keep opaque revision IDs out of task annotations."""
 
 SOURCE_REVISIONS = {
+    "tasksource/shapeworld-grounding": "fe3756236e56d627072f4809a04ee962f4b92af4",
     "tasksource/flickr30k-grounding": "024250d93aabffb523589bec658b2a3bf0406bd3",
     "tasksource/refcoco-grounding": "4746222a3d41f2717308d66b7ae2d14766d0619e",
     "tasksource/spatial-dise": "6d597407f3b15b86cf2c323373ac9bf1c5065da9",

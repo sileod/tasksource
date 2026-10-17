@@ -92,5 +92,26 @@
       "audit_image": "/tmp/shapeworld-full-audit-2.png"
     }
   ],
-  "visual_review": "Three full-build examples inspected: green pentagon, green square above magenta ellipse (repeated green squares require the relation), and red circle. Visible referents agree with native gold boxes. Coarse sample only."
+  "visual_review": "Three full-build examples inspected: green pentagon, green square above magenta ellipse (repeated green squares require the relation), and red circle. Visible referents agree with native gold boxes. Coarse sample only.",
+  "load_task_checks": [
+    {
+      "task": "shapeworld/box",
+      "recast": null,
+      "splits": {
+        "train": 2,
+        "validation": 2,
+        "test": 2
+      }
+    },
+    {
+      "task": "shapeworld/box",
+      "recast": "jev",
+      "splits": {
+        "train": 2,
+        "validation": 2,
+        "test": 2
+      }
+    }
+  ],
+  "som_jev_gold_alignment": "pass for the procedural grounding view"
 }
