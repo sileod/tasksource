@@ -3699,3 +3699,33 @@ procedural_choices = MultipleChoice(inputs='prompt',choices_list='options',label
     task_id='procedural-choices/{config_name}',preserve_choices=True,pre_process=_procedural_choices,
     metadata=lambda r:_decision_metadata(r['id'],r['id'],task=r['task'],level=r['level'],annotation_origin='procedural'),
     load_dataset_kwargs={'revision':'8b19ab6a5b85aab38f7cf8dc13b9ffa35c56aac3'})
+
+
+def _ems_rejection(row):
+    """Single-answer native MC only; positional choices cannot survive permutation."""
+    answer,choices=row['answer'],row['choices']
+    if not re.fullmatch('[a-z]',answer):return 'multiple_or_invalid_answer'
+    if not 0<=ord(answer)-ord('a')<len(choices):return 'invalid_gold_index'
+    if not row['question'].strip() or len(choices)<2:return 'empty_question_or_choices'
+    if any(not re.match(fr'(?i)^{chr(97+i)}[.)]\s*\S',c) for i,c in enumerate(choices)):
+        return 'invalid_option_prefix'
+    if len({_text_hash(c[2:]) for c in choices})!=len(choices):return 'duplicate_choices'
+    references=r'(?i)\bof (?:the )?(?:above|below)\b|\b(?:option|choice)\s+[a-f]\b|\b[a-f]\s+(?:and|or)\s+[a-f]\b'
+    if any(re.search(references,c[2:]) for c in choices):return 'positional_option_reference'
+
+
+def _ems_rows(dataset):
+    native=DatasetDict({s:dataset[s] for s in ('train','validation','test')})
+    native=native.filter(lambda r:_ems_rejection(r) is None)
+    return _unique_text_splits(native,lambda r:_text_hash(r['question']),
+        lambda r:_text_hash(r['choices'][ord(r['answer'])-ord('a')][2:]))
+
+
+ems_mcqa = MultipleChoice(inputs='question', choices_list=lambda r:[c[2:].strip() for c in r['choices']],
+    labels=lambda r:ord(r['answer'])-ord('a'), dataset_name='Xueren/EMS-MCQA', task_id='ems-mcqa',
+    preserve_choices=True, complete_splits=False, pre_process=_ems_rows,
+    question='Which answer correctly answers this emergency medical services question?',
+    metadata=lambda r:_decision_metadata(_text_hash(r['inputs']),_text_hash(r['inputs']),
+        source_url=r['link'],level=r['level'],category=r['category'],native_answer=r['answer'],
+        explanation=r['explanation'],annotation_origin='collected practice-test questions; human proofreading'),
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['Xueren/EMS-MCQA']})

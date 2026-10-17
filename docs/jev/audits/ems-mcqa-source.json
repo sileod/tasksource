@@ -53,8 +53,8 @@
       }
     }
   },
-  "checked_on": "2026-10-16",
-  "status": "source screened; catalog conversion queued after grounding",
+  "checked_on": "2026-10-17",
+  "status": "native single-answer view implemented; publication pending",
   "annotation_provenance": "Collected practice-test questions, human proofreading and subject labels; paper reports an EMT expert review of 100 stratified questions. This does not establish expert verification of every training row.",
   "paper": "https://arxiv.org/html/2511.10900v1",
   "source_card": "https://huggingface.co/datasets/Xueren/EMS-MCQA",
@@ -64,5 +64,68 @@
     "Exclude native multi-answer records from a single-choice view; validate sequential option prefixes.",
     "Handle option references before deterministic permutation; keep source URL, level, category and rationale in metadata only."
   ],
-  "review_scope": "Mechanical scan of all native train/validation/test records; three deterministic random training examples read. No exhaustive clinical correctness review."
+  "review_scope": "Mechanical scan of all native train/validation/test records; three deterministic random training examples read. No exhaustive clinical correctness review.",
+  "conversion_counts": {
+    "train": {
+      "eligible": 12805,
+      "positional_option_reference": 196,
+      "duplicate_choices": 7,
+      "multiple_or_invalid_answer": 5,
+      "invalid_option_prefix": 8
+    },
+    "validation": {
+      "eligible": 1828,
+      "positional_option_reference": 29,
+      "multiple_or_invalid_answer": 1,
+      "duplicate_choices": 1,
+      "invalid_option_prefix": 1
+    },
+    "test": {
+      "eligible": 3669,
+      "positional_option_reference": 49,
+      "multiple_or_invalid_answer": 1,
+      "duplicate_choices": 2
+    }
+  },
+  "retained_splits": {
+    "train": 12805,
+    "validation": 1828,
+    "test": 3669
+  },
+  "load_task_jev_smoke": "pass; native splits, full choice counts and no rationale in state",
+  "recast_examples": [
+    {
+      "state": "what is the main laryngeal cartilage?",
+      "instructions": "Which answer correctly answers this emergency medical services question?",
+      "criteria": [
+        "cricoid",
+        "arytenoid",
+        "thyroid",
+        "tracheal"
+      ],
+      "label": 2
+    },
+    {
+      "state": "what is the management for a patient with a head injury and an unusual respiratory pattern?",
+      "instructions": "Which answer correctly answers this emergency medical services question?",
+      "criteria": [
+        "intubation and hyperventilation to reduce icp",
+        "positioning in the left lateral recumbent position",
+        "rapid transport because of possible brain stem injury",
+        "administration of oxygen and methylprednisolone"
+      ],
+      "label": 2
+    },
+    {
+      "state": "you are called to the home of an elderly female who is having difficulty breathing. she has a history of chronic congestive heart failure (chf). which of the following are common medications associated with patients with chronic chf?",
+      "instructions": "Which answer correctly answers this emergency medical services question?",
+      "criteria": [
+        "thiamine, nitroglycerine, and albuterol",
+        "cortisone, digoxin, and theophylline",
+        "furosemide, calcium, and nitroglycerine",
+        "diuretics, potassium, and digoxin"
+      ],
+      "label": 3
+    }
+  ]
 }

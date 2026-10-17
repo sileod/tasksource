@@ -5,6 +5,10 @@ Keys are task families, shared by their visual classification/MC views.
 """
 
 SOURCE_LICENSE_EVIDENCE = {
+    'ems-mcqa': {'license': 'mit', 'license_use': 'commercial', 'checked': '2026-10-17',
+        'scope': 'Publisher-declared MIT for the released public practice-question subset; source websites remain identified per row. Expert review covered 100 questions, not every training label.',
+        'url': 'https://huggingface.co/datasets/Xueren/EMS-MCQA',
+        'additional_urls': ['https://arxiv.org/html/2511.10900v1']},
     'shapeworld': {'license': 'mit', 'license_use': 'commercial', 'checked': '2026-10-17',
         'scope': 'Native ShapeWorld renderer and generated geometric scenes; decisions verified on saved scene models.',
         'url': 'https://github.com/AlexKuhnle/ShapeWorld/blob/e720bf46e57fc01326d04d639fa6133d9c12158f/LICENSE'},

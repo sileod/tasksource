@@ -4,6 +4,12 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource-jev-typed-decisions v2026.10.17.1
+
+- `full`: add EMS-MCQA’s native single-answer emergency-medical practice questions, preserving all options, including five- and six-choice questions.
+- Exclude multi-answer records, malformed or duplicate options and positional references that cannot survive option shuffling. Retain native source splits; exclude collection-wide aliases from loading into the task.
+- Keep source website, certification/category and rationale in metadata, separate from model inputs. `default` receives the task at its next full rebuild.
+
 ## tasksource-jev-typed-decisions v2026.10.17
 
 - `vision`: add ShapeWorld object-box grounding, capped at 20k training rows from the 100k-QA procedural mirror. Native scene models verify every unique target and spatial relation.

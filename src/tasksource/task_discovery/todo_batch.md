@@ -281,3 +281,8 @@ After WebLINX and Flickr30k Entities:
 
 - SOUL (`DAMO-NLP-SG/SOUL`): user-requested next after EMS-MCQA (2026-10-17). Review-conditioned true/false/not-given classification; verify human annotation, native training split and review-ID separation. Prefer direct Hub loading.
 - CLEF 2024 CheckThat check-worthiness: user-requested next after SOUL (2026-10-17). Find the official English training distribution, verify native labels and preserve official evaluation splits; exclude evaluation-only subsets.
+
+### English additions — 2026-10-17
+
+- EMS-MCQA: implemented directly from `Xueren/EMS-MCQA` as `ems-mcqa`; 12,805 / 1,828 / 3,669 eligible native train/validation/test rows. Full choices preserved; multi-answer, duplicate/malformed and positional options excluded. Collection aliases excluded. Native Hub loading and exact-gold Jev smoke passed; three recast examples inspected. `full` append queued as `v2026.10.17.1`; `default` updates at its next rebuild.
+- SOUL and CLEF 2024 CheckThat check-worthiness remain separate, user-curated next sources, pending native label/split and source/recast review.

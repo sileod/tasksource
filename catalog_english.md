@@ -1,4 +1,4 @@
-575 English tasks. Load one with `load_task(id)`; the annotations are in [tasks.py](src/tasksource/tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
+576 English tasks. Load one with `load_task(id)`; the annotations are in [tasks.py](src/tasksource/tasks.py). Evaluation benchmarks are in [eval_only.py](src/tasksource/eval_only.py); other excluded annotations are in [parked.py](src/tasksource/parked.py).
 
 Browse the [example catalog](docs/examples.md): one real example per task.
 
@@ -579,6 +579,7 @@ Browse the [example catalog](docs/examples.md): one real example per task.
 | 573 | [tabmwp](src/tasksource/tasks.py#L3683) | MultipleChoice | [tasksource/tabmwp](https://hf.co/datasets/tasksource/tabmwp) |  |
 | 574 | [procedural-choices/reasoning_gym](src/tasksource/tasks.py#L3697) | MultipleChoice | [reasoning-core/procedural-choices](https://hf.co/datasets/reasoning-core/procedural-choices) |  |
 | 575 | [procedural-choices/reasoning_core](src/tasksource/tasks.py#L3697) | MultipleChoice | [reasoning-core/procedural-choices](https://hf.co/datasets/reasoning-core/procedural-choices) |  |
+| 576 | [ems-mcqa](src/tasksource/tasks.py#L3724) | MultipleChoice | [Xueren/EMS-MCQA](https://hf.co/datasets/Xueren/EMS-MCQA) | ✓ |
 
 ## Soft labels
 
