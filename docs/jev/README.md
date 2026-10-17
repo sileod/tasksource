@@ -57,6 +57,27 @@ PYTHONPATH=.:src python scripts/build_jev_dataset.py --output build/jev-smoke --
   --max-rows 50 --max-rows-eval 20 --finalize
 ```
 
+## Task-specific prompts
+
+Most Jev rows phrase their decision with a few generic instructions over generic fields (`text_A`/`text_B`).
+[`src/tasksource/jev/task_prompts.json`](../../src/tasksource/jev/task_prompts.json) adds, per source, natural field
+names and reviewed task-specific instructions tagged by style (`directive`, `question`, `explained`, `terse`, `conversational`, `annotation`,
+`grounded`, `system`) plus label definitions for fixed label sets. `task_style` renders a row with them, inline after
+the instruction or as a JSON state, and `describe_options` renders options as `label: definition`.
+Consumers choose the styles, layouts and share of rows, so phrasings can be compared in controlled runs. The published
+data is unchanged.
+
+Regenerate after a release that adds sources (any OpenAI-compatible endpoint, see `tasksource.llm`):
+
+```bash
+PYTHONPATH=../litlm:.:src python scripts/build_jev_task_prompts.py --data <dir of train-*.parquet> --revision <sha>
+```
+
+An LLM drafts the prompts from a seeded sample of published rows; a review pass renders real rows with each
+instruction and keeps only those that ask what the gold option answers, fit every option, match their style and do not
+leak the answer. The sidecar records the data revision, model and prompt hash; `build/jev-task-prompts/reviews.jsonl`
+keeps every verdict.
+
 ## Vision
 
 `--vision` builds the multimodal `vision` config. `--license-use commercial` excludes unresolved and
