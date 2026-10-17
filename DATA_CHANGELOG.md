@@ -6,7 +6,7 @@ concise bullets on what changed in the data. `tasksource-jev-typed-decisions` re
 
 ## tasksource-jev-typed-decisions v2026.10.17.2
 
-- `full`: add SOUL review-conditioned opinion comprehension and English CLEF 2024 CheckThat check-worthiness classification. Use the native human labels, explicit questions and readable criteria.
+- `full`: add SOUL review-conditioned opinion comprehension and English CLEF 2024 CheckThat check-worthiness classification. Use the native human labels, explicit questions and readable criteria. Published 35,901 new rows (9,310 SOUL; 26,591 CheckThat), bringing `full` to 2,550,012 training rows.
 - SOUL keeps justifications in metadata; exclude review-text overlap across splits and contradictory duplicate decisions. CheckThat excludes unlabeled test placeholders and model-derived aliases, preserving native dev-test evaluation separately.
 - Mark unresolved original-review and CheckThat data terms explicitly. Existing shards and evaluation stay unchanged; `default` receives the tasks at its next full rebuild.
 

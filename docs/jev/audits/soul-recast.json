@@ -68,5 +68,11 @@
       "label": 1
     }
   ],
-  "duplicate_policy": "Exclude both labels of the one contradictory identical review/statement pair; deduplicate repeated decisions with held-out priority."
+  "duplicate_policy": "Exclude both labels of the one contradictory identical review/statement pair; deduplicate repeated decisions with held-out priority.",
+  "publication": {
+    "release": "v2026.10.17.2",
+    "revision": "6f92aad877d3afc19b2ea6dcf2b7270d9d4e0147",
+    "training_rows": 9310,
+    "previous_shards_verified_unchanged": 18
+  }
 }

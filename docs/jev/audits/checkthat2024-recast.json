@@ -106,5 +106,11 @@
     "url": "https://checkthat.gitlab.io/clef2024/pdf/CLEF_2024_CheckThat_LNCS_draft.pdf",
     "section": "4.1",
     "finding": "English debate sentences were annotated by human annotators; the overview cites Arslan et al. (2020). Native Hub labels match the official train/dev/dev-test labels exactly."
+  },
+  "publication": {
+    "release": "v2026.10.17.2",
+    "revision": "6f92aad877d3afc19b2ea6dcf2b7270d9d4e0147",
+    "training_rows": 26591,
+    "previous_shards_verified_unchanged": 18
   }
 }
