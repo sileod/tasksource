@@ -29,7 +29,7 @@ LICENSE_USES = ("commercial", "non-commercial", "unspecified")
 PERMISSIVE_LICENSE = re.compile(
     r"^(apache|mit|bsd|cc0|cc-by-\d|cc-by-sa-\d|odc-by|odbl|pddl|afl|gpl|lgpl|agpl|artistic|cdla|ecl|epl|mpl"
     r"|isc|unlicense|wtfpl|bigscience|openrail|creativeml-openrail|llama2|llama3)")
-NON_COMMERCIAL_LICENSE = re.compile(r"(^|-)nc(-|$)|academic|research")
+NON_COMMERCIAL_LICENSE = re.compile(r"(^|-)nc(-|$)|non-?commercial|academic|research", re.I)
 DPI_LICENSE_USE = {"All": "commercial", "NC": "non-commercial", "Acad": "non-commercial"}
 
 

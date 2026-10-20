@@ -362,3 +362,36 @@ def test_without_excess_empty_keeps_order_and_share():
     kept, dropped = without_excess_empty(rows, 0.2, 0, "x")
     assert sum(not r["answers"][0]["null"] for r in kept) == 10 and len(kept) == 12 and dropped == 38
     assert [r["i"] for r in kept] == sorted(r["i"] for r in kept)
+
+
+@pytest.mark.parametrize('groups', [[[2]], [[-1]], [[0], [0]]])
+def test_indexed_annotations_reject_invalid_or_overlapping_tokens(groups):
+    from tasksource.tasks import _indexed_span_tags
+    with pytest.raises(ValueError):
+        _indexed_span_tags(['one', 'two'], groups, 'error')
+
+
+def test_indexed_annotations_split_discontinuous_groups():
+    from tasksource.tasks import _indexed_span_tags
+    assert _indexed_span_tags(['a', 'b', 'c', 'd'], [[0, 1, 3]], 'x') == ['B-x', 'I-x', 'O', 'B-x']
+
+
+def test_vuamc_drops_empty_words_after_labeling():
+    from tasksource.tasks import _vuamc_row
+    row = _vuamc_row({'words': ['', 'flows', 'down'], 'met_type': [{'type': 'mrw/met', 'word_indices': [1]}]})
+    assert row == {'tokens': ['flows', 'down'], 'ner_tags': ['B-metaphor', 'O']}
+
+
+def test_noncommercial_sources_are_flagged():
+    from tasksource import task_licenses
+    from tasksource.licenses import card_license_use
+    assert set(task_licenses(['vuamc', 'fce/errors']).license_use) == {'non-commercial'}
+    assert set(task_licenses(['qaconv'], extractive=True).license_use) == {'non-commercial'}
+    assert card_license_use('BNC non-commercial terms') == 'non-commercial'
+    assert card_license_use('apache-2.0') == 'commercial'
+
+
+def test_qaconv_empty_answer_is_unanswerable():
+    from tasksource.extractive_tasks import _qaconv_answers
+    assert _qaconv_answers({'answers': {'text': [''], 'answer_start': [0]}}) == {'text': [], 'answer_start': []}
+    assert _qaconv_answers({'answers': {'text': ['x'], 'answer_start': [3]}}) == {'text': ['x'], 'answer_start': [3]}

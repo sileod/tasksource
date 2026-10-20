@@ -23,6 +23,7 @@ REVISIONS = {
     'next-tat/TAT-QA': 'c96247f5077eac447f63527fd3dcfdc58bb56d6a',
     'megagonlabs/subjqa': '60308110d69c81899c19a5297cfc943d615a11d9',
 
+    'MahmoudAbdelWahed/QAConvSQuAD': '53fe038f448caab5b6e6363f82bd9706963a4f69',
     'ibm-research/duorc': '2de12436b8945030c283bf4af83925d60efe10c6',
     'stanfordnlp/concurrentqa': '2cc9db602b10a561026c905403a641422f066369',
     'WorkInTheDark/FairytaleQA': 'fad16faf261459cc55d6d516b6fb3e68c0ddd5a6',
@@ -422,3 +423,16 @@ timeqa = ExtractiveQA(dataset_name='hugosousa/TimeQA', task_id='timeqa', complet
     pre_process=_timeqa_spans, max_mismatch=0,
     metadata=lambda r: {'id': r['idx'], 'level': r['level']},
     load_dataset_kwargs=_kwargs('hugosousa/TimeQA'))
+
+
+# QAConv (emails, court and NPR/CNN interview transcripts, BC3 threads) in SQuAD format;
+# unanswerables (an empty string at offset 0) become empty answers. Media transcripts are
+# research-only: non-commercial.
+def _qaconv_answers(row):
+    pairs = [(t, s) for t, s in zip(row['answers']['text'], row['answers']['answer_start']) if t.strip()]
+    return {'text': [t for t, _ in pairs], 'answer_start': [s for _, s in pairs]}
+
+
+qaconv = ExtractiveQA(dataset_name='MahmoudAbdelWahed/QAConvSQuAD', task_id='qaconv', complete_splits=False,
+    answers=_qaconv_answers,
+    metadata=lambda r: {'id': r['id'], 'title': r['title']}, load_dataset_kwargs=_kwargs('MahmoudAbdelWahed/QAConvSQuAD'))

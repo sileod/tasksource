@@ -1,6 +1,8 @@
 """Reviewed source snapshots; keep opaque revision IDs out of task annotations."""
 
 SOURCE_REVISIONS = {
+    'matejklemen/vuamc': '5dc18c35d193b521d14b909c2a74fccffff9cca8',
+    'matejklemen/clc_fce': '3addf05ff8386ac91b1e44c50ca54beda0e9197a',
     'zj88zj/SCIERC': '12d862d8ca8a4bf002ced41da993d07b25e36b2d',
     'alimurtaza0411/toxic_spans': '0065758abce08865f5666d734f0377da956c3d8b',
 

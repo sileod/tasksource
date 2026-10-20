@@ -28,6 +28,8 @@ EXCLUDED_QA = {"newsqa"}
 # Multi-span answers are sets (every span is part of the answer), not alternatives.
 LIST_QA = {"quoref", "cuad/spans", "qasper/spans"}
 NER = {
+    "vuamc": "Every metaphorically used word or phrase in the text, as written.",
+    "fce/errors": "Every erroneous word or phrase in the text, as written.",
     "semeval2014/laptop-aspects": "Every laptop aspect term in the review, as written.",
     "scierc/entities": None,
     "toxic-spans": "Every toxic span in the text, as written.",
@@ -168,11 +170,13 @@ pass, as extraction models (e.g. Cloudflare's Clairic) are asked. {rows}
   alternative gold spans; of a `list` field, every item.
 - Extractive question answering (SQuAD 2.0, AdversarialQA, Natural Questions, HotpotQA, Quoref, MuSiQue,
   DROP single-span, DuoRC, ConcurrentQA, FairytaleQA, QuAC with history, windowed CUAD, TyDi English,
-  Qasper spans, PolicyQA, SubjQA, COVID-QA, TimeQA, TAT-QA text spans and ROPES) groups the questions
+  Qasper spans, PolicyQA, SubjQA, COVID-QA, TimeQA, TAT-QA text spans, ROPES and QAConv) groups the questions
   asked about one context, up to {max_fields} fields per row.
   Named entities (CoNLL-2003, OntoNotes, WNUT-17, Few-NERD, NCBI-disease, JNLPBA, acronyms, FiNER-139
   and astronomy, biomedical, financial, software, legal, GUM, Twitter and English opinion-target sources)
   ask for every entity type of the dataset, or the types present plus absent ones up to {max_fields}.
+  Other span tagging (skills, keyphrases, aspect terms, toxic spans, metaphors, learner errors) asks for
+  every span of its kind.
   Entity texts are the source tokens joined by spaces.
 - Native splits, except those without released labels; evaluation texts that also occur in training are dropped. Each source is capped at
   {max_rows:,} training rows and {max_rows_eval:,} per evaluation split; at most {max_empty:.0%} of an entity source's

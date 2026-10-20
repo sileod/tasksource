@@ -5,6 +5,15 @@ Keys are task families, shared by their visual classification/MC views.
 """
 
 SOURCE_LICENSE_EVIDENCE = {
+    'qaconv': {'license': 'research only (media transcripts)', 'license_use': 'non-commercial', 'checked': '2026-10-20',
+        'url': 'https://github.com/salesforce/QAConv#ethics',
+        'scope': 'Crowdworker questions and span answers over conversations. The publisher states the media transcripts are for research only and cannot be used commercially; SQuAD-format Hub upload with native splits.'},
+    'vuamc': {'license': 'BNC non-commercial terms', 'license_use': 'non-commercial', 'checked': '2026-10-20',
+        'url': 'https://huggingface.co/datasets/matejklemen/vuamc/blob/884b7444f79ed8f90b22ab80ee2469eb65b697cf/README.md',
+        'scope': 'Expert MIPVU metaphor annotations over BNC excerpts. Non-commercial use subject to BNC Licence and inclusion of the complete original header with distributed copies; not a CC grant.'},
+    'fce': {'license': 'non-commercial research and education', 'license_use': 'non-commercial', 'checked': '2026-10-20',
+        'url': 'https://huggingface.co/datasets/matejklemen/clc_fce/blob/e4b0c1de4dc1e9c9ee9370c603c7010dcd255e3d/clc_fce.py',
+        'scope': 'Human gold Cambridge Learner Corpus FCE corrections, BEA19 v2.1 M2 native splits. Publisher loader states non-commercial research and educational purposes; source token error spans only.'},
     'semeval2014': {'license': 'unspecified', 'license_use': 'unspecified', 'checked': '2026-10-20', 'url': 'https://alt.qcri.org/semeval2014/task4/', 'scope': 'Human laptop review aspect-term spans, native train/test; no explicit dataset-specific grant established for this Hub distribution.'},
     'scierc': {'license': 'unspecified', 'license_use': 'unspecified', 'checked': '2026-10-20', 'url': 'https://nlp.cs.washington.edu/sciIE/', 'scope': 'Human scientific abstract entity annotations. This original-format Hub upload preserves native splits; no dataset-specific license established.'},
     'toxic-spans': {'license': 'cc0-1.0', 'license_use': 'commercial', 'checked': '2026-10-20', 'url': 'https://github.com/ipavlopoulos/toxic_spans', 'scope': 'Original human SemEval-2021 Task 5 character-span training and test CSVs; Hub reupload checked against original distribution. Upstream repository includes the distributed files under CC0 1.0.'},

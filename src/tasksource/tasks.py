@@ -1017,6 +1017,58 @@ bc2gm = TokenClassification(dataset_name='spyysalo/bc2gm_corpus', task_id='bc2gm
     tokens='tokens', labels='ner_tags', complete_splits=False,
     load_dataset_kwargs={'revision': SOURCE_REVISIONS['spyysalo/bc2gm_corpus']})
 
+# Non-commercial human token annotations, using existing immutable Hub Parquet views.
+def _indexed_span_tags(tokens, groups, kind):
+    """BIO for source-index groups; discontinuous groups become separate contiguous runs."""
+    tags = ['O'] * len(tokens)
+    for indices in groups:
+        previous = None
+        for i in sorted(set(indices)):
+            if not 0 <= i < len(tokens) or not tokens[i]:
+                raise ValueError('Annotation index is outside the nonempty source tokens')
+            if tags[i] != 'O':
+                raise ValueError('Overlapping token annotations')
+            tags[i] = f"{'I' if previous is not None and i == previous + 1 else 'B'}-{kind}"
+            previous = i
+    return tags
+
+
+def _vuamc_row(row):
+    # Empty words encode vocal/pause metadata, not text. Remap *after* labeling.
+    words = row['words']
+    groups = [m['word_indices'] for m in row['met_type'] if m['type'].startswith('mrw/')]
+    tags = _indexed_span_tags(words, groups, 'metaphor')
+    return {'tokens': [w for w in words if w], 'ner_tags': [t for w, t in zip(words, tags) if w]}
+
+
+def _vuamc_tokens(dataset):
+    return _named_ner_tags(dataset.map(_vuamc_row))
+
+
+vuamc = TokenClassification(dataset_name='matejklemen/vuamc', task_id='vuamc',
+    tokens='tokens', labels='ner_tags', complete_splits=False, splits=('train', None, None),
+    pre_process=_vuamc_tokens, metadata=lambda r: {'document_name': r['document_name']},
+    load_dataset_kwargs={'revision': SOURCE_REVISIONS['matejklemen/vuamc']})
+
+
+def _fce_row(row):
+    # Insertions have no incorrect source token: keep their count, never label a neighbor.
+    corrections = row['corrections']
+    return {'ner_tags': _indexed_span_tags(row['src_tokens'],
+                [c['idx_src'] for c in corrections], 'error'),
+            'unanchored_insertions': sum(not c['idx_src'] for c in corrections)}
+
+
+def _fce_tokens(dataset):
+    return _named_ner_tags(dataset.map(_fce_row))
+
+
+fce__errors = TokenClassification(dataset_name='matejklemen/clc_fce', task_id='fce/errors',
+    tokens='src_tokens', labels='ner_tags', complete_splits=False, pre_process=_fce_tokens,
+    metadata=lambda r: {'unanchored_insertions': r['unanchored_insertions']},
+    load_dataset_kwargs={'revision': SOURCE_REVISIONS['matejklemen/clc_fce']})
+
+
 # Extraction v3: native human-annotated token views. Parquet subsets are explicit
 # because the conversion branch has no config card and otherwise mixes domains.
 def _crossner(domain):
