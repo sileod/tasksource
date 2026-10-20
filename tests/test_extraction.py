@@ -450,3 +450,51 @@ def test_friendsqa_locate_rejects_out_of_range_utterance_id():
     context, offsets = _friendsqa_context([['A']], [u['utterance'] for u in utterances])
     answer = {'utterance_id': 7, 'inner_start': 0, 'inner_end': 0, 'is_speaker': False, 'answer_text': 'hello'}
     assert _friendsqa_locate(context, utterances, offsets, answer) is None
+
+
+
+
+def test_maven_token_row_bio_and_overlap_drop():
+    from tasksource.tasks import _maven_token_row
+    text = "A huge earthquake and tsunami hit the coast."
+    row = {'input': text, 'output': {'json_structures': {
+        'Catastrophe': [{'trigger': {'text': 'earthquake', 'start': 7, 'end': 17}, 'arguments': []},
+                        {'trigger': {'text': 'tsunami', 'start': 22, 'end': 29}, 'arguments': []}],
+        'Impact': [{'trigger': {'text': 'huge earthquake', 'start': 2, 'end': 17}, 'arguments': []}],
+    }}}
+    out = _maven_token_row(row)
+    assert out['aligned'] is True
+    assert out['tokens'][:6] == ['A', 'huge', 'earthquake', 'and', 'tsunami', 'hit']
+    # 'earthquake' overlaps the earlier-sorted (lower start) 'huge earthquake' trigger and is
+    # dropped; 'huge earthquake' (Impact) and 'tsunami' (Catastrophe) are both kept.
+    assert out['ner_tags'][:5] == ['O', 'B-Impact', 'I-Impact', 'O', 'B-Catastrophe']
+
+
+def test_maven_token_row_misaligned_span_is_unaligned():
+    from tasksource.tasks import _maven_token_row
+    text = "Earthquakezone hit Java."
+    row = {'input': text, 'output': {'json_structures': {
+        'Catastrophe': [{'trigger': {'text': 'quake', 'start': 5, 'end': 10}, 'arguments': []}],
+    }}}
+    out = _maven_token_row(row)
+    assert out == {'tokens': [], 'ner_tags': [], 'aligned': False}
+
+
+def test_slurp_token_row_contiguous_and_cross_type_overlap():
+    from tasksource.tasks import _slurp_token_row
+    row = {'metadata': json.dumps({'tokens': ['set', 'an', 'alarm', 'for', 'six', 'am'],
+        'entities': [{'span': [4, 5], 'type': 'time'}, {'span': [1, 3], 'type': 'device_type'},
+                     {'span': [4], 'type': 'date'}]})}
+    out = _slurp_token_row(row)
+    assert out['tokens'] == ['set', 'an', 'alarm', 'for', 'six', 'am']
+    assert out['ner_tags'] == ['O', 'O', 'O', 'O', 'B-time', 'I-time']  # the non-contiguous
+    # 'device_type' span and the overlapping 'date' span (same token as 'time') are both dropped.
+
+
+def test_ebm_nlp_tags_binarizes_subtype_codes():
+    from tasksource.tasks import _ebm_nlp_tags
+    row = {'Tokens': ['99', 'patients', 'with', 'H.', 'pylori', 'infection'],
+           'Participants_Labels': [0, 1, 0, 2, 2, 2]}
+    out = _ebm_nlp_tags('Participants_Labels', 'participant description')(row)
+    assert out['ner_tags'] == ['O', 'B-participant description', 'O',
+                                'B-participant description', 'I-participant description', 'I-participant description']

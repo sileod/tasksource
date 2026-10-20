@@ -1,6 +1,7 @@
 """Reviewed source snapshots; keep opaque revision IDs out of task annotations."""
 
 SOURCE_REVISIONS = {
+    'araag2/EBM_NLP': '0429237dbef648aab8c49dddd0b45cc2ad0c7178',
     'matejklemen/vuamc': '5dc18c35d193b521d14b909c2a74fccffff9cca8',
     'matejklemen/clc_fce': '3addf05ff8386ac91b1e44c50ca54beda0e9197a',
     'zj88zj/SCIERC': '12d862d8ca8a4bf002ced41da993d07b25e36b2d',

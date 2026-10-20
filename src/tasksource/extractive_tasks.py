@@ -35,6 +35,10 @@ REVISIONS = {
     'allenai/quoref': '41fed5bc359f81c2f28259e6572cd1f9aab26e29',
     'bdsaglam/musique': '4413770150c3e120306e7cff6e1ec6364a6ae006',
     'ucinlp/drop': '95cda593fae71b60b5b19f82de3fcf3298c1239c',
+    # Script-only dataset; read from its Hub parquet-conversion commit, the 'multidoc2dial'
+    # config's own files (the convert branch's merged default config mixes document_domain and
+    # dialogue_domain schemas and fails to load).
+    'IBM/multidoc2dial': 'd79fa05a7bc89f2fae00b8ac6d82593771b74c96',
 }
 
 
@@ -448,3 +452,18 @@ molweni = ExtractiveQA(dataset_name='tasksource/molweni', task_id='molweni', max
 
 friendsqa = ExtractiveQA(dataset_name='tasksource/friendsqa', task_id='friendsqa', max_mismatch=0, complete_splits=False,
     metadata='metadata', load_dataset_kwargs=_kwargs('tasksource/friendsqa'))
+
+
+# IBM/multidoc2dial is a script-only loader; its 'multidoc2dial' config (the paper's grounding
+# reading-comprehension task) is read from the Hub's own parquet conversion of that one config,
+# already SQuAD-formatted (question = dialogue history joined with [SEP], context = the grounding
+# document, answers = the verbatim grounded span). Native train/validation/test kept as published.
+def _multidoc2dial_kwargs():
+    revision = REVISIONS['IBM/multidoc2dial']
+    return {'data_files': {split: f'hf://datasets/IBM/multidoc2dial@{revision}/multidoc2dial/{split}/0000.parquet'
+                            for split in ('train', 'validation', 'test')}}
+
+
+multidoc2dial = ExtractiveQA(dataset_name='parquet', task_id='multidoc2dial', complete_splits=False,
+    metadata=lambda r: {'id': r['id'], 'title': r['title'], 'domain': r['domain']},
+    load_dataset_kwargs=_multidoc2dial_kwargs())

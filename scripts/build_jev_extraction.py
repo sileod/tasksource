@@ -53,6 +53,12 @@ NER = {
     "finer-139": "Every amount reported as {name}, as written.",
     "wiesp2022-ner": None, "broad-twitter-corpus": None, "finer-ord": None, "anatem": None,
     "stackoverflow-ner": None, "legallens-ner": None, "gum-ner": None, "opinion-target/en": None,
+
+    "maven/triggers": "Every word or phrase that triggers a {name} event, as written.",
+    "slurp/slots": None,
+    "ebm-nlp/participants": "Every {name} in the trial abstract, as written.",
+    "ebm-nlp/interventions": "Every {name} in the trial abstract, as written.",
+    "ebm-nlp/outcomes": "Every {name} in the trial abstract, as written.",
 }
 SPLITS = ("train", "validation", "test")
 
@@ -170,11 +176,12 @@ pass, as extraction models (e.g. Cloudflare's Clairic) are asked. {rows}
   alternative gold spans; of a `list` field, every item.
 - Extractive question answering (SQuAD 2.0, AdversarialQA, Natural Questions, HotpotQA, Quoref, MuSiQue,
   DROP single-span, DuoRC, ConcurrentQA, FairytaleQA, QuAC with history, windowed CUAD, TyDi English,
-  Qasper spans, PolicyQA, SubjQA, COVID-QA, TimeQA, TAT-QA text spans, ROPES and QAConv) groups the questions
-  asked about one context, up to {max_fields} fields per row.
-  Named entities (CoNLL-2003, OntoNotes, WNUT-17, Few-NERD, NCBI-disease, JNLPBA, acronyms, FiNER-139
-  and astronomy, biomedical, financial, software, legal, GUM, Twitter and English opinion-target sources)
-  ask for every entity type of the dataset, or the types present plus absent ones up to {max_fields}.
+  Qasper spans, PolicyQA, SubjQA, COVID-QA, TimeQA, TAT-QA text spans, ROPES, QAConv and MultiDoc2Dial
+  grounding) groups the questions asked about one context, up to {max_fields} fields per row.
+  Named entities (CoNLL-2003, OntoNotes, WNUT-17, Few-NERD, NCBI-disease, JNLPBA, acronyms, FiNER-139,
+  MAVEN event triggers, SLURP slots, EBM-NLP PICO spans, and astronomy, biomedical, financial, software,
+  legal, GUM, Twitter and English opinion-target sources) ask for every entity type of the dataset, or
+  the types present plus absent ones up to {max_fields}.
   Other span tagging (skills, keyphrases, aspect terms, toxic spans, metaphors, learner errors) asks for
   every span of its kind.
   Entity texts are the source tokens joined by spaces.

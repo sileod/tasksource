@@ -1166,6 +1166,36 @@ biored__entities = TokenClassification(dataset_name='gyorilab/BioRED', task_id='
     load_dataset_kwargs={'revision': SOURCE_REVISIONS['gyorilab/BioRED']})
 
 
+# EBM-NLP PICO spans: the 'source' config gives, per coarse aspect, one per-token label
+# column with fine (hierarchical) subtype codes (0 = outside any span). The three aspects'
+# spans overlap heavily (an intervention mention sits inside an outcome sentence, etc.), so
+# each aspect is its own binary span-identification task, never merged into one tag sequence
+# that could only keep one aspect per token. Train is MTurk worker spans aggregated by the
+# original authors; test is the paper's physician-adjudicated gold set (both human-labeled).
+def _ebm_nlp_tags(column, kind):
+    def convert(row):
+        tags, previous = ['O'] * len(row['Tokens']), False
+        for i, value in enumerate(row[column]):
+            tags[i] = (f'I-{kind}' if previous else f'B-{kind}') if value else 'O'
+            previous = bool(value)
+        return {'tokens': row['Tokens'], 'ner_tags': tags}
+    return convert
+
+
+def _ebm_nlp(column, kind, task_id):
+    return TokenClassification(dataset_name='araag2/EBM_NLP', config_name='source', task_id=task_id,
+        tokens='tokens', labels='ner_tags', complete_splits=False,
+        pre_process=lambda ds: _named_ner_tags(ds.map(_ebm_nlp_tags(column, kind),
+            remove_columns=['id', 'PMID', 'Split', 'Quality', 'Abstract', 'Tokens',
+                             'Participants_Labels', 'Interventions_Labels', 'Outcomes_Labels'])),
+        load_dataset_kwargs={'revision': SOURCE_REVISIONS['araag2/EBM_NLP']})
+
+
+ebm_nlp__participants = _ebm_nlp('Participants_Labels', 'participant description', 'ebm-nlp/participants')
+ebm_nlp__interventions = _ebm_nlp('Interventions_Labels', 'intervention', 'ebm-nlp/interventions')
+ebm_nlp__outcomes = _ebm_nlp('Outcomes_Labels', 'outcome', 'ebm-nlp/outcomes')
+
+
 def _bigbio_entity_row(row):
     # Reconstruct the document at its published offsets, preserving passage gaps.
     pieces = [(a, b, text) for p in row['passages']
@@ -3437,6 +3467,47 @@ maven__event = Classification('sentence1',sentence2=None,labels='labels',dataset
     pre_process=lambda d:_flatten_text(d,_maven_triggers,paired=False),metadata='metadata',complete_splits=False,
     question='What type of event does the marked [TARGET] trigger express?',
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['mneb/maven']})
+
+
+_MAVEN_TOKEN_RE=re.compile(r'\w+|[^\w\s]')
+
+def _maven_token_row(row):
+    """BIO trigger tags over a deterministic regex tokenization; triggers whose character span
+    does not land on token boundaries, and triggers overlapping an already-kept one, are dropped
+    (both are rare: regex tokenization split mid-word by MAVEN's own tokenizer, and double-annotated
+    overlapping triggers of different event types)."""
+    text=row['input'];spans=[]
+    for event_type,events in row['output']['json_structures'].items():
+        for event in events or []:
+            t=event['trigger'];start,end=t['start'],t['end']
+            if not 0<=start<end<=len(text) or text[start:end]!=t['text']:
+                raise ValueError('MAVEN trigger does not match the document')
+            spans.append((start,end,event_type))
+    occupied=[False]*len(text);kept=[]
+    for start,end,event_type in sorted(spans):
+        if any(occupied[start:end]):continue
+        occupied[start:end]=[True]*(end-start)
+        kept.append((start,end,event_type))
+    tokens=[(m.group(),m.start(),m.end()) for m in _MAVEN_TOKEN_RE.finditer(text)]
+    starts={s:i for i,(_,s,_) in enumerate(tokens)};ends={e:i for i,(_,_,e) in enumerate(tokens)}
+    tags=['O']*len(tokens)
+    for start,end,event_type in kept:
+        if start not in starts or end not in ends:return {'tokens':[],'ner_tags':[],'aligned':False}
+        first,last=starts[start],ends[end]
+        tags[first]=f'B-{event_type}'
+        for i in range(first+1,last+1):tags[i]=f'I-{event_type}'
+    return {'tokens':[t[0] for t in tokens],'ner_tags':tags,'aligned':True}
+
+
+def _maven_tokens(dataset):
+    dataset=dataset.map(_maven_token_row,remove_columns=['input','output','schema'])
+    dataset=dataset.filter(lambda aligned:aligned,input_columns='aligned')
+    return _named_ner_tags(dataset)
+
+
+maven__triggers = TokenClassification(dataset_name='mneb/maven', task_id='maven/triggers',
+    tokens='tokens', labels='ner_tags', complete_splits=False, pre_process=_maven_tokens,
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['mneb/maven']})
 empathetic_dialogues__emotion = Classification(lambda r:r['prompt'].replace('_comma_',','),labels='context',
     dataset_name='facebook/empathetic_dialogues',task_id='empathetic-dialogues/emotion',complete_splits=False,
     pre_process=lambda d:_unique_text_splits(d,lambda r:r['prompt'],'context'),
@@ -3665,6 +3736,28 @@ def _slurp_slots(row):
     return _slot_decisions(text,meta['entities'],meta)
 
 
+def _slurp_token_row(row):
+    """BIO slot tags over SLURP's own word tokens; a span must be contiguous word indices
+    (true of every SLURP slot) and not overlap another slot's span, else it is dropped."""
+    meta=json.loads(row['metadata']);tokens=meta['tokens']
+    groups={}
+    for entity in meta['entities']:
+        span=entity['span']
+        if span and span==list(range(span[0],span[-1]+1)):
+            groups.setdefault(entity['type'],[]).append(span)
+    tags=['O']*len(tokens)
+    for kind,spans in groups.items():
+        for tag_index,tag in enumerate(_indexed_span_tags(tokens,spans,kind)):
+            if tag!='O':
+                if tags[tag_index]!='O':continue  # overlapping slots of different types: drop later one
+                tags[tag_index]=tag
+    return {'tokens':tokens,'ner_tags':tags}
+
+
+def _slurp_tokens(dataset):
+    return _named_ner_tags(dataset.map(_slurp_token_row,remove_columns=['sentence1','sentence2','labels']))
+
+
 def _top_slots(row):
     words=[];stack=[];entities=[]
     for token in re.findall(r'\[(?:IN|SL):[A-Z_]+|\]|[^\s\[\]]+',row['semantic_parse']):
@@ -3688,6 +3781,9 @@ slurp__slot_type = Classification('sentence1',labels='labels',dataset_name='task
     task_id='slurp/slot-type',metadata='metadata',complete_splits=False,
     pre_process=lambda d:_unique_text_splits(_flatten_text(d,_slurp_slots,paired=False),lambda r:r['sentence1'],'labels'),
     question='What semantic slot does the marked [TARGET] expression fill in this utterance?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/slurp']})
+slurp__slots = TokenClassification(dataset_name='tasksource/slurp', task_id='slurp/slots',
+    tokens='tokens', labels='ner_tags', complete_splits=False, pre_process=_slurp_tokens,
     load_dataset_kwargs={'revision':SOURCE_REVISIONS['tasksource/slurp']})
 topv2__slot_type = Classification('sentence1',labels='labels',dataset_name='WillHeld/top_v2',
     task_id='topv2/slot-type',metadata='metadata',complete_splits=False,splits=['train','eval','test'],
