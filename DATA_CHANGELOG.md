@@ -4,6 +4,10 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource-jev-typed-decisions v2026.10.20.6
+
+- `extraction`: add TAB personal-information masking (court cases; every mention that must be masked to anonymise a person, by type, from annotator majority) and WDC-PAVE product attributes (human-verified values or null per attribute of the category); 82 sources, 388,909 training, 27,720 validation and 30,257 test rows.
+
 ## tasksource/procedural-typed-decisions v2026.10.20
 
 - Regenerated from the reasoning-core Jev generators: same configs, questions and levels. Five configs keep identical states (`event_triggered_execution`, `goal_directed_planning`, `graph_navigation`, `instruction_execution`, `record_eligibility`); the others have revised renderings and sampling, and `arithmetic` asks graded probabilities only when they are not close to one half. `provenance.json` records the generator commit.
