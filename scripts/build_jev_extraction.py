@@ -83,6 +83,14 @@ def capped(rows, limit, seed, name):
     return random.Random(f"{seed}:{name}").sample(rows, limit)
 
 
+def without_excess_empty(rows, share, seed, name):
+    """Rows whose every field is null, subsampled to at most ``share`` of the result; order kept."""
+    empty = [i for i, r in enumerate(rows) if all(a["null"] for a in r["answers"])]
+    keep = min(len(empty), int(share / (1 - share) * (len(rows) - len(empty))))
+    dropped = set(empty) - set(random.Random(f"{seed}:{name}:empty").sample(empty, keep))
+    return [r for i, r in enumerate(rows) if i not in dropped], len(dropped)
+
+
 def build(args):
     qa = [t for t in __import__("tasksource").list_tasks(extractive=True).id if t not in EXCLUDED_QA]
     tasks = [(t, True) for t in qa] + [(t, False) for t in NER]
@@ -108,6 +116,10 @@ def build(args):
         for split, items in list(rows.items()):  # hidden test labels (all O / no answers): not evaluation data
             if not any(not a["null"] for r in items for a in r["answers"]):
                 counts[f"{split}_unlabeled_dropped"] = len(rows.pop(split))
+        if not extractive:  # texts without any entity: at most --max-empty-share of a split
+            for split, items in rows.items():
+                rows[split], counts[f"{split}_empty_dropped"] = without_excess_empty(
+                    items, args.max_empty_share, args.seed, f"{task}:{split}")
         train_states = {r["state"] for r in rows.get("train", [])}
         for split, items in rows.items():
             if split != "train":
@@ -135,7 +147,7 @@ def build(args):
     dataset = DatasetDict({s: rows.shuffle(seed=args.seed) for s, rows in dataset.items()})
     args.output.mkdir(parents=True, exist_ok=True)
     manifest = {"sources": report, "excluded": sorted(EXCLUDED_QA), "max_rows": args.max_rows,
-                "max_rows_eval": args.max_rows_eval, "max_fields": args.max_fields, "seed": args.seed,
+                "max_rows_eval": args.max_rows_eval, "max_fields": args.max_fields, "max_empty_share": args.max_empty_share, "seed": args.seed,
                 "rows": {s: len(r) for s, r in dataset.items()},
                 "revisions": {t: __import__("tasksource").task_provenance(t, extractive=e).get("revision") for t, e in tasks}}
     (args.output / "build-manifest.json").write_text(json.dumps(manifest, indent=1) + "\n")
@@ -163,7 +175,8 @@ pass, as extraction models (e.g. Cloudflare's Clairic) are asked. {rows}
   ask for every entity type of the dataset, or the types present plus absent ones up to {max_fields}.
   Entity texts are the source tokens joined by spaces.
 - Native splits, except those without released labels; evaluation texts that also occur in training are dropped. Each source is capped at
-  {max_rows:,} training rows and {max_rows_eval:,} per evaluation split. `license`/`license_use` per row;
+  {max_rows:,} training rows and {max_rows_eval:,} per evaluation split; at most {max_empty:.0%} of an entity source's
+  texts mention none of its entity types. `license`/`license_use` per row;
   `metadata` keeps source question ids or entity types. See [build-manifest.json](build-manifest.json).
 
 The same question answering sources load in SQuAD format for `AutoModelForQuestionAnswering` with
@@ -204,7 +217,8 @@ def push(dataset, manifest, args):
                     repo_id=args.repo_id, repo_type="dataset", commit_message="Add extraction build manifest")
     rows = ", ".join(f"{n:,} {s}" for s, n in manifest["rows"].items())
     card = CARD.format(repo=args.repo_id, rows=f"Rows: {rows}.", max_fields=args.max_fields,
-                       max_rows=args.max_rows, max_rows_eval=args.max_rows_eval)
+                       max_rows=args.max_rows, max_rows_eval=args.max_rows_eval,
+                       max_empty=manifest["max_empty_share"])
     api.upload_file(path_or_fileobj=card.encode(), path_in_repo="extraction/README.md", repo_id=args.repo_id,
                     repo_type="dataset", commit_message="Document the extraction config")
     from huggingface_hub import hf_hub_download
@@ -225,6 +239,8 @@ def main():
     parser.add_argument("--max-rows", type=int, default=10_000)
     parser.add_argument("--max-rows-eval", type=int, default=500)
     parser.add_argument("--max-fields", type=int, default=8)
+    parser.add_argument("--max-empty-share", type=float, default=0.2,
+                        help="entity sources: share of texts without any entity kept per split")
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--repo-id", default=REPO)
     parser.add_argument("--push", action="store_true")

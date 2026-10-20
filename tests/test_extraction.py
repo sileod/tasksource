@@ -352,3 +352,13 @@ def test_extractive_empty_filtered_evaluation_split():
     out = task(DatasetDict(train=rows, validation=rows.select([])))
     assert len(out['train']) == 1 and len(out['validation']) == 0
     assert out['train'].features == out['validation'].features
+
+
+def test_without_excess_empty_keeps_order_and_share():
+    from scripts.build_jev_extraction import without_excess_empty
+    full = {"answers": [{"null": False, "values": [{"text": "a", "start": 0, "end": 1}]}]}
+    empty = {"answers": [{"null": True, "values": []}]}
+    rows = [dict(full, i=i) if i % 5 == 0 else dict(empty, i=i) for i in range(50)]
+    kept, dropped = without_excess_empty(rows, 0.2, 0, "x")
+    assert sum(not r["answers"][0]["null"] for r in kept) == 10 and len(kept) == 12 and dropped == 38
+    assert [r["i"] for r in kept] == sorted(r["i"] for r in kept)
