@@ -17,6 +17,7 @@ from pathlib import Path
 from datasets import Dataset, DatasetDict, Value
 from huggingface_hub import HfApi
 
+from tasksource.citation import card_section
 from tasksource.jev.extraction import FEATURES, check
 
 REPO_ID = "tasksource/procedural-extraction"
@@ -163,18 +164,7 @@ Levels 0 to 4 are drawn uniformly; `level` is a column. Mean per-field score by 
 `state` (the text), `fields` (`[{{name, type, instruction}}]`), `answers` (one per field: `{{null, values:
 [{{text, start, end}}]}}`, `state[start:end] == text`), `metadata` (JSON: level, state seed), `level`.
 
-## Citation
-
-```bibtex
-@inproceedings{{sileo-2024-tasksource,
-    title = "tasksource: A Large Collection of {{NLP}} tasks with a Structured Dataset Preprocessing Framework",
-    author = "Sileo, Damien",
-    booktitle = "Proceedings of the 2024 Joint International Conference on Computational Linguistics, Language Resources and Evaluation (LREC-COLING 2024)",
-    year = "2024",
-    url = "https://aclanthology.org/2024.lrec-main.1361",
-}}
-```
-"""
+{card_section(procedural=True)}"""
 
 
 def main():

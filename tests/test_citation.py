@@ -14,3 +14,11 @@ def test_adds_refreshes_and_keeps_original_citations():
     original = '# data\n\n## Citation\n\n```bibtex\n@dataset{orig2022, title = {Original}}\n```\n'
     both = with_citation(original)
     assert '@dataset{orig2022' in both and '## Citing tasksource' in both and with_citation(both) == both
+
+
+def test_procedural_cards_also_cite_reasoning_core():
+    from tasksource.citation import REASONING_CORE_BIBTEX
+    card = with_citation("# Card\n\nBody.\n", procedural=True)
+    assert BIBTEX in card and REASONING_CORE_BIBTEX in card
+    assert with_citation(card, procedural=True) == card
+    assert REASONING_CORE_BIBTEX not in with_citation("# Card\n")

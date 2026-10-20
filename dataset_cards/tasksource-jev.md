@@ -112,7 +112,7 @@ Visual annotation licenses may not cover third-party images. The visual license 
 
 ## Citation
 
-If you use tasksource, its standardized task annotations, or datasets derived from them in published research, please cite the tasksource paper (Sileo, LREC-COLING 2024).
+If you use tasksource, its standardized task annotations, or datasets derived from them in published research, please cite the tasksource paper (Sileo, LREC-COLING 2024). The procedural data is generated with Reasoning Core; please also cite the Reasoning Core paper (Sileo et al., 2026).
 
 ```bibtex
 @inproceedings{sileo-2024-tasksource,
@@ -126,5 +126,13 @@ If you use tasksource, its standardized task annotations, or datasets derived fr
     url = "https://aclanthology.org/2024.lrec-main.1361",
     doi = "10.63317/2h4pkr685mkq",
     pages = "15655--15684",
+}
+
+@article{sileo2026reasoning,
+  title={Reasoning Core: Designing Broad Procedural Data for Completion-Supervised Reasoning Training},
+  author={Sileo, Damien and Lacombe, Valentin and Kachler, Dimitri},
+  journal={arXiv preprint arXiv:2608.05148},
+  year={2026},
+  url={https://arxiv.org/abs/2608.05148}
 }
 ```
