@@ -101,3 +101,12 @@ listed in the script. It is rebuilt and replaced as a whole:
 ```bash
 PYTHONPATH=.:src python scripts/build_jev_extraction.py --output build/jev-extraction --push
 ```
+
+Procedural extraction sources (`procedural/...`) come from reasoning-core's extraction generators
+(`reasoning_core/tasks/jev/*_extraction.py`), published as `tasksource/procedural-extraction` and read at the
+revision pinned in `build_jev_extraction.py`. To change them, commit the generators in reasoning-core,
+recalibrate, republish from a clean checkout and update the pin:
+
+```bash
+PYTHONPATH=.:src:../reasoning-core python scripts/build_procedural_extraction.py --upload
+```

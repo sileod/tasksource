@@ -25,6 +25,11 @@ from tasksource.jev.extraction import FEATURES, ner_rows, qa_rows
 REPO = "tasksource/tasksource-jev-typed-decisions"
 # NewsQA's redistribution terms (Microsoft's NewsQA license over CNN articles) are unresolved.
 EXCLUDED_QA = {"newsqa"}
+# Procedural extraction (reasoning-core generators, scripts/build_procedural_extraction.py): one source per
+# generator, each capped like any other source, so equal shares. Pinned Hub snapshot of the published data.
+PROCEDURAL_REPO, PROCEDURAL_REVISION = "tasksource/procedural-extraction", "322a73a8f3d18aa8b666baf023cfe21f648cdd11"
+PROCEDURAL = ["record_field_extraction", "state_update_extraction", "conditional_list_extraction",
+              "log_query_extraction"]
 # Multi-span answers are sets (every span is part of the answer), not alternatives.
 LIST_QA = {"quoref", "cuad/spans", "qasper/spans"}
 NER = {
@@ -68,8 +73,18 @@ def row_id(row):
     return f"{row['source']}:{hashlib.sha256(key.encode()).hexdigest()[:16]}"
 
 
+def procedural_rows(task):
+    from datasets import load_dataset
+    config = task.split("/", 1)[1]
+    dataset = load_dataset(PROCEDURAL_REPO, config, revision=PROCEDURAL_REVISION)
+    return {split: [{**{k: v for k, v in r.items() if k != "level"}, "source": task} for r in dataset[split]]
+            for split in SPLITS if split in dataset}
+
+
 def source_rows(task, extractive, args):
     """``{split: [rows]}`` of one task, before capping."""
+    if extractive is None:
+        return procedural_rows(task)
     dataset = load_task(task, extractive=extractive)
     out = {}
     for split in SPLITS:
@@ -101,7 +116,7 @@ def without_excess_empty(rows, share, seed, name):
 
 def build(args):
     qa = [t for t in __import__("tasksource").list_tasks(extractive=True).id if t not in EXCLUDED_QA]
-    tasks = [(t, True) for t in qa] + [(t, False) for t in NER]
+    tasks = [(t, True) for t in qa] + [(t, False) for t in NER] + [(f"procedural/{t}", None) for t in PROCEDURAL]
     if args.tasks:
         tasks = [(t, e) for t, e in tasks if t in args.tasks]
     licenses = {}
@@ -110,6 +125,7 @@ def build(args):
         if ids:
             frame = task_licenses(ids, extractive=extractive, fresh=True)
             licenses.update({r.id: (r.license, r.license_use) for r in frame.itertuples()})
+    licenses.update({t: ("mit", "commercial") for t, e in tasks if e is None})
     splits, report = {s: [] for s in SPLITS}, {}
     for task, extractive in tasks:
         print(f"loading {task}", flush=True)
@@ -124,7 +140,7 @@ def build(args):
         for split, items in list(rows.items()):  # hidden test labels (all O / no answers): not evaluation data
             if not any(not a["null"] for r in items for a in r["answers"]):
                 counts[f"{split}_unlabeled_dropped"] = len(rows.pop(split))
-        if not extractive:  # texts without any entity: at most --max-empty-share of a split
+        if extractive is False:  # texts without any entity: at most --max-empty-share of a split
             for split, items in rows.items():
                 rows[split], counts[f"{split}_empty_dropped"] = without_excess_empty(
                     items, args.max_empty_share, args.seed, f"{task}:{split}")
@@ -157,7 +173,8 @@ def build(args):
     manifest = {"sources": report, "excluded": sorted(EXCLUDED_QA), "max_rows": args.max_rows,
                 "max_rows_eval": args.max_rows_eval, "max_fields": args.max_fields, "max_empty_share": args.max_empty_share, "seed": args.seed,
                 "rows": {s: len(r) for s, r in dataset.items()},
-                "revisions": {t: __import__("tasksource").task_provenance(t, extractive=e).get("revision") for t, e in tasks}}
+                "revisions": {t: PROCEDURAL_REVISION if e is None else
+                              __import__("tasksource").task_provenance(t, extractive=e).get("revision") for t, e in tasks}}
     (args.output / "build-manifest.json").write_text(json.dumps(manifest, indent=1) + "\n")
     dataset.save_to_disk(str(args.output / "dataset"))
     return dataset, manifest
@@ -184,6 +201,10 @@ pass, as extraction models (e.g. Cloudflare's Clairic) are asked. {rows}
   the types present plus absent ones up to {max_fields}.
   Other span tagging (skills, keyphrases, aspect terms, toxic spans, metaphors, learner errors) asks for
   every span of its kind.
+- Procedural extraction ([procedural-extraction](https://huggingface.co/datasets/tasksource/procedural-extraction),
+  sources `procedural/...`): person records with near-miss names and confusers, plan slots in force after a chat
+  of proposals and undos, conditional order lists after updates, and log queries, at difficulty levels 0 to 4;
+  spans and nulls exact by construction.
   Entity texts are the source tokens joined by spaces.
 - Native splits, except those without released labels; evaluation texts that also occur in training are dropped. Each source is capped at
   {max_rows:,} training rows and {max_rows_eval:,} per evaluation split; at most {max_empty:.0%} of an entity source's
