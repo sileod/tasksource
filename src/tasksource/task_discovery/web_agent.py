@@ -202,6 +202,15 @@ def session(brief, known, chat, max_steps=40, log=None):
     return (submitted or []) + extra, messages
 
 
+def safe_session(brief, known, chat, max_steps=40, log=None):
+    """A session whose endpoint keeps failing finds nothing; the other briefs and rounds go on."""
+    try:
+        return session(brief, known, chat, max_steps, log)
+    except (urllib.error.URLError, TimeoutError, KeyError) as error:
+        print(f'session failed ({error!r}): {brief[:80]}', flush=True)
+        return [], []
+
+
 def candidates(found, brief):
     """Hub repositories as canonical rows; other URLs as leads."""
     api, rows, leads = HfApi(), {}, []
@@ -240,7 +249,7 @@ def main():
             '\n\nAlready found by earlier rounds (do not resubmit; look elsewhere, with different queries and angles): '
             + ', '.join(found_names))
         with open(stem + '.tools.jsonl', 'a') as log, ThreadPoolExecutor(max_workers=4) as pool:  # ≤4: shared rate limit
-            results = list(pool.map(lambda brief: (brief, *session(prompt(brief), known, chat, args.max_steps, log)), args.brief))
+            results = list(pool.map(lambda brief: (brief, *safe_session(prompt(brief), known, chat, args.max_steps, log)), args.brief))
         new = 0
         for brief, found, messages in results:
             transcripts.append(dict(round=round_, brief=brief, messages=messages))
