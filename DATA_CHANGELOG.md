@@ -4,6 +4,12 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource-jev-typed-decisions v2026.10.20.1
+
+- `extraction`: add 18 sources, bringing it to 209,452 training, 14,065 validation and 13,842 test rows (719,489 training fields).
+- Extractive QA: DuoRC (SelfRC and ParaphraseRC, verbatim answers and native unanswerables), ConcurrentQA (Wikipedia and email), FairytaleQA (explicit answers).
+- Named entities: BC5CDR, BC2GM, AnatEM, TweetNER7, Broad Twitter Corpus, MIT Movie and Restaurant, CoNLL04, WIESP2022 astronomy, FiNER-ORD, StackOverflow-NER, LegalLensNER, GUM and English SemEval opinion targets. Twitter @-mentions are one entity.
+
 ## tasksource-jev-typed-decisions v2026.10.20
 
 - New `extraction` config (Clairic-style): a text with several typed fields (`text` or `list`), each answered by character spans of the text or null. 123,023 training, 7,316 validation and 5,413 test rows; 402,082 training fields.
