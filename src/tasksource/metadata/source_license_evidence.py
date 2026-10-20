@@ -5,6 +5,18 @@ Keys are task families, shared by their visual classification/MC views.
 """
 
 SOURCE_LICENSE_EVIDENCE = {
+    'ud/ewt': {'license': 'cc-by-sa-4.0', 'license_use': 'commercial', 'checked': '2026-10-20',
+        'url': 'https://github.com/UniversalDependencies/UD_English-EWT/blob/4a4d77f599ea53cc405f85d0cec4b2f14f81d42b/LICENSE.txt',
+        'scope': 'Human-corrected English Web Treebank basic dependencies; full-subtree answers derived procedurally. Native train/dev/test. Hub UD 2.18 data-only upload.'},
+    'ud/gum': {'license': 'cc-by-nc-sa-4.0', 'license_use': 'non-commercial', 'checked': '2026-10-20',
+        'url': 'https://github.com/UniversalDependencies/UD_English-GUM/blob/1fe635509c649e376dfb449d528424ab78f4eaee/LICENSE.txt',
+        'scope': 'Human-corrected Georgetown University Multilayer corpus basic dependencies. Mixed underlying text terms; aggregate non-commercial share-alike license. UD upload excludes separately licensed Reddit text.'},
+    'redocred': {'license': 'mit', 'license_use': 'commercial', 'checked': '2026-10-20',
+        'url': 'https://huggingface.co/datasets/tonytan48/Re-DocRED/blob/e0ab3489edfe72c968261bffed5243b6fefddd22/README.md',
+        'scope': 'Author upload of human-revised train/dev/test DocRED annotations; no train_distant. MIT card covers annotation distribution; Wikipedia documents retain source terms.'},
+    'conll2000': {'license': 'unspecified', 'license_use': 'unspecified', 'checked': '2026-10-20',
+        'url': 'https://www.clips.uantwerpen.be/conll2000/chunking/',
+        'scope': 'Chunk labels derived procedurally from human Penn Treebank WSJ parses; native sections 15-18 train and 20 test. No explicit corpus redistribution license established; Apache loader code is not a data license.'},
     'qaconv': {'license': 'research only (media transcripts)', 'license_use': 'non-commercial', 'checked': '2026-10-20',
         'url': 'https://github.com/salesforce/QAConv#ethics',
         'scope': 'Crowdworker questions and span answers over conversations. The publisher states the media transcripts are for research only and cannot be used commercially; SQuAD-format Hub upload with native splits.'},

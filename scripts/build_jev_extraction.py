@@ -31,8 +31,9 @@ PROCEDURAL_REPO, PROCEDURAL_REVISION = "tasksource/procedural-extraction", "322a
 PROCEDURAL = ["record_field_extraction", "state_update_extraction", "conditional_list_extraction",
               "log_query_extraction"]
 # Multi-span answers are sets (every span is part of the answer), not alternatives.
-LIST_QA = {"quoref", "cuad/spans", "qasper/spans", "tab/pii"}
+LIST_QA = {"quoref", "cuad/spans", "qasper/spans", "tab/pii", "ud/ewt", "ud/gum", "preco/mentions", "redocred/entities"}
 NER = {
+    "conll2000": "Every {name} chunk in the text, as written.",
     "vuamc": "Every metaphorically used word or phrase in the text, as written.",
     "fce/errors": "Every erroneous word or phrase in the text, as written.",
     "semeval2014/laptop-aspects": "Every laptop aspect term in the review, as written.",
@@ -217,6 +218,10 @@ pass, as extraction models (e.g. Cloudflare's Clairic) are asked. {rows}
   the types present plus absent ones up to {max_fields}.
   Other span tagging (skills, keyphrases, aspect terms, toxic spans, metaphors, learner errors) asks for
   every span of its kind.
+- Structural extraction uses English UD EWT/GUM dependency subtrees (`ud/...`), PreCo coreference
+  mention sets (`preco/mentions`), human-revised Re-DocRED relation targets (`redocred/entities`),
+  and CoNLL-2000 phrase chunks. UD fields select a unique head and keep full contiguous subtrees;
+  a missing dependent is null and a non-projective positive field is omitted.
 - Procedural extraction ([procedural-extraction](https://huggingface.co/datasets/tasksource/procedural-extraction),
   sources `procedural/...`): person records with near-miss names and confusers, plan slots in force after a chat
   of proposals and undos, conditional order lists after updates, and log queries, at difficulty levels 0 to 4;

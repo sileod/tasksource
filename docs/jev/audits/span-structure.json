@@ -1,0 +1,1827 @@
+{
+  "tasks": {
+    "ud/ewt": {
+      "splits": {
+        "test": {
+          "input_rows": 8271,
+          "extraction_rows": 1380,
+          "fields": 8271,
+          "null_fields": 5852,
+          "null_share": 0.707532
+        },
+        "train": {
+          "input_rows": 59951,
+          "extraction_rows": 10007,
+          "fields": 59951,
+          "null_fields": 41799,
+          "null_share": 0.697219
+        },
+        "validation": {
+          "input_rows": 8533,
+          "extraction_rows": 1423,
+          "fields": 8533,
+          "null_fields": 6110,
+          "null_share": 0.716044
+        }
+      },
+      "examples": [
+        {
+          "id": "ud/ewt:c21ac7447e4ae01a",
+          "source": "ud/ewt",
+          "split": "train",
+          "state": "A least your going.!",
+          "fields": [
+            {
+              "name": "subject",
+              "type": "list",
+              "instruction": "Every subject of 'going', including each dependent's full subtree, as written."
+            },
+            {
+              "name": "object",
+              "type": "list",
+              "instruction": "Every object of 'going', including each dependent's full subtree, as written."
+            },
+            {
+              "name": "indirect_object",
+              "type": "list",
+              "instruction": "Every indirect object of 'going', including each dependent's full subtree, as written."
+            },
+            {
+              "name": "oblique_modifier",
+              "type": "list",
+              "instruction": "Every oblique modifier of 'going', including each dependent's full subtree, as written."
+            },
+            {
+              "name": "clausal_complement",
+              "type": "list",
+              "instruction": "Every clausal complement of 'going', including each dependent's full subtree, as written."
+            },
+            {
+              "name": "open_clausal_complement",
+              "type": "list",
+              "instruction": "Every open clausal complement of 'going', including each dependent's full subtree, as written."
+            }
+          ],
+          "answers": [
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "you",
+                  "start": 8,
+                  "end": 11
+                }
+              ]
+            },
+            {
+              "null": true,
+              "values": []
+            },
+            {
+              "null": true,
+              "values": []
+            },
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "A least",
+                  "start": 0,
+                  "end": 7
+                }
+              ]
+            },
+            {
+              "null": true,
+              "values": []
+            },
+            {
+              "null": true,
+              "values": []
+            }
+          ],
+          "metadata": "{\"question_ids\": [\"answers-20111107193044AAvUYBv_ans-0014\", \"answers-20111107193044AAvUYBv_ans-0014\", \"answers-20111107193044AAvUYBv_ans-0014\", \"answers-20111107193044AAvUYBv_ans-0014\", \"answers-20111107193044AAvUYBv_ans-0014\", \"answers-20111107193044AAvUYBv_ans-0014\"]}"
+        },
+        {
+          "id": "ud/ewt:28b9d0449350ef95",
+          "source": "ud/ewt",
+          "split": "train",
+          "state": "I got so excited!!!!",
+          "fields": [
+            {
+              "name": "subject",
+              "type": "list",
+              "instruction": "Every subject of 'got', including each dependent's full subtree, as written."
+            },
+            {
+              "name": "object",
+              "type": "list",
+              "instruction": "Every object of 'got', including each dependent's full subtree, as written."
+            },
+            {
+              "name": "indirect_object",
+              "type": "list",
+              "instruction": "Every indirect object of 'got', including each dependent's full subtree, as written."
+            },
+            {
+              "name": "oblique_modifier",
+              "type": "list",
+              "instruction": "Every oblique modifier of 'got', including each dependent's full subtree, as written."
+            },
+            {
+              "name": "clausal_complement",
+              "type": "list",
+              "instruction": "Every clausal complement of 'got', including each dependent's full subtree, as written."
+            },
+            {
+              "name": "open_clausal_complement",
+              "type": "list",
+              "instruction": "Every open clausal complement of 'got', including each dependent's full subtree, as written."
+            }
+          ],
+          "answers": [
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "I",
+                  "start": 0,
+                  "end": 1
+                }
+              ]
+            },
+            {
+              "null": true,
+              "values": []
+            },
+            {
+              "null": true,
+              "values": []
+            },
+            {
+              "null": true,
+              "values": []
+            },
+            {
+              "null": true,
+              "values": []
+            },
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "so excited!!!!",
+                  "start": 6,
+                  "end": 20
+                }
+              ]
+            }
+          ],
+          "metadata": "{\"question_ids\": [\"answers-20111107193044AAvUYBv_ans-0005\", \"answers-20111107193044AAvUYBv_ans-0005\", \"answers-20111107193044AAvUYBv_ans-0005\", \"answers-20111107193044AAvUYBv_ans-0005\", \"answers-20111107193044AAvUYBv_ans-0005\", \"answers-20111107193044AAvUYBv_ans-0005\"]}"
+        }
+      ],
+      "provenance": {
+        "dataset": "universal-dependencies/universal_dependencies",
+        "config": "en_ewt",
+        "revision": "c3fed78df6b9f8cd27ed24cc7142e9eccf1e6703"
+      },
+      "license": {
+        "license": "other, cc-by-sa-4.0 (original source)",
+        "license_use": "commercial"
+      }
+    },
+    "ud/gum": {
+      "splits": {
+        "test": {
+          "input_rows": 7583,
+          "extraction_rows": 1267,
+          "fields": 7583,
+          "null_fields": 5219,
+          "null_share": 0.68825
+        },
+        "train": {
+          "input_rows": 56384,
+          "extraction_rows": 9418,
+          "fields": 56384,
+          "null_fields": 39408,
+          "null_share": 0.698922
+        },
+        "validation": {
+          "input_rows": 8026,
+          "extraction_rows": 1342,
+          "fields": 8026,
+          "null_fields": 5596,
+          "null_share": 0.697234
+        }
+      },
+      "examples": [
+        {
+          "id": "ud/gum:a9a5f51d2e756d50",
+          "source": "ud/gum",
+          "split": "train",
+          "state": "\"What are you doing?",
+          "fields": [
+            {
+              "name": "subject",
+              "type": "list",
+              "instruction": "Every subject of 'doing', including each dependent's full subtree, as written."
+            },
+            {
+              "name": "object",
+              "type": "list",
+              "instruction": "Every object of 'doing', including each dependent's full subtree, as written."
+            },
+            {
+              "name": "indirect_object",
+              "type": "list",
+              "instruction": "Every indirect object of 'doing', including each dependent's full subtree, as written."
+            },
+            {
+              "name": "oblique_modifier",
+              "type": "list",
+              "instruction": "Every oblique modifier of 'doing', including each dependent's full subtree, as written."
+            },
+            {
+              "name": "clausal_complement",
+              "type": "list",
+              "instruction": "Every clausal complement of 'doing', including each dependent's full subtree, as written."
+            },
+            {
+              "name": "open_clausal_complement",
+              "type": "list",
+              "instruction": "Every open clausal complement of 'doing', including each dependent's full subtree, as written."
+            }
+          ],
+          "answers": [
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "you",
+                  "start": 10,
+                  "end": 13
+                }
+              ]
+            },
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "What",
+                  "start": 1,
+                  "end": 5
+                }
+              ]
+            },
+            {
+              "null": true,
+              "values": []
+            },
+            {
+              "null": true,
+              "values": []
+            },
+            {
+              "null": true,
+              "values": []
+            },
+            {
+              "null": true,
+              "values": []
+            }
+          ],
+          "metadata": "{\"question_ids\": [\"GUM_fiction_pag-81\", \"GUM_fiction_pag-81\", \"GUM_fiction_pag-81\", \"GUM_fiction_pag-81\", \"GUM_fiction_pag-81\", \"GUM_fiction_pag-81\"]}"
+        },
+        {
+          "id": "ud/gum:e16975e68777a965",
+          "source": "ud/gum",
+          "split": "train",
+          "state": "And now we did yoga!",
+          "fields": [
+            {
+              "name": "subject",
+              "type": "list",
+              "instruction": "Every subject of 'did', including each dependent's full subtree, as written."
+            },
+            {
+              "name": "object",
+              "type": "list",
+              "instruction": "Every object of 'did', including each dependent's full subtree, as written."
+            },
+            {
+              "name": "indirect_object",
+              "type": "list",
+              "instruction": "Every indirect object of 'did', including each dependent's full subtree, as written."
+            },
+            {
+              "name": "oblique_modifier",
+              "type": "list",
+              "instruction": "Every oblique modifier of 'did', including each dependent's full subtree, as written."
+            },
+            {
+              "name": "clausal_complement",
+              "type": "list",
+              "instruction": "Every clausal complement of 'did', including each dependent's full subtree, as written."
+            },
+            {
+              "name": "open_clausal_complement",
+              "type": "list",
+              "instruction": "Every open clausal complement of 'did', including each dependent's full subtree, as written."
+            }
+          ],
+          "answers": [
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "we",
+                  "start": 8,
+                  "end": 10
+                }
+              ]
+            },
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "yoga",
+                  "start": 15,
+                  "end": 19
+                }
+              ]
+            },
+            {
+              "null": true,
+              "values": []
+            },
+            {
+              "null": true,
+              "values": []
+            },
+            {
+              "null": true,
+              "values": []
+            },
+            {
+              "null": true,
+              "values": []
+            }
+          ],
+          "metadata": "{\"question_ids\": [\"GUM_vlog_college-47\", \"GUM_vlog_college-47\", \"GUM_vlog_college-47\", \"GUM_vlog_college-47\", \"GUM_vlog_college-47\", \"GUM_vlog_college-47\"]}"
+        }
+      ],
+      "provenance": {
+        "dataset": "universal-dependencies/universal_dependencies",
+        "config": "en_gum",
+        "revision": "c3fed78df6b9f8cd27ed24cc7142e9eccf1e6703"
+      },
+      "license": {
+        "license": "other, cc-by-nc-sa-4.0 (original source)",
+        "license_use": "non-commercial"
+      }
+    },
+    "preco/mentions": {
+      "splits": {
+        "train": {
+          "input_rows": 218478,
+          "extraction_rows": 43242,
+          "fields": 218478,
+          "null_fields": 0,
+          "null_share": 0.0
+        },
+        "validation": {
+          "input_rows": 3124,
+          "extraction_rows": 607,
+          "fields": 3124,
+          "null_fields": 0,
+          "null_share": 0.0
+        }
+      },
+      "examples": [
+        {
+          "id": "preco/mentions:7992e20b29357258",
+          "source": "preco/mentions",
+          "split": "train",
+          "state": "I 'm a Chinese girl . My name is Li Ying . I 'm twelve . I 'm in No . 1 Middle school . Chen Hong is my friend . She is nine . Mr Wu is my Chinese teacher and Miss Zhao is my English teacher .",
+          "fields": [
+            {
+              "name": "entity_2",
+              "type": "list",
+              "instruction": "Every mention of the entity first mentioned as 'Chen Hong', including that first mention."
+            },
+            {
+              "name": "entity_4",
+              "type": "list",
+              "instruction": "Every mention of the entity first mentioned as 'Mr Wu', including that first mention."
+            },
+            {
+              "name": "entity_5",
+              "type": "list",
+              "instruction": "Every mention of the entity first mentioned as 'Miss Zhao', including that first mention."
+            }
+          ],
+          "answers": [
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "Chen Hong",
+                  "start": 88,
+                  "end": 97
+                },
+                {
+                  "text": "my friend",
+                  "start": 101,
+                  "end": 110
+                },
+                {
+                  "text": "She",
+                  "start": 113,
+                  "end": 116
+                }
+              ]
+            },
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "Mr Wu",
+                  "start": 127,
+                  "end": 132
+                },
+                {
+                  "text": "my Chinese teacher",
+                  "start": 136,
+                  "end": 154
+                }
+              ]
+            },
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "Miss Zhao",
+                  "start": 159,
+                  "end": 168
+                },
+                {
+                  "text": "my English teacher",
+                  "start": 172,
+                  "end": 190
+                }
+              ]
+            }
+          ],
+          "metadata": "{\"question_ids\": [\"train_07710:2\", \"train_07710:4\", \"train_07710:5\"]}"
+        },
+        {
+          "id": "preco/mentions:3bee3c7a09c58049",
+          "source": "preco/mentions",
+          "split": "train",
+          "state": "Hello ! I`m Tony Green . My telephone number is five five seven four one zero two , and my school ID card number is two six five nine . This is my English book . It 's blue . I like it very much .",
+          "fields": [
+            {
+              "name": "entity_0",
+              "type": "list",
+              "instruction": "Every mention of the entity first mentioned as 'I`m', including that first mention."
+            },
+            {
+              "name": "entity_1",
+              "type": "list",
+              "instruction": "Every mention of the entity first mentioned as 'My telephone number', including that first mention."
+            },
+            {
+              "name": "entity_2",
+              "type": "list",
+              "instruction": "Every mention of the entity first mentioned as 'my school ID card number', including that first mention."
+            },
+            {
+              "name": "entity_3",
+              "type": "list",
+              "instruction": "Every mention of the entity first mentioned as 'This', including that first mention."
+            }
+          ],
+          "answers": [
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "I`m",
+                  "start": 8,
+                  "end": 11
+                },
+                {
+                  "text": "Tony Green",
+                  "start": 12,
+                  "end": 22
+                },
+                {
+                  "text": "My",
+                  "start": 25,
+                  "end": 27
+                },
+                {
+                  "text": "my",
+                  "start": 88,
+                  "end": 90
+                },
+                {
+                  "text": "my",
+                  "start": 144,
+                  "end": 146
+                },
+                {
+                  "text": "I",
+                  "start": 175,
+                  "end": 176
+                }
+              ]
+            },
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "My telephone number",
+                  "start": 25,
+                  "end": 44
+                },
+                {
+                  "text": "five five seven four one zero two",
+                  "start": 48,
+                  "end": 81
+                }
+              ]
+            },
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "my school ID card number",
+                  "start": 88,
+                  "end": 112
+                },
+                {
+                  "text": "two six five nine",
+                  "start": 116,
+                  "end": 133
+                }
+              ]
+            },
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "This",
+                  "start": 136,
+                  "end": 140
+                },
+                {
+                  "text": "my English book",
+                  "start": 144,
+                  "end": 159
+                },
+                {
+                  "text": "It",
+                  "start": 162,
+                  "end": 164
+                },
+                {
+                  "text": "it",
+                  "start": 182,
+                  "end": 184
+                }
+              ]
+            }
+          ],
+          "metadata": "{\"question_ids\": [\"train_36548:0\", \"train_36548:1\", \"train_36548:2\", \"train_36548:3\"]}"
+        }
+      ],
+      "provenance": {
+        "dataset": "coref-data/preco_raw",
+        "revision": "02c8ffedb9d0b49168809a572ff553c2f6f9f7ca"
+      },
+      "license": {
+        "license": "research purposes (annotations)",
+        "license_use": "non-commercial"
+      }
+    },
+    "redocred/entities": {
+      "splits": {
+        "train": {
+          "input_rows": 50248,
+          "extraction_rows": 7618,
+          "fields": 50248,
+          "null_fields": 0,
+          "null_share": 0.0
+        },
+        "validation": {
+          "input_rows": 9752,
+          "extraction_rows": 1434,
+          "fields": 9752,
+          "null_fields": 0,
+          "null_share": 0.0
+        },
+        "test": {
+          "input_rows": 9752,
+          "extraction_rows": 1431,
+          "fields": 9752,
+          "null_fields": 0,
+          "null_share": 0.0
+        }
+      },
+      "examples": [
+        {
+          "id": "redocred/entities:fb9e5c60df406ef1",
+          "source": "redocred/entities",
+          "split": "train",
+          "state": "\" Pass It On \" is a song by The Coral , which was taken as the second single from their 2003 album , Magic and Medicine . \" Pass It On \" is The Coral 's highest charting single to date , reaching number five in the UK Singles Chart . \" Pass It On \" was not only released on CD and vinyl but also on DVD which contains 2 b - sides and a 3-minute documentary about the band . The song is similar in structure to The Beatles song \" You Like Me Too Much \" . It appeared in an episode of Scrubs , \" My Turf War \" and is featured in the theatrical trailer for Ken Loach 's film Looking for Eric .",
+          "fields": [
+            {
+              "name": "entity_3_P175",
+              "type": "list",
+              "instruction": "Every entity linked from 'Magic and Medicine' by the relation 'performer'. Return the first mention of each target entity in document order."
+            },
+            {
+              "name": "entity_3_P527",
+              "type": "list",
+              "instruction": "Every entity linked from 'Magic and Medicine' by the relation 'has part(s)'. Return the first mention of each target entity in document order."
+            },
+            {
+              "name": "entity_3_P577",
+              "type": "list",
+              "instruction": "Every entity linked from 'Magic and Medicine' by the relation 'publication date'. Return the first mention of each target entity in document order."
+            },
+            {
+              "name": "entity_9_P800",
+              "type": "list",
+              "instruction": "Every entity linked from 'Beatles' by the relation 'notable work'. Return the first mention of each target entity in document order."
+            },
+            {
+              "name": "entity_10_P175",
+              "type": "list",
+              "instruction": "Every entity linked from 'You Like Me Too Much' by the relation 'performer'. Return the first mention of each target entity in document order."
+            },
+            {
+              "name": "entity_11_P527",
+              "type": "list",
+              "instruction": "Every entity linked from 'Scrubs' by the relation 'has part(s)'. Return the first mention of each target entity in document order."
+            },
+            {
+              "name": "entity_12_P179",
+              "type": "list",
+              "instruction": "Every entity linked from 'My Turf War' by the relation 'part of the series'. Return the first mention of each target entity in document order."
+            },
+            {
+              "name": "entity_12_P361",
+              "type": "list",
+              "instruction": "Every entity linked from 'My Turf War' by the relation 'part of'. Return the first mention of each target entity in document order."
+            }
+          ],
+          "answers": [
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "The Coral",
+                  "start": 28,
+                  "end": 37
+                }
+              ]
+            },
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "Pass It On",
+                  "start": 2,
+                  "end": 12
+                }
+              ]
+            },
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "2003",
+                  "start": 88,
+                  "end": 92
+                }
+              ]
+            },
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "You Like Me Too Much",
+                  "start": 429,
+                  "end": 449
+                }
+              ]
+            },
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "Beatles",
+                  "start": 414,
+                  "end": 421
+                }
+              ]
+            },
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "My Turf War",
+                  "start": 494,
+                  "end": 505
+                }
+              ]
+            },
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "Scrubs",
+                  "start": 483,
+                  "end": 489
+                }
+              ]
+            },
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "Scrubs",
+                  "start": 483,
+                  "end": 489
+                }
+              ]
+            }
+          ],
+          "metadata": "{\"question_ids\": [\"Pass It On (song):3:P175\", \"Pass It On (song):3:P527\", \"Pass It On (song):3:P577\", \"Pass It On (song):9:P800\", \"Pass It On (song):10:P175\", \"Pass It On (song):11:P527\", \"Pass It On (song):12:P179\", \"Pass It On (song):12:P361\"]}"
+        },
+        {
+          "id": "redocred/entities:9946e39765ff3e94",
+          "source": "redocred/entities",
+          "split": "train",
+          "state": "Oleg Ivanovich Dahl (; 25 May 1941 , Moscow – 3 March 1981 , Kiev ) was a Soviet actor . He acted in films , from classics of drama to fairy tales and adventures . His most popular works included Zhenya , Zhenechka and Katyusha ( 1967 ) , Chronicles of a Dive Bomber ( 1967 ) , An Old , Old Tale ( 1970 ) , King Lear ( 1969 ) , On Thursday and Never Again ( 1977 ) , September Vacation ( 1979 ) . Oleg Dahl played his last cinema role in Uninvited Friend by Leonid Maryagin in 1981 . He worked in Sovremennik Theatre ( 1963 - 1971 , 1973 - 1975 ) and in Malaia Bronnaia Theatre ( 1975 - 1978 ) .",
+          "fields": [
+            {
+              "name": "entity_0_P19",
+              "type": "list",
+              "instruction": "Every entity linked from 'Oleg Ivanovich Dahl' by the relation 'place of birth'. Return the first mention of each target entity in document order."
+            },
+            {
+              "name": "entity_0_P20",
+              "type": "list",
+              "instruction": "Every entity linked from 'Oleg Ivanovich Dahl' by the relation 'place of death'. Return the first mention of each target entity in document order."
+            },
+            {
+              "name": "entity_0_P27",
+              "type": "list",
+              "instruction": "Every entity linked from 'Oleg Ivanovich Dahl' by the relation 'country of citizenship'. Return the first mention of each target entity in document order."
+            },
+            {
+              "name": "entity_0_P569",
+              "type": "list",
+              "instruction": "Every entity linked from 'Oleg Ivanovich Dahl' by the relation 'date of birth'. Return the first mention of each target entity in document order."
+            },
+            {
+              "name": "entity_0_P570",
+              "type": "list",
+              "instruction": "Every entity linked from 'Oleg Ivanovich Dahl' by the relation 'date of death'. Return the first mention of each target entity in document order."
+            },
+            {
+              "name": "entity_2_P131",
+              "type": "list",
+              "instruction": "Every entity linked from 'Moscow' by the relation 'located in the administrative territorial entity'. Return the first mention of each target entity in document order."
+            },
+            {
+              "name": "entity_2_P17",
+              "type": "list",
+              "instruction": "Every entity linked from 'Moscow' by the relation 'country'. Return the first mention of each target entity in document order."
+            },
+            {
+              "name": "entity_6_P161",
+              "type": "list",
+              "instruction": "Every entity linked from 'Zhenya , Zhenechka and Katyusha' by the relation 'cast member'. Return the first mention of each target entity in document order."
+            }
+          ],
+          "answers": [
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "Moscow",
+                  "start": 37,
+                  "end": 43
+                }
+              ]
+            },
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "Kiev",
+                  "start": 61,
+                  "end": 65
+                }
+              ]
+            },
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "Soviet",
+                  "start": 74,
+                  "end": 80
+                }
+              ]
+            },
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "25 May 1941",
+                  "start": 23,
+                  "end": 34
+                }
+              ]
+            },
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "3 March 1981",
+                  "start": 46,
+                  "end": 58
+                },
+                {
+                  "text": "1981",
+                  "start": 477,
+                  "end": 481
+                }
+              ]
+            },
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "Soviet",
+                  "start": 74,
+                  "end": 80
+                }
+              ]
+            },
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "Soviet",
+                  "start": 74,
+                  "end": 80
+                }
+              ]
+            },
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "Oleg Ivanovich Dahl",
+                  "start": 0,
+                  "end": 19
+                }
+              ]
+            }
+          ],
+          "metadata": "{\"question_ids\": [\"Oleg Dahl:0:P19\", \"Oleg Dahl:0:P20\", \"Oleg Dahl:0:P27\", \"Oleg Dahl:0:P569\", \"Oleg Dahl:0:P570\", \"Oleg Dahl:2:P131\", \"Oleg Dahl:2:P17\", \"Oleg Dahl:6:P161\"]}"
+        }
+      ],
+      "provenance": {
+        "dataset": "tonytan48/Re-DocRED",
+        "revision": "e0ab3489edfe72c968261bffed5243b6fefddd22"
+      },
+      "license": {
+        "license": "mit (original source)",
+        "license_use": "commercial"
+      }
+    },
+    "conll2000": {
+      "splits": {
+        "train": {
+          "input_rows": 8937,
+          "extraction_rows": 8934,
+          "fields": 61630,
+          "null_fields": 28847,
+          "null_share": 0.468067
+        },
+        "test": {
+          "input_rows": 2013,
+          "extraction_rows": 2012,
+          "fields": 13842,
+          "null_fields": 6523,
+          "null_share": 0.471247
+        }
+      },
+      "examples": [
+        {
+          "id": "conll2000:44ef4e1402bb8852",
+          "source": "conll2000",
+          "split": "train",
+          "state": "First , a pop quiz .",
+          "fields": [
+            {
+              "name": "adjective_phrase",
+              "type": "list",
+              "instruction": "Every adjective phrase chunk in the text, as written."
+            },
+            {
+              "name": "adverb_phrase",
+              "type": "list",
+              "instruction": "Every adverb phrase chunk in the text, as written."
+            },
+            {
+              "name": "noun_phrase",
+              "type": "list",
+              "instruction": "Every noun phrase chunk in the text, as written."
+            },
+            {
+              "name": "subordinate_clause",
+              "type": "list",
+              "instruction": "Every subordinate clause chunk in the text, as written."
+            }
+          ],
+          "answers": [
+            {
+              "null": true,
+              "values": []
+            },
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "First",
+                  "start": 0,
+                  "end": 5
+                }
+              ]
+            },
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "a pop quiz",
+                  "start": 8,
+                  "end": 18
+                }
+              ]
+            },
+            {
+              "null": true,
+              "values": []
+            }
+          ],
+          "metadata": "{\"entity_types\": [\"ADJP\", \"ADVP\", \"NP\", \"SBAR\"]}"
+        },
+        {
+          "id": "conll2000:acd6f08aa4ee462e",
+          "source": "conll2000",
+          "split": "train",
+          "state": "First , generalize .",
+          "fields": [
+            {
+              "name": "adverb_phrase",
+              "type": "list",
+              "instruction": "Every adverb phrase chunk in the text, as written."
+            },
+            {
+              "name": "prepositional_phrase",
+              "type": "list",
+              "instruction": "Every prepositional phrase chunk in the text, as written."
+            },
+            {
+              "name": "particle",
+              "type": "list",
+              "instruction": "Every particle chunk in the text, as written."
+            },
+            {
+              "name": "verb_phrase",
+              "type": "list",
+              "instruction": "Every verb phrase chunk in the text, as written."
+            }
+          ],
+          "answers": [
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "First",
+                  "start": 0,
+                  "end": 5
+                }
+              ]
+            },
+            {
+              "null": true,
+              "values": []
+            },
+            {
+              "null": true,
+              "values": []
+            },
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "generalize",
+                  "start": 8,
+                  "end": 18
+                }
+              ]
+            }
+          ],
+          "metadata": "{\"entity_types\": [\"ADVP\", \"PP\", \"PRT\", \"VP\"]}"
+        }
+      ],
+      "provenance": {
+        "dataset": "eriktks/conll2000",
+        "revision": "bda188850926d9a842f700ffce57c5232b794ce6"
+      },
+      "license": {
+        "license": "unspecified (original source)",
+        "license_use": "unspecified"
+      }
+    },
+    "qasrl/orig": {
+      "status": "local conversion only; no active task",
+      "splits": {
+        "test": {
+          "input_rows": 44221,
+          "extraction_rows": 11254,
+          "fields": 44221,
+          "null_fields": 0,
+          "null_share": 0.0
+        },
+        "train": {
+          "input_rows": 209931,
+          "extraction_rows": 49777,
+          "fields": 209931,
+          "null_fields": 0,
+          "null_share": 0.0
+        },
+        "validation": {
+          "input_rows": 37578,
+          "extraction_rows": 9717,
+          "fields": 37578,
+          "null_fields": 0,
+          "null_share": 0.0
+        }
+      },
+      "examples": [
+        {
+          "id": "qasrl/orig:02f85a291752033b",
+          "source": "qasrl/orig",
+          "split": "train",
+          "state": "How did life begin ?",
+          "fields": [
+            {
+              "name": "predicate_1_argument_0",
+              "type": "list",
+              "instruction": "What did something do? For predicate 'did' at characters [4, 7) (zero-based, end-exclusive). Return every answer span."
+            },
+            {
+              "name": "predicate_1_argument_1",
+              "type": "list",
+              "instruction": "What did something? For predicate 'did' at characters [4, 7) (zero-based, end-exclusive). Return every answer span."
+            },
+            {
+              "name": "predicate_3_argument_0",
+              "type": "list",
+              "instruction": "What began? For predicate 'begin' at characters [13, 18) (zero-based, end-exclusive). Return every answer span."
+            }
+          ],
+          "answers": [
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "begin",
+                  "start": 13,
+                  "end": 18
+                }
+              ]
+            },
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "life",
+                  "start": 8,
+                  "end": 12
+                }
+              ]
+            },
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "life",
+                  "start": 8,
+                  "end": 12
+                }
+              ]
+            }
+          ],
+          "metadata": "{\"question_ids\": [\"TQA:T_3242_0:1:0\", \"TQA:T_3242_0:1:1\", \"TQA:T_3242_0:3:0\"]}"
+        },
+        {
+          "id": "qasrl/orig:bf5d764e4190c77a",
+          "source": "qasrl/orig",
+          "split": "train",
+          "state": "It focuses on CFCs .",
+          "fields": [
+            {
+              "name": "predicate_1_argument_0",
+              "type": "list",
+              "instruction": "What does something focus on? For predicate 'focuses' at characters [3, 10) (zero-based, end-exclusive). Return every answer span."
+            },
+            {
+              "name": "predicate_1_argument_1",
+              "type": "list",
+              "instruction": "What focuses? For predicate 'focuses' at characters [3, 10) (zero-based, end-exclusive). Return every answer span."
+            }
+          ],
+          "answers": [
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "on CFCs",
+                  "start": 11,
+                  "end": 18
+                }
+              ]
+            },
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "It",
+                  "start": 0,
+                  "end": 2
+                }
+              ]
+            }
+          ],
+          "metadata": "{\"question_ids\": [\"TQA:T_0482_1:1:0\", \"TQA:T_0482_1:1:1\"]}"
+        }
+      ]
+    },
+    "bioscope/abstracts": {
+      "status": "local conversion only; no active task",
+      "splits": {
+        "train": {
+          "input_rows": 28120,
+          "extraction_rows": 11871,
+          "fields": 28120,
+          "null_fields": 20044,
+          "null_share": 0.712802
+        }
+      },
+      "examples": [
+        {
+          "id": "bioscope/abstracts:4deeca80a4d3dcbf",
+          "source": "bioscope/abstracts",
+          "split": "train",
+          "state": "Succinate alone had no effect.",
+          "fields": [
+            {
+              "name": "negation_cues",
+              "type": "list",
+              "instruction": "Every negation cue in the text, as written."
+            },
+            {
+              "name": "speculation_cues",
+              "type": "list",
+              "instruction": "Every speculation cue in the text, as written."
+            },
+            {
+              "name": "negation_scope_0",
+              "type": "list",
+              "instruction": "The full scope of the negation cue 'no' at [20, 22) (zero-based characters, end-exclusive). Return every scope segment."
+            }
+          ],
+          "answers": [
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "no",
+                  "start": 20,
+                  "end": 22
+                }
+              ]
+            },
+            {
+              "null": true,
+              "values": []
+            },
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "no effect",
+                  "start": 20,
+                  "end": 29
+                }
+              ]
+            }
+          ],
+          "metadata": "{\"question_ids\": [\"abstracts:10121:S1085.7:negation\", \"abstracts:10121:S1085.7:speculation\", \"abstracts:10121:S1085.7:X1085.7.1\"]}"
+        },
+        {
+          "id": "bioscope/abstracts:99dd96903b51a55d",
+          "source": "bioscope/abstracts",
+          "split": "train",
+          "state": "it had no effect on IL-10 secretion.",
+          "fields": [
+            {
+              "name": "negation_cues",
+              "type": "list",
+              "instruction": "Every negation cue in the text, as written."
+            },
+            {
+              "name": "speculation_cues",
+              "type": "list",
+              "instruction": "Every speculation cue in the text, as written."
+            },
+            {
+              "name": "negation_scope_0",
+              "type": "list",
+              "instruction": "The full scope of the negation cue 'no' at [7, 9) (zero-based characters, end-exclusive). Return every scope segment."
+            }
+          ],
+          "answers": [
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "no",
+                  "start": 7,
+                  "end": 9
+                }
+              ]
+            },
+            {
+              "null": true,
+              "values": []
+            },
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "no effect on IL-10 secretion",
+                  "start": 7,
+                  "end": 35
+                }
+              ]
+            }
+          ],
+          "metadata": "{\"question_ids\": [\"abstracts:4097:S446.5:negation\", \"abstracts:4097:S446.5:speculation\", \"abstracts:4097:S446.5:X446.5.1\"]}"
+        }
+      ]
+    },
+    "bioscope/papers": {
+      "status": "local conversion only; no active task",
+      "splits": {
+        "train": {
+          "input_rows": 6384,
+          "extraction_rows": 2671,
+          "fields": 6384,
+          "null_fields": 4482,
+          "null_share": 0.702068
+        }
+      },
+      "examples": [
+        {
+          "id": "bioscope/papers:032be32d1af0d1d7",
+          "source": "bioscope/papers",
+          "split": "train",
+          "state": "Possible Signaling Role for Adenosine",
+          "fields": [
+            {
+              "name": "negation_cues",
+              "type": "list",
+              "instruction": "Every negation cue in the text, as written."
+            },
+            {
+              "name": "speculation_cues",
+              "type": "list",
+              "instruction": "Every speculation cue in the text, as written."
+            },
+            {
+              "name": "speculation_scope_0",
+              "type": "list",
+              "instruction": "The full scope of the speculation cue 'Possible' at [0, 8) (zero-based characters, end-exclusive). Return every scope segment."
+            }
+          ],
+          "answers": [
+            {
+              "null": true,
+              "values": []
+            },
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "Possible",
+                  "start": 0,
+                  "end": 8
+                }
+              ]
+            },
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "Possible Signaling Role for Adenosine",
+                  "start": 0,
+                  "end": 37
+                }
+              ]
+            }
+          ],
+          "metadata": "{\"question_ids\": [\"papers:2369:S7.241:negation\", \"papers:2369:S7.241:speculation\", \"papers:2369:S7.241:X7.241.1\"]}"
+        },
+        {
+          "id": "bioscope/papers:c8f92603c58b74e6",
+          "source": "bioscope/papers",
+          "split": "train",
+          "state": "So, roX1 and roX2 might be partially redundant.",
+          "fields": [
+            {
+              "name": "negation_cues",
+              "type": "list",
+              "instruction": "Every negation cue in the text, as written."
+            },
+            {
+              "name": "speculation_cues",
+              "type": "list",
+              "instruction": "Every speculation cue in the text, as written."
+            },
+            {
+              "name": "speculation_scope_0",
+              "type": "list",
+              "instruction": "The full scope of the speculation cue 'might' at [18, 23) (zero-based characters, end-exclusive). Return every scope segment."
+            }
+          ],
+          "answers": [
+            {
+              "null": true,
+              "values": []
+            },
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "might",
+                  "start": 18,
+                  "end": 23
+                }
+              ]
+            },
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "might be partially redundant",
+                  "start": 18,
+                  "end": 46
+                }
+              ]
+            }
+          ],
+          "metadata": "{\"question_ids\": [\"papers:2638:S9.66:negation\", \"papers:2638:S9.66:speculation\", \"papers:2638:S9.66:X9.66.1\"]}"
+        }
+      ]
+    },
+    "sherlock/scopes": {
+      "status": "local conversion only; no active task",
+      "splits": {
+        "test": {
+          "input_rows": 1353,
+          "extraction_rows": 1089,
+          "fields": 1353,
+          "null_fields": 869,
+          "null_share": 0.642276
+        },
+        "train": {
+          "input_rows": 4616,
+          "extraction_rows": 3642,
+          "fields": 4616,
+          "null_fields": 2893,
+          "null_share": 0.626733
+        },
+        "validation": {
+          "input_rows": 960,
+          "extraction_rows": 787,
+          "fields": 960,
+          "null_fields": 648,
+          "null_share": 0.675
+        }
+      },
+      "examples": [
+        {
+          "id": "sherlock/scopes:62e806fa0ec3bcde",
+          "source": "sherlock/scopes",
+          "split": "train",
+          "state": "I will not tell . ''",
+          "fields": [
+            {
+              "name": "negation_scope_0",
+              "type": "list",
+              "instruction": "The scope of the negation cue 'not' at [7, 10) (zero-based characters, end-exclusive). Return every scope segment, excluding the cue itself."
+            },
+            {
+              "name": "negation_cues",
+              "type": "list",
+              "instruction": "Every negation cue in the text, as written."
+            }
+          ],
+          "answers": [
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "I will",
+                  "start": 0,
+                  "end": 6
+                },
+                {
+                  "text": "tell",
+                  "start": 11,
+                  "end": 15
+                }
+              ]
+            },
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "not",
+                  "start": 7,
+                  "end": 10
+                }
+              ]
+            }
+          ],
+          "metadata": "{\"question_ids\": [\"baskervilles09:208:0\", \"baskervilles09:208\"]}"
+        },
+        {
+          "id": "sherlock/scopes:1f0bf8442367a7aa",
+          "source": "sherlock/scopes",
+          "split": "train",
+          "state": "That was imprudent .",
+          "fields": [
+            {
+              "name": "negation_scope_0",
+              "type": "list",
+              "instruction": "The scope of the negation cue 'im' at [9, 11) (zero-based characters, end-exclusive). Return every scope segment, excluding the cue itself."
+            },
+            {
+              "name": "negation_cues",
+              "type": "list",
+              "instruction": "Every negation cue in the text, as written."
+            }
+          ],
+          "answers": [
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "That was",
+                  "start": 0,
+                  "end": 8
+                },
+                {
+                  "text": "prudent",
+                  "start": 11,
+                  "end": 18
+                }
+              ]
+            },
+            {
+              "null": false,
+              "values": [
+                {
+                  "text": "im",
+                  "start": 9,
+                  "end": 11
+                }
+              ]
+            }
+          ],
+          "metadata": "{\"question_ids\": [\"baskervilles05:222:0\", \"baskervilles05:222\"]}"
+        }
+      ]
+    }
+  },
+  "drops": {
+    "ud_records:dev": {
+      "input_rows": 2001,
+      "no_unambiguous_head": 578,
+      "nonprojective_fields_dropped": 5,
+      "nonprojective_subtrees": 5,
+      "null_fields": 6110,
+      "output_fields": 8533
+    },
+    "ud_records:test": {
+      "input_rows": 2077,
+      "no_unambiguous_head": 697,
+      "nonprojective_fields_dropped": 9,
+      "nonprojective_subtrees": 9,
+      "null_fields": 5852,
+      "output_fields": 8271
+    },
+    "ud_records:train": {
+      "input_rows": 12544,
+      "no_unambiguous_head": 2537,
+      "nonprojective_fields_dropped": 91,
+      "nonprojective_subtrees": 91,
+      "null_fields": 41799,
+      "output_fields": 59951
+    },
+    "ud_records:dev:gum": {
+      "input_rows": 1575,
+      "no_unambiguous_head": 233,
+      "nonprojective_fields_dropped": 26,
+      "nonprojective_subtrees": 26,
+      "null_fields": 5596,
+      "output_fields": 8026
+    },
+    "ud_records:test:gum": {
+      "input_rows": 1464,
+      "no_unambiguous_head": 197,
+      "nonprojective_fields_dropped": 19,
+      "nonprojective_subtrees": 20,
+      "null_fields": 5219,
+      "output_fields": 7583
+    },
+    "ud_records:train:gum": {
+      "input_rows": 11314,
+      "no_unambiguous_head": 1896,
+      "nonprojective_fields_dropped": 124,
+      "nonprojective_subtrees": 125,
+      "null_fields": 39408,
+      "output_fields": 56384
+    },
+    "redocred_records:train": {
+      "ambiguous_relation_fields": 15250,
+      "input_rows": 3053,
+      "null_fields": 0,
+      "output_fields": 50248
+    },
+    "redocred_records:validation": {
+      "ambiguous_relation_fields": 2958,
+      "input_rows": 500,
+      "null_fields": 0,
+      "output_fields": 9752
+    },
+    "redocred_records:test": {
+      "ambiguous_relation_fields": 2855,
+      "input_rows": 500,
+      "null_fields": 0,
+      "output_fields": 9752
+    },
+    "preco_records:train": {
+      "ambiguous_clusters": 194960,
+      "input_rows": 36620,
+      "null_fields": 0,
+      "output_fields": 218478,
+      "singleton_clusters": 1997261
+    },
+    "preco_records:validation": {
+      "ambiguous_clusters": 2674,
+      "input_rows": 500,
+      "null_fields": 0,
+      "output_fields": 3124,
+      "singleton_clusters": 25995
+    }
+  },
+  "smoke": {
+    "sources": {
+      "ud/ewt": {
+        "train_duplicates_dropped": 262,
+        "validation_duplicates_dropped": 12,
+        "test_duplicates_dropped": 19,
+        "train": 300,
+        "train_fields": 1797,
+        "train_null_fields": 1253,
+        "validation_overlap_dropped": 7,
+        "validation": 50,
+        "validation_fields": 300,
+        "validation_null_fields": 210,
+        "test_overlap_dropped": 5,
+        "test": 50,
+        "test_fields": 299,
+        "test_null_fields": 203
+      },
+      "ud/gum": {
+        "train_duplicates_dropped": 56,
+        "validation_duplicates_dropped": 8,
+        "test_duplicates_dropped": 6,
+        "train": 300,
+        "train_fields": 1790,
+        "train_null_fields": 1249,
+        "validation_overlap_dropped": 6,
+        "validation": 50,
+        "validation_fields": 298,
+        "validation_null_fields": 207,
+        "test_overlap_dropped": 3,
+        "test": 50,
+        "test_fields": 300,
+        "test_null_fields": 207
+      },
+      "preco/mentions": {
+        "train_duplicates_dropped": 0,
+        "validation_duplicates_dropped": 0,
+        "train": 300,
+        "train_fields": 1491,
+        "train_null_fields": 0,
+        "validation_overlap_dropped": 6,
+        "validation": 50,
+        "validation_fields": 276,
+        "validation_null_fields": 0
+      },
+      "redocred/entities": {
+        "train_duplicates_dropped": 0,
+        "validation_duplicates_dropped": 0,
+        "test_duplicates_dropped": 0,
+        "train": 300,
+        "train_fields": 2050,
+        "train_null_fields": 0,
+        "validation_overlap_dropped": 3,
+        "validation": 50,
+        "validation_fields": 344,
+        "validation_null_fields": 0,
+        "test_overlap_dropped": 0,
+        "test": 50,
+        "test_fields": 322,
+        "test_null_fields": 0
+      },
+      "conll2000": {
+        "train_duplicates_dropped": 0,
+        "test_duplicates_dropped": 1,
+        "train_empty_dropped": 0,
+        "test_empty_dropped": 0,
+        "train": 300,
+        "train_fields": 2071,
+        "train_null_fields": 937,
+        "test_overlap_dropped": 13,
+        "test": 50,
+        "test_fields": 351,
+        "test_null_fields": 165
+      }
+    },
+    "excluded": [
+      "newsqa"
+    ],
+    "max_rows": 300,
+    "max_rows_eval": 50,
+    "max_collection_rows": 20000,
+    "collection_rows": {
+      "procedural": 80000
+    },
+    "max_fields": 8,
+    "max_empty_share": 0.2,
+    "seed": 0,
+    "rows": {
+      "train": 1500,
+      "validation": 200,
+      "test": 200
+    },
+    "revisions": {
+      "ud/ewt": "c3fed78df6b9f8cd27ed24cc7142e9eccf1e6703",
+      "ud/gum": "c3fed78df6b9f8cd27ed24cc7142e9eccf1e6703",
+      "preco/mentions": "02c8ffedb9d0b49168809a572ff553c2f6f9f7ca",
+      "redocred/entities": "e0ab3489edfe72c968261bffed5243b6fefddd22",
+      "conll2000": "bda188850926d9a842f700ffce57c5232b794ce6"
+    }
+  },
+  "pending_provenance": {
+    "qasrl": {
+      "source": "qasrl",
+      "upstream": {
+        "url": "https://qasrl.org/data/qasrl-v2.tar",
+        "sha256": "caba7a2d18584d6210b9a176ef6b4808d96f3d48194083dcb20db03697793e07",
+        "revision": "29034398c26e419d530a2ec1e81994ca4a4d4e42",
+        "documentation": "https://github.com/uwnlp/qasrl-bank/blob/29034398c26e419d530a2ec1e81994ca4a4d4e42/FORMAT.md",
+        "license": "unspecified",
+        "license_evidence": "https://github.com/uwnlp/qasrl-bank/blob/29034398c26e419d530a2ec1e81994ca4a4d4e42/LICENSE",
+        "license_note": "Repository MIT license is phrased for software, not an explicit grant over underlying TQA/Wikipedia/Wikinews texts. Data scope remains unspecified."
+      },
+      "settings": {
+        "qasrl_partition": "orig",
+        "qasrl_validation": ">=2 valid human judgments and strict majority; modal complete reading",
+        "bioscope_members": [
+          "abstracts.xml",
+          "full_papers.xml"
+        ],
+        "uploads": false
+      },
+      "rows": {
+        "train": 209931,
+        "validation": 37578,
+        "test": 44221
+      },
+      "counts": {
+        "train": {
+          "input_sentences": 44482,
+          "unvalidated_questions": 5501
+        },
+        "validation": {
+          "input_sentences": 9079,
+          "unvalidated_questions": 909
+        },
+        "test": {
+          "input_sentences": 10457,
+          "unvalidated_questions": 1168
+        }
+      },
+      "script": "scripts/repackage_dataset/span_structure.py"
+    },
+    "bioscope": {
+      "source": "bioscope",
+      "upstream": {
+        "url": "https://rgai.inf.u-szeged.hu/sites/rgai.inf.u-szeged.hu/files/bioscope.zip",
+        "sha256": "b20b525506f783ab9c120548ac4022ab587bf7cc419beaf759f7253f0cf0b1d1",
+        "revision": "43ba162359f01d6436590ba2a014421b6ad09621",
+        "documentation": "https://huggingface.co/datasets/bigbio/bioscope/blob/43ba162359f01d6436590ba2a014421b6ad09621/bioscope.py",
+        "license": "cc-by-2.0",
+        "license_evidence": "https://huggingface.co/datasets/bigbio/bioscope/blob/43ba162359f01d6436590ba2a014421b6ad09621/README.md",
+        "license_note": "Public biological abstracts and papers only; article texts retain their original terms. Clinical masked text excluded."
+      },
+      "settings": {
+        "qasrl_partition": "orig",
+        "qasrl_validation": ">=2 valid human judgments and strict majority; modal complete reading",
+        "bioscope_members": [
+          "abstracts.xml",
+          "full_papers.xml"
+        ],
+        "uploads": false
+      },
+      "rows": {
+        "abstracts": 28120,
+        "papers": 6384
+      },
+      "counts": {
+        "abstracts": {
+          "input_sentences": 11871
+        },
+        "papers": {
+          "input_sentences": 2670
+        }
+      },
+      "script": "scripts/repackage_dataset/span_structure.py"
+    },
+    "sherlock": {
+      "revision": "03cb052efdb205efdf403223a71764237a353f6e",
+      "files": {
+        "training_dev.txt": {
+          "url": "https://raw.githubusercontent.com/mosharafhossain/negation-cue/03cb052efdb205efdf403223a71764237a353f6e/data/cd-sco/corpus/training_dev/training_dev.txt",
+          "sha256": "ea966b062893cdc18d8d74b1c635f50db623f3f6e9d605fa4e3e262272901e64"
+        },
+        "single_gold.txt": {
+          "url": "https://raw.githubusercontent.com/mosharafhossain/negation-cue/03cb052efdb205efdf403223a71764237a353f6e/data/cd-sco/corpus/test-gold/single_gold.txt",
+          "sha256": "cb71fad09c44b8d4d7147cd7275fd025583d1c8d6f1458f039565c685c85b996"
+        }
+      },
+      "native_sentences": {
+        "train": 3644,
+        "validation": 787,
+        "test": 1089
+      },
+      "rows": {
+        "train": 4616,
+        "validation": 960,
+        "test": 1353
+      },
+      "dropped": {
+        "train": {
+          "unlocated_cue_fields": 6
+        },
+        "validation": {},
+        "test": {}
+      },
+      "license": "unspecified (freely available annotations; public-domain source stories)",
+      "license_evidence": "https://www.aclweb.org/portal/content/sem-shared-task-2012-resolving-scope-and-focus-negation",
+      "settings": {
+        "text": "tokens joined by one space",
+        "scopes": "merge adjacent literal segments; preserve discontinuity",
+        "split": "official story partitions, no resampling",
+        "uploads": false
+      }
+    }
+  }
+}

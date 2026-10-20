@@ -97,6 +97,10 @@ def entity_type(label):
 
 # Entity types whose label alone is opaque (OntoNotes, acronyms) or too short to read well.
 NAMES = {
+    "NP": "noun phrase", "VP": "verb phrase", "PP": "prepositional phrase",
+    "ADJP": "adjective phrase", "ADVP": "adverb phrase", "CONJP": "conjunction phrase",
+    "INTJ": "interjection", "LST": "list marker", "PRT": "particle",
+    "SBAR": "subordinate clause", "UCP": "unlike coordinated phrase",
     "ChemicalEntity": "chemical entity", "DiseaseOrPhenotypicFeature": "disease or phenotypic feature",
     "OrganismTaxon": "organism or species",
     "VEH": "vehicle", "Generic": "generic scientific term", "OtherScientificTerm": "other scientific term",

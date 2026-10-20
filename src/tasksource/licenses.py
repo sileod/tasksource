@@ -56,7 +56,7 @@ def source_license(task_id, repos, cards=None):
     cards = CARD_LICENSES if cards is None else cards
     card = {repo: cards[repo] for repo in repos if cards.get(repo)}
     task = task_id.removeprefix("multilingual/").removeprefix("vision/")
-    evidence = SOURCE_LICENSE_EVIDENCE.get(task.split('/')[0])
+    evidence = SOURCE_LICENSE_EVIDENCE.get(task, SOURCE_LICENSE_EVIDENCE.get(task.split('/')[0]))
     # DPI annotated older tasksource ids; a whole-dataset id also covers its configs
     dpi = sorted(set(DPI_TASKS.get(task, DPI_TASKS.get(task.split("/")[0], []))).union(
         *[DPI_REPOS.get(repo.lower(), []) for repo in repos]))

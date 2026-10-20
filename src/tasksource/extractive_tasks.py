@@ -12,6 +12,7 @@ from datasets import Value
 
 from .preprocess import ExtractiveQA
 from .metadata.source_revisions import SOURCE_REVISIONS
+from .span_structure import structure_spans, ud_records, preco_records, redocred_records
 
 # Hub revisions; script-based datasets are read from their parquet conversion commit.
 REVISIONS = {
@@ -45,6 +46,9 @@ REVISIONS = {
     # commit (HfApi().dataset_info(repo).sha) once uploaded.
     'tasksource/websrc-spans': 'ed1886369b0d0516930c11d51cfad3d363caff6c',
     'tasksource/swde': '2a754b98a6b62a3d6d835455f90fec6d95cc8ef9',
+    'universal-dependencies/universal_dependencies': 'c3fed78df6b9f8cd27ed24cc7142e9eccf1e6703',
+    'coref-data/preco_raw': '02c8ffedb9d0b49168809a572ff553c2f6f9f7ca',
+    'tonytan48/Re-DocRED': 'e0ab3489edfe72c968261bffed5243b6fefddd22',
 }
 
 
@@ -205,7 +209,7 @@ fairytaleqa = ExtractiveQA(dataset_name='WorkInTheDark/FairytaleQA', task_id='fa
 
 
 # Additional dialogue, contract and scientific-paper span views. Native splits are preserved.
-def _span_records(dataset, records):
+def _span_records(dataset, records, load_from_cache_file=True):
     from datasets import DatasetDict, Features, List
     features = Features({'context': Value('string'), 'question': Value('string'),
         'answers': {'text': List(Value('string')), 'answer_start': List(Value('int32'))},
@@ -215,7 +219,8 @@ def _span_records(dataset, records):
                 for out in records(dict(zip(batch, values)))]
         return {key: [r[key] for r in rows] for key in features}
     return DatasetDict({s: rows.map(flatten, batched=True, batch_size=16,
-        remove_columns=rows.column_names, features=features) for s, rows in dataset.items()})
+        remove_columns=rows.column_names, features=features, load_from_cache_file=load_from_cache_file)
+        for s, rows in dataset.items()})
 
 
 def _span_record(context, question, answers, **metadata):
@@ -727,3 +732,26 @@ swde_movie = _swde('movie')
 swde_nbaplayer = _swde('nbaplayer')
 swde_restaurant = _swde('restaurant')
 swde_university = _swde('university')
+
+
+# English structural annotations (span_structure): dependency subtrees, coreference clusters, relation targets.
+
+
+def _ud(config):
+    return ExtractiveQA(dataset_name='universal-dependencies/universal_dependencies', config_name=f'en_{config}',
+        task_id=f'ud/{config}', complete_splits=False, splits=('train', 'dev', 'test'),
+        pre_process=lambda d: structure_spans(d, ud_records), metadata='metadata', max_mismatch=0,
+        load_dataset_kwargs=_kwargs('universal-dependencies/universal_dependencies'))
+
+
+ud_ewt = _ud('ewt')
+ud_gum = _ud('gum')
+
+preco_mentions = ExtractiveQA(dataset_name='coref-data/preco_raw', task_id='preco/mentions',
+    complete_splits=False, splits=('train', 'validation', None),
+    pre_process=lambda d: structure_spans(d, preco_records), metadata='metadata', max_mismatch=0,
+    load_dataset_kwargs=_kwargs('coref-data/preco_raw'))
+
+redocred_entities = ExtractiveQA(dataset_name='tonytan48/Re-DocRED', task_id='redocred/entities',
+    complete_splits=False, pre_process=lambda d: structure_spans(d, redocred_records),
+    metadata='metadata', max_mismatch=0, load_dataset_kwargs=_kwargs('tonytan48/Re-DocRED'))

@@ -1896,8 +1896,8 @@ conceptrules_v2 = Classification("context", "text", "label", question="Is the st
 scidtb = Classification("unit1_txt","unit2_txt","label", dataset_name="multilingual-discourse-hub/disrpt",config_name='eng.dep.scidtb.rels',
     question="Which discourse relation links unit text_B to unit text_A?")
 
-chunking = TokenClassification("tokens","chunk_tags", dataset_name="eriktks/conll2000", task_id="conll2000",
-    load_dataset_kwargs=dict(revision=PARQUET))
+chunking = TokenClassification("tokens","chunk_tags", dataset_name="eriktks/conll2000", task_id="conll2000", complete_splits=False,
+    load_dataset_kwargs=dict(revision="bda188850926d9a842f700ffce57c5232b794ce6"))
 
 few_nerd = TokenClassification("tokens","fine_ner_tags",dataset_name="DFKI-SLT/few-nerd",config_name='supervised')
 finer = TokenClassification('tokens','ner_tags',dataset_name='nlpaueb/finer-139',

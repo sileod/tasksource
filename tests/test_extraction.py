@@ -1,4 +1,5 @@
 import json
+import re
 
 import pytest
 from datasets import Dataset, DatasetDict
@@ -573,3 +574,166 @@ def test_pave_values_located_verbatim_with_native_nulls():
     out = list(qa_rows(list(_pave_records(json.dumps(many))), 'wdc-pave', 'train'))
     assert [len(r['fields']) for r in out] == [7, 7, 6]
     assert out[0]['fields'][1]['name'] == 'attribute_03'
+
+
+def _ud_sentence(tokens, heads, relations, upos=None, text=None):
+    return dict(sent_id='s', text=text or ' '.join(tokens), tokens=tokens, head=heads,
+                deprel=relations, upos=upos or ['VERB'] * len(tokens))
+
+
+def test_ud_full_subtree_null_subtypes_and_unique_head():
+    from collections import Counter
+    from tasksource.span_structure import ud_records
+    row = _ud_sentence(['The', 'deal', 'was', 'signed', 'by', 'Ann', '.'],
+                       [2, 4, 4, 0, 6, 4, 4],
+                       ['det', 'nsubj:pass', 'aux:pass', 'root', 'case', 'obl:agent', 'punct'])
+    counts = Counter()
+    records = list(ud_records(row, counts))
+    fields = {json.loads(r['metadata'])['field']: r for r in records}
+    assert fields['subject']['answers']['text'] == ['The deal']
+    assert fields['oblique_modifier']['answers']['text'] == ['by Ann']
+    nulls = [f for f, r in fields.items() if not r['answers']['text']]
+    assert len(fields) == 3 and len(nulls) == 1 and nulls[0] not in ('subject', 'oblique_modifier')
+    [out] = list(qa_rows(records, 'ud/ewt', 'train'))
+    check(out)
+    assert all(f['type'] == 'list' for f in out['fields'])
+    assert "'signed'" in out['fields'][0]['instruction']
+    repeated = _ud_sentence(['Ann', 'signed', 'and', 'signed'], [2, 0, 4, 2], ['nsubj', 'root', 'cc', 'conj'])
+    assert list(ud_records(repeated, counts)) == []
+    assert counts['no_unambiguous_head'] == 1
+
+
+def test_ud_nonprojective_answer_drops_entire_field_never_becomes_null():
+    from collections import Counter
+    from tasksource.span_structure import ud_records
+    # Object subtree {0, 2} is interrupted by the head at 1.
+    row = _ud_sentence(['which', 'saw', 'dog'], [3, 0, 2], ['det', 'root', 'obj'])
+    counts = Counter()
+    fields = {json.loads(r['metadata'])['field'] for r in ud_records(row, counts)}
+    assert 'object' not in fields
+    assert counts['nonprojective_subtrees'] == counts['nonprojective_fields_dropped'] == 1
+    counts = Counter()
+    assert list(ud_records({**row, 'text': 'different'}, counts)) == []
+    assert counts['unaligned_sentences'] == 1
+
+
+def test_preco_first_mention_sorted_multi_mention_and_ambiguous_anchor():
+    from collections import Counter
+    from tasksource.span_structure import preco_records
+    row = dict(id='p', sentences=[['Alice', 'saw', 'her', 'dog', '.'], ['She', 'smiled', '.']],
+               mention_clusters=[[[1, 0, 1], [0, 0, 1]], [[0, 2, 3]], [[0, 3, 4]]])
+    counts = Counter()
+    [r] = list(preco_records(row, counts))
+    assert r['answers']['text'] == ['Alice', 'She']
+    assert "'Alice'" in r['question']
+    assert counts['singleton_clusters'] == 2
+    [out] = list(qa_rows([r], 'preco/mentions', 'train'))
+    check(out)
+    row['sentences'][1][0] = 'Alice'
+    assert list(preco_records(row, counts)) == []
+    assert counts['ambiguous_clusters'] == 1
+
+
+def test_redocred_relation_direction_aggregates_entities_and_first_mentions():
+    from collections import Counter
+    from tasksource.span_structure import redocred_records
+    def mention(sent, a, b):
+        return dict(sent_id=sent, pos=[a, b], name='ignored: native tokens determine text')
+    row = dict(title='d', sents=[['Ann', 'has', 'Bob', 'and', 'Cal', '.'], ['Bob', 'smiles', '.']],
+        vertexSet=[[mention(0, 0, 1)], [mention(1, 0, 1), mention(0, 2, 3)], [mention(0, 4, 5)]],
+        labels=[dict(h=0, t=1, r='P40'), dict(h=0, t=2, r='P40'), dict(h=0, t=1, r='P40')])
+    [r] = list(redocred_records(row, Counter()))
+    assert r['answers']['text'] == ['Bob', 'Cal']
+    assert "'Ann'" in r['question'] and "'child'" in r['question']
+    assert json.loads(r['metadata'])['tail_entities'] == [1, 2]
+    [out] = list(qa_rows([r], 'redocred/entities', 'train'))
+    check(out)
+    row['sents'][1][0] = 'Ann'
+    counts = Counter()
+    assert list(redocred_records(row, counts)) == []
+    assert counts['ambiguous_relation_fields'] == 1
+
+
+def test_structural_tasks_pins_native_splits_licenses_and_collection_budgets():
+    from tasksource import task_licenses
+    from tasksource.extractive_tasks import ud_ewt, ud_gum, preco_mentions, redocred_entities
+    from tasksource.tasks import chunking
+    from scripts.build_jev_extraction import LIST_QA, NER, train_limits
+    tasks = [ud_ewt, ud_gum, preco_mentions, redocred_entities]
+    assert {t.task_id for t in tasks} <= LIST_QA
+    for task in tasks + [chunking]:
+        assert not task.complete_splits
+        assert re.fullmatch('[0-9a-f]{40}', task.load_dataset_kwargs['revision'])
+    assert ud_ewt.splits == ('train', 'dev', 'test')
+    assert preco_mentions.splits == ('train', 'validation', None)
+    licenses = task_licenses([t.task_id for t in tasks], extractive=True).set_index('id')
+    assert licenses.loc['ud/ewt', 'license_use'] == 'commercial'
+    assert licenses.loc['ud/gum', 'license_use'] == 'non-commercial'
+    assert licenses.loc['preco/mentions', 'license_use'] == 'non-commercial'
+    assert 'conll2000' in NER
+    assert train_limits(['ud/ewt', 'ud/gum'], 10_000, 10_000)['ud/ewt'] == 5000
+
+
+def test_qasrl_requires_independent_human_validation_and_selects_complete_reading():
+    from collections import Counter
+    from scripts.repackage_dataset.span_structure import qasrl_records
+    def judgment(worker, valid, spans):
+        return dict(sourceId=worker, isValid=valid, spans=spans)
+    label = dict(answerJudgments=[judgment('turk-a', True, [[0, 1], [2, 3]]),
+        judgment('turk-b', True, [[0, 1]]), judgment('model-x', True, [[1, 2]])])
+    row = dict(sentenceId='s', sentenceTokens=['Ann', 'and', 'Bob', 'ran'],
+               verbEntries={'3': dict(verbIndex=3, questionLabels={'Who ran?': label})})
+    counts = Counter()
+    [r] = list(qasrl_records(row, counts))
+    # Tie retains one real complete set, never the union of incompatible validator readings.
+    assert r['answers']['text'] == ['Ann']
+    assert json.loads(r['metadata'])['valid_judgments'] == 2
+    label['answerJudgments'] = [judgment('turk-a', True, [[0, 1]]), judgment('turk-a-eval', True, [[0, 1]]),
+                                 judgment('model-x', True, [[0, 1]])]
+    assert list(qasrl_records(row, counts)) == []
+    label['answerJudgments'] = [judgment('turk-a', True, [[0, 1]]), judgment('turk-b', True, [[2, 3]]),
+                                 judgment('turk-c', False, []), judgment('turk-d', False, [])]
+    assert list(qasrl_records(row, counts)) == []
+    assert counts['unvalidated_questions'] == 2
+
+
+def test_bioscope_nested_offsets_and_discontinuous_scope_keep_cue_identity():
+    from collections import Counter
+    from xml.etree import ElementTree as ET
+    from scripts.repackage_dataset.span_structure import bioscope_records
+    xml = '<sentence id="s"><xcope id="a">He <cue type="negation" ref="a">never</cue> '
+    xml += '<xcope id="b"><cue type="speculation" ref="b">may</cue> go</xcope></xcope>'
+    xml += ', but <xcope id="a">she can</xcope>.</sentence>'
+    records = list(bioscope_records(ET.fromstring(xml), 's', Counter()))
+    fields = {json.loads(r['metadata'])['field']: r for r in records}
+    assert fields['negation_cues']['answers']['text'] == ['never']
+    assert fields['speculation_cues']['answers']['text'] == ['may']
+    assert fields['negation_scope_0']['answers']['text'] == ['He never may go', 'she can']
+    for row in qa_rows(records, 'bioscope/abstracts', 'train'):
+        check(row)
+    empty = list(bioscope_records(ET.fromstring('<sentence>No scope.</sentence>'), 'n', Counter()))
+    assert all(r['answers']['text'] == [] for r in empty) and len(empty) == 2
+
+
+def test_sherlock_separate_cues_affixes_and_discontinuous_scopes():
+    from collections import Counter
+    from scripts.repackage_dataset.sherlock_spans import sherlock_records
+    # Two independent scopes; affix cue "un" and its complement "happy" share a token.
+    rows = [
+        ['story', '1', '0', 'He', 'he', 'PRP', '*', '_', 'He', '_', '_', 'He', '_'],
+        ['story', '1', '1', 'is', 'be', 'VB', '*', '_', 'is', '_', '_', 'is', '_'],
+        ['story', '1', '2', 'not', 'not', 'RB', '*', 'not', '_', '_', '_', '_', '_'],
+        ['story', '1', '3', 'unhappy', 'unhappy', 'JJ', '*', '_', 'unhappy', '_', 'un', 'happy', '_'],
+    ]
+    records = list(sherlock_records(['\t'.join(r) for r in rows], Counter()))
+    fields = {json.loads(r['metadata'])['field']: r for r in records}
+    assert fields['negation_cues']['answers']['text'] == ['not', 'un']
+    assert fields['negation_scope_0']['answers']['text'] == ['He is', 'unhappy']
+    assert fields['negation_scope_1']['answers']['text'] == ['He is', 'happy']
+    for row in qa_rows(records, 'sherlock/scopes', 'train'):
+        check(row)
+    rows[3][10] = 'not-in-token'
+    counts = Counter()
+    result = list(sherlock_records(['\t'.join(r) for r in rows], counts))
+    assert len(result) == 1  # the other scope survives; the all-cues field is dropped
+    assert counts['unlocated_cue_fields'] == 1

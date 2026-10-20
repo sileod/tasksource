@@ -102,6 +102,10 @@ listed in the script. It is rebuilt and replaced as a whole:
 PYTHONPATH=.:src python scripts/build_jev_extraction.py --output build/jev-extraction --push
 ```
 
+English syntax, coreference, relation-target and chunk sources are described in
+[the span-structure source audit](audits/span-structure.md), including pins, licenses, split counts,
+null shares, examples and the local-only conversions awaiting mirrors.
+
 Procedural extraction sources (`procedural/...`) come from reasoning-core's extraction generators
 (`reasoning_core/tasks/jev/*_extraction.py`), published as `tasksource/procedural-extraction` and read at the
 revision pinned in `build_jev_extraction.py`. To change them, commit the generators in reasoning-core,
