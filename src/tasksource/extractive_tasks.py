@@ -41,6 +41,10 @@ REVISIONS = {
     'IBM/multidoc2dial': 'd79fa05a7bc89f2fae00b8ac6d82593771b74c96',
     # Author upload (Ildikó Pilán) of the TAB v1.0 standoff JSON.
     'ildpil/text-anonymization-benchmark': '1f22ce098996054689b5b331fb20b3a74a78e1c5',
+    # Repackaged by scripts/repackage_dataset/web_extraction.py, not yet published: pin the Hub
+    # commit (HfApi().dataset_info(repo).sha) once uploaded.
+    'tasksource/websrc-spans': 'ed1886369b0d0516930c11d51cfad3d363caff6c',
+    'tasksource/swde': '2a754b98a6b62a3d6d835455f90fec6d95cc8ef9',
 }
 
 
@@ -620,3 +624,106 @@ def _multidoc2dial_kwargs():
 multidoc2dial = ExtractiveQA(dataset_name='parquet', task_id='multidoc2dial', complete_splits=False,
     metadata=lambda r: {'id': r['id'], 'title': r['title'], 'domain': r['domain']},
     load_dataset_kwargs=_multidoc2dial_kwargs())
+
+
+# Web pages as visible text (scripts/repackage_dataset/web_extraction.py: decoded entities, collapsed
+# whitespace, one line per block element, ' | ' between table cells); spans are verified on that text.
+
+def _websrc_page(row):
+    """WebSRC span questions of one page (yes/no questions are not spans and stay out). Long pages are
+    windowed without cutting a gold span; WebSRC has no unanswerable questions, so a question is asked
+    only in the window that holds its answer."""
+    context, questions = row['context'], row['questions']
+    gold = {'text': [t for q in questions for t in q['answers']['text']],
+            'answer_start': [s for q in questions for s in q['answers']['answer_start']]}
+    for start, end in _contract_windows(context, gold):
+        for q in questions:
+            pairs = [(t, s - start) for t, s in zip(q['answers']['text'], q['answers']['answer_start'])
+                     if start <= s and s + len(t) <= end]
+            if pairs:
+                yield _span_record(context[start:end], q['question'],
+                    {'text': [t for t, _ in pairs], 'answer_start': [s for _, s in pairs]},
+                    id=q['id'], page=row['id'], window_start=start)
+
+
+# Crowd-written questions over 6.4k web page segments (Chen et al., 2021); native website-disjoint
+# train/dev/test, the test answers released by the authors.
+websrc_spans = ExtractiveQA(dataset_name='tasksource/websrc-spans', task_id='websrc/spans', complete_splits=False,
+    pre_process=lambda d: _span_records(d, _websrc_page), metadata='metadata', max_mismatch=0,
+    load_dataset_kwargs=_kwargs('tasksource/websrc-spans'))
+
+
+# SWDE attributes: (question, type). ``text`` attributes have one value or alternative surface forms
+# ("Free Style" / "Free Style (2009)"), every occurrence of which is gold; ``list`` attributes hold
+# several items (co-authors, genres, address parts, phone numbers), each listed once.
+SWDE_ATTRIBUTES = {
+    'auto': {'model': ('What car model is the page about?', 'text'),
+             'price': ('What is the price of the car?', 'text'),
+             'engine': ('Every engine of the car, as written (each distinct text once).', 'list'),
+             'fuel_economy': ('Every fuel economy figure of the car, as written (each distinct text once).', 'list')},
+    'book': {'title': ('What is the title of the book?', 'text'),
+             'author': ('Every author of the book, as written (each distinct text once).', 'list'),
+             'isbn_13': ('What is the ISBN-13 of the book?', 'text'),
+             'publisher': ('Who is the publisher of the book?', 'text'),
+             'publication_date': ('When was the book published?', 'text')},
+    'camera': {'model': ('What camera model is the page about?', 'text'),
+               'price': ('What is the price of the camera?', 'text'),
+               'manufacturer': ('Who is the manufacturer of the camera?', 'text')},
+    'job': {'title': ('What is the title of the job?', 'text'),
+            'company': ('Which company is hiring?', 'text'),
+            'location': ('Where is the job located?', 'text'),
+            'date_posted': ('When was the job posted?', 'text')},
+    'movie': {'title': ('What is the title of the movie?', 'text'),
+              'director': ('Every director of the movie, as written (each distinct text once).', 'list'),
+              'genre': ('Every genre of the movie, as written (each distinct text once).', 'list'),
+              'mpaa_rating': ('What is the MPAA rating of the movie?', 'text')},
+    'nbaplayer': {'name': ('What is the name of the player?', 'text'),
+                  'team': ('Which team does the player play for?', 'text'),
+                  'height': ('What is the height of the player?', 'text'),
+                  'weight': ('What is the weight of the player?', 'text')},
+    'restaurant': {'name': ('What is the name of the restaurant?', 'text'),
+                   'address': ('Every part of the restaurant address, as written (each distinct text once).', 'list'),
+                   'phone': ('What is the phone number of the restaurant?', 'text'),
+                   'cuisine': ('Every cuisine of the restaurant, as written (each distinct text once).', 'list')},
+    'university': {'name': ('What is the name of the university?', 'text'),
+                   'phone': ('Every phone number of the university, as written (each distinct text once).', 'list'),
+                   'website': ('What is the website of the university?', 'text'),
+                   'type': ('What type of institution is the university (public or private)?', 'text')},
+}
+
+
+def _swde_page(vertical):
+    """One question per attribute of the vertical: located values, or none for a labelled null."""
+    def records(row):
+        import json
+        fields = json.loads(row['fields'])
+        for attribute, (question, kind) in SWDE_ATTRIBUTES[vertical].items():
+            if attribute not in fields:  # a value that could not be located: not asked, never null
+                continue
+            occurrences = fields[attribute]
+            if kind == 'list':
+                spans = [min(found) for found in occurrences]
+            else:
+                spans = sorted({tuple(o) for found in occurrences for o in found})
+            yield _span_record(row['context'], question,
+                {'text': [t for _, t in spans], 'answer_start': [s for s, _ in spans]},
+                id=f"{row['id']}/{attribute}", field=attribute, type=kind)
+    return records
+
+
+def _swde(vertical):
+    return ExtractiveQA(dataset_name='tasksource/swde', config_name=vertical, task_id=f'swde/{vertical}',
+        complete_splits=False, pre_process=lambda d: _span_records(d, _swde_page(vertical)),
+        metadata='metadata', max_mismatch=0, load_dataset_kwargs=_kwargs('tasksource/swde'))
+
+
+# Product, book, job, movie, player, restaurant, car and university pages of 80 websites (Hao et al.,
+# 2011), attribute values labelled by per-site handcrafted rules; website-disjoint splits by hash.
+swde_auto = _swde('auto')
+swde_book = _swde('book')
+swde_camera = _swde('camera')
+swde_job = _swde('job')
+swde_movie = _swde('movie')
+swde_nbaplayer = _swde('nbaplayer')
+swde_restaurant = _swde('restaurant')
+swde_university = _swde('university')

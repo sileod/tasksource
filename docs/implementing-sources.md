@@ -77,6 +77,9 @@ extractive QA in `extractive_tasks.py`.
   field names and `metadata["group"]` for balanced rows (TAB, WDC PAVE).
 - Tokenization artifacts become entities: Broad Twitter Corpus tagged `@` and the handle separately,
   merge them. Long documents need windows that never cut a gold span (CUAD).
+- HTML sources: convert to deterministic visible text once in the repackage, locate gold again inside the
+  labelled element's range by occurrence count, drop answers cut by line breaks, and treat a site-wide all-null
+  attribute as unlabelled rather than as nulls (WebSRC, SWDE).
 
 ## Checks before handing over
 

@@ -59,20 +59,28 @@ def _metadata(value):
 def qa_rows(rows, source, split, max_fields=MAX_FIELDS, kind="text"):
     """SQuAD-format rows (``context``, ``question``, ``answers``) grouped by context into fields of type
     ``kind``: ``text`` when several gold spans are alternatives (SQuAD), ``list`` when a question's
-    answer is all of them (Quoref). A source may split a context's questions into rows itself with
-    ``metadata["group"]``, and name its fields with ``metadata["field"]`` (fixed slots: TAB, WDC PAVE)."""
+    answer is all of them (Quoref). Sources with fixed slots name their fields: a question's metadata ``field``
+    (an attribute or entity type) and ``type`` override ``answer_<i>`` and ``kind``, and ``group`` splits a
+    context's questions into rows (TAB, WDC PAVE, SWDE)."""
     groups = OrderedDict()
     for row in rows:
         groups.setdefault((row["context"], _metadata(row.get("metadata")).get("group")), []).append(row)
     for (context, _), questions in groups.items():
-        for chunk in range(0, len(questions), max_fields):
-            part = questions[chunk:chunk + max_fields]
+        # Chunks of at most max_fields; a named field repeated (two records with the same text) opens a new one.
+        parts, names = [[]], [set()]
+        for q in questions:
+            name = _metadata(q.get("metadata")).get("field")
+            if len(parts[-1]) == max_fields or (name and name in names[-1]):
+                parts.append([]); names.append(set())
+            parts[-1].append(q); names[-1].add(name)
+        for part in parts:
             fields, answers, ids = [], [], []
             for i, q in enumerate(part, 1):
+                meta = _metadata(q.get("metadata"))
                 spans = {(s, t) for t, s in zip(q["answers"]["text"], q["answers"]["answer_start"])}
                 values = [{"text": t, "start": s, "end": s + len(t)} for s, t in sorted(spans)]
-                meta = _metadata(q.get("metadata"))
-                fields.append({"name": meta.get("field") or f"answer_{i}", "type": kind, "instruction": q["question"].strip()})
+                fields.append({"name": meta.get("field") or f"answer_{i}", "type": meta.get("type") or kind,
+                               "instruction": q["question"].strip()})
                 answers.append({"null": not values, "values": values})
                 ids.append(meta.get("id"))
             yield check({"id": "", "source": source, "split": split, "state": context, "fields": fields,

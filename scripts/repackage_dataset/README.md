@@ -113,3 +113,16 @@ python -m scripts.repackage_dataset mind2web_dom
 The data-only mirror is `tasksource/mind2web-dom` (`action`, `dom-element` configs).
 `provenance.json` records the pinned upstream revision, file/code hashes, counts,
 and complete trajectory-to-split mapping. No protected benchmark tests are read.
+
+## Web page span extraction
+
+```bash
+python -m scripts.repackage_dataset websrc_spans swde --dry-run
+```
+
+`web_extraction.py` converts HTML to deterministic visible text (`VisibleText`) and verifies every gold
+span on it. `websrc-spans`: WebSRC span questions (yes/no left out) relocated from the answer element
+into that text, one row per page, native train/dev/test (released test answers). `swde`: one config per
+vertical, SWDE attribute values located word-bounded in the page text (captions naming the attribute
+trimmed, unlocated attributes left out, site-wide unlabelled attributes not asked), long pages cut to one
+6,000-character window holding every value, 250 pages per site, site-disjoint 8/1/1 split by hash.

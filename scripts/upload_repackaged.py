@@ -17,6 +17,7 @@ from scripts.repackage_dataset.text import (
 )
 from scripts.repackage_dataset.vision import view2space, ai2d, iconqa_text, mind2web
 from scripts.repackage_dataset.browser import websrc
+from scripts.repackage_dataset.web_extraction import websrc_spans, swde
 from scripts.repackage_dataset.mind2web import mind2web_dom
 from scripts.repackage_dataset.relevance import antique, sentfin, wands, scirepeval_search
 from scripts.repackage_dataset.specialized_text import acord, edos, evidence_inference
@@ -91,6 +92,8 @@ BUILDERS = {"shapeworld-grounding": ("tasksource/shapeworld-grounding", shapewor
             "scirepeval_search": ("tasksource/scirepeval-search", scirepeval_search),
             "mind2web_dom": ("tasksource/mind2web-dom", mind2web_dom, "per-config"),
             "websrc": ("tasksource/websrc", websrc, "per-config"),
+            "websrc_spans": ("tasksource/websrc-spans", websrc_spans),
+            "swde": ("tasksource/swde", swde, "per-config"),
             "superclevr": ("tasksource/superclevr", superclevr),
             "coco_regions": ("tasksource/coco-regions", coco_regions, "per-config"),
             "doclaynet_region": ("tasksource/doclaynet-region", doclaynet_region),
@@ -142,6 +145,7 @@ LICENSES = {"tasksource/shapeworld-grounding": "mit",
             "tasksource/scirepeval-search": "other",
             "tasksource/mind2web-dom": "cc-by-4.0",
             "tasksource/websrc": "cc-by-4.0",
+            "tasksource/websrc-spans": "cc-by-4.0", "tasksource/swde": "other",
             "tasksource/superclevr": "mit",
             "tasksource/coco-regions": ["other", "cc-by-4.0", "cc-by-2.0",
                                       "cc-by-nc-2.0", "cc-by-nc-sa-2.0"],

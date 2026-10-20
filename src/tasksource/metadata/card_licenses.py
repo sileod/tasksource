@@ -22,6 +22,7 @@ CARD_LICENSES = {
  "McGill-NLP/WebLINX": ["cc-by-nc-sa-4.0"],
  "X-LANCE/WebSRC_v1.0": ["cc-by-4.0"],
  "tasksource/websrc": ["cc-by-4.0"],
+ "tasksource/websrc-spans": ["cc-by-4.0"],
  "RyanWW/Super-CLEVR": ["mit"],
  "tasksource/superclevr": ["mit"],
  "0jl/SPair-71k": [],
