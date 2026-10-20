@@ -1,0 +1,13 @@
+Extract these fields from the document.
+
+Document:
+"""
+{{DOCUMENT}}
+"""
+
+Fields:
+{{FIELDS}}
+
+A text field is one span copied exactly from the document; a list field is every matching span, each copied
+exactly, in order of appearance. Use null when the document does not state it.
+Answer with JSON only: {"field_name": "span" | ["span", ...] | null, ...}

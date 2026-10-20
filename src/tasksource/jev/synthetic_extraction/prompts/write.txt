@@ -1,0 +1,14 @@
+Write one realistic {{DOCUMENT_KIND}} for this application: {{APPLICATION}}.
+Length: {{LENGTH}}. Use these names where people appear: {{NAMES}}. Write naturally, like a real document of this
+kind (format, tone, signatures, quoted earlier messages or tables where they belong).
+
+Plan for each field (the instruction says what counts):
+{{PLAN}}
+
+"near miss" means: the document also states a similar value that does NOT satisfy the instruction (a former value,
+another person's, an offered instead of requested one, a draft that was corrected), so that a careless reader
+would pick it. "absent" means: the document does not state any value that satisfies the instruction, but it
+mentions something close that does not qualify.
+
+Answer with JSON only: {"document": "...", "answers": {"field_name": "span" | ["span", ...] | null}}
+Every answer must be copied character for character from the document; lists in order of appearance.

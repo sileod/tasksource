@@ -1,0 +1,17 @@
+You design the extraction step of a real application that reads {{SOURCE}} in the domain "{{DOMAIN}}".
+
+Write the schema an engineer would give an extraction model: one document kind and {{N_FIELDS}} fields. Each field is
+- "text": one span copied from the document (or null), or
+- "list": every span that matches, each copied from the document (or null when there is none).
+
+Good fields need reading, not pattern matching: the value that holds after a correction or a later message, who
+committed to what, the item a complaint is about, every action assigned to a given role, the reason given for a
+decision, the condition attached to an approval. Mix easy fields with harder ones. Every answer must be a verbatim
+span of the document: no computed, normalized, summarized or yes/no values.
+
+Each instruction must be precise enough that two careful readers copy the same spans: say which mention counts
+when several are possible (current vs former, requested vs offered, this person vs others), and what a span covers
+(the name alone, the full date as written, the amount with its currency).
+
+Answer with JSON only:
+{"application": "...", "document_kind": "...", "fields": [{"name": "snake_case_name", "type": "text" or "list", "instruction": "..."}]}

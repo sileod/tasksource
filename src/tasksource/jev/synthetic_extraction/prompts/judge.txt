@@ -1,0 +1,16 @@
+Two readers extracted the same field from a document and disagree. Decide who follows the instruction.
+
+Document:
+"""
+{{DOCUMENT}}
+"""
+
+Field "{{NAME}}" ({{TYPE}}): {{INSTRUCTION}}
+
+Answer 1: {{ANSWER_1}}
+Answer 2: {{ANSWER_2}}
+
+Verdict: "1" if only answer 1 is right, "2" if only answer 2 is right, "both" if both are acceptable readings,
+"neither" if neither is. Set "ambiguous" to true when the instruction or the document allows several reasonable
+answers.
+Answer with JSON only: {"verdict": "1" | "2" | "both" | "neither", "ambiguous": true | false, "reason": "..."}
