@@ -46,6 +46,8 @@ ORIGINALS = {
     "tasksource/discogem": [],  # original DiscoGeM 1.0 crowd distributions
     "tasksource/slurp": [],  # official textual annotations, without audio
     "tasksource/mcscript2": [],  # original Saarland XML archive
+    "tasksource/molweni": [],  # original HIT-SCIR/Molweni MRC(withDiscourse) GitHub release
+    "tasksource/friendsqa": [],  # original emorynlp/FriendsQA GitHub release
 
     "tasksource/acord": ["theatticusproject/acord"],
     "tasksource/edos": [],  # pinned official GitHub CSV

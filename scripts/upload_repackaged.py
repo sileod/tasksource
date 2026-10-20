@@ -20,7 +20,7 @@ from scripts.repackage_dataset.browser import websrc
 from scripts.repackage_dataset.mind2web import mind2web_dom
 from scripts.repackage_dataset.relevance import antique, sentfin, wands, scirepeval_search
 from scripts.repackage_dataset.specialized_text import acord, edos, evidence_inference
-from scripts.repackage_dataset.dialogue import slurp, mcscript2, esconv
+from scripts.repackage_dataset.dialogue import slurp, mcscript2, esconv, molweni, friendsqa
 from scripts.repackage_dataset.sbic import sbic
 from scripts.repackage_dataset.comve import comve
 from scripts.repackage_dataset.tabmwp import tabmwp
@@ -81,6 +81,8 @@ BUILDERS = {"shapeworld-grounding": ("tasksource/shapeworld-grounding", shapewor
             "perspectrum": ("tasksource/perspectrum", perspectrum),
             "ukpconvarg": ("tasksource/ukpconvarg", ukpconvarg), "discogem": ("tasksource/discogem", discogem),
             "mcscript2": ("tasksource/mcscript2", mcscript2),
+            "molweni": ("tasksource/molweni", molweni),
+            "friendsqa": ("tasksource/friendsqa", friendsqa),
             "sentfin": ("tasksource/sentfin", sentfin),
             "acord": ("tasksource/acord", acord),
             "edos": ("tasksource/edos", edos),
@@ -133,6 +135,7 @@ LICENSES = {"tasksource/shapeworld-grounding": "mit",
             "tasksource/pubmed-rct": "other",
             "tasksource/vast": "other", "tasksource/fnc1": "other", "tasksource/perspectrum": "cc-by-sa-4.0",
             "tasksource/ukpconvarg": "cc-by-4.0", "tasksource/discogem": "other",
+            "tasksource/molweni": "apache-2.0", "tasksource/friendsqa": "apache-2.0",
             "tasksource/sentfin": "mit", "tasksource/wands": "mit",
             "tasksource/acord": "cc-by-4.0", "tasksource/edos": "cc0-1.0",
             "tasksource/evidence-inference": "other",

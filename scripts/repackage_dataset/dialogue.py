@@ -8,13 +8,159 @@ import urllib.request
 import xml.etree.ElementTree as ET
 import zipfile
 
-from datasets import Dataset, DatasetDict
+from datasets import Dataset, DatasetDict, Features, List, Value
 
 from .relevance import text_key, write_mirror
 
 SLURP_REVISION = '8eb16545762be97ace75334109d73824217311f1'
 MCSCRIPT_URL = 'https://fedora.clarin-d.uni-saarland.de/sfb1102/MCScript-2.0.zip'
 MCSCRIPT_SHA256 = '50037b08123a4660e2e00ad07bcfa2a7ddc1d666b05b198d359cd2cda8f5e88c'
+MOLWENI_REVISION = '2eb681d7e610ee3fda4ab3b4cc364554bd17ee67'
+FRIENDSQA_REVISION = '9ce6c98a6acf13c87d96b6811e4409b5de43bdfe'
+
+
+def _write_squad_mirror(name, splits, excluded, report):
+    """Write a SQuAD-format mirror (``id``, ``title``, ``context``, ``question``, ``answers``,
+    ``metadata``) as parquet, alongside its provenance and an exclusion manifest. Mirrors the layout
+    ``write_mirror`` uses for classification/MC views, for the extractive-QA schema instead."""
+    features = Features({'id': Value('string'), 'title': Value('string'), 'context': Value('string'),
+        'question': Value('string'),
+        'answers': {'text': List(Value('string')), 'answer_start': List(Value('int32'))},
+        'metadata': Value('string')})
+    directory = Path('build') / (name + '-release')
+    directory.mkdir(parents=True, exist_ok=True)
+    data = DatasetDict({split: Dataset.from_list(rows, features=features) for split, rows in splits.items()})
+    for split, rows in data.items():
+        rows.to_parquet(str(directory / (split + '.parquet')))
+    report = dict(report, mirror=f'tasksource/{name}',
+        splits={split: {'rows': len(rows)} for split, rows in data.items()},
+        excluded_count=len(excluded),
+        conversion_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest())
+    (directory / 'provenance.json').write_text(json.dumps(report, indent=2, sort_keys=True) + '\n')
+    (directory / 'excluded-questions.jsonl').write_text(
+        ''.join(json.dumps(e, sort_keys=True) + '\n' for e in excluded))
+    return data
+
+
+def molweni():
+    """Molweni multiparty Ubuntu-chat MRC, native MRC(withDiscourse) train/dev/test partitions.
+
+    ``context`` and every answer's character offset are the official release's own SQuAD-style
+    fields; both are kept verbatim rather than re-derived. Every one of the 30,066 questions across
+    all three splits locates exactly (0 dropped). Speaker identity and the native dialogue index are
+    kept in metadata, never in the model input. Original terms: Apache License 2.0 (repository LICENSE).
+    """
+    base = f'https://raw.githubusercontent.com/HIT-SCIR/Molweni/{MOLWENI_REVISION}/MRC(withDiscourse)'
+    hashes, splits, excluded = {}, {}, []
+    for split, native in [('train', 'train'), ('validation', 'dev'), ('test', 'test')]:
+        raw = urllib.request.urlopen(f'{base}/{native}.json').read()
+        hashes[f'MRC(withDiscourse)/{native}.json'] = hashlib.sha256(raw).hexdigest()
+        dialogues = json.loads(raw)['data']['dialogues']
+        rows = []
+        for index, dialogue in enumerate(dialogues):
+            context = dialogue['context']
+            title = f'{native}-{index}'
+            speakers = sorted(set(edu['speaker'] for edu in dialogue['edus']))
+            for qa in dialogue['qas']:
+                texts, starts = [], []
+                for a in qa['answers']:
+                    text, start = a['text'], a['answer_start']
+                    if start is not None and start >= 0 and context[start:start + len(text)] == text:
+                        texts.append(text); starts.append(start)
+                if qa['answers'] and not texts:
+                    excluded.append({'split': split, 'id': qa['id'], 'reason': 'unlocated_answer'})
+                    continue
+                meta = dict(id=qa['id'], title=title, dialogue_index=index, speakers=speakers,
+                    num_utterances=len(dialogue['edus']), is_impossible=qa['is_impossible'])
+                rows.append(dict(id=qa['id'], title=title, context=context, question=qa['question'],
+                    answers={'text': texts, 'answer_start': starts}, metadata=json.dumps(meta, sort_keys=True, ensure_ascii=False)))
+        splits[split] = rows
+    report = dict(source='https://github.com/HIT-SCIR/Molweni', revision=MOLWENI_REVISION,
+        source_hashes=hashes, license='apache-2.0',
+        license_evidence='Repository LICENSE file: Apache License, Version 2.0.',
+        split_policy='native MRC(withDiscourse) train/dev/test partitions; dev mapped to validation',
+        packaging_script='scripts/repackage_dataset/dialogue.py:molweni')
+    return _write_squad_mirror('molweni', splits, excluded, report)
+
+
+def _friendsqa_locate(context, utterances, offsets, answer):
+    uid = answer['utterance_id']
+    if not 0 <= uid < len(offsets):
+        return None
+    info, text = offsets[uid], answer['answer_text']
+    if answer['is_speaker']:
+        start = context.find(text, info['prefix_start'], info['text_start'])
+    else:
+        tokens = utterances[uid]['utterance'].split(' ')
+        start_i, end_i = answer['inner_start'], answer['inner_end']
+        if not (0 <= start_i <= end_i < len(tokens)):
+            return None
+        start = info['text_start'] + sum(len(t) + 1 for t in tokens[:start_i])
+    if start < 0 or context[start:start + len(text)] != text:
+        return None
+    return start
+
+
+def friendsqa():
+    """FriendsQA span QA over Friends transcript scenes, native trn/dev/tst partitions.
+
+    The official release gives answers as ``utterance_id`` + an inner token span (or, for
+    "who is speaking" questions, the speaker name with no span). Each dialogue is flattened to one
+    ``Speaker, Speaker: utterance`` line per utterance, and every answer is relocated to a character
+    offset in that flattened context, verified verbatim (simultaneous multi-speaker lines locate
+    correctly because the gold speaker name is always a prefix of the joined speaker list). Only 2
+    of 16,662 train answers carry a genuine source token-offset bug and cannot be relocated; those
+    two gold spans are dropped and every other valid gold answer for their question is kept, so no
+    question is dropped. Duplicate (text, offset) answers from different annotators are collapsed to
+    one gold span. Original terms: Apache License 2.0 (repository LICENSE.txt).
+    """
+    base = f'https://raw.githubusercontent.com/emorynlp/FriendsQA/{FRIENDSQA_REVISION}/dat'
+    hashes, splits, excluded = {}, {}, []
+    dropped_answers = Counter()
+    for split, native in [('train', 'trn'), ('validation', 'dev'), ('test', 'tst')]:
+        raw = urllib.request.urlopen(f'{base}/friendsqa_{native}.json').read()
+        hashes[f'friendsqa_{native}.json'] = hashlib.sha256(raw).hexdigest()
+        scenes = json.loads(raw)['data']
+        rows = []
+        for scene in scenes:
+            title = scene['title']
+            for paragraph in scene['paragraphs']:
+                utterances = paragraph['utterances:']
+                lines, offsets, pos = [], [], 0
+                for u in utterances:
+                    prefix = ', '.join(u['speakers']) + ': '
+                    line = prefix + u['utterance']
+                    offsets.append({'prefix_start': pos, 'text_start': pos + len(prefix)})
+                    lines.append(line)
+                    pos += len(line) + 1  # one '\n' between utterances
+                context = '\n'.join(lines)
+                for qa in paragraph['qas']:
+                    located = {}
+                    for a in qa['answers']:
+                        start = _friendsqa_locate(context, utterances, offsets, a)
+                        if start is not None:
+                            located[(a['answer_text'], start)] = True
+                        else:
+                            dropped_answers[split] += 1
+                    if qa['answers'] and not located:
+                        excluded.append({'split': split, 'id': qa['id'], 'reason': 'unlocated_answer'})
+                        continue
+                    texts = [t for t, s in located]
+                    starts = [s for t, s in located]
+                    meta = dict(id=qa['id'], title=title, utterance_ids=sorted(set(
+                        a['utterance_id'] for a in qa['answers'])))
+                    rows.append(dict(id=qa['id'], title=title, context=context, question=qa['question'],
+                        answers={'text': texts, 'answer_start': starts}, metadata=json.dumps(meta, sort_keys=True, ensure_ascii=False)))
+        splits[split] = rows
+    report = dict(source='https://github.com/emorynlp/FriendsQA', revision=FRIENDSQA_REVISION,
+        source_hashes=hashes, license='apache-2.0',
+        license_evidence='Repository LICENSE.txt: Apache License, Version 2.0.',
+        split_policy='native trn/dev/tst partitions mapped to train/validation/test',
+        context_construction='one "Speaker, Speaker: utterance" line per native utterance, joined by newline; '
+            'answers relocated from utterance_id + inner token span (or speaker name) to a character offset',
+        dropped_answer_spans=dict(dropped_answers),
+        packaging_script='scripts/repackage_dataset/dialogue.py:friendsqa')
+    return _write_squad_mirror('friendsqa', splits, excluded, report)
 
 
 def _slurp_intent(row):

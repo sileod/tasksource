@@ -24,6 +24,8 @@ REVISIONS = {
     'megagonlabs/subjqa': '60308110d69c81899c19a5297cfc943d615a11d9',
 
     'MahmoudAbdelWahed/QAConvSQuAD': '53fe038f448caab5b6e6363f82bd9706963a4f69',
+    'tasksource/molweni': 'f2d24c023fa066b2972dcf827e648208350ad7f5',
+    'tasksource/friendsqa': 'bc4adc08c0bf71b2ce7cbfb36002d3cabf403a6a',
     'ibm-research/duorc': '2de12436b8945030c283bf4af83925d60efe10c6',
     'stanfordnlp/concurrentqa': '2cc9db602b10a561026c905403a641422f066369',
     'WorkInTheDark/FairytaleQA': 'fad16faf261459cc55d6d516b6fb3e68c0ddd5a6',
@@ -436,3 +438,13 @@ def _qaconv_answers(row):
 qaconv = ExtractiveQA(dataset_name='MahmoudAbdelWahed/QAConvSQuAD', task_id='qaconv', complete_splits=False,
     answers=_qaconv_answers,
     metadata=lambda r: {'id': r['id'], 'title': r['title']}, load_dataset_kwargs=_kwargs('MahmoudAbdelWahed/QAConvSQuAD'))
+
+
+# Molweni and FriendsQA have no usable Hub upload: scripts/repackage_dataset/dialogue.py republishes
+# Molweni's native SQuAD-format spans and relocates FriendsQA's utterance/token-span answers to
+# character offsets in a flattened "Speaker: utterance" context, as tasksource mirrors.
+molweni = ExtractiveQA(dataset_name='tasksource/molweni', task_id='molweni', max_mismatch=0, complete_splits=False,
+    metadata='metadata', load_dataset_kwargs=_kwargs('tasksource/molweni'))
+
+friendsqa = ExtractiveQA(dataset_name='tasksource/friendsqa', task_id='friendsqa', max_mismatch=0, complete_splits=False,
+    metadata='metadata', load_dataset_kwargs=_kwargs('tasksource/friendsqa'))

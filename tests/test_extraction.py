@@ -395,3 +395,58 @@ def test_qaconv_empty_answer_is_unanswerable():
     from tasksource.extractive_tasks import _qaconv_answers
     assert _qaconv_answers({'answers': {'text': [''], 'answer_start': [0]}}) == {'text': [], 'answer_start': []}
     assert _qaconv_answers({'answers': {'text': ['x'], 'answer_start': [3]}}) == {'text': ['x'], 'answer_start': [3]}
+
+
+def _friendsqa_context(speakers_per_utterance, utterances):
+    lines, offsets, pos = [], [], 0
+    for speakers, utterance in zip(speakers_per_utterance, utterances):
+        prefix = ', '.join(speakers) + ': '
+        line = prefix + utterance
+        offsets.append({'prefix_start': pos, 'text_start': pos + len(prefix)})
+        lines.append(line)
+        pos += len(line) + 1
+    return '\n'.join(lines), offsets
+
+
+def test_friendsqa_locate_token_span():
+    from scripts.repackage_dataset.dialogue import _friendsqa_locate
+    utterances = [{'utterance': "I 'm not giving up the apartment ."}]
+    context, offsets = _friendsqa_context([['Chandler Bing']], [u['utterance'] for u in utterances])
+    answer = {'utterance_id': 0, 'inner_start': 3, 'inner_end': 4, 'is_speaker': False,
+              'answer_text': 'giving up'}
+    start = _friendsqa_locate(context, utterances, offsets, answer)
+    assert start is not None and context[start:start + len('giving up')] == 'giving up'
+
+
+def test_friendsqa_locate_speaker_name_prefix_of_multi_speaker_line():
+    from scripts.repackage_dataset.dialogue import _friendsqa_locate
+    utterances = [{'utterance': 'Breathe .'}]
+    context, offsets = _friendsqa_context([['Monica Geller', 'Rachel Green']], [u['utterance'] for u in utterances])
+    answer = {'utterance_id': 0, 'inner_start': -1, 'inner_end': -1, 'is_speaker': True,
+              'answer_text': 'Monica Geller'}
+    start = _friendsqa_locate(context, utterances, offsets, answer)
+    assert start == 0 and context[start:start + len('Monica Geller')] == 'Monica Geller'
+    # The gold answer is only ever the credited speaker, but the search still locates a
+    # different speaker's name verbatim within the same "Speaker, Speaker: " prefix slot.
+    other = _friendsqa_locate(context, utterances, offsets, {**answer, 'answer_text': 'Rachel Green'})
+    assert context[other:other + len('Rachel Green')] == 'Rachel Green'
+    # A name that never appears in the prefix at all is rejected.
+    assert _friendsqa_locate(context, utterances, offsets, {**answer, 'answer_text': 'Phoebe Buffay'}) is None
+
+
+def test_friendsqa_locate_rejects_misaligned_token_offsets():
+    from scripts.repackage_dataset.dialogue import _friendsqa_locate
+    utterances = [{'utterance': '[ Scene : a room . ]'}]
+    context, offsets = _friendsqa_context([['#NOTE#']], [u['utterance'] for u in utterances])
+    # A genuinely bad source annotation (the span text does not match the claimed token offset).
+    answer = {'utterance_id': 0, 'inner_start': 5, 'inner_end': 6, 'is_speaker': False,
+              'answer_text': 'some other text'}
+    assert _friendsqa_locate(context, utterances, offsets, answer) is None
+
+
+def test_friendsqa_locate_rejects_out_of_range_utterance_id():
+    from scripts.repackage_dataset.dialogue import _friendsqa_locate
+    utterances = [{'utterance': 'hello .'}]
+    context, offsets = _friendsqa_context([['A']], [u['utterance'] for u in utterances])
+    answer = {'utterance_id': 7, 'inner_start': 0, 'inner_end': 0, 'is_speaker': False, 'answer_text': 'hello'}
+    assert _friendsqa_locate(context, utterances, offsets, answer) is None

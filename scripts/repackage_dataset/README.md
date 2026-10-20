@@ -24,6 +24,19 @@ interpretation, eligibility checks, candidate sampling and geometry calculations
 here. Runtime task declarations should select canonical fields and ontologies;
 a short grouped-QA expansion is retained to avoid repeating stored image bytes.
 
+`dialogue.py` also pulls two dialogue extractive-QA sources straight from their pinned GitHub
+commits, since neither has a usable Hub upload: `molweni` (HIT-SCIR/Molweni, `MRC(withDiscourse)`
+JSON, native SQuAD-style `context`/`answer_start`, Apache 2.0) and `friendsqa` (emorynlp/FriendsQA,
+`dat/friendsqa_*.json`, Apache 2.0). FriendsQA's utterance-id/inner-token-span answers are flattened
+to one `Speaker: utterance` line per utterance and the gold spans relocated to a character offset
+in that context; a handful of genuinely misaligned source spans are dropped per-answer, not
+per-question. Both write the shared SQuAD mirror schema (`id`, `title`, `context`, `question`,
+`answers`, `metadata`) via `_write_squad_mirror`. Reproduce with:
+
+```bash
+python -m scripts.repackage_dataset molweni friendsqa
+```
+
 ## Archive-only HTML and Super-CLEVR
 
 ```bash
