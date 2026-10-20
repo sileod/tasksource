@@ -4,6 +4,12 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource-jev-typed-decisions v2026.10.20.2
+
+- `extraction`: add 32 sources (65 in total), bringing it to 294,154 training, 22,559 validation and 24,633 test rows (1,015,056 training fields).
+- Extractive QA: QuAC with dialogue history, CUAD contract clauses in windows of about 4,000 characters, TyDi QA GoldP English, Qasper, PolicyQA, SubjQA (books, electronics, grocery, movies, TripAdvisor), COVID-QA, TimeQA, TAT-QA text spans and ROPES. Answers are verbatim spans of the context; native unanswerables stay null.
+- Span tagging: CrossNER (politics, science, music, literature, AI), SkillSpan skills and knowledge, FabNER, BUSTER, BioRED entities, LitBank, MedMentions ST21pv, Chia, Linnaeus, SciERC entities, toxic spans, Inspec keyphrases and SemEval-2014 laptop aspect terms.
+
 ## tasksource-jev-typed-decisions v2026.10.20.1
 
 - `extraction`: add 18 sources, bringing it to 209,452 training, 14,065 validation and 13,842 test rows (719,489 training fields).
