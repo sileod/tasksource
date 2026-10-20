@@ -4,6 +4,11 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource/procedural-extraction v2026.10.20.1
+
+- Add four generators: typed mentions (named-entity style, typed by context, defined role or stated format), business documents (values in force after amendments, dated windows and schedule references), nested JSON/YAML/XML configurations with override layers, and raw HTML pages (item scope, visibility, table grids). Eight configs of 10,000 training and 500 validation and test rows.
+- `record_field_extraction` adds names that are also field values (May, Sydney).
+
 ## tasksource-jev-typed-decisions v2026.10.20.6
 
 - `extraction`: add TAB personal-information masking (court cases; every mention that must be masked to anonymise a person, by type, from annotator majority) and WDC-PAVE product attributes (human-verified values or null per attribute of the category); 82 sources, 388,909 training, 27,720 validation and 30,257 test rows.

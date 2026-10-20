@@ -27,9 +27,10 @@ REPO = "tasksource/tasksource-jev-typed-decisions"
 EXCLUDED_QA = {"newsqa"}
 # Procedural extraction (reasoning-core generators, scripts/build_procedural_extraction.py): one source per
 # generator, each capped like any other source, so equal shares. Pinned Hub snapshot of the published data.
-PROCEDURAL_REPO, PROCEDURAL_REVISION = "tasksource/procedural-extraction", "322a73a8f3d18aa8b666baf023cfe21f648cdd11"
+PROCEDURAL_REPO, PROCEDURAL_REVISION = "tasksource/procedural-extraction", "a7c6fd6cf55bb827029a2edcea05b43e34b81ed4"
 PROCEDURAL = ["record_field_extraction", "state_update_extraction", "conditional_list_extraction",
-              "log_query_extraction"]
+              "log_query_extraction", "typed_mention_extraction", "business_document_extraction",
+              "nested_structure_extraction", "html_extraction"]
 # Multi-span answers are sets (every span is part of the answer), not alternatives.
 LIST_QA = {"quoref", "cuad/spans", "qasper/spans", "tab/pii", "ud/ewt", "ud/gum", "preco/mentions", "redocred/entities"}
 NER = {
@@ -230,7 +231,8 @@ pass, as extraction models (e.g. Cloudflare's Clairic) are asked. {rows}
   a missing dependent is null and a non-projective positive field is omitted.
 - Procedural extraction ([procedural-extraction](https://huggingface.co/datasets/tasksource/procedural-extraction),
   sources `procedural/...`): person records with near-miss names and confusers, plan slots in force after a chat
-  of proposals and undos, conditional order lists after updates, and log queries, at difficulty levels 0 to 4;
+  of proposals and undos, conditional order lists after updates, log queries, typed mentions, business documents
+  with amendments, nested configurations with override layers and raw HTML pages, at difficulty levels 0 to 4;
   spans and nulls exact by construction.
   Entity texts are the source tokens joined by spaces.
 - Native splits, except those without released labels; evaluation texts that also occur in training are dropped. Each source is capped at
