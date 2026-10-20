@@ -85,8 +85,9 @@ def provenance():
     from reasoning_core import get_task
     root = Path(reasoning_core.__file__).resolve().parents[1]
     commit = subprocess.run(["git", "-C", str(root), "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
-    dirty = subprocess.run(["git", "-C", str(root), "status", "--porcelain", "reasoning_core"],
-                           capture_output=True, text=True).stdout.strip()
+    git = lambda *a: subprocess.run(["git", "-C", str(root), *a], capture_output=True, text=True).stdout.strip()
+    dirty = git("status", "--porcelain", "--untracked-files=no", "reasoning_core") or git(
+        "status", "--porcelain", "reasoning_core/tasks/jev")
     if dirty:
         raise SystemExit(f"reasoning-core checkout {root} has uncommitted task changes; commit them first")
     return {"generator": "https://github.com/sileod/reasoning-core", "commit": commit,

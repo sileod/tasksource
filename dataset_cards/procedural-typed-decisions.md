@@ -179,6 +179,10 @@ Every answer is computed exactly from the state by rules that the state
 itself spells out, so the labels are noise-free. No yes/no or choice label exceeds 60% of a question's answers: yes/no questions are at most a third of a task's questions. A state skips a question whose answer, or whose yes/no format, is already over-represented, so states ask varying subsets of their task's questions. Several configs vary the number of options
 (4 to 60), to balance the binary and 4–6-option questions that dominate the rest of Jev.
 
+The generators are the Jev tasks of [reasoning-core](https://github.com/sileod/reasoning-core)
+(`reasoning_core/tasks/jev/`; `arithmetic` is `practical_arithmetic` there and `evidence_sufficiency` is
+`claim_support`); [provenance.json](provenance.json) records the commit and task versions.
+
 This is an independent dataset. It is not an official TypeSafe Jev dataset and
 is not produced by or affiliated with TypeSafe or OpenJev.
 
@@ -234,7 +238,10 @@ Level 0 is meant to be easy for a strong decision model and level 4 hard. The
 table gives Jev's chance-adjusted accuracy, kappa = (accuracy − chance) /
 (1 − chance), on 40 fresh states per level (every question of each state;
 `typesafe/jev-1.13-20260917`, September 2026; `jev-latest`, October 2026, for `event_triggered_execution`,
-`goal_directed_planning`, `graph_navigation`, `instruction_execution`, `partial_observation_calibration` and `record_eligibility`, 30–40 states per level). 1 is perfect, 0 is chance.
+`goal_directed_planning`, `graph_navigation`, `instruction_execution`, `partial_observation_calibration` and `record_eligibility`, 30–40 states per level). 1 is perfect, 0 is chance. It was measured before the
+generators moved to reasoning-core: five configs generate identical states there (`event_triggered_execution`,
+`goal_directed_planning`, `graph_navigation`, `instruction_execution`, `record_eligibility`), the others keep their
+rules and levels with revised renderings and sampling.
 
 | config | level 0 | 1 | 2 | 3 | 4 |
 |---|---|---|---|---|---|
@@ -283,13 +290,12 @@ The same rows are included, grouped by state, in
 ## Reproduction
 
 Generation is deterministic (row `i` of a split is seeded by `task:split:i`).
-From a [tasksource](https://github.com/sileod/tasksource) checkout:
+From a [tasksource](https://github.com/sileod/tasksource) checkout, with the reasoning-core commit of
+[provenance.json](provenance.json) installed:
 
 ```bash
 PYTHONPATH=.:src python scripts/build_procedural_jev.py --output build/procedural-typed-decisions --upload
 ```
-
-Generators live in `src/tasksource/jev/procedural/`.
 
 ## Citation
 

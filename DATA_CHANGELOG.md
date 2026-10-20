@@ -4,6 +4,14 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource/procedural-typed-decisions v2026.10.20
+
+- Regenerated from the reasoning-core Jev generators: same configs, questions and levels. Five configs keep identical states (`event_triggered_execution`, `goal_directed_planning`, `graph_navigation`, `instruction_execution`, `record_eligibility`); the others have revised renderings and sampling, and `arithmetic` asks graded probabilities only when they are not close to one half. `provenance.json` records the generator commit.
+
+## tasksource/procedural-extraction v2026.10.20
+
+- New: four procedural extraction generators (person records, plan details in force, conditional lists, log queries), 10,000 training and 500 validation and test rows each, at levels 0 to 4.
+
 ## tasksource-jev-typed-decisions v2026.10.20.5
 
 - `extraction`: add four procedural sources (`procedural/...`, from [procedural-extraction](https://huggingface.co/datasets/tasksource/procedural-extraction)): person records with near-miss names and confusers, plan details in force after proposals and undos, conditional order lists after updates, and log queries, at difficulty levels 0 to 4 with exact spans and nulls. 10,000 training and 500 validation and test rows each; 80 sources, 383,770 training, 27,499 validation and 29,545 test rows.

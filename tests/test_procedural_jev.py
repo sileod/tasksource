@@ -1,78 +1,17 @@
+"""tasksource side of the procedural Jev data: published schema, splits, balance and Jev conversion. The generators
+and their oracle tests live in reasoning-core (reasoning_core/tasks/jev/)."""
 import json
 import random
-import re
 import unittest
 from collections import Counter
-from fractions import Fraction
-from itertools import product
 
 from datasets import Dataset
 
 from tasksource.jev.augmentations import augment_jev_internal
 from tasksource.jev.procedural import TASKS, jev_rows
-from tasksource.jev.procedural.policy_applicability import SENSITIVITY
 from tasksource.jev.recast import render_typed_decision_group
 from scripts.build_jev_dataset import TRAINING_FEATURES, share_cap, source_row_group
 from scripts.build_procedural_jev import MAX_LABEL_SHARE, build_task, generate_split
-
-
-def _intent(state):
-    if any(state["billing"].values()):
-        return "billing"
-    account, telemetry = state["account"], state["telemetry"]
-    failures = account["auth_failures"] if "auth_failures" in account else sum(
-        e["kind"] == "login" and not e["ok"] for e in state["recent_events"])
-    if account["active"] and (failures >= 2 or account["permission_mismatch"]):
-        return "access"
-    if telemetry["integration_failures"] >= 2 or telemetry["error_rate_percent"] >= 20:
-        return "technical"
-    return "other"
-
-
-def _impact(workflow):
-    down = {e["feature"] for e in workflow["affected_features"] if e["status"] == "down"}
-    slow = {e["feature"] for e in workflow["affected_features"] if e["status"] == "slow"}
-    if down & set(workflow["core_features"]) - set(workflow["workarounds"]):
-        return 2
-    return int(bool(down | slow))
-
-
-def _risk(record, rule):
-    return (
-        (0 if record["authorized"] else rule["unauthorized_points"])
-        + (rule["blocked_status_points"] if record["status"] == "blocked" else 0)
-        + (rule["amount_threshold_points"] if record["amount"] >= rule["amount_threshold"] else 0)
-        + (rule["unassigned_owner_points"] if record["owner"] == "unassigned" else 0)
-    )
-
-
-def _uncertain_policy_answers(state):
-    """Brute force from the rendered state: every (role, report outcomes) world, weighted and conditioned."""
-    history = dict((plural[:-1], int(n)) for n, plural in re.findall(r"(\d+) by (\w+)", state["role_evidence"]["history"]))
-    reports = [(r["says"], Fraction(*map(int, re.findall(r"\d+", r["reliability"]))))
-               for r in state["role_evidence"]["reports"]]
-    roles = list(history)
-    joint = {}
-    for role in roles:
-        for outcomes in product(roles, repeat=len(reports)):
-            weight = Fraction(history[role], sum(history.values()))
-            for said, (_, reliability) in zip(outcomes, reports):
-                weight *= reliability if said == role else (1 - reliability) / (len(roles) - 1)
-            if list(outcomes) == [said for said, _ in reports]:
-                joint[role] = joint.get(role, 0) + weight
-    total = sum(joint.values())
-    allowed, governing = Fraction(0), {}
-    for role, weight in joint.items():
-        request = state["request"]
-        subject = {**request["subject"], "role": role}
-        matching = [p for p in state["policies"] if role in p["roles"] and subject["team"] in p["teams"]
-                    and subject["clearance"] >= p["min_clearance"] and request["action"] in p["actions"]
-                    and SENSITIVITY.index(request["resource"]["sensitivity"]) <= SENSITIVITY.index(p["max_sensitivity"])]
-        top = max(matching, key=lambda p: p["priority"]) if matching else None
-        key = top["id"] if top else "none (default deny)"
-        governing[key] = governing.get(key, 0) + weight / total
-        allowed += weight / total if top and top["effect"] == "allow" else 0
-    return {role: weight / total for role, weight in joint.items()}, governing, allowed
 
 
 class ProceduralJevTest(unittest.TestCase):
@@ -112,33 +51,6 @@ class ProceduralJevTest(unittest.TestCase):
         outputs = [subprocess.run([sys.executable, "-c", script], capture_output=True, text=True, check=True,
                                   env={**os.environ, "PYTHONHASHSEED": seed}).stdout for seed in ("1", "2")]
         self.assertEqual(*outputs)
-
-    def test_multi_view_gold_follows_stated_rules(self):
-        for problem in self.samples("multi_view_adjudication"):
-            state, answers = problem.state, problem.answers
-            timeline = state["timeline"]
-            deadline = timeline["deadline_hours"] if "deadline_hours" in timeline else (
-                None if timeline["due_hour"] is None else timeline["due_hour"] - timeline["now_hour"])
-            urgent = timeline["executive_escalation"] or (deadline is not None and deadline <= 24)
-            self.assertEqual(answers["intent"]["choice"], _intent(state))
-            self.assertEqual(bool(answers["is_urgent"]["noul"]), urgent)
-            self.assertEqual(answers["workflow_impact"]["score"], _impact(state["workflow"]))
-
-    def test_state_perturbation_gold_follows_risk_rule(self):
-        for problem in self.samples("state_perturbation"):
-            rule = problem.state["risk_rule"]
-            delta = sum(_risk(r, rule) for r in problem.state["after"]) - sum(_risk(r, rule) for r in problem.state["before"])
-            expected = 0 if delta < 0 else 2 if delta > 0 else 1
-            self.assertEqual(problem.answers["risk_direction"]["score"], expected)
-            before, after = ({r["id"]: r for r in problem.state[k]}[problem.data["probe"]] for k in ("before", "after"))
-            fields = {"authorized": "authorization", "status": "status", "amount": "financial", "owner": "ownership"}
-            changed = [fields[f] for f in fields if before[f] != after[f]] or ["none"]
-            self.assertEqual(changed, [problem.answers["changed_dimension"]["choice"]])
-
-    def test_strongest_support_origin_is_not_constant(self):
-        answers = {p.answers["strongest_support_origin"]["choice"]
-                   for p in self.samples("evidence_sufficiency")}
-        self.assertGreater(len(answers), 3)
 
     def test_built_splits_are_disjoint_and_grouped(self):
         dataset = build_task("state_perturbation", {"train": 60, "validation": 10, "test": 10}, [0, 1])
@@ -196,109 +108,6 @@ class ProceduralJevTest(unittest.TestCase):
         self.assertEqual(counts["tok"], 3)  # 0.03 of the rows the non-reserved formats share
         self.assertTrue(35 <= counts["mc"] <= 39, counts)
 
-    def test_needle_retrieval_gold_follows_records(self):
-        for problem in self.samples("needle_retrieval", 300):
-            d, a = problem.data, problem.answers
-            value = {r["id"]: r[d["field"]] for r in d["records"]}
-            key = d["key"]
-            while key in d["reissued"]:
-                key = d["reissued"][key]
-            self.assertEqual(a["value_of_id"]["choice"], value[key])
-            self.assertEqual(a["id_has_value"]["noul"], float(value[key] == d["proposed"]))
-            self.assertFalse(set(d["reissued"]) & set(value))  # reissued ids are never listed
-            self.assertEqual(a["id_listed"]["noul"], float(d["probe"] in value))
-            for record in d["records"]:  # every rendering keeps every record
-                self.assertIn(record["id"], problem.state)
-
-    def test_record_aggregation_gold_follows_items(self):
-        for problem in self.samples("record_aggregation", 300):
-            d, a = problem.data, problem.answers
-            members = [i for i in d["items"] if i["category"] == d["category"]]
-            self.assertEqual(a["count_in_category"]["score"], min(len(members), 9))
-            if "count_filtered" in a:
-                hits = [i for i in members if i["quantity"] >= d["cut"] and (i["in_stock"] or not d["stock"])]
-                self.assertEqual(a["count_filtered"]["score"], min(len(hits), 9))
-            self.assertEqual(a["any_out_of_stock"]["noul"], float(any(not i["in_stock"] for i in members)))
-            self.assertEqual(a["total_above"]["noul"],
-                             float(sum(i["quantity"] for i in members) > d["threshold"]))
-            pool = members if d["scope_category"] else d["items"]
-            top = max(i["quantity"] for i in pool)
-            leaders = [i["item"] for i in pool if i["quantity"] == top]
-            self.assertEqual(leaders, [a["largest_quantity"]["choice"]])
-
-    def test_uncertain_policy_gold_is_the_exact_posterior(self):
-        errors = {"prior": [], "report": []}
-        for problem in self.samples("policy_under_uncertainty", 300):
-            roles, governing, allowed = _uncertain_policy_answers(problem.state)
-            answers = problem.answers
-            self.assertAlmostEqual(answers["access_allowed"]["noul"], float(allowed), places=5)
-            for question, exact in (("requester_role", roles), ("governing_policy", governing)):
-                for option, p in answers[question]["probabilities"].items():
-                    self.assertAlmostEqual(p, float(exact.get(option, 0)), places=9)
-            # plugging a single role in, the most common one or the first report's, is clearly worse
-            history = problem.data["prior"]
-            for name, role in (("prior", max(history, key=history.get)), ("report", problem.data["reports"][0][1])):
-                plugged = _uncertain_policy_answers({**problem.state, "role_evidence": {
-                    "history": f"1 by {role}s", "reports": []}})[2]
-                errors[name].append(abs(float(plugged) - float(allowed)))
-        self.assertGreater(sum(errors["prior"]) / 300, 0.1)
-        self.assertGreater(sum(errors["report"]) / 300, 0.05)
-        sharp = sum(problem.answers["access_allowed"]["noul"] in (0.0, 1.0)
-                    for problem in self.samples("policy_under_uncertainty", 300))
-        self.assertTrue(40 < sharp < 150)  # the role is irrelevant in some problems, not most
-
-    def test_table_lookup_gold_follows_tables(self):
-        for problem in self.samples("table_lookup", 300):
-            d, a = problem.data, problem.answers
-            people = {p["name"]: p for p in d["people"]}
-            target = people[d["person"]]
-            matching = [p["name"] for p in d["people"]
-                        if (p["team"], p["city"]) == (target["team"], target["city"])
-                        and (d["cut"] is None or p["start_year"] < d["cut"])]
-            self.assertEqual(matching, [a["find_person"]["choice"]])
-            managers = {t["team"]: t["manager"] for t in d["teams"]}
-            subject = people[d["subject"]]
-            self.assertEqual(a["manager_of"]["choice"], managers[subject["team"]])
-            self.assertEqual(a["started_before"]["noul"], float(subject["start_year"] < d["year"]))
-            self.assertEqual(a["count_matching"]["score"], sum(
-                p["city"] == d["city"] and p["start_year"] >= d["since"] for p in d["people"]))
-
-    def test_entity_beliefs_replay_events(self):
-        nested_differs = 0
-        for problem in self.samples("entity_belief_tracking", 300):
-            d, a = problem.data, problem.answers
-            obj, agent, other = d["object"], d["agent"], d["other"]
-            world = believed = thinks = d["initial"][obj]
-            for event in (e for e in d["events"] if e["object"] == obj):
-                world = event["destination"]
-                if agent in event["witnesses"]:
-                    believed = world
-                    if other in event["witnesses"]:
-                        thinks = world
-            self.assertEqual(a["world_location"]["choice"], world)
-            self.assertEqual(a["agent_belief_location"]["choice"], believed)
-            if "nested_belief_location" in a:
-                self.assertEqual(a["nested_belief_location"]["choice"], thinks)
-                nested_differs += thinks != believed
-        self.assertGreater(nested_differs, 20)  # the second-order question is not the first-order one
-
-    def test_event_log_replay(self):
-        voids = 0
-        for problem in self.samples("event_state_reconstruction", 300):
-            state, answers = problem.state, problem.answers
-            voided = {e["voids_ts"] for e in state["events"] if e["kind"] == "void"}
-            voids += bool(voided)
-            current = dict(state["initial_state"])
-            for event in sorted(state["events"], key=lambda e: e["ts"]):
-                if event["ts"] in voided:
-                    continue
-                current.update({"assign": {"owner": event.get("owner")}, "severity": {"severity": event.get("severity")},
-                                "resolve": {"open": False}, "reopen": {"open": True}}.get(event["kind"], {}))
-            self.assertEqual(answers["current_owner"]["choice"], current["owner"])
-            self.assertEqual(answers["is_open"]["noul"], float(current["open"]))
-            self.assertEqual(answers["current_severity"]["score"], ["routine", "degraded", "critical"].index(current["severity"]))
-        self.assertGreater(voids, 20)
-
     def test_pretty_order_cycles_levels_then_shuffles(self):
         from scripts.build_procedural_jev import pretty_order
         rows = [{"level": i % 5, "i": i} for i in range(100)]
@@ -311,22 +120,6 @@ class ProceduralJevTest(unittest.TestCase):
                              key=lambda r: (r["level"], r["task"]))
         self.assertEqual([(r["level"], r["task"]) for r in mixed[:4]], [(0, "a"), (0, "b"), (1, "a"), (1, "b")])
 
-    def test_taxonomy_routing_gold_follows_rules(self):
-        from tasksource.jev.procedural.taxonomy_routing import _holds, _text
-        first_hit = []
-        for problem in self.samples("taxonomy_routing", 300):
-            d, a = problem.data, problem.answers
-            meets = [name for name, rule in d["rules"].items() if all(_holds(c, d["ticket"]) for c in rule)]
-            self.assertEqual(meets, [a["route"]["choice"]])
-            self.assertEqual(a["belongs_to"]["noul"], float(d["probe"] == meets[0]))
-            self.assertEqual(a["conditions_met"]["score"], sum(_holds(c, d["ticket"]) for c in d["rules"][d["probe"]]))
-            for rule in d["rules"].values():  # every rendering keeps every rule
-                self.assertIn(" and ".join(map(_text, rule)), problem.state)
-                self.assertLess(len(rule), len(problem.questions["conditions_met"]["criteria"]))  # any rule can be probed
-            # routing on a rule's first condition alone is a shortcut that must not work
-            first_hit.append(next(n for n, r in d["rules"].items() if _holds(r[0], d["ticket"])) == meets[0])
-        self.assertLess(sum(first_hit) / 300, 0.5)
-
     def test_option_counts_vary(self):
         for task, qid, low, high in (("needle_retrieval", "value_of_id", 6, 20), ("table_lookup", "find_person", 5, 30),
                                      ("entity_belief_tracking", "world_location", 4, 16),
@@ -335,67 +128,6 @@ class ProceduralJevTest(unittest.TestCase):
             self.assertLessEqual(min(sizes), low, task)
             self.assertGreaterEqual(max(sizes), high, task)
             self.assertLess(max(sizes.values()) / 300, 0.35, (task, sizes))  # no single count dominates
-
-    def test_arithmetic_gold_follows_state(self):
-        def value(answer):
-            return answer.get("choice", answer.get("noul", answer.get("score")))
-
-        sizes, ranks = Counter(), Counter()
-        for problem in self.samples("arithmetic", 600):
-            d, got = problem.data, {q: value(a) for q, a in problem.answers.items()}
-            sizes[len(got)] += 1
-            if d["scenario"] == "order":
-                cost = [l["unit_price"] * l["quantity"] for l in d["lines"]]
-                total = sum(cost)
-                due = total - d["discount"] if total >= d["threshold"] else total + d["shipping"]
-                expected = {
-                    "amount_due": due,
-                    "largest_line": d["lines"][cost.index(max(cost))]["item"],
-                    "lines_above": sum(c > d["line_cut"] for c in cost),
-                    "random_line_bulk": round(sum(l["quantity"] >= d["units"] for l in d["lines"]) / len(cost), 6),
-                    "within_budget": float(due <= d["budget"]),
-                    "budget_use": 2 if due > d["budget"] else 0 if 2 * due <= d["budget"] else 1,
-                }
-                self.assertEqual(cost.count(max(cost)), 1)
-            elif d["scenario"] == "ledger":
-                balance, balances = d["start"], []
-                for t in d["transactions"]:
-                    balance += t["amount"] if t["type"] == "deposit" else -t["amount"]
-                    balances.append(balance)
-                n, deposits, change = len(balances), sum(t["type"] == "deposit" for t in d["transactions"]), balance - d["start"]
-                expected = {
-                    "final_balance": balance,
-                    "went_negative": float(min(balances) < 0),
-                    "lowest_day": f"day {d['transactions'][balances.index(min(balances))]['day']}",
-                    "withdrawal_count": n - deposits,
-                    "random_is_deposit": round(deposits / n, 6),
-                    "net_change": 0 if change < -50 else 2 if change > 50 else 1,
-                }
-            else:
-                clock, starts = d["start"], []
-                for t in d["tasks"]:
-                    starts.append(clock)
-                    clock += t["minutes"] + d["gap"]
-                finish, minutes = clock - d["gap"], [t["minutes"] for t in d["tasks"]]
-                expected = {
-                    "finish_time": f"{finish // 60:02d}:{finish % 60:02d}",
-                    "done_by_deadline": float(finish <= d["deadline"]),
-                    "longest_task": d["tasks"][minutes.index(max(minutes))]["task"],
-                    "starts_before_noon": sum(s < 720 for s in starts),
-                    "random_is_long": round(sum(m > d["long"] for m in minutes) / len(minutes), 6),
-                }
-            for qid, answer in got.items():
-                want = expected[qid]
-                if qid in ("amount_due", "final_balance"):  # formatted with a currency symbol
-                    self.assertEqual(answer.lstrip("$€£"), str(want), qid)
-                else:
-                    self.assertEqual(answer, want, qid)
-                spec = problem.questions[qid]
-                if qid in ("amount_due", "final_balance", "finish_time"):
-                    self.assertEqual(len(spec["criteria"]), 5)
-                    ranks[sorted(spec["criteria"], key=lambda o: (len(o), o)).index(answer)] += 1
-        self.assertEqual(set(sizes), {2, 3, 4, 5})
-        self.assertGreater(min(ranks.values()), max(ranks.values()) / 2)  # gold rank is not a tell
 
     def test_partial_question_sets_build_with_null_labels(self):
         dataset = build_task("arithmetic", {"train": 300, "validation": 30, "test": 30}, [0, 2, 4])

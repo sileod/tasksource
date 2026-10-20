@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """Generate and optionally publish tasksource/procedural-typed-decisions, one config per task.
 
+The generators are reasoning-core's Jev tasks (see ``tasksource.jev.procedural``); the reasoning-core commit and
+task versions are recorded in ``provenance.json``, so publish from a clean reasoning-core checkout.
+
 Every row is one generated state with several typed Jev questions over it
 (`questions`, `answers` as JSON), plus one flat label column per question so
 that each question is also an ordinary Tasksource task. Generation is
@@ -17,7 +20,7 @@ from pathlib import Path
 from datasets import ClassLabel, Dataset, DatasetDict, Features, Value, concatenate_datasets, load_from_disk
 from huggingface_hub import HfApi
 
-from tasksource.jev.procedural import REPO_ID, TASKS
+from tasksource.jev.procedural import REPO_ID, TASKS, reasoning_core_provenance
 
 MAX_CLASS_NAMES = 100
 # No label of a yes/no or choice question goes above this share of its answers: a state
@@ -210,6 +213,9 @@ def parse_args():
 
 def main(args):
     sizes = {"train": args.train, "validation": args.eval, "test": args.eval}
+    provenance = {**reasoning_core_provenance(), "levels": args.levels, "sizes": sizes,
+                  "seeding": "row i of a split: random.Random(f'{task}:{split}:{i}') draws the level, then the state seed",
+                  "script": "https://github.com/sileod/tasksource/blob/main/scripts/build_procedural_jev.py"}
     built = {}
     for task in args.tasks:
         built[task] = build_task(task, sizes, args.levels, args.pretty_rows)
@@ -218,12 +224,15 @@ def main(args):
     if summaries:  # --tasks with no names rebuilds only the combined config from the saved tasks
         (args.output / "build-summary.json").write_text(json.dumps(summaries, indent=2) + "\n")
     built["all"] = build_all(args.output, sorted(TASKS), args.pretty_rows)
+    (args.output / "provenance.json").write_text(json.dumps(provenance, indent=1) + "\n")
     if args.upload:
         api = HfApi()
         api.create_repo(args.repo_id, repo_type="dataset", exist_ok=True)
         for task, dataset in built.items():
             dataset.push_to_hub(args.repo_id, config_name=task,
                                 commit_message=f"Publish {task}")
+        api.upload_file(path_or_fileobj=str(args.output / "provenance.json"), path_in_repo="provenance.json",
+                        repo_id=args.repo_id, repo_type="dataset", commit_message="Record generator provenance")
         # The card explicitly maps each config to its Parquet files. Upload it
         # last so named configs remain loadable after push_to_hub updates metadata.
         api.upload_file(path_or_fileobj=str(args.card), path_in_repo="README.md",
