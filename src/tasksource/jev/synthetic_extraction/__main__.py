@@ -16,7 +16,22 @@ from ..synthetic.workflows import LLM, NAMES, SOURCES, SURNAMES, stable_rng
 PROMPTS = Path(__file__).parent / "prompts"
 KEY_ENVS = ["OPENAI_API_KEY_2", "OPENAI_API_KEY_3", "OPENAI_API_KEY_4"]
 LENGTHS = ["80-150 words", "150-300 words", "300-500 words", "500-800 words"]
-PLANS = {"present": 0.45, "near miss": 0.35, "absent": 0.2}  # absent fields carry a near miss: earned nulls
+PLANS = {"present": 0.35, "near miss": 0.3, "absent": 0.35}  # absent fields carry a near miss: earned nulls
+PLAN_TEXT = {"present": "state one value that satisfies the instruction",
+             "near miss": "state one value that satisfies the instruction, and elsewhere a similar value that does not",
+             "absent": "do NOT state any value that satisfies the instruction anywhere in the document; only mention a "
+                       "similar value that clearly does not qualify, so the answer is null"}
+# reading skills suggested to the schema designer, a few per schema so schemas do not converge on the same fields
+SKILLS = ["the value in force after a correction or a later message", "who committed to what",
+          "the item a complaint is about", "every action assigned to a given role", "the reason given for a decision",
+          "the condition attached to an approval", "the requested (not offered) option", "the current (not former) holder",
+          "every item that was rejected", "the deadline that applies to a given party", "the quantity actually delivered",
+          "the person a pronoun or title refers to", "every place visited in order", "the cause named for a failure",
+          "the option finally chosen among those discussed", "every party that signed or agreed",
+          "the amount owed after a discount or credit", "the version or edition being referred to",
+          "every symptom or defect reported", "the date an event actually happened (not when it was planned)",
+          "the recipient of a transfer or handover", "every identifier of an affected item",
+          "the source a claim is attributed to", "the unresolved question at the end"]
 
 
 def prompt(template: str, **fields) -> str:
@@ -75,8 +90,9 @@ def valid_schema(schema: dict, n_fields: int) -> bool:
 async def design(llm: LLM, index: int, seed: int) -> dict | None:
     rng = stable_rng(seed, "schema", index)
     domain, source, n_fields = rng.choice(DOMAINS), rng.choice(SOURCES), rng.randint(3, 7)
+    skills = "; ".join(rng.sample(SKILLS, 3))
     for attempt in range(3):
-        text = prompt("design", domain=domain.replace("_", " "), source=source, n_fields=n_fields)
+        text = prompt("design", domain=domain.replace("_", " "), source=source, n_fields=n_fields, skills=skills)
         try:
             schema = await llm.json(text + "\n" * attempt, temperature=0.9)
         except ValueError:
@@ -92,7 +108,7 @@ async def design(llm: LLM, index: int, seed: int) -> dict | None:
 async def write(llm: LLM, schema: dict, index: int, seed: int) -> dict | None:
     rng = stable_rng(seed, schema["schema_id"], index)
     plans = {f["name"]: rng.choices(list(PLANS), list(PLANS.values()))[0] for f in schema["fields"]}
-    plan = "\n".join(f"- {f['name']} ({f['type']}): {f['instruction']}\n  Plan: {plans[f['name']]}"
+    plan = "\n".join(f"- {f['name']} ({f['type']}): {f['instruction']}\n  Plan: {PLAN_TEXT[plans[f['name']]]}"
                      for f in schema["fields"])
     names = ", ".join(f"{rng.choice(NAMES)} {rng.choice(SURNAMES)}" for _ in range(4))
     text = prompt("write", document_kind=schema["document_kind"], application=schema["application"],
@@ -136,6 +152,7 @@ async def judge(llm: LLM, item: dict, field: dict, other) -> dict:
 async def verify(item: dict, readers: dict, judge_llm: LLM) -> dict:
     readings = dict(zip(readers, await asyncio.gather(*[read(llm, item) for llm in readers.values()])))
     for field in item["fields"]:
+        field["gold_from"] = "writer"
         spans = locate(item["document"], field, field["gold"])
         field["readers"] = {name: r.get(field["name"]) for name, r in readings.items()}
         disagree = [v for v in field["readers"].values() if not same(v, field["gold"])]
@@ -150,6 +167,13 @@ async def verify(item: dict, readers: dict, judge_llm: LLM) -> dict:
             field["drop"] = None if field["kept"] else "judge"
         else:
             field["kept"], field["drop"] = False, "both readers disagree"
+            first, second = field["readers"].values()
+            reader_spans = locate(item["document"], field, first) if same(first, second) else None
+            if reader_spans:  # the writer missed a value both readers copied: a blind judge settles it
+                field["judge"] = await judge(judge_llm, item, field, first)
+                if field["judge"]["verdict"] == "reader" and not field["judge"]["ambiguous"]:
+                    field["gold"], spans, field["kept"], field["drop"] = first, reader_spans, True, None
+                    field["gold_from"] = "readers"
         field["spans"] = spans if field["kept"] else None
     return item
 

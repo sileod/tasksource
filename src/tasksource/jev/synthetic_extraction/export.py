@@ -48,6 +48,7 @@ def to_row(item: dict, schema: dict) -> dict | None:
                "document_kind": schema["document_kind"], "application": schema["application"],
                "plans": {f["name"]: item["plans"][f["name"]] for f in kept},
                "judged": [f["name"] for f in kept if f["judge"]],
+               "gold_from_readers": [f["name"] for f in kept if f.get("gold_from") == "readers"],
                "dropped": {f["name"]: f["drop"] for f in item["fields"] if not f["kept"]}}, ensure_ascii=False)}
     return check(row)
 
@@ -121,8 +122,9 @@ the `extraction` config of
 3. **Verify**: answers must be verbatim spans. Two blind readers of other model families
    ({', '.join(f'`{m}`' for m in run['readers'])}) fill every field. A field is kept when both agree with the
    writer (up to case, edge punctuation and a leading article); when one disagrees, a judge sees both answers in a
-   random order and the field is kept only for an unambiguous verdict for the writer; when both disagree it is
-   dropped. Documents keep their verified fields (at least {MIN_FIELDS}).
+   random order and the field is kept only for an unambiguous verdict for the writer. When both disagree it is
+   dropped, unless both copy the same span and the judge rules for it over the writer's answer (the writer missed a
+   value it wrote). Documents keep their verified fields (at least {MIN_FIELDS}).
 
 {stats['kept']:,} of {stats['fields']:,} written fields passed verification. Splits are by schema: validation and
 test schemas never occur in train. Prompts, models and the generation commit are in

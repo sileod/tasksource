@@ -45,6 +45,19 @@ def test_verify_rules():
     assert out["fields"][0]["drop"] == "both readers disagree"
 
 
+def test_readers_recover_a_value_the_writer_missed():
+    found = {"date": "12 March", "people": ["Ana Ruiz", "Tom Lee"], "item": "pallet of cartons", "refund": "10 March"}
+    readers = {"a": Fake(found), "b": Fake(found)}
+    flipped = gen.stable_rng("sx00000_d000", "refund", "judge").random() < 0.5
+    answer = "1" if flipped else "2"  # the readers' span, in the judge's presentation order
+    out = asyncio.run(gen.verify(item(), readers, Fake({"verdict": answer, "ambiguous": False})))
+    refund = out["fields"][3]
+    assert refund["kept"] and refund["gold"] == "10 March" and refund["gold_from"] == "readers"
+    assert DOC[refund["spans"][0]["start"]:refund["spans"][0]["end"]] == "10 March"
+    out = asyncio.run(gen.verify(item(), readers, Fake({"verdict": answer, "ambiguous": True})))
+    assert not out["fields"][3]["kept"]
+
+
 def test_judge_is_blind_to_order():
     it, field = item(), {**item()["fields"][0]}
     flip = gen.stable_rng(it["document_id"], field["name"], "judge").random() < 0.5

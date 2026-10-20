@@ -12,8 +12,10 @@ complaint), in the style of extraction applications such as Cloudflare's Clairic
    present with a near miss (a similar value that does not qualify), or absent with a near miss (an earned null).
 3. verify: answers must be verbatim spans of the document. Two blind readers from other model families extract
    every field. A field is kept when both agree with the writer; when one disagrees, a judge sees both readings and
-   the field is kept only for an unambiguous verdict for the writer; when both disagree it is dropped. Documents
-   keep their verified fields (at least two).
+   the field is kept only for an unambiguous verdict for the writer. When both disagree it is dropped, unless they
+   copy the same span and the judge, choosing between that span and the writer's answer, rules for the readers:
+   the writer missed a value it wrote (typically a planned null). Documents keep their verified fields (at least
+   two).
 
 Every call is cached by content hash under DIR/cache, so reruns resume and an export is reproducible from the
 cache. Models are any OpenAI-compatible endpoint (OPENAI_BASE_URL, OPENAI_API_KEY, OPENAI_API_KEY_2...).
