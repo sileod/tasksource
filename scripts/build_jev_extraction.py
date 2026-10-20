@@ -73,6 +73,9 @@ SPLITS = ("train", "validation", "test")
 # A collection is a task-id prefix (swde/auto, swde/book... -> swde). Its training budget is shared equally by its
 # sources, so a suite split into many configs weighs like one source; procedural generators share a larger budget.
 COLLECTION_ROWS = {"procedural": 80_000}
+# Valid but low-signal sources (label audit v2026.10.20.6: subjective or crowd-noisy span boundaries), capped
+# lower than other sources rather than parked.
+SOURCE_ROWS = {"inspec/keyphrases": 1_000, "toxic-spans": 2_000, "ebm-nlp/outcomes": 2_000, "legallens-ner": 1_000}
 
 
 def collection(task):
@@ -82,8 +85,8 @@ def collection(task):
 def train_limits(tasks, max_rows, max_collection_rows):
     """Training cap per task: ``max_rows``, lowered so that each collection stays within its budget."""
     size = Counter(collection(t) for t in tasks)
-    return {t: min(max_rows, COLLECTION_ROWS.get(collection(t), max_collection_rows) // size[collection(t)])
-            for t in tasks}
+    return {t: min(max_rows, SOURCE_ROWS.get(t, max_rows),
+                   COLLECTION_ROWS.get(collection(t), max_collection_rows) // size[collection(t)]) for t in tasks}
 
 
 def row_id(row):
@@ -191,7 +194,7 @@ def build(args):
     args.output.mkdir(parents=True, exist_ok=True)
     manifest = {"sources": report, "excluded": sorted(EXCLUDED_QA), "max_rows": args.max_rows,
                 "max_rows_eval": args.max_rows_eval, "max_collection_rows": args.max_collection_rows,
-                "collection_rows": COLLECTION_ROWS, "max_fields": args.max_fields, "max_empty_share": args.max_empty_share, "seed": args.seed,
+                "collection_rows": COLLECTION_ROWS, "source_rows": SOURCE_ROWS, "max_fields": args.max_fields, "max_empty_share": args.max_empty_share, "seed": args.seed,
                 "rows": {s: len(r) for s, r in dataset.items()},
                 "revisions": {t: PROCEDURAL_REVISION if e is None else
                               __import__("tasksource").task_provenance(t, extractive=e).get("revision") for t, e in tasks}}

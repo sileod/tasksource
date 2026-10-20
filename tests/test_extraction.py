@@ -361,6 +361,7 @@ def test_collection_budget_is_shared_equally():
                            "procedural/b"], max_rows=10_000, max_collection_rows=20_000)
     assert limits["squad-v2"] == 10_000 and limits["swde/auto"] == 5_000
     assert limits["procedural/a"] == 10_000  # explicit larger budget, still capped per source
+    assert train_limits(["inspec/keyphrases"], 10_000, 20_000)["inspec/keyphrases"] == 1_000
 
 
 def test_without_excess_empty_keeps_order_and_share():
