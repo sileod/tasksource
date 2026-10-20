@@ -4,6 +4,11 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource-jev-typed-decisions v2026.10.20.3
+
+- `extraction`: add VUA metaphor-related words, FCE learner errors and QAConv (emails, court and interview transcripts), all marked non-commercial; 68 sources, 299,640 training, 23,524 validation and 25,633 test rows.
+- In entity and span-tagging sources, texts with no span at all are subsampled to at most 20% of each split (e.g. Linnaeus 10,000 -> 1,933 training rows, SkillSpan, BC2GM, NCBI-disease). Question-answering unanswerables are unchanged.
+
 ## tasksource-jev-typed-decisions v2026.10.20.2
 
 - `extraction`: add 32 sources (65 in total), bringing it to 294,154 training, 22,559 validation and 24,633 test rows (1,015,056 training fields).
