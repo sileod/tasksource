@@ -7,6 +7,8 @@ A source becomes a training task only if all three hold:
 
 Valid but low-signal sources get `max_examples`; systematically unreliable ones go to `parked.py`.
 
+When adding sources (including from prospect lists or LLM shortlists), follow [docs/implementing-sources.md](docs/implementing-sources.md): relevance, gates, pins, splits and span checks learned from earlier rounds.
+
 # Dataset sources
 
 Reading an existing dataset with a mapping or a little code is an annotation: declare it in the task catalog on the original Hugging Face dataset. Heavy preprocessing is a repackage. Renaming or dropping columns is not a reason to mirror.
