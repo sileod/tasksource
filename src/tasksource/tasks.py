@@ -888,6 +888,70 @@ SpeedOfMagic_ontonotes_english = TokenClassification(tokens="tokens", labels="ne
     load_dataset_kwargs=dict(revision=PARQUET),
     pre_process=lambda ds: ds.cast_column("ner_tags", Sequence(ClassLabel(names=_ONTONOTES_TAGS))))
 
+# Human span annotations; preserve native splits and attach the source BIO ontologies.
+def _named_ner_tags(dataset):
+    names = sorted({tag for rows in dataset.values() for tags in rows['ner_tags'] for tag in tags})
+    return dataset.cast_column('ner_tags', Sequence(ClassLabel(names=names)))
+
+
+wiesp2022_ner = TokenClassification(dataset_name='adsabs/WIESP2022-NER', task_id='wiesp2022-ner', complete_splits=False,
+    pre_process=_named_ner_tags,
+    tokens='tokens', labels='ner_tags',
+    load_dataset_kwargs={"revision": SOURCE_REVISIONS['adsabs/WIESP2022-NER']})
+
+def _btc_mentions(dataset):
+    """BTC splits @-mentions into ``@`` and the handle, each tagged B-: one ``@handle`` token."""
+    def merge(r):
+        tokens, tags = [], []
+        for token, tag in zip(r['tokens'], r['ner_tags']):
+            if tokens and tokens[-1] == '@' and token != '@':
+                tokens[-1] += token
+                tags[-1] = tag if tags[-1] == 0 else tags[-1]
+            else:
+                tokens.append(token); tags.append(tag)
+        return {'tokens': tokens, 'ner_tags': tags}
+    return dataset.map(merge)
+
+
+broad_twitter_corpus = TokenClassification(dataset_name='GateNLP/broad_twitter_corpus', task_id='broad-twitter-corpus', complete_splits=False,
+    pre_process=_btc_mentions, tokens='tokens', labels='ner_tags',
+    load_dataset_kwargs={"revision": SOURCE_REVISIONS['GateNLP/broad_twitter_corpus']})
+
+finer_ord = TokenClassification(dataset_name='gtfintechlab/finer-ord-bio', task_id='finer-ord', complete_splits=False,
+    # The publisher's BIO upload includes null tokens; do not invent their text or offsets.
+    pre_process=lambda ds: ds.filter(lambda r: all(t is not None for t in r['tokens']))
+        .cast_column('tags', Sequence(ClassLabel(
+            names=['O', 'B-PER', 'I-PER', 'B-LOC', 'I-LOC', 'B-ORG', 'I-ORG']))),
+    tokens='tokens', labels='tags',
+    load_dataset_kwargs={"revision": SOURCE_REVISIONS['gtfintechlab/finer-ord-bio']})
+
+anatem = TokenClassification(dataset_name='disi-unibo-nlp/AnatEM', task_id='anatem', complete_splits=False,
+    pre_process=_named_ner_tags,
+    tokens='tokens', labels='ner_tags',
+    load_dataset_kwargs={"revision": SOURCE_REVISIONS['disi-unibo-nlp/AnatEM']})
+
+stackoverflow_ner = TokenClassification(dataset_name='mrm8488/stackoverflow-ner', task_id='stackoverflow-ner', complete_splits=False,
+    pre_process=_named_ner_tags,
+    tokens='tokens', labels='ner_tags',
+    load_dataset_kwargs={"revision": SOURCE_REVISIONS['mrm8488/stackoverflow-ner']})
+
+legallens_ner = TokenClassification(dataset_name='darrow-ai/LegalLensNER', task_id='legallens-ner', complete_splits=False,
+    tokens=lambda r: ast.literal_eval(r["tokens"]),
+    labels=lambda r: ast.literal_eval(r["ner_tags"]),
+    post_process=lambda ds: ds.cast_column("labels", Sequence(ClassLabel(names=["O"] +
+        [f"{p}-{t}" for t in ["LAW", "VIOLATION", "VIOLATED BY", "VIOLATED ON"] for p in "BI"]))),
+    load_dataset_kwargs={"revision": SOURCE_REVISIONS['darrow-ai/LegalLensNER']})
+
+gum_ner = TokenClassification(dataset_name='milistu/GUM-NER-conll', task_id='gum-ner', complete_splits=False,
+    tokens='words', labels='ner_tags',
+    load_dataset_kwargs={"revision": SOURCE_REVISIONS['milistu/GUM-NER-conll']})
+
+opinion_target_en = TokenClassification(dataset_name='HiTZ/Multilingual-Opinion-Target-Extraction', task_id='opinion-target/en', complete_splits=False,
+    tokens='tokens', labels='ner_tags',
+    config_name='en',
+    pre_process=lambda ds: ds.cast_column('ner_tags', Sequence(ClassLabel(names=['O', 'B-TARGET', 'I-TARGET']))),
+    load_dataset_kwargs={"revision": SOURCE_REVISIONS['HiTZ/Multilingual-Opinion-Target-Extraction']})
+
 blog_authorship_corpus__gender    = Classification(sentence1="text",labels="gender", question="What is the blogger's gender?",
     dataset_name="tasksource/blog_authorship_corpus")
 blog_authorship_corpus__age       = Classification(sentence1="text", question="What is the blogger's age group?",

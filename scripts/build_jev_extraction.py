@@ -32,6 +32,8 @@ NER = {
     "jnlpba/jnlpba": None, "ontonotes_english/SpeedOfMagic--ontonotes_english": None,
     "few-nerd/supervised": None, "acronym_identification": None,
     "finer-139": "Every amount reported as {name}, as written.",
+    "wiesp2022-ner": None, "broad-twitter-corpus": None, "finer-ord": None, "anatem": None,
+    "stackoverflow-ner": None, "legallens-ner": None, "gum-ner": None, "opinion-target/en": None,
 }
 SPLITS = ("train", "validation", "test")
 
@@ -136,8 +138,10 @@ pass, as extraction models (e.g. Cloudflare's Clairic) are asked. {rows}
   answer (an unanswerable question, an absent entity type). Several values of a `text` field are
   alternative gold spans; of a `list` field, every item.
 - Extractive question answering (SQuAD 2.0, AdversarialQA, Natural Questions, HotpotQA, Quoref, MuSiQue,
-  DROP single-span) groups the questions asked about one context, up to {max_fields} fields per row.
-  Named entities (CoNLL-2003, OntoNotes, WNUT-17, Few-NERD, NCBI-disease, JNLPBA, acronyms, FiNER-139)
+  DROP single-span, DuoRC verbatim spans, ConcurrentQA, FairytaleQA explicit spans) groups the questions
+  asked about one context, up to {max_fields} fields per row.
+  Named entities (CoNLL-2003, OntoNotes, WNUT-17, Few-NERD, NCBI-disease, JNLPBA, acronyms, FiNER-139
+  and astronomy, biomedical, financial, software, legal, GUM, Twitter and English opinion-target sources)
   ask for every entity type of the dataset, or the types present plus absent ones up to {max_fields}.
   Entity texts are the source tokens joined by spaces.
 - Native splits, except those without released labels; evaluation texts that also occur in training are dropped. Each source is capped at

@@ -14,6 +14,9 @@ from .preprocess import ExtractiveQA
 
 # Hub revisions; script-based datasets are read from their parquet conversion commit.
 REVISIONS = {
+    'ibm-research/duorc': '2de12436b8945030c283bf4af83925d60efe10c6',
+    'stanfordnlp/concurrentqa': '2cc9db602b10a561026c905403a641422f066369',
+    'WorkInTheDark/FairytaleQA': 'fad16faf261459cc55d6d516b6fb3e68c0ddd5a6',
     'rajpurkar/squad_v2': '3ffb306f725f7d2ce8394bc1873b24868140c412',
     'UCLNLP/adversarial_qa': 'c2d5f738db1ad21a4126a144dfbb00cb51e0a4a9',
     'mrqa-workshop/mrqa': 'f3178d9888471dfb2b67c93de14f0ddf499a8d9f',
@@ -120,3 +123,60 @@ def _drop_spans(dataset):
 drop_spans = ExtractiveQA(dataset_name='ucinlp/drop', task_id='drop/span', complete_splits=False,
     pre_process=_drop_spans, metadata=lambda r: {'id': r['query_id'], 'section_id': r['section_id']},
     load_dataset_kwargs=_kwargs('ucinlp/drop'))
+
+
+def _located_answers(context, texts):
+    """Keep verbatim human answers; unmatched answers are never turned into null gold."""
+    texts = list(dict.fromkeys(t for t in texts if t and t in context))
+    return {'text': texts, 'answer_start': [context.index(t) for t in texts]}
+
+
+def _duorc_spans(dataset):
+    def row(r):
+        answers = _located_answers(r['plot'], r['answers'])
+        return {'span_answers': answers, 'located': r['no_answer'] or bool(answers['text'])}
+    return dataset.map(row).filter(lambda ok: ok, input_columns='located')
+
+
+def _duorc(config):
+    return ExtractiveQA(dataset_name='ibm-research/duorc', config_name=config,
+        task_id=f'duorc/{config}', context='plot', answers='span_answers',
+        complete_splits=False, pre_process=_duorc_spans,
+        metadata=lambda r: {'id': r['question_id'], 'plot_id': r['plot_id'], 'title': r['title'],
+                            'no_answer': r['no_answer']},
+        load_dataset_kwargs=_kwargs('ibm-research/duorc'))
+
+
+duorc_self = _duorc('SelfRC')
+duorc_paraphrase = _duorc('ParaphraseRC')
+
+
+def _concurrentqa_spans(dataset):
+    def row(r):
+        context = '\n\n'.join(p['title'] + '\n' + ' '.join(p['sents']) for p in r['sp'])
+        answers = _located_answers(context, [r['answer']])
+        return {'context': context, 'answers': answers, 'located': bool(answers['text'])}
+    return dataset.map(row).filter(lambda ok: ok, input_columns='located')
+
+
+concurrentqa = ExtractiveQA(dataset_name='stanfordnlp/concurrentqa', task_id='concurrentqa',
+    complete_splits=False, pre_process=_concurrentqa_spans,
+    metadata=lambda r: {'id': r['_id'], 'domain': r['domain'], 'type': r['type']},
+    load_dataset_kwargs=_kwargs('stanfordnlp/concurrentqa'))
+
+
+def _fairytaleqa_spans(dataset):
+    def row(r):
+        # Each reference has its own explicit/implicit judgment; do not borrow an implicit reference.
+        texts = [r[a] for a, flag in [('answer1', 'ex-or-im'), ('answer2', 'ex-or-im2')]
+                 if r[flag] == 'explicit']
+        answers = _located_answers(r['story_section'], texts)
+        return {'answers': answers, 'located': bool(answers['text'])}
+    return dataset.map(row).filter(lambda ok: ok, input_columns='located')
+
+
+fairytaleqa = ExtractiveQA(dataset_name='WorkInTheDark/FairytaleQA', task_id='fairytaleqa/explicit',
+    context='story_section', complete_splits=False, pre_process=_fairytaleqa_spans,
+    metadata=lambda r: {'story_name': r['story_name'], 'attribute': r['attribute'],
+                        'local_or_summary': r['local-or-sum']},
+    load_dataset_kwargs=_kwargs('WorkInTheDark/FairytaleQA'))

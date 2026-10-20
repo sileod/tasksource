@@ -66,6 +66,10 @@ def test_readable():
     assert readable("person-artist/author") == "artist or author (person)"
     assert readable("event-other") == "other event"
     assert readable("NORP") == "nationality, religious or political group"
+    assert readable("Language") == "programming language"
+    assert readable("Keyboard_IP") == "keyboard input"
+    assert readable("VIOLATED ON") == "party affected by the violation"
+    assert readable("TARGET") == "opinion target"
 
 
 def test_root_card():
@@ -75,3 +79,41 @@ def test_root_card():
     out = root_card(card)
     assert "- clairic" in out and "| `extraction` |" in out and 'extraction = load_dataset' in out
     assert root_card(out) == out
+
+
+def test_duorc_unlocated_answer_is_not_null_gold():
+    from tasksource.extractive_tasks import _duorc_spans
+    rows = Dataset.from_list([
+        {'plot': 'Alice met Bob.', 'answers': ['Alice', 'a paraphrase'], 'no_answer': False},
+        {'plot': 'Alice met Bob.', 'answers': ['a paraphrase'], 'no_answer': False},
+        {'plot': 'Alice met Bob.', 'answers': [], 'no_answer': True},
+    ])
+    out = _duorc_spans(DatasetDict(train=rows))['train']
+    assert len(out) == 2
+    assert out[0]['span_answers'] == {'text': ['Alice'], 'answer_start': [0]}
+    assert out[1]['span_answers'] == {'text': [], 'answer_start': []}
+
+
+def test_fairytaleqa_only_explicit_verbatim_references():
+    from tasksource.extractive_tasks import _fairytaleqa_spans
+    rows = Dataset.from_list([
+        {'story_section': 'Alice met Bob.', 'answer1': 'Alice', 'ex-or-im': 'implicit',
+         'answer2': 'Bob', 'ex-or-im2': 'explicit'},
+        {'story_section': 'Alice met Bob.', 'answer1': 'a person', 'ex-or-im': 'explicit',
+         'answer2': 'Alice', 'ex-or-im2': 'implicit'},
+    ])
+    out = _fairytaleqa_spans(DatasetDict(train=rows))['train']
+    assert len(out) == 1
+    assert out[0]['answers'] == {'text': ['Bob'], 'answer_start': [10]}
+
+
+def test_finer_ord_drops_null_token_sentence():
+    from tasksource.tasks import finer_ord
+    rows = Dataset.from_list([
+        {'tokens': ['Alice', 'works'], 'tags': [1, 0]},
+        {'tokens': ['A', None, 'bank'], 'tags': [0, 0, 0]},
+    ])
+    out = finer_ord.pre_process(DatasetDict(train=rows, test=rows.select([0])))
+    assert len(out['train']) == len(out['test']) == 1
+    assert out['train'][0]['tokens'] == ['Alice', 'works']
+    assert out['train'].features['tags'].feature.names[1] == 'B-PER'

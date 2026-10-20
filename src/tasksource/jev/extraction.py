@@ -87,6 +87,12 @@ def entity_type(label):
 
 # Entity types whose label alone is opaque (OntoNotes, acronyms) or too short to read well.
 NAMES = {
+    "TARGET": "opinion target", "ANATOMY": "anatomical entity",
+    "Language": "programming language", "Class": "programming class", "Library": "software library",
+    "Keyboard_IP": "keyboard input", "HTML_XML_Tag": "HTML or XML tag", "Tag": "HTML tag",
+    "TextGarbage": "malformed text", "EntityOfFutureInterest": "other astronomy term of interest",
+    "abstract": "abstract concept",
+    "VIOLATED BY": "party committing the violation", "VIOLATED ON": "party affected by the violation",
     "NORP": "nationality, religious or political group", "FAC": "facility", "WORK_OF_ART": "work of art",
     "LAW": "law", "LANGUAGE": "language", "PRODUCT": "product", "EVENT": "event", "QUANTITY": "quantity",
     "CARDINAL": "cardinal number", "ORDINAL": "ordinal number", "short": "acronym", "long": "acronym expansion",

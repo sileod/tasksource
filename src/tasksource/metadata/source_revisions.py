@@ -1,6 +1,15 @@
 """Reviewed source snapshots; keep opaque revision IDs out of task annotations."""
 
 SOURCE_REVISIONS = {
+    'adsabs/WIESP2022-NER': 'cdb6315d2d523ee509cb915eb37a2ac1f807da2f',
+    'GateNLP/broad_twitter_corpus': '20dedb45cd2d6e45b8f41d5e18a0aea0d240d570',
+    'gtfintechlab/finer-ord-bio': 'b795c5b10022bf8f2da0d94f2f9b7ee76e63fce9',
+    'disi-unibo-nlp/AnatEM': 'ee3afc2f987f46df29de26c75d3317d129d9776f',
+    'mrm8488/stackoverflow-ner': 'e44a22761da9acdd42b4181f33aac27a95436824',
+    'darrow-ai/LegalLensNER': '1c87696e7a40293a36b75f92dc3a2b0cf418a799',
+    'milistu/GUM-NER-conll': '4c370b09378284c370fa4907db40e58fca38e2f5',
+    'HiTZ/Multilingual-Opinion-Target-Extraction': '98355e3b92afb9f92072cbd91dba766f68a70d9a',
+
     'OpenFact/CLEF24-CheckThat-Task1-en-all': 'c02a329c67e4a9201f8bc450f3c5033a60398176',
     "DAMO-NLP-SG/SOUL": "aef002daaa10d151457958a28b162fc996825023",
     "Xueren/EMS-MCQA": "dd0a05836786cb8c2de489916b13505531323d8e",
