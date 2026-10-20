@@ -41,6 +41,12 @@ need more than 100GB.
 
 `list_tasks(vision=True)` lists the visual tasks and `load_task(id, vision=True)` loads them, with images.
 
+#### Extractive question answering
+
+`list_tasks(extractive=True)` lists the span-extraction tasks (SQuAD 2.0, Natural Questions, HotpotQA, Quoref, MuSiQue...);
+`load_task(id, extractive=True)` loads them in SQuAD format (`context`, `question`, `answers`) for `AutoModelForQuestionAnswering`,
+with every answer span checked against the context.
+
 #### Questions
 
 Inputs are kept raw. When they do not say what to predict, a task carries a `question`

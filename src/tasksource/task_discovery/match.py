@@ -29,7 +29,7 @@ def deduplicate(candidates):
 def catalog_index(normalize_repos=True):
     from tasksource.access import _task_repos, list_tasks
     names, repos = defaultdict(set), defaultdict(set)
-    for options in ({}, {'soft': True}, {'multilingual': True}, {'vision': True}):
+    for options in ({}, {'soft': True}, {'multilingual': True}, {'vision': True}, {'extractive': True}):
         for row in list_tasks(**options).itertuples():
             for name in (row.id, row.id.split('/')[0]):
                 names[normalized(name)].add(row.id)

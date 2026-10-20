@@ -31,6 +31,7 @@ class lazy_tasks:
         return dir(import_module(f'.{self.module}', __package__))
 lmtasks = lazy_tasks('multilingual_tasks')
 vision_tasks = lazy_tasks('vision_tasks')
+extractive_tasks = lazy_tasks('extractive_tasks')
 
 def parse_var_name(s):
     config_name,task_name = None,None
@@ -52,7 +53,7 @@ def pretty_name(x):
     return f"{dn}/{cn}/{tn}".replace('//','/').rstrip('/')
 
 def list_tasks(tasks_path=f'{os.path.dirname(__file__)}/tasks.py', multilingual=False, instruct=False, excluded=(),
-               soft=False, min_annotators=None, license_use=None, vision=False, excluded_sources=()):
+               soft=False, min_annotators=None, license_use=None, vision=False, excluded_sources=(), extractive=False):
     """The task catalog as a DataFrame; ``excluded`` holds substrings of task ids to leave out.
 
     ``soft=False`` lists tasks with hard labels, SoftLabeling annotations by their
@@ -67,10 +68,11 @@ def list_tasks(tasks_path=f'{os.path.dirname(__file__)}/tasks.py', multilingual=
     tasks with that use and adds ``license`` and ``license_use`` columns; see
     ``task_licenses``.
 
-    ``vision=True`` selects the visual catalog; default calls list text tasks.
+    ``vision=True`` selects the visual catalog, ``extractive=True`` the extractive question answering
+    catalog (SQuAD format); default calls list text tasks.
 
     Each call returns a fresh copy, so callers may edit it without affecting later calls."""
-    df = _list_tasks(tasks_path, multilingual, instruct, tuple(excluded), soft, min_annotators, vision)
+    df = _list_tasks(tasks_path, multilingual, instruct, tuple(excluded), soft, min_annotators, vision, extractive)
     if excluded_sources:
         excluded_repos = set(excluded_sources)
         df = df[[not excluded_repos.intersection(_task_repos(m, d, i))
@@ -101,9 +103,12 @@ def _declaration_order(tasks_path):
 
 
 @cache
-def _list_tasks(tasks_path, multilingual, instruct, excluded, soft=False, min_annotators=None, vision=False):
-    if vision and multilingual:
-        raise ValueError("vision and multilingual catalogs are separate")
+def _list_tasks(tasks_path, multilingual, instruct, excluded, soft=False, min_annotators=None, vision=False,
+                extractive=False):
+    if sum((vision, multilingual, extractive)) > 1:
+        raise ValueError("vision, multilingual and extractive catalogs are separate")
+    if extractive:
+        tasks_path = tasks_path.replace("/tasks.py", "/extractive_tasks.py")
     if vision:
         tasks_path = tasks_path.replace("/tasks.py", "/vision_tasks.py")
     if multilingual:
@@ -111,7 +116,7 @@ def _list_tasks(tasks_path, multilingual, instruct, excluded, soft=False, min_an
     task_order = _declaration_order(tasks_path)
 
     l = []
-    _tasks = vision_tasks if vision else (lmtasks if multilingual else tasks)
+    _tasks = extractive_tasks if extractive else vision_tasks if vision else (lmtasks if multilingual else tasks)
 
     for key in dir(_tasks):
         if key not in task_order:
@@ -169,7 +174,7 @@ def _task_licenses(df, multilingual, cards=None):
     return [source_license(("multilingual/" if multilingual else "") + i, _task_repos(m, d, i), cards)
             for i, m, d in zip(df.id, df.mapping, df.dataset_name)]
 
-def task_licenses(task_ids=None, multilingual=False, fresh=False, vision=False):
+def task_licenses(task_ids=None, multilingual=False, fresh=False, vision=False, extractive=False):
     """License of each task: ``license``, ``license_use`` and the sources they come from.
 
     ``license`` lists the license of the Hub card of each repo the task loads (and of the
@@ -179,7 +184,7 @@ def task_licenses(task_ids=None, multilingual=False, fresh=False, vision=False):
     non-commercial or academic-only, else ``commercial`` if one allows commercial use,
     else ``unspecified``. Cards come from a checked-in snapshot; ``fresh=True`` reads
     the current cards from the Hub. A best-effort filter, not legal advice."""
-    df = _every_task(multilingual=multilingual, vision=vision)
+    df = _every_task(multilingual=multilingual, vision=vision, extractive=extractive)
     if task_ids is not None:
         missing = set(task_ids) - set(df.id)
         if missing:
@@ -194,18 +199,20 @@ def task_licenses(task_ids=None, multilingual=False, fresh=False, vision=False):
                          "card_licenses": [x.get("card_licenses", {}) for x in licenses],
                          "dpi_licenses": [x.get("dpi_licenses", []) for x in licenses]})
 
-def _every_task(multilingual=False, vision=False):
+def _every_task(multilingual=False, vision=False, extractive=False):
     """Hard and soft views together: every task id, each once."""
-    return pd.concat([list_tasks(multilingual=multilingual, soft=s, vision=vision) for s in (True, False)]).drop_duplicates("id")
+    return pd.concat([list_tasks(multilingual=multilingual, soft=s, vision=vision, extractive=extractive)
+                      for s in (True, False)]).drop_duplicates("id")
 
-def hub_datasets(task_ids=None, multilingual=None, vision=False):
+def hub_datasets(task_ids=None, multilingual=None, vision=False, extractive=False):
     """Hub dataset ids behind tasks, for the ``datasets:`` field of a model card.
 
     Lists the repo each task loads from, repos read through hf:// data files,
     and the originals of tasksource copies and mirrors (metadata/originals.py).
     ``task_ids`` defaults to every task; ``multilingual=None`` searches both lists.
     """
-    frames = [_every_task(multilingual=m, vision=vision) for m in ([False] if vision else ([False, True] if multilingual is None else [multilingual]))]
+    frames = [_every_task(multilingual=m, vision=vision, extractive=extractive)
+              for m in ([False] if vision or extractive else ([False, True] if multilingual is None else [multilingual]))]
     df = pd.concat(frames)
     if task_ids is not None:
         missing = set(task_ids) - set(df.id)
@@ -214,10 +221,10 @@ def hub_datasets(task_ids=None, multilingual=None, vision=False):
         df = df[df.id.isin(task_ids)]
     return sorted({repo for row in df.itertuples() for repo in _task_repos(row.mapping, row.dataset_name, row.id)})
 
-def task_provenance(task_id, multilingual=False, vision=False):
+def task_provenance(task_id, multilingual=False, vision=False, extractive=False):
     """Where one task's data comes from: the loading repo and config, repos read
     through hf:// data files, and the originals of tasksource copies and mirrors."""
-    df = _every_task(multilingual=multilingual, vision=vision)
+    df = _every_task(multilingual=multilingual, vision=vision, extractive=extractive)
     row = df[df.id == task_id]
     if row.empty:
         raise KeyError(f"unknown task: {task_id}")
@@ -263,7 +270,8 @@ def pin_hf_urls(value, pins):
 def load_preprocessing(tasks=tasks, **kwargs):
     module = getattr(tasks, '__name__', None)
     df = _every_task(multilingual=module == f'{__package__}.multilingual_tasks',
-                     vision=module == f'{__package__}.vision_tasks')
+                     vision=module == f'{__package__}.vision_tasks',
+                     extractive=module == f'{__package__}.extractive_tasks')
     matches = df[np.logical_and.reduce([df[k] == v for k, v in kwargs.items()] + [np.ones(len(df), bool)])]
     if matches.empty:
         raise KeyError(f"unknown task: {kwargs}")
@@ -282,8 +290,9 @@ def load_preprocessing(tasks=tasks, **kwargs):
 def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preprocessing_name=None,
          max_rows=None, max_rows_eval=None, multilingual=False, instruct=False,
          recast=None, prompted=False, seed=0, data_file_pins=None, soft=None, min_annotators=None,
-         vision=False, grounding=None, excluded_sources=(), **load_dataset_kwargs):
-    """Load a standardized task. ``vision=True`` selects the visual catalog.
+         vision=False, grounding=None, excluded_sources=(), extractive=False, **load_dataset_kwargs):
+    """Load a standardized task. ``vision=True`` selects the visual catalog, ``extractive=True`` the
+    extractive question answering catalog (SQuAD format; no recasts).
 
     ``grounding={"probabilities": {"plain": .5, "som+text": .25, "som-only": .25}}``
     draws native candidates after sampling. Mark IDs remain stable through Jev
@@ -310,9 +319,11 @@ def load_task(id=None, dataset_name=None,config_name=None,task_name=None,preproc
     query = {k:v for k,v in query.items() if v}
     if 'dataset_name' in query:
         query['dataset_name'] = CANONICAL.get(query['dataset_name'], query['dataset_name'])
-    _tasks = vision_tasks if vision else (lmtasks if multilingual else tasks)
-    if vision and multilingual:
-        raise ValueError("vision and multilingual catalogs are separate")
+    _tasks = extractive_tasks if extractive else vision_tasks if vision else (lmtasks if multilingual else tasks)
+    if sum((vision, multilingual, extractive)) > 1:
+        raise ValueError("vision, multilingual and extractive catalogs are separate")
+    if extractive and recast is not None:
+        raise ValueError("extractive tasks have no recast; the Jev extraction config is built from them")
     preprocessing = load_preprocessing(_tasks, **query)
     if set(excluded_sources).intersection(_task_repos(preprocessing, preprocessing.dataset_name, id or "")):
         raise ValueError(f"Excluded source: {preprocessing.dataset_name}")

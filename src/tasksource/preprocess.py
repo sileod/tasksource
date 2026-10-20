@@ -186,7 +186,7 @@ class Preprocessing(DotWiz):
                     images.append(image)
                 return {'images': images}
             dataset = dataset.map(embed_images)
-        if not self.label_values:
+        if not self.label_values and 'labels' in get_column_names(dataset):
             dataset = fix_labels(dataset)
         if self.label_values:
             dataset = cast_explicit_label_values(dataset, self.label_values)
@@ -434,6 +434,63 @@ class TokenClassification(SharedFields, TokenClassificationFields): pass
 
 @dataclass
 class Seq2SeqLM(SharedFields, Seq2SeqLMFields): pass
+
+
+@dataclass
+class ExtractiveQAFields(Preprocessing):
+    context: str = 'context'
+    query: str = 'question'  # ``question`` is the task-instruction field of every template
+    answers: str = 'answers'
+
+
+ANSWERS = datasets.Features({'text': datasets.List(datasets.Value('string')),
+                             'answer_start': datasets.List(datasets.Value('int32'))})
+
+
+def answer_spans(text, starts, context, tolerance=0):
+    """Gold answers as SQuAD ``{'text', 'answer_start'}``; ``None`` when a span does not match the context.
+    ``tolerance`` shifts a start by at most that many characters to where the exact text is."""
+    if len(text) != len(starts):
+        return None
+    fixed = []
+    for t, start in zip(text, starts):
+        if start is None or start < 0:
+            return None
+        shifts = sorted(range(-tolerance, tolerance + 1), key=abs)
+        start = next((start + d for d in shifts if start + d >= 0 and context[start + d:start + d + len(t)] == t), None)
+        if start is None:
+            return None
+        fixed.append(start)
+    return {'text': list(text), 'answer_start': fixed}
+
+
+@dataclass
+class ExtractiveQA(SharedFields, ExtractiveQAFields):
+    """Extractive question answering in the SQuAD format of ``AutoModelForQuestionAnswering``:
+    ``context``, ``question`` and ``answers`` = ``{'text': [...], 'answer_start': [...]}`` (character
+    offsets into ``context``). Empty answers mean the context does not answer the question (SQuAD 2.0).
+    ``answers`` may be a function returning ``{'text', 'answer_start'}``; every span is checked
+    against the context, and rows with a mismatching span are dropped (at most ``max_mismatch``).
+    ``offset_tolerance`` repairs sources whose starts are off by a few characters."""
+    max_mismatch: float = 0.01
+    offset_tolerance: int = 0
+
+    def __call__(self, dataset, *args, **kwargs):
+        dataset = super().__call__(dataset, *args, **kwargs)
+        dataset = dataset.rename_column('query', 'question')
+        def check(row):
+            spans = answer_spans(row['answers']['text'], row['answers']['answer_start'], row['context'],
+                                 self.offset_tolerance)
+            return {'answers': spans or {'text': [], 'answer_start': []}, 'valid': spans is not None}
+        for split in dataset:
+            rows = dataset[split].map(check)
+            features = rows.features.copy(); features['answers'] = ANSWERS
+            rows = rows.cast(features)
+            bad = len(rows) - sum(rows['valid'])
+            if bad > self.max_mismatch * max(len(rows), 1):
+                raise ValueError(f'{self.task_id}: {bad}/{len(rows)} {split} answers do not match their context')
+            dataset[split] = rows.filter(lambda v: v, input_columns='valid').remove_columns('valid')
+        return align_empty_splits(dataset)
 
 
 SOFT_KINDS = ("noul", "score", "choice")

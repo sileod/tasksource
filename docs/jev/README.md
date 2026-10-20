@@ -91,3 +91,13 @@ python -m scripts.append_jev --config vision --tasks TASK ... --cap 30000 --push
 
 Existing training and evaluation files stay byte-identical; evaluation images and duplicate option
 permutations are excluded from additions. FigureQA is not expanded: its original terms prohibit redistribution.
+
+## Extraction
+
+The `extraction` config (Clairic-style: a text, typed fields, character-span or null answers) is built from
+the extractive question answering catalog (`list_tasks(extractive=True)`) and the named-entity token tasks
+listed in the script. It is rebuilt and replaced as a whole:
+
+```bash
+PYTHONPATH=.:src python scripts/build_jev_extraction.py --output build/jev-extraction --push
+```

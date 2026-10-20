@@ -4,6 +4,12 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource-jev-typed-decisions v2026.10.20
+
+- New `extraction` config (Clairic-style): a text with several typed fields (`text` or `list`), each answered by character spans of the text or null. 123,023 training, 7,316 validation and 5,413 test rows; 402,082 training fields.
+- Extractive QA (SQuAD 2.0, AdversarialQA, Natural Questions, HotpotQA, Quoref, MuSiQue with unanswerable contrast questions, DROP single-span) groups the questions about one context; named entities (CoNLL-2003, OntoNotes, WNUT-17, Few-NERD, NCBI-disease, JNLPBA, acronyms, FiNER-139 XBRL amounts) ask one list field per entity type.
+- Every span is checked against the text. Each source is capped at 10,000 training and 500 rows per evaluation split; evaluation texts seen in training and splits without released labels are left out. NewsQA is excluded pending its redistribution terms. Existing configs are unchanged.
+
 ## tasksource-jev-typed-decisions v2026.10.17.2
 
 - `full`: add SOUL review-conditioned opinion comprehension and English CLEF 2024 CheckThat check-worthiness classification. Use the native human labels, explicit questions and readable criteria. Published 35,901 new rows (9,310 SOUL; 26,591 CheckThat), bringing `full` to 2,550,012 training rows.

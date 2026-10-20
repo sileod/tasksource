@@ -9,6 +9,9 @@ task_categories:
 - text-classification
 - question-answering
 - token-classification
+task_ids:
+- extractive-qa
+- named-entity-recognition
 tags:
 - tasksource
 - jev
@@ -17,6 +20,13 @@ tags:
 - decision-models
 - multiple-choice
 - decision-model
+- extraction
+- information-extraction
+- extractive-qa
+- span-extraction
+- named-entity-recognition
+- structured-extraction
+- clairic
 size_categories:
 - 1M<n<10M
 ---
@@ -32,6 +42,7 @@ from datasets import load_dataset
 
 text = load_dataset("tasksource/tasksource-jev-typed-decisions")
 vision = load_dataset("tasksource/tasksource-jev-typed-decisions", "vision")
+extraction = load_dataset("tasksource/tasksource-jev-typed-decisions", "extraction")
 row = text["train"][0]
 print(row["state"], row["question"], row["options"], row["target"])
 ```
@@ -42,6 +53,7 @@ print(row["state"], row["question"], row["options"], row["target"])
 | `full` | Larger text pool with per-source caps, including incremental additions; validation and test included. |
 | `filtered-full` | Filtered, training-only historical snapshot. Later additions are not included. See [selection policy and counts](filtered-full/README.md). |
 | `vision` | Multimodal decisions with ordered images and text choices. See [visual sources, sampling and provenance](vision/README.md). |
+| `extraction` | A text and several typed fields (questions, entity types) answered with character spans or null, Clairic-style. See [extraction format and sources](extraction/README.md). |
 
 Exact split sizes are in the Dataset Viewer metadata. Task coverage and counts are in [sources.yaml](sources.yaml) and [vision/sources.yaml](vision/sources.yaml).
 
