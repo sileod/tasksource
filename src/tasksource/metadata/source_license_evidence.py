@@ -186,6 +186,11 @@ SOURCE_LICENSE_EVIDENCE = {
     'cebab': {'license': 'cc-by-4.0', 'checked': '2026-10-13',
               'scope': 'original corpus and human-written counterfactual edits',
               'url': 'https://github.com/CEBaBing/CEBaB/blob/gh-pages/cebab_datasheet.md#distribution'},
+    'wdc-pave': {'license': 'unspecified', 'license_use': 'unspecified', 'checked': '2026-10-20',
+        'url': 'https://webdatacommons.org/structureddata/wdc-pave/',
+        'scope': 'Human-annotated attribute values of web product offers (Web Data Commons product corpus, '
+                 'Common Crawl). Neither the project page nor the authors repository '
+                 '(wbsg-uni-mannheim/wdc-pave, no LICENSE file) states a license; offer texts keep their sites terms.'},
     'tab': {'license': 'mit', 'checked': '2026-10-13', 'scope': 'original TAB corpus distribution',
             'url': 'https://github.com/NorskRegnesentral/text-anonymization-benchmark/blob/master/LICENSE.txt'},
     'discosense': {'license': 'apache-2.0', 'checked': '2026-10-13',

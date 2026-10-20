@@ -498,3 +498,70 @@ def test_ebm_nlp_tags_binarizes_subtype_codes():
     out = _ebm_nlp_tags('Participants_Labels', 'participant description')(row)
     assert out['ner_tags'] == ['O', 'B-participant description', 'O',
                                 'B-participant description', 'I-participant description', 'I-participant description']
+
+
+def _tab_doc(text, annotators):
+    def mention(start, end, kind, level):
+        return dict(start_offset=start, end_offset=end, entity_type=kind, identifier_type=level,
+                    span_text=text[start:end])
+    return [dict(doc_id='d', text=text, task='Task: anonymise Ann Lee', meta={'applicant': 'Ann Lee'},
+                 annotator_id=f'a{i}', entity_mentions=[mention(*m) for m in mentions])
+            for i, mentions in enumerate(annotators)]
+
+
+def test_tab_majority_regions_keep_exact_annotator_spans():
+    from tasksource.extractive_tasks import _tab_masked
+    ann, mrs_ann = (4, 11, 'PERSON', 'DIRECT'), (0, 11, 'PERSON', 'DIRECT')
+    oslo, year = (21, 25, 'LOC', 'QUASI'), (32, 36, 'DATETIME', 'QUASI')
+    # Three annotators: two read 'Ann Lee', one 'Mrs Ann Lee' (one region, the majority reading wins);
+    # Oslo masked by one only (minority region, dropped); 2001 masked by two, NO_MASK for the third.
+    docs = _tab_doc('Mrs Ann Lee lives in Oslo since 2001.',
+                    [[ann, oslo, year], [mrs_ann, year], [ann, (32, 36, 'DATETIME', 'NO_MASK')]])
+    assert _tab_masked(docs) == ([ann, year], 1)
+    assert _tab_masked(docs[:1]) == ([ann, oslo, year], 0)  # one annotator: all their masked mentions
+    # Two annotators: both must mask the region; tied readings go to the first annotator.
+    assert _tab_masked(docs[:2]) == ([ann, year], 1)
+
+
+def test_tab_records_are_verbatim_windows_with_named_fields():
+    from tasksource.extractive_tasks import TAB_TYPES, _tab_records
+    text = ('The applicant was born in 1970. ' * 150) + 'Ann Lee lives in Oslo.' + (' Nothing here.' * 150)
+    start = text.index('Ann Lee')
+    docs = _tab_doc(text, [[(start, start + 7, 'PERSON', 'DIRECT'), (start + 17, start + 21, 'LOC', 'QUASI'),
+                            (26, 30, 'DATETIME', 'QUASI'), (start + 17, start + 21, 'ORG', 'NO_MASK')]])
+    records = list(_tab_records(docs))
+    windows = {json.loads(r['metadata'])['window_start'] for r in records}
+    assert len(windows) > 1 and len(records) == len(TAB_TYPES) * len(windows)
+    rows = list(qa_rows(records, 'tab/pii', 'train', kind='list'))
+    assert len(rows) == len(windows)
+    assert [f['name'] for f in rows[0]['fields']] == [name for name, _ in TAB_TYPES.values()]
+    assert 'anonymise Ann Lee' in rows[0]['fields'][0]['instruction']
+    found = {f['name']: [v['text'] for v in a['values']] for r in rows
+             for f, a in zip(r['fields'], r['answers']) if not a['null']}
+    assert found == {'person': ['Ann Lee'], 'location': ['Oslo'], 'date_time': ['1970']}  # NO_MASK ORG left out
+
+
+def test_pave_values_located_verbatim_with_native_nulls():
+    from tasksource.extractive_tasks import _pave_records
+    line = json.dumps({'id': 1, 'cluster_id': 2.0, 'category': 'Office Products', 'url': 'x.com',
+        'input_title': 'Avery Light Tags, Lightweight', 'input_description': 'Tags by Avery. Color: Manila',
+        'target_scores': {'Brand': {'Avery': {'pid': [0, 1], 'score': 1}},
+                          'Color(s)': {'Manila': {'pid': [1], 'score': 1}, 'manilla': {'pid': [1], 'score': 1}},
+                          'Weight': {'Light': {'pid': [0], 'score': 1}},
+                          'Width': {'n/a': 1}, 'Gauge': {'thin': {'pid': [0], 'score': 1}}}})
+    rows = {json.loads(r['metadata'])['field']: r for r in _pave_records(line)}
+    assert set(rows) == {'brand', 'colors', 'weight', 'width'}  # Gauge: value not in the offer, left out
+    context = rows['brand']['context']
+    for r in rows.values():
+        assert all(context[s:s + len(t)] == t for t, s in zip(r['answers']['text'], r['answers']['answer_start']))
+    assert len(rows['brand']['answers']['text']) == 2  # one occurrence in the title, one in the description
+    assert rows['colors']['answers']['text'] == ['Manila']  # unlocated variant dropped
+    assert rows['weight']['answers']['answer_start'] == [context.index('Light ')]  # not inside 'Lightweight'
+    assert rows['width']['answers']['text'] == []  # native n/a
+    assert rows['colors']['question'] == 'Color(s) of the product, as written in the offer.'
+    # 20 attributes: three balanced rows, not 8 + 8 + 4.
+    many = json.loads(line)
+    many['target_scores'] = {f'Attribute {i:02d}': {'n/a': 1} for i in range(20)}
+    out = list(qa_rows(list(_pave_records(json.dumps(many))), 'wdc-pave', 'train'))
+    assert [len(r['fields']) for r in out] == [7, 7, 6]
+    assert out[0]['fields'][1]['name'] == 'attribute_03'

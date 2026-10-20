@@ -31,7 +31,7 @@ PROCEDURAL_REPO, PROCEDURAL_REVISION = "tasksource/procedural-extraction", "322a
 PROCEDURAL = ["record_field_extraction", "state_update_extraction", "conditional_list_extraction",
               "log_query_extraction"]
 # Multi-span answers are sets (every span is part of the answer), not alternatives.
-LIST_QA = {"quoref", "cuad/spans", "qasper/spans"}
+LIST_QA = {"quoref", "cuad/spans", "qasper/spans", "tab/pii"}
 NER = {
     "vuamc": "Every metaphorically used word or phrase in the text, as written.",
     "fce/errors": "Every erroneous word or phrase in the text, as written.",

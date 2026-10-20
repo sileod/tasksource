@@ -59,20 +59,22 @@ def _metadata(value):
 def qa_rows(rows, source, split, max_fields=MAX_FIELDS, kind="text"):
     """SQuAD-format rows (``context``, ``question``, ``answers``) grouped by context into fields of type
     ``kind``: ``text`` when several gold spans are alternatives (SQuAD), ``list`` when a question's
-    answer is all of them (Quoref)."""
+    answer is all of them (Quoref). A source may split a context's questions into rows itself with
+    ``metadata["group"]``, and name its fields with ``metadata["field"]`` (fixed slots: TAB, WDC PAVE)."""
     groups = OrderedDict()
     for row in rows:
-        groups.setdefault(row["context"], []).append(row)
-    for context, questions in groups.items():
+        groups.setdefault((row["context"], _metadata(row.get("metadata")).get("group")), []).append(row)
+    for (context, _), questions in groups.items():
         for chunk in range(0, len(questions), max_fields):
             part = questions[chunk:chunk + max_fields]
             fields, answers, ids = [], [], []
             for i, q in enumerate(part, 1):
                 spans = {(s, t) for t, s in zip(q["answers"]["text"], q["answers"]["answer_start"])}
                 values = [{"text": t, "start": s, "end": s + len(t)} for s, t in sorted(spans)]
-                fields.append({"name": f"answer_{i}", "type": kind, "instruction": q["question"].strip()})
+                meta = _metadata(q.get("metadata"))
+                fields.append({"name": meta.get("field") or f"answer_{i}", "type": kind, "instruction": q["question"].strip()})
                 answers.append({"null": not values, "values": values})
-                ids.append(_metadata(q.get("metadata")).get("id"))
+                ids.append(meta.get("id"))
             yield check({"id": "", "source": source, "split": split, "state": context, "fields": fields,
                          "answers": answers, "metadata": json.dumps({"question_ids": ids}, ensure_ascii=False)})
 

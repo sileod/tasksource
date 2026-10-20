@@ -71,6 +71,10 @@ extractive QA in `extractive_tasks.py`.
 - Character spans into tokens: tokenize deterministically, convert to BIO, drop and count spans that
   cut through tokens (HiFi-KPI could not be aligned at all), reject overlaps explicitly, split
   discontinuous mentions into contiguous runs.
+- Multi-annotator spans: vote on regions of overlapping spans and keep one annotator's exact reading; exact-span
+  majority silently drops boundary disagreements (6-7% of majority-masked characters in TAB).
+- QA sources with fixed slots (one question per entity type or attribute) set `metadata["field"]` for readable
+  field names and `metadata["group"]` for balanced rows (TAB, WDC PAVE).
 - Tokenization artifacts become entities: Broad Twitter Corpus tagged `@` and the handle separately,
   merge them. Long documents need windows that never cut a gold span (CUAD).
 

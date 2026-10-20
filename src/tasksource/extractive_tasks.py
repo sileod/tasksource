@@ -39,6 +39,8 @@ REVISIONS = {
     # config's own files (the convert branch's merged default config mixes document_domain and
     # dialogue_domain schemas and fails to load).
     'IBM/multidoc2dial': 'd79fa05a7bc89f2fae00b8ac6d82593771b74c96',
+    # Author upload (Ildikó Pilán) of the TAB v1.0 standoff JSON.
+    'ildpil/text-anonymization-benchmark': '1f22ce098996054689b5b331fb20b3a74a78e1c5',
 }
 
 
@@ -306,6 +308,157 @@ def _cuad_spans(dataset):
 cuad_spans = ExtractiveQA(dataset_name='theatticusproject/cuad-qa', task_id='cuad/spans',
     complete_splits=False, pre_process=_cuad_spans, metadata='metadata', max_mismatch=0,
     load_dataset_kwargs={'revision': SOURCE_REVISIONS['theatticusproject/cuad-qa'], 'name': 'default', 'data_dir': 'default'})
+
+
+# TAB entity types: field name and what to extract (definitions of the TAB annotation guidelines).
+TAB_TYPES = {
+    'PERSON': ('person', "person's name (full name, surname, initials, nickname or alias)"),
+    'CODE': ('code', 'identification number or code (application, case, ID, phone or registration number)'),
+    'LOC': ('location', 'place or location (address, city, region, country, named infrastructure)'),
+    'ORG': ('organization', 'organization (company, court, public institution, school, hospital, prison, NGO)'),
+    'DEM': ('demographic_attribute', 'demographic attribute or role (nationality, ethnicity, religion, age, '
+            'profession, family relation)'),
+    'DATETIME': ('date_time', 'date, time or duration'),
+    'QUANTITY': ('quantity', 'meaningful quantity (amount of money, percentage, count)'),
+    'MISC': ('other_personal_information', 'other personal detail (illness, offence, event, vehicle, publication)'),
+}
+
+
+def _tab_masked(annotations):
+    """Mentions of one document to mask, agreed by most of its annotators, and the number of
+    minority regions left out.
+
+    Masked (DIRECT or QUASI) mentions of all annotators are grouped into regions of overlapping
+    spans. A region is masked when more than half of the annotators mask something in it; its
+    mentions are the reading (set of spans and types) most of them gave, ties going to the annotator
+    listed first. Every kept span is thus one annotator's exact span. With one annotator, this is
+    that annotator's masked mentions."""
+    n = len(annotations)
+    mentions = sorted({(m['start_offset'], m['end_offset'], m['entity_type'], m['identifier_type'], i)
+                       for i, a in enumerate(annotations) for m in a['entity_mentions']
+                       if m['identifier_type'] in ('DIRECT', 'QUASI')})
+    regions, end = [], -1
+    for m in mentions:
+        if m[0] < end:
+            regions[-1].append(m); end = max(end, m[1])
+        else:
+            regions.append([m]); end = m[1]
+    kept, minority = [], 0
+    for region in regions:
+        readings = {}
+        for start, stop, kind, _, i in region:
+            readings.setdefault(i, set()).add((start, stop, kind))
+        if 2 * len(readings) <= n:
+            minority += 1
+            continue
+        counts = {}
+        for i in sorted(readings):
+            counts.setdefault(frozenset(readings[i]), []).append(i)
+        reading, voters = max(counts.items(), key=lambda item: (len(item[1]), -item[1][0]))
+        for start, stop, kind in sorted(reading):
+            levels = [level for s, e, k, level, i in region if (s, e, k) == (start, stop, kind) and i in voters]
+            kept.append((start, stop, kind, max(sorted(set(levels)), key=levels.count)))
+    return kept, minority
+
+
+def _tab_records(annotations):
+    """One record per window of a document and TAB entity type: the mentions of that type to mask."""
+    first = annotations[0]
+    text, person = first['text'], first['meta']['applicant']
+    if any(a['text'] != text for a in annotations):
+        raise ValueError(f"TAB {first['doc_id']}: annotators saw different texts")
+    masked, minority = _tab_masked(annotations)
+    spans = {'text': [text[s:e] for s, e, *_ in masked], 'answer_start': [s for s, *_ in masked]}
+    for start, end in _contract_windows(text, spans):
+        for kind, (field, description) in TAB_TYPES.items():
+            inside = [(s - start, e - start, level) for s, e, k, level in masked
+                      if k == kind and start <= s and e <= end]
+            yield _span_record(text[start:end],
+                f'Every {description} that must be masked to anonymise {person} (a direct or quasi-identifier), as written.',
+                {'text': [text[start + s:start + e] for s, e, _ in inside], 'answer_start': [s for s, _, _ in inside]},
+                id=f"{first['doc_id']}:{start}:{kind}", field=field, entity_type=kind,
+                identifier_types=[level for _, _, level in inside],
+                doc_id=first['doc_id'], task=first['task'], annotators=[a['annotator_id'] for a in annotations],
+                minority_regions_dropped=minority, window_start=start, window_end=end)
+
+
+def _tab_pii(dataset):
+    from datasets import Dataset, DatasetDict
+    def generate(rows):
+        documents = {}
+        for i, doc in enumerate(rows['doc_id']):
+            documents.setdefault(doc, []).append(i)
+        for indexes in documents.values():
+            yield from _tab_records([rows[i] for i in indexes])
+    return DatasetDict({s: Dataset.from_generator(generate, gen_kwargs={'rows': rows})
+                        for s, rows in dataset.items()})
+
+
+# Text Anonymization Benchmark: ECHR judgments in which annotators marked every personal-information
+# mention and whether it must be masked to anonymise the applicant (DIRECT and QUASI identifiers are).
+# One record per document window and entity type (a list field); several annotators: _tab_masked.
+tab_pii = ExtractiveQA(dataset_name='ildpil/text-anonymization-benchmark', task_id='tab/pii',
+    complete_splits=False, pre_process=_tab_pii, metadata='metadata', max_mismatch=0,
+    load_dataset_kwargs={**_kwargs('ildpil/text-anonymization-benchmark'),
+        'data_files': {s: f'echr_{n}.zip' for s, n in [('train', 'train'), ('validation', 'dev'), ('test', 'test')]}})
+
+
+def _word_bounded(text, start, end):
+    """The span neither starts nor ends inside an alphanumeric word."""
+    return not (start > 0 and text[start - 1].isalnum() and text[start].isalnum()) and \
+        not (end < len(text) and text[end].isalnum() and text[end - 1].isalnum())
+
+
+PAVE_FIELDS = 8  # fields per extraction row (jev.extraction.MAX_FIELDS)
+
+
+def _pave_records(line):
+    """One WDC PAVE offer (a JSON line): one record per attribute of its category. Values were annotated verbatim in the title (pid 0) or the description (pid 1); each
+    occurrence there is an alternative gold span, and the annotated variants of a value are
+    alternatives too. "n/a" (no value in the offer) is a native null. Values not found verbatim are
+    dropped, and an attribute none of whose values is found is left out, never turned into a null."""
+    import json
+    row = json.loads(line)
+    title, description = row['input_title'], row['input_description']
+    prefix = 'Title: '
+    context = f'{prefix}{title}\nDescription: {description}'
+    offsets = (len(prefix), len(prefix) + len(title) + len('\nDescription: '))
+    sources, records = (title, description), []
+    for attribute in sorted(row['target_scores']):
+        values = row['target_scores'][attribute]
+        texts, starts = [], []
+        for value, info in ({} if 'n/a' in values else values).items():
+            for pid in sorted(set(info['pid'])):
+                found = [m.start() for m in re.finditer(re.escape(value), sources[pid])] if value.strip() else []
+                # Occurrences inside a longer word ("Light" in "Lightweight") only when there is no other.
+                whole = [s for s in found if _word_bounded(sources[pid], s, s + len(value))]
+                found = whole or found
+                texts += [value] * len(found); starts += [offsets[pid] + s for s in found]
+        if 'n/a' not in values and not texts:
+            continue
+        name = re.sub(r'\W+', '_', attribute.replace('(s)', 's').lower()).strip('_')
+        records.append((name, attribute, {'text': texts, 'answer_start': starts}, sorted(v for v in values if v != 'n/a')))
+    # Categories have 8 to 20 attributes: dealt round-robin into the fewest groups of at most
+    # PAVE_FIELDS, so that one offer's rows have balanced, mixed fields.
+    groups = -(-len(records) // PAVE_FIELDS)
+    for i, (name, attribute, answers, annotated) in sorted(enumerate(records), key=lambda r: (r[0] % groups, r[0])):
+        yield _span_record(context, f'{attribute} of the product, as written in the offer.', answers,
+            id=f"{row['id']}:{name}", field=name, group=i % groups, attribute=attribute, offer_id=row['id'],
+            cluster_id=row['cluster_id'], category=row['category'], url=row['url'], annotated_values=annotated)
+
+
+def _pave(dataset):
+    return _span_records(dataset, lambda r: _pave_records(r['text']) if r['text'].strip() else [])
+
+
+# WDC PAVE: product offers (title and description) from the Web Data Commons product corpus, with every
+# attribute of the offer's category annotated by hand with its verbatim value(s) or n/a. The authors'
+# extraction benchmark (all attributes, values not normalized) with its full training and test splits.
+_PAVE = ('https://raw.githubusercontent.com/wbsg-uni-mannheim/wdc-pave/'
+         '66a4cfd75087353d05471ae452a1a4a1fc9075af/data/processed_datasets/wdc_with_all_attributes/')
+wdc_pave = ExtractiveQA(dataset_name='text', task_id='wdc-pave', complete_splits=False, splits=('train', None, 'test'),
+    pre_process=_pave, metadata='metadata', max_mismatch=0,
+    load_dataset_kwargs={'data_files': {'train': _PAVE + 'train_large.jsonl', 'test': _PAVE + 'test.jsonl'}})
 
 
 def _qasper_spans(row):
