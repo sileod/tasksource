@@ -1017,6 +1017,238 @@ bc2gm = TokenClassification(dataset_name='spyysalo/bc2gm_corpus', task_id='bc2gm
     tokens='tokens', labels='ner_tags', complete_splits=False,
     load_dataset_kwargs={'revision': SOURCE_REVISIONS['spyysalo/bc2gm_corpus']})
 
+# Extraction v3: native human-annotated token views. Parquet subsets are explicit
+# because the conversion branch has no config card and otherwise mixes domains.
+def _crossner(domain):
+    return TokenClassification(dataset_name='DFKI-SLT/cross_ner', config_name=domain,
+        task_id=f'crossner/{domain}', tokens='tokens', labels='ner_tags', complete_splits=False,
+        load_dataset_kwargs={'revision': SOURCE_REVISIONS['DFKI-SLT/cross_ner'], 'data_dir': domain, 'name': 'default'})
+
+
+crossner___politics = _crossner('politics')
+crossner___science = _crossner('science')
+crossner___music = _crossner('music')
+crossner___literature = _crossner('literature')
+crossner___ai = _crossner('ai')
+
+
+def _single_type_bio(dataset, column, kind):
+    def convert(row):
+        tags = row[column]
+        if len(tags) != len(row.get('tokens', row.get('document', []))) or set(tags) - {'B', 'I', 'O'}:
+            raise ValueError('Invalid single-type BIO annotation')
+        return {'ner_tags': [f'{tag}-{kind}' if tag != 'O' else 'O' for tag in tags]}
+    return _named_ner_tags(dataset.map(convert))
+
+
+skillspan__skill = TokenClassification(dataset_name='jjzha/skillspan', task_id='skillspan/skill',
+    tokens='tokens', labels='ner_tags', complete_splits=False,
+    pre_process=lambda ds: _single_type_bio(ds, 'tags_skill', 'skill'),
+    load_dataset_kwargs={'revision': SOURCE_REVISIONS['jjzha/skillspan']})
+skillspan__knowledge = TokenClassification(dataset_name='jjzha/skillspan', task_id='skillspan/knowledge',
+    tokens='tokens', labels='ner_tags', complete_splits=False,
+    pre_process=lambda ds: _single_type_bio(ds, 'tags_knowledge', 'knowledge'),
+    load_dataset_kwargs={'revision': SOURCE_REVISIONS['jjzha/skillspan']})
+
+fabner = TokenClassification(dataset_name='DFKI-SLT/fabner', config_name='fabner_bio', task_id='fabner',
+    tokens='tokens', labels='ner_tags', complete_splits=False,
+    load_dataset_kwargs={'revision': SOURCE_REVISIONS['DFKI-SLT/fabner']})
+
+
+def _buster_gold(dataset):
+    # Fixed gold-fold protocol: folds 1-3 train, 4 validation, 5 test. Never use SILVER.
+    gold = DatasetDict(train=concatenate_datasets([dataset[f'FOLD_{i}'] for i in (1, 2, 3)]),
+                       validation=dataset['FOLD_4'], test=dataset['FOLD_5'])
+    return _named_ner_tags(gold.rename_column('labels', 'ner_tags'))
+
+
+buster = TokenClassification(dataset_name='expertai/BUSTER', task_id='buster',
+    tokens='tokens', labels='ner_tags', complete_splits=False, pre_process=_buster_gold,
+    load_dataset_kwargs={'revision': SOURCE_REVISIONS['expertai/BUSTER']})
+
+
+def _character_bio(text, entities):
+    """Flat BIO over deterministic regex tokens split at gold boundaries.
+
+    Entities are (start, end, type). Reject malformed spans and drop *all*
+    members of an overlap, rather than silently choosing an annotation.
+    """
+    entities = sorted(set(entities))
+    if any(not 0 <= a < b <= len(text) or not text[a:b].strip() for a, b, _ in entities):
+        raise ValueError('Invalid character entity interval')
+    overlapping = {i for i, (a, b, _) in enumerate(entities)
+                   for j, (c, d, _) in enumerate(entities) if i != j and a < d and c < b}
+    kept = [span for i, span in enumerate(entities) if i not in overlapping]
+    boundaries = sorted({v for a, b, _ in kept for v in (a, b)})
+    offsets = []
+    for match in re.finditer(r'\w+|[^\w\s]', text):
+        cuts = [match.start()] + [v for v in boundaries if match.start() < v < match.end()] + [match.end()]
+        offsets.extend(zip(cuts, cuts[1:]))
+    tags = ['O'] * len(offsets)
+    for a, b, kind in kept:
+        indices = [i for i, (c, d) in enumerate(offsets) if a <= c and d <= b]
+        if not indices or offsets[indices[0]][0] != a or offsets[indices[-1]][1] != b:
+            raise ValueError('Entity boundary falls on whitespace')
+        for n, i in enumerate(indices):
+            tags[i] = f'{"B" if n == 0 else "I"}-{kind}'
+    return dict(tokens=[text[a:b] for a, b in offsets], ner_tags=tags,
+                dropped_overlapping=len(overlapping), original_offsets=[list(v) for v in offsets])
+
+
+def _biored_entity_row(row):
+    text = row['document_text']
+    entities = []
+    for name, start, length, kind in zip(row['annotation_texts'], row['annotation_offsets'],
+                                        row['annotation_lengths'], row['annotation_types']):
+        if text[start:start + length] != name:
+            raise ValueError('BioRED entity span does not match document')
+        entities.append((start, start + length, kind))
+    out = _character_bio(text, entities)
+    return {**out, 'metadata': json.dumps({'document_id': row['document_id'],
+        'dropped_overlapping': out['dropped_overlapping'], 'original_offsets': out['original_offsets']})}
+
+
+biored__entities = TokenClassification(dataset_name='gyorilab/BioRED', task_id='biored/entities',
+    tokens='tokens', labels='ner_tags', metadata='metadata', complete_splits=False,
+    pre_process=lambda ds: _named_ner_tags(ds.map(_biored_entity_row)),
+    load_dataset_kwargs={'revision': SOURCE_REVISIONS['gyorilab/BioRED']})
+
+
+def _bigbio_entity_row(row):
+    # Reconstruct the document at its published offsets, preserving passage gaps.
+    pieces = [(a, b, text) for p in row['passages']
+              for (a, b), text in zip(p['offsets'], p['text'])]
+    chars = [' '] * max(b for _, b, _ in pieces)
+    for a, b, text in pieces:
+        if b - a != len(text):
+            raise ValueError('BigBio passage length mismatch')
+        chars[a:b] = text
+    text = ''.join(chars)
+    spans, discontinuous = [], 0
+    for entity in row['entities']:
+        if len(entity['offsets']) != 1:
+            discontinuous += 1
+            continue
+        [(a, b)] = entity['offsets']
+        if text[a:b] != entity['text'][0]:
+            raise ValueError('BigBio entity text mismatch')
+        spans.append((a, b, entity['type']))
+    out = _character_bio(text, spans)
+    return {**out, 'dropped_discontinuous': discontinuous,
+            'metadata': json.dumps({'document_id': row['document_id'],
+                'dropped_discontinuous': discontinuous, 'dropped_overlapping': out['dropped_overlapping'],
+                'original_offsets': out['original_offsets']})}
+
+
+medmentions__st21pv = TokenClassification(dataset_name='bigbio/medmentions', task_id='medmentions/st21pv',
+    tokens='tokens', labels='ner_tags', metadata='metadata', complete_splits=False,
+    pre_process=lambda ds: _named_ner_tags(ds.map(_bigbio_entity_row)),
+    load_dataset_kwargs={'revision': SOURCE_REVISIONS['bigbio/medmentions'],
+                         'data_dir': 'medmentions_st21pv_bigbio_kb'})
+
+chia = TokenClassification(dataset_name='bigbio/chia', task_id='chia',
+    tokens='tokens', labels='ner_tags', metadata='metadata', complete_splits=False,
+    pre_process=lambda ds: _named_ner_tags(ds.map(_bigbio_entity_row)),
+    load_dataset_kwargs={'revision': SOURCE_REVISIONS['bigbio/chia'], 'data_dir': 'chia_bigbio_kb'})
+
+litbank__entities = TokenClassification(dataset_name='garutyunov/litbank-entities', task_id='litbank/entities',
+    tokens='tokens', labels='ner_tags', complete_splits=False, pre_process=_named_ner_tags,
+    load_dataset_kwargs={'revision': SOURCE_REVISIONS['garutyunov/litbank-entities']})
+
+# The Cambridge token view supplies native train/dev/test and untyped B/I labels.
+linnaeus = TokenClassification(dataset_name='cambridgeltl/linnaeus', task_id='linnaeus',
+    tokens='tokens', labels='ner_tags', complete_splits=False,
+    pre_process=lambda ds: ds.cast_column('ner_tags', Sequence(ClassLabel(
+        names=['O', 'B-species', 'I-species']))),
+    load_dataset_kwargs={'revision': SOURCE_REVISIONS['cambridgeltl/linnaeus'], 'data_dir': 'linnaeus'})
+
+def _scierc_entity_row(row):
+    # SciERC uses document-global token offsets and inclusive ends, even though
+    # annotations and tokens are grouped by sentence in its native JSON.
+    tokens = [token for sentence in row['sentences'] for token in sentence]
+    spans = sorted({(int(a), int(b) + 1, kind) for sentence in row['ner'] for a, b, kind in sentence})
+    if any(not 0 <= a < b <= len(tokens) for a, b, _ in spans):
+        raise ValueError('Invalid SciERC token span')
+    overlapping = {i for i, (a, b, _) in enumerate(spans)
+                   for j, (c, d, _) in enumerate(spans) if i != j and a < d and c < b}
+    tags = ['O'] * len(tokens)
+    for i, (a, b, kind) in enumerate(spans):
+        if i not in overlapping:
+            tags[a:b] = [f'B-{kind}'] + [f'I-{kind}'] * (b - a - 1)
+    return {'tokens': tokens, 'ner_tags': tags,
+            'metadata': json.dumps({'document_id': row['doc_key'], 'dropped_overlapping': len(overlapping)})}
+
+
+scierc__entities = TokenClassification(dataset_name='zj88zj/SCIERC', task_id='scierc/entities',
+    tokens='tokens', labels='ner_tags', metadata='metadata', complete_splits=False,
+    pre_process=lambda ds: _named_ner_tags(ds.map(_scierc_entity_row)),
+    load_dataset_kwargs={'revision': SOURCE_REVISIONS['zj88zj/SCIERC']})
+
+
+def _toxic_span_row(row):
+    text = row['text']
+    positions = ast.literal_eval(row['spans']) if isinstance(row['spans'], str) else row['spans']
+    if any(not isinstance(i, int) or not 0 <= i < len(text) for i in positions):
+        raise ValueError('Invalid toxic character offset')
+    positions = set(positions)
+    offsets = [(m.start(), m.end()) for m in re.finditer(r'\w+|[^\w\s]', text)]
+    tags, previous_end, aligned = [], None, True
+    for a, b in offsets:
+        selected = positions.intersection(range(a, b))
+        if selected and len(selected) != b - a:
+            aligned = False
+        if selected:
+            continuing = previous_end is not None and all(i in positions for i in range(previous_end, a))
+            tags.append(('I' if continuing else 'B') + '-toxic')
+            previous_end = b
+        else:
+            tags.append('O')
+            previous_end = None
+    return {'tokens': [text[a:b] for a, b in offsets], 'ner_tags': tags, 'span_aligned': aligned}
+
+
+def _toxic_spans(dataset):
+    converted = dataset.map(_toxic_span_row)
+    for split, rows in converted.items():
+        dropped = len(rows) - sum(rows['span_aligned'])
+        if dropped:
+            warnings.warn(f'Toxic spans {split}: dropped {dropped} rows with unaligned character spans')
+    return _named_ner_tags(converted.filter(lambda r: r['span_aligned']))
+
+
+toxic_spans = TokenClassification(dataset_name='csv', task_id='toxic-spans',
+    tokens='tokens', labels='ner_tags', complete_splits=False, pre_process=_toxic_spans,
+    load_dataset_kwargs={'revision': SOURCE_REVISIONS['alimurtaza0411/toxic_spans'],
+        'data_files': {split: f"hf://datasets/alimurtaza0411/toxic_spans@{SOURCE_REVISIONS['alimurtaza0411/toxic_spans']}/tsd_{split}.csv"
+                       for split in ('train', 'test')}})
+
+def _laptop_aspect_row(row):
+    spans = []
+    for aspect in row['aspectTerms']:
+        a, b = int(aspect['from']), int(aspect['to'])
+        if row['text'][a:b] != aspect['term']:
+            raise ValueError('Laptop aspect text mismatch')
+        # Some gold terms include outer whitespace; exclude it from the span.
+        while a < b and row['text'][a].isspace():
+            a += 1
+        while a < b and row['text'][b - 1].isspace():
+            b -= 1
+        spans.append((a, b, 'aspect'))
+    out = _character_bio(row['text'], spans)
+    return {**out, 'metadata': json.dumps({'sentence_id': row['sentenceId'],
+        'dropped_overlapping': out['dropped_overlapping']})}
+
+
+semeval2014__laptop_aspects = TokenClassification(dataset_name='alexcadillon/SemEval2014Task4',
+    task_id='semeval2014/laptop-aspects', tokens='tokens', labels='ner_tags', metadata='metadata',
+    complete_splits=False, pre_process=lambda ds: _named_ner_tags(ds.map(_laptop_aspect_row)),
+    load_dataset_kwargs={'revision': SOURCE_REVISIONS['alexcadillon/SemEval2014Task4'], 'data_dir': 'laptops'})
+
+inspec__keyphrases = TokenClassification(dataset_name='midas/inspec', task_id='inspec/keyphrases',
+    tokens='document', labels='ner_tags', complete_splits=False,
+    pre_process=lambda ds: _single_type_bio(ds, 'doc_bio_tags', 'keyphrase'),
+    load_dataset_kwargs={'revision': SOURCE_REVISIONS['midas/inspec'], 'data_dir': 'extraction'})
+
 blog_authorship_corpus__gender    = Classification(sentence1="text",labels="gender", question="What is the blogger's gender?",
     dataset_name="tasksource/blog_authorship_corpus")
 blog_authorship_corpus__age       = Classification(sentence1="text", question="What is the blogger's age group?",

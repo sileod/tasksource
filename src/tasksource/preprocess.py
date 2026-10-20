@@ -483,6 +483,8 @@ class ExtractiveQA(SharedFields, ExtractiveQAFields):
                                  self.offset_tolerance)
             return {'answers': spans or {'text': [], 'answer_start': []}, 'valid': spans is not None}
         for split in dataset:
+            if not len(dataset[split]):
+                continue  # No rows to validate; map does not add columns to an empty split.
             rows = dataset[split].map(check)
             features = rows.features.copy(); features['answers'] = ANSWERS
             rows = rows.cast(features)

@@ -87,6 +87,62 @@ def entity_type(label):
 
 # Entity types whose label alone is opaque (OntoNotes, acronyms) or too short to read well.
 NAMES = {
+    "ChemicalEntity": "chemical entity", "DiseaseOrPhenotypicFeature": "disease or phenotypic feature",
+    "OrganismTaxon": "organism or species",
+    "VEH": "vehicle", "Generic": "generic scientific term", "OtherScientificTerm": "other scientific term",
+    'academicjournal': 'academic journal',
+    'astronomicalobject': 'astronomical object',
+    'chemicalcompound': 'chemical compound',
+    'chemicalelement': 'chemical element',
+    'literarygenre': 'literary genre',
+    'musicalartist': 'musical artist',
+    'musicalinstrument': 'musical instrument',
+    'musicgenre': 'music genre',
+    'politicalparty': 'political party',
+    'programlang': 'programming language',
+    'MATE': 'material',
+    'MANP': 'manufacturing process',
+    'MACEQ': 'machine or equipment',
+    'APPL': 'application',
+    'FEAT': 'feature',
+    'PRO': 'mechanical property',
+    'CHAR': 'characterization',
+    'PARA': 'parameter',
+    'ENAT': 'enabling technology',
+    'CONPRI': 'concept or principle',
+    'MANS': 'manufacturing standard',
+    'BIOP': 'biomedical entity',
+    'GeneOrGeneProduct': 'gene or gene product',
+    'SequenceVariant': 'sequence variant',
+    'CellLine': 'cell line',
+    'T005': 'virus',
+    'T007': 'bacterium',
+    'T017': 'anatomical structure',
+    'T022': 'body system',
+    'T031': 'body substance',
+    'T033': 'finding',
+    'T037': 'injury or poisoning',
+    'T038': 'biologic function',
+    'T058': 'health care activity',
+    'T062': 'research activity',
+    'T074': 'medical device',
+    'T082': 'spatial concept',
+    'T091': 'biomedical occupation or discipline',
+    'T092': 'organization',
+    'T097': 'professional or occupational group',
+    'T098': 'population group',
+    'T103': 'chemical',
+    'T168': 'food',
+    'T170': 'intellectual product',
+    'T201': 'clinical attribute',
+    'T204': 'eukaryote',
+    'Parties.BUYING_COMPANY': 'buying company',
+    'Parties.SELLING_COMPANY': 'selling company',
+    'Parties.ACQUIRED_COMPANY': 'acquired company',
+    'Advisors.LEGAL_CONSULTING_COMPANY': 'legal consulting company',
+    'Advisors.GENERIC_CONSULTING_COMPANY': 'consulting company',
+    'Generic_Info.ANNUAL_REVENUES': 'annual revenues',
+
     "Peop": "person", "Other": "other named entity", "creative_work": "creative work",
     "Character_Name": "character name", "Restaurant_Name": "restaurant name",
     "TARGET": "opinion target", "ANATOMY": "anatomical entity",
@@ -134,6 +190,8 @@ def readable(kind):
 def entity_spans(tokens, labels, names):
     """Detokenized text (tokens joined by spaces) and ``{type: [(start, end)]}``. BIO and IO schemes:
     ``B-`` opens a span, a change of type closes it."""
+    if len(tokens) != len(labels):
+        raise ValueError("Token and label counts differ")
     text, offsets, position = [], [], 0
     for token in tokens:
         offsets.append((position, position + len(token)))

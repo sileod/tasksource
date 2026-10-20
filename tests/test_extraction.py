@@ -147,3 +147,208 @@ def test_tweetner_native_files_and_tag_ids():
     assert _TWEETNER7_TAGS[0] == 'B-corporation' and _TWEETNER7_TAGS[14] == 'O'
     assert _MIT_MOVIE_TRIVIA_TAGS[15:17] == ['I-Genre', 'I-Year']
     assert _MIT_RESTAURANT_TAGS[15:17] == ['I-Price', 'I-Cuisine']
+
+
+def test_character_bio_preserves_subword_boundaries_and_adjacent_entities():
+    from tasksource.tasks import _character_bio
+    row = _character_bio('antiHER2+ drug', [(4, 8, 'gene'), (8, 9, 'marker'), (10, 14, 'chemical')])
+    assert row['tokens'] == ['anti', 'HER2', '+', 'drug']
+    assert row['ner_tags'] == ['O', 'B-gene', 'B-marker', 'B-chemical']
+    assert row['original_offsets'] == [[0, 4], [4, 8], [8, 9], [10, 14]]
+    assert row['dropped_overlapping'] == 0
+
+
+def test_character_bio_drops_every_member_of_overlaps_and_deduplicates():
+    from tasksource.tasks import _character_bio
+    row = _character_bio('abc def ghi', [(0, 7, 'outer'), (0, 3, 'inner'), (8, 11, 'ok'), (8, 11, 'ok')])
+    assert row['dropped_overlapping'] == 2
+    assert row['ner_tags'] == ['O', 'O', 'B-ok']
+    with pytest.raises(ValueError, match='Invalid character'):
+        _character_bio('abc', [(0, 4, 'bad')])
+
+
+def test_bigbio_discontinuous_and_overlapping_counts():
+    from tasksource.tasks import _bigbio_entity_row
+    row = {'document_id': 'doc', 'passages': [
+        {'text': ['abc'], 'offsets': [[0, 3]]}, {'text': ['def ghi'], 'offsets': [[4, 11]]}],
+        'entities': [
+            {'text': ['abc', 'ghi'], 'offsets': [[0, 3], [8, 11]], 'type': 'discontinuous'},
+            {'text': ['abc def'], 'offsets': [[0, 7]], 'type': 'outer'},
+            {'text': ['def'], 'offsets': [[4, 7]], 'type': 'inner'},
+            {'text': ['ghi'], 'offsets': [[8, 11]], 'type': 'ok'}]}
+    out = _bigbio_entity_row(row)
+    assert out['dropped_discontinuous'] == 1
+    assert out['dropped_overlapping'] == 2
+    assert out['ner_tags'] == ['O', 'O', 'B-ok']
+    assert json.loads(out['metadata'])['document_id'] == 'doc'
+    row['entities'][-1]['text'] = ['wrong']
+    with pytest.raises(ValueError, match='entity text mismatch'):
+        _bigbio_entity_row(row)
+
+
+def test_buster_excludes_silver_and_preserves_gold_token_rows():
+    from tasksource.tasks import _buster_gold
+    ds = DatasetDict({f'FOLD_{i}': Dataset.from_list([
+        {'tokens': [f'doc{i}', 'company'], 'labels': ['O', 'B-Parties.BUYING_COMPANY']}]) for i in range(1, 6)})
+    ds['SILVER'] = Dataset.from_list([{'tokens': ['silver'], 'labels': ['B-fake']}])
+    out = _buster_gold(ds)
+    assert [r['tokens'][0] for r in out['train']] == ['doc1', 'doc2', 'doc3']
+    assert out['validation'][0]['tokens'][0] == 'doc4'
+    assert out['test'][0]['tokens'][0] == 'doc5'
+    assert 'B-fake' not in out['train'].features['ner_tags'].feature.names
+
+
+def test_skillspan_independent_layers_preserve_overlapping_annotations():
+    from tasksource.tasks import _single_type_bio
+    ds = DatasetDict(train=Dataset.from_list([{'tokens': ['SQL', 'skills'],
+        'tags_skill': ['B', 'I'], 'tags_knowledge': ['B', 'O']}]))
+    skills = _single_type_bio(ds, 'tags_skill', 'skill')
+    knowledge = _single_type_bio(ds, 'tags_knowledge', 'knowledge')
+    assert skills['train'].features['ner_tags'].feature.int2str(skills['train'][0]['ner_tags']) == ['B-skill', 'I-skill']
+    assert knowledge['train'].features['ner_tags'].feature.int2str(knowledge['train'][0]['ner_tags']) == ['B-knowledge', 'O']
+
+
+def test_entity_spans_rejects_truncated_or_shifted_tag_sequences():
+    with pytest.raises(ValueError, match='Token and label counts differ'):
+        entity_spans(['a', 'b'], [0, 1, 0], ['O', 'B-chemical'])
+
+
+def test_scierc_inclusive_document_global_offsets():
+    from tasksource.tasks import _scierc_entity_row
+    out = _scierc_entity_row({'doc_key': 'd', 'sentences': [['first', '.'], ['second', 'method']],
+        'ner': [[[0, 0, 'Task']], [[2, 3, 'Method']]]})
+    assert out['ner_tags'] == ['B-Task', 'O', 'B-Method', 'I-Method']
+    assert json.loads(out['metadata'])['dropped_overlapping'] == 0
+
+
+def test_toxic_span_alignment_and_separate_mentions():
+    from tasksource.tasks import _toxic_span_row
+    row = _toxic_span_row({'text': 'bad awful! ok', 'spans': repr(list(range(9)))})
+    assert row['span_aligned']
+    assert row['tokens'] == ['bad', 'awful', '!', 'ok']
+    assert row['ner_tags'] == ['B-toxic', 'I-toxic', 'O', 'O']
+    row = _toxic_span_row({'text': 'bad awful', 'spans': '[0, 1, 2, 4, 5, 6, 7, 8]'})
+    assert row['ner_tags'] == ['B-toxic', 'B-toxic']
+    assert not _toxic_span_row({'text': 'awful', 'spans': '[1, 2, 3, 4]'})['span_aligned']
+    assert _toxic_span_row({'text': 'fine', 'spans': '[]'})['ner_tags'] == ['O']
+    with pytest.raises(ValueError, match='Invalid toxic'):
+        _toxic_span_row({'text': 'fine', 'spans': '[9]'})
+
+
+def test_laptop_aspects_use_gold_offsets_without_polarity():
+    from tasksource.tasks import _laptop_aspect_row
+    row = {'sentenceId': 'a', 'text': 'good battery life', 'aspectTerms': [
+        {'term': 'battery life', 'from': '5', 'to': '17', 'polarity': 'positive'}]}
+    assert _laptop_aspect_row(row)['ner_tags'] == ['O', 'B-aspect', 'I-aspect']
+    whitespace = {'sentenceId': 'b', 'text': 'good battery ', 'aspectTerms': [
+        {'term': 'battery ', 'from': '5', 'to': '13'}]}
+    assert _laptop_aspect_row(whitespace)['ner_tags'] == ['O', 'B-aspect']
+    row['aspectTerms'][0]['from'] = '4'
+    with pytest.raises(ValueError, match='aspect text mismatch'):
+        _laptop_aspect_row(row)
+
+
+def test_quac_history_excludes_current_answer_and_retains_null():
+    from tasksource.extractive_tasks import _quac_spans
+    rows = list(_quac_spans({'context': 'Alice met Bob. CANNOTANSWER',
+        'questions': ['Who met Bob?', 'Where?'], 'orig_answers':
+        {'texts': ['Alice', 'CANNOTANSWER'], 'answer_starts': [0, 15]},
+        'turn_ids': ['a', 'b'], 'dialogue_id': 'd'}))
+    assert rows[0]['question'] == 'Question: Who met Bob?'
+    assert rows[1]['question'] == 'Previous:\nQ: Who met Bob?\nA: Alice\nQuestion: Where?'
+    assert rows[1]['answers'] == {'text': [], 'answer_start': []}
+    assert rows[0]['context'] == 'Alice met Bob.'
+
+
+def test_cuad_windows_preserve_spans_and_balance_per_contract():
+    from tasksource.extractive_tasks import _cuad_contract, _contract_windows
+    context = 'a. ' * 1400 + 'Alice Bob' + ' z. ' * 1400
+    start = context.index('Alice')
+    answers = {'text': ['Alice Bob'], 'answer_start': [start]}
+    windows = list(_contract_windows(context, answers))
+    assert all(0 < b - a <= 4000 for a, b in windows)
+    assert sum(a <= start and start + 9 <= b for a, b in windows) == 1
+    rows = [{'id': 'a', 'title': 'contract', 'context': context, 'question': 'Who?', 'answers': answers},
+            {'id': 'b', 'title': 'contract', 'context': context, 'question': 'Where?',
+             'answers': {'text': [], 'answer_start': []}}]
+    out = list(_cuad_contract(rows))
+    assert out == list(_cuad_contract(list(reversed(rows))))
+    assert sum(bool(r['answers']['text']) for r in out) == 1
+    assert len(out) == 2
+    for r in out:
+        for t, s in zip(r['answers']['text'], r['answers']['answer_start']):
+            assert r['context'][s:s + len(t)] == t
+    # An overlong answer's intersecting chunks must never become false nulls.
+    long = {'text': [context], 'answer_start': [0]}
+    assert list(_contract_windows(context, long)) == []
+
+
+def test_ropes_unlocated_positive_dropped_not_null():
+    from tasksource.extractive_tasks import _ropes_spans
+    d = DatasetDict(train=Dataset.from_list([
+        {'background': 'Alice', 'situation': 'Bob', 'question': 'Alice or Eve?', 'answers': {'text': ['Alice']}},
+        {'background': 'Alice', 'situation': 'Bob', 'question': 'Alice or Eve?', 'answers': {'text': ['Eve']}},
+    ]))
+    out = _ropes_spans(d)['train']
+    assert len(out) == 1 and out[0]['answers'] == {'text': ['Alice'], 'answer_start': [0]}
+
+
+def test_qasper_requires_every_span_verbatim_and_keeps_native_null():
+    from tasksource.extractive_tasks import _qasper_spans
+    def answer(spans, null=False):
+        return dict(extractive_spans=spans, unanswerable=null, yes_no=None, free_form_answer='')
+    row = dict(id='p', title='Paper', abstract='Alice', full_text={'paragraphs': [['Bob']]},
+        qas={'question': ['Who?'], 'question_id': ['q'], 'answers': [{
+            'annotation_id': ['a', 'b', 'c'], 'answer': [answer(['Alice', 'Bob']),
+                answer(['Alice', 'missing']), answer([], True)]}]})
+    rows = list(_qasper_spans(row))
+    assert len(rows) == 2
+    assert rows[0]['answers']['text'] == ['Alice', 'Bob']
+    assert rows[1]['answers']['text'] == []
+    from scripts.build_jev_extraction import LIST_QA
+    assert {'cuad/spans', 'qasper/spans'} <= LIST_QA
+
+
+def test_unique_verbatim_relocation_and_native_null():
+    from tasksource.extractive_tasks import _verbatim_spans
+    d = DatasetDict(train=Dataset.from_list([
+        {'context': 'Alice Bob', 'answers': {'text': ['Bob'], 'answer_start': [7]}},
+        {'context': 'Bob Bob', 'answers': {'text': ['Bob'], 'answer_start': [1]}},
+        {'context': 'Alice', 'answers': {'text': ['Bob'], 'answer_start': [0]}},
+        {'context': 'Alice', 'answers': {'text': [], 'answer_start': []}},
+    ]))
+    rows = _verbatim_spans(d)['train']
+    assert len(rows) == 2
+    assert rows[0]['span_answers'] == {'text': ['Bob'], 'answer_start': [6]}
+    assert rows[1]['span_answers'] == {'text': [], 'answer_start': []}
+
+
+def test_tatqa_only_single_text_spans():
+    from tasksource.extractive_tasks import _tatqa_spans
+    row = {'paragraphs': [{'order': 2, 'text': 'Bob'}, {'order': 1, 'text': 'Alice'}],
+           'questions': [{'uid': str(i), 'question': 'Who?', 'answer': answer,
+                          'answer_type': kind, 'answer_from': source}
+                         for i, (answer, kind, source) in enumerate([
+                             (['Alice'], 'span', 'text'), (['Bob'], 'span', 'table'),
+                             (['Alice', 'Bob'], 'multi-span', 'text'), (['Eve'], 'span', 'text')])]}
+    [out] = list(_tatqa_spans(row))
+    assert out['context'] == 'Alice\n\nBob'
+    assert out['answers'] == {'text': ['Alice'], 'answer_start': [0]}
+
+
+def test_x3_subjqa_nested_annotations_become_canonical_answers():
+    from tasksource.extractive_tasks import subjqa_books
+    row = {'context': 'Alice', 'question': 'Who?', 'id': 'a', 'review_id': 'r', 'domain': 'books',
+           'answers': {'text': ['Alice'], 'answer_start': [0], 'answer_subj_level': [1],
+                       'ans_subj_score': [0.0], 'is_ans_subjective': [False]}}
+    out = subjqa_books(DatasetDict(train=Dataset.from_list([row])))['train']
+    assert out[0]['answers'] == {'text': ['Alice'], 'answer_start': [0]}
+
+
+def test_extractive_empty_filtered_evaluation_split():
+    task = ExtractiveQA(dataset_name='x', complete_splits=False)
+    rows = Dataset.from_list([{'context': 'Alice', 'question': 'Who?',
+                              'answers': {'text': ['Alice'], 'answer_start': [0]}}])
+    out = task(DatasetDict(train=rows, validation=rows.select([])))
+    assert len(out['train']) == 1 and len(out['validation']) == 0
+    assert out['train'].features == out['validation'].features

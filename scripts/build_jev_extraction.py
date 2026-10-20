@@ -26,8 +26,23 @@ REPO = "tasksource/tasksource-jev-typed-decisions"
 # NewsQA's redistribution terms (Microsoft's NewsQA license over CNN articles) are unresolved.
 EXCLUDED_QA = {"newsqa"}
 # Multi-span answers are sets (every span is part of the answer), not alternatives.
-LIST_QA = {"quoref"}
+LIST_QA = {"quoref", "cuad/spans", "qasper/spans"}
 NER = {
+    "semeval2014/laptop-aspects": "Every laptop aspect term in the review, as written.",
+    "scierc/entities": None,
+    "toxic-spans": "Every toxic span in the text, as written.",
+    "litbank/entities": None, "linnaeus": None,
+    "crossner/politics": None,
+    "crossner/science": None,
+    "crossner/music": None,
+    "crossner/literature": None,
+    "crossner/ai": None,
+    "skillspan/skill": "Every skill requirement in the text, as written.",
+    "skillspan/knowledge": "Every knowledge requirement in the text, as written.",
+    "fabner": None, "buster": None, "biored/entities": None,
+    "medmentions/st21pv": None, "chia": None,
+    "inspec/keyphrases": "Every keyphrase in the text, as written.",
+
     "bc5cdr": None, "tweetner7": None, "mit-movie-trivia": None, "mit-restaurant": None,
     "conll04": None, "bc2gm": None,
     "conll2003/ner_tags": None, "wnut_17/wnut_17": None, "ncbi_disease/ncbi_disease": None,
@@ -140,7 +155,8 @@ pass, as extraction models (e.g. Cloudflare's Clairic) are asked. {rows}
   answer (an unanswerable question, an absent entity type). Several values of a `text` field are
   alternative gold spans; of a `list` field, every item.
 - Extractive question answering (SQuAD 2.0, AdversarialQA, Natural Questions, HotpotQA, Quoref, MuSiQue,
-  DROP single-span, DuoRC verbatim spans, ConcurrentQA, FairytaleQA explicit spans) groups the questions
+  DROP single-span, DuoRC, ConcurrentQA, FairytaleQA, QuAC with history, windowed CUAD, TyDi English,
+  Qasper spans, PolicyQA, SubjQA, COVID-QA, TimeQA, TAT-QA text spans and ROPES) groups the questions
   asked about one context, up to {max_fields} fields per row.
   Named entities (CoNLL-2003, OntoNotes, WNUT-17, Few-NERD, NCBI-disease, JNLPBA, acronyms, FiNER-139
   and astronomy, biomedical, financial, software, legal, GUM, Twitter and English opinion-target sources)

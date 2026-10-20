@@ -1,6 +1,20 @@
 """Reviewed source snapshots; keep opaque revision IDs out of task annotations."""
 
 SOURCE_REVISIONS = {
+    'zj88zj/SCIERC': '12d862d8ca8a4bf002ced41da993d07b25e36b2d',
+    'alimurtaza0411/toxic_spans': '0065758abce08865f5666d734f0377da956c3d8b',
+
+    'garutyunov/litbank-entities': '8be5b53d571a873ea97cf6bd3436cace4923d854',
+    'cambridgeltl/linnaeus': '6e684a3864e90f00a56c2f7650d73cec85c964db',
+
+    'DFKI-SLT/cross_ner': 'ac719b1953c0ce0d4b3614069ce8be463bf30e31',
+    'jjzha/skillspan': '33062e6bd0e03a5e01ae299ce0518f4613ef4298',
+    'DFKI-SLT/fabner': '69e3dfc583a1ace2b79fae9b2732a8837a535902',
+    'expertai/BUSTER': 'a70c91d81f0c6db4acff827e5cebaff552883dd5',
+    'bigbio/medmentions': 'baa6d1586c440c292f5760f91206b5fc83abdade',
+    'bigbio/chia': 'b3296f43da51c5d703afce13dd435096af89f4cc',
+    'midas/inspec': '63e35921eb68d48c8bcdedc658f285c98f9dde1e',
+
     'tner/bc5cdr': '564118257f090b2592b7b1607ec60f40948acf1c',
     'tner/tweetner7': '9d9c27f1d4fb18a02e0d8283bac6ebb01c56c458',
     'tner/mit_movie_trivia': '7f8611d43d85c202ba7d813db1694e7e62e27584',
