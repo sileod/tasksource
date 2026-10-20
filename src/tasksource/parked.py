@@ -356,6 +356,14 @@ REASONS = {key: reason for key, (_, reason) in PARKED.items()}
 
 # Candidates considered but never annotated.
 NOT_ANNOTATED = {
+    "Umean/B2NERD": ("duplicate", "Recollection of existing corpora with a standardized ontology; review native constituents, not the merged/relabelled release"),
+    "Universal-NER/Pile-NER-type": ("unsound", "Unverified model entity annotations; B2NERD recollection does not make these human gold"),
+    "Babelscape/multinerd": ("unsound", "Automatic Wikipedia/Wikinews entity annotation, not human gold"),
+    "Babelscape/wikineural": ("unsound", "Automatic silver entity annotations, not human gold"),
+    "PolyglotNER": ("unsound", "Distant automatic entity annotations, not human gold"),
+    "WikiANN": ("unsound", "Automatic Wikipedia entity annotations, not human gold"),
+    "mrqa/TriviaQA-web": ("unsound", "Distant answer matching; human trivia answers do not verify every retrieved passage span"),
+    "mrqa/SearchQA": ("unsound", "Distant answer matching in retrieved snippets; no human span verification"),
     "clue/clue cmnli": ("duplicate", "machine-translated MNLI; XNLI covers Chinese"),
     "dbarbedillo/SMS_Spam_Multilingual_Collection_Dataset": ("unsound", "machine-translated; many translations degenerate"),
     "ylacombe/xsum_factuality": ("unavailable", "no longer on the Hub"),

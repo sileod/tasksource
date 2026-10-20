@@ -1196,7 +1196,7 @@ ebm_nlp__interventions = _ebm_nlp('Interventions_Labels', 'intervention', 'ebm-n
 ebm_nlp__outcomes = _ebm_nlp('Outcomes_Labels', 'outcome', 'ebm-nlp/outcomes')
 
 
-def _bigbio_entity_row(row):
+def _bigbio_entity_row(row, *, split_discontinuous=False):
     # Reconstruct the document at its published offsets, preserving passage gaps.
     pieces = [(a, b, text) for p in row['passages']
               for (a, b), text in zip(p['offsets'], p['text'])]
@@ -1208,13 +1208,15 @@ def _bigbio_entity_row(row):
     text = ''.join(chars)
     spans, discontinuous = [], 0
     for entity in row['entities']:
-        if len(entity['offsets']) != 1:
+        if len(entity['offsets']) != len(entity['text']):
+            raise ValueError('BigBio entity offsets/text lengths differ')
+        if len(entity['offsets']) != 1 and not split_discontinuous:
             discontinuous += 1
             continue
-        [(a, b)] = entity['offsets']
-        if text[a:b] != entity['text'][0]:
-            raise ValueError('BigBio entity text mismatch')
-        spans.append((a, b, entity['type']))
+        for (a, b), mention in zip(entity['offsets'], entity['text']):
+            if not 0 <= a < b <= len(text) or text[a:b] != mention:
+                raise ValueError('BigBio entity text mismatch')
+            spans.append((a, b, entity['type']))
     out = _character_bio(text, spans)
     return {**out, 'dropped_discontinuous': discontinuous,
             'metadata': json.dumps({'document_id': row['document_id'],
@@ -1232,6 +1234,78 @@ chia = TokenClassification(dataset_name='bigbio/chia', task_id='chia',
     tokens='tokens', labels='ner_tags', metadata='metadata', complete_splits=False,
     pre_process=lambda ds: _named_ner_tags(ds.map(_bigbio_entity_row)),
     load_dataset_kwargs={'revision': SOURCE_REVISIONS['bigbio/chia'], 'data_dir': 'chia_bigbio_kb'})
+
+
+def _bigbio_ner(repo, task_id, config):
+    # New family members are bounded, retain native splits and flatten only
+    # non-overlapping contiguous runs of the original human annotations.
+    return TokenClassification(dataset_name=repo, task_id=task_id,
+        tokens='tokens', labels='ner_tags', metadata='metadata', complete_splits=False,
+        max_examples=2000,
+        pre_process=lambda ds: _named_ner_tags(ds.map(
+            lambda row: _bigbio_entity_row(row, split_discontinuous=True))),
+        load_dataset_kwargs={'revision': SOURCE_REVISIONS[repo], 'data_dir': config})
+
+
+bionlp_cg__entities = _bigbio_ner('bigbio/bionlp_st_2013_cg', 'bionlp-cg/entities',
+    'bionlp_st_2013_cg_bigbio_kb')
+bioinfer__entities = _bigbio_ner('bigbio/bioinfer', 'bioinfer/entities', 'bioinfer_bigbio_kb')
+
+# One official expert-labeled PubMedQA fold, not the artificial/unlabeled
+# configs or ten overlapping cross-validation copies. Context excludes the
+# conclusion/long answer; final_decision is the yes/no/maybe gold judgment.
+pubmedqa = Classification('context', 'question', lambda row: row['answer'][0],
+    dataset_name='bigbio/pubmed_qa', task_id='pubmedqa/labeled-fold0',
+    question='Does the abstract evidence answer the research question yes, no, or maybe?',
+    metadata=lambda row: {'id': row['document_id'], 'annotation_origin': 'expert-labeled'},
+    complete_splits=False, max_examples=2000,
+    load_dataset_kwargs={'revision': SOURCE_REVISIONS['bigbio/pubmed_qa'],
+                         'data_dir': 'pubmed_qa_labeled_fold0_bigbio_qa'})
+
+def _nonoverlapping_ner_splits(dataset):
+    """Keep native membership, with exact token sequences in only one split.
+
+    Test takes precedence over validation and train. Within-split repetitions
+    are left alone; counts of excluded cross-split copies are printed.
+    """
+    seen, kept = set(), {}
+    for split in ('test', 'validation', 'train'):
+        if split not in dataset:
+            continue
+        keys = [tuple(tokens) for tokens in dataset[split]['tokens']]
+        indices = [i for i, key in enumerate(keys) if key not in seen]
+        kept[split] = dataset[split].select(indices)
+        if len(indices) != len(keys):
+            print(f'NER {split}: excluded {len(keys) - len(indices)} cross-split duplicate rows')
+        seen.update(keys)
+    return DatasetDict({split: kept[split] for split in dataset if split in kept})
+
+
+# CHEMDNER (BioCreative IV): gold human chemical mentions. The usable Hub
+# token view is kept directly; BigBIO's conversion ref contains no data shards.
+bc4chemd = TokenClassification(dataset_name='disi-unibo-nlp/bc4chemd', task_id='bc4chemd',
+    tokens='tokens', labels='ner_tags', complete_splits=False, max_examples=3000,
+    pre_process=lambda ds: _nonoverlapping_ner_splits(_named_ner_tags(ds)),
+    load_dataset_kwargs={'revision': SOURCE_REVISIONS['disi-unibo-nlp/bc4chemd']})
+
+harveyner = TokenClassification(dataset_name='extraordinarylab/harvey-ner', task_id='harveyner',
+    tokens='tokens', labels='ner_tags', complete_splits=False, max_examples=3000,
+    pre_process=lambda ds: _nonoverlapping_ner_splits(_named_ner_tags(ds)),
+    load_dataset_kwargs={'revision': SOURCE_REVISIONS['extraordinarylab/harvey-ner']})
+
+
+def _uner(config):
+    # Original universalner/universal_ner is script-only with no Parquet ref.
+    # This existing data-only copy retains its native tokens, ClassLabels and splits.
+    return TokenClassification(dataset_name='BramVanroy/universal_ner', config_name=config,
+        task_id='uner/{config_name}', tokens='tokens', labels='ner_tags',
+        complete_splits=False, max_examples=5000,
+        pre_process=_nonoverlapping_ner_splits,
+        metadata=lambda row: {'id': row['idx'], 'annotator': row['annotator']},
+        load_dataset_kwargs={'revision': SOURCE_REVISIONS['BramVanroy/universal_ner']})
+
+
+uner = _uner('en_ewt')
 
 litbank__entities = TokenClassification(dataset_name='garutyunov/litbank-entities', task_id='litbank/entities',
     tokens='tokens', labels='ner_tags', complete_splits=False, pre_process=_named_ner_tags,

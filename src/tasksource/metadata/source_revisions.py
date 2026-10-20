@@ -1,6 +1,15 @@
 """Reviewed source snapshots; keep opaque revision IDs out of task annotations."""
 
 SOURCE_REVISIONS = {
+    'bigbio/pubmed_qa': '13a7d15476092370cbabb6475390e7e69b74d2f2',
+    'extraordinarylab/harvey-ner': 'd96281eeeed9fbc4051dce043647f66514d6f85c',
+
+    'BramVanroy/universal_ner': '0dc5199b095f864c619c13190b32341eee0c2ce2',
+    'bigbio/bionlp_st_2013_cg': '126fa3094c985a90731e7073668486e35ff6a9ba',
+    'bigbio/bioinfer': '40744ce819da6ad5efa32f6241a32afa01b0f6a7',
+    'disi-unibo-nlp/bc4chemd': '740dcf93d8baee47a3c1c7bfa53b75697ae2285e',
+    'mrqa-workshop/mrqa': 'f3178d9888471dfb2b67c93de14f0ddf499a8d9f',
+
     'araag2/EBM_NLP': '0429237dbef648aab8c49dddd0b45cc2ad0c7178',
     'matejklemen/vuamc': '5dc18c35d193b521d14b909c2a74fccffff9cca8',
     'matejklemen/clc_fce': '3addf05ff8386ac91b1e44c50ca54beda0e9197a',
@@ -133,4 +142,8 @@ SOURCE_REVISIONS = {
     "theatticusproject/cuad-qa": "d9c4ee0250ae2eb97bdb5b50773ab14ea62d0631",
     "theatticusproject/maud": "37d5c3b95d18dcd8404cc5ce3fd5069be062392f",
     "wenhu/tab_fact": "cecfbe87432b0e7fdcac4578f8ac6fc87d08db76"
+}
+
+# Original UNER files missing from usable Hub uploads; local conversion only.
+UNER_GITHUB_REVISIONS = {
 }

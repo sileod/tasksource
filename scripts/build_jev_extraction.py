@@ -49,6 +49,9 @@ NER = {
     "skillspan/knowledge": "Every knowledge requirement in the text, as written.",
     "fabner": None, "buster": None, "biored/entities": None,
     "medmentions/st21pv": None, "chia": None,
+    "bionlp-cg/entities": None, "bioinfer/entities": None, "bc4chemd": None,
+    "uner/en_ewt": None,
+    "harveyner": None,
     "inspec/keyphrases": "Every keyphrase in the text, as written.",
 
     "bc5cdr": None, "tweetner7": None, "mit-movie-trivia": None, "mit-restaurant": None,

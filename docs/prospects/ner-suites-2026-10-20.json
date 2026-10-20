@@ -1,0 +1,1556 @@
+{
+  "checked": "2026-10-20",
+  "active_tasks": [
+    {
+      "id": "bionlp-cg/entities",
+      "multilingual": false,
+      "repo": "bigbio/bionlp_st_2013_cg",
+      "revision": "126fa3094c985a90731e7073668486e35ff6a9ba",
+      "native_rows": {
+        "train": 300,
+        "validation": 100,
+        "test": 200
+      },
+      "cap": 2000,
+      "split_overlap": {
+        "train/validation": 0,
+        "train/test": 0,
+        "validation/test": 0
+      },
+      "span_audit": {
+        "train": {
+          "overlapping_runs_dropped": 258,
+          "discontinuous_mentions_split": 0,
+          "rows_dropped": 0
+        },
+        "validation": {
+          "overlapping_runs_dropped": 42,
+          "discontinuous_mentions_split": 0,
+          "rows_dropped": 0
+        },
+        "test": {
+          "overlapping_runs_dropped": 165,
+          "discontinuous_mentions_split": 0,
+          "rows_dropped": 0
+        }
+      },
+      "retained_rows": {
+        "train": 300,
+        "validation": 100,
+        "test": 200
+      },
+      "cross_split_rows_removed": {
+        "train": 0,
+        "validation": 0,
+        "test": 0
+      },
+      "capped_rows": {
+        "train": 300,
+        "validation": 100,
+        "test": 200
+      },
+      "loaded_rows": {
+        "train": 5,
+        "validation": 5,
+        "test": 5
+      },
+      "sample_extraction_rows": {
+        "train": 5,
+        "validation": 5,
+        "test": 5
+      },
+      "license": "cc-by-sa-3.0 (original source)",
+      "license_use": "commercial"
+    },
+    {
+      "id": "bioinfer/entities",
+      "multilingual": false,
+      "repo": "bigbio/bioinfer",
+      "revision": "40744ce819da6ad5efa32f6241a32afa01b0f6a7",
+      "native_rows": {
+        "train": 894,
+        "test": 206
+      },
+      "cap": 2000,
+      "split_overlap": {
+        "train/test": 0
+      },
+      "span_audit": {
+        "train": {
+          "overlapping_runs_dropped": 85,
+          "discontinuous_mentions_split": 106,
+          "rows_dropped": 0
+        },
+        "test": {
+          "overlapping_runs_dropped": 18,
+          "discontinuous_mentions_split": 16,
+          "rows_dropped": 0
+        }
+      },
+      "retained_rows": {
+        "train": 894,
+        "test": 206
+      },
+      "cross_split_rows_removed": {
+        "train": 0,
+        "test": 0
+      },
+      "capped_rows": {
+        "train": 894,
+        "test": 206
+      },
+      "loaded_rows": {
+        "train": 5,
+        "test": 5
+      },
+      "sample_extraction_rows": {
+        "train": 5,
+        "test": 5
+      },
+      "license": "cc-by-2.0 (original source)",
+      "license_use": "commercial"
+    },
+    {
+      "id": "bc4chemd",
+      "multilingual": false,
+      "repo": "disi-unibo-nlp/bc4chemd",
+      "revision": "740dcf93d8baee47a3c1c7bfa53b75697ae2285e",
+      "native_rows": {
+        "train": 30682,
+        "validation": 30639,
+        "test": 26364
+      },
+      "cap": 3000,
+      "split_overlap": {
+        "train/validation": 37,
+        "train/test": 49,
+        "validation/test": 42
+      },
+      "retained_rows": {
+        "train": 30484,
+        "validation": 30442,
+        "test": 26364
+      },
+      "cross_split_rows_removed": {
+        "train": 198,
+        "validation": 197,
+        "test": 0
+      },
+      "capped_rows": {
+        "train": 3000,
+        "validation": 30442,
+        "test": 26364
+      },
+      "loaded_rows": {
+        "train": 5,
+        "validation": 5,
+        "test": 5
+      },
+      "sample_extraction_rows": {
+        "train": 5,
+        "validation": 5,
+        "test": 5
+      },
+      "license": "cc0-1.0 (original source)",
+      "license_use": "commercial"
+    },
+    {
+      "id": "uner/en_ewt",
+      "multilingual": false,
+      "repo": "BramVanroy/universal_ner",
+      "revision": "0dc5199b095f864c619c13190b32341eee0c2ce2",
+      "native_rows": {
+        "train": 12543,
+        "validation": 2001,
+        "test": 2077
+      },
+      "cap": 5000,
+      "split_overlap": {
+        "train/validation": 36,
+        "train/test": 47,
+        "validation/test": 27
+      },
+      "positive_rows": {
+        "train": 4263,
+        "validation": 624,
+        "test": 709
+      },
+      "retained_rows": {
+        "train": 12192,
+        "validation": 1924,
+        "test": 2077
+      },
+      "cross_split_rows_removed": {
+        "train": 351,
+        "validation": 77,
+        "test": 0
+      },
+      "capped_rows": {
+        "train": 5000,
+        "validation": 1924,
+        "test": 2077
+      },
+      "loaded_rows": {
+        "train": 5,
+        "validation": 5,
+        "test": 5
+      },
+      "sample_extraction_rows": {
+        "train": 5,
+        "validation": 5,
+        "test": 5
+      },
+      "license": "cc-by-sa-4.0 (original source)",
+      "license_use": "commercial"
+    },
+    {
+      "id": "uner/zh_gsd",
+      "multilingual": true,
+      "repo": "BramVanroy/universal_ner",
+      "revision": "0dc5199b095f864c619c13190b32341eee0c2ce2",
+      "native_rows": {
+        "train": 3997,
+        "validation": 500,
+        "test": 500
+      },
+      "cap": 5000,
+      "split_overlap": {
+        "train/validation": 0,
+        "train/test": 0,
+        "validation/test": 0
+      },
+      "positive_rows": {
+        "train": 2532,
+        "validation": 328,
+        "test": 315
+      },
+      "retained_rows": {
+        "train": 3997,
+        "validation": 500,
+        "test": 500
+      },
+      "cross_split_rows_removed": {
+        "train": 0,
+        "validation": 0,
+        "test": 0
+      },
+      "capped_rows": {
+        "train": 3997,
+        "validation": 500,
+        "test": 500
+      },
+      "loaded_rows": {
+        "train": 5,
+        "validation": 5,
+        "test": 5
+      },
+      "sample_extraction_rows": {
+        "train": 5,
+        "validation": 5,
+        "test": 5
+      },
+      "license": "cc-by-sa-4.0 (original source)",
+      "license_use": "commercial"
+    },
+    {
+      "id": "uner/sv_talbanken",
+      "multilingual": true,
+      "repo": "BramVanroy/universal_ner",
+      "revision": "0dc5199b095f864c619c13190b32341eee0c2ce2",
+      "native_rows": {
+        "train": 4303,
+        "validation": 504,
+        "test": 1219
+      },
+      "cap": 5000,
+      "split_overlap": {
+        "train/validation": 0,
+        "train/test": 0,
+        "validation/test": 0
+      },
+      "positive_rows": {
+        "train": 564,
+        "validation": 19,
+        "test": 121
+      },
+      "retained_rows": {
+        "train": 4303,
+        "validation": 504,
+        "test": 1219
+      },
+      "cross_split_rows_removed": {
+        "train": 0,
+        "validation": 0,
+        "test": 0
+      },
+      "capped_rows": {
+        "train": 4303,
+        "validation": 504,
+        "test": 1219
+      },
+      "loaded_rows": {
+        "train": 5,
+        "validation": 5,
+        "test": 5
+      },
+      "sample_extraction_rows": {
+        "train": 5,
+        "validation": 5,
+        "test": 5
+      },
+      "license": "cc-by-sa-4.0 (original source)",
+      "license_use": "commercial"
+    },
+    {
+      "id": "uner/sk_snk",
+      "multilingual": true,
+      "repo": "BramVanroy/universal_ner",
+      "revision": "0dc5199b095f864c619c13190b32341eee0c2ce2",
+      "native_rows": {
+        "train": 8483,
+        "validation": 1060,
+        "test": 1061
+      },
+      "cap": 5000,
+      "split_overlap": {
+        "train/validation": 2,
+        "train/test": 4,
+        "validation/test": 2
+      },
+      "positive_rows": {
+        "train": 2253,
+        "validation": 391,
+        "test": 557
+      },
+      "retained_rows": {
+        "train": 8475,
+        "validation": 1057,
+        "test": 1061
+      },
+      "cross_split_rows_removed": {
+        "train": 8,
+        "validation": 3,
+        "test": 0
+      },
+      "capped_rows": {
+        "train": 5000,
+        "validation": 1057,
+        "test": 1061
+      },
+      "loaded_rows": {
+        "train": 5,
+        "validation": 5,
+        "test": 5
+      },
+      "sample_extraction_rows": {
+        "train": 5,
+        "validation": 5,
+        "test": 5
+      },
+      "license": "cc-by-sa-4.0 (original source)",
+      "license_use": "commercial"
+    },
+    {
+      "id": "uner/pt_bosque",
+      "multilingual": true,
+      "repo": "BramVanroy/universal_ner",
+      "revision": "0dc5199b095f864c619c13190b32341eee0c2ce2",
+      "native_rows": {
+        "train": 7018,
+        "validation": 1172,
+        "test": 1167
+      },
+      "cap": 5000,
+      "split_overlap": {
+        "train/validation": 2,
+        "train/test": 1,
+        "validation/test": 0
+      },
+      "positive_rows": {
+        "train": 3896,
+        "validation": 658,
+        "test": 623
+      },
+      "retained_rows": {
+        "train": 7015,
+        "validation": 1172,
+        "test": 1167
+      },
+      "cross_split_rows_removed": {
+        "train": 3,
+        "validation": 0,
+        "test": 0
+      },
+      "capped_rows": {
+        "train": 5000,
+        "validation": 1172,
+        "test": 1167
+      },
+      "loaded_rows": {
+        "train": 5,
+        "validation": 5,
+        "test": 5
+      },
+      "sample_extraction_rows": {
+        "train": 5,
+        "validation": 5,
+        "test": 5
+      },
+      "license": "cc-by-sa-4.0 (original source)",
+      "license_use": "commercial"
+    },
+    {
+      "id": "uner/sr_set",
+      "multilingual": true,
+      "repo": "BramVanroy/universal_ner",
+      "revision": "0dc5199b095f864c619c13190b32341eee0c2ce2",
+      "native_rows": {
+        "train": 3328,
+        "validation": 536,
+        "test": 520
+      },
+      "cap": 5000,
+      "split_overlap": {
+        "train/validation": 0,
+        "train/test": 0,
+        "validation/test": 0
+      },
+      "positive_rows": {
+        "train": 2220,
+        "validation": 357,
+        "test": 392
+      },
+      "retained_rows": {
+        "train": 3328,
+        "validation": 536,
+        "test": 520
+      },
+      "cross_split_rows_removed": {
+        "train": 0,
+        "validation": 0,
+        "test": 0
+      },
+      "capped_rows": {
+        "train": 3328,
+        "validation": 536,
+        "test": 520
+      },
+      "loaded_rows": {
+        "train": 5,
+        "validation": 5,
+        "test": 5
+      },
+      "sample_extraction_rows": {
+        "train": 5,
+        "validation": 5,
+        "test": 5
+      },
+      "license": "cc-by-sa-4.0 (original source)",
+      "license_use": "commercial"
+    },
+    {
+      "id": "uner/da_ddt",
+      "multilingual": true,
+      "repo": "BramVanroy/universal_ner",
+      "revision": "0dc5199b095f864c619c13190b32341eee0c2ce2",
+      "native_rows": {
+        "train": 4383,
+        "validation": 564,
+        "test": 565
+      },
+      "cap": 5000,
+      "split_overlap": {
+        "train/validation": 2,
+        "train/test": 1,
+        "validation/test": 0
+      },
+      "positive_rows": {
+        "train": 1698,
+        "validation": 230,
+        "test": 250
+      },
+      "retained_rows": {
+        "train": 4380,
+        "validation": 564,
+        "test": 565
+      },
+      "cross_split_rows_removed": {
+        "train": 3,
+        "validation": 0,
+        "test": 0
+      },
+      "capped_rows": {
+        "train": 4380,
+        "validation": 564,
+        "test": 565
+      },
+      "loaded_rows": {
+        "train": 5,
+        "validation": 5,
+        "test": 5
+      },
+      "sample_extraction_rows": {
+        "train": 5,
+        "validation": 5,
+        "test": 5
+      },
+      "license": "cc-by-sa-4.0 (original source)",
+      "license_use": "commercial"
+    },
+    {
+      "id": "uner/hr_set",
+      "multilingual": true,
+      "repo": "BramVanroy/universal_ner",
+      "revision": "0dc5199b095f864c619c13190b32341eee0c2ce2",
+      "native_rows": {
+        "train": 6914,
+        "validation": 960,
+        "test": 1136
+      },
+      "cap": 5000,
+      "split_overlap": {
+        "train/validation": 0,
+        "train/test": 1,
+        "validation/test": 0
+      },
+      "positive_rows": {
+        "train": 3853,
+        "validation": 601,
+        "test": 660
+      },
+      "retained_rows": {
+        "train": 6913,
+        "validation": 960,
+        "test": 1136
+      },
+      "cross_split_rows_removed": {
+        "train": 1,
+        "validation": 0,
+        "test": 0
+      },
+      "capped_rows": {
+        "train": 5000,
+        "validation": 960,
+        "test": 1136
+      },
+      "loaded_rows": {
+        "train": 5,
+        "validation": 5,
+        "test": 5
+      },
+      "sample_extraction_rows": {
+        "train": 5,
+        "validation": 5,
+        "test": 5
+      },
+      "license": "cc-by-sa-4.0 (original source)",
+      "license_use": "commercial"
+    },
+    {
+      "id": "harveyner",
+      "multilingual": false,
+      "repo": "extraordinarylab/harvey-ner",
+      "revision": "d96281eeeed9fbc4051dce043647f66514d6f85c",
+      "cap": 3000,
+      "native_rows": {
+        "train": 3967,
+        "validation": 1301,
+        "test": 1303
+      },
+      "retained_rows": {
+        "train": 3595,
+        "validation": 1227,
+        "test": 1303
+      },
+      "loaded_rows": {
+        "train": 5,
+        "validation": 5,
+        "test": 5
+      },
+      "license": "unspecified (original source)",
+      "license_use": "unspecified",
+      "cross_split_rows_removed": {
+        "train": 372,
+        "validation": 74,
+        "test": 0
+      },
+      "capped_rows": {
+        "train": 3000,
+        "validation": 1227,
+        "test": 1303
+      }
+    },
+    {
+      "id": "msra-ner",
+      "multilingual": true,
+      "repo": "levow/msra_ner",
+      "revision": "d638146691543bb15c5794716fdeb7c4ed98e854",
+      "cap": 3000,
+      "native_rows": {
+        "train": 45001,
+        "test": 3443
+      },
+      "retained_rows": {
+        "train": 45000,
+        "test": 3443
+      },
+      "loaded_rows": {
+        "train": 5,
+        "test": 5
+      },
+      "license": "unspecified (original source)",
+      "license_use": "unspecified",
+      "cross_split_rows_removed": {
+        "train": 1,
+        "test": 0
+      },
+      "capped_rows": {
+        "train": 3000,
+        "test": 3443
+      }
+    },
+    {
+      "id": "weibo-ner",
+      "multilingual": true,
+      "repo": "hltcoe/weibo_ner",
+      "revision": "9bcaa12ac4b43c2dcff2e39a981374e9b93de949",
+      "cap": 2000,
+      "native_rows": {
+        "train": 1350,
+        "validation": 270,
+        "test": 270
+      },
+      "retained_rows": {
+        "train": 1272,
+        "validation": 262,
+        "test": 270
+      },
+      "loaded_rows": {
+        "train": 5,
+        "validation": 5,
+        "test": 5
+      },
+      "license": "unspecified (original source)",
+      "license_use": "unspecified",
+      "cross_split_rows_removed": {
+        "train": 78,
+        "validation": 8,
+        "test": 0
+      },
+      "capped_rows": {
+        "train": 1272,
+        "validation": 262,
+        "test": 270
+      }
+    },
+    {
+      "id": "pubmedqa/labeled-fold0",
+      "repo": "bigbio/pubmed_qa",
+      "revision": "13a7d15476092370cbabb6475390e7e69b74d2f2",
+      "native_rows": {
+        "train": 450,
+        "validation": 50,
+        "test": 500
+      },
+      "retained_rows": {
+        "train": 450,
+        "validation": 50,
+        "test": 500
+      },
+      "cap": 2000,
+      "loaded_rows": {
+        "train": 5,
+        "validation": 5,
+        "test": 5
+      },
+      "license": "mit (original source)",
+      "license_use": "commercial",
+      "cross_split_rows_removed": {
+        "train": 0,
+        "validation": 0,
+        "test": 0
+      },
+      "capped_rows": {
+        "train": 450,
+        "validation": 50,
+        "test": 500
+      }
+    }
+  ],
+  "eval_only": [
+    {
+      "id": "mrqa-eval/BioASQ",
+      "native_rows": {
+        "test": 1504
+      },
+      "retained_rows": {
+        "test": 1481
+      },
+      "loaded_rows": {
+        "test": 5
+      },
+      "dropped_occurrences": 34,
+      "repo": "mrqa-workshop/mrqa",
+      "revision": "c0499a54c1e32765044572e1d685bd16cf126a80",
+      "cap": null,
+      "catalog": "eval_only",
+      "license": "unspecified; constituent terms apply"
+    },
+    {
+      "id": "mrqa-eval/DROP",
+      "native_rows": {
+        "test": 1503
+      },
+      "retained_rows": {
+        "test": 1462
+      },
+      "loaded_rows": {
+        "test": 5
+      },
+      "dropped_occurrences": 183,
+      "repo": "mrqa-workshop/mrqa",
+      "revision": "c0499a54c1e32765044572e1d685bd16cf126a80",
+      "cap": null,
+      "catalog": "eval_only",
+      "license": "unspecified; constituent terms apply"
+    },
+    {
+      "id": "mrqa-eval/DuoRC.ParaphraseRC",
+      "native_rows": {
+        "test": 1501
+      },
+      "retained_rows": {
+        "test": 392
+      },
+      "loaded_rows": {
+        "test": 5
+      },
+      "dropped_occurrences": 6053,
+      "repo": "mrqa-workshop/mrqa",
+      "revision": "c0499a54c1e32765044572e1d685bd16cf126a80",
+      "cap": null,
+      "catalog": "eval_only",
+      "license": "unspecified; constituent terms apply"
+    },
+    {
+      "id": "mrqa-eval/RACE",
+      "native_rows": {
+        "test": 674
+      },
+      "retained_rows": {
+        "test": 673
+      },
+      "loaded_rows": {
+        "test": 5
+      },
+      "dropped_occurrences": 2,
+      "repo": "mrqa-workshop/mrqa",
+      "revision": "c0499a54c1e32765044572e1d685bd16cf126a80",
+      "cap": null,
+      "catalog": "eval_only",
+      "license": "unspecified; constituent terms apply"
+    },
+    {
+      "id": "mrqa-eval/RelationExtraction",
+      "native_rows": {
+        "test": 2948
+      },
+      "retained_rows": {
+        "test": 2948
+      },
+      "loaded_rows": {
+        "test": 5
+      },
+      "dropped_occurrences": 1,
+      "repo": "mrqa-workshop/mrqa",
+      "revision": "c0499a54c1e32765044572e1d685bd16cf126a80",
+      "cap": null,
+      "catalog": "eval_only",
+      "license": "unspecified; constituent terms apply"
+    },
+    {
+      "id": "mrqa-eval/TextbookQA",
+      "native_rows": {
+        "test": 1503
+      },
+      "retained_rows": {
+        "test": 1482
+      },
+      "loaded_rows": {
+        "test": 5
+      },
+      "dropped_occurrences": 42,
+      "repo": "mrqa-workshop/mrqa",
+      "revision": "c0499a54c1e32765044572e1d685bd16cf126a80",
+      "cap": null,
+      "catalog": "eval_only",
+      "license": "unspecified; constituent terms apply"
+    }
+  ],
+  "staged_uner": {
+    "configs": {
+      "qaf_arabizi": {
+        "source": "https://github.com/UniversalNER/UNER_Maghrebi_Arabic_French-Arabizi",
+        "revision": "9b39d96f6de25ed2730481e67d777e1707028550",
+        "source_files": {
+          "train": {
+            "url": "https://raw.githubusercontent.com/UniversalNER/UNER_Maghrebi_Arabic_French-Arabizi/9b39d96f6de25ed2730481e67d777e1707028550/qaf_arabizi-ud-train.iob2",
+            "sha256": "c1ad99b160e535048d28fd2eec75b8b16a3006b290a90721551e151873314d47"
+          },
+          "validation": {
+            "url": "https://raw.githubusercontent.com/UniversalNER/UNER_Maghrebi_Arabic_French-Arabizi/9b39d96f6de25ed2730481e67d777e1707028550/qaf_arabizi-ud-dev.iob2",
+            "sha256": "9023915a45b9d1a400020f894d658cc1008173db922c6ddee3bbf0516379cb5f"
+          },
+          "test": {
+            "url": "https://raw.githubusercontent.com/UniversalNER/UNER_Maghrebi_Arabic_French-Arabizi/9b39d96f6de25ed2730481e67d777e1707028550/qaf_arabizi-ud-test.iob2",
+            "sha256": "41a48924914a4d9bc93789ef43565ed2e28aba7966b67781664abce8bd8f89b2"
+          }
+        },
+        "license": "cc-by-sa-4.0",
+        "license_evidence": "https://github.com/UniversalNER/UNER_Maghrebi_Arabic_French-Arabizi/blob/9b39d96f6de25ed2730481e67d777e1707028550/LICENSE.txt",
+        "native_rows": {
+          "train": 1003,
+          "validation": 139,
+          "test": 145
+        },
+        "rows": {
+          "train": 1002,
+          "validation": 139,
+          "test": 145
+        },
+        "cross_split_duplicates_removed": {
+          "test": [],
+          "validation": [],
+          "train": [
+            "M2S4"
+          ]
+        },
+        "annotation_origin": "human; includes documented original-author transfers of human annotations",
+        "conversion": "native token/tag columns; no retokenization or new label inference"
+      },
+      "el_gdt": {
+        "source": "https://github.com/UniversalNER/UNER_Greek_GDT",
+        "revision": "73bbd59607ec776f6eba07ed5a54b3840907c4af",
+        "source_files": {
+          "train": {
+            "url": "https://raw.githubusercontent.com/UniversalNER/UNER_Greek_GDT/73bbd59607ec776f6eba07ed5a54b3840907c4af/el_gdt-ud-train.iob2",
+            "sha256": "a8b37f918adc45b56877b1082fd0e5d27d03a15ef7f0bd9312beb84d70ad40ee"
+          },
+          "validation": {
+            "url": "https://raw.githubusercontent.com/UniversalNER/UNER_Greek_GDT/73bbd59607ec776f6eba07ed5a54b3840907c4af/el_gdt-ud-dev.iob2",
+            "sha256": "7d766a23b89344197bd5d57e921f51b5eaad6fc1df5ec4b6be7b0a8a1f0bc8a4"
+          },
+          "test": {
+            "url": "https://raw.githubusercontent.com/UniversalNER/UNER_Greek_GDT/73bbd59607ec776f6eba07ed5a54b3840907c4af/el_gdt-ud-test.iob2",
+            "sha256": "0a0c18856f0a7dba5e829957590131d273d9005dfbd4ef43867aa8cb99c5e7f0"
+          }
+        },
+        "license": "unspecified",
+        "license_evidence": "https://github.com/UniversalNER/UNER_Greek_GDT/blob/73bbd59607ec776f6eba07ed5a54b3840907c4af/README.md",
+        "native_rows": {
+          "train": 1662,
+          "validation": 403,
+          "test": 456
+        },
+        "rows": {
+          "train": 1648,
+          "validation": 401,
+          "test": 456
+        },
+        "cross_split_duplicates_removed": {
+          "test": [],
+          "validation": [
+            "gdt-20020207-ep-sessions_131-0015",
+            "gdt-20120301-elwikinews-4980-0002"
+          ],
+          "train": [
+            "gdt-20020116-ep-sessions_132-0035",
+            "gdt-20020205-ep-sessions_104-0030",
+            "gdt-20020206-ep-sessions_004-0019",
+            "gdt-20020206-ep-sessions_004-0024",
+            "gdt-20020206-ep-sessions_004-0055",
+            "gdt-20020206-ep-sessions_013-0039",
+            "gdt-20020227-ep-sessions_117-0043",
+            "gdt-20020227-ep-sessions_137-0050",
+            "gdt-20120304-elwikinews-5008-0002",
+            "gdt-20120307-elwikinews-5038-0002",
+            "gdt-20120309-elwikinews-5160-0002",
+            "gdt-20120320-elwikinews-5245-0002",
+            "gdt-20120322-elwikinews-5263-0002",
+            "gdt-20120324-elwikinews-5274-0002"
+          ]
+        },
+        "annotation_origin": "human; includes documented original-author transfers of human annotations",
+        "conversion": "native token/tag columns; no retokenization or new label inference"
+      },
+      "he_htb": {
+        "source": "https://github.com/UniversalNER/UNER_Hebrew-HTB",
+        "revision": "2aabf2e78b5a32218113469196d4754d373fdd36",
+        "source_files": {
+          "train": {
+            "url": "https://raw.githubusercontent.com/UniversalNER/UNER_Hebrew-HTB/2aabf2e78b5a32218113469196d4754d373fdd36/he_htb-ud-train.iob2",
+            "sha256": "19f8a1f980ced9fa53e364b76c341611f4da17e7b956e18c144a2c12dab2c45a"
+          },
+          "validation": {
+            "url": "https://raw.githubusercontent.com/UniversalNER/UNER_Hebrew-HTB/2aabf2e78b5a32218113469196d4754d373fdd36/he_htb-ud-dev.iob2",
+            "sha256": "60992e4541a16d6b03f25f985b3056008748e8bc4d39db70e01f37f563c383fe"
+          },
+          "test": {
+            "url": "https://raw.githubusercontent.com/UniversalNER/UNER_Hebrew-HTB/2aabf2e78b5a32218113469196d4754d373fdd36/he_htb-ud-test.iob2",
+            "sha256": "2dbd0693762d908996577e4639e91ab5cb39e066666753f491056c4cd0061b0a"
+          }
+        },
+        "license": "cc-by-sa-4.0",
+        "license_evidence": "https://github.com/UniversalNER/UNER_Hebrew-HTB/blob/2aabf2e78b5a32218113469196d4754d373fdd36/LICENSE.txt",
+        "native_rows": {
+          "train": 5241,
+          "validation": 484,
+          "test": 491
+        },
+        "rows": {
+          "train": 5241,
+          "validation": 484,
+          "test": 491
+        },
+        "cross_split_duplicates_removed": {
+          "test": [],
+          "validation": [],
+          "train": []
+        },
+        "annotation_origin": "human; includes documented original-author transfers of human annotations",
+        "conversion": "native token/tag columns; no retokenization or new label inference"
+      },
+      "nno_ndt": {
+        "source": "https://github.com/UniversalNER/UNER_Norwegian-NDT",
+        "revision": "f1da13196788be028fe8124cdc7b9b197399ad98",
+        "source_files": {
+          "train": {
+            "url": "https://raw.githubusercontent.com/UniversalNER/UNER_Norwegian-NDT/f1da13196788be028fe8124cdc7b9b197399ad98/nno_norne-ud-train.iob2",
+            "sha256": "0da88bcfb489e02182d623d23fa6d527fef2534238fd8bd50923567fca935df2"
+          },
+          "validation": {
+            "url": "https://raw.githubusercontent.com/UniversalNER/UNER_Norwegian-NDT/f1da13196788be028fe8124cdc7b9b197399ad98/nno_norne-ud-dev.iob2",
+            "sha256": "eade67afc9960b07531bbbfe67adae5b5a5b17bdc972a2e44ca1cd61fb7bf6c6"
+          },
+          "test": {
+            "url": "https://raw.githubusercontent.com/UniversalNER/UNER_Norwegian-NDT/f1da13196788be028fe8124cdc7b9b197399ad98/nno_norne-ud-test.iob2",
+            "sha256": "de2aa0c72fe9e5a61c7bd03bd71e0010f04eeaaaf19cc39b546e2dd4ebda18ee"
+          }
+        },
+        "license": "cc-by-sa-4.0",
+        "license_evidence": "https://github.com/UniversalNER/UNER_Norwegian-NDT/blob/f1da13196788be028fe8124cdc7b9b197399ad98/LICENSE.txt",
+        "native_rows": {
+          "train": 14174,
+          "validation": 1890,
+          "test": 1511
+        },
+        "rows": {
+          "train": 14110,
+          "validation": 1879,
+          "test": 1511
+        },
+        "cross_split_duplicates_removed": {
+          "test": [],
+          "validation": [
+            "014260",
+            "014925",
+            "015080",
+            "015082",
+            "015125",
+            "015139",
+            "015146",
+            "015159",
+            "015705",
+            "015721",
+            "015760"
+          ],
+          "train": [
+            "000175",
+            "000386",
+            "000703",
+            "001117",
+            "001339",
+            "002094",
+            "002920",
+            "003672",
+            "004531",
+            "005082",
+            "005104",
+            "005131",
+            "005161",
+            "005211",
+            "005604",
+            "005645",
+            "005646",
+            "005647",
+            "005662",
+            "005673",
+            "005674",
+            "005675",
+            "005678",
+            "005840",
+            "005915",
+            "005916",
+            "005932",
+            "005959",
+            "006003",
+            "006062",
+            "006145",
+            "006161",
+            "006229",
+            "006282",
+            "006305",
+            "006337",
+            "006487",
+            "006488",
+            "006489",
+            "006496",
+            "006571",
+            "006866",
+            "006888",
+            "006902",
+            "006903",
+            "007274",
+            "007292",
+            "007348",
+            "007408",
+            "007611",
+            "007644",
+            "009530",
+            "009551",
+            "009573",
+            "009642",
+            "009704",
+            "009716",
+            "009733",
+            "009752",
+            "009863",
+            "010034",
+            "011711",
+            "011723",
+            "011738"
+          ]
+        },
+        "annotation_origin": "human; includes documented original-author transfers of human annotations",
+        "conversion": "native token/tag columns; no retokenization or new label inference"
+      },
+      "nob_ndt": {
+        "source": "https://github.com/UniversalNER/UNER_Norwegian-NDT",
+        "revision": "f1da13196788be028fe8124cdc7b9b197399ad98",
+        "source_files": {
+          "train": {
+            "url": "https://raw.githubusercontent.com/UniversalNER/UNER_Norwegian-NDT/f1da13196788be028fe8124cdc7b9b197399ad98/nob_norne-ud-train.iob2",
+            "sha256": "88fbcfd346822c42a011f3b2a24d9c0448d241bf68a80997ae0737db9ac178bf"
+          },
+          "validation": {
+            "url": "https://raw.githubusercontent.com/UniversalNER/UNER_Norwegian-NDT/f1da13196788be028fe8124cdc7b9b197399ad98/nob_norne-ud-dev.iob2",
+            "sha256": "a93228929ba48e3e16c77000863f2afa3a7d4171d24686d4d8460f3658f512dd"
+          },
+          "test": {
+            "url": "https://raw.githubusercontent.com/UniversalNER/UNER_Norwegian-NDT/f1da13196788be028fe8124cdc7b9b197399ad98/nob_norne-ud-test.iob2",
+            "sha256": "71a9379911a37da56f42ee6b0639d881b509f20658be22db4dd95254e5f6d11f"
+          }
+        },
+        "license": "cc-by-sa-4.0",
+        "license_evidence": "https://github.com/UniversalNER/UNER_Norwegian-NDT/blob/f1da13196788be028fe8124cdc7b9b197399ad98/LICENSE.txt",
+        "native_rows": {
+          "train": 15696,
+          "validation": 2409,
+          "test": 1939
+        },
+        "rows": {
+          "train": 15628,
+          "validation": 2398,
+          "test": 1939
+        },
+        "cross_split_duplicates_removed": {
+          "test": [],
+          "validation": [
+            "015806",
+            "016854",
+            "016929",
+            "017261",
+            "017371",
+            "017395",
+            "017485",
+            "017713",
+            "017887",
+            "017889",
+            "017890"
+          ],
+          "train": [
+            "002990",
+            "005435",
+            "005698",
+            "006382",
+            "006468",
+            "006831",
+            "006834",
+            "008057",
+            "008316",
+            "008399",
+            "008488",
+            "008492",
+            "008592",
+            "008855",
+            "008962",
+            "009085",
+            "009265",
+            "009416",
+            "009448",
+            "009449",
+            "009618",
+            "010371",
+            "010445",
+            "010554",
+            "011293",
+            "011691",
+            "011712",
+            "011735",
+            "011915",
+            "011997",
+            "012163",
+            "013617",
+            "013694",
+            "013789",
+            "013802",
+            "013812",
+            "013883",
+            "013899",
+            "013910",
+            "013921",
+            "013936",
+            "013949",
+            "013968",
+            "013972",
+            "014062",
+            "014079",
+            "014081",
+            "014094",
+            "014129",
+            "014280",
+            "014324",
+            "014339",
+            "014356",
+            "014378",
+            "014382",
+            "014399",
+            "014461",
+            "014494",
+            "014523",
+            "014525",
+            "014537",
+            "014554",
+            "014612",
+            "014650",
+            "014659",
+            "014756",
+            "014841",
+            "014998"
+          ]
+        },
+        "annotation_origin": "human; includes documented original-author transfers of human annotations",
+        "conversion": "native token/tag columns; no retokenization or new label inference"
+      },
+      "sl_ssj": {
+        "source": "https://github.com/UniversalNER/UNER_Slovenian_SSJ",
+        "revision": "f6c6f40e297749ecb7ce7143e9783083e545aadf",
+        "source_files": {
+          "train": {
+            "url": "https://raw.githubusercontent.com/UniversalNER/UNER_Slovenian_SSJ/f6c6f40e297749ecb7ce7143e9783083e545aadf/sl_ssj-ud-train.iob2",
+            "sha256": "329e92b57bf3c78aa4eda4e932fea767ecf35124c28cc3ef257df8e582e8f1fc"
+          },
+          "validation": {
+            "url": "https://raw.githubusercontent.com/UniversalNER/UNER_Slovenian_SSJ/f6c6f40e297749ecb7ce7143e9783083e545aadf/sl_ssj-ud-dev.iob2",
+            "sha256": "23277de6fda46e9b4b29552a2f63c2cb3223680def284659162d3ce4c9ff179f"
+          },
+          "test": {
+            "url": "https://raw.githubusercontent.com/UniversalNER/UNER_Slovenian_SSJ/f6c6f40e297749ecb7ce7143e9783083e545aadf/sl_ssj-ud-test.iob2",
+            "sha256": "df3190f78b1f148776329f66e49cac78e97a66c0c3c9abc8ea0f799749047527"
+          }
+        },
+        "license": "cc-by-sa-4.0",
+        "license_evidence": "https://github.com/UniversalNER/UNER_Slovenian_SSJ/blob/f6c6f40e297749ecb7ce7143e9783083e545aadf/LICENSE.txt",
+        "native_rows": {
+          "train": 10903,
+          "validation": 1250,
+          "test": 1282
+        },
+        "rows": {
+          "train": 10887,
+          "validation": 1250,
+          "test": 1282
+        },
+        "cross_split_duplicates_removed": {
+          "test": [],
+          "validation": [],
+          "train": [
+            "ssj5.25.82",
+            "ssj142.927.3541",
+            "ssj142.930.3561",
+            "ssj142.935.3578",
+            "ssj142.936.3581",
+            "ssj142.952.3633",
+            "ssj142.955.3651",
+            "ssj142.957.3656",
+            "ssj142.958.3657",
+            "ssj153.1045.3920",
+            "ssj288.1764.6270",
+            "ssj360.2075.7348",
+            "ssj366.2097.7437",
+            "ssj403.2252.7956",
+            "ssj409.2273.8028",
+            "ssj438.2408.8459"
+          ]
+        },
+        "annotation_origin": "human; includes documented original-author transfers of human annotations",
+        "conversion": "native token/tag columns; no retokenization or new label inference"
+      },
+      "sv_lines": {
+        "source": "https://github.com/UniversalNER/UNER_Swedish-Lines",
+        "revision": "897414e7bae2386ecb8be2d3c561ea8570882827",
+        "source_files": {
+          "train": {
+            "url": "https://raw.githubusercontent.com/UniversalNER/UNER_Swedish-Lines/897414e7bae2386ecb8be2d3c561ea8570882827/sv_lines-ud-train.iob2",
+            "sha256": "5c8b3eeddc2aa28b7011afead76ac2c9b24cdf6375ef2eb60235f1f50db0ede5"
+          },
+          "validation": {
+            "url": "https://raw.githubusercontent.com/UniversalNER/UNER_Swedish-Lines/897414e7bae2386ecb8be2d3c561ea8570882827/sv_lines-ud-dev.iob2",
+            "sha256": "e098bd0cd4680cc6b77263461e50377786f34f60af0da6f1a7917c0453b1175a"
+          },
+          "test": {
+            "url": "https://raw.githubusercontent.com/UniversalNER/UNER_Swedish-Lines/897414e7bae2386ecb8be2d3c561ea8570882827/sv_lines-ud-test.iob2",
+            "sha256": "cae340d39e97de6b38960233fafa5edbddfe32ed39ccc4ac5e644552a5c11438"
+          }
+        },
+        "license": "cc-by-sa-4.0",
+        "license_evidence": "https://github.com/UniversalNER/UNER_Swedish-Lines/blob/897414e7bae2386ecb8be2d3c561ea8570882827/LICENSE.txt",
+        "native_rows": {
+          "train": 3176,
+          "validation": 1032,
+          "test": 1035
+        },
+        "rows": {
+          "train": 3172,
+          "validation": 1032,
+          "test": 1035
+        },
+        "cross_split_duplicates_removed": {
+          "test": [],
+          "validation": [],
+          "train": [
+            "1-0113",
+            "5-0118",
+            "6-0194",
+            "6-0216"
+          ]
+        },
+        "annotation_origin": "human; includes documented original-author transfers of human annotations",
+        "conversion": "native token/tag columns; no retokenization or new label inference"
+      }
+    },
+    "source_url": "https://github.com/UniversalNER",
+    "conversion_sha256": "55a41a866bc82d6003a03a81477135f4a2ed85fa979e35809bdc10b6949eee32",
+    "publication_status": "local only; catalog activation awaits a real Hub mirror revision"
+  },
+  "staged_live_loads": {
+    "qaf_arabizi": {
+      "loaded_rows": {
+        "train": 5,
+        "validation": 5,
+        "test": 5
+      },
+      "retained_rows": {
+        "train": 1002,
+        "validation": 139,
+        "test": 145
+      },
+      "license": "cc-by-sa-4.0"
+    },
+    "el_gdt": {
+      "loaded_rows": {
+        "train": 5,
+        "validation": 5,
+        "test": 5
+      },
+      "retained_rows": {
+        "train": 1648,
+        "validation": 401,
+        "test": 456
+      },
+      "license": "unspecified"
+    },
+    "he_htb": {
+      "loaded_rows": {
+        "train": 5,
+        "validation": 5,
+        "test": 5
+      },
+      "retained_rows": {
+        "train": 5241,
+        "validation": 484,
+        "test": 491
+      },
+      "license": "cc-by-sa-4.0"
+    },
+    "nno_ndt": {
+      "loaded_rows": {
+        "train": 5,
+        "validation": 5,
+        "test": 5
+      },
+      "retained_rows": {
+        "train": 14110,
+        "validation": 1879,
+        "test": 1511
+      },
+      "license": "cc-by-sa-4.0"
+    },
+    "nob_ndt": {
+      "loaded_rows": {
+        "train": 5,
+        "validation": 5,
+        "test": 5
+      },
+      "retained_rows": {
+        "train": 15628,
+        "validation": 2398,
+        "test": 1939
+      },
+      "license": "cc-by-sa-4.0"
+    },
+    "sl_ssj": {
+      "loaded_rows": {
+        "train": 5,
+        "validation": 5,
+        "test": 5
+      },
+      "retained_rows": {
+        "train": 10887,
+        "validation": 1250,
+        "test": 1282
+      },
+      "license": "cc-by-sa-4.0"
+    },
+    "sv_lines": {
+      "loaded_rows": {
+        "train": 5,
+        "validation": 5,
+        "test": 5
+      },
+      "retained_rows": {
+        "train": 3172,
+        "validation": 1032,
+        "test": 1035
+      },
+      "license": "cc-by-sa-4.0"
+    }
+  },
+  "b2_chinese_hub_search": {
+    "Boson": [
+      "bosonai/proactbench",
+      "randxie-boson/drop",
+      "randxie-boson/ifeval-data",
+      "randxie-boson/table",
+      "xjh19972/boson-nighttime",
+      "open-llm-leaderboard/bosonai__Higgs-Llama-3-70B-details",
+      "bosonai/EmergentTTS-Eval",
+      "Boson20/hsc_sdss_cross_matched"
+    ],
+    "CCKS2017": [],
+    "CCKS2018": [],
+    "CCKS2019": [
+      "doushabao4766/ccks_2019_ner_k_V3",
+      "doushabao4766/ccks_2019_ner_k_V3_wc",
+      "doushabao4766/ccks_2019_ner_k_V3_wc_bioes",
+      "FinanceMTEB/CCKS2019"
+    ],
+    "CCKS2020": [
+      "FinanceMTEB/CCKS2020"
+    ],
+    "CCKS2021address": [],
+    "chineseliterature": [],
+    "finance-sina": [],
+    "gaiic2022": [],
+    "imcs21": [],
+    "nlpcc2018": [],
+    "peopledaily2014": [],
+    "ruijin": [
+      "fcsw/ruijin"
+    ],
+    "Taobao NER": [],
+    "wanchuang": [],
+    "Microbiota NER": [],
+    "resume ner": [
+      "shivanshjayara2991/ner_resume_data",
+      "tsa17/resume_ner17_hr",
+      "tsa17/resume_ner17_sl",
+      "doushabao4766/resume_zh_ner",
+      "doushabao4766/resume_zh_ner_knowledge_V3",
+      "doushabao4766/resume_zh_ner_knowledge_V3_wc",
+      "ttxy/resume_ner",
+      "PassbyGrocer/resume-ner"
+    ],
+    "youku ner": [],
+    "CAIL2021": [],
+    "CBLUE": [
+      "dirtycomputer/CBLUE-CHIP-STS",
+      "dirtycomputer/CBLUE-KUAKE-QTR",
+      "dirtycomputer/CBLUE-KUAKE-QQR",
+      "wyp/CBlue-KUAKE-QIC",
+      "wyp/cblue-QIC-100",
+      "wyp/cblue-sts",
+      "wyp/cblue-qtr",
+      "wyp/cblue-qqr2"
+    ],
+    "math-high": [
+      "reciprocate/ultrafeedback_orca_math_cleaned_high_dpo",
+      "pepoo20/Math_Elementary-HighSchool",
+      "mlfoundations-dev/High-Quality-Verifiable-Math-156k",
+      "mlfoundations-dev/difficulty_sorting_high_seed_math",
+      "mlfoundations-dev/difficulty_sorting_high_seed_math_w_openthoughts",
+      "watermelonhjg/MATH-lighteval-level_High",
+      "Croaker3/task_data_high-school-math_DeepSeek-R1",
+      "Chen1999/deep_math_short_sampled_high_confidence"
+    ],
+    "cluener": [
+      "nlhappy/CLUE-NER",
+      "xusenlin/clue-ner",
+      "yyh11/CLUE_NER",
+      "RICAR03/cluener2020"
+    ]
+  },
+  "extraction_smoke": {
+    "sources": {
+      "bionlp-cg/entities": {
+        "train_duplicates_dropped": 0,
+        "validation_duplicates_dropped": 0,
+        "test_duplicates_dropped": 0,
+        "train_empty_dropped": 0,
+        "validation_empty_dropped": 0,
+        "test_empty_dropped": 0,
+        "train": 300,
+        "train_fields": 2370,
+        "train_null_fields": 595,
+        "validation_overlap_dropped": 0,
+        "validation": 50,
+        "validation_fields": 390,
+        "validation_null_fields": 111,
+        "test_overlap_dropped": 0,
+        "test": 50,
+        "test_fields": 390,
+        "test_null_fields": 86
+      },
+      "bioinfer/entities": {
+        "train_duplicates_dropped": 0,
+        "test_duplicates_dropped": 0,
+        "train_empty_dropped": 0,
+        "test_empty_dropped": 0,
+        "train": 300,
+        "train_fields": 1800,
+        "train_null_fields": 1393,
+        "test_overlap_dropped": 0,
+        "test": 50,
+        "test_fields": 300,
+        "test_null_fields": 230
+      },
+      "bc4chemd": {
+        "train_duplicates_dropped": 0,
+        "validation_duplicates_dropped": 16,
+        "test_duplicates_dropped": 160,
+        "train_empty_dropped": 1235,
+        "validation_empty_dropped": 12241,
+        "test_empty_dropped": 10702,
+        "train": 300,
+        "train_fields": 300,
+        "train_null_fields": 68,
+        "validation_overlap_dropped": 0,
+        "validation": 50,
+        "validation_fields": 50,
+        "validation_null_fields": 13,
+        "test_overlap_dropped": 0,
+        "test": 50,
+        "test_fields": 50,
+        "test_null_fields": 14
+      },
+      "uner/en_ewt": {
+        "train_duplicates_dropped": 95,
+        "validation_duplicates_dropped": 38,
+        "test_duplicates_dropped": 106,
+        "train_empty_dropped": 2892,
+        "validation_empty_dropped": 1155,
+        "test_empty_dropped": 1129,
+        "train": 300,
+        "train_fields": 900,
+        "train_null_fields": 602,
+        "validation_overlap_dropped": 0,
+        "validation": 50,
+        "validation_fields": 150,
+        "validation_null_fields": 105,
+        "test_overlap_dropped": 0,
+        "test": 50,
+        "test_fields": 150,
+        "test_null_fields": 103
+      }
+    },
+    "excluded": [
+      "newsqa"
+    ],
+    "max_rows": 300,
+    "max_rows_eval": 50,
+    "max_fields": 8,
+    "max_empty_share": 0.2,
+    "seed": 0,
+    "rows": {
+      "train": 1200,
+      "validation": 150,
+      "test": 200
+    },
+    "revisions": {
+      "bionlp-cg/entities": "126fa3094c985a90731e7073668486e35ff6a9ba",
+      "bioinfer/entities": "40744ce819da6ad5efa32f6241a32afa01b0f6a7",
+      "bc4chemd": "740dcf93d8baee47a3c1c7bfa53b75697ae2285e",
+      "uner/en_ewt": "0dc5199b095f864c619c13190b32341eee0c2ce2"
+    }
+  },
+  "harvey_smoke": {
+    "sources": {
+      "harveyner": {
+        "train_duplicates_dropped": 97,
+        "validation_duplicates_dropped": 14,
+        "test_duplicates_dropped": 43,
+        "train_empty_dropped": 1942,
+        "validation_empty_dropped": 790,
+        "test_empty_dropped": 833,
+        "train": 300,
+        "train_fields": 1200,
+        "train_null_fields": 918,
+        "validation_overlap_dropped": 0,
+        "validation": 50,
+        "validation_fields": 200,
+        "validation_null_fields": 149,
+        "test_overlap_dropped": 0,
+        "test": 50,
+        "test_fields": 200,
+        "test_null_fields": 158
+      }
+    },
+    "excluded": [
+      "newsqa"
+    ],
+    "max_rows": 300,
+    "max_rows_eval": 50,
+    "max_fields": 8,
+    "max_empty_share": 0.2,
+    "seed": 0,
+    "rows": {
+      "train": 300,
+      "validation": 50,
+      "test": 50
+    },
+    "revisions": {
+      "harveyner": "d96281eeeed9fbc4051dce043647f66514d6f85c"
+    }
+  },
+  "tests": "87 passed; test_ner_suites, extraction, task_catalogs, catalog_naming, licenses, parked, offline_import"
+}

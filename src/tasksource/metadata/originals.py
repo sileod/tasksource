@@ -11,6 +11,7 @@ by scripts/upload_repackaged.py) or a task switches to a mirror.
 """
 
 ORIGINALS = {
+    "BramVanroy/universal_ner": ["universalner/universal_ner"],
     "tasksource/shapeworld-grounding": [],  # pinned upstream generator linked in provenance/card
     "tasksource/flickr30k-grounding": ["nlphuji/flickr30k"],
     "tasksource/weblinx-grounding": ["McGill-NLP/WebLINX", "McGill-NLP/WebLINX-full"],

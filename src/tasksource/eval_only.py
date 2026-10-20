@@ -9,6 +9,9 @@ annotation has a REASONS entry and remains available through its normal loader:
 They are not included in list_tasks(). Source splits and annotations are retained
 as originally defined; benchmark-specific loader limitations still apply.
 """
+import re
+import string
+
 from datasets import ClassLabel
 
 from .access import parse_var_name
@@ -16,6 +19,69 @@ from .metadata import (bigbench_discriminative_english, blimp_hard as blimp_hard
                        imppres_presupposition, imppres_implicature)
 from .metadata.configs import MMLU
 from .preprocess import Preprocessing, Classification, MultipleChoice, cat, constant, get, name
+from .preprocess import ExtractiveQA
+from .metadata.source_revisions import SOURCE_REVISIONS
+
+
+def _mrqa_answer_key(text):
+    # Official MRQA/SQuAD comparison: uncased, no ASCII punctuation/articles,
+    # collapsed whitespace. This verifies a supplied occurrence; it never
+    # searches for or relocates one.
+    text = text.lower().translate(str.maketrans('', '', string.punctuation))
+    return ' '.join(re.sub(r'\b(a|an|the)\b', ' ', text).split())
+
+
+def _mrqa_eval_answers(row):
+    """Verify gold occurrences under MRQA's documented answer normalization.
+
+    Ends are inclusive. Return the exact source slice, not the normalized
+    answer string. Reject occurrences whose normalized gold text disagrees.
+    """
+    detected = row['detected_answers']
+    if len(detected['text']) != len(detected['char_spans']):
+        raise ValueError('MRQA answer/span lengths differ')
+    texts, starts, dropped = [], [], 0
+    for text, spans in zip(detected['text'], detected['char_spans']):
+        if len(spans['start']) != len(spans['end']):
+            raise ValueError('MRQA start/end lengths differ')
+        for start, end in zip(spans['start'], spans['end']):
+            mention = row['context'][start:end + 1]
+            if (0 <= start <= end < len(row['context']) and mention.strip()
+                    and _mrqa_answer_key(mention) == _mrqa_answer_key(text)):
+                texts.append(mention); starts.append(start)
+            else:
+                dropped += 1
+    return {'checked_answers': {'text': texts, 'answer_start': starts}, 'dropped_occurrences': dropped}
+
+
+def _mrqa_eval_split(dataset, subset):
+    rows = dataset['test'].filter(lambda value: value == subset, input_columns='subset')
+    checked = rows.map(_mrqa_eval_answers)
+    kept = checked.filter(lambda row: bool(row['checked_answers']['text']))
+    print(f'MRQA {subset}: excluded {len(rows) - len(kept)} unlocated positive rows; '
+          f'{sum(checked["dropped_occurrences"])} mismatched occurrences')
+    return type(dataset)(test=kept)
+
+
+def _mrqa_eval(subset):
+    # As for PROST below, the loader's train slot is an evaluation interface.
+    # Select ONLY the source test split, never the in-domain train/dev rows.
+    return ExtractiveQA(dataset_name='mrqa-workshop/mrqa', task_id=f'mrqa-eval/{subset}',
+        splits=('test', None, None), complete_splits=False,
+        pre_process=lambda ds: _mrqa_eval_split(ds, subset), answers='checked_answers',
+        metadata=lambda row: {'id': row['qid'], 'mrqa_subset': row['subset'], 'source_split': 'test',
+                              'dropped_occurrences': row['dropped_occurrences']},
+        load_dataset_kwargs={'revision': SOURCE_REVISIONS['mrqa-workshop/mrqa'],
+                             'data_files': {'test': 'plain_text/test-*.parquet'},
+                             'verification_mode': 'no_checks'})
+
+
+mrqa_bioasq = _mrqa_eval('BioASQ')
+mrqa_drop = _mrqa_eval('DROP')
+mrqa_duorc = _mrqa_eval('DuoRC.ParaphraseRC')
+mrqa_race = _mrqa_eval('RACE')
+mrqa_relation_extraction = _mrqa_eval('RelationExtraction')
+mrqa_textbookqa = _mrqa_eval('TextbookQA')
 
 # MMLU is an evaluation benchmark; no train split
 mmlu = MultipleChoice('question',labels='answer',choices_list='choices',splits=['validation','dev','test'],
@@ -161,6 +227,8 @@ cladder = Classification(_cladder_context, "question", "answer", dataset_name="t
     pre_process=lambda ds: ds.filter(lambda x: bool(x["reasoning"]["step1"])))
 
 REASONS = {
+    **{f'mrqa_{name}': 'MRQA out-of-domain subset has source test rows only; no genuine training split'
+       for name in ('bioasq', 'drop', 'duorc', 'race', 'relation_extraction', 'textbookqa')},
     'prost': 'PROST is a test-only zero-shot physical-reasoning probe; its publisher explicitly provides no training data',
     'cladder': 'CLadder is a causal-reasoning evaluation benchmark, not a training source',
     'mmlu': 'MMLU is an evaluation benchmark; no train split',
