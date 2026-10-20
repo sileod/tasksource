@@ -4,6 +4,11 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource-jev-typed-decisions v2026.10.20.7
+
+- `extraction`: add web pages (WebSRC answer spans, SWDE attribute values in eight verticals), English span structure (Universal Dependencies EWT and GUM subtrees by relation, PreCo coreference mentions, Re-DocRED entities, CoNLL-2000 chunks), entity sources (BC4CHEMD chemicals, HarveyNER, BioNLP-CG, BioInfer, UNER English) and four procedural generators (typed mentions, business documents, nested configurations, raw HTML). 105 sources, 498,522 training, 35,743 validation and 38,574 test rows.
+- Sources of one collection share a training budget (20,000 rows; 80,000 for procedural generators), so suites split into many configs no longer dominate. Toxic spans and EBM-NLP outcomes are capped at 2,000 training rows after a label audit.
+
 ## tasksource/procedural-extraction v2026.10.20.1
 
 - Add four generators: typed mentions (named-entity style, typed by context, defined role or stated format), business documents (values in force after amendments, dated windows and schedule references), nested JSON/YAML/XML configurations with override layers, and raw HTML pages (item scope, visibility, table grids). Eight configs of 10,000 training and 500 validation and test rows.
