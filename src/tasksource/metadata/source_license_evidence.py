@@ -5,6 +5,25 @@ Keys are task families, shared by their visual classification/MC views.
 """
 
 SOURCE_LICENSE_EVIDENCE = {
+    'bc5cdr': {'license': 'unspecified', 'license_use': 'unspecified', 'checked': '2026-10-20',
+        'scope': 'Human entity annotations; no concrete original dataset license established. Software terms are not substituted for data terms.',
+        'url': 'https://huggingface.co/datasets/tner/bc5cdr'},
+    'tweetner7': {'license': 'unspecified', 'license_use': 'unspecified', 'checked': '2026-10-20',
+        'scope': 'Human entity annotations; no concrete original dataset license established. Software terms are not substituted for data terms.',
+        'url': 'https://huggingface.co/datasets/tner/tweetner7'},
+    'mit-movie-trivia': {'license': 'unspecified', 'license_use': 'unspecified', 'checked': '2026-10-20',
+        'scope': 'Human entity annotations; no concrete original dataset license established. Software terms are not substituted for data terms.',
+        'url': 'https://huggingface.co/datasets/tner/mit_movie_trivia'},
+    'mit-restaurant': {'license': 'unspecified', 'license_use': 'unspecified', 'checked': '2026-10-20',
+        'scope': 'Human entity annotations; no concrete original dataset license established. Software terms are not substituted for data terms.',
+        'url': 'https://huggingface.co/datasets/tner/mit_restaurant'},
+    'conll04': {'license': 'unspecified', 'license_use': 'unspecified', 'checked': '2026-10-20',
+        'scope': 'Human entity annotations; no concrete original dataset license established. Software terms are not substituted for data terms.',
+        'url': 'https://huggingface.co/datasets/DFKI-SLT/conll04'},
+    'bc2gm': {'license': 'unspecified', 'license_use': 'unspecified', 'checked': '2026-10-20',
+        'scope': 'Human entity annotations; no concrete original dataset license established. Software terms are not substituted for data terms.',
+        'url': 'https://huggingface.co/datasets/spyysalo/bc2gm_corpus'},
+
     'wiesp2022-ner': {"license": 'cc-by-4.0', "license_use": 'commercial', "checked": "2026-10-20",
         "scope": 'NASA ADS manual astrophysics entity annotations; paper excerpts retain their original rights.',
         "url": 'https://huggingface.co/datasets/adsabs/WIESP2022-NER'},

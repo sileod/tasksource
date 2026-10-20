@@ -28,6 +28,8 @@ EXCLUDED_QA = {"newsqa"}
 # Multi-span answers are sets (every span is part of the answer), not alternatives.
 LIST_QA = {"quoref"}
 NER = {
+    "bc5cdr": None, "tweetner7": None, "mit-movie-trivia": None, "mit-restaurant": None,
+    "conll04": None, "bc2gm": None,
     "conll2003/ner_tags": None, "wnut_17/wnut_17": None, "ncbi_disease/ncbi_disease": None,
     "jnlpba/jnlpba": None, "ontonotes_english/SpeedOfMagic--ontonotes_english": None,
     "few-nerd/supervised": None, "acronym_identification": None,

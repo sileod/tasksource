@@ -70,6 +70,8 @@ def test_readable():
     assert readable("Keyboard_IP") == "keyboard input"
     assert readable("VIOLATED ON") == "party affected by the violation"
     assert readable("TARGET") == "opinion target"
+    assert readable("Peop") == "person"
+    assert readable("creative_work") == "creative work"
 
 
 def test_root_card():
@@ -117,3 +119,31 @@ def test_finer_ord_drops_null_token_sentence():
     assert len(out['train']) == len(out['test']) == 1
     assert out['train'][0]['tokens'] == ['Alice', 'works']
     assert out['train'].features['tags'].feature.names[1] == 'B-PER'
+
+
+def test_conll04_entities_only_and_adjacent_mentions():
+    from tasksource.tasks import _conll04_bio
+    rows = Dataset.from_list([{
+        'tokens': ['New', 'York', 'Paris', 'reports'],
+        'entities': [{'start': 0, 'end': 2, 'type': 'Loc'},
+                     {'start': 2, 'end': 3, 'type': 'Loc'}],
+        'relations': [{'head': 0, 'tail': 1, 'type': 'irrelevant'}],
+    }])
+    out = _conll04_bio(DatasetDict(train=rows))['train']
+    names = out.features['ner_tags'].feature.names
+    assert [names[tag] for tag in out[0]['ner_tags']] == ['B-Loc', 'I-Loc', 'B-Loc', 'O']
+    text, spans = entity_spans(out[0]['tokens'], out[0]['ner_tags'], names)
+    assert [text[s:e] for s, e in spans['Loc']] == ['New York', 'Paris']
+    bad = rows.map(lambda r: {'entities': r['entities'] + [{'start': 1, 'end': 3, 'type': 'Org'}]})
+    with pytest.raises(ValueError, match='overlaps'):
+        _conll04_bio(DatasetDict(train=bad))
+
+
+def test_tweetner_native_files_and_tag_ids():
+    from tasksource.tasks import tweetner7, _TWEETNER7_TAGS, _MIT_MOVIE_TRIVIA_TAGS, _MIT_RESTAURANT_TAGS
+    assert {split: path.rsplit('/', 1)[1] for split, path in
+            tweetner7.load_dataset_kwargs['data_files'].items()} == {
+        'train': '2020.train.json', 'validation': '2020.dev.json', 'test': '2020.test.json'}
+    assert _TWEETNER7_TAGS[0] == 'B-corporation' and _TWEETNER7_TAGS[14] == 'O'
+    assert _MIT_MOVIE_TRIVIA_TAGS[15:17] == ['I-Genre', 'I-Year']
+    assert _MIT_RESTAURANT_TAGS[15:17] == ['I-Price', 'I-Cuisine']

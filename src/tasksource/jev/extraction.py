@@ -87,6 +87,8 @@ def entity_type(label):
 
 # Entity types whose label alone is opaque (OntoNotes, acronyms) or too short to read well.
 NAMES = {
+    "Peop": "person", "Other": "other named entity", "creative_work": "creative work",
+    "Character_Name": "character name", "Restaurant_Name": "restaurant name",
     "TARGET": "opinion target", "ANATOMY": "anatomical entity",
     "Language": "programming language", "Class": "programming class", "Library": "software library",
     "Keyboard_IP": "keyboard input", "HTML_XML_Tag": "HTML or XML tag", "Tag": "HTML tag",

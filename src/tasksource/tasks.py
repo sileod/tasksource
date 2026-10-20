@@ -952,6 +952,71 @@ opinion_target_en = TokenClassification(dataset_name='HiTZ/Multilingual-Opinion-
     pre_process=lambda ds: ds.cast_column('ner_tags', Sequence(ClassLabel(names=['O', 'B-TARGET', 'I-TARGET']))),
     load_dataset_kwargs={"revision": SOURCE_REVISIONS['HiTZ/Multilingual-Opinion-Target-Extraction']})
 
+# TNER's integer ids follow its publisher-card dictionaries (including non-BIO ordering).
+# The three automatic parquet exports preserve native splits and token/tag values.
+_BC5CDR_TAGS = [
+    'O', 'B-Chemical', 'B-Disease', 'I-Disease', 'I-Chemical'
+]
+bc5cdr = TokenClassification(dataset_name='tner/bc5cdr', task_id='bc5cdr',
+    tokens='tokens', labels='tags', complete_splits=False,
+    pre_process=lambda ds: ds.cast_column('tags', Sequence(ClassLabel(names=_BC5CDR_TAGS))),
+    load_dataset_kwargs={'revision': SOURCE_REVISIONS['tner/bc5cdr']})
+
+_MIT_MOVIE_TRIVIA_TAGS = [
+    'O', 'B-Actor', 'I-Actor', 'B-Plot', 'I-Plot', 'B-Opinion', 'I-Opinion', 'B-Award', 'I-Award',
+    'B-Year', 'B-Genre', 'B-Origin', 'I-Origin', 'B-Director', 'I-Director', 'I-Genre', 'I-Year',
+    'B-Soundtrack', 'I-Soundtrack', 'B-Relationship', 'I-Relationship', 'B-Character_Name',
+    'I-Character_Name', 'B-Quote', 'I-Quote'
+]
+mit_movie_trivia = TokenClassification(dataset_name='tner/mit_movie_trivia', task_id='mit-movie-trivia',
+    tokens='tokens', labels='tags', complete_splits=False,
+    pre_process=lambda ds: ds.cast_column('tags', Sequence(ClassLabel(names=_MIT_MOVIE_TRIVIA_TAGS))),
+    load_dataset_kwargs={'revision': SOURCE_REVISIONS['tner/mit_movie_trivia']})
+
+_MIT_RESTAURANT_TAGS = [
+    'O', 'B-Rating', 'I-Rating', 'B-Amenity', 'I-Amenity', 'B-Location', 'I-Location',
+    'B-Restaurant_Name', 'I-Restaurant_Name', 'B-Price', 'B-Hours', 'I-Hours', 'B-Dish', 'I-Dish',
+    'B-Cuisine', 'I-Price', 'I-Cuisine'
+]
+mit_restaurant = TokenClassification(dataset_name='tner/mit_restaurant', task_id='mit-restaurant',
+    tokens='tokens', labels='tags', complete_splits=False,
+    pre_process=lambda ds: ds.cast_column('tags', Sequence(ClassLabel(names=_MIT_RESTAURANT_TAGS))),
+    load_dataset_kwargs={'revision': SOURCE_REVISIONS['tner/mit_restaurant']})
+
+_TWEETNER7_TAGS = [
+    'B-corporation', 'B-creative_work', 'B-event', 'B-group', 'B-location', 'B-person',
+    'B-product', 'I-corporation', 'I-creative_work', 'I-event', 'I-group', 'I-location',
+    'I-person', 'I-product', 'O'
+]
+# Read only the native 2020 files; the automatic default merges overlapping split files.
+tweetner7 = TokenClassification(dataset_name='json', task_id='tweetner7',
+    tokens='tokens', labels='tags', complete_splits=False,
+    pre_process=lambda ds: ds.cast_column('tags', Sequence(ClassLabel(names=_TWEETNER7_TAGS))),
+    load_dataset_kwargs={'revision': SOURCE_REVISIONS['tner/tweetner7'],
+        'data_files': {split: f"hf://datasets/tner/tweetner7@{SOURCE_REVISIONS['tner/tweetner7']}/dataset/2020.{file}.json"
+            for split, file in [('train', 'train'), ('validation', 'dev'), ('test', 'test')]}})
+
+def _conll04_bio(dataset):
+    """Entity token intervals are half-open; relations are deliberately unused."""
+    def convert(row):
+        tags = ['O'] * len(row['tokens'])
+        for entity in row['entities']:
+            start, end, kind = entity['start'], entity['end'], entity['type']
+            if not 0 <= start < end <= len(tags) or any(t != 'O' for t in tags[start:end]):
+                raise ValueError('CoNLL04 entity is invalid or overlaps another entity')
+            tags[start:end] = [f'B-{kind}'] + [f'I-{kind}'] * (end - start - 1)
+        return {'ner_tags': tags}
+    return _named_ner_tags(dataset.map(convert))
+
+
+conll04 = TokenClassification(dataset_name='DFKI-SLT/conll04', task_id='conll04',
+    tokens='tokens', labels='ner_tags', complete_splits=False, pre_process=_conll04_bio,
+    load_dataset_kwargs={'revision': SOURCE_REVISIONS['DFKI-SLT/conll04']})
+
+bc2gm = TokenClassification(dataset_name='spyysalo/bc2gm_corpus', task_id='bc2gm',
+    tokens='tokens', labels='ner_tags', complete_splits=False,
+    load_dataset_kwargs={'revision': SOURCE_REVISIONS['spyysalo/bc2gm_corpus']})
+
 blog_authorship_corpus__gender    = Classification(sentence1="text",labels="gender", question="What is the blogger's gender?",
     dataset_name="tasksource/blog_authorship_corpus")
 blog_authorship_corpus__age       = Classification(sentence1="text", question="What is the blogger's age group?",

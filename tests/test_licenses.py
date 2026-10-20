@@ -87,3 +87,10 @@ def test_research_image_restrictions_and_no_redistribution_are_recorded():
 def test_review_does_not_weaken_known_noncommercial_terms():
     info = source_license('vision/aokvqa', ['upstream'], {'upstream': ['cc-by-nc-4.0']})
     assert info['license_use'] == 'non-commercial'
+
+
+def test_unspecified_licenses_do_not_become_software_licenses():
+    for task in ('bc5cdr', 'tweetner7', 'mit-movie-trivia', 'mit-restaurant', 'conll04', 'bc2gm'):
+        info = source_license(task, [], {})
+        assert info['license_use'] == 'unspecified'
+        assert info['source_license_evidence']['license'] == 'unspecified'

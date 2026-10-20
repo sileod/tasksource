@@ -1,6 +1,12 @@
 """Reviewed source snapshots; keep opaque revision IDs out of task annotations."""
 
 SOURCE_REVISIONS = {
+    'tner/bc5cdr': '564118257f090b2592b7b1607ec60f40948acf1c',
+    'tner/tweetner7': '9d9c27f1d4fb18a02e0d8283bac6ebb01c56c458',
+    'tner/mit_movie_trivia': '7f8611d43d85c202ba7d813db1694e7e62e27584',
+    'tner/mit_restaurant': '9df4f1990bfef526831efda5639d0d9b31942ede',
+    'DFKI-SLT/conll04': 'a252269d2265f4253ca725dad5f8fb5a89f1616d',
+    'spyysalo/bc2gm_corpus': 'dc0640510665bb3de7c88416ede4708cf6481b61',
     'adsabs/WIESP2022-NER': 'cdb6315d2d523ee509cb915eb37a2ac1f807da2f',
     'GateNLP/broad_twitter_corpus': '20dedb45cd2d6e45b8f41d5e18a0aea0d240d570',
     'gtfintechlab/finer-ord-bio': 'b795c5b10022bf8f2da0d94f2f9b7ee76e63fce9',
