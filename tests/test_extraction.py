@@ -354,6 +354,14 @@ def test_extractive_empty_filtered_evaluation_split():
     assert out['train'].features == out['validation'].features
 
 
+def test_collection_budget_is_shared_equally():
+    from scripts.build_jev_extraction import train_limits
+    limits = train_limits(["squad-v2", "swde/auto", "swde/book", "swde/job", "swde/movie", "procedural/a",
+                           "procedural/b"], max_rows=10_000, max_collection_rows=20_000)
+    assert limits["squad-v2"] == 10_000 and limits["swde/auto"] == 5_000
+    assert limits["procedural/a"] == 10_000  # explicit larger budget, still capped per source
+
+
 def test_without_excess_empty_keeps_order_and_share():
     from scripts.build_jev_extraction import without_excess_empty
     full = {"answers": [{"null": False, "values": [{"text": "a", "start": 0, "end": 1}]}]}

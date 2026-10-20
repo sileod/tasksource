@@ -66,6 +66,20 @@ NER = {
     "ebm-nlp/outcomes": "Every {name} in the trial abstract, as written.",
 }
 SPLITS = ("train", "validation", "test")
+# A collection is a task-id prefix (swde/auto, swde/book... -> swde). Its training budget is shared equally by its
+# sources, so a suite split into many configs weighs like one source; procedural generators share a larger budget.
+COLLECTION_ROWS = {"procedural": 80_000}
+
+
+def collection(task):
+    return task.split("/", 1)[0]
+
+
+def train_limits(tasks, max_rows, max_collection_rows):
+    """Training cap per task: ``max_rows``, lowered so that each collection stays within its budget."""
+    size = Counter(collection(t) for t in tasks)
+    return {t: min(max_rows, COLLECTION_ROWS.get(collection(t), max_collection_rows) // size[collection(t)])
+            for t in tasks}
 
 
 def row_id(row):
@@ -126,6 +140,7 @@ def build(args):
             frame = task_licenses(ids, extractive=extractive, fresh=True)
             licenses.update({r.id: (r.license, r.license_use) for r in frame.itertuples()})
     licenses.update({t: ("mit", "commercial") for t, e in tasks if e is None})
+    limits = train_limits([t for t, _ in tasks], args.max_rows, args.max_collection_rows)
     splits, report = {s: [] for s in SPLITS}, {}
     for task, extractive in tasks:
         print(f"loading {task}", flush=True)
@@ -150,7 +165,7 @@ def build(args):
                 before = len(items)
                 items = [r for r in items if r["state"] not in train_states]
                 counts[f"{split}_overlap_dropped"] = before - len(items)
-            items = capped(items, args.max_rows if split == "train" else args.max_rows_eval, args.seed, f"{task}:{split}")
+            items = capped(items, limits[task] if split == "train" else args.max_rows_eval, args.seed, f"{task}:{split}")
             license, use = licenses.get(task, ("unspecified", "unspecified"))
             for r in items:
                 r["license"], r["license_use"] = license, use
@@ -171,7 +186,8 @@ def build(args):
     dataset = DatasetDict({s: rows.shuffle(seed=args.seed) for s, rows in dataset.items()})
     args.output.mkdir(parents=True, exist_ok=True)
     manifest = {"sources": report, "excluded": sorted(EXCLUDED_QA), "max_rows": args.max_rows,
-                "max_rows_eval": args.max_rows_eval, "max_fields": args.max_fields, "max_empty_share": args.max_empty_share, "seed": args.seed,
+                "max_rows_eval": args.max_rows_eval, "max_collection_rows": args.max_collection_rows,
+                "collection_rows": COLLECTION_ROWS, "max_fields": args.max_fields, "max_empty_share": args.max_empty_share, "seed": args.seed,
                 "rows": {s: len(r) for s, r in dataset.items()},
                 "revisions": {t: PROCEDURAL_REVISION if e is None else
                               __import__("tasksource").task_provenance(t, extractive=e).get("revision") for t, e in tasks}}
@@ -207,7 +223,7 @@ pass, as extraction models (e.g. Cloudflare's Clairic) are asked. {rows}
   spans and nulls exact by construction.
   Entity texts are the source tokens joined by spaces.
 - Native splits, except those without released labels; evaluation texts that also occur in training are dropped. Each source is capped at
-  {max_rows:,} training rows and {max_rows_eval:,} per evaluation split; at most {max_empty:.0%} of an entity source's
+  {max_rows:,} training rows (a suite of configs, such as `swde/...`, shares {max_collection_rows:,}) and {max_rows_eval:,} per evaluation split; at most {max_empty:.0%} of an entity source's
   texts mention none of its entity types. `license`/`license_use` per row;
   `metadata` keeps source question ids or entity types. See [build-manifest.json](build-manifest.json).
 
@@ -250,6 +266,7 @@ def push(dataset, manifest, args):
     rows = ", ".join(f"{n:,} {s}" for s, n in manifest["rows"].items())
     card = CARD.format(repo=args.repo_id, rows=f"Rows: {rows}.", max_fields=args.max_fields,
                        max_rows=args.max_rows, max_rows_eval=args.max_rows_eval,
+                       max_collection_rows=manifest.get("max_collection_rows", args.max_rows),
                        max_empty=manifest["max_empty_share"])
     api.upload_file(path_or_fileobj=card.encode(), path_in_repo="extraction/README.md", repo_id=args.repo_id,
                     repo_type="dataset", commit_message="Document the extraction config")
@@ -270,6 +287,8 @@ def main():
     parser.add_argument("--tasks", nargs="*", help="only these task ids (smoke runs)")
     parser.add_argument("--max-rows", type=int, default=10_000)
     parser.add_argument("--max-rows-eval", type=int, default=500)
+    parser.add_argument("--max-collection-rows", type=int, default=20_000,
+                        help="training rows shared by the sources of a collection (task-id prefix)")
     parser.add_argument("--max-fields", type=int, default=8)
     parser.add_argument("--max-empty-share", type=float, default=0.2,
                         help="entity sources: share of texts without any entity kept per split")
