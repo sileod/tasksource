@@ -3127,5 +3127,185 @@
       "ccvl/iep-ref": "6fb7d669632b11bc59032a4dd229177f45313701",
       "ccvl/clevr-refplus-dataset-gen": "a024ce4aa1bfd0ba51fc621bd254e15881959c48"
     }
+  },
+  {
+    "name": "MRQA BioASQ",
+    "annotation": "tasksource.eval_only.mrqa_bioasq",
+    "scope": "dataset",
+    "tasks": [
+      "mrqa-eval/BioASQ"
+    ],
+    "huggingface": [
+      "mrqa-workshop/mrqa"
+    ],
+    "github": [
+      "https://github.com/mrqa/MRQA-Shared-Task-2019"
+    ],
+    "papers": [
+      {
+        "url": "https://aclanthology.org/D19-5801"
+      }
+    ],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "MRQA out-of-domain subset has source test rows only; no genuine training split",
+    "checked_on": "2026-10-20",
+    "source_revisions": {
+      "mrqa-workshop/mrqa": "f3178d9888471dfb2b67c93de14f0ddf499a8d9f"
+    },
+    "evidence": [
+      "https://huggingface.co/datasets/mrqa-workshop/mrqa/blob/f3178d9888471dfb2b67c93de14f0ddf499a8d9f/README.md"
+    ],
+    "reconsider_if": "The publisher releases a training partition for this out-of-domain subset."
+  },
+  {
+    "name": "MRQA DROP",
+    "annotation": "tasksource.eval_only.mrqa_drop",
+    "scope": "dataset",
+    "tasks": [
+      "mrqa-eval/DROP"
+    ],
+    "huggingface": [
+      "mrqa-workshop/mrqa"
+    ],
+    "github": [
+      "https://github.com/mrqa/MRQA-Shared-Task-2019"
+    ],
+    "papers": [
+      {
+        "url": "https://aclanthology.org/D19-5801"
+      }
+    ],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "MRQA out-of-domain subset has source test rows only; no genuine training split",
+    "checked_on": "2026-10-20",
+    "source_revisions": {
+      "mrqa-workshop/mrqa": "f3178d9888471dfb2b67c93de14f0ddf499a8d9f"
+    },
+    "evidence": [
+      "https://huggingface.co/datasets/mrqa-workshop/mrqa/blob/f3178d9888471dfb2b67c93de14f0ddf499a8d9f/README.md"
+    ],
+    "reconsider_if": "The publisher releases a training partition for this out-of-domain subset."
+  },
+  {
+    "name": "MRQA DuoRC.ParaphraseRC",
+    "annotation": "tasksource.eval_only.mrqa_duorc",
+    "scope": "dataset",
+    "tasks": [
+      "mrqa-eval/DuoRC.ParaphraseRC"
+    ],
+    "huggingface": [
+      "mrqa-workshop/mrqa"
+    ],
+    "github": [
+      "https://github.com/mrqa/MRQA-Shared-Task-2019"
+    ],
+    "papers": [
+      {
+        "url": "https://aclanthology.org/D19-5801"
+      }
+    ],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "MRQA out-of-domain subset has source test rows only; no genuine training split",
+    "checked_on": "2026-10-20",
+    "source_revisions": {
+      "mrqa-workshop/mrqa": "f3178d9888471dfb2b67c93de14f0ddf499a8d9f"
+    },
+    "evidence": [
+      "https://huggingface.co/datasets/mrqa-workshop/mrqa/blob/f3178d9888471dfb2b67c93de14f0ddf499a8d9f/README.md"
+    ],
+    "reconsider_if": "The publisher releases a training partition for this out-of-domain subset."
+  },
+  {
+    "name": "MRQA RACE",
+    "annotation": "tasksource.eval_only.mrqa_race",
+    "scope": "dataset",
+    "tasks": [
+      "mrqa-eval/RACE"
+    ],
+    "huggingface": [
+      "mrqa-workshop/mrqa"
+    ],
+    "github": [
+      "https://github.com/mrqa/MRQA-Shared-Task-2019"
+    ],
+    "papers": [
+      {
+        "url": "https://aclanthology.org/D19-5801"
+      }
+    ],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "MRQA out-of-domain subset has source test rows only; no genuine training split",
+    "checked_on": "2026-10-20",
+    "source_revisions": {
+      "mrqa-workshop/mrqa": "f3178d9888471dfb2b67c93de14f0ddf499a8d9f"
+    },
+    "evidence": [
+      "https://huggingface.co/datasets/mrqa-workshop/mrqa/blob/f3178d9888471dfb2b67c93de14f0ddf499a8d9f/README.md"
+    ],
+    "reconsider_if": "The publisher releases a training partition for this out-of-domain subset."
+  },
+  {
+    "name": "MRQA RelationExtraction",
+    "annotation": "tasksource.eval_only.mrqa_relation_extraction",
+    "scope": "dataset",
+    "tasks": [
+      "mrqa-eval/RelationExtraction"
+    ],
+    "huggingface": [
+      "mrqa-workshop/mrqa"
+    ],
+    "github": [
+      "https://github.com/mrqa/MRQA-Shared-Task-2019"
+    ],
+    "papers": [
+      {
+        "url": "https://aclanthology.org/D19-5801"
+      }
+    ],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "MRQA out-of-domain subset has source test rows only; no genuine training split",
+    "checked_on": "2026-10-20",
+    "source_revisions": {
+      "mrqa-workshop/mrqa": "f3178d9888471dfb2b67c93de14f0ddf499a8d9f"
+    },
+    "evidence": [
+      "https://huggingface.co/datasets/mrqa-workshop/mrqa/blob/f3178d9888471dfb2b67c93de14f0ddf499a8d9f/README.md"
+    ],
+    "reconsider_if": "The publisher releases a training partition for this out-of-domain subset."
+  },
+  {
+    "name": "MRQA TextbookQA",
+    "annotation": "tasksource.eval_only.mrqa_textbookqa",
+    "scope": "dataset",
+    "tasks": [
+      "mrqa-eval/TextbookQA"
+    ],
+    "huggingface": [
+      "mrqa-workshop/mrqa"
+    ],
+    "github": [
+      "https://github.com/mrqa/MRQA-Shared-Task-2019"
+    ],
+    "papers": [
+      {
+        "url": "https://aclanthology.org/D19-5801"
+      }
+    ],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "MRQA out-of-domain subset has source test rows only; no genuine training split",
+    "checked_on": "2026-10-20",
+    "source_revisions": {
+      "mrqa-workshop/mrqa": "f3178d9888471dfb2b67c93de14f0ddf499a8d9f"
+    },
+    "evidence": [
+      "https://huggingface.co/datasets/mrqa-workshop/mrqa/blob/f3178d9888471dfb2b67c93de14f0ddf499a8d9f/README.md"
+    ],
+    "reconsider_if": "The publisher releases a training partition for this out-of-domain subset."
   }
 ]

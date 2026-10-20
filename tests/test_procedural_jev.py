@@ -13,7 +13,14 @@ from tasksource.jev.recast import render_typed_decision_group
 from scripts.build_jev_dataset import TRAINING_FEATURES, share_cap, source_row_group
 from scripts.build_procedural_jev import MAX_LABEL_SHARE, build_task, generate_split
 
+try:  # the generators live in reasoning-core, a build-time dependency
+    import reasoning_core
+except ImportError:
+    reasoning_core = None
+needs_generators = unittest.skipUnless(reasoning_core, "reasoning-core is not installed")
 
+
+@needs_generators
 class ProceduralJevTest(unittest.TestCase):
     def samples(self, task, n=200):
         rng = random.Random(task)
@@ -152,6 +159,7 @@ class ProceduralJevTest(unittest.TestCase):
             self.assertFalse(dataset["test"][0]["state"].startswith('"'))
 
 
+@needs_generators
 class LabelBalanceTest(unittest.TestCase):
     def test_no_yes_no_or_choice_label_dominates_a_question(self):
         for task in ("event_triggered_execution", "instruction_execution", "graph_navigation"):
