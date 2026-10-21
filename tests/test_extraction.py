@@ -364,6 +364,32 @@ def test_collection_budget_is_shared_equally():
     assert train_limits(["inspec/keyphrases"], 10_000, 20_000)["inspec/keyphrases"] == 1_000
 
 
+def test_multilingual_peppering_does_not_shrink_english_siblings():
+    """uner/en_ewt and tydiqa/english share a collection prefix with their non-English additions
+    (uner/pt_bosque, uner/zh_gsd; tydiqa/arabic, .../bengali, .../finnish, .../korean, .../russian,
+    .../swahili); COLLECTION_ROWS["uner"]/["tydiqa"] must be raised enough that dividing by the larger
+    source count still leaves the English member at its un-peppered max_rows cap."""
+    from scripts.build_jev_extraction import train_limits
+    limits = train_limits(["uner/en_ewt", "uner/pt_bosque", "uner/zh_gsd"], max_rows=10_000, max_collection_rows=20_000)
+    assert limits["uner/en_ewt"] == 10_000
+    assert limits["uner/pt_bosque"] == 1_600 and limits["uner/zh_gsd"] == 1_600
+    tydiqa_tasks = ["tydiqa/english", "tydiqa/arabic", "tydiqa/bengali", "tydiqa/finnish",
+                    "tydiqa/korean", "tydiqa/russian", "tydiqa/swahili"]
+    limits = train_limits(tydiqa_tasks, max_rows=10_000, max_collection_rows=20_000)
+    assert limits["tydiqa/english"] == 10_000
+    assert limits["tydiqa/swahili"] == 800
+    assert all(limits[t] == 1_600 for t in tydiqa_tasks if t not in ("tydiqa/english", "tydiqa/swahili"))
+
+
+def test_massive_slots_tags_align_with_class_names():
+    from tasksource.multilingual_tasks import _massive_slots
+    rows = Dataset.from_list([{"annot_utt": "weck mich am [date : freitag] um [time : neun uhr] auf"}])
+    out = _massive_slots(DatasetDict(train=rows))["train"]
+    names = out.features["ner_tags"].feature.names
+    tags = [names[i] for i in out[0]["ner_tags"]]
+    assert tags == ["O", "O", "O", "B-date", "O", "B-time", "I-time", "O"]
+
+
 def test_without_excess_empty_keeps_order_and_share():
     from scripts.build_jev_extraction import without_excess_empty
     full = {"answers": [{"null": False, "values": [{"text": "a", "start": 0, "end": 1}]}]}
@@ -804,6 +830,89 @@ def test_sherlock_separate_cues_affixes_and_discontinuous_scopes():
     assert counts['unlocated_cue_fields'] == 1
 
 
+def test_multispanqa_bio_tokens_become_character_spans():
+    from tasksource.extractive_tasks import _multispanqa_row
+    row = dict(id='q1', type='HUM', structure='Conjunction', num_span=2,
+               question=['who', 'wrote', 'it'],
+               context=['Mike', 'Reid', 'and', 'Allen', 'Shamblin', 'wrote', 'it', '.'],
+               label=['B', 'I', 'O', 'B', 'I', 'O', 'O', 'O'])
+    out = _multispanqa_row(row)
+    assert out['context'] == 'Mike Reid and Allen Shamblin wrote it .'
+    assert out['question'] == 'who wrote it'
+    assert out['answers']['text'] == ['Mike Reid', 'Allen Shamblin']
+    for text, start in zip(out['answers']['text'], out['answers']['answer_start']):
+        assert out['context'][start:start + len(text)] == text
+    assert json.loads(out['metadata']) == {'id': 'q1', 'answer_type': 'HUM', 'structure': 'Conjunction', 'num_span': 2}
+
+
+def _event_row(text, structures):
+    return {'input': text, 'output': {'json_structures': structures}}
+
+
+def _trigger(start, end, text):
+    return {'start': start, 'end': end, 'text': text}
+
+
+def _argument(role, start, end, text):
+    return {'role': role, 'start': start, 'end': end, 'text': text}
+
+
+def test_event_role_schema_and_present_plus_one_absent_role():
+    from tasksource.extractive_tasks import _event_role_schema, _event_role_records
+    from datasets import Dataset, DatasetDict
+    text = 'Ann killed Bob in Paris with a knife.'
+    row = _event_row(text, {'Life:Die': [{'trigger': _trigger(4, 10, 'killed'),
+        'arguments': [_argument('killer', 0, 3, 'Ann'), _argument('victim', 11, 14, 'Bob'),
+                      _argument('place', 18, 23, 'Paris')]}]})
+    other = _event_row(text, {'Life:Die': [{'trigger': _trigger(4, 10, 'killed'),
+        'arguments': [_argument('instrument', 29, 37, 'a knife')]}]})
+    schema = _event_role_schema(DatasetDict(train=Dataset.from_list([row, other])))
+    assert schema['Life:Die'] == ['instrument', 'killer', 'place', 'victim']
+    records = list(_event_role_records(schema)(row))
+    fields = {json.loads(r['metadata'])['field']: r for r in records}
+    assert fields['killer']['answers']['text'] == ['Ann']
+    assert fields['victim']['answers']['text'] == ['Bob']
+    assert fields['place']['answers']['text'] == ['Paris']
+    # Present roles are always asked; absent roles (here just "instrument") earn at most one null field.
+    assert set(fields) == {'killer', 'victim', 'place', 'instrument'}
+    assert fields['instrument']['answers']['text'] == []
+    # The trigger is named with its offsets, so a repeated trigger word is not ambiguous.
+    assert "'killed' at characters [4, 10)" in fields['killer']['question']
+    for r in records:
+        for text_, start in zip(r['answers']['text'], r['answers']['answer_start']):
+            assert r['context'][start:start + len(text_)] == text_
+        assert json.loads(r['metadata'])['group'] == json.loads(records[0]['metadata'])['group']
+
+
+def test_event_role_records_rejects_mismatched_trigger_or_argument():
+    from tasksource.extractive_tasks import _event_role_records
+    text = 'Ann killed Bob.'
+    bad_trigger = _event_row(text, {'Life:Die': [{'trigger': _trigger(4, 10, 'kills'), 'arguments': []}]})
+    with pytest.raises(ValueError):
+        list(_event_role_records({})(bad_trigger))
+    bad_argument = _event_row(text, {'Life:Die': [{'trigger': _trigger(4, 10, 'killed'),
+        'arguments': [_argument('victim', 11, 14, 'Bo')]}]})
+    with pytest.raises(ValueError):
+        list(_event_role_records({})(bad_argument))
+
+
+def test_english_extraction_round_2026_10_21_pins_and_licenses():
+    """MultiSpanQA, RAMS and CASIE event-argument sources added in the 2026-10-21 English round."""
+    from tasksource import task_licenses
+    from tasksource.extractive_tasks import multispanqa, rams_roles, casie_roles
+    from scripts.build_jev_extraction import LIST_QA
+    assert {'multispanqa', 'rams/role', 'casie/role'} <= LIST_QA
+    assert not multispanqa.complete_splits
+    assert multispanqa.load_dataset_kwargs['data_files']['test'].endswith('test.json')
+    for task in (rams_roles, casie_roles):
+        assert not task.complete_splits
+        assert re.fullmatch('[0-9a-f]{40}', task.load_dataset_kwargs['revision'])
+    licenses = task_licenses(['multispanqa', 'rams/role', 'casie/role'], extractive=True).set_index('id')
+    assert licenses.loc['multispanqa', 'license_use'] == 'commercial'
+    assert licenses.loc['rams/role', 'license_use'] == 'commercial'
+    assert licenses.loc['casie/role', 'license_use'] == 'unspecified'
+
+
 def test_cap_null_groups_keeps_every_positive_sentence():
     import json
     from datasets import Dataset, DatasetDict
@@ -814,3 +923,65 @@ def test_cap_null_groups_keeps_every_positive_sentence():
     groups = {json.loads(m)['group'] for m in capped['metadata']}
     assert {f's{g}' for g in range(10)} <= groups and len(groups) == 10 + 6  # 6 null groups: 40% of 16
     assert len(capped) == 2 * len(groups)  # a group is kept or dropped whole
+
+
+def test_phee_records_identify_events_by_trigger_offsets():
+    """PHEE event-argument extraction (src/tasksource/extractive_tasks.py): spans are verbatim at their
+    offsets, discontinuous mentions (several (text, start) pairs for one argument) become separate
+    contiguous spans, Treatment/Subject sub-arguments are asked only when their parent argument is
+    present, and every question names its event's trigger with offsets, so two events of one sentence are
+    distinct and recoverable from the text."""
+    import json
+    from tasksource.extractive_tasks import _phee_records
+    from tasksource.jev.extraction import qa_rows, check
+
+    context = ('Flecainide-induced interaction with paroxetine caused confusion in the patient '
+               'who had previously tolerated flecainide alone.')
+
+    def at(needle, occurrence=1):
+        start = -1
+        for _ in range(occurrence):
+            start = context.find(needle, start + 1)
+        assert start >= 0, needle
+        return start
+
+    def mkfield(words, occurrence=1):
+        """``words`` is one mention's pieces (several for a discontinuous mention), each located at its
+        own occurrence in ``context``."""
+        pairs = words if isinstance(words[0], tuple) else [(words, occurrence)]
+        return {'text': [[t] for t, _ in pairs], 'start': [[at(t, n)] for t, n in pairs], 'entity_id': ['T']}
+
+    row = {
+        'id': 'doc1_1', 'context': context, 'is_mult_event': True,
+        'annotations': [{'events': [
+            {'event_id': 'E1', 'event_type': 'Adverse_event',
+             'Trigger': mkfield('caused'),
+             'Treatment': {**mkfield('Flecainide'),
+                           'Drug': mkfield([('Flecainide', 1), ('paroxetine', 1), ('flecainide', 1)])},
+             'Effect': mkfield('confusion'),
+             'Subject': {**mkfield('the patient'), 'Age': mkfield('who')}},
+            {'event_id': 'E2', 'event_type': 'Adverse_event',
+             'Trigger': mkfield('interaction'),
+             'Treatment': {**mkfield('paroxetine')}},
+        ]}]}
+    line = json.dumps(row)
+    records = list(_phee_records(line))
+    assert records  # non-empty
+    for record in records:
+        for text, start in zip(record['answers']['text'], record['answers']['answer_start']):
+            assert context[start:start + len(text)] == text
+
+    metas = [json.loads(r['metadata']) for r in records]
+    # E1 has a Subject (so subject sub-fields are asked); E2 has no Subject (none asked).
+    assert any(m['group'] == 'doc1_1:E1' and m['field'] == 'subject_age' for m in metas)
+    assert not any(m['group'] == 'doc1_1:E2' and m['field'].startswith('subject_') for m in metas)
+    # Discontinuous Treatment.Drug mentions (Flecainide/paroxetine/flecainide) all kept as separate spans.
+    drug = next(r for r, m in zip(records, metas) if m['field'] == 'treatment_drug' and 'E1' in m['group'])
+    assert sorted(drug['answers']['text']) == ['Flecainide', 'flecainide', 'paroxetine']
+
+    effect = {m['group']: r['question'] for r, m in zip(records, metas) if m['field'] == 'effect'}
+    assert f"'caused' at characters [{at('caused')}, {at('caused') + 6})" in effect['doc1_1:E1']
+    assert f"'interaction' at characters [{at('interaction')}, {at('interaction') + 11})" in effect['doc1_1:E2']
+
+    for grouped in qa_rows(records, 'phee', 'train', 8, kind='list'):
+        check(grouped)

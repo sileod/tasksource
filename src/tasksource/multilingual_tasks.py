@@ -1,5 +1,8 @@
 from .preprocess import cat, get,name, regen, constant, Classification, TokenClassification, MultipleChoice
-from .tasks import _copa_input, language_name
+import re
+
+from .tasks import _copa_input, _named_ner_tags, _uner, language_name
+from .metadata.source_revisions import SOURCE_REVISIONS
 from .metadata.configs import (MASAKHANEWS, PAWS_X, STSB_MULTI_MT, UNIVERSAL_DEPENDENCIES, XCOPA, XCSR_CODAH,
                                XCSR_CSQA, XSTORY_CLOZE)
 from datasets import ClassLabel, Dataset, DatasetDict, concatenate_datasets, Sequence
@@ -217,6 +220,37 @@ mapa_fine = TokenClassification("tokens","fine_grained",dataset_name='joelito/ma
 amazon_intent = Classification("text",labels="label",
     dataset_name='mteb/MassiveIntentClassification', config_name="en",
     task_id="massive")
+
+# Span extraction peppering (jev extraction config), one language per source: human PER/ORG/LOC under the
+# UNER guidelines of uner/en_ewt, MasakhaNER 2.0 expert news NER, MASSIVE human-localized and judged slots.
+uner_pt_bosque = _uner('pt_bosque')
+uner_zh_gsd = _uner('zh_gsd')
+
+masakhaner2_swa = TokenClassification("tokens", "ner_tags", dataset_name="parquet", task_id="masakhaner2/swa",
+    load_dataset_kwargs={"data_files": {split: f"hf://datasets/masakhane/masakhaner2@{SOURCE_REVISIONS['masakhane/masakhaner2']}/swa/{split}/*.parquet"
+                                        for split in ("train", "validation", "test")}})
+
+
+def _massive_slots(dataset):
+    """MASSIVE ``annot_utt`` (``"... [date : friday] ..."``) to BIO ``tokens``/``ner_tags``."""
+    def row(r):
+        text, tokens, tags, pos = r["annot_utt"], [], [], 0
+        for m in re.finditer(r"\[(\w+)\s*:\s*([^\]]+)\]", text):
+            for w in text[pos:m.start()].split():
+                tokens.append(w); tags.append("O")
+            for i, w in enumerate(m.group(2).split()):
+                tokens.append(w); tags.append(("B-" if i == 0 else "I-") + m.group(1))
+            pos = m.end()
+        for w in text[pos:].split():
+            tokens.append(w); tags.append("O")
+        return {"tokens": tokens, "ner_tags": tags}
+    return _named_ner_tags(dataset.map(row, remove_columns=["annot_utt"]))
+
+
+massive_slots_hi = TokenClassification("tokens", "ner_tags", dataset_name="parquet", task_id="massive-slots/hi",
+    pre_process=_massive_slots,
+    load_dataset_kwargs={"data_files": {split: f"hf://datasets/AmazonScience/massive@{SOURCE_REVISIONS['AmazonScience/massive']}/hi-IN/{split}/*.parquet"
+                                        for split in ("train", "validation", "test")}})
 
 
 # modern multilingual classification / reward datasets

@@ -6,13 +6,17 @@ Every task is SQuAD-formatted for ``AutoModelForQuestionAnswering``: ``context``
 Sources have human-selected answers or procedural QA over human-verified facts (TimeQA).
 MuSiQue and DROP answers are located verbatim; unverified distant supervision is left out.
 """
+import hashlib
+import json
 import re
+import zlib
 
 from datasets import Value
 
 from .preprocess import ExtractiveQA
 from .metadata.source_revisions import SOURCE_REVISIONS
-from .span_structure import cap_null_groups, structure_spans, ud_records, preco_records, redocred_records
+from .span_structure import (cap_null_groups, structure_spans, ud_records, preco_records, redocred_records,
+    token_offsets, token_span)
 
 # Hub revisions; script-based datasets are read from their parquet conversion commit.
 REVISIONS = {
@@ -54,6 +58,11 @@ REVISIONS = {
     'tasksource/qasrl-bank-spans': 'cdef9250905c169a1bb8e2a2752dd906988352fa',
     'tasksource/bioscope-spans': '042825641b80ee236d1df7be6e260cbbf573b875',
     'tasksource/sherlock-negation-spans': 'f7e28a5e6776d6ec568521a15d7f62ef7d9bb5f3',
+
+    # mneb event-extraction repackages (same template/org as mneb/maven and mneb/maven-arg, already
+    # used for the maven classification views): input text, output.json_structures per event type.
+    'mneb/rams': '1ee321086700a39146b02f752c8b153ee2dfd45b',
+    'mneb/casie': '6af8a12e35914b358c48c5714e9c402a276a848e',
 }
 
 
@@ -524,6 +533,26 @@ tydiqa_english = ExtractiveQA(dataset_name='google-research-datasets/tydiqa', co
     metadata=lambda r: {'id': r['id'], 'title': r['title']},
     load_dataset_kwargs=_kwargs('google-research-datasets/tydiqa'))
 
+
+def _tydiqa(language):
+    # tydiqa_english for another language: the multilingual peppering of the extraction config, one
+    # row budget per language (build_jev_extraction.py SOURCE_ROWS).
+    return ExtractiveQA(dataset_name='google-research-datasets/tydiqa', config_name='secondary_task',
+        task_id=f'tydiqa/{language}', complete_splits=False,
+        pre_process=lambda d: _verbatim_spans(d.filter(
+            lambda identity: identity.startswith(f'{language}-'), input_columns='id')),
+        answers='span_answers', max_mismatch=0,
+        metadata=lambda r: {'id': r['id'], 'title': r['title']},
+        load_dataset_kwargs=_kwargs('google-research-datasets/tydiqa'))
+
+
+tydiqa_arabic = _tydiqa('arabic')
+tydiqa_bengali = _tydiqa('bengali')
+tydiqa_finnish = _tydiqa('finnish')
+tydiqa_korean = _tydiqa('korean')
+tydiqa_russian = _tydiqa('russian')
+tydiqa_swahili = _tydiqa('swahili')
+
 covidqa = ExtractiveQA(dataset_name='deepset/covid_qa_deepset', task_id='covid-qa',
     complete_splits=False, splits=('train', None, None), pre_process=_verbatim_spans,
     answers='span_answers', max_mismatch=0,
@@ -762,6 +791,118 @@ redocred_entities = ExtractiveQA(dataset_name='tonytan48/Re-DocRED', task_id='re
     metadata='metadata', max_mismatch=0, load_dataset_kwargs=_kwargs('tonytan48/Re-DocRED'))
 
 
+# MultiSpanQA (Li et al., NAACL 2022): Natural Questions long-answer paragraphs re-annotated by
+# crowdworkers for every correct short span (not just one), as word-tokenized BIO labels. Read
+# directly from the authors' GitHub release (pinned commit; no Hub upload reuses the official
+# train/valid/test exactly). A new view of NQ text: multi-span sets, not MRQA's single located answer.
+_MULTISPANQA_REVISION = '07f8b02340fd07d28fa15956720f92a6f61ba70a'
+_MULTISPANQA_BASE = f'https://raw.githubusercontent.com/haonan-li/MultiSpanQA/{_MULTISPANQA_REVISION}/data/MultiSpanQA_data/'
+
+
+def _multispanqa_row(r):
+    text, starts = token_offsets(r['context'])
+    spans, current = [], None
+    for i, tag in enumerate(r['label']):
+        if tag == 'B':
+            if current is not None:
+                spans.append(current)
+            current = [i, i]
+        elif tag == 'I' and current is not None:
+            current[1] = i
+        else:
+            if current is not None:
+                spans.append(current)
+            current = None
+    if current is not None:
+        spans.append(current)
+    pairs = sorted(set(token_span(r['context'], starts, s, e + 1) for s, e in spans))
+    return {'context': text, 'question': ' '.join(r['question']),
+            'answers': {'text': [text[a:b] for a, b in pairs], 'answer_start': [a for a, b in pairs]},
+            'metadata': json.dumps({'id': r['id'], 'answer_type': r['type'], 'structure': r['structure'],
+                                     'num_span': r['num_span']}, ensure_ascii=False)}
+
+
+def _multispanqa_spans(dataset):
+    return dataset.map(_multispanqa_row, remove_columns=['id', 'type', 'num_span', 'label', 'structure'])
+
+
+multispanqa = ExtractiveQA(dataset_name='json', task_id='multispanqa', complete_splits=False,
+    pre_process=_multispanqa_spans, metadata='metadata', max_mismatch=0,
+    load_dataset_kwargs={'data_files': {'train': _MULTISPANQA_BASE + 'train.json',
+        'validation': _MULTISPANQA_BASE + 'valid.json', 'test': _MULTISPANQA_BASE + 'test.json'}, 'field': 'data'})
+
+
+# Event-argument span QA: one event (trigger + its role fillers) per record, roles as list fields.
+# Same ``input``/``output.json_structures`` schema as mneb/maven-arg's classification view: per
+# event type, a list of events, each a ``trigger`` and its ``arguments`` ({role, start, end, text}).
+# The full role vocabulary of an event type is read from the corpus itself (every role ever filled
+# for it); present roles are always asked, plus at most one earned-null role (ud_records' pattern),
+# so always-null roles do not flood the mix. The trigger is referred to by its verbatim text and offsets
+# (not inserted as markup, so every span answer still indexes unmodified source text).
+def _event_role_schema(dataset):
+    schema = {}
+    for rows in dataset.values():
+        for row in rows:
+            for event_type, events in row['output']['json_structures'].items():
+                for event in events or []:
+                    for argument in event['arguments'] or []:
+                        schema.setdefault(event_type, set()).add(argument['role'])
+    return {event_type: sorted(roles) for event_type, roles in schema.items()}
+
+
+def _event_role_records(schema):
+    def records(row):
+        text = row['input']
+        group = hashlib.sha256(text.encode()).hexdigest()
+        for event_type, events in sorted(row['output']['json_structures'].items()):
+            for event in events or []:
+                trigger = event['trigger']
+                t_start, t_end = trigger['start'], trigger['end']
+                if not 0 <= t_start < t_end <= len(text) or text[t_start:t_end] != trigger['text']:
+                    raise ValueError('Event annotation does not match the document (trigger)')
+                fillers = {}
+                for argument in event['arguments'] or []:
+                    a_start, a_end = argument['start'], argument['end']
+                    if not 0 <= a_start < a_end <= len(text) or text[a_start:a_end] != argument['text']:
+                        raise ValueError('Event annotation does not match the document (argument)')
+                    fillers.setdefault(argument['role'], set()).add((a_start, a_end))
+                roles = schema.get(event_type, sorted(fillers))
+                present = [r for r in roles if r in fillers]
+                absent = [r for r in roles if r not in fillers]
+                event_id = f'{group}:{t_start}:{t_end}:{event_type}'
+                asked = present + (absent[zlib.crc32(event_id.encode()) % len(absent):][:1] if absent else [])
+                for role in asked:
+                    spans = sorted(fillers.get(role, set()))
+                    field = re.sub(r'\W+', '_', role.lower()).strip('_')
+                    yield _span_record(text,
+                        f"Event type: {event_type}. Every {role.lower()} of the event triggered by "
+                        f"{trigger['text']!r} at characters [{t_start}, {t_end}) (zero-based, end-exclusive), as written.",
+                        {'text': [text[a:b] for a, b in spans], 'answer_start': [a for a, b in spans]},
+                        id=f'{event_id}:{field}', field=field, group=event_id,
+                        event_type=event_type, trigger_span=[t_start, t_end])
+    return records
+
+
+def _event_role_spans(dataset):
+    schema = _event_role_schema(dataset)
+    return _span_records(dataset, _event_role_records(schema))
+
+
+# Cross-sentence event-argument linking (Ebner et al., ACL 2020): 139 event types over 1-3 sentence
+# windows, roles that can span outside the trigger's own sentence. mneb/rams data-only repackage of
+# the official release (readable event-type and role names kept as given, not reformatted).
+rams_roles = ExtractiveQA(dataset_name='mneb/rams', task_id='rams/role', complete_splits=False,
+    pre_process=_event_role_spans, metadata='metadata', max_mismatch=0,
+    load_dataset_kwargs=_kwargs('mneb/rams'))
+
+# Cybersecurity event extraction (Satyapanich et al., AAAI 2020): attack-pattern, vulnerability and
+# patch events in security news, argument roles (attacker, victim, trusted entity, etc.).
+# mneb/casie data-only repackage of the official release.
+casie_roles = ExtractiveQA(dataset_name='mneb/casie', task_id='casie/role', complete_splits=False,
+    pre_process=_event_role_spans, metadata='metadata', max_mismatch=0,
+    load_dataset_kwargs=_kwargs('mneb/casie'))
+
+
 # QA-SRL Bank 2.0, BioScope and *SEM 2012 ConanDoyle-neg have no usable Hub upload (script-only loaders, missing
 # data files or an under-sized test upload): tasksource mirrors, repackaged by the scripts above.
 
@@ -790,3 +931,82 @@ bioscope_papers = ExtractiveQA(dataset_name='tasksource/bioscope-spans', config_
 sherlock_scopes = ExtractiveQA(dataset_name='tasksource/sherlock-negation-spans', task_id='sherlock/scopes',
     complete_splits=False, metadata='metadata', pre_process=cap_null_groups, max_mismatch=0,
     load_dataset_kwargs=_kwargs('tasksource/sherlock-negation-spans'))
+
+
+# PHEE: pharmacovigilance event extraction from MEDLINE case reports and biomedical literature (Sun et al.,
+# EMNLP 2022). Annotated by 15 trained CS/medical PhD students against a schema reviewed with
+# pharmacovigilance and biomedical-NLP researchers; native train/dev/test splits (document-disjoint), pinned
+# GitHub commit (MIT license, github.com/ZhaoyueSun/PHEE). One row per event, which the questions identify by its
+# trigger and the trigger's offsets (a sentence can hold several events): core arguments (Subject, Treatment,
+# Effect) are always asked; Treatment's and Subject's sub-arguments only when that parent argument is present.
+# Attribute fields (Negated, Speculated, Severity) are left out: the paper reports only 46.41% EM-F1
+# inter-annotator agreement for attributes, against 80-88% for triggers and arguments.
+_PHEE_COMMIT = '41489b08675d0b63a1eb7cd4f2d1946952833eb1'
+_PHEE_URL = f'https://raw.githubusercontent.com/ZhaoyueSun/PHEE/{_PHEE_COMMIT}/data/json/'
+
+_PHEE_CORE = [
+    ('subject', 'Subject', 'The patient or population the event is about, as written.'),
+    ('treatment', 'Treatment', 'The treatment or drug administration described, as written.'),
+    ('effect', 'Effect', 'The adverse or therapeutic effect reported, as written.'),
+]
+_PHEE_TREATMENT = [
+    ('treatment_drug', 'Drug', 'Every drug named in the treatment, as written.'),
+    ('treatment_disorder', 'Disorder', 'The disorder the treatment is given for, as written.'),
+    ('treatment_dosage', 'Dosage', 'The dosage of the treatment, as written.'),
+    ('treatment_route', 'Route', 'The route of administration of the treatment, as written.'),
+    ('treatment_duration', 'Duration', 'The duration of the treatment, as written.'),
+    ('treatment_freq', 'Freq', 'The frequency of the treatment, as written.'),
+    ('treatment_time_elapsed', 'Time_elapsed', 'The time elapsed between the treatment and the effect, as written.'),
+]
+_PHEE_SUBJECT = [
+    ('subject_age', 'Age', "The subject's age, as written."),
+    ('subject_gender', 'Gender', "The subject's gender, as written."),
+    ('subject_population', 'Population', 'The size of the subject population, as written.'),
+    ('subject_race', 'Race', "The subject's race or ethnicity, as written."),
+    ('subject_disorder', 'Disorder', "The subject's pre-existing disorder, as written."),
+]
+
+
+def _phee_mentions(field):
+    """Every mention of a PHEE argument, as (start, end): a mention's pieces (discontinuous when more
+    than one) each become their own contiguous span."""
+    spans = []
+    for texts, starts in zip(field.get('text', []), field.get('start', [])):
+        spans.extend((s, s + len(t)) for t, s in zip(texts, starts))
+    return sorted(set(spans))
+
+
+def _phee_group(context, scope, fields, group, event_type, prefix):
+    for name, key, question in fields:
+        spans = _phee_mentions(scope[key]) if key in scope else []
+        yield _span_record(context, f'{prefix} {question}',
+            {'text': [context[a:b] for a, b in spans], 'answer_start': [a for a, _ in spans]},
+            field=name, group=group, event_type=event_type)
+
+
+def _phee_records(line):
+    row = json.loads(line)
+    context = row['context']
+    for event in row['annotations'][0]['events']:
+        trigger = _phee_mentions(event['Trigger']) if 'Trigger' in event else []
+        if not trigger:
+            continue
+        where = ' + '.join(f'{context[a:b]!r} at characters [{a}, {b})' for a, b in trigger)
+        prefix = (f"For the {event['event_type'].replace('_', ' ').lower()} triggered by {where} "
+                  '(zero-based, end-exclusive):')
+        group = f"{row['id']}:{event['event_id']}"
+        yield from _phee_group(context, event, _PHEE_CORE, group, event['event_type'], prefix)
+        if 'Treatment' in event:
+            yield from _phee_group(context, event['Treatment'], _PHEE_TREATMENT, group, event['event_type'], prefix)
+        if 'Subject' in event:
+            yield from _phee_group(context, event['Subject'], _PHEE_SUBJECT, group, event['event_type'], prefix)
+
+
+def _phee(dataset):
+    return _span_records(dataset, lambda r: list(_phee_records(r['text'])) if r['text'].strip() else [])
+
+
+phee = ExtractiveQA(dataset_name='text', task_id='phee', complete_splits=False, metadata='metadata', max_mismatch=0,
+    pre_process=_phee,
+    load_dataset_kwargs={'data_files': {'train': _PHEE_URL + 'train.json', 'validation': _PHEE_URL + 'dev.json',
+                                         'test': _PHEE_URL + 'test.json'}})

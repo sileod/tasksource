@@ -26,6 +26,12 @@ SOURCE_LICENSE_EVIDENCE = {
     'mrqa-eval': {'license': 'unspecified', 'license_use': 'unspecified', 'checked': '2026-10-20',
         'url': 'https://github.com/mrqa/MRQA-Shared-Task-2019#datasets',
         'scope': 'MRQA out-of-domain development data (Hub test). Constituent licenses remain applicable; the repository MIT software license is not assigned to all constituent texts. Source occurrences are verified under official MRQA answer normalization and returned verbatim; invalid positive rows are excluded, never changed to null.'},
+    'masakhaner2': {'license': 'afl-3.0', 'license_use': 'commercial', 'checked': '2026-10-21',
+        'url': 'https://huggingface.co/datasets/masakhane/masakhaner2',
+        'scope': 'MasakhaNER 2.0: expert-annotated African news NER, native train/dev/test per language. Hub card declares AFL 3.0 (OSI-approved, permits commercial use). Only Swahili (swa) is used here, paired with tydiqa/swahili so that language mixes NER and extractive QA.'},
+    'massive-slots': {'license': 'cc-by-4.0', 'license_use': 'commercial', 'checked': '2026-10-21',
+        'url': 'https://huggingface.co/datasets/AmazonScience/massive',
+        'scope': 'MASSIVE 1.1: voice-assistant utterances localized from SLURP by professional translators, with slot/intent/grammar judged by three further annotator workers per row (``judgments``), not machine-translated or auto-labeled. Hub card declares CC BY 4.0. Only Hindi (hi-IN) is used here; ``annot_utt`` bracket spans are parsed into BIO tags in tasksource.tasks._massive_slots.'},
     'uner': {'license': 'cc-by-sa-4.0', 'license_use': 'commercial', 'checked': '2026-10-20',
         'url': 'https://huggingface.co/datasets/universalner/universal_ner#licensing-information',
         'scope': 'UNER human PER/ORG/LOC annotations over UD treebanks, including human-derived transfers. Existing data-only copy preserves native tokens, tags, annotator identities and splits. Underlying UD source terms remain applicable; GSDSIMP is excluded as a duplicate of GSD.'},
@@ -81,8 +87,8 @@ SOURCE_LICENSE_EVIDENCE = {
     'qasper': {'license': 'cc-by-4.0', 'license_use': 'commercial', 'checked': '2026-10-20',
         'scope': 'NLP researchers annotated paper answers; only verbatim extractive annotations and native unanswerables are retained. Source paper rights remain applicable.',
         'url': 'https://huggingface.co/datasets/allenai/qasper'},
-    'tydiqa': {'license': 'apache-2.0', 'license_use': 'commercial', 'checked': '2026-10-20',
-        'scope': 'Original publisher Gold Passage secondary task; human information-seeking questions and gold spans, English only. Wikipedia source terms remain applicable.',
+    'tydiqa': {'license': 'apache-2.0', 'license_use': 'commercial', 'checked': '2026-10-21',
+        'scope': 'Original publisher Gold Passage secondary task; human information-seeking questions and gold minimal-answer spans. Covers English and the eight GoldP non-English languages (Arabic, Bengali, Finnish, Indonesian, Korean, Russian, Swahili, Telugu), same annotation methodology. Wikipedia source terms remain applicable.',
         'url': 'https://huggingface.co/datasets/google-research-datasets/tydiqa'},
     'covid-qa': {'license': 'apache-2.0', 'license_use': 'commercial', 'checked': '2026-10-20',
         'scope': 'Publisher COVID-QA data card; biomedical experts annotated answers. Underlying scientific articles retain their source licenses.',
@@ -230,6 +236,11 @@ SOURCE_LICENSE_EVIDENCE = {
                  '(wbsg-uni-mannheim/wdc-pave, no LICENSE file) states a license; offer texts keep their sites terms.'},
     'tab': {'license': 'mit', 'checked': '2026-10-13', 'scope': 'original TAB corpus distribution',
             'url': 'https://github.com/NorskRegnesentral/text-anonymization-benchmark/blob/master/LICENSE.txt'},
+    'phee': {'license': 'mit', 'license_use': 'commercial', 'checked': '2026-10-21',
+        'url': 'https://github.com/ZhaoyueSun/PHEE/blob/41489b08675d0b63a1eb7cd4f2d1946952833eb1/LICENSE',
+        'scope': "PHEE pharmacovigilance event extraction (Sun et al., EMNLP 2022); the authors' repository and "
+                 "Zenodo record (10.5281/zenodo.7689970) both declare MIT. Sentences are drawn from MEDLINE case "
+                 'reports and biomedical literature abstracts.'},
     'qasrl/orig': {'license': 'unspecified', 'license_use': 'unspecified', 'checked': '2026-10-21',
         'url': 'https://github.com/uwnlp/qasrl-bank/blob/29034398c26e419d530a2ec1e81994ca4a4d4e42/LICENSE',
         'scope': "QA-SRL Bank 2.0 'orig' partition: >=2 independent human worker judgments with a strict "
@@ -276,6 +287,24 @@ SOURCE_LICENSE_EVIDENCE = {
               'url': 'https://github.com/OSU-slatelab/MapQA/blob/main/license'},
     'tqa': {'license': 'cc-by-sa-4.0', 'scope': 'dataset distribution',
             'url': 'https://registry.opendata.aws/allenai-tqa/'},
+
+    # 2026-10-21 additions (English extraction round): verified against author GitHub releases, not
+    # the Hub card alone.
+    'multispanqa': {'license': 'cc-by-sa-4.0', 'license_use': 'commercial', 'checked': '2026-10-21',
+        'url': 'https://multi-span.github.io/', 'scope': 'Crowd multi-span re-annotation of Natural Questions long-answer '
+        'paragraphs (Li et al., NAACL 2022). Read directly from the authors\' GitHub release (pinned commit); native '
+        'train/valid/test, all with public gold BIO labels (no hidden split).'},
+    'rams': {'license': 'cc-by-sa-4.0', 'license_use': 'commercial', 'checked': '2026-10-21',
+        'url': 'https://github.com/pitrack/arglinking/blob/master/LICENSE',
+        'scope': 'Cross-sentence event-argument annotations (Ebner et al., ACL 2020); the project page '
+        '(https://nlp.jhu.edu/rams/) states annotations are released under CC-BY-SA-4.0 with a takedown policy '
+        'for source text, which the authors do not claim to own. mneb/rams data-only repackage, native '
+        'train/dev/test.'},
+    'casie': {'license': 'unspecified', 'license_use': 'unspecified', 'checked': '2026-10-21',
+        'url': 'https://github.com/Ebiquity/CASIE', 'scope': 'Cybersecurity event annotations over 1,000 news '
+        'articles (Satyapanich et al., AAAI 2020); the original repository includes full source article text '
+        'alongside annotations but states no explicit redistribution license beyond a citation request. '
+        'mneb/casie data-only repackage, native train/validation/test.'},
 }
 
 # Scoped review: a permissive annotation/repository license cannot clear photos.

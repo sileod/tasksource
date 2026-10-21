@@ -276,6 +276,7 @@ KINDS = {
     "unsound": "labels or inputs do not support the task as annotated",
     "impractical": "inputs too long or data too heavy",
     "unavailable": "source no longer loads",
+    "restricted": "license or copyright forbids redistributing the data",
     "todo": "worth adding, not annotated yet",
 }
 
@@ -368,6 +369,24 @@ NOT_ANNOTATED = {
     "clue/clue cmnli": ("duplicate", "machine-translated MNLI; XNLI covers Chinese"),
     "dbarbedillo/SMS_Spam_Multilingual_Collection_Dataset": ("unsound", "machine-translated; many translations degenerate"),
     "ylacombe/xsum_factuality": ("unavailable", "no longer on the Hub"),
+    "klimzaporojets/DWIE": ("restricted", "Document-level entity/coref/relation annotations over Deutsche Welle news "
+        "articles (Zaporojets et al., 2021). The authors' own GitHub release (github.com/klimzaporojets/DWIE) "
+        "deliberately ships annotations WITHOUT article text: a download script fetches each article live from "
+        "DW's web service and verifies it by hash, rather than redistributing the text, with no stated license for "
+        "that content. The Hub mirror DFKI-SLT/DWIE embeds a pre-fetched 'content' field for all 802 documents "
+        "with license: other and no licensing-information section -- an unlicensed redistribution of DW's news "
+        "text, not a basis for inclusion per the 'may not be redistributed' gate."),
+    "cadec": ("restricted", "CSIRO Data Licence over the CADEC/AskaPatient corpus (research.csiro.au) is "
+              "non-commercial and states 'you may not distribute the Data to any other person'; the small "
+              "Hub re-uploads found (KevinSpaghetti/cadec, JoelMba/CADEC, akramRedjdal/cadec-ner-dataset-clean) "
+              "are partial, filtered copies of this non-redistributable corpus, not an author-sanctioned mirror, "
+              "and none reaches the claimed v2 size (3,548 posts / 32,613 mentions)"),
+    "Ineichen-Group/Preclinical_IE_Dataset": ("restricted", "PreClinIE's annotated contexts are full "
+              "abstract and methods sections of preclinical papers extracted from PDFs, most from "
+              "closed-access journals (European Journal of Pharmacology, Neuropharmacology, Brain Research, "
+              "J. Neuroscience...); the repository's MIT license covers the authors' code and annotation "
+              "layer, not copyright over the extracted publisher full text, so most of the corpus may not be "
+              "redistributed"),
 }
 
 

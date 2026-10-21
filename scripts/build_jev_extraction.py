@@ -33,7 +33,8 @@ PROCEDURAL = ["record_field_extraction", "state_update_extraction", "conditional
               "nested_structure_extraction", "html_extraction"]
 # Multi-span answers are sets (every span is part of the answer), not alternatives.
 LIST_QA = {"quoref", "cuad/spans", "qasper/spans", "tab/pii", "ud/ewt", "ud/gum", "preco/mentions", "redocred/entities",
-           "qasrl/orig", "bioscope/abstracts", "bioscope/papers", "sherlock/scopes"}
+           "qasrl/orig", "bioscope/abstracts", "bioscope/papers", "sherlock/scopes", "multispanqa",
+           "rams/role", "casie/role", "phee"}
 NER = {
     "conll2000": "Every {name} chunk in the text, as written.",
     "vuamc": "Every metaphorically used word or phrase in the text, as written.",
@@ -54,6 +55,9 @@ NER = {
     "bionlp-cg/entities": None, "bioinfer/entities": None, "bc4chemd": None,
     "uner/en_ewt": None,
     "harveyner": None,
+    # Multilingual peppering (MULTILINGUAL, SOURCE_ROWS).
+    "uner/pt_bosque": None, "uner/zh_gsd": None,
+    "masakhaner2/swa": None, "massive-slots/hi": "Every {name} in the utterance, as written.",
     "inspec/keyphrases": "Every keyphrase in the text, as written.",
 
     "bc5cdr": None, "tweetner7": None, "mit-movie-trivia": None, "mit-restaurant": None,
@@ -71,13 +75,21 @@ NER = {
     "ebm-nlp/interventions": "Every {name} in the trial abstract, as written.",
     "ebm-nlp/outcomes": "Every {name} in the trial abstract, as written.",
 }
+# NER sources of the multilingual catalog (``list_tasks(multilingual=True)``).
+MULTILINGUAL = {"uner/pt_bosque", "uner/zh_gsd", "masakhaner2/swa", "massive-slots/hi"}
 SPLITS = ("train", "validation", "test")
 # A collection is a task-id prefix (swde/auto, swde/book... -> swde). Its training budget is shared equally by its
 # sources, so a suite split into many configs weighs like one source; procedural generators share a larger budget.
-COLLECTION_ROWS = {"procedural": 80_000}
+COLLECTION_ROWS = {"procedural": 80_000,
+    # Their non-English members are capped by SOURCE_ROWS; raised so uner/en_ewt and tydiqa/english keep max_rows.
+    "uner": 30_000, "tydiqa": 70_000}
 # Valid but low-signal sources (label audit v2026.10.20.6: subjective or crowd-noisy span boundaries), capped
 # lower than other sources rather than parked.
-SOURCE_ROWS = {"inspec/keyphrases": 1_000, "toxic-spans": 2_000, "ebm-nlp/outcomes": 2_000, "legallens-ner": 1_000}
+SOURCE_ROWS = {"inspec/keyphrases": 1_000, "toxic-spans": 2_000, "ebm-nlp/outcomes": 2_000, "legallens-ner": 1_000,
+    # Multilingual peppering: 1,600 training rows per language, shared by its sources (Swahili: QA + NER).
+    "uner/pt_bosque": 1_600, "uner/zh_gsd": 1_600, "masakhaner2/swa": 800, "massive-slots/hi": 1_600,
+    "tydiqa/arabic": 1_600, "tydiqa/bengali": 1_600, "tydiqa/finnish": 1_600, "tydiqa/korean": 1_600,
+    "tydiqa/russian": 1_600, "tydiqa/swahili": 800}
 
 
 def collection(task):
@@ -104,11 +116,16 @@ def procedural_rows(task):
             for split in SPLITS if split in dataset}
 
 
+def catalog(task, extractive):
+    """``load_task``/``task_licenses`` keyword arguments selecting the catalog of ``task``."""
+    return {"extractive": extractive, "multilingual": task in MULTILINGUAL}
+
+
 def source_rows(task, extractive, args):
     """``{split: [rows]}`` of one task, before capping."""
     if extractive is None:
         return procedural_rows(task)
-    dataset = load_task(task, extractive=extractive)
+    dataset = load_task(task, **catalog(task, extractive))
     out = {}
     for split in SPLITS:
         if split not in dataset or not len(dataset[split]):
@@ -143,10 +160,10 @@ def build(args):
     if args.tasks:
         tasks = [(t, e) for t, e in tasks if t in args.tasks]
     licenses = {}
-    for extractive in (True, False):
-        ids = [t for t, e in tasks if e == extractive]
+    for extractive, multilingual in ((True, False), (False, False), (False, True)):
+        ids = [t for t, e in tasks if e == extractive and (t in MULTILINGUAL) == multilingual]
         if ids:
-            frame = task_licenses(ids, extractive=extractive, fresh=True)
+            frame = task_licenses(ids, extractive=extractive, multilingual=multilingual, fresh=True)
             licenses.update({r.id: (r.license, r.license_use) for r in frame.itertuples()})
     licenses.update({t: ("mit", "commercial") for t, e in tasks if e is None})
     limits = train_limits([t for t, _ in tasks], args.max_rows, args.max_collection_rows)
@@ -199,7 +216,7 @@ def build(args):
                 "collection_rows": COLLECTION_ROWS, "source_rows": SOURCE_ROWS, "max_fields": args.max_fields, "max_empty_share": args.max_empty_share, "seed": args.seed,
                 "rows": {s: len(r) for s, r in dataset.items()},
                 "revisions": {t: PROCEDURAL_REVISION if e is None else
-                              __import__("tasksource").task_provenance(t, extractive=e).get("revision") for t, e in tasks}}
+                              __import__("tasksource").task_provenance(t, **catalog(t, e)).get("revision") for t, e in tasks}}
     (args.output / "build-manifest.json").write_text(json.dumps(manifest, indent=1) + "\n")
     dataset.save_to_disk(str(args.output / "dataset"))
     return dataset, manifest

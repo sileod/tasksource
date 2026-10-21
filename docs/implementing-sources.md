@@ -43,7 +43,9 @@ extractive QA in `extractive_tasks.py`.
   fine, record `license_use: non-commercial` (FiNER-ORD, GUM, VUA, FCE, QAConv). Skip only data that
   may not be redistributed (e.g. Yelp review terms), gated data you cannot read, and sources whose
   labels are documented as unreliable (tner/fin).
-- English (other languages go to the multilingual catalog).
+- English (other languages go to the multilingual catalog). The extraction config's multilingual
+  peppering is language-balanced (1,600 training rows per language in `SOURCE_ROWS`): its NER sources live
+  in `multilingual_tasks.py` and the builder's `MULTILINGUAL`, its QA sources in `extractive_tasks.py`.
 
 ## Sources and pins
 
@@ -79,6 +81,11 @@ extractive QA in `extractive_tasks.py`.
   majority silently drops boundary disagreements (6-7% of majority-masked characters in TAB).
 - QA sources with fixed slots (one question per entity type or attribute) set `metadata["field"]` for readable
   field names and `metadata["group"]` for balanced rows (TAB, WDC PAVE).
+- The extraction builder's duplicate check hashes `(source, state, field instructions)`, not the answers or
+  `metadata["group"]`: a document with several same-schema groups asking the *same* fixed questions (two events
+  in one PHEE sentence, both asking Trigger/Subject/Treatment/Effect) silently collides and drops one group's
+  answers. Identify the event in the question by something readable in the text, such as its trigger with
+  offsets (PHEE, RAMS, CASIE), never by an ordinal the reader cannot recover.
 - `--max-empty-share` only subsamples NER texts. QA-path sources whose always-asked fields are mostly null
   (negation cues: BioScope, Sherlock) cap all-null groups in the task with `span_structure.cap_null_groups`; the
   mirror keeps every sentence.
