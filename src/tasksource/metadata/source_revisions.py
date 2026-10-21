@@ -5,6 +5,7 @@ SOURCE_REVISIONS = {
     'extraordinarylab/harvey-ner': 'd96281eeeed9fbc4051dce043647f66514d6f85c',
 
     'BramVanroy/universal_ner': '0dc5199b095f864c619c13190b32341eee0c2ce2',
+    "tasksource/curlie-domains": "a2f5176ea155c61be3a0a277a90aabe0dc4b1a9b",
     "masakhane/masakhaner2": "a11b3e2dc7b4425c6d9a77b67d269823154eea00",  # refs/convert/parquet
     "AmazonScience/massive": "ed58ac423a2f4121720918bf5301577edce4ffd3",  # refs/convert/parquet
     'bigbio/bionlp_st_2013_cg': '126fa3094c985a90731e7073668486e35ff6a9ba',

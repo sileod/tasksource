@@ -675,6 +675,14 @@ hate_speech_offensive = Classification(sentence1="tweet", labels="class", splits
 yahoo_answers_topics = Classification(
     "question_title","question_content",labels="topic")
 
+# Curlie web-directory category of an apex domain name, from the name alone; many names carry little signal,
+# so the source is capped. 98% of domains have one category; multi-category domains are left out.
+curlie_domains = Classification(sentence1="domain", labels="labels", dataset_name="tasksource/curlie-domains",
+    question="Which top-level Curlie web-directory category does the website with this domain name belong to?",
+    max_examples=5000, pre_process=lambda ds: _single_label(ds, "labels").cast_column("labels", ClassLabel(
+        names=[n.replace("_", " ") for n in ds["train"].features["labels"].feature.names])),
+    load_dataset_kwargs={"revision": SOURCE_REVISIONS["tasksource/curlie-domains"]})
+
 # popularity bands from the dataset's BigQuery thresholds on score, favorites and views
 stackoverflow_questions=Classification("title","body",labels="label", ordinal=True,
     question="How popular is this Stack Overflow question?",

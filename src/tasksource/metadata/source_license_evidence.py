@@ -48,6 +48,11 @@ SOURCE_LICENSE_EVIDENCE = {
     'massive-slots': {'license': 'cc-by-4.0', 'license_use': 'commercial', 'checked': '2026-10-21',
         'url': 'https://huggingface.co/datasets/AmazonScience/massive',
         'scope': 'MASSIVE 1.1: voice-assistant utterances localized from SLURP by professional translators, with slot/intent/grammar judged by three further annotator workers per row (``judgments``), not machine-translated or auto-labeled. Hub card declares CC BY 4.0. Only Hindi (hi-IN) is used here; ``annot_utt`` bracket spans are parsed into BIO tags in tasksource.tasks._massive_slots.'},
+    'curlie-domains': {'license': 'cc-by-4.0', 'license_use': 'commercial', 'checked': '2026-10-21',
+        'url': 'https://zenodo.org/records/19943663',
+        'scope': 'Curlie Domain-Level Multi-Label Content Classification Benchmark (Weiss and Baumann, 2026): apex domains with '
+                 'human-edited Curlie directory categories, via the Homepage2Vec release; CC BY 4.0, attribute Curlie and '
+                 'the Homepage2Vec authors. tasksource/curlie-domains mirrors its native splits.'},
     'uner': {'license': 'cc-by-sa-4.0', 'license_use': 'commercial', 'checked': '2026-10-20',
         'url': 'https://huggingface.co/datasets/universalner/universal_ner#licensing-information',
         'scope': 'UNER human PER/ORG/LOC annotations over UD treebanks, including human-derived transfers. Existing data-only copy preserves native tokens, tags, annotator identities and splits. Underlying UD source terms remain applicable; GSDSIMP is excluded as a duplicate of GSD.'},
