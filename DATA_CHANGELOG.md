@@ -4,6 +4,10 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource/procedural-extraction v2026.10.21
+
+- `business_document_extraction`: documents no longer print a start-of-term date, which a reader could take for the commencement date that some documents leave out (gold null). Other configs are unchanged.
+
 ## tasksource-jev-typed-decisions v2026.10.20.7
 
 - `extraction`: add web pages (WebSRC answer spans, SWDE attribute values in eight verticals), English span structure (Universal Dependencies EWT and GUM subtrees by relation, PreCo coreference mentions, Re-DocRED entities, CoNLL-2000 chunks), entity sources (BC4CHEMD chemicals, HarveyNER, BioNLP-CG, BioInfer, UNER English) and four procedural generators (typed mentions, business documents, nested configurations, raw HTML). 105 sources, 498,522 training, 35,743 validation and 38,574 test rows.
