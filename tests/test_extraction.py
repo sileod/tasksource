@@ -1,3 +1,4 @@
+import hashlib
 import json
 import re
 
@@ -985,3 +986,145 @@ def test_phee_records_identify_events_by_trigger_offsets():
 
     for grouped in qa_rows(records, 'phee', 'train', 8, kind='list'):
         check(grouped)
+
+
+def _write_abstrct_fixture(root, text, spans):
+    """One brat .txt/.ann abstract pair; ``spans`` is ``[(label, start, end)]``, offsets taken from
+    ``text`` itself so the fixture is always verbatim by construction."""
+    (root.parent / f'{root.name}.txt').write_text(text)
+    lines = [f'T{i}\t{label} {s} {e}\t{text[s:e]}\n' for i, (label, s, e) in enumerate(spans, 1)]
+    (root.parent / f'{root.name}.ann').write_text(''.join(lines))
+
+
+def test_abstrct_spans_repackage_is_document_level_and_verbatim(tmp_path):
+    """AbstRCT (Mayer, Cabrio and Villata, ECAI 2020): major-claim/claim/premise spans over the full
+    abstract (not per-sentence BIO), repackaged from the authors' brat release, 2026-10-21 rework.
+    Runs scripts/repackage_dataset/abstrct_spans.py end to end against a small fixture archive built
+    to look like the real GitLab release, so the task can be validated before the mirror is published."""
+    import zipfile
+    from scripts.repackage_dataset.abstrct_spans import convert
+
+    revision = 'deadbeef' * 5
+    root = tmp_path / 'src' / f'abstrct-{revision}' / 'AbstRCT_corpus' / 'data'
+
+    t1 = "This drug improves outcomes. It also reduces pain in patients."
+    (root / 'train' / 'neoplasm_train').mkdir(parents=True)
+    _write_abstrct_fixture(root / 'train' / 'neoplasm_train' / '1', t1,
+        [('Claim', 0, t1.index('.') + 1), ('Premise', t1.index('It also'), len(t1))])
+
+    t2 = "No major claim is stated here either way at all."
+    (root / 'dev' / 'neoplasm_dev').mkdir(parents=True)
+    _write_abstrct_fixture(root / 'dev' / 'neoplasm_dev' / '2', t2, [])
+
+    t3 = "A wide ranging major claim opens this abstract for review purposes."
+    (root / 'test' / 'neoplasm_test').mkdir(parents=True)
+    _write_abstrct_fixture(root / 'test' / 'neoplasm_test' / '3', t3, [('MajorClaim', 0, len(t3))])
+
+    t4 = "Glaucoma abstract text for cross domain testing purposes only."
+    (root / 'test' / 'glaucoma_test').mkdir(parents=True)
+    _write_abstrct_fixture(root / 'test' / 'glaucoma_test' / '4', t4, [])
+
+    t5 = "Mixed domain abstract text for cross domain testing purposes."
+    (root / 'test' / 'mixed_test').mkdir(parents=True)
+    _write_abstrct_fixture(root / 'test' / 'mixed_test' / '5', t5, [])
+
+    license_dir = tmp_path / 'src' / f'abstrct-{revision}'
+    (license_dir / 'LICENSE').write_text(
+        'Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License:\n'
+        'https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode\n')
+
+    archive = tmp_path / 'abstrct_fixture.zip'
+    with zipfile.ZipFile(archive, 'w') as zf:
+        for path in (tmp_path / 'src').rglob('*'):
+            if path.is_file():
+                zf.write(path, path.relative_to(tmp_path / 'src'))
+    sha256 = hashlib.sha256(archive.read_bytes()).hexdigest()
+
+    output = tmp_path / 'out'
+    convert(archive, output, revision=revision, sha256=sha256)
+
+    from datasets import load_dataset
+    neoplasm_train = load_dataset('parquet', data_files=str(output / 'train.parquet'))['train']
+    by_field = {json.loads(r['metadata'])['field']: r for r in neoplasm_train}
+    assert by_field['claim']['answers']['text'] == ['This drug improves outcomes.']
+    assert by_field['premise']['answers']['text'] == ['It also reduces pain in patients.']
+    assert by_field['major_claim']['answers']['text'] == []  # no MajorClaim in this abstract
+    for r in neoplasm_train:
+        for text, start in zip(r['answers']['text'], r['answers']['answer_start']):
+            assert r['context'][start:start + len(text)] == text  # verbatim at its offset
+        assert json.loads(r['metadata'])['group'] == 'neoplasm:1'  # document-level group, not sentence
+
+    neoplasm_dev = load_dataset('parquet', data_files=str(output / 'validation.parquet'))['train']
+    assert all(not r['answers']['text'] for r in neoplasm_dev)  # abstract 2 has no annotated spans
+
+    neoplasm_test = load_dataset('parquet', data_files=str(output / 'test.parquet'))['train']
+    major_claim = next(r for r in neoplasm_test if json.loads(r['metadata'])['field'] == 'major_claim')
+    assert major_claim['answers']['text'] == [t3]
+
+    glaucoma_test = load_dataset('parquet', data_files=str(output / 'glaucoma' / 'test.parquet'))['train']
+    mixed_test = load_dataset('parquet', data_files=str(output / 'mixed' / 'test.parquet'))['train']
+    assert len(glaucoma_test) and len(mixed_test)  # test-only cross-domain configs are produced too
+
+    provenance = json.loads((output / 'provenance.json').read_text())
+    assert provenance['license'] == 'cc-by-nc-sa-4.0'
+    assert provenance['rows']['neoplasm/train'] == 3  # 3 fields (major_claim, claim, premise) x 1 abstract
+    assert (output / 'README.md').exists()
+
+
+def test_abstrct_neoplasm_points_at_the_mirror_and_is_list_qa():
+    from tasksource.extractive_tasks import abstrct_neoplasm
+    from scripts.build_jev_extraction import LIST_QA
+
+    assert abstrct_neoplasm.dataset_name == 'tasksource/abstrct-spans'
+    assert abstrct_neoplasm.config_name == 'neoplasm'
+    assert not abstrct_neoplasm.complete_splits
+    assert 'abstrct/neoplasm' in LIST_QA
+    # The source no longer exists as a per-sentence token-labeling source.
+    import tasksource.tasks as tasks_module
+    assert not hasattr(tasks_module, 'abstrct_neoplasm')
+
+
+def test_gum_segmentation_windows_at_edu_boundaries_and_drops_reddit():
+    """GUM EDU segmentation (src/tasksource/extractive_tasks.py): a window boundary always falls on an
+    EDU boundary (never cuts a span), and Reddit documents (redistributed as underscored placeholders,
+    not real text) are dropped."""
+    from tasksource.extractive_tasks import (_gum_segmentation_docs, _gum_segmentation_windows,
+        _gum_segmentation_records)
+
+    lines = [
+        '# newdoc_id = GUM_test_doc',
+        '1\tHello\t_\t_\t_\t_\t_\t_\t_\tBeginSeg=Yes',
+        '2\tworld\t_\t_\t_\t_\t_\t_\t_\t_',
+        '3\t.\t_\t_\t_\t_\t_\t_\t_\t_',
+        '4\tBye\t_\t_\t_\t_\t_\t_\t_\tBeginSeg=Yes',
+        '5\tnow\t_\t_\t_\t_\t_\t_\t_\t_',
+        '# newdoc_id = GUM_reddit_thread',
+        '1\t___\t_\t_\t_\t_\t_\t_\t_\tBeginSeg=Yes',
+        '2\t__\t_\t_\t_\t_\t_\t_\t_\t_',
+    ]
+    docs = _gum_segmentation_docs(lines)
+    assert [d[0] for d in docs] == ['GUM_test_doc']  # reddit doc dropped
+
+    doc_id, tokens, begins = docs[0]
+    windows = list(_gum_segmentation_windows(doc_id, tokens, begins, window=2))
+    # Window boundaries land on EDU starts, never mid-EDU: 2nd window starts at the 2nd BeginSeg token.
+    assert [w[1] for w in windows] == [['Hello', 'world', '.'], ['Bye', 'now']]
+
+    # At the module's default window (larger than this toy document), the whole document is one window.
+    records = list(_gum_segmentation_records(lines))
+    assert len(records) == 1
+    record = records[0]
+    for text, start in zip(record['answers']['text'], record['answers']['answer_start']):
+        assert record['context'][start:start + len(text)] == text
+    assert record['answers']['text'] == ['Hello world .', 'Bye now']
+
+
+def test_gum_segmentation_writes_multiword_tokens_once():
+    from tasksource.extractive_tasks import _gum_segmentation_docs
+    row = lambda i, t, seg=False: f"{i}\t{t}\t_\t_\t_\t_\t_\t_\t_\t{'BeginSeg=Yes' if seg else '_'}"
+    lines = ['# newdoc_id = GUM_news_x', row(1, 'We', True), row('2-3', 'don’t'), row(2, 'do'), row(3, 'n’t'),
+             row(4, 'go'), row('5-6', 'cannot'), row(5, 'can'), row(6, 'not', True), row(7, 'stop')]
+    [(_, tokens, begins)] = _gum_segmentation_docs(lines)
+    # Surface form when no EDU starts inside; parts kept when one does.
+    assert tokens == ['We', 'don’t', 'go', 'can', 'not', 'stop']
+    assert begins == [True, False, False, False, True, False]

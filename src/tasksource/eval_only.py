@@ -76,6 +76,17 @@ def _mrqa_eval(subset):
                              'verification_mode': 'no_checks'})
 
 
+# AbstRCT (Mayer, Cabrio and Villata, ECAI 2020) cross-domain transfer test sets: no training abstracts.
+# Same tasksource/abstrct-spans mirror and schema as abstrct_neoplasm in extractive_tasks.py.
+abstrct_glaucoma = ExtractiveQA(dataset_name='tasksource/abstrct-spans', config_name='glaucoma',
+    task_id='abstrct-eval/glaucoma', splits=('test', None, None), complete_splits=False,
+    metadata='metadata', max_mismatch=0,
+    load_dataset_kwargs={'revision': SOURCE_REVISIONS['tasksource/abstrct-spans']})
+abstrct_mixed = ExtractiveQA(dataset_name='tasksource/abstrct-spans', config_name='mixed',
+    task_id='abstrct-eval/mixed', splits=('test', None, None), complete_splits=False,
+    metadata='metadata', max_mismatch=0,
+    load_dataset_kwargs={'revision': SOURCE_REVISIONS['tasksource/abstrct-spans']})
+
 mrqa_bioasq = _mrqa_eval('BioASQ')
 mrqa_drop = _mrqa_eval('DROP')
 mrqa_duorc = _mrqa_eval('DuoRC.ParaphraseRC')
@@ -249,6 +260,8 @@ cladder = Classification(_cladder_context, "question", "answer", dataset_name="t
     pre_process=lambda ds: ds.filter(lambda x: bool(x["reasoning"]["step1"])))
 
 REASONS = {
+    'abstrct_glaucoma': 'AbstRCT cross-domain transfer test set (Mayer et al. train on neoplasm only); no training abstracts',
+    'abstrct_mixed': 'AbstRCT cross-domain transfer test set (Mayer et al. train on neoplasm only); no training abstracts',
     **{f'mrqa_{name}': 'MRQA out-of-domain subset has source test rows only; no genuine training split'
        for name in ('bioasq', 'drop', 'duorc', 'race', 'relation_extraction', 'textbookqa')},
     **{f'qa4mre_{year}': 'QA4MRE main-task questions are CLEF campaign test sets (120-284 per year); no training questions'

@@ -3391,5 +3391,102 @@
       "https://huggingface.co/datasets/community-datasets/qa4mre/blob/a6ba3ed66833455732993c7d2daeb2f397785be0/README.md"
     ],
     "reconsider_if": "A training partition of reading-test questions is released."
+  },
+  {
+    "name": "CURT (Claim Span Identification in Tweets)",
+    "scope": "source",
+    "tasks": [],
+    "status": "deferred",
+    "reason_code": "source_access_required",
+    "reason": "Sundriyal et al. (EMNLP 2022) introduce CURT, 9,458 claim spans over 7,555 tweets with human BIO annotation. The paper's code repository (LCS2-IIITD/DABERTA-EMNLP-2022) ships no data: its README instructs users to supply their own train/test/validation files in an empty dataset/ folder. No Hub mirror of the labeled tweets was found; the one Hub dataset with a matching name (ariondas/claim-span-dataset) is gated and could not be inspected.",
+    "evidence": [
+      "https://aclanthology.org/2022.emnlp-main.525/",
+      "https://github.com/LCS2-IIITD/DABERTA-EMNLP-2022",
+      "https://huggingface.co/datasets/ariondas/claim-span-dataset"
+    ],
+    "checked_on": "2026-10-21",
+    "reconsider_if": "The authors publish the labeled tweets (or tweet IDs plus spans) in a readable location, or the gated Hub copy is confirmed to be a faithful, accessible mirror.",
+    "huggingface": [
+      "ariondas/claim-span-dataset"
+    ],
+    "github": [
+      "LCS2-IIITD/DABERTA-EMNLP-2022"
+    ],
+    "papers": [
+      "2022.emnlp-main.525"
+    ],
+    "source_revisions": {},
+    "reviews": [
+      {
+        "reviewer": {
+          "kind": "model",
+          "model": "claude-sonnet-5",
+          "model_id_source": "session"
+        },
+        "checked_on": "2026-10-21",
+        "verdict": "defer",
+        "findings": "No usable download for the labeled data exists (empty dataset/ folder in the authors' repo; gated Hub copy).",
+        "evidence": [
+          "https://github.com/LCS2-IIITD/DABERTA-EMNLP-2022",
+          "https://huggingface.co/datasets/ariondas/claim-span-dataset"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "AbstRCT glaucoma",
+    "annotation": "tasksource.eval_only.abstrct_glaucoma",
+    "scope": "dataset",
+    "tasks": [
+      "abstrct-eval/glaucoma"
+    ],
+    "huggingface": [],
+    "github": [
+      "https://gitlab.com/tomaye/abstrct"
+    ],
+    "papers": [
+      {
+        "url": "https://ebooks.iospress.nl/doi/10.3233/FAIA200334"
+      }
+    ],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "AbstRCT cross-domain transfer test set (Mayer et al. train on neoplasm only); no training abstracts",
+    "checked_on": "2026-10-21",
+    "source_revisions": {
+      "gitlab.com/tomaye/abstrct": "f856f1ca7514caa4094194b5623e84c159d9bf1d"
+    },
+    "evidence": [
+      "https://gitlab.com/tomaye/abstrct/-/blob/f856f1ca7514caa4094194b5623e84c159d9bf1d/LICENSE"
+    ],
+    "reconsider_if": "The publisher releases training abstracts for this domain."
+  },
+  {
+    "name": "AbstRCT mixed",
+    "annotation": "tasksource.eval_only.abstrct_mixed",
+    "scope": "dataset",
+    "tasks": [
+      "abstrct-eval/mixed"
+    ],
+    "huggingface": [],
+    "github": [
+      "https://gitlab.com/tomaye/abstrct"
+    ],
+    "papers": [
+      {
+        "url": "https://ebooks.iospress.nl/doi/10.3233/FAIA200334"
+      }
+    ],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "AbstRCT cross-domain transfer test set (Mayer et al. train on neoplasm only); no training abstracts",
+    "checked_on": "2026-10-21",
+    "source_revisions": {
+      "gitlab.com/tomaye/abstrct": "f856f1ca7514caa4094194b5623e84c159d9bf1d"
+    },
+    "evidence": [
+      "https://gitlab.com/tomaye/abstrct/-/blob/f856f1ca7514caa4094194b5623e84c159d9bf1d/LICENSE"
+    ],
+    "reconsider_if": "The publisher releases training abstracts for this domain."
   }
 ]

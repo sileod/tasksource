@@ -143,7 +143,8 @@ SOURCE_REVISIONS = {
     "tasksource/wands": "96a856e9d45eb0e5847a07a026d07f2b13092733",
     "theatticusproject/cuad-qa": "d9c4ee0250ae2eb97bdb5b50773ab14ea62d0631",
     "theatticusproject/maud": "37d5c3b95d18dcd8404cc5ce3fd5069be062392f",
-    "wenhu/tab_fact": "cecfbe87432b0e7fdcac4578f8ac6fc87d08db76"
+    "wenhu/tab_fact": "cecfbe87432b0e7fdcac4578f8ac6fc87d08db76",
+    "tasksource/abstrct-spans": "c4b6010f561530cd8f99bdc8fc60fabc1d7547f5",
 }
 
 # Original UNER files missing from usable Hub uploads; local conversion only.

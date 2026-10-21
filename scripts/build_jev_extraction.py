@@ -34,7 +34,7 @@ PROCEDURAL = ["record_field_extraction", "state_update_extraction", "conditional
 # Multi-span answers are sets (every span is part of the answer), not alternatives.
 LIST_QA = {"quoref", "cuad/spans", "qasper/spans", "tab/pii", "ud/ewt", "ud/gum", "preco/mentions", "redocred/entities",
            "qasrl/orig", "bioscope/abstracts", "bioscope/papers", "sherlock/scopes", "multispanqa",
-           "rams/role", "casie/role", "phee"}
+           "rams/role", "casie/role", "phee", "gum/segmentation", "abstrct/neoplasm"}
 NER = {
     "conll2000": "Every {name} chunk in the text, as written.",
     "vuamc": "Every metaphorically used word or phrase in the text, as written.",

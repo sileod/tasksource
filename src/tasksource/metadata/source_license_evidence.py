@@ -5,12 +5,28 @@ Keys are task families, shared by their visual classification/MC views.
 """
 
 SOURCE_LICENSE_EVIDENCE = {
+    'abstrct': {'license': 'cc-by-nc-sa-4.0', 'license_use': 'non-commercial', 'checked': '2026-10-21',
+        'url': 'https://gitlab.com/tomaye/abstrct/-/blob/f856f1ca7514caa4094194b5623e84c159d9bf1d/LICENSE',
+        'scope': 'AbstRCT (Mayer, Cabrio and Villata, ECAI 2020): major-claim/claim/premise argument-component '
+                 'spans in MEDLINE RCT abstracts, brat-annotated by two experts with adjudication, full abstract '
+                 'as context. Original gitlab.com/tomaye/abstrct release (pinned revision '
+                 'f856f1ca7514caa4094194b5623e84c159d9bf1d) states CC BY-NC-SA 4.0 in its own LICENSE file. '
+                 'Repackaged by scripts/repackage_dataset/abstrct_spans.py into the '
+                 'tasksource/abstrct-spans mirror: native neoplasm train/dev/test is `abstrct/neoplasm`; '
+                 'glaucoma and mixed configs are test-only cross-domain transfer sets.'},
     'ud/ewt': {'license': 'cc-by-sa-4.0', 'license_use': 'commercial', 'checked': '2026-10-20',
         'url': 'https://github.com/UniversalDependencies/UD_English-EWT/blob/4a4d77f599ea53cc405f85d0cec4b2f14f81d42b/LICENSE.txt',
         'scope': 'Human-corrected English Web Treebank basic dependencies; full-subtree answers derived procedurally. Native train/dev/test. Hub UD 2.18 data-only upload.'},
     'ud/gum': {'license': 'cc-by-nc-sa-4.0', 'license_use': 'non-commercial', 'checked': '2026-10-20',
         'url': 'https://github.com/UniversalDependencies/UD_English-GUM/blob/1fe635509c649e376dfb449d528424ab78f4eaee/LICENSE.txt',
         'scope': 'Human-corrected Georgetown University Multilayer corpus basic dependencies. Mixed underlying text terms; aggregate non-commercial share-alike license. UD upload excludes separately licensed Reddit text.'},
+    'gum/segmentation': {'license': 'cc-by-nc-sa-4.0', 'license_use': 'non-commercial', 'checked': '2026-10-21',
+        'url': 'https://gucorpling.org/gum/',
+        'scope': 'GUM elementary discourse unit (EDU) segmentation (Zeldes 2017; RST-DT-style guidelines), gold '
+                 'human annotation from the DISRPT 2023 shared task native eng.rst.gum release. Annotations are '
+                 'CC BY 4.0 but underlying source texts mix licenses (wikiHow genre is CC BY-NC-SA), so the '
+                 'aggregate corpus is treated as non-commercial, matching extractive_tasks.ud_gum. The Reddit '
+                 'genre is redistributed as underscored placeholder tokens (no usable text) and is dropped.'},
     'redocred': {'license': 'mit', 'license_use': 'commercial', 'checked': '2026-10-20',
         'url': 'https://huggingface.co/datasets/tonytan48/Re-DocRED/blob/e0ab3489edfe72c968261bffed5243b6fefddd22/README.md',
         'scope': 'Author upload of human-revised train/dev/test DocRED annotations; no train_distant. MIT card covers annotation distribution; Wikipedia documents retain source terms.'},

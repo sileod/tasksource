@@ -58,6 +58,7 @@ REVISIONS = {
     'tasksource/qasrl-bank-spans': 'cdef9250905c169a1bb8e2a2752dd906988352fa',
     'tasksource/bioscope-spans': '042825641b80ee236d1df7be6e260cbbf573b875',
     'tasksource/sherlock-negation-spans': 'a99de3f3bfc69fe7e7d631171f9ea8807a955419',
+    'tasksource/abstrct-spans': 'c4b6010f561530cd8f99bdc8fc60fabc1d7547f5',
 
     # mneb event-extraction repackages (same template/org as mneb/maven and mneb/maven-arg, already
     # used for the maven classification views): input text, output.json_structures per event type.
@@ -933,6 +934,18 @@ sherlock_scopes = ExtractiveQA(dataset_name='tasksource/sherlock-negation-spans'
     load_dataset_kwargs=_kwargs('tasksource/sherlock-negation-spans'))
 
 
+# AbstRCT (Mayer, Cabrio and Villata, ECAI 2020): major-claim/claim/premise argument-component spans in
+# MEDLINE RCT abstracts, brat-annotated by two experts with adjudication. Unlike a per-sentence BIO view,
+# the context is the full abstract: whether a sentence is a claim or a premise depends on the rest of the
+# abstract (the native .ann spans are document-level, not sentence-level). Data-only tasksource mirror
+# (scripts/repackage_dataset/abstrct_spans.py) of the authors' brat release (gitlab.com/tomaye/abstrct,
+# pinned revision f856f1ca7514caa4094194b5623e84c159d9bf1d, CC BY-NC-SA 4.0). glaucoma and mixed configs
+# are test-only cross-domain transfer sets (see eval_only.py); only neoplasm has training abstracts.
+abstrct_neoplasm = ExtractiveQA(dataset_name='tasksource/abstrct-spans', config_name='neoplasm',
+    task_id='abstrct/neoplasm', complete_splits=False, metadata='metadata', max_mismatch=0,
+    load_dataset_kwargs=_kwargs('tasksource/abstrct-spans'))
+
+
 # PHEE: pharmacovigilance event extraction from MEDLINE case reports and biomedical literature (Sun et al.,
 # EMNLP 2022). Annotated by 15 trained CS/medical PhD students against a schema reviewed with
 # pharmacovigilance and biomedical-NLP researchers; native train/dev/test splits (document-disjoint), pinned
@@ -1010,3 +1023,100 @@ phee = ExtractiveQA(dataset_name='text', task_id='phee', complete_splits=False, 
     pre_process=_phee,
     load_dataset_kwargs={'data_files': {'train': _PHEE_URL + 'train.json', 'validation': _PHEE_URL + 'dev.json',
                                          'test': _PHEE_URL + 'test.json'}})
+
+
+# GUM (Georgetown University Multilayer Corpus, Zeldes 2017) elementary discourse unit segmentation,
+# from the DISRPT 2023 shared task's native ``eng.rst.gum`` release (pinned GitHub commit,
+# github.com/disrpt/sharedtask2023). Each token's ``.tok`` CoNLL-style row carries ``BeginSeg=Yes`` when
+# it opens a new EDU (expert RST-DT-style segmentation, gold for 11 of 12 GUM genres); the Reddit
+# forum-discussion genre is redistributed as underscored placeholder tokens (its text requires a separate
+# reconstruction step DISRPT does not provide data for) and is dropped. Long documents are windowed so a
+# window boundary never falls inside an EDU, at a token budget that keeps windows legible; EDU boundaries
+# define the window edges, so this also never cuts a span. The corpus mixes CC BY-licensed Wikimedia/other
+# text with CC BY-NC-SA wikiHow text (same aggregate non-commercial treatment as ``extractive_tasks.ud_gum``).
+_GUM_SEGMENTATION_COMMIT = '6484f9d7bb0fd2b0b5a11cc630bd4c22184a3867'
+_GUM_SEGMENTATION_URL = (f'https://raw.githubusercontent.com/disrpt/sharedtask2023/{_GUM_SEGMENTATION_COMMIT}'
+                          '/data/eng.rst.gum/eng.rst.gum_')
+_GUM_SEGMENTATION_WINDOW = 120
+
+
+def _gum_segmentation_docs(lines):
+    """``[(doc_id, tokens, begin_seg)]`` from a DISRPT ``.tok`` file's lines; Reddit documents dropped
+    (their tokens are redistributed as underscored placeholders, not real text). A multiword token (don't =
+    do + n't) is written once as its surface form, unless an EDU starts inside it: then its parts are kept."""
+    docs, doc_id, tokens, begins, mwt = [], None, [], [], None
+
+    def flush():
+        surface, last, parts = mwt
+        if any(flag for _, flag in parts[1:]):
+            tokens.extend(t for t, _ in parts)
+            begins.extend(flag for _, flag in parts)
+        else:
+            tokens.append(surface)
+            begins.append(parts[0][1] if parts else False)
+
+    for line in lines:
+        if line.startswith('# newdoc_id'):
+            if tokens:
+                docs.append((doc_id, tokens, begins))
+            doc_id, tokens, begins = line.split('=', 1)[1].strip(), [], []
+        elif not line.strip() or line.startswith('#'):
+            continue
+        else:
+            cols = line.split('\t')
+            if '-' in cols[0]:
+                mwt = (cols[1], int(cols[0].split('-')[1]), [])
+                continue
+            if '.' in cols[0]:
+                continue
+            if mwt:
+                mwt[2].append((cols[1], 'BeginSeg=Yes' in cols[-1]))
+                if int(cols[0]) == mwt[1]:
+                    flush()
+                    mwt = None
+                continue
+            tokens.append(cols[1])
+            begins.append('BeginSeg=Yes' in cols[-1])
+    if tokens:
+        docs.append((doc_id, tokens, begins))
+    return [(doc_id, tokens, begins) for doc_id, tokens, begins in docs if 'reddit' not in doc_id.lower()]
+
+
+def _gum_segmentation_windows(doc_id, tokens, begins, window=_GUM_SEGMENTATION_WINDOW):
+    """Document token runs split at EDU boundaries, each window at least ``window`` tokens (the last
+    window of a document may be shorter); a window boundary is always an EDU boundary."""
+    start = 0
+    for i in range(1, len(tokens) + 1):
+        at_end = i == len(tokens)
+        if at_end or (i - start >= window and begins[i]):
+            yield doc_id, tokens[start:i], begins[start:i]
+            start = i
+
+
+def _gum_segmentation_records(lines):
+    for doc_id, tokens, begins in _gum_segmentation_docs(lines):
+        for w, (window_tokens, window_begins) in enumerate(
+                (t, b) for _, t, b in _gum_segmentation_windows(doc_id, tokens, begins)):
+            text, starts = token_offsets(window_tokens)
+            bounds = [i for i, b in enumerate(window_begins) if b] + [len(window_tokens)]
+            spans = [token_span(window_tokens, starts, bounds[j], bounds[j + 1]) for j in range(len(bounds) - 1)]
+            yield _span_record(text, 'Every elementary discourse unit in the text, as written.',
+                {'text': [text[a:b] for a, b in spans], 'answer_start': [a for a, _ in spans]},
+                doc_id=doc_id, window=w)
+
+
+def _gum_segmentation(dataset):
+    from datasets import Dataset, DatasetDict, Features, List
+    features = Features({'context': Value('string'), 'question': Value('string'),
+        'answers': {'text': List(Value('string')), 'answer_start': List(Value('int32'))},
+        'metadata': Value('string')})
+    return DatasetDict({split: Dataset.from_list(
+        list(_gum_segmentation_records(rows['text'])), features=features)
+        for split, rows in dataset.items()})
+
+
+gum_segmentation = ExtractiveQA(dataset_name='text', task_id='gum/segmentation', complete_splits=False,
+    metadata='metadata', max_mismatch=0, pre_process=_gum_segmentation,
+    load_dataset_kwargs={'data_files': {'train': _GUM_SEGMENTATION_URL + 'train.tok',
+                                         'validation': _GUM_SEGMENTATION_URL + 'dev.tok',
+                                         'test': _GUM_SEGMENTATION_URL + 'test.tok'}})

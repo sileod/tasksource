@@ -387,6 +387,17 @@ NOT_ANNOTATED = {
               "J. Neuroscience...); the repository's MIT license covers the authors' code and annotation "
               "layer, not copyright over the extracted publisher full text, so most of the corpus may not be "
               "redistributed"),
+    "argument-annotated-essays": ("restricted", "Argument Annotated Essays v2 (Stab & Gurevych, major "
+              "claim/claim/premise spans over persuasive essays; tudatalib.ulb.tu-darmstadt.de/handle/tudatalib/2422) "
+              "is behind an anti-bot challenge (Anubis) in this environment, so the actual download-page terms "
+              "could not be read directly. Secondary sources conflict: some cite a page-footer 'CC BY 4.0' notice, "
+              "others report a UKP TU Darmstadt data-sharing agreement whose clause 2.2 forbids publishing, "
+              "redistributing or displaying the data. The only Hub copies are a script-only loader that re-downloads "
+              "the same TU Darmstadt zip (Theoreticallyhugo/Stab-Gurevych-Essays, no parquet conversion) and an "
+              "unrelated synthetic LLM-generated/annotated dataset (DriftLogic/Annotated_Persuasive_Essays, "
+              "AI-written essays with AI-assigned argument labels, not human annotation of the original corpus). "
+              "Do not add until the original terms are read directly and, if permissive, the corpus is repackaged "
+              "from the authors' zip under scripts/repackage_dataset/."),
 }
 
 
