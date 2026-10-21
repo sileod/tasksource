@@ -27,10 +27,10 @@ REPO = "tasksource/tasksource-jev-typed-decisions"
 EXCLUDED_QA = {"newsqa"}
 # Procedural extraction (reasoning-core generators, scripts/build_procedural_extraction.py): one source per
 # generator, each capped like any other source, so equal shares. Pinned Hub snapshot of the published data.
-PROCEDURAL_REPO, PROCEDURAL_REVISION = "tasksource/procedural-extraction", "4fe51430ff2ec6d770ec85441c98ff86ad9558f9"
+PROCEDURAL_REPO, PROCEDURAL_REVISION = "tasksource/procedural-extraction", "ee40c9664ab772661f96aa71e4977d2abe686816"
 PROCEDURAL = ["record_field_extraction", "state_update_extraction", "conditional_list_extraction",
               "log_query_extraction", "typed_mention_extraction", "business_document_extraction",
-              "nested_structure_extraction", "html_extraction"]
+              "nested_structure_extraction", "html_extraction", "date_range_extraction", "spec_match_extraction"]
 # Multi-span answers are sets (every span is part of the answer), not alternatives.
 LIST_QA = {"quoref", "cuad/spans", "qasper/spans", "tab/pii", "ud/ewt", "ud/gum", "preco/mentions", "redocred/entities",
            "qasrl/orig", "bioscope/abstracts", "bioscope/papers", "sherlock/scopes", "multispanqa",

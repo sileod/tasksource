@@ -128,7 +128,8 @@ def main():
         parsed = parse_json(reply)
         for field, gold in zip(row["fields"], row["answers"]):
             predicted = parsed.get(field["name"]) if isinstance(parsed, dict) else None
-            predicted = [predicted] if isinstance(predicted, str) else predicted
+            predicted = [predicted] if isinstance(predicted, (str, int, float)) else predicted
+            predicted = [str(v) for v in predicted if isinstance(v, (str, int, float))] if isinstance(predicted, list) else None
             items.append({"row": row, "field": field, "gold": [v["text"] for v in gold["values"]] or None,
                           "predicted": predicted or None, "parsed": parsed is not None,
                           "agree": parsed is not None and agree(field, gold, predicted)})

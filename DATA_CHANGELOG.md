@@ -4,6 +4,12 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource/procedural-extraction v2026.10.21.1
+
+- New `date_range_extraction`: records whose date of one role falls in a range, before/after a date, in a month or on a weekday, with dates in many formats (ISO, worded, numeric under a stated day/month or month/day convention, year-less, relative to another record).
+- New `spec_match_extraction`: catalog products meeting spec requirements, with specs in mixed exact units and stated number conventions (1.234,5), near misses failing one requirement.
+- Every config is regenerated: row seeds no longer depend on the build process, so the data is reproducible from the reasoning-core commit in `provenance.json`. The other generators and their distributions are unchanged.
+
 ## tasksource/procedural-extraction v2026.10.21
 
 - `business_document_extraction`: documents no longer print a start-of-term date, which a reader could take for the commencement date that some documents leave out (gold null). Other configs are unchanged.
