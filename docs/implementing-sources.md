@@ -34,7 +34,11 @@ extractive QA in `extractive_tasks.py`.
 
 - Genuine training split; test-only sources are eval-only candidates (`eval_only.py`).
 - Human, expert or procedural labels. Silver, distant (TriviaQA, SearchQA) and unverified model
-  labels fail; model-written text verified by experts can pass (LegalLensNER), say why.
+  labels fail; model-written text verified by experts can pass (LegalLensNER), say why. A dataset
+  card's "extraction rules" or "distant supervision" can still end in a trained-model vote: MAVE
+  keeps a span only when 5 AVEQA model replicas agree, spot-checked on 1000 examples, not per-label
+  verified (`parked.NOT_ANNOTATED["google-research-datasets/MAVE"]`) — read the paper's labelling
+  section, not just the card, before trusting "rules".
 - Licenses: unspecified/unknown is fine, record `unspecified`. Non-commercial and research-only are
   fine, record `license_use: non-commercial` (FiNER-ORD, GUM, VUA, FCE, QAConv). Skip only data that
   may not be redistributed (e.g. Yelp review terms), gated data you cannot read, and sources whose

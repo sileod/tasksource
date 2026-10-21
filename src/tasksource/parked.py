@@ -364,6 +364,7 @@ NOT_ANNOTATED = {
     "WikiANN": ("unsound", "Automatic Wikipedia entity annotations, not human gold"),
     "mrqa/TriviaQA-web": ("unsound", "Distant answer matching; human trivia answers do not verify every retrieved passage span"),
     "mrqa/SearchQA": ("unsound", "Distant answer matching in retrieved snippets; no human span verification"),
+    "google-research-datasets/MAVE": ("unsound", "Positive/negative attribute-value spans are kept only when 5 AVEQA model replicas unanimously agree (Yang et al., WSDM 2022, Sec. 3.3); quality is estimated from a 1000-example manual spot check (97.8% precision), not per-label human verification, so the released 3M annotations are unverified model output, not procedural or gold labels"),
     "clue/clue cmnli": ("duplicate", "machine-translated MNLI; XNLI covers Chinese"),
     "dbarbedillo/SMS_Spam_Multilingual_Collection_Dataset": ("unsound", "machine-translated; many translations degenerate"),
     "ylacombe/xsum_factuality": ("unavailable", "no longer on the Hub"),
