@@ -95,6 +95,28 @@ prost = MultipleChoice(cat(['context','ex_question']), choices=['A','B','C','D']
     dataset_name='corypaik/prost', load_dataset_kwargs={'revision':'refs/convert/parquet'},
     splits=['test',None,None], complete_splits=False)
 
+# QA4MRE main tasks (CLEF 2011-2013): the campaigns' test questions with gold answers; no training questions exist.
+_QA4MRE_REVISION = 'a6ba3ed66833455732993c7d2daeb2f397785be0'
+
+
+def _qa4mre_rows(dataset):
+    def options(row):
+        ids, texts = row['answer_options']['answer_id'], row['answer_options']['answer_str']
+        return {'options': texts, 'label': ids.index(row['correct_answer_id'])}
+    return dataset.map(options)
+
+
+def _qa4mre(year):
+    return MultipleChoice(cat(['document_str', 'question_str']), choices_list='options', labels='label',
+        dataset_name='community-datasets/qa4mre', config_name=f'{year}.main.EN', task_id=f'qa4mre/{year}',
+        load_dataset_kwargs={'revision': _QA4MRE_REVISION}, pre_process=_qa4mre_rows, preserve_choices=True,
+        splits=['train', None, None], complete_splits=False)
+
+
+qa4mre_2011 = _qa4mre(2011)
+qa4mre_2012 = _qa4mre(2012)
+qa4mre_2013 = _qa4mre(2013)
+
 # BLiMP is an evaluation benchmark (test-only minimal pairs)
 blimp_hard = MultipleChoice(inputs=constant(''),
     choices=['sentence_good','sentence_bad'],
@@ -229,6 +251,8 @@ cladder = Classification(_cladder_context, "question", "answer", dataset_name="t
 REASONS = {
     **{f'mrqa_{name}': 'MRQA out-of-domain subset has source test rows only; no genuine training split'
        for name in ('bioasq', 'drop', 'duorc', 'race', 'relation_extraction', 'textbookqa')},
+    **{f'qa4mre_{year}': 'QA4MRE main-task questions are CLEF campaign test sets (120-284 per year); no training questions'
+       for year in (2011, 2012, 2013)},
     'prost': 'PROST is a test-only zero-shot physical-reasoning probe; its publisher explicitly provides no training data',
     'cladder': 'CLadder is a causal-reasoning evaluation benchmark, not a training source',
     'mmlu': 'MMLU is an evaluation benchmark; no train split',

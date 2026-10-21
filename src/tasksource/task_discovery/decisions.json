@@ -3307,5 +3307,89 @@
       "https://huggingface.co/datasets/mrqa-workshop/mrqa/blob/f3178d9888471dfb2b67c93de14f0ddf499a8d9f/README.md"
     ],
     "reconsider_if": "The publisher releases a training partition for this out-of-domain subset."
+  },
+  {
+    "name": "QA4MRE 2011 main (English)",
+    "annotation": "tasksource.eval_only.qa4mre_2011",
+    "scope": "dataset",
+    "tasks": [
+      "qa4mre/2011"
+    ],
+    "huggingface": [
+      "community-datasets/qa4mre"
+    ],
+    "github": [],
+    "papers": [
+      {
+        "url": "https://link.springer.com/chapter/10.1007/978-3-642-40802-1_29"
+      }
+    ],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "QA4MRE main-task questions are CLEF campaign test sets (120-284 per year); no training questions",
+    "checked_on": "2026-10-21",
+    "source_revisions": {
+      "community-datasets/qa4mre": "a6ba3ed66833455732993c7d2daeb2f397785be0"
+    },
+    "evidence": [
+      "https://huggingface.co/datasets/community-datasets/qa4mre/blob/a6ba3ed66833455732993c7d2daeb2f397785be0/README.md"
+    ],
+    "reconsider_if": "A training partition of reading-test questions is released."
+  },
+  {
+    "name": "QA4MRE 2012 main (English)",
+    "annotation": "tasksource.eval_only.qa4mre_2012",
+    "scope": "dataset",
+    "tasks": [
+      "qa4mre/2012"
+    ],
+    "huggingface": [
+      "community-datasets/qa4mre"
+    ],
+    "github": [],
+    "papers": [
+      {
+        "url": "https://link.springer.com/chapter/10.1007/978-3-642-40802-1_29"
+      }
+    ],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "QA4MRE main-task questions are CLEF campaign test sets (120-284 per year); no training questions",
+    "checked_on": "2026-10-21",
+    "source_revisions": {
+      "community-datasets/qa4mre": "a6ba3ed66833455732993c7d2daeb2f397785be0"
+    },
+    "evidence": [
+      "https://huggingface.co/datasets/community-datasets/qa4mre/blob/a6ba3ed66833455732993c7d2daeb2f397785be0/README.md"
+    ],
+    "reconsider_if": "A training partition of reading-test questions is released."
+  },
+  {
+    "name": "QA4MRE 2013 main (English)",
+    "annotation": "tasksource.eval_only.qa4mre_2013",
+    "scope": "dataset",
+    "tasks": [
+      "qa4mre/2013"
+    ],
+    "huggingface": [
+      "community-datasets/qa4mre"
+    ],
+    "github": [],
+    "papers": [
+      {
+        "url": "https://link.springer.com/chapter/10.1007/978-3-642-40802-1_29"
+      }
+    ],
+    "status": "parked",
+    "reason_code": "evaluation_only",
+    "reason": "QA4MRE main-task questions are CLEF campaign test sets (120-284 per year); no training questions",
+    "checked_on": "2026-10-21",
+    "source_revisions": {
+      "community-datasets/qa4mre": "a6ba3ed66833455732993c7d2daeb2f397785be0"
+    },
+    "evidence": [
+      "https://huggingface.co/datasets/community-datasets/qa4mre/blob/a6ba3ed66833455732993c7d2daeb2f397785be0/README.md"
+    ],
+    "reconsider_if": "A training partition of reading-test questions is released."
   }
 ]

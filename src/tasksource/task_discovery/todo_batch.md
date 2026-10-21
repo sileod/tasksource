@@ -197,7 +197,7 @@ These are user requests, separate from automatically discovered prospects.
 | MedNLI | Clinical NLI | Blocked: PhysioNet credentialing and signed data-use agreement; no public redistribution through Tasksource. Recorded in decisions.json. |
 | GAP | A/B/neither pronoun resolution | Added `gap` directly from coref-data/gap_raw; upstream development is the HF train split, allowed for model development. Official test remains test. |
 | TRIP (sled-umich/TRIP) | Physical-state plausibility MC | Added `trip/cloze` and `trip/order` directly from the official Hub Parquet conversion; 799 and 2,330 train pairs. Native story groups are split-disjoint, including across views. License unspecified. |
-| QA4MRE (community-datasets/qa4mre) | English main-track native MC | Queued next: verify genuinely labeled training partitions versus released evaluation questions; resolve original terms. |
+| QA4MRE (community-datasets/qa4mre) | English main-track native MC | Evaluation only (2026-10-21): the 2011-2013 main tasks are CLEF campaign test sets (120/160/284 questions, five native options) with no training questions; `eval_only.qa4mre_{2011,2012,2013}`. License unspecified. |
 
 The seven catalog additions enter the next canonical text build automatically. Partial smoke builds are not publications and must not be uploaded over `full`/`default`.
 
