@@ -236,13 +236,15 @@ pass, as extraction models (e.g. Cloudflare's Clairic) are asked. {rows}
 - Extractive question answering (SQuAD 2.0, AdversarialQA, Natural Questions, HotpotQA, Quoref, MuSiQue,
   DROP single-span, DuoRC, ConcurrentQA, FairytaleQA, QuAC with history, windowed CUAD, TyDi English,
   Qasper spans, PolicyQA, SubjQA, COVID-QA, TimeQA, TAT-QA text spans, ROPES, QAConv and MultiDoc2Dial
-  grounding) groups the questions asked about one context, up to {max_fields} fields per row.
+  grounding, MultiSpanQA, QA-SRL) groups the questions asked about one context, up to {max_fields} fields per row.
   Named entities (CoNLL-2003, OntoNotes, WNUT-17, Few-NERD, NCBI-disease, JNLPBA, acronyms, FiNER-139,
   MAVEN event triggers, SLURP slots, EBM-NLP PICO spans, and astronomy, biomedical, financial, software,
   legal, GUM, Twitter and English opinion-target sources) ask for every entity type of the dataset, or
-  the types present plus absent ones up to {max_fields}.
-  Other span tagging (skills, keyphrases, aspect terms, toxic spans, metaphors, learner errors) asks for
-  every span of its kind.
+  the types present plus absent ones up to {max_fields}. Entity texts are the source tokens joined by spaces.
+  Other span tagging (skills, keyphrases, aspect terms, toxic spans, metaphors, learner errors, BioScope and
+  ConanDoyle-neg negation and speculation scopes, AbstRCT claims and premises, GUM elementary discourse units)
+  asks for every span of its kind. Event arguments (PHEE adverse drug events, RAMS and CASIE) ask for every
+  argument of each role of a trigger given by its character offsets.
 - Structural extraction uses English UD EWT/GUM dependency subtrees (`ud/...`), PreCo coreference
   mention sets (`preco/mentions`), human-revised Re-DocRED relation targets (`redocred/entities`),
   and CoNLL-2000 phrase chunks. UD fields select a unique head and keep full contiguous subtrees;
@@ -250,9 +252,12 @@ pass, as extraction models (e.g. Cloudflare's Clairic) are asked. {rows}
 - Procedural extraction ([procedural-extraction](https://huggingface.co/datasets/tasksource/procedural-extraction),
   sources `procedural/...`): person records with near-miss names and confusers, plan slots in force after a chat
   of proposals and undos, conditional order lists after updates, log queries, typed mentions, business documents
-  with amendments, nested configurations with override layers and raw HTML pages, at difficulty levels 0 to 4;
+  with amendments, nested configurations with override layers, raw HTML pages, records dated in mixed formats
+  within a range and products matching specs in mixed units and number styles, at difficulty levels 0 to 4;
   spans and nulls exact by construction.
-  Entity texts are the source tokens joined by spaces.
+- Mostly English, with a small multilingual share: TyDi QA (Arabic, Bengali, Finnish, Korean, Russian, Swahili),
+  UNER (Portuguese, Chinese), MasakhaNER 2 (Swahili) and MASSIVE slots (Hindi), at most 1,600 training rows per
+  language.
 - Native splits, except those without released labels; evaluation texts that also occur in training are dropped. Each source is capped at
   {max_rows:,} training rows (a suite of configs, such as `swde/...`, shares {max_collection_rows:,}) and {max_rows_eval:,} per evaluation split; at most {max_empty:.0%} of an entity source's
   texts mention none of its entity types. `license`/`license_use` per row;
