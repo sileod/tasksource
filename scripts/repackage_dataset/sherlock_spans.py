@@ -67,7 +67,8 @@ def sherlock_records(lines, counts):
             continue
         cue = ', '.join(f'{text[a:b]!r} at [{a}, {b})' for a, b in cues)
         yield record(text, f'The scope of the negation cue {cue} (zero-based characters, end-exclusive). '
-                     'Return every scope segment, excluding the cue itself.', scopes,
+                     'Return every scope segment: the negated event with all its participants, including its '
+                     'subject, excluding the cue itself.', scopes,
                      f'negation_scope_{i}', group, id=f'{group}:{i}', cue_spans=cues)
     if not cue_failure:
         yield record(text, 'Every negation cue in the text, as written.', all_cues, 'negation_cues', group, id=group)

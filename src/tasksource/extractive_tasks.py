@@ -57,7 +57,7 @@ REVISIONS = {
     # data-only mirrors from scripts/repackage_dataset/span_structure.py and sherlock_spans.py
     'tasksource/qasrl-bank-spans': 'cdef9250905c169a1bb8e2a2752dd906988352fa',
     'tasksource/bioscope-spans': '042825641b80ee236d1df7be6e260cbbf573b875',
-    'tasksource/sherlock-negation-spans': 'f7e28a5e6776d6ec568521a15d7f62ef7d9bb5f3',
+    'tasksource/sherlock-negation-spans': 'a99de3f3bfc69fe7e7d631171f9ea8807a955419',
 
     # mneb event-extraction repackages (same template/org as mneb/maven and mneb/maven-arg, already
     # used for the maven classification views): input text, output.json_structures per event type.

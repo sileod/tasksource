@@ -133,7 +133,12 @@ def main():
                           "predicted": predicted or None, "parsed": parsed is not None,
                           "agree": parsed is not None and agree(field, gold, predicted)})
     print(f"parsed {sum(i['parsed'] for i in items)}/{len(items)} fields", flush=True)
-    disputed = [i for i in items if i["parsed"] and not i["agree"]]
+    # A model answer that is not verbatim in the text cannot beat the gold span: no judge call.
+    for item in items:
+        if item["parsed"] and not item["agree"] and not all(
+                isinstance(v, str) and v in item["row"]["state"] for v in item["predicted"] or []):
+            item["verdict"] = "gold"
+    disputed = [i for i in items if i["parsed"] and not i["agree"] and "verdict" not in i]
     rng = random.Random(args.seed)
     flips = [rng.random() < 0.5 for _ in disputed]
     print(f"judging {len(disputed)} disagreements", flush=True)
@@ -161,7 +166,7 @@ def main():
         lines.append(f"| {source} | {s['fields']} | {s['parsed']} | {s['agree']} | {s['disputed']} | {s['gold']} | "
                      f"{s['model']} | {s['both']} | {s['neither']} | {error:.1%} |")
     report = (f"# Extraction label audit\n\nModel `{args.model}`, {args.per_source} rows per source, blind extraction "
-              "then a judge on disagreements. Estimated label error: fields where the judge prefers the model "
+              "then a judge on disagreements; a model answer not verbatim in the text counts for gold. Estimated label error: fields where the judge prefers the model "
               "answer or neither, over parsed fields.\n\n" + "\n".join(lines) + "\n")
     (args.output / "report.md").write_text(report)
     (args.output / "summary.json").write_text(json.dumps(summary, indent=1) + "\n")
