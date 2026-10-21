@@ -119,7 +119,7 @@ the `extraction` config of
    and typed fields with precise instructions.
 2. **Write**: it writes documents with an intended answer per field, each planned as present, present beside a near
    miss (a similar value that does not qualify), or absent beside a near miss, so nulls are earned.
-3. **Verify**: answers must be verbatim spans. Two blind readers of other model families
+3. **Verify**: answers must be verbatim spans. Two blind readers, one of another model family
    ({', '.join(f'`{m}`' for m in run['readers'])}) fill every field. A field is kept when both agree with the
    writer (up to case, edge punctuation and a leading article); when one disagrees, a judge sees both answers in a
    random order and the field is kept only for an unambiguous verdict for the writer. When both disagree it is
@@ -147,7 +147,7 @@ def main(argv=None):
     parser.add_argument("--run", type=Path, required=True, help="output directory of a generation run")
     parser.add_argument("--output", type=Path)
     parser.add_argument("--writer", default="deepseek-v4-flash-0731")
-    parser.add_argument("--readers", nargs="+", default=["gpt-oss-120b", "gemma-4-31b-it"])
+    parser.add_argument("--readers", nargs="+", default=["gpt-oss-120b", "deepseek-v4-flash-0731"])
     parser.add_argument("--judge")
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--upload", action="store_true")

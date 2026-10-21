@@ -10,7 +10,7 @@ complaint), in the style of extraction applications such as Cloudflare's Clairic
    kind and typed fields (`text`: one span, `list`: every matching span) with precise instructions.
 2. write: per schema, documents are written with an intended answer per field; each field is planned as present,
    present with a near miss (a similar value that does not qualify), or absent with a near miss (an earned null).
-3. verify: answers must be verbatim spans of the document. Two blind readers from other model families extract
+3. verify: answers must be verbatim spans of the document. Two blind readers (one of another model family) extract
    every field. A field is kept when both agree with the writer; when one disagrees, a judge sees both readings and
    the field is kept only for an unambiguous verdict for the writer. When both disagree it is dropped, unless they
    copy the same span and the judge, choosing between that span and the writer's answer, rules for the readers:

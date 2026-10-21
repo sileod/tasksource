@@ -228,7 +228,7 @@ def main(argv=None) -> None:
     parser.add_argument("--documents", type=int, default=25, help="documents per schema")
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--writer", default="deepseek-v4-flash-0731")
-    parser.add_argument("--readers", nargs="+", default=["gpt-oss-120b", "gemma-4-31b-it"])
+    parser.add_argument("--readers", nargs="+", default=["gpt-oss-120b", "deepseek-v4-flash-0731"])
     parser.add_argument("--judge", help="default: the writer model")
     parser.add_argument("--concurrency", type=int, default=12)
     asyncio.run(run(parser.parse_args(argv)))
