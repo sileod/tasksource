@@ -27,7 +27,7 @@ REPO = "tasksource/tasksource-jev-typed-decisions"
 EXCLUDED_QA = {"newsqa"}
 # Procedural extraction (reasoning-core generators, scripts/build_procedural_extraction.py): one source per
 # generator, each capped like any other source, so equal shares. Pinned Hub snapshot of the published data.
-PROCEDURAL_REPO, PROCEDURAL_REVISION = "tasksource/procedural-extraction", "a7c6fd6cf55bb827029a2edcea05b43e34b81ed4"
+PROCEDURAL_REPO, PROCEDURAL_REVISION = "tasksource/procedural-extraction", "4fe51430ff2ec6d770ec85441c98ff86ad9558f9"
 PROCEDURAL = ["record_field_extraction", "state_update_extraction", "conditional_list_extraction",
               "log_query_extraction", "typed_mention_extraction", "business_document_extraction",
               "nested_structure_extraction", "html_extraction"]
