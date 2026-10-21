@@ -230,6 +230,27 @@ SOURCE_LICENSE_EVIDENCE = {
                  '(wbsg-uni-mannheim/wdc-pave, no LICENSE file) states a license; offer texts keep their sites terms.'},
     'tab': {'license': 'mit', 'checked': '2026-10-13', 'scope': 'original TAB corpus distribution',
             'url': 'https://github.com/NorskRegnesentral/text-anonymization-benchmark/blob/master/LICENSE.txt'},
+    'qasrl/orig': {'license': 'unspecified', 'license_use': 'unspecified', 'checked': '2026-10-21',
+        'url': 'https://github.com/uwnlp/qasrl-bank/blob/29034398c26e419d530a2ec1e81994ca4a4d4e42/LICENSE',
+        'scope': "QA-SRL Bank 2.0 'orig' partition: >=2 independent human worker judgments with a strict "
+                 'valid majority, one modal complete reading per predicate question. The repository MIT '
+                 'license covers the loader code, not an explicit grant over the underlying TQA/Wikipedia/'
+                 'Wikinews sentences; data scope stays unspecified. Repackaged as tasksource/qasrl-bank-spans '
+                 '(no usable Hub parquet conversion of Bank 2.0 exists).'},
+    'bioscope': {'license': 'cc-by-2.0', 'license_use': 'commercial', 'checked': '2026-10-21',
+        'url': 'https://huggingface.co/datasets/bigbio/bioscope/blob/43ba162359f01d6436590ba2a014421b6ad09621/README.md',
+        'scope': 'Public BioScope abstracts and full-paper negation/speculation cue and scope annotations '
+                 '(BigBio states CC BY 2.0); clinical masked-text file excluded. Underlying PubMed/BMC article '
+                 'texts retain their original terms. Repackaged as tasksource/bioscope-spans: abstracts gets a '
+                 'deterministic document-disjoint train/validation/test split (no native split exists); papers '
+                 '(9 documents) stays train-only.'},
+    'sherlock/scopes': {'license': 'unspecified', 'license_use': 'unspecified', 'checked': '2026-10-21',
+        'url': 'https://www.aclweb.org/portal/content/sem-shared-task-2012-resolving-scope-and-focus-negation',
+        'scope': "*SEM 2012 ConanDoyle-neg human negation cue/scope gold over Conan Doyle 'Sherlock' stories. "
+                 "Organizers state annotations are freely available and the stories are public domain, but no "
+                 'standard annotation license is stated. Native story train/validation/test partitions '
+                 '(Baskervilles / Wisteria / Cardboard+Circle). Repackaged as tasksource/sherlock-negation-spans '
+                 'from a pinned native-column copy (rejected Hub copies lose cue identity or the training split).'},
     'discosense': {'license': 'apache-2.0', 'checked': '2026-10-13',
                    'scope': 'license declaration in the original dataset README (malformed Hub front matter)',
                    'url': 'https://huggingface.co/datasets/prajjwal1/discosense/blob/6d008011ac5b47dcd75029f46901da81382b6d89/README.md'},

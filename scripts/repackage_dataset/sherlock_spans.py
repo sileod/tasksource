@@ -14,6 +14,7 @@ from pathlib import Path
 from datasets import Dataset
 
 from scripts.repackage_dataset.span_structure import FEATURES
+from tasksource.citation import card_section
 from tasksource.span_structure import record, token_offsets
 
 REVISION = '03cb052efdb205efdf403223a71764237a353f6e'
@@ -95,35 +96,71 @@ def convert(input_path, output):
     sizes, reports = {}, {}
     for split, sentences in split_lines.items():
         counts = Counter()
-        def generate():
-            for sentence in sentences:
-                yield from sherlock_records(sentence, counts)
-        rows = Dataset.from_generator(generate, features=FEATURES)
+        records = [r for sentence in sentences for r in sherlock_records(sentence, counts)]
+        rows = Dataset.from_list(records, features=FEATURES)
         rows.to_parquet(str(output / f'{split}.parquet'))
         sizes[split], reports[split] = len(rows), dict(counts)
-    provenance = dict(revision=REVISION, files={name: {'url': BASE + path, 'sha256': sha}
+    mirror = 'tasksource/sherlock-negation-spans'
+    provenance = dict(mirror=mirror, revision=REVISION, files={name: {'url': BASE + path, 'sha256': sha}
         for name, (path, sha) in FILES.items()}, native_sentences=expected, rows=sizes, dropped=reports,
         license='unspecified (freely available annotations; public-domain source stories)',
         license_evidence='https://www.aclweb.org/portal/content/sem-shared-task-2012-resolving-scope-and-focus-negation',
         settings={'text': 'tokens joined by one space', 'scopes': 'merge adjacent literal segments; preserve discontinuity',
                   'split': 'official story partitions, no resampling', 'uploads': False})
     (output / 'provenance.json').write_text(json.dumps(provenance, indent=2) + '\n')
-    (output / 'README.md').write_text('''---
-language: en
+    (output / 'README.md').write_text(f'''---
+license: unknown
+language:
+- en
+tags:
+- tasksource
+- extraction
+- negation
+configs:
+- config_name: default
+  data_files:
+  - split: train
+    path: train.parquet
+  - split: validation
+    path: validation.parquet
+  - split: test
+    path: test.parquet
 ---
-# ConanDoyle-neg span annotations
+# ConanDoyle-neg negation spans
 
-Local unpublished conversion of the [original shared task distribution](https://www.clips.uantwerpen.be/sem2012-st-neg/),
-using a [pinned copy of the native gold columns](https://github.com/mosharafhossain/negation-cue/tree/03cb052efdb205efdf403223a71764237a353f6e/data/cd-sco).
+Negation cues and their scopes in Conan Doyle stories, as annotated for the *SEM 2012 shared task: every sentence
+asks for its negation cues (including affixes such as "in" of "infrequent") and the scope of each cue, which can be
+discontinuous.
+
+Data-only mirror of the [original *SEM 2012 shared task distribution](https://www.clips.uantwerpen.be/sem2012-st-neg/),
+using a [pinned copy of the native gold columns](https://github.com/mosharafhossain/negation-cue/tree/03cb052efdb205efdf403223a71764237a353f6e/data/cd-sco),
+prepared for `{mirror}`.
 Reproduce with [scripts/repackage_dataset/sherlock_spans.py](https://github.com/sileod/tasksource/blob/main/scripts/repackage_dataset/sherlock_spans.py).
 [provenance.json](provenance.json) records file hashes, revisions, splits and settings.
 
-Native train/validation/test story partitions. Schema: `context`, `question`, list `answers`
-(`text`, `answer_start`), JSON-string `metadata` (`field`, `group`, cue offsets).
-Offsets preserve sub-token cues, cue identity and discontinuous scopes. Human gold only.
-Stories are public domain; no standard annotation license established (unspecified).
-No active task until a maintainer publishes and pins a data-only mirror.
-''')
+Native train/validation/test story partitions (Baskervilles / Wisteria / Cardboard+Circle).
+Schema: `context`, `question`, list `answers` (`text`, `answer_start`), JSON-string `metadata`
+(`field`, `group`, cue offsets). Offsets preserve sub-token cues, cue identity and discontinuous
+scopes. Human gold only. Stories are public domain; no standard annotation license established
+(unspecified). Declared in tasksource's extraction catalog as `sherlock/scopes`.
+
+Every sentence is kept; sentences without negation answer the cue field with null.
+
+## Citation
+
+Please cite the original dataset:
+
+```bibtex
+@inproceedings{{morante-daelemans-2012-conandoyle,
+    title = "{{C}}onan{{D}}oyle-neg: Annotation of negation cues and their scope in {{C}}onan {{D}}oyle stories",
+    author = "Morante, Roser and Daelemans, Walter",
+    booktitle = "Proceedings of the Eighth International Conference on Language Resources and Evaluation ({{LREC}}'12)",
+    year = "2012",
+    url = "http://www.lrec-conf.org/proceedings/lrec2012/pdf/221_Paper.pdf",
+}}
+```
+
+{card_section(title='Citing tasksource')}''')
     print(json.dumps(provenance, indent=2))
 
 

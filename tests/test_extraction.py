@@ -675,6 +675,70 @@ def test_structural_tasks_pins_native_splits_licenses_and_collection_budgets():
     assert train_limits(['ud/ewt', 'ud/gum'], 10_000, 10_000)['ud/ewt'] == 5000
 
 
+def test_span_structure_mirrors_are_registered_and_pinned():
+    """QA-SRL Bank 2.0, BioScope and Sherlock/ConanDoyle-neg load from pinned tasksource mirrors
+    (scripts/repackage_dataset/span_structure.py, sherlock_spans.py)."""
+    from tasksource import task_licenses
+    from tasksource.extractive_tasks import qasrl_orig, bioscope_abstracts, bioscope_papers, sherlock_scopes
+    from scripts.build_jev_extraction import LIST_QA
+    tasks = [qasrl_orig, bioscope_abstracts, bioscope_papers, sherlock_scopes]
+    assert {t.task_id for t in tasks} <= LIST_QA
+    for task in tasks:
+        assert not task.complete_splits
+        assert len(task.load_dataset_kwargs['revision']) == 40
+    assert qasrl_orig.dataset_name == 'tasksource/qasrl-bank-spans'
+    assert bioscope_abstracts.dataset_name == bioscope_papers.dataset_name == 'tasksource/bioscope-spans'
+    assert bioscope_abstracts.config_name == 'abstracts' and bioscope_papers.config_name == 'papers'
+    assert bioscope_papers.splits == ('train', None, None)  # only 9 documents: too few to split
+    assert sherlock_scopes.dataset_name == 'tasksource/sherlock-negation-spans'
+    licenses = task_licenses([t.task_id for t in tasks], extractive=True).set_index('id')
+    assert licenses.loc['qasrl/orig', 'license_use'] == 'unspecified'
+    assert licenses.loc['bioscope/abstracts', 'license_use'] == 'commercial'
+    assert licenses.loc['bioscope/papers', 'license_use'] == 'commercial'
+    assert licenses.loc['sherlock/scopes', 'license_use'] == 'unspecified'
+
+
+def test_span_structure_mirror_schema_smoke_loads_through_extractive_qa():
+    """The mirrors' raw parquet schema (context/question/answers/metadata) is exactly the
+    ExtractiveQA schema already used by qasrl_orig/bioscope_abstracts/bioscope_papers/sherlock_scopes
+    (no pre_process): run real conversion output for each source through the same preprocessing
+    class, offline, standing in for the Hub load until a maintainer pins the mirror revision."""
+    from collections import Counter
+    from scripts.repackage_dataset.span_structure import qasrl_records, bioscope_records
+    from scripts.repackage_dataset.sherlock_spans import sherlock_records
+    from xml.etree import ElementTree as ET
+
+    def judgment(worker, valid, spans):
+        return dict(sourceId=worker, isValid=valid, spans=spans)
+    label = dict(answerJudgments=[judgment('turk-a', True, [[0, 1]]), judgment('turk-b', True, [[0, 1]]),
+                                   judgment('turk-c', True, [[0, 1]])])
+    qasrl_row = dict(sentenceId='s', sentenceTokens=['Ann', 'ran', 'fast', '.'],
+                      verbEntries={'1': dict(verbIndex=1, questionLabels={'Who ran?': label})})
+    qasrl_rows = list(qasrl_records(qasrl_row, Counter()))
+
+    bioscope_xml = ('<sentence id="s">He <cue type="negation" ref="a">never</cue> '
+                     '<xcope id="a">saw it</xcope>.</sentence>')
+    bioscope_rows = list(bioscope_records(ET.fromstring(bioscope_xml), 'g', Counter()))
+
+    sherlock_lines = ['\t'.join(r) for r in [
+        ['story', '1', '0', 'He', 'he', 'PRP', '*', '_', 'He', '_', '_', 'He', '_'],
+        ['story', '1', '1', 'is', 'be', 'VB', '*', '_', 'is', '_', '_', 'is', '_'],
+        ['story', '1', '2', 'not', 'not', 'RB', '*', 'not', '_', '_', '_', '_', '_'],
+        ['story', '1', '3', 'unhappy', 'unhappy', 'JJ', '*', '_', 'unhappy', '_', 'un', 'happy', '_']]]
+    sherlock_rows = list(sherlock_records(sherlock_lines, Counter()))
+
+    for name, rows in [('qasrl', qasrl_rows), ('bioscope', bioscope_rows), ('sherlock', sherlock_rows)]:
+        assert rows, name
+        data = Dataset.from_list(rows)
+        task = ExtractiveQA(context='context', query='question', answers='answers', metadata='metadata',
+                             dataset_name='x', splits=('train', None, None), complete_splits=False, max_mismatch=0)
+        out = task(DatasetDict(train=data))['train']
+        assert len(out) == len(rows), name
+        for row in out:
+            for text, start in zip(row['answers']['text'], row['answers']['answer_start']):
+                assert row['context'][start:start + len(text)] == text
+
+
 def test_qasrl_requires_independent_human_validation_and_selects_complete_reading():
     from collections import Counter
     from scripts.repackage_dataset.span_structure import qasrl_records
@@ -738,3 +802,15 @@ def test_sherlock_separate_cues_affixes_and_discontinuous_scopes():
     result = list(sherlock_records(['\t'.join(r) for r in rows], counts))
     assert len(result) == 1  # the other scope survives; the all-cues field is dropped
     assert counts['unlocated_cue_fields'] == 1
+
+
+def test_cap_null_groups_keeps_every_positive_sentence():
+    import json
+    from datasets import Dataset, DatasetDict
+    from tasksource.span_structure import cap_null_groups
+    rows = [dict(answers={'text': ['not'] if g < 10 else [], 'answer_start': [0] if g < 10 else []},
+                 metadata=json.dumps({'group': f's{g}'})) for g in range(40) for _ in range(2)]
+    capped = cap_null_groups(DatasetDict(train=Dataset.from_list(rows)))['train']
+    groups = {json.loads(m)['group'] for m in capped['metadata']}
+    assert {f's{g}' for g in range(10)} <= groups and len(groups) == 10 + 6  # 6 null groups: 40% of 16
+    assert len(capped) == 2 * len(groups)  # a group is kept or dropped whole

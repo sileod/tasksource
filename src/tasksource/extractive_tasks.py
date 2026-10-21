@@ -12,7 +12,7 @@ from datasets import Value
 
 from .preprocess import ExtractiveQA
 from .metadata.source_revisions import SOURCE_REVISIONS
-from .span_structure import structure_spans, ud_records, preco_records, redocred_records
+from .span_structure import cap_null_groups, structure_spans, ud_records, preco_records, redocred_records
 
 # Hub revisions; script-based datasets are read from their parquet conversion commit.
 REVISIONS = {
@@ -49,6 +49,11 @@ REVISIONS = {
     'universal-dependencies/universal_dependencies': 'c3fed78df6b9f8cd27ed24cc7142e9eccf1e6703',
     'coref-data/preco_raw': '02c8ffedb9d0b49168809a572ff553c2f6f9f7ca',
     'tonytan48/Re-DocRED': 'e0ab3489edfe72c968261bffed5243b6fefddd22',
+
+    # data-only mirrors from scripts/repackage_dataset/span_structure.py and sherlock_spans.py
+    'tasksource/qasrl-bank-spans': 'cdef9250905c169a1bb8e2a2752dd906988352fa',
+    'tasksource/bioscope-spans': '042825641b80ee236d1df7be6e260cbbf573b875',
+    'tasksource/sherlock-negation-spans': 'f7e28a5e6776d6ec568521a15d7f62ef7d9bb5f3',
 }
 
 
@@ -755,3 +760,33 @@ preco_mentions = ExtractiveQA(dataset_name='coref-data/preco_raw', task_id='prec
 redocred_entities = ExtractiveQA(dataset_name='tonytan48/Re-DocRED', task_id='redocred/entities',
     complete_splits=False, pre_process=lambda d: structure_spans(d, redocred_records),
     metadata='metadata', max_mismatch=0, load_dataset_kwargs=_kwargs('tonytan48/Re-DocRED'))
+
+
+# QA-SRL Bank 2.0, BioScope and *SEM 2012 ConanDoyle-neg have no usable Hub upload (script-only loaders, missing
+# data files or an under-sized test upload): tasksource mirrors, repackaged by the scripts above.
+
+# QA-SRL Bank 2.0 "orig" partition: >=2 independent human worker judgments with a strict valid
+# majority, one modal complete reading per predicate question. Native train/validation/test.
+qasrl_orig = ExtractiveQA(dataset_name='tasksource/qasrl-bank-spans', task_id='qasrl/orig',
+    complete_splits=False, metadata='metadata', max_mismatch=0,
+    load_dataset_kwargs=_kwargs('tasksource/qasrl-bank-spans'))
+
+# BioScope public abstracts: no native split, so a deterministic document-disjoint 80/10/10
+# split by crc32(DocID). Expert negation/speculation cue and scope annotations.
+bioscope_abstracts = ExtractiveQA(dataset_name='tasksource/bioscope-spans', config_name='abstracts',
+    task_id='bioscope/abstracts', complete_splits=False, metadata='metadata', pre_process=cap_null_groups, max_mismatch=0,
+    load_dataset_kwargs=_kwargs('tasksource/bioscope-spans'))
+
+# BioScope public full papers: only 9 documents, too few for a representative split; train-only,
+# matching BigBio (which assigns this corpus no evaluation split either).
+bioscope_papers = ExtractiveQA(dataset_name='tasksource/bioscope-spans', config_name='papers',
+    task_id='bioscope/papers', complete_splits=False, splits=('train', None, None), pre_process=cap_null_groups,
+    metadata='metadata', max_mismatch=0,
+    load_dataset_kwargs=_kwargs('tasksource/bioscope-spans'))
+
+# *SEM 2012 ConanDoyle-neg (Conan Doyle "Sherlock" stories): human negation cue and scope gold,
+# including sub-token affix cues and discontinuous scopes; native story train/validation/test
+# partitions (Baskervilles / Wisteria / Cardboard+Circle).
+sherlock_scopes = ExtractiveQA(dataset_name='tasksource/sherlock-negation-spans', task_id='sherlock/scopes',
+    complete_splits=False, metadata='metadata', pre_process=cap_null_groups, max_mismatch=0,
+    load_dataset_kwargs=_kwargs('tasksource/sherlock-negation-spans'))

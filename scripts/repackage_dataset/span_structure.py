@@ -1,12 +1,14 @@
-"""Prepare unpublished English structural-span mirrors locally; never upload.
+"""Build data-only English structural-span mirrors locally; this script never uploads.
 
-PYTHONPATH=.:src python -m scripts.repackage_dataset.span_structure qasrl --input /tmp/qasrl-v2.tar --output build/pending-qasrl
-PYTHONPATH=.:src python -m scripts.repackage_dataset.span_structure bioscope --input /tmp/bioscope.zip --output build/pending-bioscope
+PYTHONPATH=.:src python -m scripts.repackage_dataset.span_structure qasrl --input /tmp/qasrl-v2.tar --output build/span-structure/pending-qasrl
+PYTHONPATH=.:src python -m scripts.repackage_dataset.span_structure bioscope --input /tmp/bioscope.zip --output build/span-structure/pending-bioscope
 
 QA-SRL uses orig only, native train/dev/test, independent human validation, and one complete
 validator reading per question. BioScope uses public abstracts/full papers only (the clinical
-file masks words and requires restricted originals); the publisher's BigBio loader assigns
-this corpus to train, with no fabricated evaluation split. Archive hashes below pin bytes.
+file masks words and requires restricted originals); abstracts gets a deterministic
+document-disjoint 80/10/10 split (BioScope has no native split); full_papers has only 9
+documents and stays train-only. Archive hashes below pin bytes. The output directories are
+upload-ready mirrors; a maintainer runs the upload command separately.
 """
 import argparse
 import gzip
@@ -15,16 +17,19 @@ import json
 import re
 import tarfile
 import zipfile
+import zlib
 from collections import Counter, defaultdict
 from pathlib import Path
 from xml.etree import ElementTree as ET
 
 from datasets import Dataset, Features, List, Value
 
+from tasksource.citation import card_section
 from tasksource.span_structure import record, token_offsets, token_span
 
 SOURCES = {
     'qasrl': {
+        'mirror': 'tasksource/qasrl-bank-spans',
         'url': 'https://qasrl.org/data/qasrl-v2.tar',
         'sha256': 'caba7a2d18584d6210b9a176ef6b4808d96f3d48194083dcb20db03697793e07',
         'revision': '29034398c26e419d530a2ec1e81994ca4a4d4e42',
@@ -32,8 +37,22 @@ SOURCES = {
         'license': 'unspecified',
         'license_evidence': 'https://github.com/uwnlp/qasrl-bank/blob/29034398c26e419d530a2ec1e81994ca4a4d4e42/LICENSE',
         'license_note': 'Repository MIT license is phrased for software, not an explicit grant over underlying TQA/Wikipedia/Wikinews texts. Data scope remains unspecified.',
+        'title': 'QA-SRL Bank 2.0 spans',
+        'about': ('Predicate-argument structure as questions: for each verb of a sentence, crowd-written questions '
+                  '("Who studies something?") answered by spans of the sentence. Only the `orig` partition, with at '
+                  'least two independent validator judgments and a strict valid majority; one modal complete reading '
+                  'per question. Native train/validation/test.'),
+        'configs': {'default': ('train', 'validation', 'test')},
+        'citation': '''@inproceedings{fitzgerald-etal-2018-large,
+    title = "Large-Scale {QA}-{SRL} Parsing",
+    author = "FitzGerald, Nicholas and Michael, Julian and He, Luheng and Zettlemoyer, Luke",
+    booktitle = "Proceedings of the 56th Annual Meeting of the Association for Computational Linguistics",
+    year = "2018",
+    url = "https://aclanthology.org/P18-1191",
+}''',
     },
     'bioscope': {
+        'mirror': 'tasksource/bioscope-spans',
         'url': 'https://rgai.inf.u-szeged.hu/sites/rgai.inf.u-szeged.hu/files/bioscope.zip',
         'sha256': 'b20b525506f783ab9c120548ac4022ab587bf7cc419beaf759f7253f0cf0b1d1',
         'revision': '43ba162359f01d6436590ba2a014421b6ad09621',
@@ -41,6 +60,23 @@ SOURCES = {
         'license': 'cc-by-2.0',
         'license_evidence': 'https://huggingface.co/datasets/bigbio/bioscope/blob/43ba162359f01d6436590ba2a014421b6ad09621/README.md',
         'license_note': 'Public biological abstracts and papers only; article texts retain their original terms. Clinical masked text excluded.',
+        'title': 'BioScope negation and speculation spans',
+        'about': ('Expert annotations of negation and speculation cues and their scopes in biomedical abstracts and '
+                  'full papers (the clinical part, whose text is masked, is left out). Every sentence asks for the '
+                  'negation and speculation cues and the scope of each cue. BioScope has no native split: '
+                  '`abstracts` gets a deterministic document-disjoint 80/10/10 split (`crc32(DocID) % 100`); '
+                  '`papers` has only 9 documents and stays train-only.'),
+        'configs': {'abstracts': ('train', 'validation', 'test'), 'papers': ('train',)},
+        'citation': '''@article{vincze2008bioscope,
+    title = {The {BioScope} corpus: biomedical texts annotated for uncertainty, negation and their scopes},
+    author = {Vincze, Veronika and Szarvas, Gy{\\"o}rgy and Farkas, Rich{\\'a}rd and M{\\'o}ra, Gy{\\"o}rgy and Csirik, J{\\'a}nos},
+    journal = {BMC Bioinformatics},
+    volume = {9},
+    number = {Suppl 11},
+    pages = {S9},
+    year = {2008},
+    url = {https://doi.org/10.1186/1471-2105-9-S11-S9},
+}''',
     },
 }
 FEATURES = Features({'context': Value('string'), 'question': Value('string'),
@@ -138,42 +174,90 @@ def convert(source, input_path, output):
     else:
         with zipfile.ZipFile(input_path) as archive:
             for config, member in [('abstracts', 'abstracts.xml'), ('papers', 'full_papers.xml')]:
-                counter = Counter()
-                def generate():
-                    root = ET.fromstring(archive.read(member))
-                    for index, sentence in enumerate(root.iter('sentence')):
-                        counter['input_sentences'] += 1
-                        yield from bioscope_records(sentence, f'{config}:{index}:{sentence.attrib["id"]}', counter)
-                rows = Dataset.from_generator(generate, features=FEATURES)
                 path = output / config
                 path.mkdir(exist_ok=True)
-                rows.to_parquet(str(path / 'train.parquet'))
-                counts[config], sizes[config] = dict(counter), len(rows)
-                (path / 'README.md').write_text(f'# {config}\n\nPublic BioScope {config}; train only, following BigBio. '
-                    'Native XML text, nested cue/scope offsets; clinical masked words excluded.\n')
-    provenance = dict(source=source, upstream=info, settings={'qasrl_partition': 'orig',
+                root = ET.fromstring(archive.read(member))
+                documents = root.findall('.//Document')
+                doc_ids = [d.find('DocID').text for d in documents]
+                if len(set(doc_ids)) != len(doc_ids) or any(not d for d in doc_ids):
+                    raise ValueError(f'{config}: DocID is not a unique document key')
+                # abstracts has 1,273 documents: a deterministic document-disjoint 80/10/10 split by
+                # DocID hash. papers has only 9 documents, too few for a representative split, and
+                # stays train-only (matching BigBio, which assigns no evaluation split either).
+                def doc_split(doc_id):
+                    if config == 'papers':
+                        return 'train'
+                    bucket = zlib.crc32(doc_id.encode()) % 100
+                    return 'train' if bucket < 80 else ('validation' if bucket < 90 else 'test')
+                buckets = {'train': [], 'validation': [], 'test': []}
+                for doc, doc_id in zip(documents, doc_ids):
+                    buckets[doc_split(doc_id)].append((doc, doc_id))
+                for split, group_docs in buckets.items():
+                    if not group_docs:
+                        continue
+                    counter = Counter()
+                    records = []
+                    for doc, doc_id in group_docs:
+                        for index, sentence in enumerate(doc.iter('sentence')):
+                            counter['input_sentences'] += 1
+                            records += bioscope_records(sentence, f'{config}:{doc_id}:{index}', counter)
+                    rows = Dataset.from_list(records, features=FEATURES)
+                    rows.to_parquet(str(path / f'{split}.parquet'))
+                    counts[f'{config}/{split}'], sizes[f'{config}/{split}'] = dict(counter), len(rows)
+                readme = (f'# {config}\n\nPublic BioScope {config}, following BigBio.\n'
+                    'Native XML text, nested cue/scope offsets; clinical masked words excluded.\n'
+                    '\nEvery sentence is kept; sentences without a cue answer both cue fields with null.\n')
+                if config == 'papers':
+                    readme += '\nTrain-only: the collection has 9 documents, too few to split representatively.\n'
+                else:
+                    readme += ('\nDeterministic document-disjoint split (no native split exists): '
+                        "`crc32(DocID) % 100` assigns each of the 1,273 documents to train (<80), "
+                        'validation (80-89) or test (>=90); every sentence of a document stays in its split.\n')
+                (path / 'README.md').write_text(readme)
+    provenance = dict(source=source, mirror=info['mirror'], upstream=info, settings={'qasrl_partition': 'orig',
         'qasrl_validation': '>=2 valid human judgments and strict majority; modal complete reading',
-        'bioscope_members': ['abstracts.xml', 'full_papers.xml'], 'uploads': False},
+        'bioscope_members': ['abstracts.xml', 'full_papers.xml'],
+        'bioscope_split': 'abstracts: deterministic document-disjoint crc32(DocID)%100 80/10/10; '
+                          'papers: train-only (9 documents)',
+        'uploads': False},
         rows=sizes, counts=counts,
         script='scripts/repackage_dataset/span_structure.py')
     (output / 'provenance.json').write_text(json.dumps(provenance, indent=2) + '\n')
+    configs = ''.join(f"- config_name: {name}\n  data_files:\n" + ''.join(
+        f"  - split: {split}\n    path: {'' if name == 'default' else name + '/'}{split}.parquet\n" for split in splits)
+        for name, splits in info['configs'].items())
     (output / 'README.md').write_text(f'''---
-license: {info['license']}
-language: en
----
-# {source} span annotations
+license: {'unknown' if info['license'] == 'unspecified' else info['license']}
+language:
+- en
+tags:
+- tasksource
+- extraction
+configs:
+{configs}---
+# {info['title']}
 
-Local, unpublished conversion of the [original distribution]({info['url']}).
-Reproduce with [scripts/repackage_dataset/span_structure.py](https://github.com/sileod/tasksource/blob/main/scripts/repackage_dataset/span_structure.py).
-See [provenance.json](provenance.json) for pinned source documentation, archive SHA256,
-conversion settings, validation policy and counts. {info['license_note']}
+{info['about']}
 
-Schema: `context`, `question`, `answers` (`text`, `answer_start`) and JSON-string `metadata`.
-Answer spans are verbatim lists, not alternatives. Metadata contains readable `field` names and
-sentence `group` ids for the shared QA extraction path. Source native splits are preserved;
-BioScope has train-only configs `abstracts` and `papers`. QA-SRL has train/validation/test.
-No catalog declaration is active until a maintainer publishes and pins a data-only mirror.
-''')
+Data-only mirror of the [original distribution]({info['url']}) (SHA256 `{info['sha256'][:12]}`), documented by
+[{info['documentation'].split('/')[-1]}]({info['documentation']}). Reproduce with
+[scripts/repackage_dataset/span_structure.py](https://github.com/sileod/tasksource/blob/main/scripts/repackage_dataset/span_structure.py);
+[provenance.json](provenance.json) records hashes, settings and counts. License: {info['license']}
+([evidence]({info['license_evidence']})). {info['license_note']}
+
+Schema: `context`, `question`, `answers` (`text`, `answer_start`: every span, not alternatives) and JSON-string
+`metadata` (`field`, sentence `group`). Used by the `extraction` config of
+[tasksource-jev-typed-decisions](https://huggingface.co/datasets/tasksource/tasksource-jev-typed-decisions).
+
+## Citation
+
+Please cite the original dataset:
+
+```bibtex
+{info['citation']}
+```
+
+{card_section(title='Citing tasksource')}''')
     print(json.dumps(provenance, indent=2))
 
 

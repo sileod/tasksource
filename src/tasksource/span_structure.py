@@ -34,6 +34,20 @@ def unique_anchor(text, start, end):
     return bool(anchor.strip()) and [m.start() for m in re.finditer(f'(?={re.escape(anchor)})', text)] == [start]
 
 
+def cap_null_groups(dataset, max_null_share=0.4):
+    """Per split, keep at most ``max_null_share`` of sentence groups (``metadata['group']``) whose every field is
+    null, choosing them by ``crc32(group)``; groups with any span are all kept. Mirrors keep every sentence; this
+    task-level cap stops always-asked fields (negation cues of sentences without negation) from earning mostly
+    nulls."""
+    def capped(split):
+        groups = [json.loads(m)['group'] for m in split['metadata']]
+        positive = {g for g, a in zip(groups, split['answers']) if a['text']}
+        nulls = sorted(set(groups) - positive, key=lambda g: zlib.crc32(g.encode()))
+        keep = positive | set(nulls[:int(max_null_share / (1 - max_null_share) * len(positive))])
+        return split.select([i for i, g in enumerate(groups) if g in keep])
+    return type(dataset)({name: capped(split) for name, split in dataset.items()})
+
+
 def record(text, question, spans, field, group, **metadata):
     spans = sorted(set(spans))
     if any(not 0 <= a < b <= len(text) or not text[a:b].strip() for a, b in spans):

@@ -79,6 +79,9 @@ extractive QA in `extractive_tasks.py`.
   majority silently drops boundary disagreements (6-7% of majority-masked characters in TAB).
 - QA sources with fixed slots (one question per entity type or attribute) set `metadata["field"]` for readable
   field names and `metadata["group"]` for balanced rows (TAB, WDC PAVE).
+- `--max-empty-share` only subsamples NER texts. QA-path sources whose always-asked fields are mostly null
+  (negation cues: BioScope, Sherlock) cap all-null groups in the task with `span_structure.cap_null_groups`; the
+  mirror keeps every sentence.
 - Tokenization artifacts become entities: Broad Twitter Corpus tagged `@` and the handle separately,
   merge them. Long documents need windows that never cut a gold span (CUAD).
 - HTML sources: convert to deterministic visible text once in the repackage, locate gold again inside the
