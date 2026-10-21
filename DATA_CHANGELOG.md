@@ -4,6 +4,12 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource-jev-typed-decisions v2026.10.22
+
+- `extraction`: add event arguments (PHEE adverse drug events, RAMS and CASIE roles of a trigger given by offsets), multi-span questions (MultiSpanQA, QA-SRL), negation and speculation scopes (BioScope, ConanDoyle-neg with the *SEM convention stated), argument components (AbstRCT claims and premises), GUM elementary discourse units, and two procedural generators (dates in mixed formats within a range, products matching specs in mixed units and number styles). 127 sources, 552,917 training, 44,205 validation and 45,112 test rows.
+- A small multilingual share: TyDi QA (Arabic, Bengali, Finnish, Korean, Russian, Swahili), UNER (Portuguese, Chinese), MasakhaNER 2 (Swahili) and MASSIVE slots (Hindi), at most 1,600 training rows per language.
+- Procedural generators now share their 80,000-row budget across ten generators (8,000 each), regenerated with reproducible seeds.
+
 ## tasksource/procedural-extraction v2026.10.21.1
 
 - New `date_range_extraction`: records whose date of one role falls in a range, before/after a date, in a month or on a weekday, with dates in many formats (ISO, worded, numeric under a stated day/month or month/day convention, year-less, relative to another record).
