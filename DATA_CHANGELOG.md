@@ -4,6 +4,12 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource/procedural-extraction v2026.10.23
+
+- New `lookalike_field_extraction`: fields asked by role (issue vs delivery date, subtotal vs tax, sender vs approver, order vs tracking number, billing vs return address, phones, weights, durations) from forms, sections, tables, prose, emails, logs and YAML-like records; an asked role that is not stated is null although same-typed values of other roles are, or shows a placeholder.
+- `business_document_extraction`: asked keys left out more often (15% at level 0 to 40% at level 4, near-miss key still stated), questions worded several ways without "null if none is" (a null hint on a random 10% of fields, whatever the answer), and no printed in-force date that read as an answer.
+- `typed_mention_extraction`: partner sentences now state joint development (a shared lab no longer counts as a partnership).
+
 ## tasksource-jev-typed-decisions v2026.10.22
 
 - `extraction`: add event arguments (PHEE adverse drug events, RAMS and CASIE roles of a trigger given by offsets), multi-span questions (MultiSpanQA, QA-SRL), negation and speculation scopes (BioScope, ConanDoyle-neg with the *SEM convention stated), argument components (AbstRCT claims and premises), GUM elementary discourse units, and two procedural generators (dates in mixed formats within a range, products matching specs in mixed units and number styles). 127 sources, 552,917 training, 44,205 validation and 45,112 test rows.
