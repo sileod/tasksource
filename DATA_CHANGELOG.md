@@ -4,6 +4,11 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource/procedural-extraction v2026.10.23.1
+
+- New `structure_lookup_extraction`: values by section path in outlines whose labels recur under other sections, or by cell, condition or row position in one of several look-alike tables; null when the place exists only elsewhere or the cell is empty.
+- New `relational_span_extraction`: every mention of an event's direct or indirect causes or effects in narratives with temporal-only and ruled-out look-alikes, or of what follows from facts and if-then rules.
+
 ## tasksource/procedural-extraction v2026.10.23
 
 - New `lookalike_field_extraction`: fields asked by role (issue vs delivery date, subtotal vs tax, sender vs approver, order vs tracking number, billing vs return address, phones, weights, durations) from forms, sections, tables, prose, emails, logs and YAML-like records; an asked role that is not stated is null although same-typed values of other roles are, or shows a placeholder.
