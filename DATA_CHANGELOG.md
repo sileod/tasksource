@@ -4,6 +4,12 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource/procedural-typed-decisions v2026.10.23
+
+- `policy_applicability`, `policy_under_uncertainty`: the policy semantics now say that roles, teams and clearance constrain the requester and that the resource's team plays no part (the governing policy was ambiguous when the two teams differed).
+- `arithmetic`: the lowest-balance question asks which day's transaction leaves the lowest balance, so the opening balance is not a candidate.
+- Other configs are unchanged.
+
 ## tasksource/procedural-extraction v2026.10.23.1
 
 - New `structure_lookup_extraction`: values by section path in outlines whose labels recur under other sections, or by cell, condition or row position in one of several look-alike tables; null when the place exists only elsewhere or the cell is empty.
