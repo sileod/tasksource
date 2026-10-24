@@ -27,10 +27,11 @@ REPO = "tasksource/tasksource-jev-typed-decisions"
 EXCLUDED_QA = {"newsqa"}
 # Procedural extraction (reasoning-core generators, scripts/build_procedural_extraction.py): one source per
 # generator, each capped like any other source, so equal shares. Pinned Hub snapshot of the published data.
-PROCEDURAL_REPO, PROCEDURAL_REVISION = "tasksource/procedural-extraction", "ee40c9664ab772661f96aa71e4977d2abe686816"
+PROCEDURAL_REPO, PROCEDURAL_REVISION = "tasksource/procedural-extraction", "08b0f8415b2a5043a4a7de09bbef8996d59b7625"
 PROCEDURAL = ["record_field_extraction", "state_update_extraction", "conditional_list_extraction",
               "log_query_extraction", "typed_mention_extraction", "business_document_extraction",
-              "nested_structure_extraction", "html_extraction", "date_range_extraction", "spec_match_extraction"]
+              "nested_structure_extraction", "html_extraction", "date_range_extraction", "spec_match_extraction",
+              "lookalike_field_extraction", "structure_lookup_extraction", "relational_span_extraction"]
 # Multi-span answers are sets (every span is part of the answer), not alternatives.
 LIST_QA = {"quoref", "cuad/spans", "qasper/spans", "tab/pii", "ud/ewt", "ud/gum", "preco/mentions", "redocred/entities",
            "qasrl/orig", "bioscope/abstracts", "bioscope/papers", "sherlock/scopes", "multispanqa",
@@ -80,7 +81,7 @@ MULTILINGUAL = {"uner/pt_bosque", "uner/zh_gsd", "masakhaner2/swa", "massive-slo
 SPLITS = ("train", "validation", "test")
 # A collection is a task-id prefix (swde/auto, swde/book... -> swde). Its training budget is shared equally by its
 # sources, so a suite split into many configs weighs like one source; procedural generators share a larger budget.
-COLLECTION_ROWS = {"procedural": 80_000,
+COLLECTION_ROWS = {"procedural": 112_000,
     # Their non-English members are capped by SOURCE_ROWS; raised so uner/en_ewt and tydiqa/english keep max_rows.
     "uner": 30_000, "tydiqa": 70_000}
 # Valid but low-signal sources (label audit v2026.10.20.6: subjective or crowd-noisy span boundaries), capped
@@ -253,7 +254,9 @@ pass, as extraction models (e.g. Cloudflare's Clairic) are asked. {rows}
   sources `procedural/...`): person records with near-miss names and confusers, plan slots in force after a chat
   of proposals and undos, conditional order lists after updates, log queries, typed mentions, business documents
   with amendments, nested configurations with override layers, raw HTML pages, records dated in mixed formats
-  within a range and products matching specs in mixed units and number styles, at difficulty levels 0 to 4;
+  within a range, products matching specs in mixed units and number styles, fields asked by role among
+  same-typed look-alikes, values located by section path or table cell, row and condition, and the causes, effects
+  or consequences of an event in narratives and rule sets, at difficulty levels 0 to 4;
   spans and nulls exact by construction.
 - Mostly English, with a small multilingual share: TyDi QA (Arabic, Bengali, Finnish, Korean, Russian, Swahili),
   UNER (Portuguese, Chinese), MasakhaNER 2 (Swahili) and MASSIVE slots (Hindi), at most 1,600 training rows per
