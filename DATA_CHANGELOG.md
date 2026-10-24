@@ -4,6 +4,10 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource/procedural-extraction v2026.10.24.1
+
+- `structure_lookup_extraction`: new breakdown reports, about 30% of documents. Groups (segments, regions, departments, campuses) are listed in prose; some metrics are given per group, in a table or in sentences, others only overall. Fields ask the groups, a group's figure, an overall figure or the groups whose figure is reported; a group's figure is null when the metric is reported only overall or not for that group. Other configs are unchanged.
+
 ## tasksource-jev-typed-decisions v2026.10.24
 
 - `extraction`: add three procedural generators (fields asked by role among same-typed look-alikes, values located by section path or table cell, row and condition, and the causes, effects or consequences of an event in narratives and rule sets) and the business-document update with more missing keys and no null hint (procedural-extraction v2026.10.23.2). Procedural generators now share 112,000 training rows (8,615 each, was 8,000). 130 sources, 584,912 training, 45,705 validation and 46,612 test rows.
