@@ -4,6 +4,10 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource/synthetic-extraction v2026.10.24
+
+- First release: 9,829 LLM-written documents across 402 application schemas (domains and document sources), with typed `text`/`list` fields answered by verbatim spans or null; fields kept only when two blind readers of different model families agree with the writer or a judge rules unambiguously (43,189 of 53,090). Splits by schema: 7,670 train, 1,035 validation, 1,124 test rows.
+
 ## tasksource/procedural-extraction v2026.10.24.1
 
 - `structure_lookup_extraction`: new breakdown reports, about 30% of documents. Groups (segments, regions, departments, campuses) are listed in prose; some metrics are given per group, in a table or in sentences, others only overall. Fields ask the groups, a group's figure, an overall figure or the groups whose figure is reported; a group's figure is null when the metric is reported only overall or not for that group. Other configs are unchanged.
