@@ -4,6 +4,10 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource/procedural-extraction v2026.10.24.2
+
+- `structure_lookup_extraction`: breakdown reports removed; the config is again as in v2026.10.24 (outlines and look-alike tables only). Other configs are unchanged.
+
 ## tasksource-jev-typed-decisions v2026.10.24.1
 
 - `extraction`: the procedural look-alike field documents now also state conditional or policy values of an asked role ("Late payments may incur a late fee of 1.5% per month."), which are not the answer (procedural-extraction v2026.10.24). Other sources and row counts are unchanged.
