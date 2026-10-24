@@ -27,7 +27,7 @@ REPO = "tasksource/tasksource-jev-typed-decisions"
 EXCLUDED_QA = {"newsqa"}
 # Procedural extraction (reasoning-core generators, scripts/build_procedural_extraction.py): one source per
 # generator, each capped like any other source, so equal shares. Pinned Hub snapshot of the published data.
-PROCEDURAL_REPO, PROCEDURAL_REVISION = "tasksource/procedural-extraction", "08b0f8415b2a5043a4a7de09bbef8996d59b7625"
+PROCEDURAL_REPO, PROCEDURAL_REVISION = "tasksource/procedural-extraction", "1837601def7a02132e6e0ff97462b96ae0df80d7"
 PROCEDURAL = ["record_field_extraction", "state_update_extraction", "conditional_list_extraction",
               "log_query_extraction", "typed_mention_extraction", "business_document_extraction",
               "nested_structure_extraction", "html_extraction", "date_range_extraction", "spec_match_extraction",
@@ -255,7 +255,7 @@ pass, as extraction models (e.g. Cloudflare's Clairic) are asked. {rows}
   of proposals and undos, conditional order lists after updates, log queries, typed mentions, business documents
   with amendments, nested configurations with override layers, raw HTML pages, records dated in mixed formats
   within a range, products matching specs in mixed units and number styles, fields asked by role among
-  same-typed look-alikes, values located by section path or table cell, row and condition, and the causes, effects
+  same-typed look-alikes and conditional or policy values, values located by section path or table cell, row and condition, and the causes, effects
   or consequences of an event in narratives and rule sets, at difficulty levels 0 to 4;
   spans and nulls exact by construction.
 - Mostly English, with a small multilingual share: TyDi QA (Arabic, Bengali, Finnish, Korean, Russian, Swahili),

@@ -4,6 +4,10 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource-jev-typed-decisions v2026.10.24.1
+
+- `extraction`: the procedural look-alike field documents now also state conditional or policy values of an asked role ("Late payments may incur a late fee of 1.5% per month."), which are not the answer (procedural-extraction v2026.10.24). Other sources and row counts are unchanged.
+
 ## tasksource/synthetic-extraction v2026.10.24
 
 - First release: 9,829 LLM-written documents across 402 application schemas (domains and document sources), with typed `text`/`list` fields answered by verbatim spans or null; fields kept only when two blind readers of different model families agree with the writer or a judge rules unambiguously (43,189 of 53,090). Splits by schema: 7,670 train, 1,035 validation, 1,124 test rows.
