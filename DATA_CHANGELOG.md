@@ -4,6 +4,10 @@ Changes that affect published data, newest first: one entry per publish, `## <da
 concise bullets on what changed in the data. `tasksource-jev-typed-decisions` releases are tagged on the Hub
 (`load_dataset("tasksource/tasksource-jev-typed-decisions", revision="v2026.10.13")`).
 
+## tasksource/procedural-extraction v2026.10.24
+
+- `lookalike_field_extraction`: an asked role may also appear in a conditional or policy sentence with another value ("If payment is received late, a late fee of 1.5% per month may apply."); that value is not the answer, which stays the stated value or null. New `late_fee` role. Other configs are unchanged.
+
 ## tasksource/procedural-extraction v2026.10.23.2
 
 - `lookalike_field_extraction`, `structure_lookup_extraction`, `relational_span_extraction`: fewer null answers at the higher levels (asked items left out at most 30% of the time instead of 40%, fewer empty table cells); null share at level 4 is now about 30%.
