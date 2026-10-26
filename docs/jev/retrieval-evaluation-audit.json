@@ -1,0 +1,203 @@
+{
+  "checked_on": "2026-10-26",
+  "scope": "Evaluation-only. Live source loads, complete reference/alignment checks, and coarse manual review of 1–3 examples per source. No training rows published.",
+  "reviewer": {
+    "kind": "model",
+    "family": "GPT-6",
+    "exact_variant": "not exposed in session"
+  },
+  "source_revisions": {
+    "AmazonScience/GaRAGe": "c3604d0fa2a169c2d30f893fc0ae701b58604898",
+    "xlangai/BRIGHT": "3066d29c9651a576c8aba4832d249807b181ecae",
+    "jhu-clsp/robust04-instructions": "0e19bc4812d57bd41bb7f3ac6cfec3c9b59ac197",
+    "jhu-clsp/core17-instructions": "d720233bc061d39c6618234123053a5cb8633d9b",
+    "jhu-clsp/news21-instructions": "0aff1fb616d1b9e4a411caf7203dc746c9523907",
+    "github:castorini/ragnarok_data": "7d72285640df36d965b8defd017a137e6f40852e",
+    "github:castorini/anserini-tools": "43add835e20bd66b48f9a640be9bad95a4762d82"
+  },
+  "native_checks": {
+    "bright/biology": {
+      "queries": 103,
+      "corpus": 57359,
+      "missing_gold_ids": 0
+    },
+    "followir/robust04": {
+      "rows": {
+        "queries": 52,
+        "corpus": 47492,
+        "qrels_og": 18465,
+        "qrels_changed": 18465,
+        "top_ranked": 52000
+      },
+      "changed_pairs": 722,
+      "original_grades": {
+        "0.0": 16713,
+        "1.0": 1439,
+        "2.0": 313
+      },
+      "changed_grades": {
+        "0.0": 17435,
+        "1.0": 849,
+        "2.0": 181
+      },
+      "missing_ids": 0
+    },
+    "followir/core17": {
+      "rows": {
+        "queries": 20,
+        "corpus": 19899,
+        "qrels_og": 4740,
+        "qrels_changed": 4740,
+        "top_ranked": 20000
+      },
+      "changed_pairs": 436,
+      "original_grades": {
+        "0.0": 3650,
+        "1.0": 808,
+        "2.0": 282
+      },
+      "changed_grades": {
+        "0.0": 4086,
+        "1.0": 499,
+        "2.0": 155
+      },
+      "missing_ids": 0
+    },
+    "followir/news21": {
+      "rows": {
+        "queries": 32,
+        "corpus": 30921,
+        "qrels_og": 4277,
+        "qrels_changed": 4277,
+        "top_ranked": 32000
+      },
+      "changed_pairs": 669,
+      "original_grades": {
+        "2.0": 635,
+        "8.0": 137,
+        "0.0": 3085,
+        "4.0": 295,
+        "16.0": 125
+      },
+      "changed_grades": {
+        "0.0": 3754,
+        "4.0": 140,
+        "2.0": 269,
+        "8.0": 63,
+        "16.0": 51
+      },
+      "missing_ids": 0
+    },
+    "trec-rag/2025": {
+      "requests": 105,
+      "candidates": 10500,
+      "manual_qrels": 10284,
+      "judged_topics": 22,
+      "baseline_candidates_with_judgments": 1951,
+      "grades": {
+        "2": 3760,
+        "1": 1499,
+        "3": 1318,
+        "4": 88,
+        "0": 3619
+      }
+    }
+  },
+  "garage": {
+    "garage__answer_support": {
+      "rows": 25949,
+      "splits": [
+        "train"
+      ],
+      "labels": {
+        "other evidence": 14934,
+        "yes": 11015
+      }
+    },
+    "garage__evidence_type": {
+      "rows": 25949,
+      "splits": [
+        "train"
+      ],
+      "labels": {
+        "UNKNOWN": 2826,
+        "ANSWER-THE-QUESTION": 11015,
+        "OUTDATED": 2771,
+        "RELATED-INFORMATION": 9337
+      }
+    }
+  },
+  "exclusions": {
+    "garage_blank_evidence_type": 9402,
+    "garage_source_passages": 35351,
+    "followir_synthetic_train": "GPT-generated documents/labels with model filtering, no per-example human verification. Explicitly deferred.",
+    "trec_model_qrels": "UMBRELA and participant predictions are excluded; manual qrels.rag25.test.txt used."
+  },
+  "review_findings": [
+    {
+      "source": "bright/biology",
+      "query_index": 0,
+      "document_id": "insects_attracted_to_light/Phototaxis_4.txt",
+      "finding": "Native gold document discusses phototaxis, an indirect match to the insect/light/heat question. All 103 queries resolve their gold IDs in the matching corpus. Preserve native retrieval judgments; no fabricated negative classifications or assertion that each gold document alone fully answers the query."
+    },
+    {
+      "source": "followir/robust04",
+      "query_id": "305",
+      "document_id": "FT944-15615_1",
+      "grades": [
+        1,
+        0
+      ],
+      "finding": "Recall article on GM truck crashworthiness matches the original question, but the changed instruction explicitly excludes recall articles. Correct original/changed judgment pairing preserved."
+    },
+    {
+      "source": "followir/core17",
+      "query_id": "310",
+      "document_id": "1125613_1",
+      "grades": [
+        1,
+        0
+      ],
+      "finding": "Cancer/electrical-exposure article includes leukemia. The modified instruction explicitly excludes leukemia; matching grade changes to zero."
+    },
+    {
+      "source": "followir/news21",
+      "query_id": "937",
+      "document_id": "00af9842-08bb-11e2-a10c-fa5a255a9258_3",
+      "grades": [
+        2,
+        0
+      ],
+      "finding": "MERS-related article discusses possible animal carriers. Changed instruction explicitly excludes potential animal origins, matching the zero grade. All native scores, including 16, are preserved."
+    },
+    {
+      "source": "trec-rag/2025",
+      "query_id": "14",
+      "grades": [
+        2,
+        3
+      ],
+      "finding": "Two inspected sports-ethics passages address compensation, enhancement and/or diversity in the multi-part sports narrative. Both native graded qrels align with candidate IDs. All qrel query IDs resolve; unjudged candidates remain separate, never converted to grade zero."
+    },
+    {
+      "source": "garage/evidence-type",
+      "sample_id": "3e85c5e3-ac81-484f-bee3-9cba1000169f",
+      "passage_indices": [
+        0,
+        2,
+        10
+      ],
+      "labels": [
+        "UNKNOWN",
+        "ANSWER-THE-QUESTION",
+        "OUTDATED"
+      ],
+      "finding": "Citation indices and native labels survive flattening. Question date is included. Source has subjective or debatable UNKNOWN/OUTDATED assignments; these views expose human category annotations rather than independently verified factual truth. Binary view explicitly asks for the native answer-support category. Answers and citation-use labels are absent from model inputs."
+    }
+  ],
+  "checks": {
+    "offline_suite": "55 passed; retrieval-eval, parked, catalogs, naming, licenses and discovery-history checks",
+    "training_isolation": "No tasks.py, loader discovery or training builder changes; evaluation functions and both garage annotations remain outside list_tasks().",
+    "mirrors": "None; pinned native sources loaded directly without corpus joins or generated labels."
+  }
+}

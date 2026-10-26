@@ -6,13 +6,17 @@ annotation has a REASONS entry and remains available through its normal loader:
     from tasksource import eval_only
     benchmark = eval_only.mmlu
 
+Retrieval bundles are available through load_bright(), load_followir() and
+load_trec_rag_2025(); they keep queries, corpora/candidates and native qrels separate.
+
 They are not included in list_tasks(). Source splits and annotations are retained
 as originally defined; benchmark-specific loader limitations still apply.
 """
 import re
+import json
 import string
 
-from datasets import ClassLabel
+from datasets import ClassLabel, Dataset, DatasetDict, Features, Value, load_dataset
 
 from .access import parse_var_name
 from .metadata import (bigbench_discriminative_english, blimp_hard as blimp_hard_configs,
@@ -259,7 +263,92 @@ cladder = Classification(_cladder_context, "question", "answer", dataset_name="t
     # backdoor-adjustment rows carry no graph at all: identical texts get opposite answers
     pre_process=lambda ds: ds.filter(lambda x: bool(x["reasoning"]["step1"])))
 
+
+# Retrieval benchmarks retain their native corpus and judgments: no synthetic negatives.
+def load_bright(domain='biology'):
+    """BRIGHT evaluation queries (with gold/excluded IDs) and the matching document corpus."""
+    repo='xlangai/BRIGHT'
+    return DatasetDict({key:load_dataset(repo,config,revision=SOURCE_REVISIONS[repo],
+        data_files={domain:f'{config}/{domain}-*.parquet'},split=domain,
+        verification_mode='no_checks')  # The source card describes all twelve domain splits.
+        for key,config in (('queries','examples'),('corpus','documents'))})
+
+
+def load_followir(subset='robust04'):
+    """Human FollowIR evaluation, including original/changed instructions and qrels.
+
+    Scores retain their native grades (News21 is not binary). No synthetic train data.
+    """
+    if subset not in ('robust04','core17','news21'):
+        raise ValueError('FollowIR subset must be robust04, core17 or news21')
+    repo=f'jhu-clsp/{subset}-instructions'
+    return DatasetDict({config:load_dataset(repo,config,revision=SOURCE_REVISIONS[repo],split=split)
+        for config,split in (('queries','queries'),('corpus','corpus'),('qrels_og','test'),
+                            ('qrels_changed','test'),('top_ranked','top_ranked'))})
+
+
+def load_trec_rag_2025():
+    """Official top-100 requests and manual 0–4 test qrels; unjudged candidates stay unjudged."""
+    candidates=SOURCE_REVISIONS['github:castorini/ragnarok_data']
+    judgments=SOURCE_REVISIONS['github:castorini/anserini-tools']
+    return DatasetDict(
+        requests=load_dataset('json',split='test',data_files={'test':
+            f'https://media.githubusercontent.com/media/castorini/ragnarok_data/{candidates}/rag25/'
+            'retrieve_results/MISC/retrieve_results_rankqwen3_32b.rag25_top100.jsonl'}),
+        qrels=load_dataset('csv',split='test',delimiter=' ',
+            column_names=['query_id','iteration','document_id','grade'],
+            features=Features({k:Value('int64' if k=='grade' else 'string')
+                               for k in ('query_id','iteration','document_id','grade')}),
+            data_files={'test':f'https://raw.githubusercontent.com/castorini/anserini-tools/{judgments}/qrels/qrels.rag25.test.txt'}))
+
+
+GARAGE_LABELS = ('ANSWER-THE-QUESTION','RELATED-INFORMATION','UNKNOWN','OUTDATED')
+
+
+def _garage_records(row):
+    columns=('evidence_correct','evidence_relevant','evidence_cited')
+    if any(len(row[k])!=len(row['grounding']) for k in columns):
+        raise ValueError(f"GaRAGe passage/annotation length mismatch: {row['sample_id']}")
+    for i,passage in enumerate(row['grounding']):
+        label=row['evidence_correct'][i]
+        if not label:continue  # Blank annotations are not negative judgments.
+        if label not in GARAGE_LABELS:raise ValueError(f'Unknown GaRAGe evidence type: {label}')
+        citations=[(k,v) for k,v in passage.items() if k.startswith('cite_') and v is not None]
+        if len(citations)!=1 or not citations[0][1].strip():
+            raise ValueError(f"GaRAGe requires exactly one passage text: {row['sample_id']}:{i}")
+        citation,text=citations[0]
+        metadata=dict(id=f"{row['sample_id']}:{i}",sample_id=row['sample_id'],passage_index=i,
+            split_group_id=row['sample_id'],source_split='train',citation=citation,
+            **{k:row[k][i] for k in ('evidence_relevant','evidence_cited')},
+            passage_date=passage.get('date'),passage_age=passage.get('age'),provider=passage.get('provider'),
+            **{k:v for k,v in row.items() if k.startswith('question_') and k!='question'})
+        date=passage.get('date')
+        context=f"Question date: {row['question_date']}\nQuestion: {row['question']}"
+        if date and date!='not defined':context+=f"\nPassage date: {date}"
+        yield dict(sentence1=context+f'\nPassage: {text.strip()}',labels=label,
+            metadata=json.dumps(metadata,ensure_ascii=False,sort_keys=True))
+
+
+def _garage_rows(dataset):
+    features=Features({k:Value('string') for k in ('sentence1','labels','metadata')})
+    return DatasetDict({split:Dataset.from_list([r for row in rows for r in _garage_records(row)],features=features)
+                        for split,rows in dataset.items()})
+
+
+garage__answer_support = Classification('sentence1',labels=lambda r:'yes' if r['labels']=='ANSWER-THE-QUESTION' else 'other evidence',
+    dataset_name='AmazonScience/GaRAGe',task_id='garage/answer-support',complete_splits=False,
+    pre_process=_garage_rows,metadata='metadata',label_values={'yes':'yes','other evidence':'other evidence'},
+    question='Is this passage annotated as answering the question, rather than related, unknown or outdated evidence?',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['AmazonScience/GaRAGe']})
+garage__evidence_type = Classification('sentence1',labels='labels',
+    dataset_name='AmazonScience/GaRAGe',task_id='garage/evidence-type',complete_splits=False,
+    pre_process=_garage_rows,metadata='metadata',label_values={label:label for label in GARAGE_LABELS},
+    question='Classify the passage as answering the question, related information, unknown, or outdated at the question date.',
+    load_dataset_kwargs={'revision':SOURCE_REVISIONS['AmazonScience/GaRAGe']})
+
 REASONS = {
+    'garage__answer_support': 'GaRAGe is a human-annotated RAG evaluation benchmark; the Hub train split is not a designed training partition',
+    'garage__evidence_type': 'GaRAGe is a human-annotated RAG evaluation benchmark; the Hub train split is not a designed training partition',
     'abstrct_glaucoma': 'AbstRCT cross-domain transfer test set (Mayer et al. train on neoplasm only); no training abstracts',
     'abstrct_mixed': 'AbstRCT cross-domain transfer test set (Mayer et al. train on neoplasm only); no training abstracts',
     **{f'mrqa_{name}': 'MRQA out-of-domain subset has source test rows only; no genuine training split'

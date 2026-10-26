@@ -1,6 +1,13 @@
 """Reviewed source snapshots; keep opaque revision IDs out of task annotations."""
 
 SOURCE_REVISIONS = {
+    "AmazonScience/GaRAGe": "c3604d0fa2a169c2d30f893fc0ae701b58604898",
+    "xlangai/BRIGHT": "3066d29c9651a576c8aba4832d249807b181ecae",
+    "jhu-clsp/robust04-instructions": "0e19bc4812d57bd41bb7f3ac6cfec3c9b59ac197",
+    "jhu-clsp/core17-instructions": "d720233bc061d39c6618234123053a5cb8633d9b",
+    "jhu-clsp/news21-instructions": "0aff1fb616d1b9e4a411caf7203dc746c9523907",
+    "github:castorini/ragnarok_data": "7d72285640df36d965b8defd017a137e6f40852e",
+    "github:castorini/anserini-tools": "43add835e20bd66b48f9a640be9bad95a4762d82",
     'bigbio/pubmed_qa': '13a7d15476092370cbabb6475390e7e69b74d2f2',
     'extraordinarylab/harvey-ner': 'd96281eeeed9fbc4051dce043647f66514d6f85c',
 

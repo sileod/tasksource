@@ -3488,5 +3488,136 @@
       "https://gitlab.com/tomaye/abstrct/-/blob/f856f1ca7514caa4094194b5623e84c159d9bf1d/LICENSE"
     ],
     "reconsider_if": "The publisher releases training abstracts for this domain."
+  },
+  {
+    "name": "FollowIR synthetic training",
+    "scope": "dataset",
+    "status": "deferred",
+    "reason_code": "unverified_model_labels",
+    "reason": "GPT-3.5 generated documents and labels, filtered by Mistral rather than verified by human annotators. User requested human evaluation only; native human FollowIR sets are available in eval_only.py.",
+    "evidence": [
+      "https://huggingface.co/datasets/jhu-clsp/FollowIR-train",
+      "https://github.com/orionw/FollowIR"
+    ],
+    "checked_on": "2026-10-26",
+    "reconsider_if": "Per-example human or independently reliable verification is provided.",
+    "huggingface": [
+      "jhu-clsp/FollowIR-train"
+    ],
+    "github": [
+      "orionw/FollowIR"
+    ],
+    "papers": [
+      "arxiv:2403.15246"
+    ]
+  },
+  {
+    "name": "garage/answer-support",
+    "annotation": "tasksource.eval_only.garage__answer_support",
+    "scope": "task",
+    "tasks": [
+      "garage/answer-support"
+    ],
+    "huggingface": [
+      "AmazonScience/GaRAGe"
+    ],
+    "github": [],
+    "papers": [
+      "arxiv:2506.07671"
+    ],
+    "status": "eval_only",
+    "reason_code": "evaluation_only",
+    "reason": "GaRAGe is a human-annotated RAG evaluation benchmark; the Hub train split is not a designed training partition",
+    "checked_on": "2026-10-26",
+    "evidence": [
+      "https://huggingface.co/datasets/AmazonScience/GaRAGe"
+    ],
+    "reconsider_if": "A separately designed training partition is released and benchmark overlap is checked."
+  },
+  {
+    "name": "garage/evidence-type",
+    "annotation": "tasksource.eval_only.garage__evidence_type",
+    "scope": "task",
+    "tasks": [
+      "garage/evidence-type"
+    ],
+    "huggingface": [
+      "AmazonScience/GaRAGe"
+    ],
+    "github": [],
+    "papers": [
+      "arxiv:2506.07671"
+    ],
+    "status": "eval_only",
+    "reason_code": "evaluation_only",
+    "reason": "GaRAGe is a human-annotated RAG evaluation benchmark; the Hub train split is not a designed training partition",
+    "checked_on": "2026-10-26",
+    "evidence": [
+      "https://huggingface.co/datasets/AmazonScience/GaRAGe"
+    ],
+    "reconsider_if": "A separately designed training partition is released and benchmark overlap is checked."
+  },
+  {
+    "name": "BRIGHT",
+    "scope": "dataset",
+    "tasks": [],
+    "huggingface": [
+      "xlangai/BRIGHT"
+    ],
+    "github": [],
+    "papers": [
+      "arxiv:2407.12883"
+    ],
+    "status": "eval_only",
+    "reason_code": "evaluation_only",
+    "reason": "Reasoning-intensive retrieval benchmark without a designated training split; native retrieval evaluation available through eval_only.load_bright.",
+    "checked_on": "2026-10-26",
+    "evidence": [
+      "docs/retrieval-evaluation.md"
+    ],
+    "reconsider_if": "A genuine training partition is released and benchmark overlap is checked."
+  },
+  {
+    "name": "FollowIR human evaluation",
+    "scope": "dataset",
+    "tasks": [],
+    "huggingface": [
+      "jhu-clsp/robust04-instructions",
+      "jhu-clsp/core17-instructions",
+      "jhu-clsp/news21-instructions"
+    ],
+    "github": [
+      "orionw/FollowIR"
+    ],
+    "papers": [
+      "arxiv:2403.15246"
+    ],
+    "status": "eval_only",
+    "reason_code": "evaluation_only",
+    "reason": "Human-judged Robust04/Core17/News21 instruction-retrieval test sets; native original/changed judgments available through eval_only.load_followir. Synthetic training is separately deferred.",
+    "checked_on": "2026-10-26",
+    "evidence": [
+      "docs/retrieval-evaluation.md"
+    ],
+    "reconsider_if": "A genuine training partition is released and benchmark overlap is checked."
+  },
+  {
+    "name": "TREC RAG 2025",
+    "scope": "dataset",
+    "tasks": [],
+    "huggingface": [],
+    "github": [
+      "castorini/ragnarok_data",
+      "castorini/anserini-tools"
+    ],
+    "papers": [],
+    "status": "eval_only",
+    "reason_code": "evaluation_only",
+    "reason": "TREC test benchmark with no dedicated train split; organizer top-100 requests and manual graded qrels available through eval_only.load_trec_rag_2025.",
+    "checked_on": "2026-10-26",
+    "evidence": [
+      "docs/retrieval-evaluation.md"
+    ],
+    "reconsider_if": "A genuine training partition is released and benchmark overlap is checked."
   }
 ]
